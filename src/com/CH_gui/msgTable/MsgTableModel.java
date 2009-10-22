@@ -1,0 +1,944 @@
+/*
+ * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Mississauga, Ontario, Canada.
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Development Team ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Development Team.
+ */
+
+package com.CH_gui.msgTable;
+
+import java.util.*;
+import java.sql.Timestamp;
+
+import com.CH_co.monitor.*;
+import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.*;
+import com.CH_co.util.*;
+import com.CH_co.trace.Trace;
+
+import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.records.*;
+import com.CH_cl.service.records.filters.*;
+
+import com.CH_gui.addressBook.*;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.list.*;
+import com.CH_gui.msgs.*;
+import com.CH_gui.recycleTable.*;
+import com.CH_gui.table.*;
+import com.CH_gui.postTable.PostTableCellRenderer;
+
+import com.CH_guiLib.util.HTML_utils;
+
+/** 
+ * <b>Copyright</b> &copy; 2001-2009
+ * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+ * CryptoHeaven Development Team.
+ * </a><br>All rights reserved.<p>
+ *
+ * Class Description:
+ *
+ *
+ * Class Details:
+ *
+ *
+ * <b>$Revision: 1.54 $</b>
+ * @author  Marcin Kurzawa
+ * @version
+ */
+public class MsgTableModel extends RecordTableModel {
+
+  // FolderShareIds for which records have been fetched already.
+  private static final Vector fetchedIds = new Vector(); // default non-filter type (full or brief depending on folder type)
+  private static final Vector fetchedIdsFull = new Vector();
+
+  private MsgLinkListener linkListener;
+  private MsgDataListener dataListener;
+
+  // mode to use a message renderer, sent message renderer, or posting renderer for this model's data
+  private int messageMode;
+  public static final int MODE_MSG = 0;
+  public static final int MODE_MSG_INBOX = 1;
+  public static final int MODE_MSG_SENT = 2;
+  public static final int MODE_MSG_SPAM = 3;
+  public static final int MODE_DRAFTS = 4;
+  public static final int MODE_POST = 5;
+  public static final int MODE_CHAT = 6;
+  public static final int MODE_ADDRESS = 7;
+  public static final int MODE_WHITELIST = 8;
+
+  public static final int COLUMN_INDEX__FROM = 3; // reflects the model index of "From" column
+  public static final int COLUMN_INDEX__POSTING = 5; // reflects the model index of "Posting" column
+  public static final int COLUMN_INDEX__SENT = 6; // reflects the model index of "Sent" column
+
+  private static String STR_PRIORITY = com.CH_gui.lang.Lang.rb.getString("column_Priority");
+  private static String STR_SECURE_LOCK = com.CH_gui.lang.Lang.rb.getString("column_Secure_Lock");
+  private static String STR_ATTACHMENT = com.CH_gui.lang.Lang.rb.getString("column_Attachment");
+  private static String STR_FLAG = com.CH_gui.lang.Lang.rb.getString("column_Flag");
+
+  private static String STR_FROM = com.CH_gui.lang.Lang.rb.getString("column_From");
+
+  private static String STR_TO = com.CH_gui.lang.Lang.rb.getString("column_To");
+  private static String STR_E_MAIL_ADDRESS = com.CH_gui.lang.Lang.rb.getString("column_E_Mail_Address");
+
+  private static String STR_SUBJECT = com.CH_gui.lang.Lang.rb.getString("column_Subject");
+  private static String STR_POSTING = com.CH_gui.lang.Lang.rb.getString("column_Posting");
+  private static String STR_MESSAGE = com.CH_gui.lang.Lang.rb.getString("column_Message");
+  private static String STR_NAME = com.CH_gui.lang.Lang.rb.getString("column_Name");
+
+  private static String STR_SENT = com.CH_gui.lang.Lang.rb.getString("column_Sent");
+  private static String STR_LINK_ID = com.CH_gui.lang.Lang.rb.getString("column_Link_ID");
+  private static String STR_DATA_ID = com.CH_gui.lang.Lang.rb.getString("column_Data_ID");
+  private static String STR_FETCH_COUNT = com.CH_gui.lang.Lang.rb.getString("column_Fetch_count");
+  private static String STR_CREATED = com.CH_gui.lang.Lang.rb.getString("column_Created");
+  private static String STR_DELIVERED = com.CH_gui.lang.Lang.rb.getString("column_Delivered");
+  private static String STR_EXPIRY = com.CH_gui.lang.Lang.rb.getString("column_Expiration");
+  private static String STR_PASSWORD = com.CH_gui.lang.Lang.rb.getString("column_Password");
+  private static String STR_UPDATED = com.CH_gui.lang.Lang.rb.getString("column_Updated");
+  private static String STR_SIZE_ON_DISK = com.CH_gui.lang.Lang.rb.getString("column_Size_on_Disk");
+  private static String STR_IN_REPLY_TO = com.CH_gui.lang.Lang.rb.getString("column_In_reply_to");
+
+  private static String STR_BUSINESS_PHONE = com.CH_gui.lang.Lang.rb.getString("column_Business_Phone");
+  private static String STR_HOME_PHONE = com.CH_gui.lang.Lang.rb.getString("column_Home_Phone");
+
+  private static String STR_TIP_MESSAGE_PRIORITY = com.CH_gui.lang.Lang.rb.getString("columnTip_Message_Priority");
+  private static String STR_TIP_MESSAGE_ATTACHMENTS = com.CH_gui.lang.Lang.rb.getString("columnTip_Message_Attachments");
+  private static String STR_TIP_NEW_OLD_STATUS_FLAG = com.CH_gui.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag");
+  private static String STR_TIP_PASSWORD = com.CH_gui.lang.Lang.rb.getString("columnTip_Password");
+  private static String STR_TIP_SECURE_LOCK = com.CH_gui.lang.Lang.rb.getString("columnTip_Secure_Lock");
+
+  static final ColumnHeaderData[] columnHeaderDatas = new ColumnHeaderData[] {
+      // mail
+      new ColumnHeaderData(new Object[][]
+      { { null, null, null, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null},
+        { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+        { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(3), new Integer(6) }, // narrow list columns
+          { new Integer(-106) }
+        }),
+      // mail Inbox
+      new ColumnHeaderData(new Object[][]
+      { { null, null, null, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null},
+        { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+        { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(15), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(15), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(3), new Integer(6) }, // narrow list columns
+          { new Integer(-106) }
+        }),
+
+      // mail sent
+      new ColumnHeaderData(new Object[][]
+        { { null, null, null, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null },
+          { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+          { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(4), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(4), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(4), new Integer(6) }, // narrow list columns
+          { new Integer(-106) }
+        }),
+      // mail spam
+      new ColumnHeaderData(new Object[][]
+      { { null, null, null, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null},
+        { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+        { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(3), new Integer(6) }, // narrow list columns
+          { new Integer(-106) }
+        }),
+      // Drafts
+      new ColumnHeaderData(new Object[][]
+        { { null, null, null, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null },
+          { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_SUBJECT, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+          { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(4), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(2), new Integer(0), new Integer(4), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(4), new Integer(6) }, // narrow list columns
+          { new Integer(-106) }
+        }),
+      // postings
+      new ColumnHeaderData(new Object[][]
+        { { null, null, null, STR_FROM, STR_TO, STR_POSTING, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null },
+          { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_POSTING, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+          { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(320), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(250), new Integer(400), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 60), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { }, // no short list
+          { new Integer(-106) }
+        }),
+      // chat
+      new ColumnHeaderData(new Object[][]
+        { { null, null, null, STR_FROM, STR_TO, STR_MESSAGE, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, null, null, null, STR_EXPIRY, null },
+          { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_MESSAGE, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, null, null, null, STR_EXPIRY, STR_PASSWORD },
+          { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.PRIORITY_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(520), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(520), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(520), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(200), new Integer(400), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 60), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5) }, // wide list columns
+          { }, // no short list
+          { new Integer(6) } // old on the top, new on the bottom
+        }),
+      // Addresses
+      new ColumnHeaderData(new Object[][]
+        { { null, null, null, STR_FROM, STR_TO, STR_NAME, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, STR_E_MAIL_ADDRESS, STR_BUSINESS_PHONE, STR_HOME_PHONE, STR_EXPIRY, null },
+          { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_NAME, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, STR_E_MAIL_ADDRESS, STR_BUSINESS_PHONE, STR_HOME_PHONE, STR_EXPIRY, STR_PASSWORD },
+          { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.EMAIL_SYMBOL_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(150), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), new Integer(150), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(150), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), new Integer(150), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(150), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), new Integer(150), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), new Integer(  0), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 70), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), new Integer(120), new Integer(110), new Integer(110), new Integer(120), new Integer(16) },
+          { new Integer(5), new Integer(1), new Integer(17) }, // current list columns
+          { new Integer(2), new Integer(0), new Integer(5), new Integer(1), new Integer(16), new Integer(17), new Integer(18) }, // wide list columns
+          { new Integer(5), new Integer(1), new Integer(17) }, // narrow list columns
+          { new Integer(5), new Integer(16), new Integer(6) }
+        }),
+      // WhiteList
+      new ColumnHeaderData(new Object[][]
+        { { null, null, null, STR_FROM, STR_TO, STR_NAME, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, null, STR_E_MAIL_ADDRESS, STR_BUSINESS_PHONE, STR_HOME_PHONE, STR_EXPIRY, null },
+          { STR_PRIORITY, STR_ATTACHMENT, STR_FLAG, STR_FROM, STR_TO, STR_NAME, STR_SENT, STR_LINK_ID, STR_DATA_ID, STR_FETCH_COUNT, STR_CREATED, STR_UPDATED, STR_DELIVERED, STR_SIZE_ON_DISK, STR_IN_REPLY_TO, STR_SECURE_LOCK, STR_E_MAIL_ADDRESS, STR_BUSINESS_PHONE, STR_HOME_PHONE, STR_EXPIRY, STR_PASSWORD },
+          { STR_TIP_MESSAGE_PRIORITY, STR_TIP_MESSAGE_ATTACHMENTS, STR_TIP_NEW_OLD_STATUS_FLAG, null, null, null, null, null, null, null, null, null, null, null, null, STR_TIP_SECURE_LOCK, STR_TIP_PASSWORD },
+          { new Integer(ImageNums.PRIORITY_SMALL), new Integer(ImageNums.ATTACH_SMALL), new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null, null, null, null, null, null, null, new Integer(ImageNums.LOCK_CLOSED_BLACK_SMALL), new Integer(ImageNums.EMAIL_SYMBOL_SMALL), null, null, new Integer(ImageNums.STOPWATCH16), new Integer(ImageNums.KEY16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(150), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), new Integer(150), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(150), TIMESTAMP_PRL, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRL, TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 95), new Integer( 60), new Integer(16), new Integer(150), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(150), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), new Integer(150), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer(  0), new Integer(  0), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), new Integer(  0), new Integer(150), new Integer(150), new Integer(130), new Integer(16) },
+          { new Integer(16), new Integer(16), new Integer(16), new Integer( 70), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), new Integer(120), new Integer(120), new Integer(120), new Integer(120), new Integer(16) },
+          { new Integer(5) }, // current list columns
+          { new Integer(2), new Integer(5), new Integer(16) }, // wide list columns
+          { new Integer(5) }, // narrow list columns
+          { new Integer(5), new Integer(16) }
+        }),
+  };
+
+
+
+  /**
+   * Creates new MsgTableModel
+   * @param folderId specifies the folder for which this table will display data.
+   * @param mode can either be MODE_MSG, MODE_MSG_SENT, MODE_POST, MODE_CHAT
+   */
+  public MsgTableModel(Long folderId, int mode) {
+    super(columnHeaderDatas[mode], new FixedFilter(false));
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "MsgTableModel()");
+    messageMode = mode;
+    if (folderId != null)
+      initData(folderId);
+    if (trace != null) trace.exit(MsgTableModel.class);
+  }
+
+  public int getMode() {
+    return messageMode;
+  }
+  public boolean isModeAddr() {
+    return messageMode == MODE_ADDRESS || messageMode == MODE_WHITELIST;
+  }
+  public boolean isModeMsgBody() {
+    return messageMode == MODE_CHAT || messageMode == MODE_POST;
+  }
+
+  /**
+   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+   * user switches focus to another folder...
+   * This vector should also be cleared when users are switched...
+   */
+  public Vector getCachedFetchedFolderIDs() {
+    return fetchedIds;
+  }
+
+  /**
+   * Sets auto update mode by listening on the cache contact updates.
+   */
+  public synchronized void setAutoUpdate(boolean flag) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "setAutoUpdate(boolean flag)");
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    if (flag) {
+      if (linkListener == null) {
+        linkListener = new MsgLinkListener();
+        cache.addMsgLinkRecordListener(linkListener);
+        dataListener = new MsgDataListener();
+        cache.addMsgDataRecordListener(dataListener);
+      }
+    } else {
+      if (linkListener != null) {
+        cache.removeMsgLinkRecordListener(linkListener);
+        linkListener = null;
+        cache.removeMsgDataRecordListener(dataListener);
+        dataListener = null;
+      }
+    }
+    if (trace != null) trace.exit(MsgTableModel.class);
+  }
+
+
+  /**
+   * Initializes the model setting the specified folderId as its main variable
+   */
+  public synchronized void initData(Long folderId) {
+    initData(folderId, false);
+  }
+  public synchronized void initData(Long folderId, boolean forceSwitch) {
+    FolderPair folderPair = getParentFolderPair();
+    boolean isChatting = false;
+    if (folderPair != null && folderPair.getFolderRecord() != null && folderPair.getFolderRecord().isChatting())
+      isChatting = true;
+    // chatting folders force reload so that it will scroll to the bottom...
+    boolean effectiveForceSwitch = forceSwitch || isChatting;
+    if (forceSwitch || effectiveForceSwitch || folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
+      setFilter(folderId != null ? (RecordFilter) new MsgFilter(Record.RECORD_TYPE_FOLDER, folderId) : (RecordFilter) new FixedFilter(false));
+      switchData(folderId, effectiveForceSwitch);
+      refreshData(folderId, false);
+    }
+  }
+
+  /**
+   * Initializes the model setting the specified folderId as its main variable
+   */
+  private synchronized void switchData(Long folderId, boolean forceSwitch) {
+    FolderPair folderPair = getParentFolderPair();
+    if (forceSwitch || folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
+
+      removeData();
+
+      if (folderId != null) {
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        FolderShareRecord shareRec = cache.getFolderShareRecordMy(folderId, true);
+        FolderRecord folderRec = cache.getFolderRecord(folderId);
+
+        if (shareRec != null && folderRec != null) {
+
+          folderPair = new FolderPair(shareRec, folderRec);
+          setParentFolderPair(folderPair);
+          Long shareId = folderPair.getFolderShareRecord().shareId;
+
+          // add all messages for this folder
+          MsgLinkRecord[] linkRecords = cache.getMsgLinkRecordsForFolder(folderId);
+          if (linkRecords != null && linkRecords.length > 0) {
+            updateData(linkRecords);
+          }
+        }
+      } // end if folderId != null
+      else
+        setParentFolderPair(null);
+    }
+  }
+
+
+  /**
+   * @param fetch true if data should be refetched from the database.
+   */
+  public synchronized void refreshData(boolean forceFetch) {
+    FolderPair folderPair = getParentFolderPair();
+    if (folderPair != null) {
+      refreshData(folderPair.getId(), forceFetch);
+    }
+  }
+
+  /**
+   * Forces a refresh of data displayed even if its already displaying the specified folder data.
+   */
+  private synchronized void refreshData(Long folderId, boolean forceFetch) {
+    if (folderId != null) {
+      FolderShareRecord shareRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(folderId, true);
+      if (shareRec != null) {
+        Long shareId = shareRec.shareId;
+        // fetch the messages for this folder
+        fetchMsgs(shareId, folderId, forceFetch);
+      }
+    }
+  }
+
+  public Collection getSearchableCharSequencesFor(Object searchableObj) {
+    return getSearchableCharSequencesFor(searchableObj, true);
+  }
+  public Collection getSearchableCharSequencesFor(Object searchableObj, boolean includeMsgBody) {
+    if (searchableObj instanceof Record)
+      return RecycleTableModel.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
+    else
+      return null;
+  }
+
+  public synchronized Object getValueAtRawColumn(Record record, int rawColumn, boolean forSortOnly) {
+    Object value = null;
+
+    if (record instanceof MsgLinkRecord) {
+      MsgLinkRecord msgLink = (MsgLinkRecord) record;
+
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      MsgDataRecord msgData = forSortOnly ? cache.getMsgDataRecordNoTrace(msgLink.msgId) : cache.getMsgDataRecord(msgLink.msgId);
+
+      switch (rawColumn) {
+        // importance
+        case 0:
+          if (msgData != null) {
+            if (forSortOnly) {
+              short imp = msgData.importance.shortValue();
+              if (msgData.dateExpired != null) {
+                value = new Integer(9);
+              } else if (MsgDataRecord.isImpFYI(imp)) {
+                value = new Integer(1);
+              } else if (MsgDataRecord.isImpHigh(imp)) {
+                value = new Integer(5);
+              } else if (MsgDataRecord.isImpSystem(imp)) {
+                value = new Integer(7);
+              } else if (MsgDataRecord.isImpNormal(imp)) {
+                value = new Integer(3);
+              }
+            } else {
+              value = msgData.importance;
+            }
+          }
+          break;
+        // attachments
+        case 1:
+          if (msgData != null) {
+            int numOfAttachments = 0;
+            if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
+              numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
+              // if regular email, don't show serialized email as attachment in the table...
+              if (msgData.isEmail()) {
+                numOfAttachments --;
+              }
+            }
+            value = new Short((short) numOfAttachments);
+          }
+          break;
+        // Flag
+        case 2:
+          StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+          if (stat != null) {
+            value = stat.getFlag();
+          }
+          break;
+        // From
+        case 3:
+          if (msgData != null) {
+            String fromEmailAddress = msgData.getFromEmailAddress();
+            if (msgData.isEmail() || fromEmailAddress != null) {
+              value = fromEmailAddress;
+            } else {
+              if (forSortOnly) {
+                value = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+              } else {
+                value = msgData.senderUserId;
+              }
+            }
+          }
+          break;
+        // To
+        case 4:
+          if (msgData != null) {
+            if (forSortOnly) {
+              String sortStr = null;
+              // just get the second token because it is usually the first recipient
+              Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);
+              for (int i=0; sortStr==null && i<recipients.length; i++)
+                for (int k=0; sortStr==null && k<recipients[i].length; k++)
+                  if (recipients[i][k] != null)
+                    sortStr = ListRenderer.getRenderedText(recipients[i][k]);
+              value = sortStr;
+            } else {
+              value = msgData.getRecipients();
+            }
+          }
+          break;
+        // Subject or Posting or Address Name
+        case 5:
+          value = getSubjectColumnValue(MsgTableModel.this, msgLink, msgData, forSortOnly, cache);
+          break;
+        // Sent Date
+        case 6: value = msgLink.dateCreated;
+          break;
+        // Link ID
+        case 7: value = msgLink.msgLinkId;
+          break;
+        // Msg ID
+        case 8: value = msgLink.msgId;
+          break;
+        // Fetch count
+        case 9: value = msgLink.status;
+          break;
+        // Created
+        case 10:
+          if (msgData != null)
+            value = msgData.dateCreated;
+          break;
+        // Updated
+        case 11: value = msgLink.dateUpdated;
+          break;
+        // Delivered
+        case 12: value = msgLink.dateDelivered;
+          break;
+        // Size on Disk
+        case 13:
+          if (msgData != null)
+            value = msgData.recordSize;
+          break;
+        // In reply to
+        case 14:
+          if (msgData != null)
+            value = msgData.replyToMsgId;
+          break;
+        // Secure Lock
+        case 15:
+          if (msgData != null)
+            value = msgData.importance;
+          break;
+        // E-mail Address
+        case 16:
+          if (msgData != null)
+            value = msgData.email;
+          break;
+        // Business Phone
+        case 17:
+          if (msgData != null) {
+            String phone = "";
+            //value = "";
+            if (msgData.phoneB != null && msgData.phoneB.length() > 0)
+              phone = msgData.phoneB;
+            // alternatively if table has no Home Phone column, append it on new line
+            if (getColumnHeaderData().convertRawColumnToModel(18) == -1 && msgData.phoneH != null && msgData.phoneH.length() > 0) {
+              if (phone.length() > 0)
+                phone = "<html>" + phone + "<br>h: " + msgData.phoneH + "</html>";
+              else
+                phone = "h: " + msgData.phoneH;
+            }
+            value = phone;
+          }
+          break;
+        // Home Phone
+        case 18:
+          if (msgData != null) {
+            String phone = "";
+            if (msgData.phoneH != null && msgData.phoneH.length() > 0)
+              phone = msgData.phoneH;
+            // alternatively if table has no Business Phone column, append it on new line
+            if (getColumnHeaderData().convertRawColumnToModel(17) == -1 && msgData.phoneB != null && msgData.phoneB.length() > 0) {
+              if (phone.length() > 0)
+                phone = "<html>" + phone + "<br>b: " + msgData.phoneB + "</html>";
+              else
+                phone = "b: " + msgData.phoneB;
+            }
+            value = phone;
+          }
+          break;
+        // Expiration
+        case 19:
+          if (msgData != null)
+            value = msgData.dateExpired;
+          break;
+        // Password
+        case 20:
+          if (msgData != null)
+            value = Boolean.valueOf(msgData.bodyPassHash != null);
+          break;
+      }
+
+    }
+
+    return value;
+  }
+
+  public static Object getSubjectColumnValue(MsgTableModel model, MsgLinkRecord msgLink, MsgDataRecord msgData, boolean forSortOnly, FetchedDataCache cache) {
+    Object value = null;
+    String text = null;
+    if (msgData != null) {
+      if (msgData.isTypeAddress()) {
+        if (forSortOnly) {
+          if (model.getColumnHeaderData().convertRawColumnToModel(16) == -1)
+            text = msgData.fileAs + msgData.email;
+          else
+            text = msgData.fileAs;
+        } else {
+          if (model.messageMode == MODE_ADDRESS || model.messageMode == MODE_WHITELIST) {
+            value = msgData.fileAs;
+          } else if (model.messageMode == MODE_CHAT || model.messageMode == MODE_POST) {
+            value = new StringBuffer("<b>" + msgData.fileAs + "</b>" + msgData.parseAddressBody(true, true));
+          } else {
+            value = msgData.fileAs;
+            if (!msgData.fileAs.equals(msgData.name))
+              value = "" + value + " ("+msgData.name+")";
+            if (msgData.email != null)
+              value = "" + value + " <"+msgData.email+">";
+          }
+        }
+      } else if (model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
+        // message table with subject line only
+        text = msgData.getSubject();
+      } else if (forSortOnly) {
+        text = msgData.getSubject() + msgData.getText();
+      } else {
+        text = Misc.encodePlainIntoHtml(msgData.getSubject());
+        String postRenderingCache = msgLink.getPostRenderingCache();
+        if (postRenderingCache != null) {
+          value = new StringBuffer(postRenderingCache);
+        } else {
+          String messageText = msgData.getText();
+          boolean isHTML = msgData.isHtmlMail();
+          StringBuffer sb = new StringBuffer();
+
+          sb.append(MsgPanelUtils.HTML_START);
+
+          boolean toAddFrom = false;
+          boolean toAddSent = false;
+
+          Record fromRec = null;
+          // if table has no 'From' column prepend it to the body
+          if (model.getColumnHeaderData().convertRawColumnToModel(3) == -1 && msgData != null) {
+            fromRec = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
+            if (fromRec != null) {
+              toAddFrom = true;
+            }
+          }
+
+          // if table has no 'Sent' column prepend it to the body
+          if (model.getColumnHeaderData().convertRawColumnToModel(6) == -1) {
+            toAddSent = true;
+          }
+
+          if (toAddFrom || toAddSent) {
+            //sb.append("<SMALL><FONT COLOR=#666666>");
+            sb.append(MsgPanelUtils.HTML_FONT_START);
+            sb.append("<FONT COLOR=#666666 size='-2'>");
+          }
+
+          if (toAddFrom) {
+            String name = null;
+            if (fromRec instanceof UserRecord && fromRec.getId().equals(cache.getMyUserId()))
+              name = ((UserRecord) fromRec).handle;
+            else
+              name = ListRenderer.getRenderedText(fromRec);
+            sb.append(name);
+          }
+
+          if (toAddSent) {
+            if (toAddFrom)
+              sb.append(' ');
+            sb.append(Misc.getFormattedDate(msgLink.dateCreated, false));
+          }
+
+          if (toAddFrom || toAddSent) {
+            //sb.append("</SMALL></FONT> ");
+            sb.append("</FONT> ");
+            sb.append(MsgPanelUtils.HTML_FONT_END);
+          }
+
+          sb.append(MsgPanelUtils.HTML_FONT_START);
+
+          boolean subjectAppended = false;
+          // append subject
+          if (text != null && text.length() > 0) {
+            sb.append("<b>");
+            sb.append(text);
+            sb.append("</b> ");
+            subjectAppended = true;
+          }
+          // append body
+          if (messageText != null && messageText.length() > 0) {
+            // prepare message text
+            if (!isHTML) {
+              boolean textProcessed = false;
+              // check for short codes
+              if (messageText.length() == 4) {
+                String formated = MsgTypeArea.formatShortCode(messageText);
+                if (formated != null) {
+                  messageText = formated;
+                  textProcessed = true;
+                }
+              }
+              // If it is a PLAIN mail, then convert special characters <>& characters to entities.
+              if (!textProcessed)
+                messageText = msgData.getEncodedHTMLData();
+            } else {
+              // move the BODY tag right after the HTML tag...
+              messageText = HTML_utils.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true);
+              int iBody1 = messageText.indexOf("<body");
+              if (iBody1 < 0)
+                iBody1 = messageText.indexOf("<BODY");
+              int iBody2 = messageText.indexOf('>', iBody1);
+              if (iBody1 >= 0 && iBody2 > iBody1) {
+                sb.insert("<html>".length(), messageText.substring(iBody1, iBody2 + ">".length()));
+                messageText = messageText.substring(iBody2 + ">".length());
+              }
+            }
+            // skip the unnecessary line break if no subject was added
+            if (subjectAppended) {
+              sb.append("<br>");
+            }
+            sb.append(messageText);
+          }
+          sb.append(MsgPanelUtils.HTML_FONT_END);
+          sb.append(MsgPanelUtils.HTML_END);
+          value = sb;
+          msgLink.setPostRenderingCache(sb.toString());
+        }
+      }
+    } else {
+      text = "";
+    }
+    if (value == null)
+      value = text;
+    return value;
+  }
+
+  public RecordTableCellRenderer createRenderer() {
+    if (messageMode == MODE_MSG || messageMode == MODE_MSG_INBOX || messageMode == MODE_MSG_SPAM)
+      return new MsgTableCellRenderer();
+    else if (messageMode == MODE_MSG_SENT)
+      return new MsgSentTableCellRenderer();
+    else if (messageMode == MODE_DRAFTS)
+      return new MsgDraftsTableCellRenderer();
+    else if (messageMode == MODE_POST || messageMode == MODE_CHAT)
+      return new PostTableCellRenderer();
+    else if (messageMode == MODE_ADDRESS || messageMode == MODE_WHITELIST)
+      return new AddressTableCellRenderer();
+    else if (true)
+      throw new IllegalStateException("Don't know how to handle messageMode " + messageMode);
+    return null;
+  }
+
+  private boolean isFilteringBodies() {
+    RecordFilter filter = getFilterNarrowing();
+    return filter instanceof TextSearchFilter && ((TextSearchFilter) filter).isIncludingMsgBodies();
+  }
+
+  /**
+   * Send a request to fetch message briefs or full (depending on messages or postings)
+   * for the <code> shareId </code> from the server
+   * if messages were not fetched for this folder, otherwise get them from cache.
+   * @param force true to force a fetch from the database
+   */
+  private void fetchMsgs(final Long shareId, final Long folderId, boolean force) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "fetchMsgs(Long shareId, Long folderId, boolean force)");
+    if (trace != null) trace.args(shareId, folderId);
+    if (trace != null) trace.args(force);
+
+    synchronized (fetchedIds) {
+      if (force || !fetchedIds.contains(shareId) || (isFilteringBodies() && !fetchedIdsFull.contains(shareId))) {
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
+        // if refreshing and folder previously fetched, remove message links from the cache, leave the message data records
+        if (force && fetchedIds.contains(shareId)) {
+          int rowCount = getRowCount();
+          Vector linksToRemove = new Vector();
+          for (int row=0; row<rowCount; row++) {
+            Record rec = getRowObject(row);
+            if (rec instanceof MsgLinkRecord) {
+              linksToRemove.addElement(rec);
+            }
+          }
+          if (linksToRemove.size() > 0) {
+            MsgLinkRecord[] mRecs = new MsgLinkRecord[linksToRemove.size()];
+            linksToRemove.toArray(mRecs);
+            fetchedIds.remove(shareId);
+            fetchedIdsFull.remove(shareId);
+            cache.removeMsgLinkRecords(mRecs);
+          }
+        }
+
+        // if we should frech only when we already have the folder-share pair, or they weren't already deleted
+        if (cache.getFolderShareRecord(shareId) != null &&
+            cache.getFolderRecord(folderId) != null &&
+            !cache.getFolderRecord(folderId).isCategoryType()) {
+
+          FolderRecord folder = cache.getFolderRecord(folderId);
+          if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
+          if (folder != null) FolderRecUtil.markFolderFetchRequestIssued(folder.folderId);
+
+          final boolean _isFilteringBodies = isFilteringBodies();
+          final int _action = (messageMode == MODE_POST || messageMode == MODE_CHAT || _isFilteringBodies) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
+
+          // order of fetching is from newest to oldest
+          short fetchNumMax = -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE;
+
+          // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
+          Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, fetchNumMax, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
+
+          // Gather messages already fetched so we don't re-fetch all items if not necessary
+          if (_action == CommandCodes.MSG_Q_GET_FULL) {
+            MsgLinkRecord[] existingMsgLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
+            request.exceptMsgLinkIDs = RecordUtils.getIDs(existingMsgLinks);
+          } else {
+            MsgLinkRecord[] existingMsgLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(folderId);
+            request.exceptMsgLinkIDs = RecordUtils.getIDs(existingMsgLinks);
+          }
+
+          Interrupter msgInterrupter = new Interrupter() {
+            public boolean isInterrupted() {
+              FolderPair fPair = getParentFolderPair();
+              return fPair == null || !fPair.getId().equals(folderId) || (_isFilteringBodies && !isFilteringBodies());
+            }
+          };
+          final boolean[] addedFetchIDs = new boolean[] { false, false };
+          Interruptible msgInterruptible = new Interruptible() {
+            public void interrupt() {
+              if (addedFetchIDs[1]) {
+                fetchedIdsFull.remove(shareId);
+              }
+              if (addedFetchIDs[0]) {
+                fetchedIds.remove(shareId);
+                // since we interrupted our basic data fetch, see if we should finish it... applies when canceling Msg BODY search without having basic one completed
+                FolderPair fPair = getParentFolderPair();
+                if (fPair != null) {
+                  if (fPair.getFolderShareRecord() != null && fPair.getFolderRecord() != null && fPair.getId().equals(folderId))
+                    fetchMsgs(shareId, folderId, false);
+                }
+              }
+            }
+          };
+          final MessageAction msgAction = new MessageAction(_action, request, msgInterrupter, msgInterruptible);
+          Runnable replyReceivedJob = new Runnable() {
+            public void run() {
+              if (!fetchedIds.contains(shareId)) {
+                fetchedIds.add(shareId);
+                addedFetchIDs[0] = true;
+              }
+              if (_action == CommandCodes.MSG_Q_GET_FULL && _isFilteringBodies) {
+                if (!fetchedIdsFull.contains(shareId)) {
+                  fetchedIdsFull.add(shareId);
+                  addedFetchIDs[1] = true;
+                }
+              }
+            }
+          };
+          Runnable afterJob = new Runnable() {
+            public void run() {
+              FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
+              if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
+            }
+          };
+          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, replyReceivedJob, afterJob, afterJob);
+        }
+      }
+    } // end synchronized
+
+    if (trace != null) trace.exit(MsgTableModel.class);
+  }
+
+  /**
+   * Checks if folder share's content of a given ID was already retrieved.
+   */
+  public boolean isContentFetched(Long shareId) {
+    synchronized (fetchedIds) {
+      return fetchedIds.contains(shareId);
+    }
+  }
+
+
+  /****************************************************************************************/
+  /************* LISTENERS ON CHANGES IN THE CACHE ****************************************/
+  /****************************************************************************************/
+
+  /** Listen on updates to the MsgLinkRecords in the cache.
+    * if the event happens, add, move or remove message links.
+    */
+  private class MsgLinkListener implements MsgLinkRecordListener {
+    public void msgLinkRecordUpdated(MsgLinkRecordEvent event) {
+      // Exec on event thread since we must preserve selected rows and don't want visuals
+      // to seperate from selection for a split second.
+      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
+    }
+  }
+  private class MsgDataListener implements MsgDataRecordListener {
+    public void msgDataRecordUpdated(MsgDataRecordEvent event) {
+      // Exec on event thread since we must preserve selected rows and don't want visuals
+      // to seperate from selection for a split second.
+      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
+    }
+  }
+
+  private class MsgGUIUpdater implements Runnable {
+    private RecordEvent event;
+    public MsgGUIUpdater(RecordEvent event) {
+      this.event = event;
+    }
+    public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "run()");
+
+      if (event instanceof MsgLinkRecordEvent) {
+        Record[] records = event.getRecords();
+        if (event.getEventType() == RecordEvent.SET) {
+          updateData(records);
+        } else if (event.getEventType() == RecordEvent.REMOVE) {
+          removeData(records);
+        }
+      } else if (event instanceof MsgDataRecordEvent) {
+        // and changes to Address Records may affect the rendering of the table rows...
+        FolderPair parentPair = MsgTableModel.this.getParentFolderPair();
+        // only for message folders, exclude posting folders
+        if (parentPair != null && parentPair.getFolderRecord().folderType.shortValue() == FolderRecord.MESSAGE_FOLDER) {
+          if (event.getEventType() == RecordEvent.SET) {
+            Record[] records = event.getRecords();
+            for (int i=0; i<records.length; i++) {
+              if (((MsgDataRecord) records[i]).isTypeAddress()) {
+                fireTableRowsUpdated(0, MsgTableModel.this.getRowCount() -1);
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
+    }
+  }
+
+  public void finalize() throws Throwable {
+    setAutoUpdate(false);
+    super.finalize();
+  }
+
+}
