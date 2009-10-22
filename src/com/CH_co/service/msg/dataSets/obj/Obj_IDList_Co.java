@@ -1,0 +1,108 @@
+/*
+ * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Mississauga, Ontario, Canada.
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Development Team ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Development Team.
+ */
+
+package com.CH_co.service.msg.dataSets.obj;
+
+import java.io.IOException;
+import java.util.Vector;
+
+import com.CH_co.io.DataInputStream2; 
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
+/** 
+ * <b>Copyright</b> &copy; 2001-2009
+ * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+ * CryptoHeaven Development Team.
+ * </a><br>All rights reserved.<p> 
+ * 
+ * User: Get User Handles: <numOfIDs> { <userId> }+
+ *
+ *
+ * @author  Marcin Kurzawa
+ * @version 
+ */
+public class Obj_IDList_Co extends ProtocolMsgDataSet {
+
+  // <numOfIDs> { <objId> }+
+  public Long[] IDs;
+
+  /** Creates new Obj_IDList_Co */
+  public Obj_IDList_Co() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "Obj_IDList_Co()");
+    if (trace != null) trace.exit(Obj_IDList_Co.class);
+  }
+  /** Creates new Obj_IDList_Co */
+  public Obj_IDList_Co(Long ID) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "Obj_IDList_Co(Long ID)");
+    if (trace != null) trace.args(ID);
+    this.IDs = new Long[] { ID };
+    if (trace != null) trace.exit(Obj_IDList_Co.class);
+  }
+  /** Creates new Obj_IDList_Co */
+  public Obj_IDList_Co(Long[] IDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "Obj_IDList_Co(Long[] IDs)");
+    if (trace != null) trace.args(IDs);
+    this.IDs = IDs;
+    if (trace != null) trace.exit(Obj_IDList_Co.class);
+  }
+  /** Creates new Obj_IDList_Co */
+  public Obj_IDList_Co(Vector IDsV) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "Obj_IDList_Co(Vector IDsV)");
+    if (trace != null) trace.args(IDsV);
+    this.IDs = (Long[]) ArrayUtils.toArray(IDsV, Long.class);
+    if (trace != null) trace.exit(Obj_IDList_Co.class);
+  }
+
+  /** Writes out 'this' object to a stream */
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "writeToStream(DataOutputStream2)");
+    // write indicator
+    if (IDs == null)
+      dataOut.write(0);
+    else {
+      dataOut.write(1);
+
+      dataOut.writeShort(IDs.length);
+      for (int i=0; i<IDs.length; i++)
+        dataOut.writeLongObj(IDs[i]);
+    }
+
+    if (trace != null) trace.exit(Obj_IDList_Co.class);
+  } // end writeToStream()
+
+  /** Initializes 'this' object from a stream. */
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "initFromStream(DataInputStream2)");
+    // read indicator
+    int indicator = dataIn.read();
+    if (indicator == 0)
+      IDs = new Long[0];
+    else {
+      IDs = new Long[dataIn.readShort()];
+
+      for (int i=0; i<IDs.length; i++)
+        IDs[i] = dataIn.readLongObj();
+    }
+    if (trace != null) trace.exit(Obj_IDList_Co.class);
+  } // end initFromStream()
+
+
+  public String toString() {
+    return "[Obj_IDList_Co"
+      + ": IDs=" + Misc.objToStr(IDs)
+      + "]";
+  }
+}
