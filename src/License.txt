@@ -1,0 +1,88 @@
+CryptoHeaven Service License Agreement
+
+Copyright (c) 2001-2009 CryptoHeaven Development Team.  All rights reserved.
+
+The CryptoHeaven Development Team, its parents, subsidiaries, affiliates, officers, directors, associates, and employees, individually and collectively referred to as "CHDT", grants you a non-exclusive and non-transferable license for the use of the CryptoHeaven Service and Software including without limitation any related software, storage and communication services which may be offered from time to time by CHDT for use with your CryptoHeaven account, subject to the following conditions and terms of service referred hereto as the "TOS".
+
+The CryptoHeaven software including all copyright notices, documents, data, text, graphics, and any error corrections provided by CHDT are referred hereto to as the "Software", individually and collectively with the communication services, storage, related software, CryptoHeaven web site and other software and services which may be offered at any time from time to time through, utilizing or otherwise connected to the CryptoHeaven web site are referred hereto as the "Service".
+
+The Service is provided to commercial users or individuals who are at least 18 years old or minors who have parental permission to open and maintain an account. Each active commercial user is required to upgrade to a paid account within 30 days from the account creation date.  BY COMPLETING THE REGISTRATION PROCESS, YOU ARE STATING THAT YOU ARE ELIGIBLE FOR AN ACCOUNT AND THAT YOU AGREE TO BE BOUND BY THE TOS.
+
+1. MEMBER CONDUCT
+
+You understand that all information, data, text, software, music, sound, photographs, graphics, video, messages or other materials referred hereto as the "Content", whether publicly posted or privately transmitted, are the sole responsibility of the individual or entity from which such Content originated. This means that you, and not CHDT, are entirely responsible for all Content that you upload, post, email or otherwise transmit via the Service. CHDT has no ability to  control the Content posted or otherwise transmitted via the Service. You understand that by using the Service, you may be exposed to Content that is offensive, indecent or objectionable. Under no circumstances will CHDT be liable in any way for any Content, including, but not limited to, for any errors or omissions in any Content, or for any loss or damage of any kind incurred as a result of the use of any Content posted, emailed or otherwise transmitted via the Service. 
+
+You hereby agree to not use the Service to: 
+(i) transmit or store any Content that is unlawful, harmful, threatening, abusive, harassing, tortious, defamatory, vulgar, obscene, libelous, invasive of another's privacy, hateful, or racially, ethnically or otherwise objectionable;
+(ii) defame, abuse, harass, stalk, threaten or otherwise violate the legal rights of others; 
+(iii) harm minors in any way; 
+(iv) impersonate any person or entity, or falsely state or otherwise misrepresent your affiliation with a person or entity; 
+(v) email or otherwise transmit any Content that you do not have a right to transmit under any applicable law or under contractual or fiduciary relationships (such as inside information, proprietary and confidential information learned or disclosed as part of employment relationships or under nondisclosure agreements); 
+(vi) post, email or otherwise transmit any Content that infringes any patent, trademark, trade secret, copyright or other proprietary rights of any party; 
+(vii) upload, post, email or otherwise transmit any unsolicited or unauthorized advertising, promotional materials, "junk mail," "spam," "chain letters," "pyramid schemes," or any other form of solicitation;
+(viii) upload, post, email or otherwise transmit any material that contains software viruses, trojan horses, worms, time bombs, or any other computer code, files or programs designed to interrupt, destroy or limit the functionality of any computer software or hardware or telecommunications equipment; 
+(ix) interfere with or disrupt the Service or servers or networks connected to the Service, or disobey any requirements, procedures, policies or regulations of networks connected to the Service; 
+(x) intentionally or unintentionally violate any applicable local, state, national or international law;
+(xi) harvest or otherwise collect information about others, including email addresses, without their consent 
+
+2. GENERAL PRACTICES REGARDING USE 
+
+You acknowledge that CHDT may establish general practices and limits concerning use of the Service, including without limitation the maximum number of days that email messages, postings or other uploaded Content will be retained by the Service, the maximum number of email messages that may be sent from or received by an account on the Service, the maximum size of any email message that may be sent from or received by an account on the Service, the maximum disk space that will be allotted on related servers on your behalf, and the maximum number of times (and the maximum duration for which) you may access the Service in a given period of time. You agree that CHDT has no responsibility or liability for the deletion or failure to store any messages and other communications or other Content maintained or transmitted by the Service. You acknowledge that CHDT reserves the right to log off accounts that are inactive for an extended period of time. You further acknowledge that CHDT reserves the right to change these general practices and limits at any time, in its sole discretion, with or without notice, effective immediately.
+
+3. COPYRIGHT
+
+All Content created by CHDT included with the Service is the property of CHDT and protected by copyright laws and international treaties. You acknowledge that Software may be bundled with other copyrighted works of Sun Microsystems, Inc. such as Java Runtime Environment and you agree to be bound by the license terms of Binary Code License Agreement and JAVA 2 RUNTIME ENVIRONMENT (J2RE), VERSION 1.3.x SUPPLEMENTAL LICENSE TERMS. You are solely responsible to read, understand and abide the terms of the license(s) that may apply to you.
+
+4. NO RESALE OF SERVICE 
+
+You agree not to reproduce, duplicate, copy, sell, resell or exploit for any commercial purposes, any portion of the Service, use of the Service, or access to the Service.
+
+5. MODIFICATIONS TO SERVICE 
+
+CHDT reserves the right at any time and from time to time to modify or discontinue, temporarily or permanently, the Service with or without notice. You agree that CHDT shall not be liable to you or to any third party for any modification, disruption, suspension or discontinuance of the Service.
+
+6. MODIFICATIONS TO TERMS OF SERVICE 
+
+CHDT reserves the right to change the TOS or policies regarding the use of the Service at any time and to notify you by posting an updated version of the TOS on CryptoHeaven web site. You are responsible for regularly reviewing the TOS. Continued use of the Service after any such changes shall constitute your consent to such changes.
+
+7. TERMINATION OF SERVICE
+
+CHDT may terminate your access the Service at any time, with or without cause, with or without notice, effective immediately, for any reason whatsoever. Upon termination of the Service, your right to use the Service immediately ceases.
+
+CHDT shall have no obligation to maintain any content in your account or to forward any unread or unsent messages to you or any third party.
+
+8. LIMITATION OF LIABILITY 
+
+CHDT does not represent or warrant that the Service will be uninterrupted or error-free, that defects will be corrected, or that the Service or the server that makes it available, are free of viruses or other harmful components. CHDT does not warrant or represent that the use or the results of the use of the Service or the materials made available as part of the Service will be correct, accurate, timely, or otherwise reliable.
+
+You specifically agree that CHDT shall not be responsible for unauthorized access to or alteration of your transmissions or data, any material or data sent or received or not sent or received, or any transactions entered into through the Service. You specifically agree that CHDT is not responsible or liable for any threatening, defamatory, obscene, offensive or illegal content or conduct of any other party or any infringement of another's rights, including intellectual property rights. You specifically agree that you, and not CHDT, are responsible for any Content with connection to the Service by any third party.
+
+CHDT does not make any representations about the suitability, reliability, availability, timeliness, and accuracy of the service for any purpose. The service is provided "AS IS" without warranty of any kind, CHDT hereby disclaim all warranties and conditions with regard to the service, including all implied warranties and conditions of merchantability, fitness for a particular purpose, title and non-infringement.
+
+In no event shall CHDT be liable for any direct, indirect, punitive, incidental, special, consequential damages or any damages whatsoever including, without limitation, damages for loss of use, data or profits, arising out of or in any way connected with the use or performance of the Service, with the delay or inability to use the Service, the provision of or failure to provide the Service, or for any information, software, products, services and related content obtained through the Service, or otherwise arising out of the use of the Service, whether based on contract, tort, negligence, strict liability or otherwise, even if CHDT has been advised of the possibility of damages. Some states/jurisdictions do not allow the exclusion or limitation of liability for consequential or incidental damages; the above limitation may not apply to you.
+
+9. REDISTRIBUTION OF SOFTWARE
+
+CHDT releases the Software without restrictions upon its further dissemination. You may freely distribute verbatim copies of the Software provided that you include with it all license documents, copyright and proprietary notices. You may not distribute non-verbatim copies of the Software. This license explicitly forbids you to distribute modified Software including, but not limited to Software with additions, alterations, translations, omissions or otherwise copies which are not verbatim to the original Software.
+
+10. TRADEMARKS AND LOGOS. 
+
+You acknowledge and agree as between you and CHDT that CHDT owns the CryptoHeaven trademark and all CryptoHeaven-related trademarks, service marks, logos and other brand designations, and you agree not to use the CHDT trademarks or trade name in a trademark sense to endorse or promote your products or services, or any third party. Nothing in this License shall be deemed to create any relationship of agency, partnership, or joint venture between you and the CHDT. 
+
+11. EXPORT LAW ASSURANCES
+
+You may not use or otherwise export or re-export the Software except as authorized by Canadian law and the laws of the jurisdiction in which the Software was obtained. 
+
+12. TERMINATION FOR INFRINGEMENT. 
+
+You may not use the Software or Service in jurisdictions where it may be infringing any intellectual property rights.  Either party may terminate this License immediately should any Software or Service become, or in either party's opinion be likely to become, the subject of a claim of infringement of any intellectual property right. 
+
+13. FEEDBACK
+
+You may wish to report any errors, performance issues, inaccuracies or inconsistencies, or otherwise provide suggestions for future fixes, additions or new features or any other information to CHDT referred hereto as "Feedback". To the extent that you provide CHDT with any Feedback, you hereby agree that such Feedback is provided on a non-proprietary and non-confidential basis, and grant CHDT a perpetual, non-exclusive, worldwide, fully paid-up, irrevocable license, with the right to sub license through multiple levels of sublicenses, to incorporate, disclose, and use without limitation the Feedback for any purpose related to the Service and future versions, implementations, releases thereof. 
+
+14. MISCELLANEOUS
+
+The TOS constitute the entire agreement between you and CHDT relating to its subject matter. It supersedes all prior or contemporaneous oral or written communications, proposals, representations and warranties and prevails over any conflicting or additional terms of any quote, order, acknowledgment, or other communication between the parties relating to its subject matter during the term of this TOS. You also may be subject to additional terms and conditions that may apply when you use affiliate services, third-party content or third-party software. The TOS and the relationship between you and CHDT shall be governed by the laws of the Province of Ontario without regard to its conflict of law provisions. You hereby irrevocably consent to the personal and exclusive jurisdiction of the courts located within the Province of Ontario in all disputes arising out of or relating to the use of the Service. The failure of CHDT to exercise or enforce any right or provision of the TOS shall not constitute a waiver of such right or provision. If any provision of the TOS is found by a court of competent jurisdiction to be invalid, the parties nevertheless agree that the court should endeavor to give effect to the parties' intentions as reflected in the provision, and the other provisions of the TOS remain in full force and effect. You agree to indemnify and hold CHDT, its parents, subsidiaries, affiliates, officers, directors, associates, and employees, harmless from any claim, demand, or damage, including reasonable attorneys' fees, asserted by any third party due to or arising out of your use of or conduct on the Service.
+
+Any rights not expressly granted herein are reserved.
