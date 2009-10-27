@@ -219,10 +219,14 @@ public class MenuActionItem extends Object implements List_Viewable, Cloneable {
 
   public void setKeyStroke(KeyStroke keyStroke) {
     this.keyStroke = keyStroke;
+    if (action != null)
+      action.putValue(Actions.ACCELERATOR, keyStroke);
   }
 
   public void setMnemonic(Integer mnemonic) {
     this.mnemonic = mnemonic;
+    if (action != null)
+      action.putValue(Actions.MNEMONIC, mnemonic);
   }
 
   public void setDefaultProperty(boolean newValue) {

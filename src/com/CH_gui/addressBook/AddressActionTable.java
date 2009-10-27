@@ -40,8 +40,8 @@ public class AddressActionTable extends MsgActionTable {
   private static Integer versionedVisualsSavable = new Integer(1);
 
   /** Creates new AddressActionTable */
-  public AddressActionTable(RecordTableModel model) {
-    super(model, MsgDataRecord.OBJ_TYPE_ADDR);
+  public AddressActionTable(RecordTableModel model, boolean previewMode) {
+    super(model, MsgDataRecord.OBJ_TYPE_ADDR, previewMode);
   }
 
   /**

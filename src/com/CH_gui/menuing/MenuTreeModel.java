@@ -46,6 +46,8 @@ import com.CH_co.util.*;
  */
 public class MenuTreeModel extends Object {
 
+  public static final int PLUGINS_ID = -100000;
+
   /**
    * JMenus(s) do not have accelerator specified.
    * JSeparator(s) do not have mnemonic and accelerator specified.
@@ -241,6 +243,7 @@ public class MenuTreeModel extends Object {
               ")|"+
             "Separator|0|"+
             "Customize Toolbar ...|101|-1|-1|-1|"+
+            "Customize Menu ...|102|-1|-1|-1|"+
             "Tool Tips|100|-1|-1|-1|"+
             "Look and Feel|-71|"+KeyEvent.VK_L+"|"+
               "(|"+
@@ -267,7 +270,7 @@ public class MenuTreeModel extends Object {
           "Separator|0|"+
           "About "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+"|201|-1|-1|-1|"+
           ")|"+
-        "Plugins|-100000|"+KeyEvent.VK_P+"|"+
+        "Plugins|"+PLUGINS_ID+"|"+KeyEvent.VK_P+"|"+
       ")|";
 
   private static String EMPTY_MENU_POPUP_SEQUENCE = 
@@ -442,6 +445,7 @@ public class MenuTreeModel extends Object {
               ")|"+
             "Separator|0|"+
             "Customize Toolbar ...|101|-1|-1|-1|"+
+            "Customize Menu ...|102|-1|-1|-1|"+
             "Tool Tips|100|-1|-1|-1|"+
             "Look and Feel|-71|-1|"+
               "(|"+
@@ -476,7 +480,7 @@ public class MenuTreeModel extends Object {
             // Main Frame
             "Exit|200|-1|-1|-1|"+
           ")|"+
-        "Plugins|-100000|-1|"+
+        "Plugins|"+PLUGINS_ID+"|-1|"+
       ")|";
 
 
@@ -517,8 +521,6 @@ public class MenuTreeModel extends Object {
     Object[] _treeModel = buildMenuTreeModel(null, null, Arrays.asList(menuSequence.split("[\\|]+")).iterator());
     treeModel = (DefaultTreeModel) _treeModel[0];
     treeModelHT = (Hashtable) _treeModel[1];
-
-    //printMenus();
 
     /** GUI placeholder for this model. */
     jMenuBar = new JMenuBar();
@@ -570,17 +572,22 @@ public class MenuTreeModel extends Object {
   /**
    * Rebuild is currently unused.  Coded for purposes of MenuEditor, but it has been disabled.
    */
-  public synchronized void rebuildMenuBar() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "rebuildMenuBar()");
+  public synchronized void rebuildMenuBar(DefaultTreeModel treeModel) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "rebuildMenuBar(DefaultTreeModel treeModel)");
+    if (trace != null) trace.args(treeModel);
 
+    this.treeModel = treeModel;
+    treeModelHT.clear();
     jMenuBar.removeAll();
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
     Enumeration e = root.depthFirstEnumeration();
 
     Vector actionsV = new Vector();
+    // rebuild the Hashtable of nodes and hide the nodes so we can re-ad them...
     while (e.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
       MenuActionItem menuActionItem = (MenuActionItem) node.getUserObject();
+      treeModelHT.put(menuActionItem.getActionId(), node);
       menuActionItem.setShowing(false);
       if (menuActionItem.getAction() != null)
         actionsV.addElement(menuActionItem.getAction());
@@ -776,11 +783,12 @@ public class MenuTreeModel extends Object {
 //          }
 //        }
 //      }
-      if (!insertionMenuItem.isGUIButtonSet()) {
-        JMenuItem jMenuItem = convertActionToMenuItem(insertionMenuItem);
-        //if (jMenuItem instanceof JActionMenuItem) System.out.println("inserting item " + jMenuItem + " " + visibleBefore);
-        currentMenu.insert(jMenuItem, visibleBefore);
-      }
+      JMenuItem jMenuItem = null;
+      if (!insertionMenuItem.isGUIButtonSet())
+        jMenuItem = convertActionToMenuItem(insertionMenuItem);
+      else
+        jMenuItem = (JMenuItem) insertionMenuItem.getGUIButton();
+      currentMenu.insert(jMenuItem, visibleBefore);
     }
     else 
       currentMenu.insertSeparator(visibleBefore);
@@ -984,9 +992,9 @@ public class MenuTreeModel extends Object {
         menuItem.setGUIButton(null);
         parentMenu.remove(menuComponentIndex);
       }
-      //MenuActionItem item = findMenuActionItem(menuItem.getActionId(), treeModelHT);
-      if (disabable == null || disabable.equals(Boolean.TRUE))
-        menuItem.setAction(null);
+      // Don't remove the Action item because it messes up the Menu Editor and rebuild action
+//      if (disabable == null || disabable.equals(Boolean.TRUE))
+//        menuItem.setAction(null);
     }
     // if menuComponent is JMenu and it has no children, hide it from parentMenu
     else if (index > 0) {
@@ -1013,9 +1021,9 @@ public class MenuTreeModel extends Object {
           menuItem.setGUIButton(null);
           parentMenu.remove(menuComponent);
         }
-        //MenuActionItem item = findMenuActionItem(menuItem.getActionId(), treeModelHT);
-        if (disabable == null || disabable.equals(Boolean.TRUE))
-          menuItem.setAction(null);
+        // Don't remove the Action item because it messes up the Menu Editor and rebuild action
+//        if (disabable == null || disabable.equals(Boolean.TRUE))
+//          menuItem.setAction(null);
       }
     }
     // if menuComponent is JMenuBar, just leave it
@@ -1028,6 +1036,7 @@ public class MenuTreeModel extends Object {
    */
   private void removeExtraSeparatorsFromMenu(DefaultMutableTreeNode node) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "removeExtraSeparatorsFromMenu(DefaultMutableTreeNode node)");
+    if (trace != null) trace.args(node);
 
     Vector visibleNodesV = new Vector();
     int childCount = node.getChildCount();
@@ -1069,7 +1078,6 @@ public class MenuTreeModel extends Object {
               (i == visibleNodesV.size()-1) || // trailing seperator
               (i < visibleNodesV.size()-1 && ((MenuActionItem) ((DefaultMutableTreeNode) visibleNodesV.elementAt(i+1)).getUserObject()).isSeparator())) // if next is also a seperator (two seperators in a row)
           {
-            //System.out.println("hiding node " + menuNode);
             ensureNodeIsInvisible(n);
             visibleNodesV.removeElementAt(i);
             continue;

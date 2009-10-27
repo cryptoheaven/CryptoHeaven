@@ -296,7 +296,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   public void initAddressTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initAddressTableComponent()");
     if (addressTableComponent == null) {
-      addressTableComponent = new AddressTableComponent();
+      addressTableComponent = new AddressTableComponent(false);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(addressTableComponent);
@@ -309,7 +309,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   public void initWhiteListTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initWhiteListTableComponent()");
     if (whiteListTableComponent == null) {
-      whiteListTableComponent = new WhiteListTableComponent();
+      whiteListTableComponent = new WhiteListTableComponent(false);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(whiteListTableComponent);
@@ -377,7 +377,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   public void initMsgInboxTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgInboxTableComponent()");
     if (msgInboxTableComponent == null) {
-      msgInboxTableComponent = new MsgInboxTableComponent();
+      msgInboxTableComponent = new MsgInboxTableComponent(false);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(msgInboxTableComponent);
@@ -390,7 +390,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   public void initMsgSentTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgSentTableComponent()");
     if (msgSentTableComponent == null) {
-      msgSentTableComponent = new MsgSentTableComponent();
+      msgSentTableComponent = new MsgSentTableComponent(false);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(msgSentTableComponent);
@@ -403,7 +403,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   public void initMsgSpamTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgSpamTableComponent()");
     if (msgSpamTableComponent == null) {
-      msgSpamTableComponent = new MsgSpamTableComponent();
+      msgSpamTableComponent = new MsgSpamTableComponent(false);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(msgSpamTableComponent);
@@ -416,7 +416,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   public void initMsgDraftsTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgDraftsTableComponent()");
     if (msgDraftsTableComponent == null) {
-      msgDraftsTableComponent = new MsgDraftsTableComponent();
+      msgDraftsTableComponent = new MsgDraftsTableComponent(false);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(msgDraftsTableComponent);

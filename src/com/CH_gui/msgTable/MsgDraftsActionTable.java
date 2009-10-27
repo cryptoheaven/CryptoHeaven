@@ -28,8 +28,8 @@ import com.CH_gui.table.RecordTableModel;
 public class MsgDraftsActionTable extends MsgActionTable {
 
   /** Creates new MsgDraftsActionTable */
-  public MsgDraftsActionTable(RecordTableModel model) {
-    super(model);
+  public MsgDraftsActionTable(RecordTableModel model, boolean previewMode) {
+    super(model, previewMode);
   }
 
   /**

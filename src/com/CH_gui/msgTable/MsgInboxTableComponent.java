@@ -37,9 +37,10 @@ import com.CH_gui.table.*;
 public class MsgInboxTableComponent extends RecordTableComponent {
 
   /** Creates new MsgInboxTableComponent */
-  public MsgInboxTableComponent() {
-    super(new MsgInboxActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_INBOX)), Template.get(Template.EMPTY_MAIL));
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgInboxTableComponent.class, "MsgInboxTableComponent()");
+  public MsgInboxTableComponent(boolean previewMode) {
+    super(new MsgInboxActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_INBOX), previewMode), Template.get(Template.EMPTY_MAIL));
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgInboxTableComponent.class, "MsgInboxTableComponent(boolean previewMode)");
+    if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(MsgInboxTableComponent.class);
   }
 

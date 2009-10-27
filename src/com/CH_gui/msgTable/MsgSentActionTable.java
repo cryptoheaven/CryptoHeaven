@@ -26,8 +26,8 @@ import com.CH_gui.table.RecordTableModel;
 public class MsgSentActionTable extends MsgActionTable {
 
   /** Creates new MsgSentActionTable */
-  public MsgSentActionTable(RecordTableModel model) {
-    super(model);
+  public MsgSentActionTable(RecordTableModel model, boolean previewMode) {
+    super(model, previewMode);
   }
 
   /*******************************************************

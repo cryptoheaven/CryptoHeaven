@@ -48,7 +48,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 6;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 464;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 466;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -162,6 +162,7 @@ public class GlobalProperties extends Object {
   // build 460 Fix engine-to-engine distribution of Message Body replies
   // build 462 Better handling of shared Inbox and live updates for participants
   // build 464 Clicking of mailto: links will compose email from address that recived the original message
+  // build 466 Menu Editor
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
@@ -201,18 +202,18 @@ public class GlobalProperties extends Object {
       }
     }
 
-    // Remove all the MenuTreeModel.* from the properties and replace them by properties from this class.
-    Vector keysToRemoveV = new Vector();
-    Enumeration enm = properties.keys();
-    while (enm.hasMoreElements()) {
-      String key = (String) enm.nextElement();
-      if (key.startsWith("MenuTreeModel.")) {
-        keysToRemoveV.addElement(key);
-      }
-    }
-    for (int i=0; i<keysToRemoveV.size(); i++) {
-      properties.remove(keysToRemoveV.elementAt(i));
-    }
+//    // Remove all the MenuTreeModel.* from the properties and replace them by properties from this class.
+//    Vector keysToRemoveV = new Vector();
+//    Enumeration enm = properties.keys();
+//    while (enm.hasMoreElements()) {
+//      String key = (String) enm.nextElement();
+//      if (key.startsWith("MenuTreeModel.")) {
+//        keysToRemoveV.addElement(key);
+//      }
+//    }
+//    for (int i=0; i<keysToRemoveV.size(); i++) {
+//      properties.remove(keysToRemoveV.elementAt(i));
+//    }
 
     if (!ok) {
       //System.err.println("WARNING: Unable to load \"" + it + "\" .  Will use default values instead.");

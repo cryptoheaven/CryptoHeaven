@@ -38,9 +38,10 @@ import com.CH_gui.table.*;
 public class AddressTableComponent extends RecordTableComponent {
 
   /** Creates new AddressTableComponent */
-  public AddressTableComponent() {
-    this(new AddressActionTable(new MsgTableModel(null, MsgTableModel.MODE_ADDRESS)), Template.get(Template.EMPTY_ADDRESSES));
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AddressTableComponent.class, "AddressTableComponent()");
+  public AddressTableComponent(boolean previewMode) {
+    this(new AddressActionTable(new MsgTableModel(null, MsgTableModel.MODE_ADDRESS), previewMode), Template.get(Template.EMPTY_ADDRESSES));
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AddressTableComponent.class, "AddressTableComponent(boolean previewMode)");
+    if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(AddressTableComponent.class);
   }
   public AddressTableComponent(RecordActionTable actionTable, String emptyTemplate) {

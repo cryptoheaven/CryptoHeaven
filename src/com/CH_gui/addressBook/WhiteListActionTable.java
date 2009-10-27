@@ -38,8 +38,8 @@ import com.CH_gui.table.RecordTableModel;
 public class WhiteListActionTable extends AddressActionTable {
 
   /** Creates new WhiteListActionTable */
-  public WhiteListActionTable(RecordTableModel model) {
-    super(model);
+  public WhiteListActionTable(RecordTableModel model, boolean previewMode) {
+    super(model, previewMode);
   }
 
   /*******************************************************

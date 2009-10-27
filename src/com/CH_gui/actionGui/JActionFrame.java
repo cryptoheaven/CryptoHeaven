@@ -29,6 +29,7 @@ import com.CH_cl.service.ops.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import javax.swing.tree.DefaultTreeModel;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -51,7 +52,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   private static Integer versionedVisualsSavable = new Integer(3);
 
   private static final boolean ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS = false;
-  private static final boolean ENABLE_MENU_CUSTOMIZATION_ACTION = false;
+  public static boolean ENABLE_MENU_CUSTOMIZATION_ACTION = true;
 
   protected MenuTreeModel menuTreeModel;
   protected ToolBarModel toolBarModel;
@@ -567,11 +568,12 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
    * Discards the current Menu Bar and rebuilds a new one.
    * Used after Customize Menus action -- currently unused as this function has been taken out of menus.
    */
-  public void reconstructMenusFromScratch() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "reconstructMenusFromScratch()");
+  public void reconstructMenusFromScratch(DefaultTreeModel treeModel) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "reconstructMenusFromScratch(DefaultTreeModel treeModel)");
+    if (trace != null) trace.args(treeModel);
 
     if (menuTreeModel != null) {
-      menuTreeModel.rebuildMenuBar();
+      menuTreeModel.rebuildMenuBar(treeModel);
       //addComponentActions(this);
       Action[] actionArray = ActionUtils.getActionsRecursively(this);
       if (menuTreeModel != null)

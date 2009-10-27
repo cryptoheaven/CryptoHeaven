@@ -33,8 +33,8 @@ import com.CH_gui.table.RecordTableModel;
 public class MsgInboxActionTable extends MsgActionTable {
 
   /** Creates new MsgInboxActionTable */
-  public MsgInboxActionTable(RecordTableModel model) {
-    super(model);
+  public MsgInboxActionTable(RecordTableModel model, boolean previewMode) {
+    super(model, previewMode);
   }
 
   /*******************************************************

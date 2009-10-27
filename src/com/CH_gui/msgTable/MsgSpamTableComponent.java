@@ -37,9 +37,10 @@ import com.CH_gui.table.*;
 public class MsgSpamTableComponent extends RecordTableComponent {
 
   /** Creates new MsgSpamTableComponent */
-  public MsgSpamTableComponent() {
-    super(new MsgSpamActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_SPAM)), Template.get(Template.EMPTY_MAIL_SPAM));
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgSpamTableComponent.class, "MsgSpamTableComponent()");
+  public MsgSpamTableComponent(boolean previewMode) {
+    super(new MsgSpamActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_SPAM), previewMode), Template.get(Template.EMPTY_MAIL_SPAM));
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgSpamTableComponent.class, "MsgSpamTableComponent(boolean previewMode)");
+    if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(MsgSpamTableComponent.class);
   }
 

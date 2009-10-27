@@ -38,9 +38,10 @@ import com.CH_gui.table.*;
 public class WhiteListTableComponent extends AddressTableComponent {
 
   /** Creates new WhiteListTableComponent */
-  public WhiteListTableComponent() {
-    super(new WhiteListActionTable(new MsgTableModel(null, MsgTableModel.MODE_WHITELIST)), Template.get(Template.EMPTY_WHITELIST));
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WhiteListTableComponent.class, "WhiteListTableComponent()");
+  public WhiteListTableComponent(boolean previewMode) {
+    super(new WhiteListActionTable(new MsgTableModel(null, MsgTableModel.MODE_WHITELIST), previewMode), Template.get(Template.EMPTY_WHITELIST));
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WhiteListTableComponent.class, "WhiteListTableComponent(boolean previewMode)");
+    if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(WhiteListTableComponent.class);
   }
 

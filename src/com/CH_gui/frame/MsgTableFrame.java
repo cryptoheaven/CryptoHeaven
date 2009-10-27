@@ -98,7 +98,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
     if (folderPair != null)
       folderType = folderPair.getFolderRecord().folderType.shortValue();
 
-    RecordTableComponent mainTableComponent = null;
+    mainTableComponent = null;
     JComponent mainComponent = null;
     JSplitPane mainSplitPane = null;
     // message folder/address folder
@@ -109,17 +109,17 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         folderType == FolderRecord.RECYCLE_FOLDER) {
       // check for message folder types or special folders
       if (folderType == FolderRecord.ADDRESS_FOLDER) {
-        mainTableComponent = new AddressTableComponent();
+        mainTableComponent = new AddressTableComponent(msgPreviewMode);
       } else if (folderType == FolderRecord.WHITELIST_FOLDER) {
-        mainTableComponent = new WhiteListTableComponent();
+        mainTableComponent = new WhiteListTableComponent(msgPreviewMode);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().msgFolderId)) {
-        mainTableComponent = new MsgInboxTableComponent();
+        mainTableComponent = new MsgInboxTableComponent(msgPreviewMode);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().junkFolderId)) {
-        mainTableComponent = new MsgSpamTableComponent();
+        mainTableComponent = new MsgSpamTableComponent(msgPreviewMode);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().sentFolderId)) {
-        mainTableComponent = new MsgSentTableComponent();
+        mainTableComponent = new MsgSentTableComponent(msgPreviewMode);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().draftFolderId)) {
-        mainTableComponent = new MsgDraftsTableComponent();
+        mainTableComponent = new MsgDraftsTableComponent(msgPreviewMode);
       } else { // recycle and all other mail will default here
         mainTableComponent = new MsgTableComponent(msgPreviewMode ? Template.get(Template.NONE) : Template.get(Template.EMPTY_MAIL), msgPreviewMode);
       }

@@ -33,8 +33,8 @@ import com.CH_gui.table.RecordTableModel;
 public class MsgSpamActionTable extends MsgActionTable {
 
   /** Creates new MsgSpamActionTable */
-  public MsgSpamActionTable(RecordTableModel model) {
-    super(model);
+  public MsgSpamActionTable(RecordTableModel model, boolean previewMode) {
+    super(model, previewMode);
   }
 
   /*******************************************************

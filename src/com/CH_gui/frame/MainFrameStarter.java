@@ -178,6 +178,13 @@ public class MainFrameStarter extends Object {
               initialMsgLinkId = new Long(args[i]);
             } catch (Throwable t) {
             }
+          } else if (args[0].equals("-menuEditor")) {
+            i++;
+            String onOff = args[i];
+            if (onOff.equalsIgnoreCase("on") || onOff.equalsIgnoreCase("true"))
+              JActionFrame.ENABLE_MENU_CUSTOMIZATION_ACTION = true;
+            else if (onOff.equalsIgnoreCase("off") || onOff.equalsIgnoreCase("false"))
+              JActionFrame.ENABLE_MENU_CUSTOMIZATION_ACTION = false;
           } else if (args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("/?") || args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("/help")) {
             System.out.println("Usage 1: [-D[!]<propertiesDir>] [-privateLabelURL <URL>] [-username <username>] [<-password <password>>|<-password-blank>] [-signup] [-signupEmail <emailAddress>] [-folderId <id>] [-msgLinkId <id>]");
             System.out.println("Usage 2: -localKeyChangePass <localKeyId> <old name> <old password> <new name> <new password>");

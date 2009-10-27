@@ -430,13 +430,16 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     UserRecord uRec = SIL.getFetchedDataCache().getUserRecord();
     setUserTitle(uRec);
 
-    // init main table components so actions are added to the frame 
+    // init main table components so actions are added to the frame
+    tableComp.initAddressTableComponent();
     tableComp.initFileTableComponent();
     tableComp.initMsgTableComponent();
     tableComp.initPostTableComponent();
     tableComp.initChatTableComponent();
+    tableComp.initGroupTableComponent();
     tableComp.initLocalFileTableComponent();
     tableComp.initKeyTableComponent();
+    tableComp.initRecycleTableComponent();
 
     // adding a listener will initialize the FileTableComponent so do that after we add it into the frame so actions can be generated and displayed
     treeComp.addTreeSelectionListener(tableComp);

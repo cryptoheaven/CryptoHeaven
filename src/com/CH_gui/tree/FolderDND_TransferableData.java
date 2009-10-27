@@ -14,8 +14,6 @@ package com.CH_gui.tree;
 
 import java.io.Serializable;
 
-import com.CH_co.service.records.*;
-
 /** 
  * <b>Copyright</b> &copy; 2001-2009
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
