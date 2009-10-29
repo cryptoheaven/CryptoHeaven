@@ -12,17 +12,15 @@
 
 package com.CH_cl.service.ops;
 
-import com.CH_cl.monitor.TransferProgMonitor;
-import java.util.Vector;
-import java.io.File;
 import java.awt.Component;
-import javax.swing.*;
+import java.io.File;
+import java.util.Vector;
 
+import com.CH_cl.monitor.TransferProgMonitor;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.fld.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;

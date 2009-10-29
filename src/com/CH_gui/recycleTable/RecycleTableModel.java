@@ -14,7 +14,6 @@ package com.CH_gui.recycleTable;
 
 import java.util.*;
 import java.sql.Timestamp;
-import javax.swing.table.*;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.msg.*;
@@ -31,10 +30,8 @@ import com.CH_cl.service.records.filters.*;
 
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.file.FileUtilities;
-import com.CH_gui.fileTable.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
-import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
 
 /** 
@@ -61,9 +58,9 @@ public class RecycleTableModel extends RecordTableModel {
   private MsgLinkListener msgLinkListener;
 
   /* folderShareIds for which the files has been fetched already */
-  private static Vector fetchedIds = new Vector(); // briefs and full
-  private static Vector fetchedIdsBriefs = new Vector();
-  private static Vector fetchedIdsFull = new Vector();
+  private static final Vector fetchedIds = new Vector(); // briefs and full
+  private static final Vector fetchedIdsBriefs = new Vector();
+  private static final Vector fetchedIdsFull = new Vector();
 
   protected static final String STR_FILE_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_File_Folder");
   protected static final String STR_SHARED_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_Shared_Folder");

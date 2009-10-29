@@ -381,7 +381,7 @@ public class ArrayUtils extends Object {
    * source array type.
    */
   public static Object[] getDifference(Object[] source, Object[] subtract) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "getDifference(getDifference(Object[] source, Object[] subtract)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "getDifference(Object[] source, Object[] subtract)");
     if (trace != null) trace.args(source, subtract);
 
     Object[] objs = null;
@@ -406,10 +406,10 @@ public class ArrayUtils extends Object {
 
   /**
    * @return the difference between specified arrays.
-   * The return instance if of runtime type Object[]
+   * The return instance is of runtime type Object[]
    */
   public static Object[] getDifference2(Object[] source, Object[] subtract) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "getDifference(getDifference2(Object[] source, Object[] subtract)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "getDifference2(Object[] source, Object[] subtract)");
     if (trace != null) trace.args(source, subtract);
 
     Object[] objs = null;

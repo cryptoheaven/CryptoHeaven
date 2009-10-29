@@ -22,13 +22,13 @@ import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 
-import com.CH_gui.contactTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.Vector;
@@ -473,9 +473,32 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       if (trace != null) trace.exit(getClass());
       if (trace != null) trace.clear();
     }
+    private static RecordTableComponent getParentRecordTableComponent(Component c) {
+      RecordTableComponent recordTableComponent = null;
+      Container cont = c.getParent();
+      if (cont != null) {
+        while (true) {
+          if (cont == null)
+            break;
+          else if (cont instanceof RecordTableComponent) {
+            recordTableComponent = (RecordTableComponent) cont;
+            break;
+          }
+          cont = cont.getParent();
+        }
+      }
+      return recordTableComponent;
+    }
     private void doWork() {
       // only do this if GUI is actually showing
+      boolean isShowing = false;
       if (recordTableToValidate.isShowing()) {
+        isShowing = true;
+      } else {
+        RecordTableComponent recordTableComponent = getParentRecordTableComponent(recordTableToValidate);
+        isShowing = recordTableComponent != null && recordTableComponent.isShowing();
+      }
+      if (isShowing) {
         FolderPair folderPair = recordTableToValidate.recordTableModel.getParentFolderPair();
         FolderRecord folder = folderPair != null ? folderPair.getFolderRecord() : null;
         Long folderId = folder != null ? folder.folderId : null;
@@ -494,7 +517,10 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
             if (folder.isMsgType() || folder.isRecycleType()) {
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
               Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
-              int messageMode = ((MsgTableModel) recordTableToValidate.recordTableModel).getMode();
+              int messageMode = MsgTableModel.MODE_MSG; // default value in case this is a Recycle table
+              if (recordTableToValidate.recordTableModel instanceof MsgTableModel) {
+                messageMode = ((MsgTableModel) recordTableToValidate.recordTableModel).getMode();
+              }
               int action = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
               SIL.submitAndReturn(new MessageAction(action, request));
             }

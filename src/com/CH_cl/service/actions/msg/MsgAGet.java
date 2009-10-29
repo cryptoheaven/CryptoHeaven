@@ -35,7 +35,7 @@ import com.CH_co.service.msg.dataSets.stat.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -43,7 +43,7 @@ import com.CH_co.service.msg.dataSets.stat.*;
  *
  * <b>$Revision: 1.18 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgAGet extends ClientMessageAction {
 
@@ -53,7 +53,7 @@ public class MsgAGet extends ClientMessageAction {
     if (trace != null) trace.exit(MsgAGet.class);
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -106,8 +106,8 @@ public class MsgAGet extends ClientMessageAction {
           while (recips != null && recips.length > recipsIndex) {
             String type = recips[recipsIndex++];
             String sId = recips[recipsIndex++];
-            if (type.charAt(0) == MsgDataRecord.RECIPIENT_USER || 
-                (type.charAt(0) == MsgDataRecord.RECIPIENT_COPY && type.charAt(1) == MsgDataRecord.RECIPIENT_USER) || 
+            if (type.charAt(0) == MsgDataRecord.RECIPIENT_USER ||
+                (type.charAt(0) == MsgDataRecord.RECIPIENT_COPY && type.charAt(1) == MsgDataRecord.RECIPIENT_USER) ||
                 (type.charAt(0) == MsgDataRecord.RECIPIENT_COPY_BLIND && type.charAt(1) == MsgDataRecord.RECIPIENT_USER)
                 ) {
               Long id = new Long(sId);
@@ -168,6 +168,12 @@ public class MsgAGet extends ClientMessageAction {
       getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
 
+    // if this was a bulk fetch done in stages, gather Messages which exist in the cache but should be removed
+    MsgLinkRecord[] toRemoveMsgs = null;
+    if (linkRecords != null && fetchNumMax != null && fetchNumNew != null) {
+      MsgLinkRecord[] priorMsgs = cache.getMsgLinkRecords(linkRecords[0].dateCreated, linkRecords[linkRecords.length-1].dateCreated, fetchingOwnerObjId, fetchingOwnerObjType);
+      toRemoveMsgs = (MsgLinkRecord[]) ArrayUtils.getDifference(priorMsgs, linkRecords);
+    }
 
     // We need data Records in the cache before the message table can display contents.
     // For that reason, the event will be fired when we are done with both, links and datas.
@@ -204,7 +210,7 @@ public class MsgAGet extends ClientMessageAction {
               if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
               FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsHT);
               if (sRec != null) {
-                if (needMsgBody_dataIDsV == null) { 
+                if (needMsgBody_dataIDsV == null) {
                   needMsgBody_dataIDsV = new Vector();
                   needMsgBody_shareIDsV = new Vector();
                   needMsgBody_linkIDsV = new Vector();
@@ -227,6 +233,14 @@ public class MsgAGet extends ClientMessageAction {
         }
       }
     }
+
+    // Update the fetched stats if any, do this after fetching message bodies
+    // so that the original values count and automatic fetching doesn't affect the shown stats.
+    // Stats in the database are unaffected by this client sequence overwrite.
+    // Update the stats before fireing events for messages so the flags get displayed at the same time as messages.
+    if (statRecords != null)
+      cache.addStatRecords(statRecords);
+
     // fire events now to be sure that no messages are skipped if their bodies were not just fetched...
     if (linkRecords != null && linkRecords.length > 0)
       cache.fireMsgLinkRecordUpdated(linkRecords, MsgLinkRecordEvent.SET);
@@ -238,17 +252,26 @@ public class MsgAGet extends ClientMessageAction {
       cache.fireMsgDataRecordUpdated(dataRecords, MsgDataRecordEvent.SET);
     }
 
-    // Update the fetched stats if any, do this after fetching message bodies 
-    // so that the original values count and automatic fetching doesn't affect the shown stats.
-    // Stats in the database are unaffected by this client sequence overwrite.
-    // Update the stats before fireing events for messages so the flags get displayed at the same time as messages.
-    if (statRecords != null)
-      cache.addStatRecords(statRecords);
+    // Remove the skipped messages from the cache, and also remove the Message Datas with no more links to them
+    if (toRemoveMsgs != null && toRemoveMsgs.length > 0) {
+      MsgDataRecord[] toRemoveDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(toRemoveMsgs));
+      cache.removeMsgLinkRecords(toRemoveMsgs);
+      Vector toRemoveDatasV = new Vector();
+      for (int i=0; i<toRemoveDatas.length; i++) {
+        MsgLinkRecord[] otherMsgLinks = cache.getMsgLinkRecordsForMsg(toRemoveDatas[i].msgId);
+        if (otherMsgLinks == null || otherMsgLinks.length == 0) {
+          toRemoveDatasV.addElement(toRemoveDatas[i]);
+        }
+      }
+      toRemoveDatas = (MsgDataRecord[]) ArrayUtils.toArray(toRemoveDatasV, MsgDataRecord.class);
+      if (toRemoveDatas != null && toRemoveDatas.length > 0) {
+        cache.removeMsgDataRecords(toRemoveDatas);
+      }
+    }
 
-    // Fire the suppressed events as the needed bodies should be in the cache already.
-    cache.fireMsgLinkRecordUpdated(linkRecords, RecordEvent.SET);
-    cache.fireMsgDataRecordUpdated(dataRecords, RecordEvent.SET);
-
+//    // Fire the suppressed events as the needed bodies should be in the cache already.
+//    cache.fireMsgLinkRecordUpdated(linkRecords, RecordEvent.SET);
+//    cache.fireMsgDataRecordUpdated(dataRecords, RecordEvent.SET);
 
     // Gather all Message Links that we don't have stat records for, and fetch the stats
     {
@@ -341,7 +364,7 @@ public class MsgAGet extends ClientMessageAction {
         }
         if (hash != null) {
           // if hash not already in the cache, add it to be fetched
-          // always fetch hashes for new Address Records in case Address Record was deleted and recreated 
+          // always fetch hashes for new Address Records in case Address Record was deleted and recreated
           // (there could be wanted duplicates of hashes when address exists in Address Book and Allowed Senders book)
           if ((dataRecord.isTypeAddress() && newDataRecordIDsV.contains(dataRecord.msgId)) ||
               (cache.getAddrHashRecords(hash) == null && !cache.wasRequestedAddrHash(hash)))

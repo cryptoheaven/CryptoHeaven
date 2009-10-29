@@ -24,7 +24,6 @@ import com.CH_co.util.*;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -92,7 +91,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public static final String PROPERTY_NAME_MAX_CONNECTION_COUNT = "ServerInterfaceLayer" + "_maxConnCount";
 
   /** Vector of connection workers. */
-  private Vector workers;
+  private final Vector workers = new Vector();
   /** All the ready messages go through this queue. 
       No jobs are being run by that queue, they are handled to the submitting threads to be run. */
   private QueueMM1 executionQueue;
@@ -106,14 +105,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       ExecutionQueue so that its not blocked while independent jobs are being run. */
   private QueueMM1 independentExecutionQueue;
 
-
   /** List to put the waiting stamps. */
-  private Vector stampList;
+  private final Vector stampList = new Vector();
   /** Secondary list to put the waiting stamps as a signal for execution thread to start its work. */
-  private Vector stampList2;
+  private final Vector stampList2 = new Vector();
   /** List to put the fetched Client Message Actions for the waiting stamps. */
-  private Vector doneList;
-
+  private final Vector doneList = new Vector();
 
   /** Last successful login message. */
   private MessageAction lastLoginMessageAction;
@@ -141,7 +138,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    */
   private ServerInterfaceWorker mainWorker;
   private boolean mainWorkerSubmition;
-  private Object mainWorkerMonitor;
+  private final Object mainWorkerMonitor = new Object();
   private LoginCompletionNotifierI loginCompletionNotifier;
 
   private boolean isClient;
@@ -222,14 +219,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       }
     }
 
-    // create waiting lists
-    this.stampList = new Vector();
-    this.stampList2 = new Vector();
-    this.doneList = new Vector();
-
-    // Create a storage holder for the workers.
-    this.workers = new Vector();
-
     // Create the execution queue
     this.executionQueue = new QueueMM1("Execution Queue", new QueueExecutionFunction());
 
@@ -239,9 +228,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     // Create the independent execution queue 
     independentExecutor = independentExecutor != null ? independentExecutor : new IndependentClientQueueExecutionFunction(this);
     this.independentExecutionQueue = new QueueMM1("Independent Exec Queue", independentExecutor);
-
-    // Create main worker monitor object
-    this.mainWorkerMonitor = new Object();
 
     // set MAX connection count
     if (fixedMaxConnectionCount == null) {
@@ -1701,7 +1687,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private class WaitingJobsScanner extends Thread {
     private Object lastScanHeadJob = null;
     private boolean triggeredMonitor = false;
-    private Object triggerMonitor = new Object();
+    private final Object triggerMonitor = new Object();
     public WaitingJobsScanner() {
       super("Waiting Jobs Scanner");
       setDaemon(true);

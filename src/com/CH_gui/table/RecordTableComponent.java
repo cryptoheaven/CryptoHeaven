@@ -477,7 +477,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
 
 
   private Timer timer = null;
-  private Object timerMonitor = new Object();
+  private final Object timerMonitor = new Object();
   private FolderPair evaluatedFolder = null;
   private void showTableOrDelayedTemplate() {
     FolderPair pfp = recordTableScrollPane.getTableModel().getParentFolderPair();
@@ -729,9 +729,9 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
               String[] notes = FolderTree.getOwnerAndChatNote(fRec);
               desc = "Participants: " + notes[0] + " " + notes[1];
               // correct the Chat Log title to ommit the participants...
-              String title = share.getFolderName();
+              String name  = share.getFolderName();
               String defaultChatFolderName = com.CH_gui.lang.Lang.rb.getString("folderName_Chat_Log");
-              if (title.startsWith(defaultChatFolderName))
+              if (name.startsWith(defaultChatFolderName))
                 jTitleLabel.setText("Chat");
             }
           } else {

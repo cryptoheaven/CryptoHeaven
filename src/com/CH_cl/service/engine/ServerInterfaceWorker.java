@@ -12,7 +12,6 @@
 
 package com.CH_cl.service.engine;
 
-import com.CH_co.util.GlobalProperties;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;

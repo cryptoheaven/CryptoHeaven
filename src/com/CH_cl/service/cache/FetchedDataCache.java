@@ -2366,6 +2366,38 @@ public class FetchedDataCache extends Object {
     return msgLinks;
   }
 
+/**
+   * @return all Message Link Records created between specified times.
+   * The records found in the cache are returned.
+   */
+  public synchronized MsgLinkRecord[] getMsgLinkRecords(Date dateCreatedFrom, Date dateCreatedTo, Long ownerObjId, Short ownerObjType) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords(Date dateCreatedFrom, Date dateCreatedTo, Long ownerObjId, Short ownerObjType)");
+    if (trace != null) trace.args(dateCreatedFrom, dateCreatedTo, ownerObjId, ownerObjType);
+
+    Vector msgLinksV = new Vector();
+    Iterator iter = msgLinkRecordMap.values().iterator();
+    Date dateFrom = null;
+    Date dateTo = null;
+    if (dateCreatedFrom.before(dateCreatedTo)) {
+      dateFrom = dateCreatedFrom;
+      dateTo = dateCreatedTo;
+    } else {
+      dateFrom = dateCreatedTo;
+      dateTo = dateCreatedFrom;
+    }
+    while (iter.hasNext()) {
+      MsgLinkRecord msgLink = (MsgLinkRecord) iter.next();
+      if ((ownerObjId == null || ownerObjId.equals(msgLink.ownerObjId)) && (ownerObjType == null || ownerObjType.equals(msgLink.ownerObjType))) {
+        if (msgLink.dateCreated.compareTo(dateFrom) >= 0 && msgLink.dateCreated.compareTo(dateTo) <= 0) {
+          msgLinksV.addElement(msgLink);
+        }
+      }
+    }
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+
+    if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
+    return msgLinks;
+  }
 
   /**
    * @return all Message Link Records for a given folder id.
