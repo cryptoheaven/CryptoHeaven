@@ -50,10 +50,7 @@ public class DefaultReplyRunner extends Thread {
     this.msgAction = msgAction;
     defaultReplyRunnerCount ++;
     defaultReplyRunnerCount %= Integer.MAX_VALUE-1;
-
-    // change the priority of this thread to minimum
-    setPriority(MIN_PRIORITY);
-
+    setDaemon(true);
     if (trace != null) trace.exit(DefaultReplyRunner.class);
   }
 

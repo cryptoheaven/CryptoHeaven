@@ -25,6 +25,7 @@ import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 
+import com.CH_gui.gui.URLLauncherCHACTION;
 import com.CH_gui.gui.URLLauncherMAILTO;
 import com.CH_gui.msgs.*;
 import com.CH_gui.msgTable.*;
@@ -66,9 +67,14 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
     altMyBkColor = new Color(247, 247, 247);
     sha256 = new SHA256();
 
-    // for clickable links, register the handler...
+    // for clickable links and actions, register the handler...
     HTML_ClickablePane.setRegisteredGlobalLauncher(HTML_ClickablePane.PROTOCOL_MAIL, new URLLauncherMAILTO());
   };
+
+  public PostTableCellRenderer() {
+    super();
+    jTextAreaRenderer.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
+  }
 
   private static Color makeBkColor(Object sourceContents) {
     byte[] digest = sha256.digest(("" + sourceContents).getBytes());
@@ -110,6 +116,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
     Object v = value instanceof StringBuffer ? "" : value;
     Component renderer = super.getTableCellRendererComponent(table, v, isSelected, hasFocus, row, column);
+    jTextAreaRenderer.setRendererContainer(table);
 
 
     // Determine color of the message, white or none-white?
@@ -155,8 +162,11 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
     }
     // end of background color management
 
+    int rawColumn = getRawColumn(table, column);
 
-    if (value instanceof StringBuffer) {
+    // subject + body
+    if (rawColumn == 5) {
+      StringBuffer sb = null;
 
       // HTML_ClickablePane somehow fixes the sizing adjustement bug
       JTextComponent editor = jTextAreaRenderer;
@@ -165,11 +175,22 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       int indentLevel = 0;
       JSortedTable sTable = (JSortedTable) table;
       TableModel tableModel = sTable.getRawModel();
+
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      MsgLinkRecord mLink = null;
+      MsgDataRecord mData = null;
+      MsgLinkRecord pLink = null;
+
       // Since multiple views may display the same message links, we must choose how to view them in the renderer.
-      if (tableModel instanceof MsgTableModel && ((MsgTableSorter) sTable.getModel()).isThreaded()) {
+      if (tableModel instanceof MsgTableModel) {
         MsgTableModel mtm = (MsgTableModel) tableModel;
-        MsgLinkRecord linkRecord = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
-        indentLevel = linkRecord.getSortThreadLayer();
+        mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
+        mData = cache.getMsgDataRecord(mLink.msgId);
+        pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
+        sb = (StringBuffer) mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
+        if (((MsgTableSorter) sTable.getModel()).isThreaded()) {
+          indentLevel = mLink.getSortThreadLayer();
+        }
       }
 
       TableColumnModel columnModel = table.getColumnModel();
@@ -183,7 +204,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       editor.setBorder(RecordTableCellRenderer.getIndentedBorder(0, false));
 
       // Set contents of the message area
-      MsgPanelUtils.setMessageContent(value.toString(), true, editor, true);
+      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true);
       //xx-xx editor.setText(value.toString());
 
 //      editor.setPreferredWidthLimit(usableColumnWidth);
@@ -208,6 +229,26 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
         table.setRowHeight(row, desiredHeight);
       }
     } // end if String Buffer
+    // From
+    else if (rawColumn == 3) {
+      if (row > 0) {
+        JSortedTable sTable = (JSortedTable) table;
+        TableModel tableModel = sTable.getRawModel();
+        if (tableModel instanceof MsgTableModel) {
+          MsgTableModel mtm = (MsgTableModel) tableModel;
+          MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
+          MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
+          Object obj = mtm.getValueAtRawColumn(mLink, rawColumn, false);
+          if (pLink != null) {
+            Object pObj = mtm.getValueAtRawColumn(pLink, rawColumn, false);
+            if (obj.equals(pObj)) {
+              ((MsgTableCellRenderer) renderer).setText(null);
+              ((MsgTableCellRenderer) renderer).setIcon(null);
+            }
+          }
+        }
+      }
+    }
 
     return renderer;
   }

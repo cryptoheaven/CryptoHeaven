@@ -260,14 +260,12 @@ public class DeleteAccountDialog extends GeneralDialog {
   private class OKThread extends Thread {
     public OKThread() {
       super("DeleteAccountDialog OKThread");
+      setDaemon(true);
     }
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
 
       setEnabledInputs(false);
-
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
 
       boolean error = false;
 

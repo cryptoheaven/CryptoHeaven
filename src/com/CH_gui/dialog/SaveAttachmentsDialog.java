@@ -423,7 +423,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   }
 
   private void pressedCopy() {
-    new Thread("Attachment Copier") {
+    Thread th = new Thread("Attachment Copier") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -495,7 +495,9 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     closeDialog();
   }

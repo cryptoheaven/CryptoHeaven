@@ -145,7 +145,7 @@ public class StatTableModel extends RecordTableModel {
   }
 
   public synchronized void refreshData() {
-    new Thread("Stat Refresher") {
+    Thread th = new Thread("Stat Refresher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -182,7 +182,9 @@ public class StatTableModel extends RecordTableModel {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   /**

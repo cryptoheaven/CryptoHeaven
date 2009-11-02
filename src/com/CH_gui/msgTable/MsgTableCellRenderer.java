@@ -127,13 +127,13 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           String toolTip = o[0].toString();
           icon = (Icon) o[1];
           if (!isDoubleLineView) {
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+            MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
+            MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
             // if Expiration or Password column is not visible
             boolean col_19 = isColumnVisible(table, 19); // expiry column
             boolean col_20 = isColumnVisible(table, 20); // password protection column
             if (!col_19 || !col_20) {
-              FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-              MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
-              MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
               if (!col_20) {
                 if (mData.bodyPassHash != null) {
                   icon = Images.get(ImageNums.KEY16);
@@ -148,6 +148,26 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 }
               }
             }
+            // if no "Importance" icon then use it for "Attachments" if it was removed
+            if (icon == null && !isColumnVisible(table, 1)) {
+              if (mData != null) {
+                int numOfAttachments = 0;
+                if (mData.attachedFiles != null && mData.attachedMsgs != null) {
+                  numOfAttachments = mData.attachedFiles.shortValue() + mData.attachedMsgs.shortValue();
+                  // if regular email, don't show serialized email as attachment in the table...
+                  if (mData.isEmail()) {
+                    numOfAttachments --;
+                  }
+                }
+                if (numOfAttachments > 0) {
+                  icon = Images.get(ImageNums.ATTACH16);
+                  if (numOfAttachments == 1)
+                    toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
+                  else
+                    toolTip = "" + numOfAttachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
+                }
+              }
+            }
           }
           setIcon(icon);
           setToolTipText(toolTip);
@@ -157,17 +177,17 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       // attachments
       else if (rawColumn == 1) {
         if (value instanceof Short) {
-          short attachments = value != null ? ((Short) value).shortValue() : -1;
+          short numOfAttachments = value != null ? ((Short) value).shortValue() : -1;
           Icon icon = null;
           String toolTip = null;
           //setHorizontalAlignment(RIGHT);
-          if (attachments > 0) {
+          if (numOfAttachments > 0) {
             //text = "" + value;
             icon = Images.get(ImageNums.ATTACH16);
-            if (attachments == 1)
+            if (numOfAttachments == 1)
               toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
             else
-              toolTip = "" + attachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
+              toolTip = "" + numOfAttachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
           } else {
             toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_No_Attachments_Present");
             // since no attachments present, maybe we can put other useful info here
@@ -178,23 +198,30 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 // if Expiration or Password column is not visible
                 boolean col_19 = isColumnVisible(table, 19); // expiry column
                 boolean col_20 = isColumnVisible(table, 20); // password protection column
-                if (!col_19 || !col_20) {
-                  FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-                  MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
-                  MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-                  if (!col_20) {
-                    if (mData.bodyPassHash != null) {
-                      icon = Images.get(ImageNums.KEY16);
-                      toolTip = "Password Protected";
-                    }
+                FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+                MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
+                MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
+                boolean isSet = false;
+                if (!col_19) {
+                  Object[] exp = mData.getExpirationIconAndText(cache.getMyUserId());
+                  if (exp[0] != null) {
+                    icon = (Icon) exp[0];
+                    toolTip = "Expiration: " + exp[1];
+                    isSet = true;
                   }
-                  if (!col_19) {
-                    Object[] exp = mData.getExpirationIconAndText(cache.getMyUserId());
-                    if (exp[0] != null) {
-                      icon = (Icon) exp[0];
-                      toolTip = "Expiration: " + exp[1];
-                    }
+                }
+                if (!isSet && !col_20) {
+                  if (mData.bodyPassHash != null) {
+                    icon = Images.get(ImageNums.KEY16);
+                    toolTip = "Password Protected";
+                    isSet = true;
                   }
+                }
+                // default to Importance column
+                if (!isSet) {
+                  Object[] o = MsgDataRecord.getPriorityTextAndIcon(mData.importance.shortValue());
+                  toolTip = o[0].toString();
+                  icon = (Icon) o[1];
                 }
               }
             }
@@ -230,9 +257,12 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
 
     // From
     else if (rawColumn == 3) {
+      if (column == 0)
+        setBorder(RecordTableCellRenderer.BORDER_ICONIZED_FIRST);
+      else
+        setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
       // From (internal)
       if (value instanceof Long) {
-        setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         setHorizontalAlignment(LEFT);
         // The From field is the contact name or user's short info, whichever is available
         Long userId = (Long) value;
@@ -248,7 +278,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       }
       // From (email)
       else if (value instanceof String) {
-        setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         setHorizontalAlignment(LEFT);
         Record sender = CacheUtilities.convertToFamiliarEmailRecord((String) value);
         setIcon(ListRenderer.getRenderedIcon(sender));
@@ -277,7 +306,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         // for Address objects, change the first line to "Name" because we know this column is hidden
         if (mData != null && mData.isTypeAddress())
           thisCloned.setText(ListRenderer.getRenderedText(mData));
-        Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, false, cache);
+        Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, cache);
         JComponent subjectComp = (JComponent) getTableCellRendererComponent(table, subjectValue, isSelected, hasFocus, row, -1, 5);
         subjectComp.setOpaque(true);
         if (subjectComp instanceof JLabel) {
@@ -365,7 +394,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             jFlowPanel.removeAll();
             jFlowPanel.add(jAddrRenderer);
           }
-          Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, false, cache);
+          Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, cache);
           JComponent subjectComp = (JComponent) getTableCellRendererComponent(table, subjectValue, isSelected, hasFocus, row, -1, 5);
           subjectComp.setOpaque(true);
           if (subjectComp instanceof JLabel) {
@@ -393,94 +422,98 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
     }
 
     // Subject
-    else if (rawColumn == 5 && value instanceof String) {
-      String subject = (String) value;
-      int indentLevel = 0;
-      // If message status is UNREAD then display closed main icon, otherwise open mail icon.
+    else if (rawColumn == 5) {
       JSortedTable sTable = (JSortedTable) table;
       TableModel tableModel = sTable.getRawModel();
-      Long msgId = null;
-      // Since multiple views may display the same message links, we must choose how to view them in the renderer.
       if (tableModel instanceof MsgTableModel) {
         MsgTableModel mtm = (MsgTableModel) tableModel;
-        MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
-        msgId = mLink.msgId;
-        MsgDataRecord mData = FetchedDataCache.getSingleInstance().getMsgDataRecord(mLink.msgId);
-        boolean isFlagRed = false;
-        StatRecord statRecord = null;
-        isFlagRed = mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew();
-        // set icon if in its own column (not as part of other)
-        if (column > -1) {
-          Icon icon = null;
-          if (mData != null && mData.isTypeAddress()) {
-            icon = mData.getIcon();
-          }
-          if (icon == null) {
-            icon = mLink.getIcon();
-          }
-          setIcon(icon);
-          // check if need to use BOLD
-          if (isFlagRed) {
-            renderer = jRendererBoldIconized;
-            jRendererBoldIconized.setText(getText());
-            jRendererBoldIconized.setIcon(getIcon());
-            setDefaultBackground(renderer, row, isSelected);
-          }
-        } else {
-          // if part of other column, use the smaller renderer
-          if (isFlagRed) {
-            renderer = jRendererSmallBoldIconized;
-            jRendererSmallBoldIconized.setText(getText());
-          } else {
-            renderer = jRendererSmallPlainIconized;
-            jRendererSmallPlainIconized.setText(getText());
-          }
-          setDefaultBackground(renderer, row, isSelected);
-        }
-        if  (((MsgTableSorter) sTable.getModel()).isThreaded())
-          indentLevel = mLink.getSortThreadLayer();
-        // set Subject
-        if (subject == null || subject.length() == 0)
-          subject = ListRenderer.getRenderedText(mData);
-        ((JLabel) renderer).setText(subject);
+        if (!mtm.isModeMsgBody()) {
+          String subject = null;
+          int indentLevel = 0;
+          // If message status is UNREAD then display closed main icon, otherwise open mail icon.
+          // Since multiple views may display the same message links, we must choose how to view them in the renderer.
+          if (tableModel instanceof MsgTableModel) {
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+            MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
+            MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
+            subject = (String) mtm.getSubjectColumnValue(mtm, mLink, mData, null, cache);
+            boolean isFlagRed = false;
+            StatRecord statRecord = null;
+            isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew();
+            // set icon if in its own column (not as part of other)
+            if (column > -1) {
+              Icon icon = null;
+              if (mData != null && mData.isTypeAddress()) {
+                icon = mData.getIcon();
+              }
+              if (icon == null) {
+                icon = mLink.getIcon();
+              }
+              setIcon(icon);
+              // check if need to use BOLD
+              if (isFlagRed) {
+                renderer = jRendererBoldIconized;
+                jRendererBoldIconized.setText(getText());
+                jRendererBoldIconized.setIcon(getIcon());
+                setDefaultBackground(renderer, row, isSelected);
+              }
+            } else {
+              // if part of other column, use the smaller renderer
+              if (isFlagRed) {
+                renderer = jRendererSmallBoldIconized;
+                jRendererSmallBoldIconized.setText(getText());
+              } else {
+                renderer = jRendererSmallPlainIconized;
+                jRendererSmallPlainIconized.setText(getText());
+              }
+              setDefaultBackground(renderer, row, isSelected);
+            }
+            if  (((MsgTableSorter) sTable.getModel()).isThreaded())
+              indentLevel = mLink.getSortThreadLayer();
+            // set Subject
+            if (subject == null || subject.length() == 0)
+              subject = ListRenderer.getRenderedText(mData);
+            ((JLabel) renderer).setText(subject);
 
-        // in Address type tables, if no "Email Address" column, show it here under "Name"
-        if (mtm.getMode() == MsgTableModel.MODE_ADDRESS || mtm.getMode() == MsgTableModel.MODE_WHITELIST) {
-          if (mData != null && mData.isTypeAddress() && !isColumnVisible(table, 16) && !mData.fileAs.equalsIgnoreCase(mData.email)) {
-            JLabel thisCloned = (JLabel) renderer;
-            thisCloned.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
-            thisCloned.setForeground(getForeground());
-            thisCloned.setBackground(getBackground());
-            jTwoLinesRendererSubject.removeAll();
-            jTwoLinesRendererSubject.setLayout(new GridLayout(2, 1));
-            jTwoLinesRendererSubject.add(thisCloned);
-            jRendererSmallPlainIconized2.setText(mData.email);
-            jTwoLinesRendererSubject.add(jRendererSmallPlainIconized2);
-            setDefaultBackground(jRendererSmallPlainIconized2, row, isSelected);
-            setDefaultBackground(jTwoLinesRendererSubject, row, isSelected);
-            renderer = jTwoLinesRendererSubject;
+            // in Address type tables, if no "Email Address" column, show it here under "Name"
+            if (mtm.getMode() == MsgTableModel.MODE_ADDRESS || mtm.getMode() == MsgTableModel.MODE_WHITELIST) {
+              if (mData != null && mData.isTypeAddress() && !isColumnVisible(table, 16) && !mData.fileAs.equalsIgnoreCase(mData.email)) {
+                JLabel thisCloned = (JLabel) renderer;
+                thisCloned.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
+                thisCloned.setForeground(getForeground());
+                thisCloned.setBackground(getBackground());
+                jTwoLinesRendererSubject.removeAll();
+                jTwoLinesRendererSubject.setLayout(new GridLayout(2, 1));
+                jTwoLinesRendererSubject.add(thisCloned);
+                jRendererSmallPlainIconized2.setText(mData.email);
+                jTwoLinesRendererSubject.add(jRendererSmallPlainIconized2);
+                setDefaultBackground(jRendererSmallPlainIconized2, row, isSelected);
+                setDefaultBackground(jTwoLinesRendererSubject, row, isSelected);
+                renderer = jTwoLinesRendererSubject;
+              }
+            }
+          }
+
+          if (indentLevel > 0) {
+            boolean isIconized = true;
+            // if not in its own column strip the transparent icon and add another Indent
+            if (column == -1 && renderer instanceof JLabel) {
+              ((JLabel) renderer).setIcon(null);
+              isIconized = false;
+              indentLevel ++;
+            }
+            renderer = makeIndentedAreaRenderer(indentLevel, renderer, true, isIconized);
+            // since renderer can be a panel here, use this special call to set the tool tip
+            if (renderer instanceof JComponent)
+              setDefaultToolTip(subject, (JComponent) renderer, table, row, column);
+          }
+
+          // Fix up the height of the row in case the message subject needs more space.
+          int desiredHeight = Math.max(renderer.getPreferredSize().height, table.getRowHeight());
+          if (table.getRowHeight(row) < desiredHeight) {
+            table.setRowHeight(row, desiredHeight);
           }
         }
-      }
-
-      if (indentLevel > 0) {
-        boolean isIconized = true;
-        // if not in its own column strip the transparent icon and add another Indent
-        if (column == -1 && renderer instanceof JLabel) {
-          ((JLabel) renderer).setIcon(null);
-          isIconized = false;
-          indentLevel ++;
-        }
-        renderer = makeIndentedAreaRenderer(indentLevel, renderer, true, isIconized);
-        // since renderer can be a panel here, use this special call to set the tool tip
-        if (renderer instanceof JComponent)
-          setDefaultToolTip(subject, (JComponent) renderer, table, row, column);
-      }
-
-      // Fix up the height of the row in case the message subject needs more space.
-      int desiredHeight = Math.max(renderer.getPreferredSize().height, table.getRowHeight());
-      if (table.getRowHeight(row) < desiredHeight) {
-        table.setRowHeight(row, desiredHeight);
       }
     }
 

@@ -49,7 +49,7 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public abstract class JActionFrame extends JFrame implements ContainerListener, ActionProducerI, VisualsSavable {
 
-  private static Integer versionedVisualsSavable = new Integer(3);
+  private static Integer versionedVisualsSavable = new Integer(4);
 
   private static final boolean ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS = false;
   public static boolean ENABLE_MENU_CUSTOMIZATION_ACTION = true;

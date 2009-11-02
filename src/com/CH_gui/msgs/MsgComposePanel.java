@@ -479,7 +479,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     }
 
     // do fetching of attachments in a seperate thread as this may take a while
-    new Thread("Setting From Draft Attachments Fetcher") {
+    Thread th = new Thread("Setting From Draft Attachments Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
         Record[] attachments = AttachmentFetcherPopup.fetchAttachments(new MsgLinkRecord[] { draftMsgLink });
@@ -489,7 +489,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     // recipients are filled, so subject is first empty/editable field
     if (isAnyRecipients()) {
@@ -742,7 +744,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     if (toRecipients != null && toRecipients.length == 1 && toRecipients[0] instanceof FolderPair) {
       final FolderPair _toFolderPair = (FolderPair) toRecipients[0];
       final Component _this = this;
-      new Thread(new Runnable() {
+      Thread th = new Thread(new Runnable() {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())));
@@ -814,7 +816,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         }
-      }, "Ring Pressed Thread").start();
+      }, "Ring Pressed Thread");
+      th.setDaemon(true);
+      th.start();
     }
   }
 
@@ -854,7 +858,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     public void actionPerformedNoVeto() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "actionPerformedNoVeto()");
       setSendMessageInProgress(true);
-      new Thread("Send Action Runner") {
+      Thread th = new Thread("Send Action Runner") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           boolean isCanceled = false;
@@ -952,7 +956,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         } // end run{}
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
       if (trace != null) trace.exit(getClass());
     }
     private boolean showStagedSecureChoiceDialog(final EmailAddressRecord[] emailAddresses) {
@@ -1915,7 +1921,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     checkEmailAddressesForAddressBookAdition_Threaded(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, folderFilter, false, null);
   }
   public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter, final boolean forceAddAtOnce, final FolderPair toAddressBook) {
-    new Thread("Address Book Email Checker") {
+    Thread th = new Thread("Address Book Email Checker") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
         checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, false, folderFilter, forceAddAtOnce, toAddressBook);
@@ -1923,7 +1929,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   /**
@@ -2225,7 +2233,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   }
 
   public static void checkUserRecordsForContactListAdition_Threaded(final Component parent, final Vector userRecordsV) {
-    new Thread("Contact List User Checker") {
+    Thread th = new Thread("Contact List User Checker") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
         checkUserRecordsForContactListAdition(parent, userRecordsV);
@@ -2233,7 +2241,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   public static void checkUserRecordsForContactListAdition(Component parent, Vector userRecordsV) {
@@ -2272,7 +2282,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       buttons[0].addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           dialog.dispose();
-          new Thread("Contact Adding Thread") {
+          Thread th = new Thread("Contact Adding Thread") {
             public void run() {
               Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
               for (int i=0; i<usersToAddV.size(); i++) {
@@ -2315,7 +2325,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
               if (trace != null) trace.exit(getClass());
               if (trace != null) trace.clear();
             } // end run()
-          }.start();
+          };
+          th.setDaemon(true);
+          th.start();
         }
       });
       buttons[1].addActionListener(new ActionListener() {

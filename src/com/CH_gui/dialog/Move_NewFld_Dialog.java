@@ -689,7 +689,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private class OKActionListener implements ActionListener {
     public void actionPerformed (ActionEvent event) {
       // seperate AWT Thread from any potention network request in set request methods
-      new Thread("Folder Creator") {
+      Thread th = new Thread("Folder Creator") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -734,7 +734,9 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         } // end run()
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     } // end actionPerformed()
   } // end class OKActionListener
 

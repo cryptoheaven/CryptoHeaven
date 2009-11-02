@@ -93,7 +93,7 @@ public class OpenSaveCancelDialog extends GeneralDialog {
     final FileLinkRecord _fileLink = fileLink;
     final MsgLinkRecord _parentMsgLink = parentMsg;
 
-    new Thread("File-From updater") {
+    Thread th = new Thread("File-From Updater") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
         try {
@@ -193,7 +193,9 @@ public class OpenSaveCancelDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
     if (trace != null) trace.exit(OpenSaveCancelDialog.class);
   }
 

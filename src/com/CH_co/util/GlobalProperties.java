@@ -48,7 +48,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 6;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 468;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 470;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -164,6 +164,7 @@ public class GlobalProperties extends Object {
   // build 464 Clicking of mailto: links will compose email from address that recived the original message
   // build 466 Menu Editor
   // build 468 Re-connect now includes synching of empty tables, recycle bin, and removal of deleted messages
+  // build 470 Decluttering of chat window, rearranged some menus and toolbars, deamonizing and priority changes to helper and background threads, other minor fixes
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;

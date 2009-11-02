@@ -170,7 +170,7 @@ public class MsgAGet extends ClientMessageAction {
 
     // if this was a bulk fetch done in stages, gather Messages which exist in the cache but should be removed
     MsgLinkRecord[] toRemoveMsgs = null;
-    if (linkRecords != null && fetchNumMax != null && fetchNumNew != null) {
+    if (linkRecords != null && linkRecords.length > 0 && fetchNumMax != null && fetchNumNew != null) {
       MsgLinkRecord[] priorMsgs = cache.getMsgLinkRecords(linkRecords[0].dateCreated, linkRecords[linkRecords.length-1].dateCreated, fetchingOwnerObjId, fetchingOwnerObjType);
       toRemoveMsgs = (MsgLinkRecord[]) ArrayUtils.getDifference(priorMsgs, linkRecords);
     }

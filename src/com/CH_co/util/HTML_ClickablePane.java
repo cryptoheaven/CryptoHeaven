@@ -58,6 +58,8 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
 
   private static URL defaultBase;
 
+  private Component rendererContainer;
+
   public HTML_ClickablePane(HTMLEditorKit editorKit) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "HTML_ClickablePane()");
     setContentType("text/html");
@@ -167,6 +169,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
           if (trace != null) trace.clear();
         }
       };
+      fetcher.setDaemon(true);
       fetcher.start();
     }
     if (trace != null) trace.exit(HTML_ClickablePane.class, returnPane);
@@ -241,6 +244,12 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
      */
   }
 
+  public Component getRendererContainer() {
+    return rendererContainer;
+  }
+  public void setRendererContainer(Component rendererContainer) {
+    this.rendererContainer = rendererContainer;
+  }
   /**
    * Launcher is invoked with URL when key matches URL type upon hyper link click.
    */
@@ -289,7 +298,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
   private void newClick(final URL url) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "newClick(URL url)");
     if (trace != null) trace.args(url);
-    new Thread("Click Launcher") {
+    Thread launcher = new Thread("Click Launcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
         try {
@@ -306,7 +315,9 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    launcher.setDaemon(true);
+    launcher.start();
     if (trace != null) trace.exit(HTML_ClickablePane.class);
   }
 

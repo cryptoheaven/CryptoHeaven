@@ -399,7 +399,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
   private void submitShareChanges(final boolean applyToTree, final FolderPair[] children) {
 
-    new Thread("Submitter of Share Changes") {
+    Thread th = new Thread("Submitter of Share Changes") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -569,7 +569,9 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   private void pressedCancel() {
@@ -650,12 +652,9 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
 
   private void fetchData() {
-    new Thread("Folder Properties Dialog Data Fetcher") {
+    Thread th = new Thread("Folder Properties Dialog Data Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           // fetch owner User Record
@@ -803,7 +802,9 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
 

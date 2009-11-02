@@ -203,7 +203,7 @@ public class TraceTableModel extends RecordTableModel {
   }
 */
   public synchronized void refreshData() {
-    new Thread("Trace Refresher") {
+    Thread th = new Thread("Trace Refresher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -269,7 +269,9 @@ public class TraceTableModel extends RecordTableModel {
         DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, reply);
         if (trace != null) trace.exit(getClass());
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   /**

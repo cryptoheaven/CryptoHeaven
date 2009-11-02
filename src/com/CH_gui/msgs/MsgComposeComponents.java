@@ -1025,16 +1025,16 @@ public class MsgComposeComponents extends Object implements DisposableObj {
    * @param pickFromRecipients
    */
   public void setFromAccounts(MsgDataRecord originalMsg) {
-    if (jFromCombo != null) {
-      EmailRecord[] emlRecs = cache.getEmailRecords(cache.getMyUserId());
+    if (jFromCombo != null && originalMsg != null) {
       EmailRecord emlRecFound = MsgPanelUtils.getOurMatchingFromEmlRec(originalMsg);
-      jFromCombo.setSelectedObject(emlRecFound, emlRecs);
+      if (emlRecFound != null) {
+        jFromCombo.setSelectedObject(emlRecFound);
+      }
     }
   }
   public void setFromAccount(EmailRecord sendFromEmailAccount) {
-    if (jFromCombo != null) {
-      EmailRecord[] emlRecs = cache.getEmailRecords(cache.getMyUserId());
-      jFromCombo.setSelectedObject(sendFromEmailAccount, emlRecs);
+    if (jFromCombo != null && sendFromEmailAccount != null) {
+      jFromCombo.setSelectedObject(sendFromEmailAccount);
     }
   }
 

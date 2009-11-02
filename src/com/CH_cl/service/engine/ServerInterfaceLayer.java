@@ -403,6 +403,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         if (trace != null) trace.clear();
       } // end run()
     }; // end Thread
+    th.setDaemon(true);
     th.start();
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
@@ -658,7 +659,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             if (trace != null) trace.clear();
           }
         };
-        th.setPriority(Thread.MIN_PRIORITY);
+        th.setDaemon(true);
         th.start();
         while (true) {
           try {
@@ -797,7 +798,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    */
   public void ensureAtLeastOneAdditionalWorker_SpawnThread() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ensureAtLeastOneAdditionalWorker()");
-    new Thread(new Runnable() {
+    Thread th = new Thread(new Runnable() {
       public void run() {
         Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -812,7 +813,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }, "Additional Worker Ensurer").start();
+    }, "Additional Worker Ensurer");
+    th.setDaemon(true);
+    th.start();
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
@@ -1072,6 +1075,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         if (trace != null) trace.clear();
       }
     }, "Socket Creator");
+    th.setDaemon(true);
     th.start();
     return th;
   }
@@ -1142,6 +1146,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           if (trace != null) trace.clear();
         }
       }, "Socket Connector");
+      socketConnector.setDaemon(true);
       socketConnector.start();
 
       // Wait for established connection reasonable amount of time.

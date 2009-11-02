@@ -466,6 +466,7 @@ public class LoginFrame extends JFrame {
       }
     };
     // change the priority of that thread to minimum
+    t.setDaemon(true);
     t.setPriority(Thread.MIN_PRIORITY);
     t.start();
   }
@@ -1280,8 +1281,7 @@ public class LoginFrame extends JFrame {
 
     public OKThread() {
       super("LoginFrame OKThread");
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
+      setDaemon(true);
     }
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");

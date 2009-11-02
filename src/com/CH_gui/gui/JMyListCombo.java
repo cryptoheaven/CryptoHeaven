@@ -176,6 +176,12 @@ public class JMyListCombo extends JPanel {
     this.provider = provider;
   }
 
+  public void setSelectedObject(Object obj) {
+    if (provider != null)
+      objects = provider.provide(null);
+    setSelectedObject(obj, objects);
+  }
+
   public void setSelectedObject(Object obj, Object[] objects) {
     this.objects = objects;
     int index = 0;

@@ -65,7 +65,7 @@ public class SysANotify extends ClientMessageAction {
       }
 
       if (shouldReSynch) {
-        new Thread() {
+        Thread th = new Thread() {
           public void run() {
             Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -94,7 +94,9 @@ public class SysANotify extends ClientMessageAction {
             if (trace != null) trace.exit(getClass());
             if (trace != null) trace.clear();
           }
-        }.start();
+        };
+        th.setDaemon(true);
+        th.start();
         SIL.lastForcedWorkerStamp = null;
         SIL.lastWorkerActivityResyncPending = false;
       } // end shouldReSynch

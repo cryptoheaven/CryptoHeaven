@@ -27,14 +27,11 @@ import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.*;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.Vector;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.table.TableModel;
@@ -154,8 +151,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     RecordTableCellRenderer renderer = recordTableModel.createRenderer();
     jSTable.setSelectionBackground(renderer.getAltBkColors()[RecordTableCellRenderer.ALT_BK_SELECTED_COLOR_I]);
     jSTable.setDefaultRenderer(Object.class, renderer);
-    jSTable.setShowHorizontalLines(false);
-    jSTable.setShowVerticalLines(false);
+    jSTable.setShowGrid(false);
+    jSTable.getColumnModel().setColumnMargin(0);
     jSTable.addTableModelSortListener(sortListener);
 
     // Inform interested listeners about record selection changes when sorting is not in progress.
@@ -172,8 +169,6 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     setViewport(new JBottomStickViewport());
     setViewportView(jSTable);
     getViewport().setBackground(jSTable.getBackground());
-//    if (!(recordTableModel instanceof ContactTableModel))
-//      setBorder(new EmptyBorder(0,0,0,0));
     setBorder(new EmptyBorder(0,0,0,0));
 
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this)));
@@ -422,7 +417,10 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
         }
         if (isInterrupted())
           break;
-        doWork();
+        try {
+          doWork();
+        } catch (Throwable t) {
+        }
       }
     }
     private void doWork() {

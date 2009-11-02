@@ -1205,10 +1205,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       this.parent = parent;
       this.folderPairs = folderPairs;
       this.includeSubTree = includeSubTree;
-
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
-
+      setDaemon(true);
       if (trace != null) trace.exit(DeleteRunner.class);
     }
     public void run() {

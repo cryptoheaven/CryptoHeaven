@@ -100,7 +100,7 @@ public class PrintPreview extends JDialog {
     JButton bt = new JMyButton("Print");
     ActionListener lst = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        new Thread(new Runnable() {
+        Thread th = new Thread(new Runnable() {
           public void run() {
             Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
             try {
@@ -118,7 +118,9 @@ public class PrintPreview extends JDialog {
             if (trace != null) trace.exit(getClass());
             if (trace != null) trace.clear();
           }
-        }).start();
+        });
+        th.setDaemon(true);
+        th.start();
       }
     };
     bt.addActionListener(lst);
@@ -127,7 +129,7 @@ public class PrintPreview extends JDialog {
     bt = new JMyButton("Page Setup");
     lst = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        new Thread(new Runnable() {
+        Thread th = new Thread(new Runnable() {
           public void run() {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if (printerJob == null) {
@@ -141,7 +143,9 @@ public class PrintPreview extends JDialog {
             initLayoutPreview(m_target, m_preview, pageFormat);
             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
           }
-        }).start();
+        });
+        th.setDaemon(true);
+        th.start();
       }
     };
     bt.addActionListener(lst);

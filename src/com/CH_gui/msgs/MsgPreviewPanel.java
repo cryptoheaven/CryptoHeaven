@@ -326,7 +326,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       public void actionPerformed(ActionEvent event) {
         if (msgLinkRecord != null && msgDataRecord != null) {
           boolean isForceSimpleHTML = msgDataRecord.isHtmlMail() && !isHTML;
-          new Thread(new PrintRunnable(msgLinkRecord, msgDataRecord, isForceSimpleHTML, MsgPreviewPanel.this)).start();
+          Thread th = new Thread(new PrintRunnable(msgLinkRecord, msgDataRecord, isForceSimpleHTML, MsgPreviewPanel.this));
+          th.setDaemon(true);
+          th.start();
         }
       }
     });
@@ -363,7 +365,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         FolderPair inbox = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().msgFolderId));
         MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, inbox, new MsgLinkRecord[] { msgLinkRecord });
         // Add sender email address at once to Whitelist (free up AWT thread)
-        new Thread("Not Spam Mover") {
+        Thread th = new Thread("Not Spam Mover") {
           public void run() {
             Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
             FolderPair whiteList = FolderOps.getOrCreateWhiteList(MainFrame.getServerInterfaceLayer());
@@ -380,7 +382,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             if (trace != null) trace.exit(getClass());
             if (trace != null) trace.clear();
           }
-        }.start();
+        };
+        th.setDaemon(true);
+        th.start();
       }
     });
 
@@ -900,7 +904,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private void setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final JPanel _jLineAttachments) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final JPanel _jLineAttachments)");
     if (trace != null) trace.args(_msgLink, _dataRecord);
-    new Thread("Attachments Preview Fetcher") {
+    Thread fetcher = new Thread("Attachments Preview Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -947,7 +951,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    fetcher.setDaemon(true);
+    fetcher.start();
     if (trace != null) trace.exit(MsgPreviewPanel.class);
   }
 
@@ -1071,7 +1077,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 Object[] objs = (Object[]) link.getDescription();
                 final MsgLinkRecord parentMsgLink = (MsgLinkRecord) objs[0];
                 final Object att = objs[1];
-                new Thread() { // we must do the action on non-GUI thread
+                Thread th = new Thread() { // we must do the action on non-GUI thread
                   public void run() {
                     if (att instanceof FileLinkRecord) {
                       final FileLinkRecord fileLink = (FileLinkRecord) att;
@@ -1140,7 +1146,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                       } // end if file != null
                     }
                   }
-                }.start();
+                };
+                th.setDaemon(true);
+                th.start();
               }
             });
 
@@ -1150,7 +1158,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                   Object[] objs = (Object[]) link.getDescription();
                   final MsgLinkRecord parentMsgLink = (MsgLinkRecord) objs[0];
                   final Object att = objs[1];
-                  new Thread() { // we must do the action on non-GUI thread
+                  Thread th = new Thread() { // we must do the action on non-GUI thread
                     public void run() {
                       if (att instanceof FileLinkRecord) {
                         FileLinkRecord fileLink = (FileLinkRecord) att;
@@ -1163,7 +1171,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                         }
                       }
                     }
-                  }.start();
+                  };
+                  th.setDaemon(true);
+                  th.start();
                 }
               });
             }
@@ -1174,7 +1184,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                   Object[] objs = (Object[]) link.getDescription();
                   final MsgLinkRecord parentMsgLink = (MsgLinkRecord) objs[0];
                   final Object att = objs[1];
-                  new Thread() { // we must do the action on non-GUI thread
+                  Thread th = new Thread() { // we must do the action on non-GUI thread
                     public void run() {
                       if (att instanceof FileLinkRecord) {
                         FileLinkRecord fileLink = (FileLinkRecord) att;
@@ -1192,7 +1202,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                         }
                       }
                     }
-                  }.start();
+                  };
+                  th.setDaemon(true);
+                  th.start();
                 }
               });
               slider.addMouseListener(new MouseAdapter() {
@@ -1333,6 +1345,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           if (text == null) {
             text = STR_MSG_BODY_UNAVAILABLE;
             convertHTMLtoPLAIN = !isHTML;
+            isWaitingForMsgBody = true;
+          } else if (msgDataRecord.bodyPassHash != null && msgDataRecord.getTextBody() == null && msgDataRecord.getEncText() != null && msgDataRecord.getEncText().size() > 0) {
+            // Also waiting for body when it is password protected and password not yet entered.
             isWaitingForMsgBody = true;
           } else {
             isWaitingForMsgBody = false;

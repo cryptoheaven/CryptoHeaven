@@ -1829,7 +1829,7 @@ public class FetchedDataCache extends Object {
       // After notification is done, make previous status equal current status,
       // so that late unnecessary notification are not triggered when managing contacts.
       final ContactRecord[] recs = records;
-      new Thread() {
+      Thread th = new Thread() {
         public void run() {
           try { Thread.sleep(3000); } catch (Throwable t) { }
           for (int i=0; recs!=null && i<recs.length; i++) {
@@ -1837,7 +1837,9 @@ public class FetchedDataCache extends Object {
               recs[i].previousStatus = recs[i].status;
           }
         }
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);

@@ -297,12 +297,9 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
   }
 
   private void fetchData(final UserRecord forUserRecord) {
-    new Thread("Manage Email Addresses Domains Fetcher") {
+    Thread th = new Thread("Manage Email Addresses Domains Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           // fetch all available domains and all current email addresses
@@ -354,12 +351,14 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
 
   private void pressedOk() {
-    new Thread("Manage Email Addresses Commiter") {
+    Thread th = new Thread("Manage Email Addresses Commiter") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -413,7 +412,9 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   private void pressedCancel() {

@@ -224,6 +224,8 @@ public class ImageNums extends Object {
 
   public static final int PRIORITY_HIGH_SMALL;
   public static final int PRIORITY_LOW_SMALL;
+  public static final int PRIORITY_HIGH_12;
+  public static final int PRIORITY_LOW_12;
   public static final int PRIORITY_SMALL;
   public static final int LOCK_CLOSED_BLACK_SMALL;
   public static final int LOCK_CLOSED_SMALL;
@@ -239,6 +241,9 @@ public class ImageNums extends Object {
   public static final int FLAG_GREEN24;
   public static final int FLAG_RED_SMALL;
   public static final int FLAG_YELLOW_SMALL;
+  public static final int FLAG_GREEN_12;
+  public static final int FLAG_RED_12;
+  public static final int FLAG_YELLOW_12;
 
   public static final int TRACE_HISTORY12_13;
   public static final int TRACE_HISTORY13;
@@ -264,6 +269,7 @@ public class ImageNums extends Object {
   public static final int TOOLS24;
   public static final int TOOLS_FIX16;
   public static final int ATTACH16;
+  public static final int ATTACH_14x12;
   public static final int ATTACH24;
   public static final int ATTACH_SMALL;
   public static final int DETACH16;
@@ -416,6 +422,7 @@ public class ImageNums extends Object {
   public static final int STATUS_ONLINE16;
   public static final int STATUS_QUESTION16;
   public static final int LIGHT_ON_SMALL;
+  public static final int LIGHT_ON_12;
   public static final int LIGHT_OFF_SMALL;
   public static final int LIGHT_GREEN_SMALL;
   public static final int LIGHT_X_SMALL;
@@ -549,7 +556,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[308+50]; // plus emotions
+    images = new String[315+50]; // plus emotions
 
 
     /******************************************************************
@@ -1030,6 +1037,12 @@ public class ImageNums extends Object {
     PRIORITY_LOW_SMALL = i;
     images[i] = "priority-low-small"; i++;
 
+    PRIORITY_HIGH_12 = i;
+    images[i] = "priority-high-12"; i++;
+
+    PRIORITY_LOW_12 = i;
+    images[i] = "priority-low-12"; i++;
+
     PRIORITY_SMALL = i;
     images[i] = "priority-small"; i++;
 
@@ -1075,7 +1088,14 @@ public class ImageNums extends Object {
     FLAG_YELLOW_SMALL = i;
     images[i] = "flag-yellow-small"; i++;
 
+    FLAG_GREEN_12 = i;
+    images[i] = "flag-green-12"; i++;
 
+    FLAG_RED_12 = i;
+    images[i] = "flag-red-12"; i++;
+
+    FLAG_YELLOW_12 = i;
+    images[i] = "flag-yellow-12"; i++;
 
     TRACE_HISTORY12_13 = i;
     images[i] = "TraceHist12_13"; i++;
@@ -1139,6 +1159,9 @@ public class ImageNums extends Object {
 
     ATTACH16 = i;
     images[i] = "attach-small"; i++;
+
+    ATTACH_14x12 = i;
+    images[i] = "attach-14x12"; i++;
 
     ATTACH24 = i;
     images[i] = "Attach24"; i++;
@@ -1535,6 +1558,8 @@ public class ImageNums extends Object {
     images[i] = "StatusWaiting16"; i++;
     LIGHT_ON_SMALL = i;
     images[i] = "light-on-small"; i++;
+    LIGHT_ON_12 = i;
+    images[i] = "light-on-12"; i++;
     LIGHT_OFF_SMALL = i;
     images[i] = "light-off-small"; i++;
     LIGHT_GREEN_SMALL = i;

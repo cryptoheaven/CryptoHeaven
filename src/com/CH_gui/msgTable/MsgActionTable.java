@@ -737,7 +737,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (msgLinks != null && msgLinks.length == 1 && !isAllSelected) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgDataRecord msgData = cache.getMsgDataRecord(msgLinks[0].msgId);
-        new Thread(new MsgPreviewPanel.PrintRunnable(msgLinks[0], msgData, false, MsgActionTable.this)).start();
+        Thread th = new Thread(new MsgPreviewPanel.PrintRunnable(msgLinks[0], msgData, false, MsgActionTable.this));
+        th.setDaemon(true);
+        th.start();
       } else if (msgLinks != null && msgLinks.length >= 1) {
         // more than one selected, print table format
         RecordTableModel mdl = getTableModel();

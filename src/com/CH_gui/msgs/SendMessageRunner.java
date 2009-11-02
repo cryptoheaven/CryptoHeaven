@@ -92,8 +92,7 @@ public class SendMessageRunner extends Thread {
     if (trace != null) trace.data(51, selectedMsgAndPostAttachments);
     if (trace != null) trace.data(52, selectedLocalFileAttachments);
 
-    // change the priority of this thread to minimum
-    setPriority(MIN_PRIORITY);
+    setDaemon(true);
 
     if (trace != null) trace.exit(SendMessageRunner.class);
   }

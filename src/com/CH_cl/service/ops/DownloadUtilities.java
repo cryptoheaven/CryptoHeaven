@@ -267,7 +267,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     }
 
     public DownloadCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
-      super("DownloadCoordinator # " + downloadCoordinatorCount);
+      super("Download Coordinator # " + downloadCoordinatorCount);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "DownloadCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
       if (trace != null) trace.args(toDownload, fromMsgs, destDir, SIL);
       if (trace != null) trace.args(waitForComplete);
@@ -286,6 +286,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
       // change the priority of this thread to minimum
       setPriority(MIN_PRIORITY);
+      setDaemon(true);
 
       if (trace != null) trace.exit(DownloadCoordinator.class);
     }
@@ -589,7 +590,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     private boolean suppressDownloadSoundsAndAutoClose;
 
     public DownloadFileRunner(MessageAction msgAction, File destDir, FileLinkRecord[] files, String[] fileNames, ServerInterfaceLayer SIL, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
-      super("DownloadFileRunner # " + downloadRunnerCount);
+      super("Download File Runner # " + downloadRunnerCount);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadFileRunner.class, "DownloadRunner(MessageAction msgAction, File destDir, ServerInterfaceLayer SIL, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
       if (trace != null) trace.args(msgAction, destDir, fileNames, SIL);
       if (trace != null) trace.args(openAfterDownload);
@@ -605,6 +606,10 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
       downloadRunnerCount ++;
       downloadRunnerCount %= Integer.MAX_VALUE-1;
+
+      // change the priority of this thread to minimum
+      setPriority(MIN_PRIORITY);
+      setDaemon(true);
 
       if (trace != null) trace.exit(DownloadFileRunner.class);
     }

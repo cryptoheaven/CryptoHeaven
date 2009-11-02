@@ -17,7 +17,6 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.tree.*;
 
-import com.CH_co.service.records.*;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.CommandCodes;
 
@@ -39,7 +38,7 @@ public class FolderTreeRefreshRunner extends Thread {
 
   private FolderTree fTree;
   private static boolean refreshInProgress;
-  private static Object refreshMonitor = new Object();
+  private static final Object refreshMonitor = new Object();
   private static int refreshThreadCount;
   private boolean withClearFolderCache = true;
 
@@ -55,9 +54,7 @@ public class FolderTreeRefreshRunner extends Thread {
     refreshThreadCount %= Integer.MAX_VALUE-1;
     this.fTree = folderTree;
     this.withClearFolderCache = withClearFolderCache;
-
-    // change the priority of this thread to minimum
-    setPriority(MIN_PRIORITY);
+    setDaemon(true);
 
     if (trace != null) trace.exit(FolderTreeRefreshRunner.class);
   }

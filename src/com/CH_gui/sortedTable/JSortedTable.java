@@ -21,11 +21,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import com.CH_cl.service.cache.FetchedDataCache;
+
 import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
+import com.CH_gui.dialog.SaveAttachmentsDialog;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
@@ -87,12 +90,39 @@ public class JSortedTable extends JTable implements DisposableObj {
           Rectangle cellRect = sTable.getCellRect(viewRow, viewColumn, false);
           int cellX = e.getPoint().x-cellRect.x;
           int cellY = e.getPoint().y-cellRect.y;
-          TableCellRenderer renderer = getCellRenderer(viewRow, modelColumn);
-          Object value = sTable.getModel().getValueAt(viewRow, modelColumn);
+          TableCellRenderer renderer = getCellRenderer(viewRow, viewColumn);
+          Object value = sTable.getValueAt(viewRow, viewColumn);
           Component component = renderer.getTableCellRendererComponent(sTable, value, false, false, viewRow, modelColumn);
           if (component instanceof HTML_ClickablePane) {
             MouseEvent event = new MouseEvent(component, e.getID(), e.getWhen(), e.getModifiers(), cellX, cellY, e.getClickCount(), e.isPopupTrigger());
             ((HTML_ClickablePane) component).processMouseEvent(event);
+          }
+          // if clicked at attachment icon then activate it
+          TableModel tableModel = sTable.getRawModel();
+          if (tableModel instanceof MsgTableModel) {
+            MsgTableModel mtm = (MsgTableModel) tableModel;
+            int rawColumn = mtm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
+            if (rawColumn == 1) {
+              int rawRow = sTable.convertMyRowIndexToModel(viewRow);
+              FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+              MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
+              MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
+              if (msgData != null) {
+                int numOfAttachments = 0;
+                if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
+                  numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
+                  // if regular email, don't show serialized email as attachment in the table...
+                  if (msgData.isEmail()) {
+                    numOfAttachments --;
+                  }
+                }
+                if (numOfAttachments > 0) {
+                  Window w = SwingUtilities.windowForComponent(sTable);
+                  if (w instanceof Frame) new SaveAttachmentsDialog((Frame) w, new MsgLinkRecord[] { msgLink });
+                  else if (w instanceof Dialog) new SaveAttachmentsDialog((Dialog) w, new MsgLinkRecord[] { msgLink });
+                }
+              }
+            }
           }
         }
       }
@@ -409,6 +439,8 @@ public class JSortedTable extends JTable implements DisposableObj {
           // Convert to raw column index
           if (rawModel instanceof RecordTableModel) {
             RecordTableModel rtModel = (RecordTableModel) rawModel;
+            if (rtModel instanceof MsgTableModel)
+              ((MsgTableModel) rtModel).clearMsgPostRenderingCache();
             column = rtModel.getColumnHeaderData().convertColumnToRawModel(column);
             FolderPair fPair = rtModel.getParentFolderPair();
             // Special case for Posting/Chatting tables:

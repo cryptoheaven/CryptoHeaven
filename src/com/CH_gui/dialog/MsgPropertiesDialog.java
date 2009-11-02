@@ -723,12 +723,9 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
 
   private void fetchData() {
-    new Thread("Message Properties Data Fetcher") {
+    Thread th = new Thread("Message Properties Data Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -775,7 +772,9 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   private void updateData(final MsgDataRecord dataRecord) {

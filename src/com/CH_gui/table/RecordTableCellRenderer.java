@@ -77,6 +77,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
 
   public static final Border BORDER_ICON = null;
   public static final Border BORDER_ICONIZED = new EmptyBorder(0,1,0,5);
+  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(0,5,0,5);
   public static final Border BORDER_TEXT = new EmptyBorder(0,5,0,5);
   public static Border[] BORDERS_INDENTED_ICONIZED = null;
   public static Border[] BORDERS_INDENTED_TEXT = null;
@@ -140,7 +141,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
 
     // Date
     if (value instanceof Timestamp) {
-      setText(Misc.getFormattedDate((Timestamp) value));
+      setText(Misc.getFormattedDate((Timestamp) value, false));
     }
     // Numbers
     else if (value instanceof Number) {

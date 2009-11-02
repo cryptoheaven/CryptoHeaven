@@ -208,8 +208,8 @@ public class MsgTableModel extends RecordTableModel {
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
           { new Integer(16), new Integer(16), new Integer(16), new Integer(250), new Integer(400), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 60), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
-          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
-          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(3), new Integer(2), new Integer(0), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(3), new Integer(2), new Integer(0), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
           { }, // no short list
           { new Integer(-106) }
         }),
@@ -224,8 +224,8 @@ public class MsgTableModel extends RecordTableModel {
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(520), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
           { new Integer(16), new Integer(16), new Integer(16), new Integer(200), new Integer(400), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 60), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
-          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5) }, // current list columns
-          { new Integer(2), new Integer(0), new Integer(3), new Integer(1), new Integer(5) }, // wide list columns
+          { new Integer(3), new Integer(2), new Integer(5) }, // current list columns
+          { new Integer(3), new Integer(2), new Integer(5) }, // wide list columns
           { }, // no short list
           { new Integer(6) } // old on the top, new on the bottom
         }),
@@ -496,7 +496,26 @@ public class MsgTableModel extends RecordTableModel {
           break;
         // Subject or Posting or Address Name
         case 5:
-          value = getSubjectColumnValue(MsgTableModel.this, msgLink, msgData, forSortOnly, cache);
+          if (forSortOnly) {
+            String text = null;
+            if (msgData != null) {
+              if (msgData.isTypeAddress()) {
+                if (forSortOnly) {
+                  if (getColumnHeaderData().convertRawColumnToModel(16) == -1)
+                    text = msgData.fileAs + msgData.email;
+                  else
+                    text = msgData.fileAs;
+                }
+              } else if (messageMode != MODE_POST && messageMode != MODE_CHAT) {
+                text = msgData.getSubject();
+              } else {
+                text = msgData.getSubject() + msgData.getText();
+              }
+            }
+            value = text;
+          } else {
+            value = null;
+          }
           break;
         // Sent Date
         case 6: value = msgLink.dateCreated;
@@ -591,34 +610,25 @@ public class MsgTableModel extends RecordTableModel {
     return value;
   }
 
-  public static Object getSubjectColumnValue(MsgTableModel model, MsgLinkRecord msgLink, MsgDataRecord msgData, boolean forSortOnly, FetchedDataCache cache) {
+  public static Object getSubjectColumnValue(MsgTableModel model, MsgLinkRecord msgLink, MsgDataRecord msgData, MsgLinkRecord prevMsgLink, FetchedDataCache cache) {
     Object value = null;
     String text = null;
     if (msgData != null) {
       if (msgData.isTypeAddress()) {
-        if (forSortOnly) {
-          if (model.getColumnHeaderData().convertRawColumnToModel(16) == -1)
-            text = msgData.fileAs + msgData.email;
-          else
-            text = msgData.fileAs;
+        if (model.messageMode == MODE_ADDRESS || model.messageMode == MODE_WHITELIST) {
+          value = msgData.fileAs;
+        } else if (model.messageMode == MODE_CHAT || model.messageMode == MODE_POST) {
+          value = new StringBuffer("<b>" + msgData.fileAs + "</b>" + msgData.parseAddressBody(true, true));
         } else {
-          if (model.messageMode == MODE_ADDRESS || model.messageMode == MODE_WHITELIST) {
-            value = msgData.fileAs;
-          } else if (model.messageMode == MODE_CHAT || model.messageMode == MODE_POST) {
-            value = new StringBuffer("<b>" + msgData.fileAs + "</b>" + msgData.parseAddressBody(true, true));
-          } else {
-            value = msgData.fileAs;
-            if (!msgData.fileAs.equals(msgData.name))
-              value = "" + value + " ("+msgData.name+")";
-            if (msgData.email != null)
-              value = "" + value + " <"+msgData.email+">";
-          }
+          value = msgData.fileAs;
+          if (!msgData.fileAs.equals(msgData.name))
+            value = "" + value + " ("+msgData.name+")";
+          if (msgData.email != null)
+            value = "" + value + " <"+msgData.email+">";
         }
       } else if (model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
         // message table with subject line only
         text = msgData.getSubject();
-      } else if (forSortOnly) {
-        text = msgData.getSubject() + msgData.getText();
       } else {
         text = Misc.encodePlainIntoHtml(msgData.getSubject());
         String postRenderingCache = msgLink.getPostRenderingCache();
@@ -633,40 +643,95 @@ public class MsgTableModel extends RecordTableModel {
 
           boolean toAddFrom = false;
           boolean toAddSent = false;
+          boolean toAddPriority = false;
+          boolean toAddAttachment = false;
+          boolean toAddFlag = false;
 
-          Record fromRec = null;
+          String fromName = null;
+          String prevFromName = null;
           // if table has no 'From' column prepend it to the body
           if (model.getColumnHeaderData().convertRawColumnToModel(3) == -1 && msgData != null) {
-            fromRec = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
-            if (fromRec != null) {
+            fromName = getFromName(msgData);
+            prevFromName = getFromName(prevMsgLink, cache);
+            if (!fromName.equals(prevFromName)) {
               toAddFrom = true;
             }
           }
-
           // if table has no 'Sent' column prepend it to the body
           if (model.getColumnHeaderData().convertRawColumnToModel(6) == -1) {
             toAddSent = true;
           }
+          // if table has no 'Priority' or 'Attachments' column prepend 'Priority' to the body
+          if (model.getColumnHeaderData().convertRawColumnToModel(0) == -1 && model.getColumnHeaderData().convertRawColumnToModel(1) == -1) {
+            toAddPriority = true;
+          }
+          // if table has no 'Attachment' column prepend it to the body
+          if (model.getColumnHeaderData().convertRawColumnToModel(1) == -1) {
+            toAddAttachment = true;
+          }
+          // if table has no 'Flag' column prepend it to the body
+          if (model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
+            toAddFlag = true;
+          }
+
+          if (toAddFlag) {
+            StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+            if (stat != null) {
+              Short flagS = stat.getFlag();
+              if (flagS != null) {
+                short flag = flagS.shortValue();
+                if (flag == StatRecord.STATUS__UNSEEN_UNDELIVERED)
+                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.FLAG_RED_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+                else if (flag == StatRecord.STATUS__UNSEEN_DELIVERED)
+                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.FLAG_GREEN_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+                else if (flag == StatRecord.STATUS__SEEN_UNDELIVERED)
+                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.FLAG_YELLOW_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              }
+            }
+          }
+
+          if (toAddPriority) {
+            if (msgData.isImpHigh(msgData.importance.shortValue()))
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.PRIORITY_HIGH_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+            else if (msgData.isImpFYI(msgData.importance.shortValue()))
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.PRIORITY_LOW_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+            else if (msgData.isImpSystem(msgData.importance.shortValue()))
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.LIGHT_ON_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+          }
+
+          if (toAddAttachment) {
+            int numOfAttachments = 0;
+            if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
+              numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
+              // if regular email, don't show serialized email as attachment in the table...
+              if (msgData.isEmail()) {
+                numOfAttachments --;
+              }
+            }
+            if (numOfAttachments > 0) {
+              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.ATTACH_14x12] + ".png\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"12\"/></a>");
+            }
+          }
 
           if (toAddFrom || toAddSent) {
-            //sb.append("<SMALL><FONT COLOR=#666666>");
             sb.append(MsgPanelUtils.HTML_FONT_START);
-            sb.append("<FONT COLOR=#666666 size='-2'>");
           }
 
           if (toAddFrom) {
-            String name = null;
-            if (fromRec instanceof UserRecord && fromRec.getId().equals(cache.getMyUserId()))
-              name = ((UserRecord) fromRec).handle;
-            else
-              name = ListRenderer.getRenderedText(fromRec);
-            sb.append(name);
+            sb.append("<FONT COLOR=#9c2950>");
+            sb.append("<strong>");
+            sb.append(fromName);
+            sb.append("</strong>");
           }
 
           if (toAddSent) {
+            sb.append("<FONT size='-2' COLOR=#777777>");
             if (toAddFrom)
               sb.append(' ');
-            sb.append(Misc.getFormattedDate(msgLink.dateCreated, false));
+            String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, false) : "";
+            String dateStr = Misc.getFormattedDate(msgLink.dateCreated, false);
+            if (!dateStr.equals(prevDateStr))
+              sb.append(dateStr);
           }
 
           if (toAddFrom || toAddSent) {
@@ -731,6 +796,31 @@ public class MsgTableModel extends RecordTableModel {
     if (value == null)
       value = text;
     return value;
+  }
+
+  private static String getFromName(MsgLinkRecord msgLink, FetchedDataCache cache) {
+    return msgLink != null ? getFromName(cache.getMsgDataRecord(msgLink.msgId)) : null;
+  }
+
+  private static String getFromName(MsgDataRecord msgData) {
+    String fromName = null;
+    if (msgData != null) {
+      String fromEmailAddress = msgData.getFromEmailAddress();
+      if (msgData.isEmail() || fromEmailAddress != null) {
+        fromName = fromEmailAddress;
+      } else {
+        fromName = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+      }
+    }
+    return fromName;
+  }
+
+  public void clearMsgPostRenderingCache() {
+    FolderPair fp = getParentFolderPair();
+    if (fp != null && fp.getId() != null) {
+      MsgLinkRecord[] mLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(fp.getId());
+      MsgLinkRecord.clearPostRenderingCache(mLinks);
+    }
   }
 
   public RecordTableCellRenderer createRenderer() {

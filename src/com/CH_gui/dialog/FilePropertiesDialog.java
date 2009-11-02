@@ -511,12 +511,9 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
 
   private void fetchData() {
-    new Thread("File Properties Data Fetcher") {
+    Thread th = new Thread("File Properties Data Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -602,7 +599,9 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
 

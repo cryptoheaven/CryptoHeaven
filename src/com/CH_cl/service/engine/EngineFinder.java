@@ -304,6 +304,7 @@ public class EngineFinder extends Object {
         if (trace != null) trace.clear();
       }
     };
+    fetcher.setDaemon(true);
     fetcher.start();
     try {
       fetcher.join(maxWaitMillis);

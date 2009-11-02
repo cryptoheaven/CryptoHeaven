@@ -93,7 +93,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
   // track if dialog close method was called to prevent certain updates
   private boolean isClosed;
-  private Object monitor = new Object();
+  private final Object monitor = new Object();
 
   /** Creates new AcceptDeclineContactDialog */
   public AcceptDeclineContactDialog(Frame owner, ContactRecord contactRecord) {
@@ -135,12 +135,9 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     }
     // if not found, run request to the server
     else {
-      new Thread("Accept / Decline Contact Get Handle") {
+      Thread th = new Thread("Accept / Decline Contact Get Handle") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-          // change the priority of this thread to minimum
-          setPriority(MIN_PRIORITY);
 
           try {
             Obj_IDList_Co request = new Obj_IDList_Co();
@@ -176,7 +173,9 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         }
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
   }
 
@@ -192,12 +191,9 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     }
     // if not found, run request to the server
     else {
-      new Thread("Accept / Decline Contact Get Public Key") {
+      Thread th = new Thread("Accept / Decline Contact Get Public Key") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-          // change the priority of this thread to minimum
-          setPriority(MIN_PRIORITY);
 
           try {
             Obj_IDList_Co request = new Obj_IDList_Co();
@@ -232,7 +228,9 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         }
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
   }
 
@@ -443,7 +441,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
     closeDialog();
 
-    new Thread("Accept / Decline Contact Send") {
+    Thread th = new Thread("Accept / Decline Contact Send") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -452,7 +450,8 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
         try {
           int code = accept ? CommandCodes.CNT_Q_ACCEPT_CONTACTS : CommandCodes.CNT_Q_DECLINE_CONTACTS;
-          serverInterfaceLayer.submitAndReturn(new MessageAction(code, prepareDataSet(accept)));
+          ProtocolMsgDataSet dataSet = prepareDataSet(accept); // << this may take some time due to encryption
+          serverInterfaceLayer.submitAndReturn(new MessageAction(code, dataSet));
         } catch (Throwable t) {
           if (trace != null) trace.exception(getClass(), 100, t);
         }
@@ -461,7 +460,9 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     if (trace != null) trace.exit(AcceptDeclineContactDialog.class);
   }

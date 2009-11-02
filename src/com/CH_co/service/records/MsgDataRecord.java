@@ -220,7 +220,7 @@ public class MsgDataRecord extends Record {
   }
   public Object[] getExpirationIconAndText(Long forUserId, boolean isShortForm) {
     Icon icon = null;
-    String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired) : Misc.getFormattedTimestamp(dateExpired));
+    String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired, false) : Misc.getFormattedTimestamp(dateExpired));
     String note = "";
     if (dateExpired != null) {
       if (dateExpired.getTime() > System.currentTimeMillis())

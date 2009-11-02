@@ -12,19 +12,16 @@
 
 package com.CH_gui.chatTable;
 
-import com.CH_gui.gui.Template;
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
-import com.CH_gui.postTable.PostTableCellRenderer;
 import com.CH_gui.table.*;
 
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 /** 
@@ -49,6 +46,7 @@ public class ChatTableComponent extends RecordTableComponent {
   public ChatTableComponent() {
     super(new ChatActionTable(new MsgTableModel(null, MsgTableModel.MODE_CHAT)), Template.get(Template.EMPTY_CHAT), Template.get(Template.NONE), Template.get(Template.CATEGORY_CHAT));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatTableComponent.class, "ChatTableComponent()");
+    getRecordTableScrollPane().getJSortedTable().setRowMargin(0);
     addHierarchyListener(new HierarchyListener() {
       public void hierarchyChanged(HierarchyEvent e) {
         if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {

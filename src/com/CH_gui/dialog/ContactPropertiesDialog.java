@@ -139,12 +139,9 @@ public class ContactPropertiesDialog extends GeneralDialog {
   }
 
   private void fetchHandles() {
-    new Thread("Contact Properties Get Handles") {
+    Thread th = new Thread("Contact Properties Get Handles") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           Obj_IDList_Co request = new Obj_IDList_Co();
@@ -201,16 +198,15 @@ public class ContactPropertiesDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   private void fetchPubKeys() {
-    new Thread("Contact Properties Get Public Key") {
+    Thread th = new Thread("Contact Properties Get Public Key") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           Obj_IDList_Co request = new Obj_IDList_Co();
@@ -257,7 +253,9 @@ public class ContactPropertiesDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
 
@@ -548,7 +546,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
     closeDialog();
 
-    new Thread("Change Contact Properties - sending...") {
+    Thread th = new Thread("Change Contact Properties - sending...") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -608,7 +606,9 @@ public class ContactPropertiesDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     if (trace != null) trace.exit(ContactPropertiesDialog.class);
   }

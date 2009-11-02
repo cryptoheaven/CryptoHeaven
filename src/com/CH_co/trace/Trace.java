@@ -33,6 +33,9 @@ import com.CH_co.util.Misc;
  */
 public class Trace extends Object {
 
+  // debug help to show threads that are non-deamon useful in debugin program non-exits after logout...
+  private static boolean DEBUG__PRINT_OUT_NON_DEAMON_THREADS = true;
+
   // Global flag to indicate if DEBUG is enabled
   public static boolean DEBUG = false;
 
@@ -181,11 +184,14 @@ public class Trace extends Object {
     } // end else
   }
 
-
   /**
    * Exit from a pair entry
    */
   private void exit(Class c, Object obj, boolean isObj) {
+    // this debug is done on "exit" because threads may set its Deamon status in the constructor
+    if (DEBUG__PRINT_OUT_NON_DEAMON_THREADS) {
+      printOutNonDeamonThreads();
+    }
     if (this == dumpingTrace) return;
     synchronized (staticMonitor) {
       String className = Misc.getClassNameWithoutPackage( c );
@@ -578,6 +584,20 @@ public class Trace extends Object {
     if (TraceProperties.getLevel( (Class) stack.peek() ) < debugLevel)
       return true;
     return false;
+  }
+
+  private static Hashtable nonDeamonThreadsHT = new Hashtable();
+  private static void printOutNonDeamonThreads() {
+    try {
+      String name = Thread.currentThread().getName();
+      if (!name.startsWith("main") && !name.startsWith("AWT")) {
+        if (!Thread.currentThread().isDaemon() && !nonDeamonThreadsHT.contains(name)) {
+          System.out.println(name);
+          nonDeamonThreadsHT.put(name, name);
+        }
+      }
+    } catch (Throwable t) {
+    }
   }
 
 } // end class

@@ -55,6 +55,7 @@ public class ChatSessionCreator extends Thread {
     super("ChatSessionCreator");
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatSessionCreator.class, "ChatSessionCreator(MemberContactRecordI chatWithContacts)");
     if (trace != null) trace.args(chatWithContacts);
+    setDaemon(true);
     this.chatWithContacts = chatWithContacts;
     if (trace != null) trace.exit(ChatSessionCreator.class);
   }

@@ -165,13 +165,10 @@ public class AccountOptionsDialog extends GeneralDialog {
   }
 
   private void fetchData() {
-    new Thread("Account Options Quotas Fetcher") {
+    Thread th = new Thread("Account Options Quotas Fetcher") {
       private AutoResponderRecord autoResponderRecord = null;
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           // fetch a single sub user account info
@@ -286,7 +283,9 @@ public class AccountOptionsDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
 

@@ -230,7 +230,7 @@ public class MiscGui extends Object {
                 ((Frame)w).setState(Frame.NORMAL);
             }
             final Window window = w;
-            new Thread(new Runnable() {
+            Thread th = new Thread(new Runnable() {
               public void run() {
                 if (window.isShowing()) {
                   Point p = window.getLocation();
@@ -249,7 +249,9 @@ public class MiscGui extends Object {
                 if (includeTitleRoll && window instanceof JActionFrame)
                   ((JActionFrame) window).triggerVisualUpdateNotificationRoll("  *ring*");
               }
-            }).start();
+            });
+            th.setDaemon(true);
+            th.start();
           }
         }
       }

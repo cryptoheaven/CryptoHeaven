@@ -371,10 +371,9 @@ public class Misc extends Object {
     diff = Math.abs(diff);
     DateFormat formatter;
 
-    //if (diff < hoursToMilliseconds(8)) {
     if (diff < hoursToMilliseconds(16)) {
       //formatter = new SimpleDateFormat(includeSeconds ? "HH:mm:ss" :"HH:mm");
-      formatter = DateFormat.getTimeInstance();
+      formatter = DateFormat.getTimeInstance(includeSeconds ? DateFormat.MEDIUM : DateFormat.SHORT);
     } else if (diff < daysToMilliseconds(2)) {
       //formatter = new SimpleDateFormat(includeSeconds ? "EEE, HH:mm:ss" : "EEE, HH:mm");
       //formatter = DateFormat.getDateInstance();

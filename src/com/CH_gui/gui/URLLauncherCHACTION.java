@@ -21,7 +21,6 @@ import javax.swing.tree.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
@@ -51,6 +50,10 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
   public static final String ACTION_PATH = "actions";
 
   public void openURL(URL url, Component invoker) {
+    openActionURL(url, invoker);
+  }
+
+  public static void openActionURL(URL url, Component invoker) {
     String pathRootDir = null;
     String path = url.getPath();
     String args = url.getQuery(); // args in most cases is null
@@ -71,7 +74,6 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
       pathRootDir = path.substring(0, endRootDir);
       path = path.substring(endRootDir + 1);
     }
-
     if (pathRootDir != null && pathRootDir.equalsIgnoreCase(ACTION_PATH)) {
       String actionName = null;
       Integer actionId = null;
@@ -97,19 +99,24 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
           } else if (args.equalsIgnoreCase("Drafts")) {
             FolderPair fPair = FolderOps.getOrCreateDraftFolder(MainFrame.getServerInterfaceLayer());
             new MsgTableFrame(fPair);
-          } else if (args.equalsIgnoreCase("Inbox")) { 
+          } else if (args.equalsIgnoreCase("Inbox")) {
             new MsgTableFrame(CacheUtilities.convertRecordToPair(cache.getFolderRecord(uRec.msgFolderId)));
-          } else if (args.equalsIgnoreCase("Spam")) { 
+          } else if (args.equalsIgnoreCase("Spam")) {
             FolderPair fPair = FolderOps.getOrCreateJunkFolder(MainFrame.getServerInterfaceLayer());
             new MsgTableFrame(fPair);
-          } else if (args.equalsIgnoreCase("Sent")) { 
+          } else if (args.equalsIgnoreCase("Sent")) {
             new MsgTableFrame(CacheUtilities.convertRecordToPair(cache.getFolderRecord(uRec.sentFolderId)));
-          } else if (args.equalsIgnoreCase("Contacts")) { 
+          } else if (args.equalsIgnoreCase("Contacts")) {
             new ContactTableFrame();
           }
         }
       } else {
         Frame parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, invoker);
+        if (parentFrame == null && invoker instanceof HTML_ClickablePane) {
+          Component renderingFor = ((HTML_ClickablePane) invoker).getRendererContainer();
+          if (renderingFor != null)
+            parentFrame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, renderingFor);
+        }
         if (parentFrame instanceof JActionFrame) {
           JActionFrame actionFrame = (JActionFrame) parentFrame;
           MenuTreeModel menuModel = actionFrame.getMenuTreeModel();
@@ -134,7 +141,6 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
               // no break if found action is not exactly CASE MATCHING
               foundAction = menuNode;
             }
-
           } // end while hasMoreElements
 
           if (foundAction != null) {

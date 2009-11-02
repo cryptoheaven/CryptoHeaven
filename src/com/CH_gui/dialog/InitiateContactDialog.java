@@ -111,12 +111,9 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
   }
 
   private void getPubKey() {
-    new Thread("Initiater Contact -- Public Key Fetcher") {
+    Thread th = new Thread("Initiater Contact -- Public Key Fetcher") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
 
         try {
           Obj_IDList_Co request = new Obj_IDList_Co();
@@ -141,7 +138,9 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   private JButton[] createButtons() {
@@ -245,7 +244,7 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "pressedOK()");
     closeDialog();
 
-    new Thread("Initiate Contact -- Pressed OK Submitter") {
+    Thread th = new Thread("Initiate Contact -- Pressed OK Submitter") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -280,7 +279,9 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     if (trace != null) trace.exit(InitiateContactDialog.class);
   }

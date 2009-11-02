@@ -39,7 +39,7 @@ import com.CH_co.monitor.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -47,7 +47,7 @@ import com.CH_co.monitor.*;
  *
  * <b>$Revision: 1.17 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class UploadUtilities extends Object { // implicit no-argument constructor
 
@@ -59,7 +59,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
   public static final String PROPERTY_NAME__LOCAL_FILE_SOURCE_DIR = UploadUtilities.class.getName() + "_localFileSourceDir";
 
 
-  /** 
+  /**
    * @return The default upload directory as specified in the properties, or current directory if default is invalid.
    */
   public static File getDefaultSourceDir() {
@@ -79,7 +79,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
   }
 
 
-  /** 
+  /**
     * This method is called every time the user requests uploading of a file.
     * Pops up a file choice dialog to choose which file(s) to upload, then launch UploadCoordinator.
     * @param shareId is the share to which to upload a file
@@ -138,7 +138,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     private boolean isThreadedRun;
 
     public UploadCoordinator(File[] files, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun) {
-      super("UploadCoordinator # " + uploadCoordinatorCount);
+      super("Upload Coordinator # " + uploadCoordinatorCount);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadCoordinator.class, "UploadCoordinator(File[] files, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun)");
       if (trace != null) trace.args(files, shareRecord, SIL);
       if (trace != null) trace.args(isThreadedRun);
@@ -152,6 +152,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
       // change the priority of this thread to minimum
       setPriority(MIN_PRIORITY);
+      setDaemon(true);
 
       if (trace != null) trace.exit(UploadCoordinator.class);
     }
@@ -232,7 +233,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           // find node of the new directory
           if (newShareId != null) {
             File[] fList = f[i].listFiles();
-            if (fList != null && fList.length > 0) 
+            if (fList != null && fList.length > 0)
               uploadFiles(fList, cache.getFolderShareRecord(newShareId), SIL, isThreadedRun);
           }
         } // end for all directories
@@ -243,7 +244,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
 
 
-  /** 
+  /**
    * Sets a request to upload a file to the shareRecord, batches up the files in groups of 10.
    * @param file Local file to upload.
    * @param shareFolder is a folder to which to upload a file
@@ -270,7 +271,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     if (trace != null) trace.exit(UploadUtilities.class);
   }
 
-  /** 
+  /**
    * Sets a request to upload a file to the shareRecord.
    * @param file Local file to upload.
    * @param shareFolder is a folder to which to upload a file
@@ -285,7 +286,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
     File_NewFiles_Rq request = new File_NewFiles_Rq();
     MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_NEW_FILES, request);
-    replyClass = runUploadFileBunch(files, msgAction, request, shareRecord.getSymmetricKey(), 
+    replyClass = runUploadFileBunch(files, msgAction, request, shareRecord.getSymmetricKey(),
                                     shareRecord.shareId, new Short(Record.RECORD_TYPE_SHARE), isThreadedRun, SIL);
 
     lastReplyClass = replyClass;
@@ -297,8 +298,8 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
    * Universal function for uploads of files and message with file attachments.
    * @return Class of the reply if non threaded run
    */
-  public static Class runUploadFileBunch(File[] files, MessageAction msgActionToSend, File_NewFiles_Rq request, 
-                                      BASymmetricKey parentSymmetricKey, Long ownerObjId, Short ownerObjType, boolean isThreadedRun, ServerInterfaceLayer SIL) 
+  public static Class runUploadFileBunch(File[] files, MessageAction msgActionToSend, File_NewFiles_Rq request,
+                                      BASymmetricKey parentSymmetricKey, Long ownerObjId, Short ownerObjType, boolean isThreadedRun, ServerInterfaceLayer SIL)
   {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadUtilities.class, "runUploadFileBunch(File[] files, MessageAction msgActionToSend, File_NewFiles_Rq request, BASymmetricKey parentSymmetricKey, Long ownerObjId, Short ownerObjType, boolean isThreadedRun, ServerInterfaceLayer SIL)");
     if (trace != null) trace.args(files, msgActionToSend, request, parentSymmetricKey, ownerObjId, ownerObjType);
@@ -344,7 +345,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
   ********************************************/
   /**
    * Runs seal(s) and upload(s) of files.
-   */  
+   */
   private static class UploadRunner extends Thread {
 
     private MessageAction msgActionToSend;
@@ -358,7 +359,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
      * attachments, arguments include the message action and the request.
      */
     private UploadRunner(MessageAction msgActionToSend, File_NewFiles_Rq request, BASymmetricKey parentSymmetricKey, ServerInterfaceLayer SIL) {
-      super("UploadRunner # " + uploadRunnerCount);
+      super("Upload Runner # " + uploadRunnerCount);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadRunner.class, "UploadRunner(MessageAction msgActionToSend, File_NewFiles_Rq request, BASymmetricKey parentSymmetricKey, ServerInterfaceLayer SIL)");
       if (trace != null) trace.args(msgActionToSend, request, parentSymmetricKey, SIL);
 
@@ -368,6 +369,10 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       this.SIL = SIL;
       uploadRunnerCount ++;
       uploadRunnerCount %= Integer.MAX_VALUE-1;
+
+      // change the priority of this thread to minimum
+      setPriority(MIN_PRIORITY);
+      setDaemon(true);
 
       if (trace != null) trace.exit(UploadRunner.class);
     }
@@ -436,7 +441,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
         ClientMessageAction replyMsgAction = SIL.submitAndFetchReply(msgActionToSend);
         replyClass = replyMsgAction.getClass();
         DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction);
-      } catch (Throwable t) { 
+      } catch (Throwable t) {
         if (trace != null) trace.exception(UploadRunner.class, 100, t);
       }
       // catch everything so we can decrement the counter properly

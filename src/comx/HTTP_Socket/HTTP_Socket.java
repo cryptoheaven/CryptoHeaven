@@ -16,7 +16,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import com.CH_co.queue.*;
 import com.CH_co.trace.*;
 
 import comx.HTTP_Common.*;
@@ -76,11 +75,11 @@ public class HTTP_Socket extends Socket {
   int port;
 
   // create send and receive buffers
-  SequenceFifo recvFifo = new SequenceFifo(); // list of DataSets in order by sequenceId
-  OrderedFifo sendFifo = new OrderedFifo(); // list of DataSets
-  DataSetCache sentCacheFifo = new DataSetCache();
+  final SequenceFifo recvFifo = new SequenceFifo(); // list of DataSets in order by sequenceId
+  final OrderedFifo sendFifo = new OrderedFifo(); // list of DataSets
+  final DataSetCache sentCacheFifo = new DataSetCache();
 
-  Object connectionIdMonitor = new Object();
+  final Object connectionIdMonitor = new Object();
   int connectionId = -1;
   long sendSequenceId = -1;
 
@@ -98,7 +97,7 @@ public class HTTP_Socket extends Socket {
   long lastPingMadeStamp;
   int timeToWait = 100;
 
-  Object socketMonitor = new Object();
+  final Object socketMonitor = new Object();
   Socket socket;
   DataInputStream socketInput;
   DataOutputStream socketOutput;

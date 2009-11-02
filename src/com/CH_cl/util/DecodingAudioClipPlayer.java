@@ -256,7 +256,7 @@ public class DecodingAudioClipPlayer {
     public void run() {
       try {
         if (callbacksV != null) {
-          new Thread() {
+          Thread th = new Thread() {
             public void run() {
               notifyLength();
               while (clip.isOpen()) {
@@ -268,7 +268,9 @@ public class DecodingAudioClipPlayer {
                 try { Thread.sleep(20); } catch (InterruptedException e) { }
               }
             }
-          }.start();
+          };
+          th.setDaemon(true);
+          th.start();
         }
       } catch (Throwable e) {
       }

@@ -138,7 +138,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     jFilename = new JMyLabel("File: ");
     jFilesize = new JMyLabel("Size: ");
 
-    new Thread() {
+    Thread th = new Thread() {
       public void run() {
         while (!closed) {
           boolean tracing = TraceProperties.isTraceEnabled();
@@ -166,7 +166,9 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
           }
         }
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     int posY = 0;
     panel.add(jHeader, new GridBagConstraints(0, posY, 2, 1, 10, 0, 

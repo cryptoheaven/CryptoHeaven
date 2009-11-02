@@ -198,7 +198,7 @@ public class InviteByEmailDialog extends GeneralDialog {
       option = MessageDialog.showDialogYesNo(this, msgPanel, title);
     }
     if (option == true) {
-      new Thread("Invitation Sender") {
+      Thread th = new Thread("Invitation Sender") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -216,7 +216,9 @@ public class InviteByEmailDialog extends GeneralDialog {
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         }
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
     else {
       setEnabledButtons(true);

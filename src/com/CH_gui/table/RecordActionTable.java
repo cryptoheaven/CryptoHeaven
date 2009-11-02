@@ -23,7 +23,6 @@ import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
 import com.CH_gui.actionGui.*;
-import com.CH_gui.addressBook.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
@@ -33,38 +32,13 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.sortedTable.*;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.Window;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
 import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ButtonGroup;
-import javax.swing.JComponent;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -484,7 +458,6 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.SELECTED_RADIO, Boolean.valueOf(set));
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
-      //putValue(Actions.REMOVABLE_MENU, Boolean.TRUE);
       getTableModel().setSortDirButtonGroup(group);
     }
     public void actionPerformed(ActionEvent actionEvent) {
@@ -495,6 +468,9 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
         ts.sortByColumn(column, isAscending);
       }
       fixSortRadioButtonSelection();
+      RecordTableModel tableModel = getTableModel();
+      if (tableModel instanceof MsgTableModel)
+        ((MsgTableModel) tableModel).clearMsgPostRenderingCache();
     }
   } // end class SortAscDescAction
 
@@ -517,7 +493,6 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
-      //putValue(Actions.REMOVABLE_MENU, Boolean.TRUE);
       getTableModel().setSortButtonGroup(group);
     }
     public void actionPerformed(ActionEvent actionEvent) {
@@ -525,6 +500,9 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       TableSorter ts = (TableSorter) jst.getModel();
       ts.sortByColumn(columnIndex);
       fixSortRadioButtonSelection();
+      RecordTableModel tableModel = getTableModel();
+      if (tableModel instanceof MsgTableModel)
+        ((MsgTableModel) tableModel).clearMsgPostRenderingCache();
     }
   } // end class SortByColumnAction
 
@@ -537,16 +515,15 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       super(actionName);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_columns_to_render_in_the_table."));
-      //putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
-      //putValue(Actions.REMOVABLE_MENU, Boolean.TRUE);
     }
     public void actionPerformed(ActionEvent actionEvent) {
       CustomizeColumnsDialog d = null;
-      RecordTableModel recordTableModel = getTableModel();
-      ColumnHeaderData data = recordTableModel.getColumnHeaderData();
+      RecordTableModel tableModel = getTableModel();
+      ColumnHeaderData data = tableModel.getColumnHeaderData();
 
-      recordTableModel.updateHeaderDataFrom(getJSortedTable());
+      // if user has moved (drag-drop) columns, update our model so that current state is reflected in the Customization dialog
+      tableModel.updateHeaderDataFrom(getJSortedTable());
 
       Window w = SwingUtilities.windowForComponent(RecordActionTable.this);
       if (w instanceof Dialog)
@@ -555,27 +532,16 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
         d = new CustomizeColumnsDialog((Frame) w, data);
       if (d != null && d.pressedOk) {
         d.applyChoices(data);
-        RecordTableModel rtm = getTableModel();
-        if (rtm instanceof MsgTableModel) {
-          MsgTableModel mtm = (MsgTableModel) rtm;
-          FolderPair fp = mtm.getParentFolderPair();
-          if (fp != null && fp.getId() != null) {
-            MsgLinkRecord[] mLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(fp.getId());
-            MsgLinkRecord.clearPostRenderingCache(mLinks);
-          }
-        }
+        if (tableModel instanceof MsgTableModel)
+          ((MsgTableModel) tableModel).clearMsgPostRenderingCache();
         getTableModel().updateHeaderDataFromTo(null, getJSortedTable());
       }
     }
   } // end class CustomizeColumnsAction
 
-
   public void fixSortRadioButtonSelection() {
     getJSortedTable().fixSortRadioButtonSelection();
   }
-
-
-
 
   /**
    * Remembers the folderId and associates it with a mark.

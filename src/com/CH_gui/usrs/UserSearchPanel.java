@@ -370,10 +370,7 @@ public class UserSearchPanel extends JPanel {
     private UserSearchRunner(Usr_Search_Rq request) {
       super("UserSearchRunner");
       this.request = request;
-
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
-
+      setDaemon(true);
     }
 
     public void run() {

@@ -156,7 +156,7 @@ public class ExpiryRevocationDialog extends GeneralDialog {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ExpiryRevocationDialog.class, "pressedOK()");
     closeDialog();
 
-    new Thread("Change Expiry or Revocation - sending...") {
+    Thread th = new Thread("Change Expiry or Revocation - sending...") {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
 
@@ -179,7 +179,9 @@ public class ExpiryRevocationDialog extends GeneralDialog {
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }.start();
+    };
+    th.setDaemon(true);
+    th.start();
 
     if (trace != null) trace.exit(ExpiryRevocationDialog.class);    
   }

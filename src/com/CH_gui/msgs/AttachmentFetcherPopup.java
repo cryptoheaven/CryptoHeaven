@@ -77,9 +77,6 @@ public class AttachmentFetcherPopup extends Thread {
       throw new IllegalArgumentException("Parent component may not be null!");
     }
 
-    // change the priority of this thread to minimum
-    setPriority(MIN_PRIORITY);
-
     if (trace != null) trace.exit(AttachmentFetcherPopup.class);
   }
 

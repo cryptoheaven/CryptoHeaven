@@ -26,7 +26,7 @@ import com.CH_co.trace.Trace;
 public class QueueMM1 extends Object {
 
   private FifoWriterI fifo = null;
-  private Object processingMonitor = new Object();
+  private final Object processingMonitor = new Object();
 
   private PrivateQueueServer server;
   private ProcessingFunctionI processingFunction;
@@ -163,10 +163,6 @@ public class QueueMM1 extends Object {
       super(name);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrivateQueueServer.class, "()");
       if (trace != null) trace.data(10, name);
-
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
-
       if (trace != null) trace.exit(PrivateQueueServer.class);
     }
 

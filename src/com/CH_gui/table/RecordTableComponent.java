@@ -547,7 +547,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
   } // end showTableOrDelayedTemplate()
 
   private void performEmptyTableCheck_Threaded() {
-    new Thread(new Runnable() {
+    Thread th = new Thread(new Runnable() {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
         performEmptyTableCheck();
@@ -555,7 +555,9 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
         if (trace != null) trace.exit(getClass());
         if (trace != null) trace.clear();
       }
-    }, "Empty Table Checker").start();
+    }, "Empty Table Checker");
+    th.setDaemon(true);
+    th.start();
   }
   private void performEmptyTableCheck() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableComponent.class, "performEmptyTableCheck");

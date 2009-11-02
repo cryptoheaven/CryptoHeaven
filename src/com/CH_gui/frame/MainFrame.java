@@ -925,7 +925,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformed(ActionEvent actionEvent) {
-      new Thread("Manage White List Action") {
+      Thread th = new Thread("Manage White List Action") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           FolderPair whiteListFolderPair = FolderOps.getOrCreateWhiteList(SIL);
@@ -936,7 +936,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         }
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
   }
 
@@ -995,7 +997,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
 
     if (closed) {
-      new Thread("Logout Request Sender") {
+      Thread th = new Thread("Logout Request Sender") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           // from now on don't show any error messages when logging out and quitting.
@@ -1017,7 +1019,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           if (trace != null) trace.exit(getClass());
           if (trace != null) trace.clear();
         } // end run()
-      }.start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
     if (trace != null) trace.exit(MainFrame.class);
   } // end exitAction()
@@ -1112,7 +1116,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
           // additional delay so we don't slow down loading of MainFrame
           try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
           } catch (Throwable t) {
           }
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
