@@ -13,7 +13,6 @@
 package com.CH_gui.gui;
 
 import java.awt.*;
-import java.beans.*;
 import javax.swing.*;
 
 import com.CH_co.trace.Trace;

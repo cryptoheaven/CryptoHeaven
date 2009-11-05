@@ -85,7 +85,6 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
       ((JBottomStickViewport) view).setAutoScrollEnabled(false);
     }
     // add a callback hook that will notify us when new items have been added
-
     getTableModel().recordInsertionCallback = new CallbackI() {
       public void callback(final Object value) {
         try {

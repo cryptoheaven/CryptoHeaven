@@ -36,9 +36,9 @@ public class BurstableMonitor extends Object {
   private long burstSize;
   private long burstMinTimeMillis;
   private long minSeperationTime;
-  private LinkedList passStampsList;
   private boolean monitorBusy;
-  private Vector waitingList;
+  private final LinkedList passStampsList = new LinkedList();
+  private final Vector waitingList = new Vector();
 
   /** Creates new BurstableMonitor */
   public BurstableMonitor(long burstSize, long burstMinTimeMillis, long minSeperationTime) {
@@ -46,8 +46,6 @@ public class BurstableMonitor extends Object {
     this.burstSize = burstSize;
     this.burstMinTimeMillis = burstMinTimeMillis;
     this.minSeperationTime = minSeperationTime;
-    this.passStampsList = new LinkedList();
-    this.waitingList = new Vector();
     if (burstSize < 1)
       throw new IllegalArgumentException("Burst Size must be >= 1");
     if (trace != null) trace.exit(BurstableMonitor.class);
