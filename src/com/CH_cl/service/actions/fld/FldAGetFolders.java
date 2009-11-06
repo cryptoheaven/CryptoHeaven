@@ -16,8 +16,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.CacheUtilities;
-import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 
@@ -34,15 +33,16 @@ import java.util.Vector;
  * <b>Copyright</b> &copy; 2001-2009
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FldAGetFolders extends ClientMessageAction {
 
-  private static SingleTokenArbiter singleRedFlagCountArbiter;
+  private static SingleTokenArbiter singleTokenArbiter;
   private static Object singleRedFlagCountArbiterKey;
+  private static Object singleDftFolderCreatorArbiterKey;
   private static Hashtable newShareIDsHT;
 
   /** Creates new FldAGetFolders */
@@ -51,7 +51,7 @@ public class FldAGetFolders extends ClientMessageAction {
     if (trace != null) trace.exit(FldAGetFolders.class);
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -101,7 +101,7 @@ public class FldAGetFolders extends ClientMessageAction {
     if (folderRecords != null && folderRecords.length > 0)
       cache.addFolderRecords(folderRecords);
 
-    // Batch the shares that are asymetrically encrypted so that user can see folders as 
+    // Batch the shares that are asymetrically encrypted so that user can see folders as
     // they come and not wait an hour for 1000+ folders that might be newly shared.
     if (trace != null) trace.data(11, "Adding shares to cache...");
     if (shareRecords != null && shareRecords.length > 0) {
@@ -242,17 +242,44 @@ public class FldAGetFolders extends ClientMessageAction {
       } while (batchStart<shareRecords.length);
     }
 
-    // Check if we have a Spam (Junk e-mail) folder, if not, create it
-    FolderOps.getOrCreateJunkFolder(SIL);
-    // Check if we have a Recycle Bin folder, if not, create it
-    if (GlobalProperties.PROGRAM_BUILD_NUMBER >= 358)
-      FolderOps.getOrCreateRecycleFolder(SIL);
+    doDelayedDftFolderCreation(SIL);
 
     if (trace != null) trace.exit(FldAGetFolders.class, null);
   }
 
+  private static void doDelayedDftFolderCreation(final ServerInterfaceLayer SIL) {
+    // Lazily create Junk and Recycle folders if they don't exist
+    if (singleTokenArbiter == null) singleTokenArbiter = new SingleTokenArbiter();
+    if (singleDftFolderCreatorArbiterKey == null) singleDftFolderCreatorArbiterKey = new Object();
+    final Object token = new Object();
+    if (singleTokenArbiter.putToken(singleDftFolderCreatorArbiterKey, token)) {
+      Thread th = new Thread("Junk and Recycle Folder checker-creator") {
+        public void run() {
+          try {
+            // delay a little to let other requests through before this one
+            try {
+              Thread.sleep(3000);
+            } catch(Throwable t) {
+            }
+            // Check if we have a Spam (Junk e-mail) folder, if not, create it
+            FolderOps.getOrCreateJunkFolder(SIL);
+            // Check if we have a Recycle Bin folder, if not, create it
+            if (GlobalProperties.PROGRAM_BUILD_NUMBER >= 358) {
+              FolderOps.getOrCreateRecycleFolder(SIL);
+            }
+          } catch (Throwable t) {
+          } finally {
+            singleTokenArbiter.removeToken(singleDftFolderCreatorArbiterKey, token);
+          }
+        }
+      };
+      th.setDaemon(true);
+      th.start();
+    }
+  }
+
   private static void doDelayedRedFlagCount(final ServerInterfaceLayer SIL, FolderShareRecord[] newShares) {
-    if (singleRedFlagCountArbiter == null) singleRedFlagCountArbiter = new SingleTokenArbiter();
+    if (singleTokenArbiter == null) singleTokenArbiter = new SingleTokenArbiter();
     if (singleRedFlagCountArbiterKey == null) singleRedFlagCountArbiterKey = new Object();
     if (newShareIDsHT == null) newShareIDsHT = new Hashtable();
 
@@ -268,7 +295,7 @@ public class FldAGetFolders extends ClientMessageAction {
         }
       }
       if (newShareIDsHT.size() > 0) {
-        if (singleRedFlagCountArbiter.putToken(arbiterKey, arbiterToken)) { // token will be removed when job finishes
+        if (singleTokenArbiter.putToken(arbiterKey, arbiterToken)) { // token will be removed when job finishes
           Set keys = newShareIDsHT.keySet();
           toProcessShareIDs = new Long[keys.size()];
           toProcessShareIDs = (Long[]) keys.toArray(toProcessShareIDs);
@@ -280,13 +307,13 @@ public class FldAGetFolders extends ClientMessageAction {
     if (toProcessShareIDs != null && toProcessShareIDs.length > 0) {
       Runnable afterJob = new Runnable() {
         public void run() {
-          singleRedFlagCountArbiter.removeToken(arbiterKey, arbiterToken);
+          singleTokenArbiter.removeToken(arbiterKey, arbiterToken);
           doDelayedRedFlagCount(SIL, null);
         }
       };
       Runnable timeoutJob = new Runnable() {
         public void run() {
-          singleRedFlagCountArbiter.removeToken(arbiterKey, arbiterToken);
+          singleTokenArbiter.removeToken(arbiterKey, arbiterToken);
           doDelayedRedFlagCount(SIL, null);
         }
       };
