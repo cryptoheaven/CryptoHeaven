@@ -78,10 +78,10 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
   }
 
   // =====================================================================
-  // LISTENERS FOR THE MENU ITEMS        
+  // LISTENERS FOR THE MENU ITEMS
   // =====================================================================
 
-  /** 
+  /**
    * Switch to Full App.
    **/
   private class SwitchToFullAction extends AbstractAction {
@@ -121,4 +121,11 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
     return a;
   }
 
+  /*******************************************************
+  *** V i s u a l s S a v a b l e    interface methods ***
+  *******************************************************/
+  public static final String visualsClassKeyName = "MsgTableStarterFrame";
+  public String getVisualsClassKeyName() {
+    return visualsClassKeyName;
+  }
 }

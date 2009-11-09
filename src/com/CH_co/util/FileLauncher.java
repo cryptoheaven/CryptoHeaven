@@ -66,6 +66,6 @@ public class FileLauncher {
 
   public static boolean isImageFilename(String filename) {
     filename = filename.toLowerCase();
-    return filename.endsWith(".jpg") || filename.endsWith(".gif") || filename.endsWith(".png");
+    return filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".gif") || filename.endsWith(".png");
   }
 }
