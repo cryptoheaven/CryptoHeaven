@@ -14,8 +14,8 @@ package com.CH_gui.list;
 
 import java.util.*;
 
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2009
@@ -301,12 +301,12 @@ public class StringHighlighter extends Object {
     if (includeVisual) {
       if (match != MATCH_STRING__NO_MATCH) {
         if (includePreTags)
-          visualsReturnBuffer[0] = "<html><pre><font face='Arial, Verdana, Helvetica, sans-serif'>" + visual + "</font></pre></html>";
+          visualsReturnBuffer[0] = "<html><pre><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + visual + "</font></pre></html>";
         else
           visualsReturnBuffer[0] = "<html>" + visual + "</html>";
       } else if (alwaysArmorInHTML) {
         if (includePreTags)
-          visualsReturnBuffer[0] = "<html><pre><font face='Arial, Verdana, Helvetica, sans-serif'>" + Misc.encodePlainLineIntoHtmlLine(s1Orig) + "</font></pre></html>";
+          visualsReturnBuffer[0] = "<html><pre><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + Misc.encodePlainLineIntoHtmlLine(s1Orig) + "</font></pre></html>";
         else
           visualsReturnBuffer[0] = "<html>" + Misc.encodePlainLineIntoHtmlLine(s1Orig) + "</html>";
       }

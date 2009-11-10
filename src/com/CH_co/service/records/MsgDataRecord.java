@@ -23,6 +23,7 @@ import com.CH_co.monitor.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import com.CH_guiLib.util.HTML_utils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -808,16 +809,16 @@ public class MsgDataRecord extends Record {
       if (v.size() > 0) {
         //sb.append("<table cellspacing='0' bgcolor='#FFFFCC'>\n");
         sb.append("<table cellspacing='0' cellpadding='2'>\n");
-        sb.append("<tr><td colspan='2' valign='top' bgcolor='#B2D9F5'><font color='#003366' "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+        sb.append("<tr><td colspan='2' valign='top' bgcolor='#B2D9F5'><font color='#003366' "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
         sb.append(e.getNameSafe());
         sb.append("</font></td></tr>\n");
         for (int i=0; i<v.size(); i++) {
           XMLElement c = (XMLElement) v.elementAt(i);
           width = useVerticalLayout && useSmallerFont ? "width='65'" : "width='85'";
-          sb.append("<tr><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+          sb.append("<tr><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
           sb.append(c.getNameSafe() + ":");
           width = useVerticalLayout && useSmallerFont ? "width='150'" : "width='190'";
-          sb.append("</font></td><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+          sb.append("</font></td><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
           String content = c.getContent();
           if (e.getNameSafe().equals("Web") && c.getNameSafe().equals("Home")) {
             String contentLower = content.toLowerCase();
@@ -842,10 +843,10 @@ public class MsgDataRecord extends Record {
           Object displayAs = c.getAttribute("displayAs");
           if (displayAs != null) {
             width = useVerticalLayout && useSmallerFont ? "width='65'" : "width='85'";
-            sb.append("<tr><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+            sb.append("<tr><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
             sb.append("Display As:");
             width = useVerticalLayout && useSmallerFont ? "width='150'" : "width='190'";
-            sb.append("</font></td><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+            sb.append("</font></td><td valign='top' bgcolor='#EAF4FC' "+width+"><font "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
             sb.append(Misc.encodePlainIntoHtml(displayAs.toString()));
             sb.append("</font></td></tr>\n");
           }
@@ -858,10 +859,10 @@ public class MsgDataRecord extends Record {
         else
           width = "width='560'";
         sb.append("<table "+width+" border='0'>\n");
-        sb.append("<tr><td valign='top' bgcolor='#B2D9F5'><font color='#003366' "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+        sb.append("<tr><td valign='top' bgcolor='#B2D9F5'><font color='#003366' "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
         sb.append(e.getNameSafe());
         sb.append("</font></td></tr>\n");
-        sb.append("<tr><td valign='top'><font "+size+" face='Arial, Verdana, Helvetica, sans-serif'>\n");
+        sb.append("<tr><td valign='top'><font "+size+" face="+HTML_utils.DEFAULT_FONTS_QUOTED+">\n");
         if (e.getAttribute("type").equals("text/plain")) {
           sb.append(Misc.encodePlainIntoHtml(e.getContent()));
         } else {

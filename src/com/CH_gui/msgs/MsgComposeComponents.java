@@ -1081,7 +1081,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           });
       }
       text = 
-          "<html><body face='Arial, Verdana, Helvetica, sans-serif'> " +
+          "<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+"> " +
           "<p> <br> </p> " + 
           (addSignature ? signatureText : "") +
           "<table cellpadding='1' cellspacing='5' border='0'> " +
@@ -1222,7 +1222,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         content[0] = "text/html";
         UserRecord me = cache.getUserRecord();
         content[1] = 
-            (isForceOutputInHTMLPrintHeader ? "<font size='-1' face='Arial, Verdana, Helvetica, sans-serif'><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") + 
+            (isForceOutputInHTMLPrintHeader ? "<font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") + 
             (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") + 
 
@@ -1294,9 +1294,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   
   private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
     if (htmlText != null && htmlText.length() > 0) {
-      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2' face='Arial, Verdana, Helvetica, sans-serif'>" : "") + 
+      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" : "") +
               "<b>" + name + ": </b>" + 
-              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2' face='Arial, Verdana, Helvetica, sans-serif'>" : "") + 
+              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" : "") +
               htmlText + 
               (isPrintHeader ? "</font></td></tr>" : "<br>");
     } else {

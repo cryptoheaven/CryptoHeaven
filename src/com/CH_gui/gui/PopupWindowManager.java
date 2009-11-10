@@ -60,7 +60,7 @@ public class PopupWindowManager extends Object {
         body = msgData.getEncodedHTMLData();
       }
       String msgBody = (addSub ? ("<b>" + sub + "</b> ") : "") + body;
-      String hrefStart = "<html><body><font face='Arial, Verdana, Helvetica, sans-serif' size='-1'><a href=\""+user+"\">";
+      String hrefStart = "<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='-1'><a href=\""+user+"\">";
       String hrefEnd = "</a>";
       String text = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("USER_says_-_MESSAGE"), new Object[] {hrefStart, user, hrefEnd, msgBody});
       final JTextPane msgPane = new JMyTextPane();

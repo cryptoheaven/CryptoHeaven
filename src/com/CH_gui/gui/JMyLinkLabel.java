@@ -15,10 +15,10 @@ package com.CH_gui.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
-import javax.swing.*;
 
 import com.CH_co.gui.*;
 import com.CH_co.util.*;
+import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2009
@@ -45,7 +45,7 @@ public class JMyLinkLabel extends JMyLabel {
     this(label, urlLink, "+0");
   }
   public JMyLinkLabel(String label, URL urlLink, String fontRelativeSize) {
-    super("<html><body><font face='Arial, Verdana, Helvetica, sans-serif' size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
+    super("<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
     if (urlLink != null) {
       this.link = urlLink;
       setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -71,11 +71,11 @@ public class JMyLinkLabel extends JMyLabel {
   }
   public void setText(String label, URL urlLink, String fontRelativeSize) {
     this.link = urlLink;
-    super.setText("<html><body><font face='Arial, Verdana, Helvetica, sans-serif' size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
+    super.setText("<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
   }
   public void setText(String label, URL urlLink, String fontRelativeSize, String bgColor) {
     this.link = urlLink;
-    super.setText("<html><body><font face='Arial, Verdana, Helvetica, sans-serif' bgcolor='"+bgColor+"' size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
+    super.setText("<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" bgcolor='"+bgColor+"' size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
   }
 
   public URL getLink() {

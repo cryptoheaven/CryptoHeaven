@@ -15,7 +15,6 @@ import com.CH_co.trace.Trace;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.ImageObserver;
-import java.io.*;
 import java.net.*;
 import java.util.Dictionary;
 import javax.swing.*;

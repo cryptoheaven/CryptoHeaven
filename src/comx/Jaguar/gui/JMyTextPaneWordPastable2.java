@@ -16,6 +16,7 @@ import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 import com.CH_guiLib.gui.JMyTextPaneWordPastable;
+import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2009
@@ -55,7 +56,7 @@ public class JMyTextPaneWordPastable2 extends JMyTextPaneWordPastable {
         }
         if (!faceFound) {
           SimpleAttributeSet as = new SimpleAttributeSet();
-          as.addAttribute("face", "Arial, Verdana, Helvetica");
+          as.addAttribute("face", HTML_utils.DEFAULT_FONTS);
           mHtmlDoc.addAttributes(elem, as);
         }
       }

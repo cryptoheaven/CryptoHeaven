@@ -52,6 +52,7 @@ import com.CH_gui.postTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import com.CH_guiLib.util.HTML_utils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -753,7 +754,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           StringBuffer sb = new StringBuffer();
 
           sb.append("<html><body>");
-          sb.append("<font size='-1' face='Arial, Verdana, Helvetica, sans-serif'><b>" + ListRenderer.getRenderedText(model.getParentFolderPair()) + "</b></font>");
+          sb.append("<font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>" + ListRenderer.getRenderedText(model.getParentFolderPair()) + "</b></font>");
           sb.append("<hr color=#000000 noshade size=2>");
           sb.append("<table cellpadding='0' cellspacing='0' border='0'>");
           sb.append("<tr>");
@@ -762,7 +763,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
             int modelCol = table.convertColumnIndexToModel(viewCol);
             int rawCol = chd.convertColumnToRawModel(modelCol);
             String headerName = chd.getRawColumnName(rawCol);
-            sb.append("<td NOWRAP align='left' valign='top'><font size='-1' face='Arial, Verdana, Helvetica, sans-serif'><b>");
+            sb.append("<td NOWRAP align='left' valign='top'><font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>");
             sb.append(headerName != null && headerName.trim().length() > 0 ? Misc.encodePlainIntoHtml(headerName + "  ") : "&nbsp;");
             sb.append("</b></td>");
           }
@@ -829,7 +830,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
               else 
                 sb.append("<td align='left' valign='top'>");
               // set cell font
-              sb.append("<font size='-2' face='Arial, Verdana, Helvetica, sans-serif'>");
+              sb.append("<font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">");
               //set cell data
               if (s != null && s.trim().length() > 0) {
                 if (isHTMLformatted) {

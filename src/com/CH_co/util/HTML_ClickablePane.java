@@ -13,6 +13,7 @@
 package com.CH_co.util;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -22,7 +23,7 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 
 import com.CH_co.trace.Trace;
-import java.awt.event.MouseEvent;
+import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2009
@@ -65,7 +66,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     setContentType("text/html");
     if (editorKit != null)
       setEditorKit(editorKit);
-    setText("<html><body face='Arial, Verdana, Helvetica'> </body></html>");
+    setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+"> </body></html>");
     init(true);
     if (trace != null) trace.exit(HTML_ClickablePane.class);
   }
@@ -95,7 +96,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     if (htmlText.startsWith("<html>") && htmlText.endsWith("</html>")) {
       htmlText = htmlText.substring(6, htmlText.length()-7);
     }
-    setText("<html><body face='Arial, Verdana, Helvetica'>" + htmlText + "</body></html>");
+    setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + htmlText + "</body></html>");
     init(true);
     if (trace != null) trace.exit(HTML_ClickablePane.class);
   }
@@ -207,14 +208,19 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
         }
       }
     };
-    initFont();
      */
+    initFont();
   }
 
   /**
    * Initialize default fonts.
    */
   public void initFont() {
+    // add a CSS rule to force body tags to use the default label font
+    // instead of the value in javax.swing.text.html.default.csss
+    Font font = UIManager.getFont("Label.font");
+    String bodyRule = "body { font-family: " + font.getFamily() + "; " + "font-size: " + font.getSize() + "pt; }";
+    ((HTMLDocument) getDocument()).getStyleSheet().addRule(bodyRule);
     /*
     Object token = new Object();
     if (arbiter.putToken(arbiter, token)) {
