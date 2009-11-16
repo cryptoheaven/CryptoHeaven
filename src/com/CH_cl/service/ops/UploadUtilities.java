@@ -443,6 +443,13 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
         DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction);
       } catch (Throwable t) {
         if (trace != null) trace.exception(UploadRunner.class, 100, t);
+      } finally {
+        // After upload is done, remove the temporary files.
+        for (int i=0; i<request.fileDataRecords.length; i++) {
+          File encFile = request.fileDataRecords[i].getEncDataFile();
+          if (encFile != null && encFile.exists() && !CleanupAgent.wipeOrDelete(encFile))
+            GlobalProperties.addTempFileToCleanup(encFile);
+        }
       }
       // catch everything so we can decrement the counter properly
 

@@ -615,14 +615,14 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
           if (replyRecived)
             if (recordTableScrollPane.getTableModel().getFilterNarrowing() == null)
               refresh = true;
-        } else if (model instanceof FileTableModel) {
-          // in file folder there may be sub-directories but no files, so refresh if count of files is different - this is possible because all files are fetched at once (no batches)
-          FileLinkRecord[] links = cache.getFileLinkRecordsOwnerAndType(evaluatedFolder.getFolderRecord().folderId, new Short(Record.RECORD_TYPE_FOLDER));
-          if (links != null && links.length != countObjs) {
-            if (replyRecived)
-              if (recordTableScrollPane.getTableModel().getFilterNarrowing() == null)
-                refresh = true;
-          }
+//        } else if (model instanceof FileTableModel) {
+//          // in file folder there may be sub-directories but no files, so refresh if count of files is different - this is possible because all files are fetched at once (no batches)
+//          FileLinkRecord[] links = cache.getFileLinkRecordsOwnerAndType(evaluatedFolder.getFolderRecord().folderId, new Short(Record.RECORD_TYPE_FOLDER));
+//          if (links != null && links.length != countObjs) {
+//            if (replyRecived)
+//              if (recordTableScrollPane.getTableModel().getFilterNarrowing() == null)
+//                refresh = true;
+//          }
         }
 
         if (refresh) {

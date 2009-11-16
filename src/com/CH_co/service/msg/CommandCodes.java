@@ -283,6 +283,7 @@ public class CommandCodes extends Object {
 
   // Get Files
   public static final int FILE_Q_GET_FILES = 1810;
+  public static final int FILE_Q_GET_FILES_STAGED = 1811;
   // reply is the same as for FILE_A_GET_FILES
 
   // Get Msg File Attachments

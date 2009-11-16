@@ -12,27 +12,22 @@
 
 package com.CH_co.service.records;
 
-import com.CH_cl.service.ops.DownloadUtilities;
-import java.awt.*;
-import javax.swing.*;
 import java.io.*;
-
+import java.util.Arrays;
+import java.util.Random;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
-
 import java.sql.Timestamp;
-import java.util.Arrays;
+import javax.swing.*;
 
-import com.CH_co.trace.Trace;
-import com.CH_co.io.*;
-import com.CH_co.util.*;
-import com.CH_co.monitor.ProgMonitor;
-
+import com.CH_cl.service.ops.DownloadUtilities;
 import com.CH_co.cryptx.*;
-import java.util.Random;
+import com.CH_co.io.*;
+import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2009

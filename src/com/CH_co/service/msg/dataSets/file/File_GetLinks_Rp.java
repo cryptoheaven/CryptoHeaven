@@ -12,17 +12,17 @@
 
 package com.CH_co.service.msg.dataSets.file;
 
-import java.io.IOException;
-
-import com.CH_co.monitor.ProgMonitor;
-import com.CH_co.util.Misc;
-
-import com.CH_co.trace.Trace;
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitor;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.msg.dataSets.stat.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
+
+import java.io.IOException;
+import java.sql.Timestamp;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -30,7 +30,7 @@ import com.CH_co.service.msg.dataSets.stat.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -38,16 +38,22 @@ import com.CH_co.service.msg.dataSets.stat.*;
  *
  * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class File_GetLinks_Rp extends ProtocolMsgDataSet {
 
+  // <ownerObjType> <ownerObjId> <fetchNumMax> <fetchNumNew> <timestamp>
   // <numberOfFiles> {
-  //    <fileLinkId> <fileId> <ownerObjId> <ownerObjType> <ownerUserId> 
-  //    <encFileType> <encFileName> <encFileDesc> <encSymmetricKey> 
-  //    <origSize> <recordCreated> <recordUpdated> 
+  //    <fileLinkId> <fileId> <ownerObjId> <ownerObjType> <ownerUserId>
+  //    <encFileType> <encFileName> <encFileDesc> <encSymmetricKey>
+  //    <origSize> <recordCreated> <recordUpdated>
   //    }*
   // <Stats_Get_Rp>
+
+  public Short ownerObjType;
+  public Long ownerObjId;
+  public Short fetchNumMax;
+  public Timestamp timestamp;
   public FileLinkRecord[] fileLinks;
   public Stats_Get_Rp stats_rp;
 
@@ -65,7 +71,18 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
   }
   /** Creates new File_GetLinks_Rp */
   public File_GetLinks_Rp(FileLinkRecord[] fileLinks, StatRecord[] statRecords) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "File_GetLinks_Rp(FileLinkRecord[], StatRecords statRecords)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "File_GetLinks_Rp(FileLinkRecord[], StatRecords[] statRecords)");
+    this.fileLinks = fileLinks;
+    if (statRecords != null && statRecords.length > 0)
+      this.stats_rp = new Stats_Get_Rp(statRecords);
+    if (trace != null) trace.exit(File_GetLinks_Rp.class);
+  }
+  public File_GetLinks_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp, FileLinkRecord[] fileLinks, StatRecord[] statRecords) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "File_GetLinks_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp, FileLinkRecord[] fileLinks, StatRecord[] statRecords)");
+    this.ownerObjType = ownerObjType;
+    this.ownerObjId = ownerObjId;
+    this.fetchNumMax = fetchNumMax;
+    this.timestamp = timestamp;
     this.fileLinks = fileLinks;
     if (statRecords != null && statRecords.length > 0)
       this.stats_rp = new Stats_Get_Rp(statRecords);
@@ -82,6 +99,14 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
   /** Writes out 'this' object to a stream */
   public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "writeToStream(DataOutputStream2)");
+
+    if (clientBuild >= 474 && serverBuild >= 474) {
+      dataOut.writeSmallint(ownerObjType);
+      dataOut.writeLongObj(ownerObjId);
+      dataOut.writeSmallint(fetchNumMax);
+      dataOut.writeTimestamp(timestamp);
+    }
+
     // write indicator
     if (fileLinks == null)
       dataOut.write(0);
@@ -116,6 +141,14 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
   /** Initializes 'this' object from a stream. */
   public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "initFromStream(DataInputStream2)");
+
+    if (clientBuild >= 474 && serverBuild >= 474) {
+      ownerObjType = dataIn.readSmallint();
+      ownerObjId = dataIn.readLongObj();
+      fetchNumMax = dataIn.readSmallint();
+      timestamp = dataIn.readTimestamp();
+    }
+
     // read indicator
     int indicator = dataIn.read();
     if (indicator == 0)

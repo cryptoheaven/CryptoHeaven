@@ -1520,6 +1520,21 @@ public class FetchedDataCache extends Object {
   }
 
   /**
+   * Removes records from the cache and fires appropriate event.
+   */
+  public synchronized void removeFileLinkRecords(Long[] fileLinkIDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFileLinkRecords(Long[] fileLinkIDs)");
+    if (trace != null) trace.args(fileLinkIDs);
+
+    FileLinkRecord[] fileLinks = getFileLinkRecords(fileLinkIDs);
+    if (fileLinks != null && fileLinks.length > 0) {
+      removeFileLinkRecords(fileLinks);
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  /**
    * @return a FileLinkRecord from cache with a given id.
    */
   public synchronized FileLinkRecord getFileLinkRecord(Long fileLinkId) {
@@ -1631,8 +1646,9 @@ public class FetchedDataCache extends Object {
       }
       //fireFileDataRecordUpdated(records, RecordEvent.SET);
       // temporary enc files should be expired now, plain files are already created.
-      for (int i=0; i<records.length; i++)
+      for (int i=0; i<records.length; i++) {
         records[i].cleanupEncFile();
+      }
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);

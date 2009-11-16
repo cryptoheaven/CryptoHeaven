@@ -94,15 +94,17 @@ public class MainFrameStarter extends Object {
     Stats.installStatsLabelMouseAdapter(new StatsInitAndLabelMouseAdapter());
 
     // initialize a clean-up agent to run every 15 minutes for garbage-collection and every 60 minutes for temp file cleanup
-    CleanupAgent.startSingleInstance(CleanupAgent.MODE_FINALIZATION | CleanupAgent.MODE_GC | CleanupAgent.MODE_TEMP_FILE_CLEANER, 
-                     new String[][] { { FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null }, 
-                                      { FileDataRecord.TEMP_PLAIN_FILE_PREFIX, null } }, 
-                     1, 29, 29, 37, 37, 1, 71); // file cleaner will start early, but run infrequently
+    CleanupAgent.startSingleInstance(CleanupAgent.MODE_FINALIZATION | CleanupAgent.MODE_GC | CleanupAgent.MODE_TEMP_FILE_CLEANER,
+                     new String[][] { { FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null },
+                                      { FileDataRecord.TEMP_PLAIN_FILE_PREFIX, null } },
+                     1, 29, 29, 37, 37, 1, 1440);
+    // File cleaner will start early, but wipe/delete left over temp files after they are at least 24h old.
+    // All temp files should be wiped/deleted in other ways, this is a last resort cleanup in case of exceptions, etc.
 
     initLookAndFeelComponentDefaults();
 
     try {
-      boolean checkVersion = true; 
+      boolean checkVersion = true;
       boolean skipLogin = false;
       boolean swingMemoryFootprintTestExitWhenMainScreenLoaded = false;
 
@@ -304,7 +306,7 @@ public class MainFrameStarter extends Object {
           }
         }
         fontUI = new FontUIResource(fontUI.deriveFont(at));
-        table.put(key, fontUI); 
+        table.put(key, fontUI);
       }
     }
 
@@ -398,7 +400,7 @@ public class MainFrameStarter extends Object {
       this.initialFolderId = initialFolderId;
       this.initialMsgLinkId = initialMsgLinkId;
     }
-            
+
     private LoginProgMonitor monitor;
 
     public LoginProgMonitor getLoginProgMonitor() {
@@ -425,7 +427,7 @@ public class MainFrameStarter extends Object {
 //        // All parent-less dialogs should go on top of the main window from now on.
 //        GeneralDialog.setDefaultParent(this);
 
-        // Mark Active Status right away since the GUI timer is scheduled in intervals... 
+        // Mark Active Status right away since the GUI timer is scheduled in intervals...
         // if user was disconnected in INACTIVE state, he should be marked active now...
         InactivityEventQueue.getInstance().sendActiveFlagIfInactive();
 
@@ -525,7 +527,7 @@ public class MainFrameStarter extends Object {
   /************* LISTENERS ON CHANGES IN THE CACHE *****************************************/
   /****************************************************************************************/
 
-  /** 
+  /**
    * Listen on updates to the ContactRecords in the cache.
    */
   private class ContactListener implements ContactRecordListener {
@@ -581,7 +583,7 @@ public class MainFrameStarter extends Object {
     }
   }
 
-  /** 
+  /**
    * Listen on updates to the UserRecords in the cache.
    */
   private static class UserListener implements UserRecordListener {
@@ -591,7 +593,7 @@ public class MainFrameStarter extends Object {
     }
   }
 
-  /** 
+  /**
    * Listen on updates to the EmailRecords in the cache.
    */
   private static class EmailListener implements EmailRecordListener {

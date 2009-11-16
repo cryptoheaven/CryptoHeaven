@@ -25,10 +25,8 @@ import com.CH_co.service.records.MsgLinkRecord;
 import com.CH_co.service.records.Record;
 import com.CH_co.service.records.RecordUtils;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
 
 import java.io.File;
-import java.util.Vector;
 
 /**
  * <b>Copyright</b> &copy; 2001-2009

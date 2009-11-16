@@ -42,7 +42,7 @@ public class CleanupAgent extends Thread {
   public static final int MODE_TEMP_FILE_CLEANER = 4;
 
   private static CleanupAgent singleInstance;
-  private static Object singleInstanceMonitor = new Object();
+  private static final Object singleInstanceMonitor = new Object();
 
   private long delayMillisHeartbeat;
   private long delayMillisFinalization, delayMillisFinalizationFirst, delayMillisFinalizationNext;
@@ -166,9 +166,12 @@ public class CleanupAgent extends Thread {
   } // end run()
 
 
-  public static void wipeOrDelete(File file) {
-    if (!wipe(file))
-      file.delete();
+  public static boolean wipeOrDelete(File file) {
+    boolean rc = wipe(file);
+    if (!rc) {
+      rc = file.delete();
+    }
+    return rc;
   }
 
   private static boolean wipe(File file) {
@@ -215,10 +218,13 @@ public class CleanupAgent extends Thread {
         progMonitor.appendLine(" " + task + file.getAbsolutePath());
       }
 
-      file.renameTo(tempFile);
-      tempFile.delete();
+      boolean renamed = file.renameTo(tempFile);
+      if (renamed)  {
+        rc = tempFile.delete();
+      } else {
+        rc = file.delete();
+      }
 
-      rc = true;
     } catch (Throwable t) {
       rc = false;
       if (parent != null) {

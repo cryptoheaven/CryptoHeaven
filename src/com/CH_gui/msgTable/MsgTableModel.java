@@ -896,13 +896,14 @@ public class MsgTableModel extends RecordTableModel {
           // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
           Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, fetchNumMax, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
 
-          // Gather messages already fetched so we don't re-fetch all items if not necessary
+          // Gather items already fetched so we don't re-fetch all items if not necessary.
+          // Useful when performing fetch for content searches when user clicks body filtering on and off a few times -- it will skip previously fetched bodies and continue on...
           if (_action == CommandCodes.MSG_Q_GET_FULL) {
-            MsgLinkRecord[] existingMsgLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
-            request.exceptMsgLinkIDs = RecordUtils.getIDs(existingMsgLinks);
+            MsgLinkRecord[] existingLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
+            request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
           } else {
-            MsgLinkRecord[] existingMsgLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(folderId);
-            request.exceptMsgLinkIDs = RecordUtils.getIDs(existingMsgLinks);
+            MsgLinkRecord[] existingLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(folderId);
+            request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
           }
 
           Interrupter msgInterrupter = new Interrupter() {
@@ -928,7 +929,7 @@ public class MsgTableModel extends RecordTableModel {
               }
             }
           };
-          final MessageAction msgAction = new MessageAction(_action, request, msgInterrupter, msgInterruptible);
+          MessageAction msgAction = new MessageAction(_action, request, msgInterrupter, msgInterruptible);
           Runnable replyReceivedJob = new Runnable() {
             public void run() {
               if (!fetchedIds.contains(shareId)) {

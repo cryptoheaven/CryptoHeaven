@@ -117,7 +117,6 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     jButtons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         closeDialog();
-        GlobalProperties.cleanupTempFiles();
       }
     });
     jCancel = jButtons[2];

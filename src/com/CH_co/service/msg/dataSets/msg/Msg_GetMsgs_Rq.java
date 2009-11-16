@@ -29,28 +29,28 @@ import com.CH_co.service.msg.ProtocolMsgDataSet;
  * <b>Copyright</b> &copy; 2001-2009
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
- * 
+ * </a><br>All rights reserved.<p>
+ *
  * Get Message Summaries
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
 
   public static final short FETCH_NUM_LIST__INITIAL_SIZE = 15;
-  public static final short FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT = 500;
+  public static final short FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT = 1000;
 
   public static final short FETCH_NUM_NEW__INITIAL_SIZE = 5;
   public static final short FETCH_NUM_NEW__MAX_SIZE__HARD_LIMIT = 100;
 
-  // <shareId> <ownerObjType> <ownerObjId> <fetchNumMax> <fetchNumNew> <timestamp> { <exceptMsgLinkIDs }*
+  // <shareId> <ownerObjType> <ownerObjId> <fetchNumMax> <fetchNumNew> <timestamp> { <exceptLinkIDs }*
   public Long shareId;
   public Short ownerObjType;
   public Long ownerObjId;
   public Short fetchNumMax;
   public Short fetchNumNew;
   public Timestamp timestamp;
-  public Long[] exceptMsgLinkIDs;
+  public Long[] exceptLinkIDs;
 
   /** Creates new Msg_GetMsgs_Rq */
   public Msg_GetMsgs_Rq() {
@@ -94,7 +94,7 @@ public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
     dataOut.writeSmallint(fetchNumNew);
     dataOut.writeTimestamp(timestamp);
     if (clientBuild >= 364 && serverBuild >= 364) {
-      new Obj_IDList_Co(exceptMsgLinkIDs).writeToStream(dataOut, progressMonitor, clientBuild, serverBuild);
+      new Obj_IDList_Co(exceptLinkIDs).writeToStream(dataOut, progressMonitor, clientBuild, serverBuild);
     }
 
     if (trace != null) trace.exit(Msg_GetMsgs_Rq.class);
@@ -111,9 +111,9 @@ public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
     fetchNumNew = dataIn.readSmallint();
     timestamp = dataIn.readTimestamp();
     if (clientBuild >= 364 && serverBuild >= 364) {
-      Obj_IDList_Co exceptMsgLinkIDsSet = new Obj_IDList_Co();
-      exceptMsgLinkIDsSet.initFromStream(dataIn, progressMonitor, clientBuild, serverBuild);
-      exceptMsgLinkIDs = exceptMsgLinkIDsSet.IDs;
+      Obj_IDList_Co exceptLinkIDsSet = new Obj_IDList_Co();
+      exceptLinkIDsSet.initFromStream(dataIn, progressMonitor, clientBuild, serverBuild);
+      exceptLinkIDs = exceptLinkIDsSet.IDs;
     }
 
     if (trace != null) trace.exit(Msg_GetMsgs_Rq.class);
@@ -128,7 +128,7 @@ public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
         + ", fetchNumMax="  + fetchNumMax
         + ", fetchNumNew="  + fetchNumNew
         + ", timestamp="    + timestamp
-        + ", exceptMsgLinkIDs=" + Misc.objToStr(exceptMsgLinkIDs)
+        + ", exceptLinkIDs=" + Misc.objToStr(exceptLinkIDs)
         + "]";
   }
 

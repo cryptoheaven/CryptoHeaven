@@ -12,25 +12,25 @@
 
 package com.CH_gui.fileTable;
 
-import java.util.*;
-import javax.swing.table.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
 
+import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.file.FileUtilities;
 import com.CH_gui.recycleTable.*;
 import com.CH_gui.table.*;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -38,7 +38,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -46,7 +46,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.30 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileTableModel extends RecordTableModel {
 
@@ -68,7 +68,7 @@ public class FileTableModel extends RecordTableModel {
   protected static final String STR_LINK_ID = com.CH_gui.lang.Lang.rb.getString("column_Link_ID");
   protected static final String STR_DATA_ID = com.CH_gui.lang.Lang.rb.getString("column_Data_ID");
 
-  static final ColumnHeaderData columnHeaderData = 
+  static final ColumnHeaderData columnHeaderData =
       new ColumnHeaderData(new Object[][]
         { { null, STR_FILE_NAME, STR_TYPE, STR_SIZE, STR_CREATED, STR_UPDATED, STR_LINK_ID, STR_DATA_ID },
           { STR_FLAG, STR_FILE_NAME, STR_TYPE, STR_SIZE, STR_CREATED, STR_UPDATED, STR_LINK_ID, STR_DATA_ID },
@@ -225,7 +225,7 @@ public class FileTableModel extends RecordTableModel {
       FileLinkRecord fileLink = (FileLinkRecord) record;
 
       switch (column) {
-        case 0: 
+        case 0:
           StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
           if (stat != null) {
             value = stat.getFlag();
@@ -327,7 +327,7 @@ public class FileTableModel extends RecordTableModel {
   }
 
 
-  /** 
+  /**
    * Send a request to fetch files for the <code> shareId </code> from the server
    * if files were not fetched for this folder, otherwise get them from cache
    * @param force true to force a fetch from the database
@@ -369,27 +369,40 @@ public class FileTableModel extends RecordTableModel {
           if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
           if (folder != null) FolderRecUtil.markFolderFetchRequestIssued(folder.folderId);
 
-          Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
-          request.IDs = new Obj_IDList_Co();
-          request.IDs.IDs = new Long[] {shareId}; 
-          request.Id = new Long(Record.RECORD_TYPE_SHARE);
+          final int _action = CommandCodes.FILE_Q_GET_FILES_STAGED;
 
-          MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES, request);
+          // order of fetching is from newest to oldest
+          short fetchNumMax = -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE;
+
+          // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
+          File_GetFiles_Rq request = new File_GetFiles_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, fetchNumMax, (Timestamp) null);
+
+          // Gather items already fetched so we don't re-fetch all items if not necessary.
+          FileLinkRecord[] existingLinks = cache.getFileLinkRecords(shareId);
+          request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
+
+          MessageAction msgAction = new MessageAction(_action, request);
+          Runnable replyReceivedJob = new Runnable() {
+            public void run() {
+              if (!fetchedIds.contains(shareId)) {
+                fetchedIds.add(shareId);
+              }
+            }
+          };
           Runnable afterJob = new Runnable() {
             public void run() {
               FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
               if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-              if (!fetchedIds.contains(shareId)) fetchedIds.add(shareId);
             }
           };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 5000, afterJob, afterJob);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, replyReceivedJob, afterJob, afterJob);
         }
       }
     } // end synchronized
 
 
     if (trace != null) trace.exit(FileTableModel.class);
-  } 
+  }
 
   /**
    * Checks if folder share's content of a given ID was already retrieved.

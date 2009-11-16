@@ -20,9 +20,10 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 
 import com.CH_cl_eml.service.ops.ExportMsgUtilities;
+
 import com.CH_co.monitor.*;
-import com.CH_co.service.msg.MessageAction;
-import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
 import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
@@ -43,7 +44,7 @@ import java.util.Vector;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -51,7 +52,7 @@ import java.util.Vector;
  *
  * <b>$Revision: 1.14 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 
 
@@ -63,7 +64,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   public static final String PROPERTY_NAME__LOCAL_FILE_DEST_DIR = "DownloadUtilities_localFileDestDir";
   public static final String PROPERTY_NAME__DOWNLOAD_AND_OPEN = "DownloadUtilities_downloadAndOpen";
 
-  /** 
+  /**
    * @return The default download directory as specified in the properties, or current directory if default is invalid.
    */
   public static File getDefaultDestDir() {
@@ -428,6 +429,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
   private static void fetchMsgListings(FolderPair[] folders, ServerInterfaceLayer SIL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "fetchMsgListings(FolderPair[] folders, ServerInterfaceLayer SIL)");
+    if (trace != null) trace.args(folders);
+
     final FetchedDataCache _cache = ServerInterfaceLayer.getFetchedDataCache();
 
     FolderShareRecord[] fldShares = FolderPair.getFolderShareRecords(folders);
@@ -461,7 +465,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
       // Gather messages already fetched so we don't re-fetch all items if not necessary
       MsgLinkRecord[] existingMsgLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
-      request.exceptMsgLinkIDs = RecordUtils.getIDs(existingMsgLinks);
+      request.exceptLinkIDs = RecordUtils.getIDs(existingMsgLinks);
       MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_FULL, request);
       SIL.submitAndReturn(msgAction);
     }
@@ -479,24 +483,71 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         }
       }
     }
+
+    if (trace != null) trace.exit(DownloadUtilities.class);
   }
 
   private static void fetchFileListings(FolderPair[] folders, ServerInterfaceLayer SIL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "fetchFileListings(FolderPair[] folders, ServerInterfaceLayer SIL)");
     if (trace != null) trace.args(folders);
 
-    Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
-    request.IDs = new Obj_IDList_Co();
-    request.Id = new Long(Record.RECORD_TYPE_SHARE);
-    request.IDs.IDs = RecordUtils.getIDs(FolderPair.getFolderShareRecords(folders));
-    MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES, request);
-    SIL.submitAndWait(msgAction);
+    final FetchedDataCache _cache = ServerInterfaceLayer.getFetchedDataCache();
+
+    FolderShareRecord[] fldShares = FolderPair.getFolderShareRecords(folders);
+    Long[] folderIDs = FolderShareRecord.getFolderIDs(fldShares);
+
+    final Vector _folderIDsBeingFetched = new Vector(Arrays.asList(folderIDs));
+
+    // Register the completion notify listener
+    FolderRecordListener folderListener = new FolderRecordListener() {
+      public void folderRecordUpdated(FolderRecordEvent e) {
+        int eventType = e.getEventType();
+        if (eventType == RecordEvent.FOLDER_FETCH_COMPLETED || eventType == RecordEvent.FOLDER_FETCH_INTERRUPTED) {
+          FolderRecord[] fldRecs = e.getFolderRecords();
+          synchronized (_folderIDsBeingFetched) {
+            for (int i=0; i<fldRecs.length; i++) {
+              _folderIDsBeingFetched.removeElement(fldRecs[i].folderId);
+            }
+            _folderIDsBeingFetched.notifyAll();
+            if (_folderIDsBeingFetched.size() == 0)
+              _cache.removeFolderRecordListener(this);
+          }
+        }
+      }
+    };
+    _cache.addFolderRecordListener(folderListener);
+
+    // Lets fetch all files ...
+    for (int i=0; i<fldShares.length; i++) {
+      Long shareId = fldShares[i].shareId;
+      Long folderId = fldShares[i].folderId;
+      File_GetFiles_Rq request = new File_GetFiles_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
+      // Gather files already fetched so we don't re-fetch all items if not necessary
+      FileLinkRecord[] existingLinks = _cache.getFileLinkRecords(shareId);
+      request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
+      MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
+      SIL.submitAndReturn(msgAction);
+    }
+
+    // wait until all folder fetching completes
+    synchronized (_folderIDsBeingFetched) {
+      while (true) {
+        if (_folderIDsBeingFetched.size() == 0) {
+          break;
+        } else {
+          try {
+            _folderIDsBeingFetched.wait();
+          } catch (InterruptedException e) {
+          }
+        }
+      }
+    }
 
     if (trace != null) trace.exit(DownloadUtilities.class);
   }
 
 
-  /** 
+  /**
    * Sets a request to download a file to the destination, batches up the files in groups of 10.
    * @param files Remote files to download.
    * @param fromMsgs is the message parent to specified files or is NULL if downloading from a folder.
@@ -557,7 +608,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     Obj_IDs_Co request = new Obj_IDs_Co();
     if (fromMsgs == null)
       request.IDs = new Long[2][];
-    else 
+    else
       request.IDs = new Long[3][];
     request.IDs[0] = RecordUtils.getIDs(files);
     if (shareRecords != null && shareRecords.length > 0)
@@ -634,7 +685,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         ProgMonitorPool.registerProgMonitor(progressMonitor, msgAction.getStamp());
 
         replyAction = SIL.submitAndFetchReply(msgAction, 0);
-      } catch (Throwable t) { 
+      } catch (Throwable t) {
         if (trace != null) trace.exception(DownloadFileRunner.class, 100, t);
       }
       // catch everything so we can decrement the counter properly

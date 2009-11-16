@@ -1428,9 +1428,9 @@ public class LoginFrame extends JFrame {
         } else {
           LoginFrame.this.setVisible(true);
           userName.selectAll();
-          password.getPasswordField().selectAll();
           password.getPasswordField().requestFocus();
           password.getPasswordField().getCaret().setVisible(true);
+          password.getPasswordField().selectAll();
         }
       }
 

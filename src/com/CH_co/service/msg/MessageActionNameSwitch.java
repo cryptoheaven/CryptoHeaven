@@ -200,6 +200,7 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FILE_Q_NEW_FILES), "Create File" },
       // Get Files
       { new Integer(CommandCodes.FILE_Q_GET_FILES), "Get File Listing" },
+      { new Integer(CommandCodes.FILE_Q_GET_FILES_STAGED), "Get File Listing" },
       // Get Msg File Attachments
       { new Integer(CommandCodes.FILE_Q_GET_MSG_FILE_ATTACHMENTS), "Get Message File Attachment(s)" },
       // Get File Data Attributes

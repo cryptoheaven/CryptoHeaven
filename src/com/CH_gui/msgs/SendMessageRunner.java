@@ -16,7 +16,6 @@ import java.awt.*;
 import java.io.*;
 import java.security.*;
 import java.util.*;
-import javax.swing.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
@@ -29,14 +28,12 @@ import com.CH_cl.service.records.*;
 import com.CH_co.cryptx.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_gui.file.*;
 import com.CH_gui.frame.MainFrame;
 
 /**

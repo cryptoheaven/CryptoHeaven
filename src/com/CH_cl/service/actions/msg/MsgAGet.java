@@ -414,9 +414,9 @@ public class MsgAGet extends ClientMessageAction {
           long startTime = getStamp();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
-          double multiplier = 2000.0 / ellapsed; // adjust the new fetch size so that it takes about 2 seconds
+          double multiplier = 3000.0 / ellapsed; // adjust the new fetch size so that it takes about 3 seconds
           // multiplier cannot make too drastic of a change
-          multiplier = Math.max(0.2, Math.min(5.0, multiplier));
+          multiplier = Math.max(0.2, Math.min(10.0, multiplier));
 
           // if only new msgs fetched apply adjustment
           if (linkRecords.length == fetchNumNew.shortValue()) {

@@ -68,7 +68,7 @@ public class Template extends Object {
 
   public static String[] templates;
 
-  public static final int SHOW_DELAY_FOR_FOLDER_TABLES = 2000; // 2 sec.
+  public static final int SHOW_DELAY_FOR_FOLDER_TABLES = 500; // 0.5 sec.
   public static final int SHOW_DELAY_FOR_NON_FOLDER_TABLES = 30000; // 30 sec.
 
 

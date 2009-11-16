@@ -12,18 +12,20 @@
 
 package com.CH_cl.service.actions.file;
 
-import java.util.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.RecordEvent;
 
-import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.stat.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -31,7 +33,7 @@ import com.CH_co.service.msg.dataSets.stat.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -39,7 +41,7 @@ import com.CH_co.service.msg.dataSets.stat.*;
  *
  * <b>$Revision: 1.7 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileAGetFiles extends ClientMessageAction {
 
@@ -49,21 +51,26 @@ public class FileAGetFiles extends ClientMessageAction {
     if (trace != null) trace.exit(FileAGetFiles.class);
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAGetFiles.class, "runAction(Connection)");
 
-    // incoming file links
     File_GetLinks_Rp reply = (File_GetLinks_Rp) getMsgDataSet();
+
+    Short fetchingOwnerObjType = reply.ownerObjType;
+    Long fetchingOwnerObjId = reply.ownerObjId;
+    Short fetchNumMax = reply.fetchNumMax;
+    Timestamp timestamp = reply.timestamp;
     FileLinkRecord[] fileLinks = reply.fileLinks;
     StatRecord[] statRecords = reply.stats_rp != null ? reply.stats_rp.stats : null;
+
     FetchedDataCache cache = getFetchedDataCache();
     Hashtable groupIDsHT = null;
 
-    // Since getting file links may be a result of another user creating it, 
+    // Since getting file links may be a result of another user creating it,
     // make sure we have the share (and its key) to unSeal the file link.
     // Share might have been created and not successfuly delivered.
 
@@ -133,6 +140,63 @@ public class FileAGetFiles extends ClientMessageAction {
         request.objLinkIDs = objLinkIDs;
 
         getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request));
+      }
+    }
+
+
+    // if this was a bulk fetch done in stages, continue the fetch
+    if (fileLinks != null && fetchNumMax != null) {
+      int fetchNumMaxLength = Math.abs(fetchNumMax.shortValue());
+      if (fetchingOwnerObjType != null && fetchingOwnerObjType.shortValue() != Record.RECORD_TYPE_FOLDER)
+        throw new IllegalStateException("Don't know how to handle staged fetching of non-folder files.");
+      Long fetchingFolderId = fetchingOwnerObjId; // this was always a folder staged fetch
+      FolderRecord fetchingFolderRec = cache.getFolderRecord(fetchingFolderId);
+      if (fileLinks.length < fetchNumMaxLength) {
+        // fetch completed, time to notify listeners
+        // check it just in case...
+        if (fetchingFolderRec != null)
+          cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_COMPLETED);
+      } else {
+        if (isInterrupted()) {
+          interrupt();
+          // When connecting to pre build 388 engine this may be null when number of messages in the folder modulus fetchNumMax = 0, so check it just in case...
+          if (fetchingFolderRec != null)
+            cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
+        } else {
+          Timestamp timeStamp = fileLinks[fileLinks.length-1].recordCreated;
+          if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
+          Long fetchingShareId = cache.getFolderShareRecordMy(fetchingFolderId, groupIDsHT).shareId;
+
+          short numMax = fetchNumMax.shortValue();
+
+          long startTime = getStamp();
+          long endTime = System.currentTimeMillis();
+          double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
+          double multiplier = 3000.0 / ellapsed; // adjust the new fetch size so that it takes about 3 seconds
+          // multiplier cannot make too drastic of a change
+          multiplier = Math.max(0.2, Math.min(10.0, multiplier));
+
+          // apply adjustment to regular fetch size
+          numMax = (short) (fetchNumMax.shortValue() * multiplier);
+          if (numMax == 0) numMax = fetchNumMax.shortValue(); // on error repeat previous iteration value
+
+          // apply hard maximum limits
+          if (numMax > File_GetFiles_Rq.FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT)
+            numMax = File_GetFiles_Rq.FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT;
+          else if (numMax < -File_GetFiles_Rq.FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT)
+            numMax = -File_GetFiles_Rq.FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT;
+
+          // apply hard minimum limits
+          if (numMax > 0)
+            numMax = (short) Math.max(numMax, File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE);
+          else if (numMax < 0)
+            numMax = (short) -Math.max(-numMax, File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE);
+
+          File_GetFiles_Rq request = new File_GetFiles_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, timeStamp);
+          MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
+          msgAction.setInterruptsFrom(this);
+          getServerInterfaceLayer().submitAndReturn(msgAction);
+        }
       }
     }
 

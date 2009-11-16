@@ -32,12 +32,12 @@ import com.CH_co.trace.Trace;
  * <b>Copyright</b> &copy; 2001-2009
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
- * 
+ * </a><br>All rights reserved.<p>
+ *
  * Translates ProtocolMsgDataSet instances into code number and vice versa
  * For cross-version compatibility, do not change the number codes for already existing request types.
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ProtocolMsgDataSwitch extends Object {
 
@@ -96,6 +96,7 @@ public class ProtocolMsgDataSwitch extends Object {
     {File_MoveCopy_Rq.class.getName(), new Integer(130)},
     {File_NewFiles_Rq.class.getName(), new Integer(131)},
     {File_Rename_Rq.class.getName(), new Integer(132)},
+    {File_GetFiles_Rq.class.getName(), new Integer(133)},
 
     {Key_KeyIDs_Rq.class.getName(), new Integer(140)},
     {Key_NewPair_Rq.class.getName(), new Integer(141)},

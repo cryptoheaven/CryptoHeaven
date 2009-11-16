@@ -45,10 +45,10 @@ public class GlobalProperties extends Object {
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 2.9f;
-  public static final short PROGRAM_VERSION_MINOR = 6;
+  public static final short PROGRAM_VERSION_MINOR = 7;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 472;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 474;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -166,6 +166,7 @@ public class GlobalProperties extends Object {
   // build 468 Re-connect now includes synching of empty tables, recycle bin, and removal of deleted messages
   // build 470 Decluttering of chat window, rearranged some menus and toolbars, deamonizing and priority changes to helper and background threads, other minor fixes
   // build 472 Performance optimization of DB connection get/return, faster server side chat entry through queued/handled-off post operations
+  // build 474 Staged File List Fetching, plus temp file cleanup fixes
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
@@ -236,7 +237,7 @@ public class GlobalProperties extends Object {
   public static void addTempFileToCleanupOnFinalize(File tempFile) {
     addTempFileToCleanup(tempFile, "TempFilesFinalize");
   }
-  public static void addTempFileToCleanup(File tempFile, String propertyName) {
+  private static void addTempFileToCleanup(File tempFile, String propertyName) {
     tempFile.deleteOnExit();
     String tempFiles = GlobalProperties.getProperty(propertyName, "");
     tempFiles += ";" + tempFile.getAbsolutePath();
@@ -253,18 +254,27 @@ public class GlobalProperties extends Object {
   public static void cleanupTempFilesOnFinalize() {
     cleanupTempFiles("TempFilesFinalize");
   }
-  public static void cleanupTempFiles(String propertyName) {
+  private static void cleanupTempFiles(String propertyName) {
     String tempFiles = getProperty(propertyName);
     if (tempFiles != null) {
+      String newTempFiles = "";
       StringTokenizer st = new StringTokenizer(tempFiles, ";");
       while (st.hasMoreTokens()) {
         String filePath = st.nextToken();
-        File file = new File(filePath);
-        if (file.exists()) {
-          try { CleanupAgent.wipeOrDelete(file); } catch (Throwable t) { }
+        if (filePath != null && filePath.length() > 0) {
+          File file = new File(filePath);
+          if (file.exists()) {
+            try {
+              if (!CleanupAgent.wipeOrDelete(file)) {
+                newTempFiles += ";" + file.getAbsolutePath();
+              }
+            } catch (Throwable t) {
+              newTempFiles += ";" + file.getAbsolutePath();
+            }
+          }
         }
       } // end while
-      setProperty(propertyName, "");
+      setProperty(propertyName, newTempFiles);
     }
   }
 

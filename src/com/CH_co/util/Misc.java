@@ -41,6 +41,7 @@ public class Misc extends Object {
   public static void systemExit(int code) {
     // cleanup files before exiting...
     GlobalProperties.cleanupTempFiles();
+    GlobalProperties.cleanupTempFilesOnFinalize();
     // exit
     if (systemExitObj != null)
       systemExitObj.disposeObj();

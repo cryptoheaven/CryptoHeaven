@@ -15,18 +15,18 @@ package com.CH_gui.recycleTable;
 import java.util.*;
 import java.sql.Timestamp;
 
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
+
+import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.file.FileUtilities;
@@ -503,12 +503,10 @@ public class RecycleTableModel extends RecordTableModel {
 
           {
             // Request Files
-            Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
-            request.IDs = new Obj_IDList_Co();
-            request.IDs.IDs = new Long[] {shareId}; 
-            request.Id = new Long(Record.RECORD_TYPE_SHARE);
+            // <shareId> <ownerObjType> <ownerObjId> <fetchNumMax> <timestamp>
+            File_GetFiles_Rq request = new File_GetFiles_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
 
-            MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES, request);
+            MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
             Runnable afterJob = new Runnable() {
               public void run() {
                 FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
@@ -516,11 +514,11 @@ public class RecycleTableModel extends RecordTableModel {
                 if (!fetchedIds.contains(shareId)) fetchedIds.add(shareId);
               }
             };
-            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 5000, afterJob, afterJob);
+            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, afterJob, afterJob);
           }
           {
             // Request Msgs
-            // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
+            // <shareId> <ownerObjType> <ownerObjId> <fetchNumMax> <fetchNumNew> <timestamp>
             Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
 
             final int _action = getFilterNarrowing() != null ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;

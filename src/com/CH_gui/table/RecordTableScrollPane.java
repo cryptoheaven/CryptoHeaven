@@ -18,8 +18,8 @@ import com.CH_cl.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 
 import com.CH_gui.frame.*;
@@ -506,11 +506,9 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
           if (SIL.hasPersistantMainWorker()) {
             if (folder.isFileType() || folder.isRecycleType()) {
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
-              Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
-              request.IDs = new Obj_IDList_Co();
-              request.IDs.IDs = new Long[] {folderPair.getFolderShareRecord().shareId}; 
-              request.Id = new Long(Record.RECORD_TYPE_SHARE);
-              SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_GET_FILES, request));
+              File_GetFiles_Rq request = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
+              int action = CommandCodes.FILE_Q_GET_FILES_STAGED;
+              SIL.submitAndReturn(new MessageAction(action, request));
             }
             if (folder.isMsgType() || folder.isRecycleType()) {
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
