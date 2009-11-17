@@ -12,14 +12,10 @@
 
 package com.CH_co.cryptx;
 
+import java.math.BigInteger;
 import java.util.Random;
 
-import java.security.KeyPair;
-import java.math.BigInteger;
-
-
 import com.CH_co.monitor.Interrupter;
-import com.CH_co.util.Misc;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
