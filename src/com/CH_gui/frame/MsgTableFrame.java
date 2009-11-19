@@ -185,7 +185,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       if (!isInitDataModel) {
         if (folderPair != null)
           mainTableComponent.getRecordTableScrollPane().getTableModel().setParentFolderPair(folderPair);
-        mainTableComponent.getRecordTableScrollPane().getTableModel().setFilter(new MsgFilter(RecordUtils.getIDs(initialData), initialData[0].ownerObjType, initialData[0].ownerObjId));
+        mainTableComponent.getRecordTableScrollPane().getTableModel().setFilter(new MsgFilter(RecordUtils.getIDs(initialData), initialData[0].ownerObjType, MsgLinkRecord.getOwnerObjIDs(initialData, initialData[0].ownerObjType.shortValue())));
       } else if (folderPair != null) {
         mainTableComponent.getRecordTableScrollPane().getTableModel().setFilter(new MsgFilter(Record.RECORD_TYPE_FOLDER, folderPair.getId()));
       }

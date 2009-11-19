@@ -121,6 +121,18 @@ public class MsgFilter extends AbstractRecordFilter implements RecordFilter {
     if (trace != null) trace.exit(MsgFilter.class);
   }
 
+  /** Creates new MsgFilter */
+  public MsgFilter(Long[] msgLinkIDs, Short ownerObjType, Long[] ownerObjIDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgFilter.class, "MsgFilter(Long[] msgLinkIDs, Short ownerObjType, Long[] ownerObjIDs)");
+    if (trace != null) trace.args(msgLinkIDs);
+    if (trace != null) trace.args(ownerObjType);
+    if (trace != null) trace.args(ownerObjId);
+    this.msgLinkIDs = msgLinkIDs;
+    this.ownerObjType = ownerObjType;
+    this.ownerObjIDs = ownerObjIDs;
+    if (trace != null) trace.exit(MsgFilter.class);
+  }
+
   /*
   public boolean keep(Record record) {
     boolean keep = false;

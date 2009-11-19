@@ -14,18 +14,16 @@ package com.CH_gui.dialog;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import java.awt.event.*;
 import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-
-import java.awt.dnd.*;
 
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.list.*;
 import com.CH_gui.msgTable.*;
-import com.CH_gui.tree.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
@@ -42,6 +40,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import com.CH_gui.frame.MsgPreviewFrame;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -49,7 +48,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -57,13 +56,13 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.31 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureListener {
 
 
-  private static final int DEFAULT_DOWNLOAD_BUTTON_INDEX = 1;
-  private static final int DEFAULT_CANCEL_BUTTON_INDEX = 2;
+  private static final int DEFAULT_DOWNLOAD_BUTTON_INDEX = 2;
+  private static final int DEFAULT_CANCEL_BUTTON_INDEX = 3;
 
   private Record[] paramAttachments;
   private MsgLinkRecord[] paramParentMsgLinkRecords;
@@ -89,8 +88,9 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   private JButton jMsgBrowse;
   private JButton jFileBrowse;
   private JButton jLocalFileBorwse;
-  private JButton jDownload;
   private JButton jCopy;
+  private JButton jOpen;
+  private JButton jDownload;
 
   private static final String PROPERTY_NAME__MSG_DEST_FOLDER = SaveAttachmentsDialog.class.getName() + "_msgDestinationFolder";
   private static final String PROPERTY_NAME__FILE_DEST_FOLDER = SaveAttachmentsDialog.class.getName() + "_fileDestinationFolder";
@@ -102,34 +102,34 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
 
 
-  /** 
+  /**
    * Creates new SaveAttachmentsDialog.
-   * Displays the specified attachments.  
-   * If attachments array is null or empty, the attachments are fetched from 
+   * Displays the specified attachments.
+   * If attachments array is null or empty, the attachments are fetched from
    * specified message parents.
    */
   public SaveAttachmentsDialog(Frame owner, Record[] attachments, MsgLinkRecord[] fromMsgLinkRecords) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Save_Attachments"));
+    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, attachments, fromMsgLinkRecords);
   }
   /** Creates new SaveAttachmentsDialog */
   public SaveAttachmentsDialog(Dialog owner, Record[] attachments, MsgLinkRecord[] fromMsgLinkRecords) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Save_Attachments"));
+    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, attachments, fromMsgLinkRecords);
   }
 
-  /** 
+  /**
    * Creates new SaveAttachmentsDialog.
-   * The attachments array is null and the attachments are fetched from 
+   * The attachments array is null and the attachments are fetched from
    * specified message parents.
    */
   public SaveAttachmentsDialog(Frame owner, MsgLinkRecord[] msgLinksToFetchAttachmentsFrom) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Save_Attachments"));
+    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, null, msgLinksToFetchAttachmentsFrom);
   }
   /** Creates new SaveAttachmentsDialog */
   public SaveAttachmentsDialog(Dialog owner, MsgLinkRecord[] msgLinksToFetchAttachmentsFrom) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Save_Attachments"));
+    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, null, msgLinksToFetchAttachmentsFrom);
   }
 
@@ -161,25 +161,6 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
   private void initializeComponents() {
 
-    DefaultListModel listModel = new DefaultListModel();
-    jList = new JList(listModel);
-    jListPane = new JScrollPane(jList);
-    if (paramAttachments != null && paramAttachments.length > 0) {
-      for (int i=0; i<paramAttachments.length; i++)
-        listModel.addElement(paramAttachments[i]);
-      jList.setSelectionInterval(0, paramAttachments.length-1);
-    }
-    else {
-      listModel.addElement(FETCHING_ATTACHMENTS);
-      sendFetchAttachmentsRequest(paramParentMsgLinkRecords);
-    }
-    jList.setCellRenderer(new ListRenderer(true, false, false));
-    jList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-      public void valueChanged(ListSelectionEvent event) {
-        setEnabledButtons();
-      }
-    });
-
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long defaultMsgFolderId = cache.getUserRecord().msgFolderId;
     Long defaultFileFolderId = cache.getUserRecord().fileFolderId;
@@ -208,7 +189,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
     jMsgLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Copy_Messages_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
     jFileLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Copy_Files_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
-    jLocalFileLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Download_Files_to"), Images.get(ImageNums.IMPORT_FILE16), JLabel.LEADING);
+    jLocalFileLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Download_to"), Images.get(ImageNums.IMPORT_FILE16), JLabel.LEADING);
 
     jMsgBrowse = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Browse_..."));
     jMsgBrowse.addActionListener(new ActionListener() {
@@ -231,6 +212,22 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       }
     });
 
+    jCopy = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Copy"));
+    jCopy.setIcon(Images.get(ImageNums.COPY16));
+    jCopy.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+        pressedCopy();
+      }
+    });
+
+    jOpen = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Open"));
+    jOpen.setIcon(Images.get(ImageNums.CLONE16));
+    jOpen.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+        pressedOpen();
+      }
+    });
+
     jDownload = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Download"));
     jDownload.setIcon(Images.get(ImageNums.IMPORT_FILE16));
     jDownload.addActionListener(new ActionListener() {
@@ -239,13 +236,25 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       }
     });
 
-    jCopy = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Copy"));
-    jCopy.setIcon(Images.get(ImageNums.COPY16));
-    jCopy.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-        pressedCopy();
+    DefaultListModel listModel = new DefaultListModel();
+    jList = new JList(listModel);
+    jListPane = new JScrollPane(jList);
+    if (paramAttachments != null && paramAttachments.length > 0) {
+      for (int i=0; i<paramAttachments.length; i++)
+        listModel.addElement(paramAttachments[i]);
+      jList.setSelectionInterval(0, paramAttachments.length-1);
+    }
+    else {
+      listModel.addElement(FETCHING_ATTACHMENTS);
+      sendFetchAttachmentsRequest(paramParentMsgLinkRecords);
+    }
+    jList.setCellRenderer(new ListRenderer(true, false, false));
+    jList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+      public void valueChanged(ListSelectionEvent event) {
+        setEnabledButtons();
       }
     });
+
   }
 
 
@@ -265,13 +274,14 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
    * @return the dialog 'Search' and 'Cancel' buttons
    */
   private JButton[] createButtons() {
-    JButton[] buttons = new JButton[3];
+    JButton[] buttons = new JButton[4];
 
     buttons[0] = jCopy;
-    buttons[1] = jDownload;
+    buttons[1] = jOpen;
+    buttons[2] = jDownload;
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
-    buttons[2].addActionListener(new ActionListener() {
+    buttons[3] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[3].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
       }
@@ -288,49 +298,49 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     panel.setLayout(new GridBagLayout());
     int posY = 0;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_Attachments_to_be_Saved")), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_Attachments")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jListPane, new GridBagConstraints(0, posY, 2, 1, 10, 10, 
+    panel.add(jListPane, new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     if (constructMsgDest) {
-      panel.add(jMsgLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+      panel.add(jMsgLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
       posY ++;
 
-      panel.add(jMsgDestination, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+      panel.add(jMsgDestination, new GridBagConstraints(0, posY, 1, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
-      panel.add(jMsgBrowse, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+      panel.add(jMsgBrowse, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     if (constructFileDest) {
-      panel.add(jFileLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+      panel.add(jFileLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
       posY ++;
 
-      panel.add(jFileDestination, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+      panel.add(jFileDestination, new GridBagConstraints(0, posY, 1, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
-      panel.add(jFileBrowse, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+      panel.add(jFileBrowse, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
       posY ++;
 
-      panel.add(jLocalFileLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+      panel.add(jLocalFileLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
       posY ++;
 
-      panel.add(jLocalFileDestination, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+      panel.add(jLocalFileDestination, new GridBagConstraints(0, posY, 1, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
-      panel.add(jLocalFileBorwse, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+      panel.add(jLocalFileBorwse, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
       posY ++;
     }
 
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -358,12 +368,13 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     jFileDestination.setEnabled(selectedFiles);
     jFileBrowse.setEnabled(selectedFiles);
 
-    jLocalFileLabel.setEnabled(selectedFiles && !selectedMsgs);
-    jLocalFileDestination.setEnabled(selectedFiles && !selectedMsgs);
-    jLocalFileBorwse.setEnabled(selectedFiles && !selectedMsgs);
+    jLocalFileLabel.setEnabled(selectedFiles || selectedMsgs);
+    jLocalFileDestination.setEnabled(selectedFiles || selectedMsgs);
+    jLocalFileBorwse.setEnabled(selectedFiles || selectedMsgs);
 
-    jDownload.setEnabled(selectedFiles && !selectedMsgs);
     jCopy.setEnabled(selectedFiles || selectedMsgs);
+    jOpen.setEnabled(selectedFiles || selectedMsgs);
+    jDownload.setEnabled(selectedFiles || selectedMsgs);
   }
 
 
@@ -395,9 +406,9 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 //    fd.setVisible(true);
 //    File destDir = new File(fd.getDirectory());
 
-    FileChooser fileChooser = FileChooser.makeNew(this, true, localFileDestination, 
-      com.CH_gui.lang.Lang.rb.getString("title_Select_Download_Destination"), 
-      com.CH_gui.lang.Lang.rb.getString("button_Select"), new Character('S'), 
+    FileChooser fileChooser = FileChooser.makeNew(this, true, localFileDestination,
+      com.CH_gui.lang.Lang.rb.getString("title_Select_Download_Destination"),
+      com.CH_gui.lang.Lang.rb.getString("button_Select"), new Character('S'),
       com.CH_gui.lang.Lang.rb.getString("actionTip_Approve_the_current_directory_selection."));
     File destDir = fileChooser.getSelectedDir();
 
@@ -410,13 +421,33 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     if (trace != null) trace.exit(getClass());
   }
 
+  private void pressedOpen() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "pressedOpen()");
+
+    Object[] selections = jList.getSelectedValues();
+    MsgLinkRecord[] mLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selections, MsgLinkRecord.class);
+    FileLinkRecord[] fLinks = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selections, FileLinkRecord.class);
+
+    if (mLinks.length > 0) {
+      new MsgPreviewFrame(paramParentMsgLinkRecords[0], mLinks);
+    }
+    for (int i=0; i<fLinks.length; i++) {
+      DownloadUtilities.downloadAndOpen(fLinks[i], paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), true, false);
+    }
+    closeDialog();
+
+    if (trace != null) trace.exit(getClass());
+  }
+
   private void pressedDownload() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "pressedDownload()");
 
     Object[] selections = jList.getSelectedValues();
+    MsgLinkRecord[] mLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selections, MsgLinkRecord.class);
     FileLinkRecord[] fLinks = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selections, FileLinkRecord.class);
+    Record[] recs = (Record[]) ArrayUtils.concatinate(mLinks, fLinks, Record.class);
 
-    new DownloadUtilities.DownloadCoordinator(fLinks, paramParentMsgLinkRecords, localFileDestination, MainFrame.getServerInterfaceLayer()).start();
+    new DownloadUtilities.DownloadCoordinator(recs, paramParentMsgLinkRecords, localFileDestination, MainFrame.getServerInterfaceLayer()).start();
     closeDialog();
 
     if (trace != null) trace.exit(getClass());
@@ -542,7 +573,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
     String title = com.CH_gui.lang.Lang.rb.getString("title_Copy_to_Folder");
 
-    Move_NewFld_Dialog d = new Move_NewFld_Dialog(this, allFolderPairs, forbidenPairs, selectedFolder, title, isDescendantOk, cache, filter); 
+    Move_NewFld_Dialog d = new Move_NewFld_Dialog(this, allFolderPairs, forbidenPairs, selectedFolder, title, isDescendantOk, cache, filter);
 
     FolderPair chosenPair = null;
     if (d != null) {

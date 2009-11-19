@@ -202,21 +202,21 @@ public class OpenSaveCancelDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton("Open");
+    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Open"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOpen();
       }
     });
 
-    buttons[1] = new JMyButton("Save");
+    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Save"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedSave();
       }
     });
 
-    buttons[2] = new JMyButton("Cancel");
+    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
