@@ -612,34 +612,44 @@ public class MsgTableModel extends RecordTableModel {
 
   public static Object getSubjectColumnValue(MsgTableModel model, MsgLinkRecord msgLink, MsgDataRecord msgData, MsgLinkRecord prevMsgLink, FetchedDataCache cache) {
     Object value = null;
-    String text = null;
-    if (msgData != null) {
-      if (msgData.isTypeAddress()) {
+    String subject = null;
+    if (msgData == null) {
+      subject = "";
+    } else {
+      if (msgData.isTypeAddress() && model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
         if (model.messageMode == MODE_ADDRESS || model.messageMode == MODE_WHITELIST) {
-          value = msgData.fileAs;
-        } else if (model.messageMode == MODE_CHAT || model.messageMode == MODE_POST) {
-          value = new StringBuffer("<b>" + msgData.fileAs + "</b>" + msgData.parseAddressBody(true, true));
+          subject = msgData.fileAs;
         } else {
-          value = msgData.fileAs;
+          subject = msgData.fileAs;
           if (!msgData.fileAs.equals(msgData.name))
-            value = "" + value + " ("+msgData.name+")";
+            subject = "" + subject + " ("+msgData.name+")";
           if (msgData.email != null)
-            value = "" + value + " <"+msgData.email+">";
+            subject = "" + subject + " <"+msgData.email+">";
         }
-      } else if (model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
+      } else if (msgData.isTypeMessage() && model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
         // message table with subject line only
-        text = msgData.getSubject();
+        subject = msgData.getSubject();
       } else {
-        text = Misc.encodePlainIntoHtml(msgData.getSubject());
         String postRenderingCache = msgLink.getPostRenderingCache();
         if (postRenderingCache != null) {
           value = new StringBuffer(postRenderingCache);
         } else {
-          String messageText = msgData.getText();
-          boolean isHTML = msgData.isHtmlMail();
+          String messageText = "";
+          if (msgData.isTypeAddress()) {
+            subject = Misc.encodePlainIntoHtml(msgData.fileAs);
+            messageText = msgData.parseAddressBody(true, true);
+          } else if (msgData.isTypeMessage()) {
+            subject = Misc.encodePlainIntoHtml(msgData.getSubject());
+            messageText = msgData.getText();
+          } else {
+            subject = "error: unknown type";
+          }
+
+          boolean isHTML = msgData.isHtml();
           StringBuffer sb = new StringBuffer();
 
           sb.append(MsgPanelUtils.HTML_START);
+          sb.append(MsgPanelUtils.HTML_BODY_START);
 
           boolean toAddFrom = false;
           boolean toAddSent = false;
@@ -744,9 +754,9 @@ public class MsgTableModel extends RecordTableModel {
 
           boolean subjectAppended = false;
           // append subject
-          if (text != null && text.length() > 0) {
+          if (subject != null && subject.length() > 0) {
             sb.append("<b>");
-            sb.append(text);
+            sb.append(subject);
             sb.append("</b> ");
             subjectAppended = true;
           }
@@ -785,16 +795,15 @@ public class MsgTableModel extends RecordTableModel {
             sb.append(messageText);
           }
           sb.append(MsgPanelUtils.HTML_FONT_END);
+          sb.append(MsgPanelUtils.HTML_BODY_END);
           sb.append(MsgPanelUtils.HTML_END);
           value = sb;
           msgLink.setPostRenderingCache(sb.toString());
         }
       }
-    } else {
-      text = "";
     }
     if (value == null)
-      value = text;
+      value = subject;
     return value;
   }
 

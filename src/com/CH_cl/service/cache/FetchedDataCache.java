@@ -2514,11 +2514,19 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(ownerId, ownerType);
 
     Vector msgLinksV = new Vector();
-    Iterator iter = msgLinkRecordMap.values().iterator();
-    while (iter.hasNext()) {
-      MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
-      if (linkRecord.ownerObjId.equals(ownerId) && linkRecord.ownerObjType.equals(ownerType))
-        msgLinksV.addElement(linkRecord);
+    try {
+      Collection coll = msgLinkRecordMap.values();
+      if (coll != null && !coll.isEmpty()) {
+        Iterator iter = coll.iterator();
+        while (iter.hasNext()) {
+          MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
+          if (linkRecord.ownerObjId.equals(ownerId) && linkRecord.ownerObjType.equals(ownerType))
+            msgLinksV.addElement(linkRecord);
+        }
+      }
+    } catch (Throwable t) {
+      if (trace != null) trace.exception(FetchedDataCache.class, 100, t);
+      throw new RuntimeException(t);
     }
     MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
 
@@ -2531,22 +2539,30 @@ public class FetchedDataCache extends Object {
    * @return all Message Link Records that are owned by ownerIDs or type ownerType.
    */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsOwnerAndType(Long ownerIDs, Short ownerType)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType)");
     if (trace != null) trace.args(ownerIDs, ownerType);
 
     Vector msgLinksV = new Vector();
-    if (ownerIDs != null) {
-      // load a Hashtable with wanted ownerIDs
-      Hashtable ht = new Hashtable();
-      for (int i=0; i<ownerIDs.length; i++) {
-        ht.put(ownerIDs[i], ownerIDs[i]);
+    try {
+      if (ownerIDs != null) {
+        // load a Hashtable with wanted ownerIDs
+        Hashtable ht = new Hashtable();
+        for (int i=0; i<ownerIDs.length; i++) {
+          ht.put(ownerIDs[i], ownerIDs[i]);
+        }
+        Collection coll = msgLinkRecordMap.values();
+        if (coll != null && !coll.isEmpty()) {
+          Iterator iter = coll.iterator();
+          while (iter.hasNext()) {
+            MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
+            if (linkRecord.ownerObjType.equals(ownerType) && ht.get(linkRecord.ownerObjId) != null)
+              msgLinksV.addElement(linkRecord);
+          }
+        }
       }
-      Iterator iter = msgLinkRecordMap.values().iterator();
-      while (iter.hasNext()) {
-        MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
-        if (linkRecord.ownerObjType.equals(ownerType) && ht.get(linkRecord.ownerObjId) != null)
-          msgLinksV.addElement(linkRecord);
-      }
+    } catch (Throwable t) {
+      if (trace != null) trace.exception(FetchedDataCache.class, 100, t);
+      throw new RuntimeException(t);
     }
     MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
 

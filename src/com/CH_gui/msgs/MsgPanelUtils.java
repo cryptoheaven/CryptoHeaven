@@ -273,6 +273,10 @@ public class MsgPanelUtils extends Object {
    * @return expanded list of recipients
    */
   public static Record[] getExpandedListOfRecipients(Record[] recipients, boolean expandAddressBooks, boolean expandGroups) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getExpandedListOfRecipients(Record[] recipients, boolean expandAddressBooks, boolean expandGroups)");
+    if (trace != null) trace.args(recipients);
+    if (trace != null) trace.args(expandAddressBooks);
+    if (trace != null) trace.args(expandGroups);
     if (expandAddressBooks) {
       FolderFilter addressBookFilter = new FolderFilter(FolderRecord.ADDRESS_FOLDER);
       Record[] addressBooks = (Record[]) addressBookFilter.filterInclude(recipients);
@@ -295,6 +299,7 @@ public class MsgPanelUtils extends Object {
       // add members from selected groups to the list of recipients
       recipients = RecordUtils.concatinate(recipients, members);
     }
+    if (trace != null) trace.exit(MsgPanelUtils.class, recipients);
     return recipients;
   }
 
@@ -303,8 +308,10 @@ public class MsgPanelUtils extends Object {
    * @return converted records into ContactRecords or User records, unwinding Groups as well
    */
   public static Record[] getOrFetchFamiliarUsers(Record[] records) {
-    Record[] users = null;
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getOrFetchFamiliarUsers(Record[] records)");
+    if (trace != null) trace.args(records);
 
+    Record[] users = null;
     Vector cRecsV = new Vector();
     Vector fRecsV = new Vector();
 
@@ -345,6 +352,7 @@ public class MsgPanelUtils extends Object {
 
     users = (Record[]) ArrayUtils.toArray(usersV, Record.class);
 
+    if (trace != null) trace.exit(MsgPanelUtils.class, users);
     return users;
   }
 
@@ -355,6 +363,9 @@ public class MsgPanelUtils extends Object {
    * @return
    */
   public static EmailRecord getOurMatchingFromEmlRec(MsgDataRecord originalMsg) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getOurMatchingFromEmlRec(MsgDataRecord originalMsg)");
+    if (trace != null) trace.args(originalMsg);
+
     EmailRecord ourMatchingEmlRec = null;
     if (originalMsg != null) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -381,6 +392,7 @@ public class MsgPanelUtils extends Object {
         }
       }
     }
+    if (trace != null) trace.exit(MsgPanelUtils.class, ourMatchingEmlRec);
     return ourMatchingEmlRec;
   }
 

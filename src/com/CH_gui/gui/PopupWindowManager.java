@@ -35,7 +35,7 @@ import com.CH_guiLib.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -43,19 +43,19 @@ import com.CH_guiLib.util.*;
  *
  * <b>$Revision: 1.17 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class PopupWindowManager extends Object {
 
   public static void addForScrolling(final Component component, MsgDataRecord msgData) {
     try {
       String user = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true));
-      final String sub = msgData.getSubject();
+      final String sub = msgData.isTypeAddress() ? msgData.fileAs : msgData.getSubject();
       final boolean addSub = sub != null && sub.length() > 0;
 
       String body = null;
-      if (msgData.isHtmlMail()) {
-        body = HTML_utils.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
+      if (msgData.isHtml()) {
+        body = msgData.isTypeAddress() ? msgData.addressBody : HTML_utils.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
       } else {
         body = msgData.getEncodedHTMLData();
       }

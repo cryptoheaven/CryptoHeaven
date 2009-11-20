@@ -515,9 +515,8 @@ public class MsgDataRecord extends Record {
       encDigest = new BADigestBlock(tempEncDigest);
 
       parseAddressPreview();
-      if (textBody != null) {
-        addressBody = parseAddressBody();
-      }
+      // address body will be assigned with proper data or unavailable message
+      addressBody = parseAddressBody();
       encodedHTMLData = null;
 
     } catch (Throwable t) {
@@ -577,9 +576,8 @@ public class MsgDataRecord extends Record {
       encDigest = new BADigestBlock(tempEncDigest);
 
       parseAddressPreview();
-      if (textBody != null) {
-        addressBody = parseAddressBody();
-      }
+      // address body will be assigned with proper data or unavailable message
+      addressBody = parseAddressBody();
       encodedHTMLData = null;
 
     } catch (Throwable t) {
@@ -609,7 +607,6 @@ public class MsgDataRecord extends Record {
       super.unSeal();
 
       subject = tempSubject.toByteStr();
-
       parseAddressPreview();
 
     } catch (Throwable t) {
@@ -933,6 +930,9 @@ public class MsgDataRecord extends Record {
   }
 
 
+  public boolean isHtml() {
+    return isTypeAddress() || isHtmlMail();
+  }
   public static boolean isHtmlMail(Short importance) {
     return isHtmlMail(importance.shortValue());
   }
