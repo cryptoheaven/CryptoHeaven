@@ -459,7 +459,7 @@ public class MsgTableModel extends RecordTableModel {
         case 2:
           StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
           if (stat != null) {
-            value = stat.getFlag();
+            value = stat.getFlag(isModeMsgBody());
           }
           break;
         // From
@@ -616,8 +616,8 @@ public class MsgTableModel extends RecordTableModel {
     if (msgData == null) {
       subject = "";
     } else {
-      if (msgData.isTypeAddress() && model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
-        if (model.messageMode == MODE_ADDRESS || model.messageMode == MODE_WHITELIST) {
+      if (msgData.isTypeAddress() && !model.isModeMsgBody()) {
+        if (model.isModeAddr()) {
           subject = msgData.fileAs;
         } else {
           subject = msgData.fileAs;
@@ -626,7 +626,7 @@ public class MsgTableModel extends RecordTableModel {
           if (msgData.email != null)
             subject = "" + subject + " <"+msgData.email+">";
         }
-      } else if (msgData.isTypeMessage() && model.messageMode != MODE_POST && model.messageMode != MODE_CHAT) {
+      } else if (msgData.isTypeMessage() && !model.isModeMsgBody()) {
         // message table with subject line only
         subject = msgData.getSubject();
       } else {
@@ -687,7 +687,7 @@ public class MsgTableModel extends RecordTableModel {
           if (toAddFlag) {
             StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
             if (stat != null) {
-              Short flagS = stat.getFlag();
+              Short flagS = stat.getFlag(model.isModeMsgBody());
               if (flagS != null) {
                 short flag = flagS.shortValue();
                 if (flag == StatRecord.STATUS__UNSEEN_UNDELIVERED)

@@ -89,6 +89,9 @@ public class StatRecord extends Record { // implicit no-argument constructor
   }
 
   public Short getFlag() {
+    return getFlag(false);
+  }
+  public Short getFlag(boolean forceIfSeenThenDelivered) {
     Short value = null;
     if ((mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered == null)
       value = new Short(STATUS__UNSEEN_UNDELIVERED);
@@ -96,14 +99,18 @@ public class StatRecord extends Record { // implicit no-argument constructor
       value = new Short(STATUS__SEEN_DELIVERED);
     else if ((mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered != null)
       value = new Short(STATUS__UNSEEN_DELIVERED);
-    else if ((mark.shortValue() & FLAG_OLD.shortValue()) != 0 && firstDelivered == null)
-      value = new Short(STATUS__SEEN_UNDELIVERED);
+    else if ((mark.shortValue() & FLAG_OLD.shortValue()) != 0 && firstDelivered == null) {
+      if (!forceIfSeenThenDelivered)
+        value = new Short(STATUS__SEEN_UNDELIVERED);
+      else
+        value = new Short(STATUS__SEEN_DELIVERED);
+    }
     return value;
   }
 
-  public String getInfo() {
+  public static String getInfo(Short flag) {
     String info = null;
-    switch (getFlag().intValue()) {
+    switch (flag.intValue()) {
       case STATUS__UNSEEN_UNDELIVERED:
         info = "Unseen/Undelivered";
         break;

@@ -48,7 +48,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 7;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 478;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 480;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -169,6 +169,7 @@ public class GlobalProperties extends Object {
   // build 474 Staged File List Fetching, plus temp file cleanup fixes
   // build 476 Save Attachments dialog includes Open button for messages and files, Download button additionally doubles as message export
   // build 478 Rendering of Address objects (priority/attachment icons) in chat/posting folders should comply with new compressed/cleaned-up view
+  // build 480 Yellow flags should not appear in chat/posting folders
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;

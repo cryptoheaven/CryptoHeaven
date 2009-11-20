@@ -242,11 +242,10 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
               if (rec instanceof MsgLinkRecord) {
                 MsgLinkRecord mLink = (MsgLinkRecord) rec;
-
                 StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
                 if (statRecord != null) {
                   setIcon(StatRecord.getIconForFlag((Short) value));
-                  setToolTipText(statRecord.getInfo());
+                  setToolTipText(StatRecord.getInfo((Short) value));
                 }
               }
             }

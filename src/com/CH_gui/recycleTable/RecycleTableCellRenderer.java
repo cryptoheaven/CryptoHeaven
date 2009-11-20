@@ -14,11 +14,7 @@ package com.CH_gui.recycleTable;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.table.*;
-
-import java.awt.Component;
-import java.sql.Timestamp;
 
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
@@ -28,7 +24,6 @@ import com.CH_gui.table.*;
 import com.CH_cl.service.cache.*;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
@@ -126,9 +121,9 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
                 statRecord = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
               }
               if (statRecord != null) {
-                setIcon(statRecord.getIconForFlag((Short) value));
+                setIcon(StatRecord.getIconForFlag((Short) value));
                 setText("");
-                setToolTipText(statRecord.getInfo());
+                setToolTipText(StatRecord.getInfo((Short) value));
               }
             }
           }

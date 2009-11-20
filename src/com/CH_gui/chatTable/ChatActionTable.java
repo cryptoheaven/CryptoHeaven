@@ -72,13 +72,13 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
     // auto-scroll to new chat message...
     msgLinkRecordListener = new MsgLinkListener();
     FetchedDataCache.getSingleInstance().addMsgLinkRecordListener(msgLinkRecordListener);
-    // scrolling should happen after the table had a change to re-sort itself so the record finds its final row destination...
-    TableModel tModel = getJSortedTable().getModel();
-    if (tModel instanceof TableMap) {
-//      TableMap map = (TableMap) tModel;
-//      sortListener = new SortListener();
-//      map.addTableModelSortListener(sortListener);
-    }
+//    // scrolling should happen after the table had a change to re-sort itself so the record finds its final row destination...
+//    TableModel tModel = getJSortedTable().getModel();
+//    if (tModel instanceof TableMap) {
+////      TableMap map = (TableMap) tModel;
+////      sortListener = new SortListener();
+////      map.addTableModelSortListener(sortListener);
+//    }
     // disable auto-scrolls in viewport since row heights are variable and it doesn't quite work with variable row heights
     JViewport view = getViewport();
     if (view instanceof JBottomStickViewport) {
@@ -176,52 +176,52 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
     }
   }
 
-  private class SortListener implements TableModelSortListener {
-    public void preSortDeleteNotify(TableModelSortEvent event) {
-    }
-    public void preSortNotify(TableModelSortEvent event) {
-      lastScrollToRecord = lastKeepRecord;
-      lastKeepRecord = null;
-    }
-    public void postSortNotify(TableModelSortEvent event) {
-      SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          if (lastScrollToRecord != null) {
-            RecordTableModel model = getTableModel();
-            JSortedTable table = getJSortedTable();
-            table.doLayout();
-            int row = model.getRowForObject(lastScrollToRecord.msgLinkId);
-            if (row >= 0) {
-              int viewRow = table.convertMyRowIndexToView(row);
-              final JScrollBar sBar = getVerticalScrollBar();
-              if (viewRow == 0) {
-                int min = sBar.getMinimum();
-                sBar.setValue(min);
-              } else if (viewRow + 1 == getTableModel().getRowCount()) {
-                int max = sBar.getMaximum();
-                sBar.setValue(max);
-                //System.out.println("postSort: immediate: setValue="+max);
-                // try setting the value again as table has layout problems the first time
-                SwingUtilities.invokeLater(new Runnable() {
-                  public void run() {
-                    int max = sBar.getMaximum();
-                    sBar.setValue(max);
-                    //System.out.println("postSort: invoked  : setValue="+max);
-                  }
-                });
-              } else {
-                Rectangle rect = getJSortedTable().getCellRect(viewRow, 0, true);
-                table.scrollRectToVisible(rect);
-                //System.out.println("postSort: immediate: scroll to rect="+rect);
-              }
-            }
-            prevKeepRecord = lastScrollToRecord;
-            lastScrollToRecord = null;
-          }
-        }
-      });
-    }
-  }
+//  private class SortListener implements TableModelSortListener {
+//    public void preSortDeleteNotify(TableModelSortEvent event) {
+//    }
+//    public void preSortNotify(TableModelSortEvent event) {
+//      lastScrollToRecord = lastKeepRecord;
+//      lastKeepRecord = null;
+//    }
+//    public void postSortNotify(TableModelSortEvent event) {
+//      SwingUtilities.invokeLater(new Runnable() {
+//        public void run() {
+//          if (lastScrollToRecord != null) {
+//            RecordTableModel model = getTableModel();
+//            JSortedTable table = getJSortedTable();
+//            table.doLayout();
+//            int row = model.getRowForObject(lastScrollToRecord.msgLinkId);
+//            if (row >= 0) {
+//              int viewRow = table.convertMyRowIndexToView(row);
+//              final JScrollBar sBar = getVerticalScrollBar();
+//              if (viewRow == 0) {
+//                int min = sBar.getMinimum();
+//                sBar.setValue(min);
+//              } else if (viewRow + 1 == getTableModel().getRowCount()) {
+//                int max = sBar.getMaximum();
+//                sBar.setValue(max);
+//                //System.out.println("postSort: immediate: setValue="+max);
+//                // try setting the value again as table has layout problems the first time
+//                SwingUtilities.invokeLater(new Runnable() {
+//                  public void run() {
+//                    int max = sBar.getMaximum();
+//                    sBar.setValue(max);
+//                    //System.out.println("postSort: invoked  : setValue="+max);
+//                  }
+//                });
+//              } else {
+//                Rectangle rect = getJSortedTable().getCellRect(viewRow, 0, true);
+//                table.scrollRectToVisible(rect);
+//                //System.out.println("postSort: immediate: scroll to rect="+rect);
+//              }
+//            }
+//            prevKeepRecord = lastScrollToRecord;
+//            lastScrollToRecord = null;
+//          }
+//        }
+//      });
+//    }
+//  }
 
   private class ChatTypingListener implements MsgTypingListener {
     public void msgTypingUpdate(EventObject event) {

@@ -14,11 +14,7 @@ package com.CH_gui.fileTable;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.table.*;
-
-import java.awt.Component;
-import java.sql.Timestamp;
 
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.table.*;
@@ -26,7 +22,6 @@ import com.CH_gui.table.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
@@ -119,9 +114,9 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
 
                 StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
                 if (statRecord != null) {
-                  setIcon(statRecord.getIconForFlag((Short) value));
+                  setIcon(StatRecord.getIconForFlag((Short) value));
                   setText("");
-                  setToolTipText(statRecord.getInfo());
+                  setToolTipText(StatRecord.getInfo((Short) value));
                 }
               }
             }
