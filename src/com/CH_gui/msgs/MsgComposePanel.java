@@ -861,96 +861,100 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       Thread th = new Thread("Send Action Runner") {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-          boolean isCanceled = false;
-          // convert text input to recipient objects if needed
-          for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
-            if (selectedRecipients[i] == null || selectedRecipients[i].length == 0) {
-              boolean waitForResults = true;
-              isCanceled = !selectRecipients(i, waitForResults);
-              if (isCanceled)
-                break;
-            }
-          }
-          // Remember the original recipient list for purposes for Address Book insertion (before they get converted to familiar contacts, etc)
-          // That insertion will take place if the send was successful..
-          preConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
-          // convert all email addresses and address contacts to users or contacts if possible
-          if (!isSavingAsDraft) {
+          try {
+            boolean isCanceled = false;
+            // convert text input to recipient objects if needed
             for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
-              boolean expandAddressBooks = objType == MsgDataRecord.OBJ_TYPE_MSG;
-              boolean expandGroups = true;
-              int numRecipients = selectedRecipients[i].length;
-              selectedRecipients[i] = MsgPanelUtils.getExpandedListOfRecipients(selectedRecipients[i], expandAddressBooks, expandGroups);
-              boolean anyExpanded = numRecipients != selectedRecipients[i].length;
-              boolean anyConverted = false;
-              if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
-                anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], isStagedSecure());
-              }
-              if (anyExpanded || anyConverted) {
-                redrawRecipients(i);
-                // Remember the converted recipient list for purpose of creating new contacts in care there were any additional new User web-accounts created...
-                postConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
+              if (selectedRecipients[i] == null || selectedRecipients[i].length == 0) {
+                boolean waitForResults = true;
+                isCanceled = !selectRecipients(i, waitForResults);
+                if (isCanceled)
+                  break;
               }
             }
-          }
-          boolean anyRecipients = false;
-          for (int i=0; i<selectedRecipients.length; i++) {
-            anyRecipients |= selectedRecipients[i] != null && selectedRecipients[i].length > 0;
-          }
-          // if conversion to recipient objects was not canceled, then we should have at lest one recipient, else skip the rest
-          if (!isCanceled && (anyRecipients || isSavingAsDraft)) {
-            // Check if any attachments, if so then warn before skipping them for external recipients.
-            // Also warn about non-encryption of external email.
-            EmailAddressRecord[] emailAddresses = null;
-            int selectedRecipientsCount = 0;
-            for (int i=0; i<selectedRecipients.length; i++) {
-              emailAddresses = (EmailAddressRecord[]) ArrayUtils.concatinate(emailAddresses, ArrayUtils.gatherAllOfType(selectedRecipients[i], EmailAddressRecord.class));
-              selectedRecipientsCount += selectedRecipients[i].length;
-            }
-            emailAddresses = (EmailAddressRecord[]) ArrayUtils.removeDuplicates(emailAddresses);
-
-            // Check if any attachments, to see if we should force the external-email-no-attachments warning
-            boolean anyAttachments = false;
-            if (selectedAttachments != null && selectedAttachments.length > 0) {
-              anyAttachments = true;
-            }
-            // Check if any external email addresses
-            boolean anyEmailAddresses = false;
-            if (emailAddresses != null && emailAddresses.length > 0) {
-              anyEmailAddresses = true;
-            }
-            // Check if any internal recipients selected
-            boolean anyInternalRecipients = true;
-            if (emailAddresses != null && emailAddresses.length >= selectedRecipientsCount) {
-              anyInternalRecipients = false;
-            }
-
-            // We must have at least one internal recipient if we have attachments and external email recipient(s)
-            if (anyAttachments && anyEmailAddresses && !anyInternalRecipients) {
-              msgComponents.setSelectedCopy(true);
-            }
-
-            boolean staged = isStagedSecure();
-            boolean canceled = false;
-            if (!staged && anyEmailAddresses && !isSavingAsDraft)
-              canceled = !showStagedSecureChoiceDialog(emailAddresses);
-            if (!canceled) {
-              if (isStagedSecure() != staged) {
-                actionPerformedNoVeto();
-              } else {
-                boolean showRegularEmailQuestion = anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
-                if (!showRegularEmailQuestion) {
-                  new SendMessageRunner(MsgComposePanel.this).start();
-                } else {
-                  showRegularEmailWarningBeforeAndSend(emailAddresses);
+            // Remember the original recipient list for purposes for Address Book insertion (before they get converted to familiar contacts, etc)
+            // That insertion will take place if the send was successful..
+            preConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
+            // convert all email addresses and address contacts to users or contacts if possible
+            if (!isSavingAsDraft) {
+              for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
+                boolean expandAddressBooks = objType == MsgDataRecord.OBJ_TYPE_MSG;
+                boolean expandGroups = true;
+                int numRecipients = selectedRecipients[i].length;
+                selectedRecipients[i] = MsgPanelUtils.getExpandedListOfRecipients(selectedRecipients[i], expandAddressBooks, expandGroups);
+                boolean anyExpanded = numRecipients != selectedRecipients[i].length;
+                boolean anyConverted = false;
+                if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
+                  anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], isStagedSecure());
+                }
+                if (anyExpanded || anyConverted) {
+                  redrawRecipients(i);
+                  // Remember the converted recipient list for purpose of creating new contacts in care there were any additional new User web-accounts created...
+                  postConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
                 }
               }
+            }
+            boolean anyRecipients = false;
+            for (int i=0; i<selectedRecipients.length; i++) {
+              anyRecipients |= selectedRecipients[i] != null && selectedRecipients[i].length > 0;
+            }
+            // if conversion to recipient objects was not canceled, then we should have at lest one recipient, else skip the rest
+            if (!isCanceled && (anyRecipients || isSavingAsDraft)) {
+              // Check if any attachments, if so then warn before skipping them for external recipients.
+              // Also warn about non-encryption of external email.
+              EmailAddressRecord[] emailAddresses = null;
+              int selectedRecipientsCount = 0;
+              for (int i=0; i<selectedRecipients.length; i++) {
+                emailAddresses = (EmailAddressRecord[]) ArrayUtils.concatinate(emailAddresses, ArrayUtils.gatherAllOfType(selectedRecipients[i], EmailAddressRecord.class));
+                selectedRecipientsCount += selectedRecipients[i].length;
+              }
+              emailAddresses = (EmailAddressRecord[]) ArrayUtils.removeDuplicates(emailAddresses);
+
+              // Check if any attachments, to see if we should force the external-email-no-attachments warning
+              boolean anyAttachments = false;
+              if (selectedAttachments != null && selectedAttachments.length > 0) {
+                anyAttachments = true;
+              }
+              // Check if any external email addresses
+              boolean anyEmailAddresses = false;
+              if (emailAddresses != null && emailAddresses.length > 0) {
+                anyEmailAddresses = true;
+              }
+              // Check if any internal recipients selected
+              boolean anyInternalRecipients = true;
+              if (emailAddresses != null && emailAddresses.length >= selectedRecipientsCount) {
+                anyInternalRecipients = false;
+              }
+
+              // We must have at least one internal recipient if we have attachments and external email recipient(s)
+              if (anyAttachments && anyEmailAddresses && !anyInternalRecipients) {
+                msgComponents.setSelectedCopy(true);
+              }
+
+              boolean staged = isStagedSecure();
+              boolean canceled = false;
+              if (!staged && anyEmailAddresses && !isSavingAsDraft)
+                canceled = !showStagedSecureChoiceDialog(emailAddresses);
+              if (!canceled) {
+                if (isStagedSecure() != staged) {
+                  actionPerformedNoVeto();
+                } else {
+                  boolean showRegularEmailQuestion = anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
+                  if (!showRegularEmailQuestion) {
+                    new SendMessageRunner(MsgComposePanel.this).start();
+                  } else {
+                    showRegularEmailWarningBeforeAndSend(emailAddresses);
+                  }
+                }
+              } else {
+                setSendMessageInProgress(false);
+              }
             } else {
+              // If no recipient or user not found and user search window was cancelled, then resume message composer
               setSendMessageInProgress(false);
             }
-          } else {
-            // If no recipient or user not found and user search window was cancelled, then resume message composer
-            setSendMessageInProgress(false);
+          } catch (Throwable t) {
+            if (trace != null) trace.exception(getClass(), 200, t);
           }
           if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
           if (trace != null) trace.exit(getClass());
@@ -2453,8 +2457,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       if (!enableDraft) {
         enableDraft = isContentInserted || (selectedAttachments != null && selectedAttachments.length > 0);
         if (!enableDraft) {
-          int contentLen = 0;
-          Document contentDoc = null;
           boolean anyContent = msgComponents != null ? msgComponents.isAnyContent() : false;
           enableDraft = anyContent;
         }
@@ -2491,10 +2493,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   public void dragExit(DropTargetEvent p1) {
   }
   public void drop(DropTargetDropEvent event) {
-    Point location = event.getLocation();
     try {
       Transferable tr = event.getTransferable();
-
       if (tr.isDataFlavorSupported(FileDND_Transferable.FILE_RECORD_FLAVOR)) {
         FileDND_TransferableData data = (FileDND_TransferableData) tr.getTransferData(FileDND_Transferable.FILE_RECORD_FLAVOR);
         if (data.fileRecordIDs[1] != null && data.fileRecordIDs[1].length > 0) {

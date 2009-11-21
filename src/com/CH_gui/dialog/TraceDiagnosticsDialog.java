@@ -20,10 +20,11 @@ import com.CH_co.service.records.Record;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 import com.CH_gui.frame.MessageFrame;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.Date;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -100,6 +101,38 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
           TraceProperties.setProperty(props[i][0], props[i][1]);
         }
         Trace.initialLoad(false, true);
+        initialDiagnosticsInfo();
+      }
+      private void initialDiagnosticsInfo() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "initialDiagnosticsInfo()");
+        if (trace != null) {
+          Runtime runtime = Runtime.getRuntime();
+
+          trace.data(1, "max memory", Misc.getFormattedSize(runtime.maxMemory(), 4, 3));
+          trace.data(2, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
+          trace.data(3, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
+
+          trace.data(100, "List of Environmet Variables");
+
+          Properties props = System.getProperties();
+          Enumeration keyEnum = props.keys();
+          TreeMap propMap = new TreeMap();
+          while (keyEnum.hasMoreElements()) {
+            String key = (String) keyEnum.nextElement();
+            String value = props.getProperty(key);
+            propMap.put(key, value);
+          }
+          Set keySet = propMap.keySet();
+          Iterator keyIter = keySet.iterator();
+          int count = 0;
+          while (keyIter.hasNext()) {
+            String key = (String) keyIter.next();
+            String value = (String) propMap.get(key);
+            trace.data(100+count, key, value);
+            count ++;
+          }
+        }
+        if (trace != null) trace.exit(getClass());
       }
     });
     jStart = jButtons[0];
@@ -170,16 +203,16 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     th.start();
 
     int posY = 0;
-    panel.add(jHeader, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jHeader, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 5, 10), 0, 0));
     posY ++;
-    panel.add(jStatus, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jStatus, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 10, 3, 10), 0, 0));
     posY ++;
-    panel.add(jFilename, new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    panel.add(jFilename, new GridBagConstraints(0, posY, 2, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 10, 3, 10), 0, 0));
     posY ++;
-    panel.add(jFilesize, new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    panel.add(jFilesize, new GridBagConstraints(0, posY, 2, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 10, 10, 10), 0, 0));
     posY ++;
 
@@ -187,8 +220,10 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
   }
 
   private void traceStop() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceDiagnosticsDialog.class, "traceStop()");
     TraceProperties.setProperty("TraceEnabled", "false");
     Trace.initialLoad();
+    if (trace != null) trace.exit(TraceDiagnosticsDialog.class);
   }
 
   public void closeDialog() {

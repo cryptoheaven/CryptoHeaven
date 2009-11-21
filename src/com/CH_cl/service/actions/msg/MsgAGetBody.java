@@ -12,14 +12,13 @@
 
 package com.CH_cl.service.actions.msg;
 
-import com.CH_co.trace.Trace;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_co.trace.Trace;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -27,7 +26,7 @@ import com.CH_co.service.msg.dataSets.msg.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -35,7 +34,7 @@ import com.CH_co.service.msg.dataSets.msg.*;
  *
  * <b>$Revision: 1.9 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgAGetBody extends ClientMessageAction {
 
@@ -45,7 +44,7 @@ public class MsgAGetBody extends ClientMessageAction {
     if (trace != null) trace.exit(MsgAGetBody.class);
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -53,7 +52,7 @@ public class MsgAGetBody extends ClientMessageAction {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgAGetBody.class, "runAction(Connection)");
 
     // reply syntax:
-    // 10420 <msgLinkId> <status> <dateDelivered> <dateUpdated>   <msgId> <encText> <encSignedDigest> <sendPrivKeyId> 
+    // 10420 <msgLinkId> <status> <dateDelivered> <dateUpdated>   <msgId> <encText> <encSignedDigest> <sendPrivKeyId>
     Msg_GetBody_Rp reply = (Msg_GetBody_Rp) getMsgDataSet();
     MsgLinkRecord linkRecord = reply.linkRecord;
     MsgDataRecord dataRecord = reply.dataRecord;
@@ -66,7 +65,12 @@ public class MsgAGetBody extends ClientMessageAction {
 
     // We need data Records in the cache before the message table can display contents.
     // For that reason, the event will be fired when we are done with both, links and datas.
-    cache.addMsgLinkAndDataRecords(linkRecord, dataRecord);
+    // Skip adding the BODY if the link was already deleted and this reply came late as effect of connection problems
+    MsgLinkRecord prevLinkRecord = cache.getMsgLinkRecord(linkRecord.msgLinkId);
+    if (prevLinkRecord != null) {
+      prevLinkRecord.merge(linkRecord);
+      cache.addMsgLinkAndDataRecords(prevLinkRecord, dataRecord);
+    }
 
     if (trace != null) trace.exit(MsgAGetBody.class, null);
     return null;
