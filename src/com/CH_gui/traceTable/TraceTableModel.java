@@ -13,18 +13,16 @@
 package com.CH_gui.traceTable;
 
 import java.util.*;
-import javax.swing.table.*;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.stat.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -37,7 +35,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -45,7 +43,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.27 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class TraceTableModel extends RecordTableModel {
 
@@ -70,8 +68,8 @@ public class TraceTableModel extends RecordTableModel {
   private static String STR_TIP__READ_ACCESS_PRIVILEGE = com.CH_gui.lang.Lang.rb.getString("columnTip_Read_Access_Privilege");
   private static String STR_TIP__READ_ACCESS_HISTORY = com.CH_gui.lang.Lang.rb.getString("columnTip_Read_Access_History");
 
-  private static final ColumnHeaderData[] columnHeaderDatas = { 
-    new ColumnHeaderData(new Object[][] 
+  private static final ColumnHeaderData[] columnHeaderDatas = {
+    new ColumnHeaderData(new Object[][]
         { { STR_NAME, null, null, STR_USER, STR_FIRST_SEEN, STR_RETRIEVED },
           { STR_NAME, STR_PRIVILEGE, STR_HISTORY, STR_USER, STR_FIRST_SEEN, STR_RETRIEVED },
           { null, STR_TIP__READ_ACCESS_PRIVILEGE, STR_TIP__READ_ACCESS_HISTORY, null, null, null },
@@ -170,7 +168,7 @@ public class TraceTableModel extends RecordTableModel {
       }
 
       switch (column) {
-        case 0: 
+        case 0:
           Record rec = getTracedObjRecord(traceRecord.objId);
           value = ListRenderer.getRenderedText(rec);
           break;
@@ -203,10 +201,8 @@ public class TraceTableModel extends RecordTableModel {
   }
 */
   public synchronized void refreshData() {
-    Thread th = new Thread("Trace Refresher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+    Thread th = new ThreadTraced("Trace Refresher") {
+      public void runTraced() {
         removeData();
 
         MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(parentObjLinks, MsgLinkRecord.class);
@@ -215,7 +211,7 @@ public class TraceTableModel extends RecordTableModel {
 
         if (msgLinks != null && msgLinks.length > 0) {
           doStatRequestMsgOrFile(msgLinks);
-        } 
+        }
         if (fileLinks != null && fileLinks.length > 0) {
           doStatRequestMsgOrFile(fileLinks);
         }
@@ -227,10 +223,6 @@ public class TraceTableModel extends RecordTableModel {
           request.objLinkIDs = new Long[0];
           doStatRequest(request);
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
 
       private void doStatRequestMsgOrFile(LinkRecordI[] links) {
@@ -304,7 +296,7 @@ public class TraceTableModel extends RecordTableModel {
             rec = fRec;
             break;
           }
-        } 
+        }
       }
     }
     return rec;

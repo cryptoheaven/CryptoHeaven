@@ -140,7 +140,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   /**
    * Refresh File List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -149,7 +149,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       rescanCurrentDirectory();
     }
   }
@@ -157,7 +157,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   /**
    * Open in seperate window
    */
-  private static class OpenInSeperateWindowAction extends AbstractAction {
+  private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -165,7 +165,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new LocalFileTableFrame("Browse");
     }
   }
@@ -173,7 +173,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   /**
    * Securely wipe the contents of selected files and directories.
    */
-  private class WipeAction extends AbstractAction {
+  private class WipeAction extends AbstractActionTraced {
     public WipeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Wipe_File"), Images.get(ImageNums.FILE_REMOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -182,7 +182,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Wipe_File"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       File[] files = getSelectedFiles();
       if (files != null && files.length > 0) {
         JPanel panel = new JPanel();
@@ -245,7 +245,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   }
 
 
-  private class UploadAction extends AbstractAction {
+  private class UploadAction extends AbstractActionTraced {
     public UploadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Upload_File_..."), Images.get(ImageNums.EXPORT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -254,7 +254,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Upload"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       File[] files = getSelectedFiles();
       if (files != null && files.length > 0) {
         boolean anyDirs = false;

@@ -127,7 +127,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   /**
    * Show selected Folder's sharing panel so user can add/invite others.
    */
-  private class InviteAction extends AbstractAction {
+  private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_to_the_Group_..."), Images.get(ImageNums.MEMBER_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -135,7 +135,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MEMBER_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_Member"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = GroupActionTable.this.getTableModel().getParentFolderPair();
       if (fPair != null && fPair.getFolderRecord().isCategoryType()) {
         Window w = SwingUtilities.windowForComponent(GroupActionTable.this);
@@ -153,7 +153,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   /** 
    * Create a new message to the entire Group
    */
-  private class NewMessageToGroupAction extends AbstractAction {
+  private class NewMessageToGroupAction extends AbstractActionTraced {
     public NewMessageToGroupAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_To_Group"), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -164,7 +164,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
       putValue(Actions.IN_POPUP, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       // new message trigger
       FolderPair pair = ((GroupTableModel) GroupActionTable.this.getTableModel()).getParentFolderPair();
       if (pair != null && pair.getFolderRecord().isCategoryType()) {
@@ -185,7 +185,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   /** 
    * Create a new message to the selected Member(s)
    */
-  private class NewMessageToMemberAction extends AbstractAction {
+  private class NewMessageToMemberAction extends AbstractActionTraced {
     public NewMessageToMemberAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_To_Member"), Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -196,7 +196,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
       putValue(Actions.IN_POPUP, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       // new message trigger
       FolderShareRecord[] shares = (FolderShareRecord[]) getSelectedRecords();
       if (shares != null) {

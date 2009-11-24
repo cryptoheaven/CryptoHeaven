@@ -368,7 +368,9 @@ public class HTML_ImageView extends View implements ImageObserver, MouseListener
     super.setParent(parent);
     fContainer = parent != null ? getContainer() : null;
     if (parent == null && fComponent != null) {
-      fComponent.getParent().remove(fComponent);
+      Container cnt = fComponent.getParent();
+      if (cnt != null)
+        cnt.remove(fComponent);
       fComponent = null;
     }
     if (trace != null) trace.exit(HTML_ImageView.class);

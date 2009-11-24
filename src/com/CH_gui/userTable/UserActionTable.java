@@ -100,7 +100,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   /** 
    * Initiate a new contact.
    */
-  private class InitiateAction extends AbstractAction {
+  private class InitiateAction extends AbstractActionTraced {
     public InitiateAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -108,7 +108,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_to_Contacts"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] uRecs = (UserRecord[]) getSelectedRecords();
       if (uRecs != null && uRecs.length > 0) {
         Window w = SwingUtilities.windowForComponent(UserActionTable.this);
@@ -121,7 +121,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   /** 
    * Message a user.
    */
-  private class SendMessageAction extends AbstractAction {
+  private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -129,7 +129,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Send_Message"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new MessageFrame(getSelectedRecords());
     }
   }

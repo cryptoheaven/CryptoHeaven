@@ -32,7 +32,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -46,7 +46,7 @@ import com.CH_guiLib.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -54,7 +54,7 @@ import com.CH_guiLib.util.*;
  *
  * <b>$Revision: 1.37 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgPanelUtils extends Object {
 
@@ -101,7 +101,7 @@ public class MsgPanelUtils extends Object {
         familiarUser = cRec;
     }
     ContactRecord cRec = (ContactRecord) familiarUser;
-    if (cRec == null || 
+    if (cRec == null ||
           // or not acknowledged, only acknowledged contacts have meaningful names...
           (!cRec.isOfActiveType() &&
            cRec.status != null && cRec.status.shortValue() != ContactRecord.STATUS_DECLINED_ACKNOWLEDGED)
@@ -167,7 +167,7 @@ public class MsgPanelUtils extends Object {
 
 
   /**
-   * Gathers all recipients into a Record[] 
+   * Gathers all recipients into a Record[]
    */
   public static Record[][] gatherAllMsgRecipients(MsgDataRecord dataRecord) {
     if (dataRecord != null)
@@ -415,9 +415,9 @@ public class MsgPanelUtils extends Object {
     Record[][] recipients = null;
     if (dataRecord != null)
       recipients = gatherAllMsgRecipients(dataRecord);
-    drawRecordFlowPanel(recipients, 
-                        new Boolean[] { Boolean.valueOf(includeTO), Boolean.valueOf(includeCC), Boolean.valueOf(includeBCC) }, 
-                        includeLabels ? new String[] { com.CH_gui.lang.Lang.rb.getString("label_To"), com.CH_gui.lang.Lang.rb.getString("label_Cc"), com.CH_gui.lang.Lang.rb.getString("label_Bcc") } : null, 
+    drawRecordFlowPanel(recipients,
+                        new Boolean[] { Boolean.valueOf(includeTO), Boolean.valueOf(includeCC), Boolean.valueOf(includeBCC) },
+                        includeLabels ? new String[] { com.CH_gui.lang.Lang.rb.getString("label_To"), com.CH_gui.lang.Lang.rb.getString("label_Cc"), com.CH_gui.lang.Lang.rb.getString("label_Bcc") } : null,
                         jRecipients, null, null, maxSize);
     if (trace != null) trace.exit(MsgPanelUtils.class);
   }
@@ -560,19 +560,20 @@ public class MsgPanelUtils extends Object {
   }
 
   /**
-   * Sets the message text component with specified content, tries to 
+   * Sets the message text component with specified content, tries to
    * fight certain exceptions and wrap the content so that it is not changed
    * visually but made displayable.
    */
   public static boolean setMessageContent(String content, boolean isHTML, JComponent jMessage) {
-    return setMessageContent(content, isHTML, jMessage, false);
+    return setMessageContent(content, isHTML, jMessage, false, false);
   }
-  public static boolean setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing)");
+  public static boolean setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing, boolean skipCaretPlacement) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing, boolean skipCaretPlacement)");
     if (trace != null) trace.args(content == null || content.length() < 255 ? content : "too long length="+content.length());
     if (trace != null) trace.args(isHTML);
     if (trace != null) trace.args(jMessage);
     if (trace != null) trace.args(skipHeaderClearing);
+    if (trace != null) trace.args(skipCaretPlacement);
 
     boolean displayedOk = false;
     if (content == null) {
@@ -606,12 +607,43 @@ public class MsgPanelUtils extends Object {
           }
         }
       } catch (Throwable t) {
+        if (trace != null) trace.exception(MsgPanelUtils.class, -10, t);
       }
       if (isHTML && !skipHeaderClearing) {
         content = HTML_utils.clearHTMLheaderAndConditionForDisplay(content, true, true, true);
       }
 //    } else if (jMessage instanceof HtmlPanel) {
 //      ((HtmlPanel) jMessage).clearDocument();
+    }
+
+    // Remove old components/Views if any
+    try {
+      if (jMessage instanceof Container) {
+        Container cnt = jMessage;
+        Component[] comps = cnt.getComponents();
+        if (comps != null) {
+          //System.out.println("comps length = " + comps.length);
+          for (int i=0; i<comps.length; i++) {
+            Component comp = comps[i];
+            if (comp instanceof Container) {
+              Container cnt2 = (Container) comp;
+              Component[] comps2 = cnt2.getComponents();
+              if (comps2 != null) {
+                //System.out.println("cmps2 length = " + comps2.length);
+                for (int j=0; j<comps2.length; j++) {
+                  Component comp2 = comps2[j];
+                  //System.out.println("j " + comp2.getName() + ", " + comp2.getClass() + ", " + comp2.getClass().getName() + ", " + comp2.getClass().getSimpleName());
+                  cnt2.remove(comps2[j]);
+                }
+              }
+            }
+            //System.out.println("i " + comp.getName() + ", " + comp.getClass() + ", " + comp.getClass().getName() + ", " + comp.getClass().getSimpleName());
+            cnt.remove(comp);
+          }
+        }
+      }
+    } catch (Throwable t) {
+      if (trace != null) trace.exception(MsgPanelUtils.class, -20, t);
     }
 
     String text = content;
@@ -633,7 +665,7 @@ public class MsgPanelUtils extends Object {
       try {
         if (trace != null) trace.data(10, MsgPanelUtils.class, "try 1");
         if (isHTML)
-          text = HTML_START + HTML_BODY_START + content + HTML_BODY_END + HTML_END; 
+          text = HTML_START + HTML_BODY_START + content + HTML_BODY_END + HTML_END;
         setText(jMessage, text);
         contentSet(text);
         if (trace != null) trace.data(11, "setText length", text.length());
@@ -646,7 +678,7 @@ public class MsgPanelUtils extends Object {
       try {
         if (trace != null) trace.data(20, MsgPanelUtils.class, "try 2");
         if (isHTML)
-          text = HTML_START + content + HTML_END; 
+          text = HTML_START + content + HTML_END;
         setText(jMessage, text);
         contentSet(text);
         if (trace != null) trace.data(21, "setText length", text.length());
@@ -695,7 +727,7 @@ public class MsgPanelUtils extends Object {
         //displayedOk = true;
       }
     }
-    if (displayedOk) {
+    if (displayedOk && !skipCaretPlacement) {
       try {
         if (jMessage instanceof JTextComponent) {
           ((JTextComponent) jMessage).setCaretPosition(0);
@@ -707,7 +739,11 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (jMessage instanceof HTML_ClickablePane) {
-      ((HTML_ClickablePane) jMessage).initFont();
+      try {
+        ((HTML_ClickablePane) jMessage).initFont();
+      } catch (Throwable t) {
+        if (trace != null) trace.exception(MsgPanelUtils.class, 200, t);
+      }
     }
     if (jMessage.isVisible()) {
       try {
@@ -800,7 +836,7 @@ public class MsgPanelUtils extends Object {
     if (inHtmlMode != isHtmlMode) {
       if (inHtmlMode)
         text = Misc.encodePlainIntoHtml(text);
-      else 
+      else
         text = extractPlainFromHtml(text);
     }
     if (addSpaces && inHtmlMode)
@@ -835,7 +871,7 @@ public class MsgPanelUtils extends Object {
     String originalHtml = html;
     String text = "";
     synchronized (paneForPlainExtraction) {
-      html = ArrayUtils.replaceKeyWords(html, 
+      html = ArrayUtils.replaceKeyWords(html,
         new String[][] {
           {"<P>", "<p>"},
           {"<p>", "</DIV><P><DIV>"},
@@ -883,7 +919,7 @@ public class MsgPanelUtils extends Object {
       try {
         text = d.getText(0, d.getLength());
         text = text.trim();
-        text = ArrayUtils.replaceKeyWords(text, 
+        text = ArrayUtils.replaceKeyWords(text,
           new String[][] {
             {"        \n", "\n"},
             {"    \n", "\n"},
@@ -935,8 +971,8 @@ public class MsgPanelUtils extends Object {
     }
     synchronized (previewContentSetterMonitor) {
       if (previewContentSetter == null) {
-        previewContentSetter = new Thread("Preview Content Setter") {
-          public void run() {
+        previewContentSetter = new ThreadTraced("Preview Content Setter") {
+          public void runTraced() {
             while (true) {
               try {
                 // pick the data to work with
@@ -972,7 +1008,7 @@ public class MsgPanelUtils extends Object {
                     SwingUtilities.invokeAndWait(new Runnable() {
                       public void run() {
                         try {
-                          MsgPanelUtils.setMessageContent(content[0], isHTMLview, messageViewer, skipHeaderClearing);
+                          MsgPanelUtils.setMessageContent(content[0], isHTMLview, messageViewer, skipHeaderClearing, false);
                         } catch (Throwable t) {
                         }
                       }

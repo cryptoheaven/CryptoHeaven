@@ -100,14 +100,14 @@ public class StatActionTable extends RecordActionTable implements ActionProducer
   /**
    * Refresh Stat List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Stats"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Stat_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       StatTableModel tableModel = (StatTableModel) getTableModel();
       tableModel.refreshData();
     }

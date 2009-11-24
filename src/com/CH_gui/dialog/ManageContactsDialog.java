@@ -14,6 +14,7 @@ package com.CH_gui.dialog;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -29,11 +30,10 @@ import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 
@@ -144,41 +144,41 @@ public class ManageContactsDialog extends GeneralDialog {
     panel.setLayout(new GridBagLayout());
 
     int posY = 0;
-    panel.add(new JMyLabel("Please select desired contacts for"), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("Please select desired contacts for"), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jUsersButton, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jUsersButton, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jUsersPanel, new GridBagConstraints(1, posY, 1, 2, 10, 0, 
+    panel.add(jUsersPanel, new GridBagConstraints(1, posY, 1, 2, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY += 2;
 
-    panel.add(dualListBox, new GridBagConstraints(0, posY, 2, 1, 10, 10, 
+    panel.add(dualListBox, new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel("Set Permissions for selected contacts:"), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("Set Permissions for selected contacts:"), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
     posY ++;
 
-    panel.add(jAllowMessaging, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jAllowMessaging, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 15, 2, 5), 0, 0));
     posY ++;
-    panel.add(jAllowSharing, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jAllowSharing, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 15, 2, 5), 0, 0));
     posY ++;
-    panel.add(jNotifyStatus, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jNotifyStatus, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 15, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jAdvanced, new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    panel.add(jAdvanced, new GridBagConstraints(0, posY, 2, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 2, 5), 0, 0));
     posY ++;
-    panel.add(jContactsAdd, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jContactsAdd, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 15, 2, 5), 0, 0));
     posY ++;
-    panel.add(jContactsSetPermissions, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jContactsSetPermissions, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 15, 5, 5), 0, 0));
     posY ++;
     return panel;
@@ -220,7 +220,7 @@ public class ManageContactsDialog extends GeneralDialog {
         ContactRecord cRec = allContacts[i];
         // only contacts between selected users and chosen users
         if ((ArrayUtils.find(selectedUserIDs, cRec.contactWithId) >= 0 && ArrayUtils.find(chosenUserIDs, cRec.ownerUserId) >= 0) ||
-            (ArrayUtils.find(chosenUserIDs, cRec.contactWithId) >= 0 && ArrayUtils.find(selectedUserIDs, cRec.ownerUserId) >= 0)) 
+            (ArrayUtils.find(chosenUserIDs, cRec.contactWithId) >= 0 && ArrayUtils.find(selectedUserIDs, cRec.ownerUserId) >= 0))
           chosenUserContactsV.addElement(cRec);
       }
     }
@@ -342,19 +342,18 @@ public class ManageContactsDialog extends GeneralDialog {
   }
 
   private void updateContactDualBox() {
-    Thread runUpdate = new Thread() {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-        try {
-          dualListBox.clearAllSourceListModels();
-          dualListBox.clearAllDestinationListModels();
+    Thread runUpdate = new ThreadTraced("Update Contact Dual Box") {
+      public void runTraced() {
+        dualListBox.clearAllSourceListModels();
+        dualListBox.clearAllDestinationListModels();
 
-          if (selectedUserRecords != null && selectedUserRecords.length > 0) {
-            jOk.setEnabled(false);
-            ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-            final FetchedDataCache cache = SIL.getFetchedDataCache();
-            final ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.CNT_Q_GET_GROUP_CONTACTS, new Obj_IDList_Co(RecordUtils.getIDs(selectedUserRecords))), 60000);
-            if (msgAction != null) {
+        if (selectedUserRecords != null && selectedUserRecords.length > 0) {
+          jOk.setEnabled(false);
+          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+          final FetchedDataCache cache = SIL.getFetchedDataCache();
+          final ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.CNT_Q_GET_GROUP_CONTACTS, new Obj_IDList_Co(RecordUtils.getIDs(selectedUserRecords))), 60000);
+          if (msgAction != null) {
+            try {
               SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                   // Gather unique userIDs from fetched contacts
@@ -383,18 +382,16 @@ public class ManageContactsDialog extends GeneralDialog {
                   }
                 }
               });
+            } catch (InterruptedException e1) {
+            } catch (InvocationTargetException e2) {
             }
-            DefaultReplyRunner.runAction(msgAction);
-            jOk.setEnabled(true);
           }
-        } catch (Throwable t) {
-          t.printStackTrace();
+          DefaultReplyRunner.runAction(msgAction);
+          jOk.setEnabled(true);
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
+    runUpdate.setDaemon(true);
     runUpdate.start();
   }
 

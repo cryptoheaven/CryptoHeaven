@@ -19,7 +19,7 @@ import javax.swing.border.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.file.*;
@@ -44,7 +44,7 @@ import com.CH_guiLib.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -52,7 +52,7 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.30 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FilePropertiesDialog extends GeneralDialog implements VisualsSavable {
 
@@ -160,29 +160,29 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     documentChangeListener = new DocumentChangeListener();
     jFileName.getDocument().addDocumentListener(documentChangeListener);
 
-    panel.add(new JMyLabel(Images.get(ImageNums.FILE_LOCKED32)), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.FILE_LOCKED32)), new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jFileName, new GridBagConstraints(1, 0, 1, 1, 10, 0, 
+    panel.add(jFileName, new GridBagConstraints(1, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, 1, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, 1, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Link_ID")), new GridBagConstraints(0, 2, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Link_ID")), new GridBagConstraints(0, 2, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(fileLink.fileLinkId.toString()), new GridBagConstraints(1, 2, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(fileLink.fileLinkId.toString()), new GridBagConstraints(1, 2, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Type")), new GridBagConstraints(0, 3, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Type")), new GridBagConstraints(0, 3, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     JLabel jFileType = new JMyLabel(fileLink.getFileType(), fileLink.getIcon(), JLabel.LEFT);
-    panel.add(jFileType, new GridBagConstraints(1, 3, 1, 1, 10, 0, 
+    panel.add(jFileType, new GridBagConstraints(1, 3, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, 4, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, 4, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     Record locationRecord = FileLinkRecUtil.getLocationRecord(fileLink);
@@ -195,60 +195,60 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
       else
         jLocationRecord = new JMyLabel(locationRecord.toString());
     }
-    else 
+    else
       jLocationRecord = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("unknown"));
-    panel.add(jLocationRecord, new GridBagConstraints(1, 4, 1, 1, 10, 0, 
+    panel.add(jLocationRecord, new GridBagConstraints(1, 4, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Original_Size")), new GridBagConstraints(0, 5, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Original_Size")), new GridBagConstraints(0, 5, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     long size = fileLink.origSize.longValue();
     String oSize = Misc.getFormattedSize(size, 3, 2);
     if (size >= 1000)
       oSize += " (" + Misc.getFormattedSize(size, 10, 10) + ")";
-    panel.add(new JMyLabel(oSize), new GridBagConstraints(1, 5, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(oSize), new GridBagConstraints(1, 5, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
     // seperator
-    panel.add(new JSeparator(), new GridBagConstraints(0, 6, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, 6, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Created")), new GridBagConstraints(0, 7, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Created")), new GridBagConstraints(0, 7, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     //SimpleDateFormat dateFormat = new SimpleDateFormat("MMMMM dd, yyyyy, HH:mm:ss.SSS");
     //String dateCreated = dateFormat.format(fileLink.recordCreated);
-    panel.add(new JMyLabel(Misc.getFormattedTimestamp(fileLink.recordCreated)), new GridBagConstraints(1, 7, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(Misc.getFormattedTimestamp(fileLink.recordCreated)), new GridBagConstraints(1, 7, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Updated")), new GridBagConstraints(0, 8, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Updated")), new GridBagConstraints(0, 8, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     //String dateUpdated = fileLink.recordUpdated != null ? dateFormat.format(fileLink.recordUpdated) : "";
     String dateUpdated = Misc.getFormattedTimestamp(fileLink.recordUpdated);
-    panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, 8, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, 8, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, 9, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, 9, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, 10, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, 10, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel("AES(256)"), new GridBagConstraints(1, 10, 1, 1, 10, 0, 
+    panel.add(new JMyLabel("AES(256)"), new GridBagConstraints(1, 10, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, 11, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, 11, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String desc = fileLink.getFileDesc();
     jFileDesc = new JMyTextArea(desc != null ? desc : "", 3, 20);
     jFileDesc.setWrapStyleWord(true);
     jFileDesc.setLineWrap(true);
     jFileDesc.getDocument().addDocumentListener(documentChangeListener);
-    panel.add(new JScrollPane(jFileDesc), new GridBagConstraints(1, 11, 1, 3, 10, 10, 
+    panel.add(new JScrollPane(jFileDesc), new GridBagConstraints(1, 11, 1, 3, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
@@ -262,102 +262,102 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     panel.setLayout(new GridBagLayout());
 
     int posY = 0;
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Data_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Data_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(fileLink.fileId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(fileLink.fileId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jSizeOnDisk = new JMyLabel(FETCHING_DATA);
-    panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_User")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_User")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataUser = new JMyLabel(FETCHING_DATA);
-    panel.add(jDataUser, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jDataUser, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataKeyID = new JMyLabel(FETCHING_DATA);
-    panel.add(jDataKeyID, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jDataKeyID, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_Info")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_Info")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataKeyInfo = new JMyLabel(FETCHING_DATA);
-    panel.add(jDataKeyInfo, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jDataKeyInfo, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Verification")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Verification")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jVerifyOK = new JMyLabel(FETCHING_DATA);
-    panel.add(jVerifyOK, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jVerifyOK, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Original_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Original_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     jDataOriginalDigest = new JMyTextField(FETCHING_DATA, 32);
     jDataOriginalDigest.setEditable(false);
-    panel.add(jDataOriginalDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jDataOriginalDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Encrypted_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Encrypted_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     jDataEncryptedDigest = new JMyTextField(FETCHING_DATA, 32);
     jDataEncryptedDigest.setEditable(false);
-    panel.add(jDataEncryptedDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jDataEncryptedDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_Uploaded")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_Uploaded")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataCreated = new JMyLabel(FETCHING_DATA);
-    panel.add(jDataCreated, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jDataCreated, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Record_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Record_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataUpdated = new JMyLabel(FETCHING_DATA);
-    panel.add(jDataUpdated, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jDataUpdated, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -511,93 +511,83 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
 
   private void fetchData() {
-    Thread th = new Thread("File Properties Data Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("File Properties Data Fetcher") {
+      public void runTraced() {
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
-        try {
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        Obj_IDs_Co request = new Obj_IDs_Co();
+        request.IDs = new Long[2][];
+        request.IDs[0] = new Long[] { fileLink.fileLinkId };
+        request.IDs[1] = new Long[] { cache.getFolderShareRecordMy(fileLink.ownerObjId, true).shareId };
 
-          Obj_IDs_Co request = new Obj_IDs_Co();
-          request.IDs = new Long[2][];
-          request.IDs[0] = new Long[] { fileLink.fileLinkId };
-          request.IDs[1] = new Long[] { cache.getFolderShareRecordMy(fileLink.ownerObjId, true).shareId };
+        MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES, request);
+        ClientMessageAction replyMsg = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
+        DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, replyMsg);
 
-          MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES, request);
-          ClientMessageAction replyMsg = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
-          DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, replyMsg);
+        if (replyMsg instanceof FileAGetFilesDataAttr) {
+          File_GetAttr_Rp reply = (File_GetAttr_Rp) replyMsg.getMsgDataSet();
+          fileData = reply.fileDataRecords[0];
+          jTranscript.setEnabled(true);
 
-          if (replyMsg instanceof FileAGetFilesDataAttr) {
-            File_GetAttr_Rp reply = (File_GetAttr_Rp) replyMsg.getMsgDataSet();
-            fileData = reply.fileDataRecords[0];
-            jTranscript.setEnabled(true);
-
-            // get Signing key
-            Long keyId = fileData.getSigningKeyId();
-            KeyRecord kRec = cache.getKeyRecord(keyId);
-            if (kRec == null) {
-              serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(keyId)), 60000);
-              kRec = cache.getKeyRecord(keyId);
-            }
-
-            // get Signing user
-            UserRecord uRec = null;
-            if (kRec != null) {
-              Long userId = kRec.ownerUserId;
-              uRec = cache.getUserRecord(userId);
-              if (uRec == null) {
-                serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userId)), 30000);
-                uRec = cache.getUserRecord(userId);
-              }
-            }
-
-            //long size = fileData.getEncSize().longValue();
-            long size = fileData.recordSize.longValue();
-            String oSize = Misc.getFormattedSize(size, 3, 2);
-            if (size >= 1000)
-              oSize += " (" + Misc.getFormattedSize(size, 10, 10) + ")";
-            jSizeOnDisk.setText(oSize);
-            jDataCreated.setText(Misc.getFormattedTimestamp(fileData.fileCreated));
-            jDataUpdated.setText(Misc.getFormattedTimestamp(fileData.fileUpdated));
-
-            if (uRec != null) {
-              jDataUser.setText(uRec.shortInfo());
-              jDataUser.setIcon(uRec.getIcon());
-            } else {
-              jDataUser.setText(com.CH_gui.lang.Lang.rb.getString("label_Unknown_User_Account"));
-              jDataUser.setIcon(Images.get(ImageNums.PERSON_SMALL));
-            }
-
-            jDataKeyID.setText(fileData.getSigningKeyId().toString());
-
-            if (kRec != null) {
-              jDataKeyInfo.setText(kRec.plainPublicKey.shortInfo());
-              jDataKeyInfo.setIcon(kRec.getIcon());
-            }
-            else {
-              jDataKeyInfo.setText(com.CH_gui.lang.Lang.rb.getString("Key_is_not_available"));
-              jDataKeyInfo.setIcon(Images.get(ImageNums.KEY16));
-            }
-
-            // since we were able to decrypt the digests, they verified OK
-            if (fileData.isVerifiedPlainDigest()) {
-              jVerifyOK.setIcon(Images.get(ImageNums.SEAL8_15));
-              jVerifyOK.setText(com.CH_gui.lang.Lang.rb.getString("Digest_signatures_verified."));
-            } else {
-              jVerifyOK.setText(com.CH_gui.lang.Lang.rb.getString("Digest_signatures_could_not_be_verified."));
-              jVerifyOK.setIcon(Images.get(ImageNums.PRIORITY_HIGH_SMALL));
-            }
-
-            jDataOriginalDigest.setText(fileData.getOrigDataDigest().getHexContent());
-            jDataEncryptedDigest.setText(fileData.getEncDataDigest().getHexContent());
+          // get Signing key
+          Long keyId = fileData.getSigningKeyId();
+          KeyRecord kRec = cache.getKeyRecord(keyId);
+          if (kRec == null) {
+            serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(keyId)), 60000);
+            kRec = cache.getKeyRecord(keyId);
           }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
-        }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+          // get Signing user
+          UserRecord uRec = null;
+          if (kRec != null) {
+            Long userId = kRec.ownerUserId;
+            uRec = cache.getUserRecord(userId);
+            if (uRec == null) {
+              serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userId)), 30000);
+              uRec = cache.getUserRecord(userId);
+            }
+          }
+
+          //long size = fileData.getEncSize().longValue();
+          long size = fileData.recordSize.longValue();
+          String oSize = Misc.getFormattedSize(size, 3, 2);
+          if (size >= 1000)
+            oSize += " (" + Misc.getFormattedSize(size, 10, 10) + ")";
+          jSizeOnDisk.setText(oSize);
+          jDataCreated.setText(Misc.getFormattedTimestamp(fileData.fileCreated));
+          jDataUpdated.setText(Misc.getFormattedTimestamp(fileData.fileUpdated));
+
+          if (uRec != null) {
+            jDataUser.setText(uRec.shortInfo());
+            jDataUser.setIcon(uRec.getIcon());
+          } else {
+            jDataUser.setText(com.CH_gui.lang.Lang.rb.getString("label_Unknown_User_Account"));
+            jDataUser.setIcon(Images.get(ImageNums.PERSON_SMALL));
+          }
+
+          jDataKeyID.setText(fileData.getSigningKeyId().toString());
+
+          if (kRec != null) {
+            jDataKeyInfo.setText(kRec.plainPublicKey.shortInfo());
+            jDataKeyInfo.setIcon(kRec.getIcon());
+          }
+          else {
+            jDataKeyInfo.setText(com.CH_gui.lang.Lang.rb.getString("Key_is_not_available"));
+            jDataKeyInfo.setIcon(Images.get(ImageNums.KEY16));
+          }
+
+          // since we were able to decrypt the digests, they verified OK
+          if (fileData.isVerifiedPlainDigest()) {
+            jVerifyOK.setIcon(Images.get(ImageNums.SEAL8_15));
+            jVerifyOK.setText(com.CH_gui.lang.Lang.rb.getString("Digest_signatures_verified."));
+          } else {
+            jVerifyOK.setText(com.CH_gui.lang.Lang.rb.getString("Digest_signatures_could_not_be_verified."));
+            jVerifyOK.setIcon(Images.get(ImageNums.PRIORITY_HIGH_SMALL));
+          }
+
+          jDataOriginalDigest.setText(fileData.getOrigDataDigest().getHexContent());
+          jDataEncryptedDigest.setText(fileData.getEncDataDigest().getHexContent());
+        }
       }
     };
     th.setDaemon(true);
@@ -628,7 +618,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
       setEnabledButtons();
     }
   }
-  
+
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/

@@ -17,7 +17,7 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.records.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
@@ -65,16 +65,12 @@ public class SysANotify extends ClientMessageAction {
       }
 
       if (shouldReSynch) {
-        Thread th = new Thread() {
-          public void run() {
-            Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+        Thread th = new ThreadTraced("ReSynch Runner") {
+          public void runTraced() {
             // invalidate views of fetched folders so that client reloads them on demand
-            {
-              FolderRecord[] folders = cache.getFolderRecords();
-              for (int i=0; i<folders.length; i++) {
-                FolderRecUtil.markFolderViewInvalidated(folders[i].folderId, true);
-              }
+            FolderRecord[] folders = cache.getFolderRecords();
+            for (int i=0; i<folders.length; i++) {
+              FolderRecUtil.markFolderViewInvalidated(folders[i].folderId, true);
             }
 
             // if connection is still active then request update
@@ -89,10 +85,6 @@ public class SysANotify extends ClientMessageAction {
                 }
               }
             }
-
-            if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-            if (trace != null) trace.exit(getClass());
-            if (trace != null) trace.clear();
           }
         };
         th.setDaemon(true);

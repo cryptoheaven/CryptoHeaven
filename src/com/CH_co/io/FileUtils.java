@@ -155,23 +155,27 @@ public class FileUtils extends Object {
       java.util.Timer timer = new java.util.Timer();
       timer.schedule(new java.util.TimerTask() {
         public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "TimerTask.run()");
 
-          boolean msgSuppressed = false;
-          msgSuppressed = progMon.isCancelled();
-          if (!msgSuppressed) {
-            msgSuppressed = progMon.isAllDone() || progMon.isJobKilled();
-          }
-          if (msgSuppressed) {
-            // suppress additional message and do nothing
-            if (trace != null) trace.data(110, "message suppressed");
-          } else {
-            // update the job status to KILLED
-            progMon.jobKilled();
+          try {
+            boolean msgSuppressed = false;
+            msgSuppressed = progMon.isCancelled();
+            if (!msgSuppressed) {
+              msgSuppressed = progMon.isAllDone() || progMon.isJobKilled();
+            }
+            if (msgSuppressed) {
+              // suppress additional message and do nothing
+              if (trace != null) trace.data(110, "message suppressed");
+            } else {
+              // update the job status to KILLED
+              progMon.jobKilled();
 
-            String msg = "Exception occurred while serializing file " + fileName + "  This error is not recoverable, the aciton was terminated. \n\nException message is: " + exceptionStr;
-            String title = "Error Uploading File";
-            MessageDialog.showErrorDialog(null, msg, title);
+              String msg = "Exception occurred while serializing file " + fileName + "  This error is not recoverable, the aciton was terminated. \n\nException message is: " + exceptionStr;
+              String title = "Error Uploading File";
+              MessageDialog.showErrorDialog(null, msg, title);
+            }
+          } catch (Throwable t) {
+            if (trace != null) trace.exception(getClass(), 100, t);
           }
 
           if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");

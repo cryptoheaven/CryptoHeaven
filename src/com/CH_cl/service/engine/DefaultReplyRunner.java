@@ -12,7 +12,7 @@
 
 package com.CH_cl.service.engine;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.monitor.*;
 
 import com.CH_co.service.msg.MessageAction;
@@ -34,7 +34,7 @@ import com.CH_cl.service.actions.ClientMessageAction;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class DefaultReplyRunner extends Thread {
+public class DefaultReplyRunner extends ThreadTraced {
 
   private static int defaultReplyRunnerCount;
   private ClientMessageAction msgAction;
@@ -54,9 +54,8 @@ public class DefaultReplyRunner extends Thread {
     if (trace != null) trace.exit(DefaultReplyRunner.class);
   }
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultReplyRunner.class, "run()");
-    if (trace != null) trace.data(10, "calling method that does real work");
+  public void runTraced() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultReplyRunner.class, "DefaultReplyRunner.runTraced()");
     try {
       nonThreadedRun(serverInterfaceLayer, msgAction);
     } catch (Throwable t) {
@@ -68,9 +67,7 @@ public class DefaultReplyRunner extends Thread {
     this.serverInterfaceLayer = null;
     this.msgAction = null;
 
-    if (trace != null) trace.data(100, Thread.currentThread().getName() + " done.");
     if (trace != null) trace.exit(DefaultReplyRunner.class);
-    if (trace != null) trace.clear();
   }
 
   /** Same as run() but without clearing thread trace stack. */

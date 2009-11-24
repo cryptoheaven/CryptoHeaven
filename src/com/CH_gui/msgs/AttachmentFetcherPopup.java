@@ -26,7 +26,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
@@ -38,15 +38,15 @@ import com.CH_gui.list.*;
  * <b>Copyright</b> &copy; 2001-2009
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  *
  *************************************************************************************
  * Class to take care of fetching the attachments and showing the popup menu.
  ************************************************************************************/
-public class AttachmentFetcherPopup extends Thread {
+public class AttachmentFetcherPopup extends ThreadTraced {
 
   private MsgLinkRecord[] paramParentMsgLinkRecords;
 
@@ -69,7 +69,7 @@ public class AttachmentFetcherPopup extends Thread {
     popup.add(new JMyMenuItem(com.CH_gui.lang.Lang.rb.getString("Fetching_Attachment(s)_...")));
     if (parent != null) {
       popup.pack();
-      // wrong-popup-location 
+      // wrong-popup-location
       // Point point = MiscGui.getSuggestedPopupLocation(parent, popup);
       // popup.show(parent, point.x, point.y);
       popup.show(parent, 0, parent.getSize().height);
@@ -81,18 +81,11 @@ public class AttachmentFetcherPopup extends Thread {
   }
 
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AttachmentFetcherPopup.class, "run()");
-
+  public void runTraced() {
     Record[] attachments = fetchAttachments(paramParentMsgLinkRecords);
     updatePopup(attachments);
-
     // help cleanup
     popup = null;
-
-    if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-    if (trace != null) trace.exit(AttachmentFetcherPopup.class);
-    if (trace != null) trace.clear();
   } // end run()
 
 
@@ -129,7 +122,7 @@ public class AttachmentFetcherPopup extends Thread {
       //FolderShareRecord[] shareRecords = cache.getFolderShareRecordsMyRootsForMsgs(parentMsgLinks);
       if (shareRecords != null && shareRecords.length > 0)
         request.IDs[1] = RecordUtils.getIDs(shareRecords);
-      else 
+      else
         request.IDs[1] = new Long[0];
       if (trace != null) trace.data(40, "request IDs", request.IDs[1]);
     }
@@ -238,7 +231,7 @@ public class AttachmentFetcherPopup extends Thread {
     private Component parent;
     private MsgLinkRecord[] paramParentMsgLinkRecords;
     private FileLinkRecord fLink;
-    
+
     private FileDownloader(Component parent, MsgLinkRecord[] paramParentMsgLinkRecords, FileLinkRecord fileLink) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "FileDownloader(FileLinkRecord fileLink)");
       if (trace != null) trace.args(parent, paramParentMsgLinkRecords, fileLink);

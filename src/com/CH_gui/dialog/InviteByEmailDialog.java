@@ -25,7 +25,7 @@ import com.CH_cl.service.engine.*;
 import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
@@ -198,10 +198,8 @@ public class InviteByEmailDialog extends GeneralDialog {
       option = MessageDialog.showDialogYesNo(this, msgPanel, title);
     }
     if (option == true) {
-      Thread th = new Thread("Invitation Sender") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+      Thread th = new ThreadTraced("Invitation Sender") {
+        public void runTraced() {
           Obj_List_Co request = new Obj_List_Co();
           request.objs = new String[] { emailAddresses, personalMsg };
           ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_SEND_EMAIL_INVITATION, request), 60000);
@@ -211,10 +209,6 @@ public class InviteByEmailDialog extends GeneralDialog {
           else {
             setEnabledButtons(true);
           }
-
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
       };
       th.setDaemon(true);

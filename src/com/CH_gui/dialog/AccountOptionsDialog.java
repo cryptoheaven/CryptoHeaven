@@ -165,123 +165,116 @@ public class AccountOptionsDialog extends GeneralDialog {
   }
 
   private void fetchData() {
-    Thread th = new Thread("Account Options Quotas Fetcher") {
+    Thread th = new ThreadTraced("Account Options Quotas Fetcher") {
       private AutoResponderRecord autoResponderRecord = null;
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "AccountOptionsDialog.fetchData.runTraced()");
 
-        try {
-          // fetch a single sub user account info
-          {
-            Obj_List_Co request = new Obj_List_Co();
-            request.objs = new Object[] { null, null, Boolean.TRUE, userRecords.length == 1 ? userRecords[0].userId : null, userRecords.length == 1 ? Boolean.TRUE : Boolean.FALSE };
-            if (trace != null) trace.data(10, "about to get responder");
-            ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_GET_SUB_ACCOUNTS, request), 60000);
-            if (trace != null) trace.data(11, "about to run reply", reply);
-            if (reply != null) {
-              DefaultReplyRunner.nonThreadedRun(SIL, reply);
-              ProtocolMsgDataSet set = reply.getMsgDataSet();
-              if (set instanceof Usr_GetSubAcc_Rp) {
-                Usr_GetSubAcc_Rp set2 = (Usr_GetSubAcc_Rp) set;
-                if (trace != null) trace.data(12, "about to set responder record");
-                if (set2.autoResponderRecords != null && set2.autoResponderRecords.length == 1) {
-                  autoResponderRecord = set2.autoResponderRecords[0];
-                  autoResponderRecord.unSeal();
-                }
-                if (trace != null) trace.data(20, "responder record set", autoResponderRecord);
+        // fetch a single sub user account info
+        {
+          Obj_List_Co request = new Obj_List_Co();
+          request.objs = new Object[] { null, null, Boolean.TRUE, userRecords.length == 1 ? userRecords[0].userId : null, userRecords.length == 1 ? Boolean.TRUE : Boolean.FALSE };
+          if (trace != null) trace.data(10, "about to get responder");
+          ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_GET_SUB_ACCOUNTS, request), 60000);
+          if (trace != null) trace.data(11, "about to run reply", reply);
+          if (reply != null) {
+            DefaultReplyRunner.nonThreadedRun(SIL, reply);
+            ProtocolMsgDataSet set = reply.getMsgDataSet();
+            if (set instanceof Usr_GetSubAcc_Rp) {
+              Usr_GetSubAcc_Rp set2 = (Usr_GetSubAcc_Rp) set;
+              if (trace != null) trace.data(12, "about to set responder record");
+              if (set2.autoResponderRecords != null && set2.autoResponderRecords.length == 1) {
+                autoResponderRecord = set2.autoResponderRecords[0];
+                autoResponderRecord.unSeal();
               }
+              if (trace != null) trace.data(20, "responder record set", autoResponderRecord);
             }
           }
-
-          Long storageUsed = null;
-          Long transferUsed = null;
-          Short accountsUsed = null;
-
-          if (userRecords.length == 1) {
-            storageUsed = userRecords[0].storageUsed;
-            transferUsed = userRecords[0].transferUsed;
-          }
-
-          // fetch cumulative usage for master accounts
-          if (userRecords.length == 1 && userRecords[0].isCapableToManageUserAccounts()) {
-            Obj_IDList_Co request = new Obj_IDList_Co();
-            request.IDs = new Long[] { userRecords[0].userId };
-            ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_CUMULATIVE_USAGE, request), 60000);
-            if (reply != null) {
-              DefaultReplyRunner.nonThreadedRun(SIL, reply);
-              Obj_List_Co set = (Obj_List_Co) reply.getMsgDataSet();
-              storageUsed = (Long) ((Object[]) set.objs[1])[0];
-              transferUsed = (Long) ((Object[]) set.objs[2])[0];
-              accountsUsed = (Short) ((Object[]) set.objs[3])[0];
-            }
-          }
-
-          final Long storageUsedF = storageUsed;
-          final Long transferUsedF = transferUsed;
-          final Short accountsUsedF = accountsUsed;
-
-          // Perform GUI updates in a GUI-safe-thread
-          SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              // userRecord was updated with the fetched record and merged together
-              if (jPanelQuotas.jStorageUsed != null) {
-                if (storageUsedF != null) {
-                  jPanelQuotas.jStorageUsed.setText(Misc.getFormattedSize(storageUsedF, 4, 3));
-                } else {
-                  jPanelQuotas.jStorageUsed.setText("");
-                }
-              }
-
-              if (jPanelQuotas.jStorageCalcDate != null) {
-                if (userRecords.length == 1 && userRecords[0].checkStorageDate != null) {
-                  jPanelQuotas.jStorageCalcDate.setText(Misc.getFormattedTimestamp(userRecords[0].checkStorageDate));
-                } else {
-                  jPanelQuotas.jStorageCalcDate.setText("");
-                }
-              }
-
-              if (jPanelQuotas.jBandwidthUsed != null) {
-                if (transferUsedF != null) {
-                  jPanelQuotas.jBandwidthUsed.setText(Misc.getFormattedSize(transferUsedF, 4, 3));
-                } else {
-                  jPanelQuotas.jBandwidthUsed.setText("");
-                }
-              }
-
-              if (userRecords.length == 1 && userRecords[0].defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
-                EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
-                defaultEmail = emlRec.getEmailAddressFull().toLowerCase();
-                jDefaultEmail.setText(emlRec.getEmailAddressFull());
-                setEditableDefaultEmail(myUserRecord, emlRec);
-              }
-
-              if (jPanelQuotas.jAccountsUsed != null) {
-                jPanelQuotas.jAccountsUsed.setText(""+accountsUsedF);
-              }
-
-              // update checkboxes
-              checks.updateCheckBoxes(myUserRecord, userRecords);
-
-              // update responder panel
-              if (autoResponderRecord != null) {
-                jPanelResponder.initializeData(userRecords.length == 1 ? userRecords[0].autoResp : null, autoResponderRecord);
-              }
-
-              UserOps.checkExpiry();
-              UserOps.checkQuotas();
-
-              // buttons enablement after fetch is done
-              setEnabledButtons();
-            }
-          });
-
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
+        Long storageUsed = null;
+        Long transferUsed = null;
+        Short accountsUsed = null;
+
+        if (userRecords.length == 1) {
+          storageUsed = userRecords[0].storageUsed;
+          transferUsed = userRecords[0].transferUsed;
+        }
+
+        // fetch cumulative usage for master accounts
+        if (userRecords.length == 1 && userRecords[0].isCapableToManageUserAccounts()) {
+          Obj_IDList_Co request = new Obj_IDList_Co();
+          request.IDs = new Long[] { userRecords[0].userId };
+          ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_CUMULATIVE_USAGE, request), 60000);
+          if (reply != null) {
+            DefaultReplyRunner.nonThreadedRun(SIL, reply);
+            Obj_List_Co set = (Obj_List_Co) reply.getMsgDataSet();
+            storageUsed = (Long) ((Object[]) set.objs[1])[0];
+            transferUsed = (Long) ((Object[]) set.objs[2])[0];
+            accountsUsed = (Short) ((Object[]) set.objs[3])[0];
+          }
+        }
+
+        final Long storageUsedF = storageUsed;
+        final Long transferUsedF = transferUsed;
+        final Short accountsUsedF = accountsUsed;
+
+        // Perform GUI updates in a GUI-safe-thread
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            // userRecord was updated with the fetched record and merged together
+            if (jPanelQuotas.jStorageUsed != null) {
+              if (storageUsedF != null) {
+                jPanelQuotas.jStorageUsed.setText(Misc.getFormattedSize(storageUsedF, 4, 3));
+              } else {
+                jPanelQuotas.jStorageUsed.setText("");
+              }
+            }
+
+            if (jPanelQuotas.jStorageCalcDate != null) {
+              if (userRecords.length == 1 && userRecords[0].checkStorageDate != null) {
+                jPanelQuotas.jStorageCalcDate.setText(Misc.getFormattedTimestamp(userRecords[0].checkStorageDate));
+              } else {
+                jPanelQuotas.jStorageCalcDate.setText("");
+              }
+            }
+
+            if (jPanelQuotas.jBandwidthUsed != null) {
+              if (transferUsedF != null) {
+                jPanelQuotas.jBandwidthUsed.setText(Misc.getFormattedSize(transferUsedF, 4, 3));
+              } else {
+                jPanelQuotas.jBandwidthUsed.setText("");
+              }
+            }
+
+            if (userRecords.length == 1 && userRecords[0].defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
+              EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
+              defaultEmail = emlRec.getEmailAddressFull().toLowerCase();
+              jDefaultEmail.setText(emlRec.getEmailAddressFull());
+              setEditableDefaultEmail(myUserRecord, emlRec);
+            }
+
+            if (jPanelQuotas.jAccountsUsed != null) {
+              jPanelQuotas.jAccountsUsed.setText(""+accountsUsedF);
+            }
+
+            // update checkboxes
+            checks.updateCheckBoxes(myUserRecord, userRecords);
+
+            // update responder panel
+            if (autoResponderRecord != null) {
+              jPanelResponder.initializeData(userRecords.length == 1 ? userRecords[0].autoResp : null, autoResponderRecord);
+            }
+
+            UserOps.checkExpiry();
+            UserOps.checkQuotas();
+
+            // buttons enablement after fetch is done
+            setEnabledButtons();
+          }
+        });
+
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);

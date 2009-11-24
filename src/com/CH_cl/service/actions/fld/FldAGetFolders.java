@@ -12,7 +12,7 @@
 
 package com.CH_cl.service.actions.fld;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_cl.service.actions.*;
@@ -253,8 +253,8 @@ public class FldAGetFolders extends ClientMessageAction {
     if (singleDftFolderCreatorArbiterKey == null) singleDftFolderCreatorArbiterKey = new Object();
     final Object token = new Object();
     if (singleTokenArbiter.putToken(singleDftFolderCreatorArbiterKey, token)) {
-      Thread th = new Thread("Junk and Recycle Folder checker-creator") {
-        public void run() {
+      Thread th = new ThreadTraced("Junk and Recycle Folder checker-creator") {
+        public void runTraced() {
           try {
             // delay a little to let other requests through before this one
             try {
@@ -268,6 +268,7 @@ public class FldAGetFolders extends ClientMessageAction {
               FolderOps.getOrCreateRecycleFolder(SIL);
             }
           } catch (Throwable t) {
+            throw new RuntimeException(t);
           } finally {
             singleTokenArbiter.removeToken(singleDftFolderCreatorArbiterKey, token);
           }

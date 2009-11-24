@@ -27,14 +27,12 @@ import com.CH_cl.service.cache.*;
 import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
-import com.CH_co.service.msg.dataSets.key.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -43,7 +41,7 @@ import com.CH_guiLib.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -51,9 +49,9 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.6 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class InitiateContactDialog extends GeneralDialog {//implements VisualsSavable {
+public class InitiateContactDialog extends GeneralDialog {
 
   JLabel jContactWith;
   JLabel jOwnerEncryption;
@@ -111,32 +109,22 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
   }
 
   private void getPubKey() {
-    Thread th = new Thread("Initiater Contact -- Public Key Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Initiater Contact -- Public Key Fetcher") {
+      public void runTraced() {
+        Obj_IDList_Co request = new Obj_IDList_Co();
+        request.IDs = contactWithIds;
+        MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
+        ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 60000);
+        DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
+        setEnabledButtons();
 
-        try {
-          Obj_IDList_Co request = new Obj_IDList_Co();
-          request.IDs = contactWithIds;
-          MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-          ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 60000);
-          DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-          setEnabledButtons();
-
-          if (contactWithIds.length == 1) {
-            KeyRecord otherKeyRec = cache.getKeyRecordForUser(contactWithIds[0]);
-            if (otherKeyRec != null) {
-              jOtherEncryption.setText(otherKeyRec.plainPublicKey.shortInfo() + "/" + "AES(256)");
-              jOtherEncryption.setIcon(otherKeyRec.getIcon());
-            }
+        if (contactWithIds.length == 1) {
+          KeyRecord otherKeyRec = cache.getKeyRecordForUser(contactWithIds[0]);
+          if (otherKeyRec != null) {
+            jOtherEncryption.setText(otherKeyRec.plainPublicKey.shortInfo() + "/" + "AES(256)");
+            jOtherEncryption.setIcon(otherKeyRec.getIcon());
           }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -169,7 +157,7 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
     JPanel panel = new JPanel();
     panel.setLayout(new GridBagLayout());
 
-    panel.add(new JMyLabel(Images.get(ImageNums.CONTACT_NEW32)), new GridBagConstraints(0, 0, 1, 2, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.CONTACT_NEW32)), new GridBagConstraints(0, 0, 1, 2, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     documentChangeListener = new DocumentChangeListener();
@@ -183,13 +171,13 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
     contactReasonMap.removeKeyStrokeBinding(enter);
 
     if (contactWithIds.length == 1) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_To")), new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_To")), new GridBagConstraints(1, 0, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Name")), new GridBagConstraints(1, 2, 1, 1, 0, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Name")), new GridBagConstraints(1, 2, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 3, 1, 1, 0, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 3, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
       UserRecord uRec = cache.getUserRecord(contactWithIds[0]);
@@ -205,22 +193,22 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
       Keymap contactNameMap = jContactName.getKeymap();
       contactNameMap.removeKeyStrokeBinding(enter);
 
-      panel.add(jContactWith, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
+      panel.add(jContactWith, new GridBagConstraints(2, 0, 1, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(jOwnerEncryption, new GridBagConstraints(2, 1, 1, 1, 10, 0, 
+      panel.add(jOwnerEncryption, new GridBagConstraints(2, 1, 1, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(jContactName, new GridBagConstraints(2, 2, 1, 1, 10, 0, 
+      panel.add(jContactName, new GridBagConstraints(2, 2, 1, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(jOtherEncryption, new GridBagConstraints(2, 3, 1, 1, 10, 0, 
+      panel.add(jOtherEncryption, new GridBagConstraints(2, 3, 1, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     }
 
 
     // Always include Reason field
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Reason")), new GridBagConstraints(1, contactWithIds.length == 1 ? 4 : 0, 2, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Reason")), new GridBagConstraints(1, contactWithIds.length == 1 ? 4 : 0, 2, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JScrollPane(jContactReason), new GridBagConstraints(1, contactWithIds.length == 1 ? 5 : 1, 2, 3, 10, 10, 
+    panel.add(new JScrollPane(jContactReason), new GridBagConstraints(1, contactWithIds.length == 1 ? 5 : 1, 2, 3, 10, 10,
       GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
 
     return panel;
@@ -244,40 +232,27 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "pressedOK()");
     closeDialog();
 
-    Thread th = new Thread("Initiate Contact -- Pressed OK Submitter") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Initiate Contact -- Pressed OK Submitter") {
+      public void runTraced() {
+        BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
 
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
+        for (int i=0; i<contactWithIds.length; i++) {
+          //1310 <shareId>   <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
 
-        try {
-          BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
+          // process each contact separately one at a time
+          Long contactWithId = contactWithIds[i];
 
-          for (int i=0; i<contactWithIds.length; i++) {
-            //1310 <shareId>   <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
+          Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
+          request.shareId = shareId;
+          request.contactRecord = new ContactRecord();
+          request.contactRecord.contactWithId = contactWithId;
+          request.contactRecord.setOwnerNote(jContactName != null && jContactName.getText().trim().length() > 0 ? jContactName.getText().trim() : cache.getUserRecord(contactWithId).handle);
+          request.contactRecord.setOtherNote(jContactReason.getText().trim());
+          request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
+          request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
 
-            // process each contact separately one at a time
-            Long contactWithId = contactWithIds[i];
-
-            Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
-            request.shareId = shareId;
-            request.contactRecord = new ContactRecord();
-            request.contactRecord.contactWithId = contactWithId;
-            request.contactRecord.setOwnerNote(jContactName != null && jContactName.getText().trim().length() > 0 ? jContactName.getText().trim() : cache.getUserRecord(contactWithId).handle);
-            request.contactRecord.setOtherNote(jContactReason.getText().trim());
-            request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
-            request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
-
-            SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
-          }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(InitiateContactDialog.class, 100, t);
+          SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -314,12 +289,5 @@ public class InitiateContactDialog extends GeneralDialog {//implements VisualsSa
       setEnabledButtons();
     }
   }
-//
-//  /*******************************************************
-//  *** V i s u a l s S a v a b l e    interface methods ***
-//  *******************************************************/
-//  public static final String visualsClassKeyName = "InitiateContactDialog";
-//  public String getVisualsClassKeyName() {
-//    return visualsClassKeyName;
-//  }
+
 }

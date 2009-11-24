@@ -182,10 +182,12 @@ public class KeyTableModel extends RecordTableModel {
   private class KeyGUIUpdater implements Runnable {
     private RecordEvent event;
     public KeyGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyGUIUpdater.class, "KeyGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(KeyGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyGUIUpdater.class, "KeyGUIUpdater.run()");
 
       Record[] records = event.getRecords();
       if (event.getEventType() == RecordEvent.SET) {

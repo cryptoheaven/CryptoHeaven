@@ -29,7 +29,7 @@ import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -41,7 +41,7 @@ import com.CH_gui.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -49,7 +49,7 @@ import com.CH_gui.gui.*;
  *
  * <b>$Revision: 1.2 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ChangePasswordDialog extends GeneralDialog {
 
@@ -131,37 +131,37 @@ public class ChangePasswordDialog extends GeneralDialog {
       warningLabel.setVerticalTextPosition(JLabel.TOP);
       warningLabel.setBorder(new EtchedBorder());
       warningLabel.setPreferredSize(new Dimension(410, 40));
-      panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+      panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 1, 1), 20, 20));
       posY ++;
     }
 
-    panel.add(LoginFrame.getPasswordHint(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(LoginFrame.getPasswordHint(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 10, 1), 20, 20));
     posY ++;
 
     if (!isSetMode) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Old_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Old_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+      panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jNewPass, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jNewPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jRePass, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jRePass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     // filler
-    panel.add(new JPanel(), new GridBagConstraints(1, posY, 1, 1, 10, 10, 
+    panel.add(new JPanel(), new GridBagConstraints(1, posY, 1, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
 
     return panel;
@@ -242,15 +242,13 @@ public class ChangePasswordDialog extends GeneralDialog {
     return UserRecord.getBAEncodedPassword(jPass.getPassword(), cache.getUserRecord().handle);
   }
 
-  private class OKThread extends Thread {
+  private class OKThread extends ThreadTraced {
 
     public OKThread() {
       super("ChangePasswordDialog OKThread");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
-
+    public void runTraced() {
       setEnabledInputs(false);
       boolean error = false;
 
@@ -300,10 +298,6 @@ public class ChangePasswordDialog extends GeneralDialog {
         // if error occurred than enable inputs
         setEnabledInputs(true);
       }
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(OKThread.class);
-      if (trace != null) trace.clear();
     }
   }
 

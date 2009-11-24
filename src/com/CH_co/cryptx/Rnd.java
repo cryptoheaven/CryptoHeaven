@@ -9,11 +9,12 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Development Team.
  */
- 
+
 package com.CH_co.cryptx;
 
 import java.security.SecureRandom;
-import com.CH_co.trace.Trace;
+
+import com.CH_co.trace.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -21,7 +22,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -29,40 +30,29 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.14 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Rnd extends Object {
 
   static {
     // initialize a secure random generator
-    Thread t = new Thread("Rnd") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
-
-        if (trace != null) trace.data(10, "auto seeding random generator ...");
+    Thread th = new ThreadTraced("Rnd Seeder") {
+      public void runTraced() {
         getSecureRandom().nextInt();  // call for next will seed the generator (this can take a while)
-        if (trace != null) trace.data(11, "auto seeding random generator ... done.");
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
-    t.setPriority(Thread.MIN_PRIORITY);
-    t.setDaemon(true);
-    t.start();
+    th.setPriority(Thread.MIN_PRIORITY);
+    th.setDaemon(true);
+    th.start();
   }
-  
+
   /** Creates new Rnd */
   public Rnd() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Rnd.class, "Rnd()");
     if (trace != null) trace.exit(Rnd.class);
   }
- 
-  
+
+
   /**
    * @return a Random generator.
    */
@@ -73,7 +63,7 @@ public class Rnd extends Object {
     if (random == null) {
       random = new SecureRandom();
     }
-    
+
     if (trace != null) trace.exit(Rnd.class);
     return random;
   }

@@ -13,7 +13,7 @@
 package com.CH_gui.tree;
 
 import com.CH_co.gui.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.tree.*;
 import com.CH_co.util.*;
 
@@ -56,7 +56,7 @@ import javax.swing.tree.TreePath;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -64,7 +64,7 @@ import javax.swing.tree.TreePath;
  *
  * <b>$Revision: 1.35 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderActionTree extends FolderTree implements ActionProducerI, DisposableObj {
 
@@ -91,7 +91,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private ServerInterfaceLayer SIL;
 
   // For listening on folder updates so we can act when new stuff comes.
-  private FolderListener folderListener; 
+  private FolderListener folderListener;
   // Keep history of update counts per folders to see in appropriate act on updates.
   private Hashtable folderUpdateHistoryHT;
 
@@ -120,8 +120,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     this.setInvokesStopCellEditing(true);
 //    this.setShowsRootHandles(false);
 
-    /** If right mouse button is clicked then the node is being selected 
-      * and the popup window shown 
+    /** If right mouse button is clicked then the node is being selected
+      * and the popup window shown
       */
     addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent mouseEvent) {
@@ -186,7 +186,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     });
 
     // Register folder listener to act on folder updates (expand branches where new items become available).
-    this.folderListener = new FolderListener(); 
+    this.folderListener = new FolderListener();
     FetchedDataCache.getSingleInstance().addFolderRecordListener(folderListener);
 
     if (trace != null) trace.exit(FolderActionTree.class);
@@ -233,14 +233,14 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
 
 
   // =====================================================================
-  // LISTENERS FOR THE MENU ITEMS        
+  // LISTENERS FOR THE MENU ITEMS
   // =====================================================================
 
   /** Display a dialog so the user can enter new folder's info and
     * selectect which folder of the tree will be the parent.
-    * Submit Create New Folder request 
+    * Submit Create New Folder request
     */
-  private class NewFolderAction extends AbstractAction {
+  private class NewFolderAction extends AbstractActionTraced {
     public NewFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Folder_..."), Images.get(ImageNums.FOLDER_NEW16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -249,9 +249,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Folder"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(NewFolderAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
         short newFolderType = 0;
         boolean isChatAction = false;
@@ -280,11 +278,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         }
         if (!isChatAction) {
           Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
-          if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null); 
-          else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null); 
+          if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
+          else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
         }
       }
-      if (trace != null) trace.exit(NewFolderAction.class);
     }
     private void updateIconAndText(FolderPair[] selectedFolderPairs) {
       if (selectedFolderPairs != null && selectedFolderPairs.length == 1) {
@@ -315,7 +312,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /** Display a dialog so the user can choose to which folder the move should be done.
     * Submit Move Folder request
     */
-  private class MoveFolderAction extends AbstractAction {
+  private class MoveFolderAction extends AbstractActionTraced {
     public MoveFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Move_Folder_..."), Images.get(ImageNums.FOLDER_MOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -323,22 +320,19 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_MOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Move"));
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MoveFolderAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
       FolderTreeModelCl treeModel = (FolderTreeModelCl) FolderActionTree.this.getFolderTreeModel().createFilteredModel(FolderFilter.MOVE_FOLDER, new FolderTreeModelCl());
-      if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, SIL.getFetchedDataCache(), null); 
-      else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, SIL.getFetchedDataCache(), null); 
-      if (trace != null) trace.exit(MoveFolderAction.class);
+      if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, SIL.getFetchedDataCache(), null);
+      else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, SIL.getFetchedDataCache(), null);
     }
   }
 
   /**
-   * Submit a Delete Folder request 
+   * Submit a Delete Folder request
    * Note: that this only works for single-selection of the nodes in the tree
   */
-  private class DeleteFolderAction extends AbstractAction {
+  private class DeleteFolderAction extends AbstractActionTraced {
     public DeleteFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Folder_..."), Images.get(ImageNums.FOLDER_DELETE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -347,7 +341,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TreePath[] selectedPaths = getSelectionPaths();
       FolderPair[] folderPairs = getLastPathComponentFolderPairs(selectedPaths);
 
@@ -398,10 +392,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
   } // end private class DeleteFolderAction
 
-  /** 
-   * Upload a file/directory to the table using UploadUtilities to do all the work 
+  /**
+   * Upload a file/directory to the table using UploadUtilities to do all the work
    */
-  private class UploadAction extends AbstractAction {
+  private class UploadAction extends AbstractActionTraced {
     public UploadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Upload_To_Folder_..."), Images.get(ImageNums.EXPORT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -409,7 +403,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.EXPORT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Upload"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
         Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
         TreePath[] selectedPaths = getSelectionPaths();
@@ -430,10 +424,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
   }
 
-  /** 
-   * Download a file/directory to the local system using DownloadUtilities to do all the work 
+  /**
+   * Download a file/directory to the local system using DownloadUtilities to do all the work
    */
-  private class DownloadFolderAction extends AbstractAction {
+  private class DownloadFolderAction extends AbstractActionTraced {
     public DownloadFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Download_Folder_..."), Images.get(ImageNums.IMPORT_FOLDER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -442,7 +436,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download_Folder"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TreePath[] selectedPaths = getSelectionPaths();
 
       FolderTreeNode[] selectedNodes = getLastPathComponentNodes(selectedPaths);
@@ -480,19 +474,19 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
   }
 
-  /** 
+  /**
    * Rename the folder, show a dialog to enter a new name and use FolderUtilities to do
    * the rest of the work
    */
   /*
-  private class RenameFolderAction extends AbstractAction {
+  private class RenameFolderAction extends AbstractActionTraced {
     public RenameFolderAction(int actionId) {
       super("Rename Folder...");
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Rename Folder");
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_UPLOAD));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FolderPair folderPair = getLastSelectedPair();
       if (folderPair == null) return;
 
@@ -512,11 +506,11 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   }
 */
 
-  /** 
+  /**
    * Rename the folder, show a dialog to enter a new name and use FolderUtilities to do
    * the rest of the work
    */
-  private class PropertiesAction extends AbstractAction {
+  private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Folder_Properties_and_Sharing"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -524,14 +518,14 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_UPLOAD));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FolderPair folderPair = getLastSelectedPair();
-      if (folderPair == null || 
-              (folderPair.getFolderRecord() != null && 
+      if (folderPair == null ||
+              (folderPair.getFolderRecord() != null &&
                 (folderPair.getFolderRecord().folderType.shortValue() == FolderRecord.LOCAL_FILES_FOLDER ||
                  folderPair.getFolderRecord().isCategoryType())
               )
-         ) 
+         )
       {
         return;
       }
@@ -558,7 +552,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Refresh Folder List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Folders"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -566,7 +560,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new FolderTreeRefreshRunner(FolderActionTree.this).start();
     }
   }
@@ -574,7 +568,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Open in seperate window
    */
-  private class OpenInSeperateWindowAction extends AbstractAction {
+  private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Folder_View"), Images.get(ImageNums.CLONE_FOLDER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -582,7 +576,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FOLDER24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new FolderTreeFrame(FolderActionTree.this.getFolderTreeModel().getFilter());
     }
   }
@@ -590,7 +584,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Explore selected folders
    */
-  private class ExploreFolderAction extends AbstractAction {
+  private class ExploreFolderAction extends AbstractActionTraced {
     public ExploreFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Explore_Folder"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -599,7 +593,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Explore"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TreePath[] selectedPaths = getSelectionPaths();
       FolderPair[] folderPairs = getLastPathComponentFolderPairs(selectedPaths);
       for (int i=0; i<folderPairs.length; i++) {
@@ -608,7 +602,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           short folderType = fPair.getFolderRecord().folderType.shortValue();
           if (folderType == FolderRecord.FILE_FOLDER) {
             new FileTableFrame(fPair);
-          } else if (folderType == FolderRecord.MESSAGE_FOLDER) { 
+          } else if (folderType == FolderRecord.MESSAGE_FOLDER) {
             new MsgTableFrame(fPair);
           } else if (folderType == FolderRecord.POSTING_FOLDER) {
             new PostTableFrame(fPair);
@@ -679,10 +673,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   }
 
 
-  /** 
+  /**
    * Create a new message to a folder
    */
-  private class NewMsgAction extends AbstractAction {
+  private class NewMsgAction extends AbstractActionTraced {
     public NewMsgAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_to_Folder"), Images.get(ImageNums.MAIL_COMPOSE_TO_FOLDER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -690,7 +684,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_FOLDER24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Post"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
         FolderPair pair = getLastSelectedPair();
         if (pair != null) {
@@ -729,14 +723,14 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Open history stat dialog for selected object.
    */
-  private class TracePrivilegeAndHistoryAction extends AbstractAction {
+  private class TracePrivilegeAndHistoryAction extends AbstractActionTraced {
     public TracePrivilegeAndHistoryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Trace_Folder_Access"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Trace_Folder_Access"));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TreePath[] selectedPaths = getSelectionPaths();
       FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
       if (selected != null && selected.length >= 1) {
@@ -763,14 +757,14 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Transfer folder ownership.
    */
-  private class TransferOwnershipAction extends AbstractAction {
+  private class TransferOwnershipAction extends AbstractActionTraced {
     public TransferOwnershipAction(int actionId) {
       super("Transfer Folder Ownership");
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Transfer Folder Ownership");
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
         TreePath[] selectedPaths = getSelectionPaths();
         FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
@@ -804,13 +798,13 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
             JPanel panel = new JPanel();
             panel.setLayout(new GridBagLayout());
             int posY = 0;
-            panel.add(new JMyLabel("Transfer Ownership to:"), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+            panel.add(new JMyLabel("Transfer Ownership to:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
                   GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
             posY ++;
-            panel.add(jYourself, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+            panel.add(jYourself, new GridBagConstraints(0, posY, 1, 1, 0, 0,
                   GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
             posY ++;
-            panel.add(jOther, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+            panel.add(jOther, new GridBagConstraints(0, posY, 1, 1, 0, 0,
                   GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
             posY ++;
 
@@ -895,7 +889,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
               }
               if (runTransfer) {
                 Long[] folderIDs = RecordUtils.getIDs(selected);
-                // See if we need to fetch any shares so that we can start determining which ones we need to create 
+                // See if we need to fetch any shares so that we can start determining which ones we need to create
                 Vector shareIDsV = new Vector();
                 for (int i=0; i<selected.length; i++) {
                   FolderRecord fRec = selected[i].getFolderRecord();
@@ -978,7 +972,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Show selected Folder's sharing panel so user can add/invite others.
    */
-  private class InviteAction extends AbstractAction {
+  private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -989,7 +983,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.IN_POPUP, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       actionPerformed_Invite(event);
     }
     private void updateText(FolderPair[] selectedFolderPairs) {
@@ -1000,7 +994,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Show selected Folder's sharing panel so user can add/invite others.
    */
-  private class InvitePopupAction extends AbstractAction {
+  private class InvitePopupAction extends AbstractActionTraced {
     public InvitePopupAction (int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1011,7 +1005,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.IN_POPUP, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       actionPerformed_Invite(event);
     }
     private void updateText(FolderPair[] selectedFolderPairs) {
@@ -1023,8 +1017,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
     TreePath[] selectedPaths = getSelectionPaths();
     FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
-    if (selected == null || selected.length != 1 || 
-          (selected[0].getFolderRecord() != null && 
+    if (selected == null || selected.length != 1 ||
+          (selected[0].getFolderRecord() != null &&
             (selected[0].getFolderRecord().folderType.shortValue() == FolderRecord.LOCAL_FILES_FOLDER ||
              selected[0].getFolderRecord().isCategoryType())
           )
@@ -1076,7 +1070,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Empty Recycle Bin Action
    */
-  private class EmptyFolderAction extends AbstractAction {
+  private class EmptyFolderAction extends AbstractActionTraced {
     public EmptyFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Empty_Folder_..."), Images.get(ImageNums.FLD_RECYCLE_CLEAR16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1085,7 +1079,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.IN_POPUP_SHOW_DEACTIVATED, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = getActionFolderPair();
       if (fPair != null) {
         doEmptyAction(fPair, fPair.getFolderRecord().folderType.shortValue() == FolderRecord.RECYCLE_FOLDER, true, FolderActionTree.this);
@@ -1112,8 +1106,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       if (fPair != null) {
         UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
         boolean isRecycleFld = uRec != null && uRec.recycleFolderId.equals(fPair.getId());
-        putValue(Actions.NAME, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_Empty_FOLDER_NAME_Folder_..."), new Object[] { fPair.getMyName()})); 
-        putValue(Actions.TOOL_TIP, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_Empty_FOLDER_NAME_Folder_..."), new Object[] { fPair.getMyName()})); 
+        putValue(Actions.NAME, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_Empty_FOLDER_NAME_Folder_..."), new Object[] { fPair.getMyName()}));
+        putValue(Actions.TOOL_TIP, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_Empty_FOLDER_NAME_Folder_..."), new Object[] { fPair.getMyName()}));
         if (isRecycleFld)
           putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_RECYCLE_CLEAR16));
         else
@@ -1179,8 +1173,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     boolean isDescendantOk = true;
 
     Move_NewFld_Dialog d = null;
-    if (parent instanceof Frame) d = new Move_NewFld_Dialog((Frame) parent, allFolderPairs, null, null, title, isDescendantOk, cache, filter); 
-    else if (parent instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) parent, allFolderPairs, null, null, title, isDescendantOk, cache, filter); 
+    if (parent instanceof Frame) d = new Move_NewFld_Dialog((Frame) parent, allFolderPairs, null, null, title, isDescendantOk, cache, filter);
+    else if (parent instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) parent, allFolderPairs, null, null, title, isDescendantOk, cache, filter);
 
     if (d != null) {
       chosenPair = d.getChosenDestination();
@@ -1193,7 +1187,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   /**
    * Delete Action private helper.
    */
-  public static class DeleteRunner extends Thread {
+  public static class DeleteRunner extends ThreadTraced {
     private Component parent;
     private FolderPair[] folderPairs;
     private boolean includeSubTree;
@@ -1208,8 +1202,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       setDaemon(true);
       if (trace != null) trace.exit(DeleteRunner.class);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DeleteRunner.class, "run()");
+    public void runTraced() {
       // Gather the entire sub-tree of folders
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       UserRecord userRecord = cache.getUserRecord();
@@ -1220,7 +1213,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       } else {
         folderTree = folderPairs;
       }
-      // Create a deapth-first logical order for the sub-tree 
+      // Create a deapth-first logical order for the sub-tree
       FolderTreeModelCl folderTreeModel = new FolderTreeModelCl();
       folderTreeModel.addNodes(folderTree);
       FolderTreeNode rootNode = folderTreeModel.getRootNode();
@@ -1234,11 +1227,11 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           // Check that this folder is still available.
           // It might have dissapeared when server reply came back from previous deletion in the batch.
           Long folderId = fPair.getFolderRecord().getId();
-          if (cache.getFolderRecord(folderId) != null && 
+          if (cache.getFolderRecord(folderId) != null &&
               (folderTreeModel == null || folderTreeModel.findNode(folderId, true) != null))
           {
             boolean canDelete = true;
-            if (userRecord.isBusinessSubAccount() && 
+            if (userRecord.isBusinessSubAccount() &&
                 fPair.getFolderRecord().ownerUserId.equals(userRecord.masterId) &&
                 !Misc.isBitSet(userRecord.flags, UserRecord.FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE))
             {
@@ -1260,22 +1253,19 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         StringBuffer sb = new StringBuffer();
         sb.append("Could not delete the following protected folders because they are assigned to you by your administrator.  To change this setting please contact your administrator.\n\n");
         for (int i=0; i<protectedMasterFoldersV.size(); i++) {
-          if (i>0) 
+          if (i>0)
             sb.append(", \n");
           sb.append("   ");
           sb.append(ListRenderer.getRenderedText(protectedMasterFoldersV.elementAt(i), false, true, false));
         }
         MessageDialog.showWarningDialog(parent, sb.toString(), "Could not delete protected folders...", false);
       }
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(DeleteRunner.class);
-      if (trace != null) trace.clear();
     }
   } // end private class DeleteRunner
 
 
   /****************************************************************************/
-  /*        A c t i o n P r o d u c e r I                                  
+  /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
 
   /** @return all the acitons that this objects produces.
@@ -1469,10 +1459,12 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class FolderGUIUpdater implements Runnable {
     private FolderRecordEvent event;
     public FolderGUIUpdater(FolderRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater(FolderRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(FolderGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater.run()");
       FolderRecord[] folderRecords = null;
       folderRecords = event.getFolderRecords();
       if (folderRecords != null) {

@@ -25,7 +25,7 @@ import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -33,7 +33,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -41,9 +41,9 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.19 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class ChatSessionCreator extends Thread {
+public class ChatSessionCreator extends ThreadTraced {
 
   private MemberContactRecordI[] chatWithContacts;
 
@@ -61,9 +61,7 @@ public class ChatSessionCreator extends Thread {
   }
 
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatSessionCreator.class, "run()");
-
+  public void runTraced() {
     // Look for a folder that is shared exclusively with this one contact.
     FolderRecord[] chatFlds = FetchedDataCache.getSingleInstance().getFolderRecordsChatting();
     FolderPair chatFolderPair = FolderOps.getChatFolderPairFromCache(chatWithContacts, chatFlds);
@@ -78,10 +76,6 @@ public class ChatSessionCreator extends Thread {
       if (chatFolderPair != null)
         new ChatTableFrame(chatFolderPair);
     }
-
-    if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-    if (trace != null) trace.exit(ChatSessionCreator.class);
-    if (trace != null) trace.clear();
   } // end run()
 
 
@@ -154,11 +148,11 @@ public class ChatSessionCreator extends Thread {
         null,
         null,
         FolderRecord.CHATTING_FOLDER, // Chatting folder since July 2006
-        myFolderName, folderDesc, shareFolderName, folderDesc, 
-        new Short(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_NUM), 
+        myFolderName, folderDesc, shareFolderName, folderDesc,
+        new Short(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_NUM),
         new Integer(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_SECONDS),
         baSymmetricKey,
-        false, 
+        false,
         additionalShares,
         SIL
         );

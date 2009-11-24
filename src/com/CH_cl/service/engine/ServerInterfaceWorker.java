@@ -24,7 +24,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_cl.service.actions.*;
@@ -286,7 +286,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   //==========================================================================
   //==========================================================================
 
-  private class ReaderThread extends Thread {
+  private class ReaderThread extends ThreadTraced {
     private ReaderThread(String threadName) {
       super(threadName);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReaderThread.class, "ReaderThread(String threadName)");
@@ -295,8 +295,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       if (trace != null) trace.exit(ReaderThread.class, this);
     }
 
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReaderThread.class, "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReaderThread.class, "ReaderThread.runTraced()");
 
       boolean cleanBreak = false;
       ClientMessageAction msgAction = null;
@@ -441,9 +441,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         readerDoneMonitor.notify();
       }
 
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(ReaderThread.class);
-      if (trace != null) trace.clear();
     } // end run
 
 
@@ -541,7 +539,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   //==========================================================================
   //==========================================================================
 
-  private class WriterThread extends Thread {
+  private class WriterThread extends ThreadTraced {
 
     private WriterThread(String threadName) {
       super(threadName);
@@ -581,8 +579,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     }
 
 
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WriterThread.class, "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WriterThread.class, "WriterThread.runTraced()");
 
       boolean cleanLogout = false;
       MessageAction msgAction = loginMsgAction;
@@ -798,9 +796,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         }
       }
 
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(WriterThread.class);
-      if (trace != null) trace.clear();
     } // end run;
 
 

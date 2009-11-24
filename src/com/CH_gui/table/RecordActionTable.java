@@ -288,7 +288,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   }
 
 
-  public class IterateNextAction extends AbstractAction {
+  public class IterateNextAction extends AbstractActionTraced {
     public IterateNextAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Next"), Images.get(ImageNums.GO_NEXT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -298,7 +298,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       pressedNext();
     }
   }
@@ -309,7 +309,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   }
 
 
-  public class IteratePrevAction extends AbstractAction {
+  public class IteratePrevAction extends AbstractActionTraced {
     public IteratePrevAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Previous"), Images.get(ImageNums.GO_PREV16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -319,7 +319,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       pressedPrev();
     }
   }
@@ -333,7 +333,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   /**
    * Toggle the split layout between horizontal and vertical.
    */
-  public class SplitLayoutAction extends AbstractAction {
+  public class SplitLayoutAction extends AbstractActionTraced {
     private boolean initialized = false;
     private int switchPercentageMin;
     private int switchPercentageMax;
@@ -346,7 +346,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.TOOL_TIP, "Split Left-Right");
       init();
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       toggleLayout();
       updateColumns();
       updateTextAndIcon();
@@ -429,7 +429,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   /**
    * Toggle Filter.
    */
-  public static class FilterAction extends AbstractAction {
+  public static class FilterAction extends AbstractActionTraced {
     public FilterAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Search"), Images.get(ImageNums.FIND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -438,12 +438,12 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Search"));
       putValue(Actions.STATE_CHECK, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
     }
   }
 
 
-  public class SortAscDescAction extends AbstractAction {
+  public class SortAscDescAction extends AbstractActionTraced {
     boolean isAscending;
     public SortAscDescAction(boolean isAscending, int actionId) {
       this(isAscending, actionId, sharedAscDescButtonGroup);
@@ -460,7 +460,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       getTableModel().setSortDirButtonGroup(group);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent actionEvent) {
       JSortedTable jst = getJSortedTable();
       TableSorter ts = (TableSorter) jst.getModel();
       int column = ts.getPrimarySortingColumn();
@@ -475,7 +475,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   } // end class SortAscDescAction
 
 
-  public class SortByColumnAction extends AbstractAction {
+  public class SortByColumnAction extends AbstractActionTraced {
     int columnIndex;
     public SortByColumnAction(int columnIndex, int actionId) {
       this(columnIndex, actionId, sharedSortColumnButtonGroup);
@@ -495,7 +495,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       getTableModel().setSortButtonGroup(group);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent actionEvent) {
       JSortedTable jst = getJSortedTable();
       TableSorter ts = (TableSorter) jst.getModel();
       ts.sortByColumn(columnIndex);
@@ -507,7 +507,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   } // end class SortByColumnAction
 
 
-  public class CustomizeColumnsAction extends AbstractAction {
+  public class CustomizeColumnsAction extends AbstractActionTraced {
     public CustomizeColumnsAction(int actionId) {
       this(actionId, com.CH_gui.lang.Lang.rb.getString("action_Table_Columns_..."));
     }
@@ -517,7 +517,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_columns_to_render_in_the_table."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent actionEvent) {
       CustomizeColumnsDialog d = null;
       RecordTableModel tableModel = getTableModel();
       ColumnHeaderData data = tableModel.getColumnHeaderData();
@@ -575,10 +575,12 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   private class FolderGUIUpdater implements Runnable {
     private FolderRecordEvent event;
     public FolderGUIUpdater(FolderRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater(FolderRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(FolderGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater.run()");
       FolderRecord[] folderRecords = null;
       folderRecords = event.getFolderRecords();
       if (folderRecords != null) {
@@ -622,10 +624,12 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   private class ContactGUIUpdater implements Runnable {
     private ContactRecordEvent event;
     public ContactGUIUpdater(ContactRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater(ContactRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(ContactGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater.run()");
       // When user goes offline and we are chatting with him, popup an information dialog.
       FolderPair parentPair = RecordActionTable.this.getTableModel().getParentFolderPair();
       FolderRecord parentFolder = parentPair != null ? parentPair.getFolderRecord() : null;

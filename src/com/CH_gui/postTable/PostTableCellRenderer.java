@@ -43,8 +43,7 @@ import com.CH_gui.table.*;
  */
 public class PostTableCellRenderer extends MsgTableCellRenderer {
 
-  private HTML_ClickablePane jTextAreaRenderer = new HTML_ClickablePane("", new HTML_EditorKit()); // our own image icon view to prevent dancing icons
-  //private HTML_ClickablePane jTextAreaRenderer = new HTML_ClickablePane("", null);
+  private HTML_ClickablePane jTextAreaRenderer = null;
 
   //private static Color postingAltColor = new Color(230, 242, 255);
   //private static Color postingAltColorSelected = new Color(184, 194, 204);
@@ -73,7 +72,22 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
 
   public PostTableCellRenderer() {
     super();
-    jTextAreaRenderer.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
+  }
+
+  private JTextComponent getHTMLRenderer(Component rendererContainer) {
+    if (jTextAreaRenderer == null) {
+      jTextAreaRenderer = makeHTMLRenderer(null);
+    }
+    jTextAreaRenderer.setRendererContainer(rendererContainer);
+    return jTextAreaRenderer;
+  }
+
+  private HTML_ClickablePane makeHTMLRenderer(Component rendererContainer) {
+    // our own image icon view to prevent dancing icons
+    HTML_ClickablePane htmlPane = new HTML_ClickablePane("", new HTML_EditorKit());
+    htmlPane.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
+    htmlPane.setRendererContainer(rendererContainer);
+    return htmlPane;
   }
 
   private static Color makeBkColor(Object sourceContents) {
@@ -116,8 +130,6 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
     Object v = value instanceof StringBuffer ? "" : value;
     Component renderer = super.getTableCellRendererComponent(table, v, isSelected, hasFocus, row, column);
-    jTextAreaRenderer.setRendererContainer(table);
-
 
     // Determine color of the message, white or none-white?
     {
@@ -168,9 +180,6 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
     if (rawColumn == 5) {
       StringBuffer sb = null;
 
-      // HTML_ClickablePane somehow fixes the sizing adjustement bug
-      JTextComponent editor = jTextAreaRenderer;
-
       // Get the right indent level.
       int indentLevel = 0;
       JSortedTable sTable = (JSortedTable) table;
@@ -200,11 +209,15 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       // in case indent is too deep, make this at least 1 pixel wide
       usableColumnWidth = Math.max(usableColumnWidth, 1);
 
+      // HTML_ClickablePane somehow fixes the sizing adjustement bug
+      // Don't recycle renderers that deal with IMAGE views, our HTML_ImageView doesn't get cleaned-up properly.
+      JTextComponent editor = sb != null && (sb.indexOf("img src=") >= 0 || sb.indexOf("IMG SRC=") >= 0) ? makeHTMLRenderer(table) : getHTMLRenderer(table);
+
       // Convert indent level to border -- leave indent to the outer pannel which will include arrow too
       editor.setBorder(RecordTableCellRenderer.getIndentedBorder(0, false));
 
       // Set contents of the message area
-      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true);
+      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true, true);
       //xx-xx editor.setText(value.toString());
 
 //      editor.setPreferredWidthLimit(usableColumnWidth);

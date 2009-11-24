@@ -21,6 +21,7 @@ import com.CH_cl.service.cache.event.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.MessageDialog;
 import com.CH_gui.frame.MainFrame;
 
@@ -203,9 +204,12 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
   private static class UserSettingsUpdater implements Runnable {
     private UserSettingsRecordEvent e;
     public UserSettingsUpdater(UserSettingsRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSettingsUpdater.class, "UserSettingsUpdater(UserSettingsRecordEvent event)");
       this.e = event;
+      if (trace != null) trace.exit(UserSettingsUpdater.class);
     }
     public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSettingsUpdater.class, "UserSettingsUpdater.run()");
       if (e.getEventType() == RecordEvent.SET) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         UserSettingsRecord userSettingsRecord = cache.getMyUserSettingsRecord();
@@ -217,6 +221,7 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
           eventQueue.setDelayToRemainder();
         }
       }
+      if (trace != null) trace.exit(UserSettingsUpdater.class);
     }
   }
 

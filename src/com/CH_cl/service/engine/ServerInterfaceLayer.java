@@ -17,7 +17,7 @@ import java.net.Socket;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.monitor.*;
 import com.CH_co.queue.*;
 import com.CH_co.util.*;
@@ -382,9 +382,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.args(timeout);
     if (trace != null) trace.args(afterJob, timeoutJob);
 
-    Thread th = new Thread("Job-Submitter-and-After-Job-Runner") {
-      public void run() {
-        Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Job-Submitter-and-After-Job-Runner") {
+      public void runTraced() {
+        Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "submitAndReturn.runTraced()");
         try {
           boolean noTimeout = submitAndWait(msgAction, timeout, replyReceivedJob);
           if (noTimeout) {
@@ -398,9 +398,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           if (trace != null) trace.data(100, "Exception while running action", msgAction);
           if (trace != null) trace.exception(getClass(), 101, t);
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       } // end run()
     }; // end Thread
     th.setDaemon(true);
@@ -444,19 +442,23 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           Timer timer = new Timer(true);
           timer.schedule(new TimerTask() {
             public void run() {
-              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "ensureEnoughAllWorkersExist.TimerTask.run()");
               if (trace != null) trace.data(10, "SIL: RETRY WOKE UP");
-              if (destroyed) {
-                if (trace != null) trace.data(11, "While sleeping, we got destroyed, so we will not try to create a worker!");
-              }
-              else {
-                if (trace != null) trace.data(12, "... we will now retry establishing workers.");
-                try {
-                  if (trace != null) trace.data(13, "SIL: RETRYING...");
-                  ensureEnoughAllWorkersExist();
-                } catch (Throwable t) {
-                  if (trace != null) trace.exception(getClass(), 100, t);
+              try {
+                if (destroyed) {
+                  if (trace != null) trace.data(11, "While sleeping, we got destroyed, so we will not try to create a worker!");
                 }
+                else {
+                  if (trace != null) trace.data(12, "... we will now retry establishing workers.");
+                  try {
+                    if (trace != null) trace.data(13, "SIL: RETRYING...");
+                    ensureEnoughAllWorkersExist();
+                  } catch (Throwable t) {
+                    if (trace != null) trace.exception(getClass(), 100, t);
+                  }
+                }
+              } catch (Throwable t) {
+                if (trace != null) trace.exception(getClass(), 100, t);
               }
               if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
               if (trace != null) trace.exit(getClass());
@@ -650,13 +652,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         // Don't start a new DefaultReplyRunner thread here (because it recursively used ServerInterfaceLayer)
         // Just execute the action synchronously (in a MIN PRIORIY THREAD) while the user waits.
         final MessageAction[] returnBufferMsgAction = new MessageAction[1];
-        Thread th = new Thread("Reply Runner") {
-          public void run() {
-            Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Thread th = new ThreadTraced("Reply Runner") {
+          public void runTraced() {
             returnBufferMsgAction[0] = DefaultReplyRunner.runAction(replyMsg);
-            if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-            if (trace != null) trace.exit(getClass());
-            if (trace != null) trace.clear();
           }
         };
         th.setDaemon(true);
@@ -798,22 +796,18 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    */
   public void ensureAtLeastOneAdditionalWorker_SpawnThread() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ensureAtLeastOneAdditionalWorker()");
-    Thread th = new Thread(new Runnable() {
-      public void run() {
-        Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+    Thread th = new ThreadTraced("Additional Worker Ensurer") {
+      public void runTraced() {
+        Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "ServerInterfaceLayer.ensureAtLeastOneAdditionalWorker_SpawnThread.runTraced()");
         synchronized (workers) {
           int countAllWorkers = workers.size();
           if (trace != null) trace.data(10, "countAllWorkers", countAllWorkers);
           if (countAllWorkers < 2 && countAllWorkers < getMaxConnectionCount())
             createWorkers(1);
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
-    }, "Additional Worker Ensurer");
+    };
     th.setDaemon(true);
     th.start();
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
@@ -930,7 +924,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               // Clear other sockets that might have been created too
               // remove socket that we are using so it doesn't get cleaned up here
               socketBuffers[joinedIndexFirst][0] = null;
-              Thread cleanupOtherSockets = new Thread() {
+              Thread cleanupOtherSockets = new Thread("Cleanup Other Sockets") {
                 public void run() {
                   // join with all socket creating threads...
                   for (int i=0; i<ths.length; i++) {
@@ -943,7 +937,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               };
               cleanupOtherSockets.setDaemon(true);
               cleanupOtherSockets.start();
-
 
               if (socket != null) {
                 if (lastLoginMessageAction != null) {
@@ -1061,20 +1054,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @return the creating thread and worker is returned in the provided buffer.
    */
   private Thread createSocket_Threaded(final String hostName, final int portNumber, final Socket[] socketBuffer, final Throwable[] errorBuffer) {
-    Thread th = new Thread(new Runnable() {
-      public void run() {
-        Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Socket Creator") {
+      public void runTraced() {
         try {
           Socket socket = createSocket(hostName, portNumber);
           socketBuffer[0] = socket;
         } catch (Throwable t) {
           errorBuffer[0] = t;
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
-    }, "Socket Creator");
+    };
     th.setDaemon(true);
     th.start();
     return th;
@@ -1097,9 +1086,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       final Exception[] exceptionBuffer = new Exception[1];
 
       // try establishing a new connection in a seperate thread... so it doesn't block too long...
-      Thread socketConnector = new Thread(new Runnable() {
-        public void run() {
-          Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Thread socketConnector = new ThreadTraced("Socket Connector") {
+        public void runTraced() {
+          Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "createSocket.socketConnector.runTraced()");
           if (trace != null) trace.data(10, "hostName", hostName);
           if (trace != null) trace.data(11, "portNumber", portNumber);
           if (trace != null) trace.data(12, "penalizedSocketType", penalizedSocketType);
@@ -1141,11 +1130,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             exceptionBuffer[0] = e3;
           } catch (Throwable t) {
           }
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
           if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
-      }, "Socket Connector");
+      };
       socketConnector.setDaemon(true);
       socketConnector.start();
 
@@ -1689,7 +1676,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
 
-  private class WaitingJobsScanner extends Thread {
+  private class WaitingJobsScanner extends ThreadTraced {
     private Object lastScanHeadJob = null;
     private boolean triggeredMonitor = false;
     private final Object triggerMonitor = new Object();
@@ -1697,8 +1684,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       super("Waiting Jobs Scanner");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "WaitingJobsScanner.runTraced()");
 
       int delay = 5000;
       while (!destroyed) {
@@ -1777,9 +1764,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         }
       } // end while
 
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(getClass());
-      if (trace != null) trace.clear();
     }
     private void triggerCheckToServeNow() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "triggerCheckToServeNow()");

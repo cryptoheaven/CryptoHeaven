@@ -26,7 +26,7 @@ import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
@@ -93,105 +93,97 @@ public class OpenSaveCancelDialog extends GeneralDialog {
     final FileLinkRecord _fileLink = fileLink;
     final MsgLinkRecord _parentMsgLink = parentMsg;
 
-    Thread th = new Thread("File-From Updater") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-        try {
-          boolean isFromSet = false;
-          boolean isSignerSet = false;
-          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-          FetchedDataCache cache = SIL.getFetchedDataCache();
-          MsgDataRecord parentMsgData = null;
-          Record emailSender = null;
-          Record msgOriginator = null;
-          Record fileOriginator = null;
-          if (_fileLink.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
-            parentMsgData = cache.getMsgDataRecord(_fileLink.ownerObjId);
-          }
-          String fromEmailAddress = null;
-          if (parentMsgData != null)
-            fromEmailAddress = parentMsgData.getFromEmailAddress();
-          if (parentMsgData != null && (parentMsgData.isEmail() || fromEmailAddress != null)) {
-            // email delivered from outside
-            emailSender = CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress);
-            jFromText.setText(ListRenderer.getRenderedText(emailSender, false, false, true));
-            jFromText.setIcon(ListRenderer.getRenderedIcon(emailSender));
-            jOriginalSignerText.setText("Mail Server");
-            isFromSet = true;
-            isSignerSet = true;
-          } else {
-            // internal Mail message or File from folder
-            if (parentMsgData != null) {
-              Long senderUserId = parentMsgData.senderUserId;
-              msgOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
-              if (msgOriginator == null) {
-                SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(senderUserId)), 30000);
-                msgOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
-              }
-              jFromText.setText(ListRenderer.getRenderedText(msgOriginator));
-              jFromText.setIcon(ListRenderer.getRenderedIcon(msgOriginator));
-              isFromSet = true;
-            }
-            FileDataRecord fileData = cache.getFileDataRecord(_fileLink.fileId);
-            if (fileData == null) {
-              Obj_IDs_Co request = new Obj_IDs_Co();
-              if (_parentMsgLink != null) {
-                // request for attachment
-                request.IDs = new Long[3][];
-                if (_parentMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-                  FolderShareRecord[] parentShares = cache.getFolderShareRecordsMyRootsForMsgs(new MsgLinkRecord[] { _parentMsgLink }, true);
-                  request.IDs[1] = new Long[] { parentShares[0].shareId };
-                } else {
-                  // don't provide share id for nested attachments, server will check access using a longer way
-                  request.IDs[1] = new Long[0];
-                }
-                request.IDs[2] = new Long[] { _parentMsgLink.msgLinkId };
-              } else {
-                // request for file in folder
-                request.IDs = new Long[2][];
-                request.IDs[1] = new Long[] { cache.getFolderShareRecordMy(_fileLink.ownerObjId, true).shareId };
-              }
-              // always include file link Id
-              request.IDs[0] = new Long[] { _fileLink.fileLinkId };
-
-              MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES, request);
-              ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
-              MiscGui.suppressMsgDialogsGUI(true);
-              DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-              MiscGui.suppressMsgDialogsGUI(false);
-              fileData = cache.getFileDataRecord(_fileLink.fileId);
-            }
-            if (fileData != null) {
-              Long keyId = fileData.getSigningKeyId();
-              KeyRecord keyRec = cache.getKeyRecord(keyId);
-              if (keyRec == null) {
-                SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 30000);
-                keyRec = cache.getKeyRecord(keyId);
-              }
-              if (keyRec != null) {
-                fileOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
-                if (fileOriginator == null) {
-                  SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(keyRec.ownerUserId)), 30000);
-                  fileOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
-                }
-                jOriginalSignerText.setText(ListRenderer.getRenderedText(fileOriginator));
-                jOriginalSignerText.setIcon(ListRenderer.getRenderedIcon(fileOriginator));
-                isSignerSet = true;
-              }
-            }
-            if (!isFromSet) {
-              jFromText.setText("Unknown user!");
-            }
-            if (!isSignerSet) {
-              jOriginalSignerText.setText("Unknown user!");
-            }
-          }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
+    Thread th = new ThreadTraced("File-From Updater") {
+      public void runTraced() {
+        boolean isFromSet = false;
+        boolean isSignerSet = false;
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        FetchedDataCache cache = SIL.getFetchedDataCache();
+        MsgDataRecord parentMsgData = null;
+        Record emailSender = null;
+        Record msgOriginator = null;
+        Record fileOriginator = null;
+        if (_fileLink.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
+          parentMsgData = cache.getMsgDataRecord(_fileLink.ownerObjId);
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+        String fromEmailAddress = null;
+        if (parentMsgData != null)
+          fromEmailAddress = parentMsgData.getFromEmailAddress();
+        if (parentMsgData != null && (parentMsgData.isEmail() || fromEmailAddress != null)) {
+          // email delivered from outside
+          emailSender = CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress);
+          jFromText.setText(ListRenderer.getRenderedText(emailSender, false, false, true));
+          jFromText.setIcon(ListRenderer.getRenderedIcon(emailSender));
+          jOriginalSignerText.setText("Mail Server");
+          isFromSet = true;
+          isSignerSet = true;
+        } else {
+          // internal Mail message or File from folder
+          if (parentMsgData != null) {
+            Long senderUserId = parentMsgData.senderUserId;
+            msgOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
+            if (msgOriginator == null) {
+              SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(senderUserId)), 30000);
+              msgOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
+            }
+            jFromText.setText(ListRenderer.getRenderedText(msgOriginator));
+            jFromText.setIcon(ListRenderer.getRenderedIcon(msgOriginator));
+            isFromSet = true;
+          }
+          FileDataRecord fileData = cache.getFileDataRecord(_fileLink.fileId);
+          if (fileData == null) {
+            Obj_IDs_Co request = new Obj_IDs_Co();
+            if (_parentMsgLink != null) {
+              // request for attachment
+              request.IDs = new Long[3][];
+              if (_parentMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
+                FolderShareRecord[] parentShares = cache.getFolderShareRecordsMyRootsForMsgs(new MsgLinkRecord[] { _parentMsgLink }, true);
+                request.IDs[1] = new Long[] { parentShares[0].shareId };
+              } else {
+                // don't provide share id for nested attachments, server will check access using a longer way
+                request.IDs[1] = new Long[0];
+              }
+              request.IDs[2] = new Long[] { _parentMsgLink.msgLinkId };
+            } else {
+              // request for file in folder
+              request.IDs = new Long[2][];
+              request.IDs[1] = new Long[] { cache.getFolderShareRecordMy(_fileLink.ownerObjId, true).shareId };
+            }
+            // always include file link Id
+            request.IDs[0] = new Long[] { _fileLink.fileLinkId };
+
+            MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES, request);
+            ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
+            MiscGui.suppressMsgDialogsGUI(true);
+            DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
+            MiscGui.suppressMsgDialogsGUI(false);
+            fileData = cache.getFileDataRecord(_fileLink.fileId);
+          }
+          if (fileData != null) {
+            Long keyId = fileData.getSigningKeyId();
+            KeyRecord keyRec = cache.getKeyRecord(keyId);
+            if (keyRec == null) {
+              SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 30000);
+              keyRec = cache.getKeyRecord(keyId);
+            }
+            if (keyRec != null) {
+              fileOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
+              if (fileOriginator == null) {
+                SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(keyRec.ownerUserId)), 30000);
+                fileOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
+              }
+              jOriginalSignerText.setText(ListRenderer.getRenderedText(fileOriginator));
+              jOriginalSignerText.setIcon(ListRenderer.getRenderedIcon(fileOriginator));
+              isSignerSet = true;
+            }
+          }
+          if (!isFromSet) {
+            jFromText.setText("Unknown user!");
+          }
+          if (!isSignerSet) {
+            jOriginalSignerText.setText("Unknown user!");
+          }
+        }
       }
     };
     th.setDaemon(true);

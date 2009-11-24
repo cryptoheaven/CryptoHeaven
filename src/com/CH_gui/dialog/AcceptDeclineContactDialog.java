@@ -33,11 +33,10 @@ import com.CH_co.service.msg.dataSets.key.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -46,7 +45,7 @@ import com.CH_guiLib.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -54,7 +53,7 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.26 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class AcceptDeclineContactDialog extends GeneralDialog {
 
@@ -135,43 +134,33 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     }
     // if not found, run request to the server
     else {
-      Thread th = new Thread("Accept / Decline Contact Get Handle") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Thread th = new ThreadTraced("Accept / Decline Contact Get Handle") {
+        public void runTraced() {
+          Obj_IDList_Co request = new Obj_IDList_Co();
+          request.IDs = new Long[] { contactRecord.ownerUserId };
+          MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_HANDLES, request);
+          ClientMessageAction replyMsg = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
+          DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, replyMsg);
 
-          try {
-            Obj_IDList_Co request = new Obj_IDList_Co();
-            request.IDs = new Long[] { contactRecord.ownerUserId };
-            MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_HANDLES, request);
-            ClientMessageAction replyMsg = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
-            DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, replyMsg);
-
-            if (replyMsg != null) {
-              synchronized (monitor) {
-                if (!isClosed) {
-                  synchronized (getTreeLock()) {
-                    if (replyMsg.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
-                      Usr_UsrHandles_Rp replyData = (Usr_UsrHandles_Rp) replyMsg.getMsgDataSet();
-                      UserRecord[] uRecs = replyData.userRecords;
-                      if (uRecs != null && uRecs.length == 1) {
-                        jContactFrom.setText(uRecs[0].shortInfo());
-                        jContactFrom.setIcon(uRecs[0].getIcon());
-                        jNewContactName.setText(uRecs[0].handle);
-                        handleFetched = true;
-                        setEnabledButtons();
-                      }
+          if (replyMsg != null) {
+            synchronized (monitor) {
+              if (!isClosed) {
+                synchronized (getTreeLock()) {
+                  if (replyMsg.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
+                    Usr_UsrHandles_Rp replyData = (Usr_UsrHandles_Rp) replyMsg.getMsgDataSet();
+                    UserRecord[] uRecs = replyData.userRecords;
+                    if (uRecs != null && uRecs.length == 1) {
+                      jContactFrom.setText(uRecs[0].shortInfo());
+                      jContactFrom.setIcon(uRecs[0].getIcon());
+                      jNewContactName.setText(uRecs[0].handle);
+                      handleFetched = true;
+                      setEnabledButtons();
                     }
                   }
                 }
               }
             }
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 100, t);
           }
-
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
       };
       th.setDaemon(true);
@@ -191,42 +180,32 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     }
     // if not found, run request to the server
     else {
-      Thread th = new Thread("Accept / Decline Contact Get Public Key") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Thread th = new ThreadTraced("Accept / Decline Contact Get Public Key") {
+        public void runTraced() {
+          Obj_IDList_Co request = new Obj_IDList_Co();
+          request.IDs = new Long[] { contactRecord.ownerUserId };
+          MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
+          ClientMessageAction replyMsg = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
+          DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, replyMsg);
 
-          try {
-            Obj_IDList_Co request = new Obj_IDList_Co();
-            request.IDs = new Long[] { contactRecord.ownerUserId };
-            MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-            ClientMessageAction replyMsg = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
-            DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, replyMsg);
-
-            if (replyMsg != null) {
-              synchronized (monitor) {
-                if (!isClosed) {
-                  synchronized (getTreeLock()) {
-                    if (replyMsg.getActionCode() == CommandCodes.KEY_A_GET_PUBLIC_KEYS) {
-                      Key_PubKeys_Rp replyData = (Key_PubKeys_Rp) replyMsg.getMsgDataSet();
-                      KeyRecord[] kRecs = replyData.keyRecords;
-                      if (kRecs != null && kRecs.length == 1) {
-                        jContactEncryption.setText(kRecs[0].plainPublicKey.shortInfo() + "/" + "AES(256)");
-                        jContactEncryption.setIcon(kRecs[0].getIcon());
-                        keyFetched = true;
-                        setEnabledButtons();
-                      }
+          if (replyMsg != null) {
+            synchronized (monitor) {
+              if (!isClosed) {
+                synchronized (getTreeLock()) {
+                  if (replyMsg.getActionCode() == CommandCodes.KEY_A_GET_PUBLIC_KEYS) {
+                    Key_PubKeys_Rp replyData = (Key_PubKeys_Rp) replyMsg.getMsgDataSet();
+                    KeyRecord[] kRecs = replyData.keyRecords;
+                    if (kRecs != null && kRecs.length == 1) {
+                      jContactEncryption.setText(kRecs[0].plainPublicKey.shortInfo() + "/" + "AES(256)");
+                      jContactEncryption.setIcon(kRecs[0].getIcon());
+                      keyFetched = true;
+                      setEnabledButtons();
                     }
                   }
                 }
               }
             }
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 100, t);
           }
-
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
       };
       th.setDaemon(true);
@@ -294,18 +273,18 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     JPanel panel = new JPanel();
     panel.setLayout(new GridBagLayout());
 
-    panel.add(new JMyLabel(Images.get(ImageNums.CONTACT_NEW32)), new GridBagConstraints(0, 0, 1, 2, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.CONTACT_NEW32)), new GridBagConstraints(0, 0, 1, 2, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_From")), new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_From")), new GridBagConstraints(1, 0, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reason_For_Contact")), new GridBagConstraints(1, 2, 2, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reason_For_Contact")), new GridBagConstraints(1, 2, 2, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 6, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 6, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Contact_Name")), new GridBagConstraints(1, 7, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Contact_Name")), new GridBagConstraints(1, 7, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
@@ -328,15 +307,15 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     Keymap contactNameMap = jNewContactName.getKeymap();
     contactNameMap.removeKeyStrokeBinding(enter);
 
-    panel.add(jContactFrom, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
+    panel.add(jContactFrom, new GridBagConstraints(2, 0, 1, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jContactEncryption, new GridBagConstraints(2, 1, 1, 1, 10, 0, 
+    panel.add(jContactEncryption, new GridBagConstraints(2, 1, 1, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JScrollPane(jContactReason), new GridBagConstraints(1, 3, 2, 3, 10, 10, 
+    panel.add(new JScrollPane(jContactReason), new GridBagConstraints(1, 3, 2, 3, 10, 10,
       GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jYourEncryption, new GridBagConstraints(2, 6, 1, 1, 10, 0, 
+    panel.add(jYourEncryption, new GridBagConstraints(2, 6, 1, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jNewContactName, new GridBagConstraints(2, 7, 1, 1, 10, 0, 
+    panel.add(jNewContactName, new GridBagConstraints(2, 7, 1, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     jAllowMessaging = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_messaging."));
@@ -352,24 +331,24 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     jPermitsPanel.setLayout(new GridBagLayout());
     jPermitsPanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_gui.lang.Lang.rb.getString("title_Grant_Permissions")));
 
-    panel.add(jPermitsPanel, new GridBagConstraints(1, 8, 2, 1, 10, 0, 
+    panel.add(jPermitsPanel, new GridBagConstraints(1, 8, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jPermitsPanel.add(jAllowMessaging, new GridBagConstraints(0, 8, 2, 1, 10, 0, 
+    jPermitsPanel.add(jAllowMessaging, new GridBagConstraints(0, 8, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
-    jPermitsPanel.add(jAllowFolderSharing, new GridBagConstraints(0, 9, 2, 1, 10, 0, 
+    jPermitsPanel.add(jAllowFolderSharing, new GridBagConstraints(0, 9, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-    jPermitsPanel.add(jNotifyOfOnlineStatus, new GridBagConstraints(0, 10, 2, 1, 10, 0, 
+    jPermitsPanel.add(jNotifyOfOnlineStatus, new GridBagConstraints(0, 10, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
 
     JPanel jOptionsPanel = new JPanel();
     jOptionsPanel.setLayout(new GridBagLayout());
     jOptionsPanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_gui.lang.Lang.rb.getString("title_Options")));
 
-    panel.add(jOptionsPanel, new GridBagConstraints(1, 9, 2, 1, 10, 0, 
+    panel.add(jOptionsPanel, new GridBagConstraints(1, 9, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jOptionsPanel.add(jAudibleNotify, new GridBagConstraints(0, 8, 2, 1, 10, 0, 
+    jOptionsPanel.add(jAudibleNotify, new GridBagConstraints(0, 8, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     return panel;
@@ -441,24 +420,11 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
     closeDialog();
 
-    Thread th = new Thread("Accept / Decline Contact Send") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
-
-        try {
-          int code = accept ? CommandCodes.CNT_Q_ACCEPT_CONTACTS : CommandCodes.CNT_Q_DECLINE_CONTACTS;
-          ProtocolMsgDataSet dataSet = prepareDataSet(accept); // << this may take some time due to encryption
-          serverInterfaceLayer.submitAndReturn(new MessageAction(code, dataSet));
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
-        }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+    Thread th = new ThreadTraced("Accept / Decline Contact Send") {
+      public void runTraced() {
+        int code = accept ? CommandCodes.CNT_Q_ACCEPT_CONTACTS : CommandCodes.CNT_Q_DECLINE_CONTACTS;
+        ProtocolMsgDataSet dataSet = prepareDataSet(accept); // << this may take some time due to encryption
+        serverInterfaceLayer.submitAndReturn(new MessageAction(code, dataSet));
       }
     };
     th.setDaemon(true);
@@ -506,7 +472,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
   /************* LISTENERS ON CHANGES IN THE CACHE *****************************************/
   /****************************************************************************************/
 
-  /** 
+  /**
    * Listen on updates to the ContactRecords in the cache.
    */
   private class ContactListener implements ContactRecordListener {
@@ -518,9 +484,11 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
   private class ContactGUIUpdater implements Runnable {
     public ContactGUIUpdater() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater()");
+      if (trace != null) trace.exit(ContactGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater.run()");
 
       setEnabledButtons();
 

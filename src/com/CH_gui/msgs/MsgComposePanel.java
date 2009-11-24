@@ -43,7 +43,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
@@ -479,15 +479,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     }
 
     // do fetching of attachments in a seperate thread as this may take a while
-    Thread th = new Thread("Setting From Draft Attachments Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Setting From Draft Attachments Fetcher") {
+      public void runTraced() {
         Record[] attachments = AttachmentFetcherPopup.fetchAttachments(new MsgLinkRecord[] { draftMsgLink });
         addAdditionalAttachments(attachments);
         markCurrentAttachmentsAsOriginal();
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -744,9 +740,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     if (toRecipients != null && toRecipients.length == 1 && toRecipients[0] instanceof FolderPair) {
       final FolderPair _toFolderPair = (FolderPair) toRecipients[0];
       final Component _this = this;
-      Thread th = new Thread(new Runnable() {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Thread th = new ThreadTraced("Ring Pressed") {
+        public void runTraced() {
           ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())));
           DefaultReplyRunner.runAction(msgAction);
           if (msgAction.getActionCode() == CommandCodes.FLD_A_RING_RING) {
@@ -812,11 +807,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
               MiscGui.nudge(_this, true, false);
             }
           }
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
-      }, "Ring Pressed Thread");
+      };
       th.setDaemon(true);
       th.start();
     }
@@ -831,7 +823,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Send composed message
    */
-  private class SendAction extends AbstractAction {
+  private class SendAction extends AbstractActionTraced {
     public SendAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send"), Images.get(ImageNums.MAIL_SEND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -846,7 +838,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Save"));
       }
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       isSavingAsDraft = false;
       actionPerformed();
     }
@@ -858,107 +850,99 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     public void actionPerformedNoVeto() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "actionPerformedNoVeto()");
       setSendMessageInProgress(true);
-      Thread th = new Thread("Send Action Runner") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-          try {
-            boolean isCanceled = false;
-            // convert text input to recipient objects if needed
+      Thread th = new ThreadTraced("Send Action Runner") {
+        public void runTraced() {
+          boolean isCanceled = false;
+          // convert text input to recipient objects if needed
+          for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
+            if (selectedRecipients[i] == null || selectedRecipients[i].length == 0) {
+              boolean waitForResults = true;
+              isCanceled = !selectRecipients(i, waitForResults);
+              if (isCanceled)
+                break;
+            }
+          }
+          // Remember the original recipient list for purposes for Address Book insertion (before they get converted to familiar contacts, etc)
+          // That insertion will take place if the send was successful..
+          preConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
+          // convert all email addresses and address contacts to users or contacts if possible
+          if (!isSavingAsDraft) {
             for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
-              if (selectedRecipients[i] == null || selectedRecipients[i].length == 0) {
-                boolean waitForResults = true;
-                isCanceled = !selectRecipients(i, waitForResults);
-                if (isCanceled)
-                  break;
+              boolean expandAddressBooks = objType == MsgDataRecord.OBJ_TYPE_MSG;
+              boolean expandGroups = true;
+              int numRecipients = selectedRecipients[i].length;
+              selectedRecipients[i] = MsgPanelUtils.getExpandedListOfRecipients(selectedRecipients[i], expandAddressBooks, expandGroups);
+              boolean anyExpanded = numRecipients != selectedRecipients[i].length;
+              boolean anyConverted = false;
+              if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
+                anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], isStagedSecure());
+              }
+              if (anyExpanded || anyConverted) {
+                redrawRecipients(i);
+                // Remember the converted recipient list for purpose of creating new contacts in care there were any additional new User web-accounts created...
+                postConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
               }
             }
-            // Remember the original recipient list for purposes for Address Book insertion (before they get converted to familiar contacts, etc)
-            // That insertion will take place if the send was successful..
-            preConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
-            // convert all email addresses and address contacts to users or contacts if possible
-            if (!isSavingAsDraft) {
-              for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
-                boolean expandAddressBooks = objType == MsgDataRecord.OBJ_TYPE_MSG;
-                boolean expandGroups = true;
-                int numRecipients = selectedRecipients[i].length;
-                selectedRecipients[i] = MsgPanelUtils.getExpandedListOfRecipients(selectedRecipients[i], expandAddressBooks, expandGroups);
-                boolean anyExpanded = numRecipients != selectedRecipients[i].length;
-                boolean anyConverted = false;
-                if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
-                  anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], isStagedSecure());
-                }
-                if (anyExpanded || anyConverted) {
-                  redrawRecipients(i);
-                  // Remember the converted recipient list for purpose of creating new contacts in care there were any additional new User web-accounts created...
-                  postConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
-                }
-              }
-            }
-            boolean anyRecipients = false;
+          }
+          boolean anyRecipients = false;
+          for (int i=0; i<selectedRecipients.length; i++) {
+            anyRecipients |= selectedRecipients[i] != null && selectedRecipients[i].length > 0;
+          }
+          // if conversion to recipient objects was not canceled, then we should have at lest one recipient, else skip the rest
+          if (!isCanceled && (anyRecipients || isSavingAsDraft)) {
+            // Check if any attachments, if so then warn before skipping them for external recipients.
+            // Also warn about non-encryption of external email.
+            EmailAddressRecord[] emailAddresses = null;
+            int selectedRecipientsCount = 0;
             for (int i=0; i<selectedRecipients.length; i++) {
-              anyRecipients |= selectedRecipients[i] != null && selectedRecipients[i].length > 0;
+              emailAddresses = (EmailAddressRecord[]) ArrayUtils.concatinate(emailAddresses, ArrayUtils.gatherAllOfType(selectedRecipients[i], EmailAddressRecord.class));
+              selectedRecipientsCount += selectedRecipients[i].length;
             }
-            // if conversion to recipient objects was not canceled, then we should have at lest one recipient, else skip the rest
-            if (!isCanceled && (anyRecipients || isSavingAsDraft)) {
-              // Check if any attachments, if so then warn before skipping them for external recipients.
-              // Also warn about non-encryption of external email.
-              EmailAddressRecord[] emailAddresses = null;
-              int selectedRecipientsCount = 0;
-              for (int i=0; i<selectedRecipients.length; i++) {
-                emailAddresses = (EmailAddressRecord[]) ArrayUtils.concatinate(emailAddresses, ArrayUtils.gatherAllOfType(selectedRecipients[i], EmailAddressRecord.class));
-                selectedRecipientsCount += selectedRecipients[i].length;
-              }
-              emailAddresses = (EmailAddressRecord[]) ArrayUtils.removeDuplicates(emailAddresses);
+            emailAddresses = (EmailAddressRecord[]) ArrayUtils.removeDuplicates(emailAddresses);
 
-              // Check if any attachments, to see if we should force the external-email-no-attachments warning
-              boolean anyAttachments = false;
-              if (selectedAttachments != null && selectedAttachments.length > 0) {
-                anyAttachments = true;
-              }
-              // Check if any external email addresses
-              boolean anyEmailAddresses = false;
-              if (emailAddresses != null && emailAddresses.length > 0) {
-                anyEmailAddresses = true;
-              }
-              // Check if any internal recipients selected
-              boolean anyInternalRecipients = true;
-              if (emailAddresses != null && emailAddresses.length >= selectedRecipientsCount) {
-                anyInternalRecipients = false;
-              }
+            // Check if any attachments, to see if we should force the external-email-no-attachments warning
+            boolean anyAttachments = false;
+            if (selectedAttachments != null && selectedAttachments.length > 0) {
+              anyAttachments = true;
+            }
+            // Check if any external email addresses
+            boolean anyEmailAddresses = false;
+            if (emailAddresses != null && emailAddresses.length > 0) {
+              anyEmailAddresses = true;
+            }
+            // Check if any internal recipients selected
+            boolean anyInternalRecipients = true;
+            if (emailAddresses != null && emailAddresses.length >= selectedRecipientsCount) {
+              anyInternalRecipients = false;
+            }
 
-              // We must have at least one internal recipient if we have attachments and external email recipient(s)
-              if (anyAttachments && anyEmailAddresses && !anyInternalRecipients) {
-                msgComponents.setSelectedCopy(true);
-              }
+            // We must have at least one internal recipient if we have attachments and external email recipient(s)
+            if (anyAttachments && anyEmailAddresses && !anyInternalRecipients) {
+              msgComponents.setSelectedCopy(true);
+            }
 
-              boolean staged = isStagedSecure();
-              boolean canceled = false;
-              if (!staged && anyEmailAddresses && !isSavingAsDraft)
-                canceled = !showStagedSecureChoiceDialog(emailAddresses);
-              if (!canceled) {
-                if (isStagedSecure() != staged) {
-                  actionPerformedNoVeto();
-                } else {
-                  boolean showRegularEmailQuestion = anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
-                  if (!showRegularEmailQuestion) {
-                    new SendMessageRunner(MsgComposePanel.this).start();
-                  } else {
-                    showRegularEmailWarningBeforeAndSend(emailAddresses);
-                  }
-                }
+            boolean staged = isStagedSecure();
+            boolean canceled = false;
+            if (!staged && anyEmailAddresses && !isSavingAsDraft)
+              canceled = !showStagedSecureChoiceDialog(emailAddresses);
+            if (!canceled) {
+              if (isStagedSecure() != staged) {
+                actionPerformedNoVeto();
               } else {
-                setSendMessageInProgress(false);
+                boolean showRegularEmailQuestion = anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
+                if (!showRegularEmailQuestion) {
+                  new SendMessageRunner(MsgComposePanel.this).start();
+                } else {
+                  showRegularEmailWarningBeforeAndSend(emailAddresses);
+                }
               }
             } else {
-              // If no recipient or user not found and user search window was cancelled, then resume message composer
               setSendMessageInProgress(false);
             }
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 200, t);
+          } else {
+            // If no recipient or user not found and user search window was cancelled, then resume message composer
+            setSendMessageInProgress(false);
           }
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         } // end run{}
       };
       th.setDaemon(true);
@@ -1143,7 +1127,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Save composed message as Draft
    */
-  private class SaveAsDraftAction extends AbstractAction {
+  private class SaveAsDraftAction extends AbstractActionTraced {
     public SaveAsDraftAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Save_as_Draft"), Images.get(ImageNums.SAVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1151,7 +1135,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.SAVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Save_Draft"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       actionPerformed();
     }
     public void actionPerformed() {
@@ -1163,7 +1147,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Select recipients
    */
-  private class SelectRecipientsAction extends AbstractAction {
+  private class SelectRecipientsAction extends AbstractActionTraced {
     public SelectRecipientsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.MAIL_RECIPIENTS16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1171,7 +1155,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_RECIPIENTS24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Address_Book"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       selectRecipientsPressed(TO);
     }
   }
@@ -1180,7 +1164,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Select attachments
    */
-  private class SelectAttachmentsAction extends AbstractAction {
+  private class SelectAttachmentsAction extends AbstractActionTraced {
     public SelectAttachmentsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1188,7 +1172,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ATTACH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Attach"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       selectAttachmentsPressed();
     }
   }
@@ -1251,7 +1235,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   }
 
 
-  private class PriorityAction extends AbstractAction {
+  private class PriorityAction extends AbstractActionTraced {
     private short priorityIndex;
     public PriorityAction(short code, int actionId, ButtonGroup group) {
       super();
@@ -1280,7 +1264,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent event) {
       msgComponents.setSelectedPriorityIndex(priorityIndex);
       setPriorityPanel();
     }
@@ -1290,7 +1274,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Undo
    */
-  private class UndoAction extends AbstractAction {
+  private class UndoAction extends AbstractActionTraced {
     public UndoAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Undo"), Images.get(ImageNums.UNDO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1298,7 +1282,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.UNDO24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Undo"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       // We did experiance some NullPointerException being thrown here for no reason,
       // just catch it and ignore.
       try {
@@ -1324,7 +1308,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Redo
    */
-  private class RedoAction extends AbstractAction {
+  private class RedoAction extends AbstractActionTraced {
     public RedoAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Redo"), Images.get(ImageNums.REDO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1332,7 +1316,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REDO24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Redo"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       // We did experiance some NullPointerException being thrown here for no reason,
       // just catch it and ignore.
       try {
@@ -1358,7 +1342,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Show All Headers
    */
-  private class ShowAllHeaders extends AbstractAction {
+  private class ShowAllHeaders extends AbstractActionTraced {
     private String propertyName = null;
     public ShowAllHeaders(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Show_Advanced"));
@@ -1374,7 +1358,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.STATE_CHECK, showAllHeaders);
       setVisibleAllHeaders(showAllHeaders.booleanValue());
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       boolean newValue = ((Boolean) getValue(Actions.STATE_CHECK)).booleanValue();
       setVisibleAllHeaders(newValue);
       GlobalProperties.setProperty(propertyName, "" + newValue);
@@ -1384,7 +1368,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Spell Check
    */
-  private class SpellCheckAction extends AbstractAction {
+  private class SpellCheckAction extends AbstractActionTraced {
     public SpellCheckAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_..."), Images.get(ImageNums.SPELL16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1392,7 +1376,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.SPELL24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Spelling"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
@@ -1417,7 +1401,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Spell Check Edit User Dictionary
    */
-  private class SpellCheckEditDictionaryAction extends AbstractAction {
+  private class SpellCheckEditDictionaryAction extends AbstractActionTraced {
     public SpellCheckEditDictionaryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Edit_user_dictionary_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1425,7 +1409,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.REMOVABLE_MENU, Boolean.FALSE);
       putValue(Actions.DISABABLE, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);
       if (w == null)
         w = GeneralDialog.getDefaultParent();
@@ -1447,7 +1431,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Spell Check Options
    */
-  private class SpellCheckOptionsAction extends AbstractAction {
+  private class SpellCheckOptionsAction extends AbstractActionTraced {
     public SpellCheckOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_preferences_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1455,7 +1439,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.REMOVABLE_MENU, Boolean.FALSE);
       putValue(Actions.DISABABLE, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);
       if (w == null)
         w = GeneralDialog.getDefaultParent();
@@ -1471,7 +1455,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Voice Recording panel
    */
-  private class RecordPanelAction extends AbstractAction {
+  private class RecordPanelAction extends AbstractActionTraced {
     public RecordPanelAction(int actionId) {
       super("Voice Recording Panel", Images.get(ImageNums.RECORD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1479,7 +1463,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.RECORD24));
       putValue(Actions.TOOL_NAME, "Record");
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       msgComponents.toggleVisibilityOfRecordingPanel();
     }
   }
@@ -1487,7 +1471,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   /**
    * Ring panel
    */
-  private class RingBellAction extends AbstractAction {
+  private class RingBellAction extends AbstractActionTraced {
     public RingBellAction(int actionId) {
       super("Ring the bell", Images.get(ImageNums.RING_BELL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -1495,7 +1479,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       ringPressed();
     }
   }
@@ -1821,7 +1805,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     // do this at the end of all AWT events after the frame is already shown.
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "redrawRecipients.run()");
         if (msgComponents.isRecipientTypeSupported(recipientType)) {
           msgComponents.redrawRecipients(recipientType, selectedRecipients[recipientType]);
           setEnabledActions();
@@ -1925,13 +1909,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     checkEmailAddressesForAddressBookAdition_Threaded(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, folderFilter, false, null);
   }
   public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter, final boolean forceAddAtOnce, final FolderPair toAddressBook) {
-    Thread th = new Thread("Address Book Email Checker") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Address Book Email Checker") {
+      public void runTraced() {
         checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, false, folderFilter, forceAddAtOnce, toAddressBook);
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -2082,79 +2062,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
             sb.append("\n");
         }
 
-        final Thread addAtOnce = new Thread("Address Adding Thread") {
-          public void run() {
-            Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-            FolderPair addrBook = toAddressBook;
-            if (addrBook == null) addrBook = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
-            Record[] recipients = new Record[] { addrBook };
-            if (addrBook != null) {
-              int countProcessed = 0;
-              final boolean[] interrupted = new boolean[] { false };
-              ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-              JProgressBar progressBar = new JProgressBar(0, emailRecordsLowerV.size());
-              JPanel progressPanel = new JPanel();
-              progressPanel.setLayout(new GridBagLayout());
-              progressPanel.add(new JMyLabel("Addresses are being imported into your Address Book, please wait..."), new GridBagConstraints(0, 0, 1, 1, 10, 0,
-                  GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-              progressPanel.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 10, 0,
-                  GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-              JButton[] buttons = new JButton[1];
-              buttons[0] = new JButton("Cancel");
-              buttons[0].addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                  interrupted[0] = true;
-                }
-              });
-              //JDialog infoDialog = MessageDialog.showDialog(parentComp, progressPanel, "Import in Progress...", MessageDialog.INFORMATION_MESSAGE, buttons, null, false);
-              GeneralDialog progressDialog = null;
-              Window w = SwingUtilities.windowForComponent(parentComp);
-              if (parentComp instanceof Frame)
-                progressDialog = new GeneralDialog((Frame) w, "Import in Progress...", buttons, -1, 0, progressPanel);
-              else if (parentComp instanceof Dialog)
-                progressDialog = new GeneralDialog((Dialog) w, "Import in Progress...", buttons, -1, 0, progressPanel);
-              else
-                progressDialog = new GeneralDialog("Import in Progress...", buttons, -1, 0, progressPanel);
-
-              for (int i=0; i<emailRecordsLowerV.size(); i++) {
-                String emailShort = (String) emailRecordsShortV.elementAt(i);
-                //String emailLower = (String) emailRecordsLowerV.elementAt(i);
-                String emailOrig = (String) emailRecordsOrigV.elementAt(i);
-                String nick = (emailNicksOrigV != null) ? (String) emailNicksOrigV.elementAt(i) : EmailRecord.getPersonalOrNick(emailOrig);
-                XMLElement addressFull = ContactInfoPanel.getContent(new XMLElement[] {
-                                                NamePanel.getContent(nick, null, null, null),
-                                                EmailPanel.getContent(EmailPanel.getTypes(), new String[] { emailShort }, null, 0) });
-                XMLElement addressPreview = ContactInfoPanel.getContentPreview(nick, null, new String[] { emailShort }, null, 0, null, null);
-
-                countProcessed ++;
-
-                BASymmetricKey key = new BASymmetricKey(32);
-                MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(recipients, key, parent);
-                MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
-                Msg_New_Rq request = new Msg_New_Rq(addrBook.getFolderShareRecord().shareId, null, links[0], data);
-                request.hashes = SendMessageRunner.prepareAddrHashes(data);
-                MessageAction action = new MessageAction(CommandCodes.MSG_Q_NEW, request);
-                // escape loop if CANCEL pressed
-                if (interrupted[0]) break;
-                // synchronize every 5 addresses
-                if (countProcessed % 5 == 0)
-                  SIL.submitAndWait(action, 120000);
-                else
-                  SIL.submitAndReturn(action);
-                progressBar.setValue(countProcessed);
-              }
-              if (progressDialog != null) {
-                progressDialog.dispose();
-              }
-            }
-            if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-            if (trace != null) trace.exit(getClass());
-            if (trace != null) trace.clear();
-          }
-        };
-
         if (forceAddAtOnce) {
-          addAtOnce.start();
+          new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV).start();
         } else {
           JButton[] buttons = new JButton[3];
           buttons[0] = new JButton("Add at Once");
@@ -2164,7 +2073,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           buttons[0].addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               dialog.dispose();
-              addAtOnce.start();
+              new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV).start();
             }
           });
           buttons[1].addActionListener(new ActionListener() {
@@ -2198,6 +2107,88 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
 
     return emailRecordsOrigV;
   } // end checkForUnknownRecipientsForAddressBookAdition
+
+  private static class AddAtOnceThread extends ThreadTraced {
+
+    private Component parentComp;
+    private FolderPair toAddressBook;
+    private Vector emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV;
+
+    public AddAtOnceThread(String name, Component parentComp, FolderPair toAddressBook, Vector emailRecordsLowerV, Vector emailRecordsShortV, Vector emailRecordsOrigV, Vector emailNicksOrigV) {
+      super(name);
+      this.parentComp = parentComp;
+      this.toAddressBook = toAddressBook;
+      this.emailRecordsLowerV = emailRecordsLowerV;
+      this.emailRecordsShortV = emailRecordsShortV;
+      this.emailRecordsOrigV = emailRecordsOrigV;
+      this.emailNicksOrigV = emailNicksOrigV;
+    }
+    public void runTraced() {
+      FolderPair addrBook = toAddressBook;
+      if (addrBook == null) addrBook = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
+      Record[] recipients = new Record[] { addrBook };
+      if (addrBook != null) {
+        int countProcessed = 0;
+        final boolean[] interrupted = new boolean[] { false };
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        JProgressBar progressBar = new JProgressBar(0, emailRecordsLowerV.size());
+        JPanel progressPanel = new JPanel();
+        progressPanel.setLayout(new GridBagLayout());
+        progressPanel.add(new JMyLabel("Addresses are being imported into your Address Book, please wait..."), new GridBagConstraints(0, 0, 1, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+        progressPanel.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+        JButton[] buttons = new JButton[1];
+        buttons[0] = new JButton("Cancel");
+        buttons[0].addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            interrupted[0] = true;
+          }
+        });
+        //JDialog infoDialog = MessageDialog.showDialog(parentComp, progressPanel, "Import in Progress...", MessageDialog.INFORMATION_MESSAGE, buttons, null, false);
+        GeneralDialog progressDialog = null;
+        Window w = SwingUtilities.windowForComponent(parentComp);
+        if (parentComp instanceof Frame)
+          progressDialog = new GeneralDialog((Frame) w, "Import in Progress...", buttons, -1, 0, progressPanel);
+        else if (parentComp instanceof Dialog)
+          progressDialog = new GeneralDialog((Dialog) w, "Import in Progress...", buttons, -1, 0, progressPanel);
+        else
+          progressDialog = new GeneralDialog("Import in Progress...", buttons, -1, 0, progressPanel);
+
+        for (int i=0; i<emailRecordsLowerV.size(); i++) {
+          String emailShort = (String) emailRecordsShortV.elementAt(i);
+          //String emailLower = (String) emailRecordsLowerV.elementAt(i);
+          String emailOrig = (String) emailRecordsOrigV.elementAt(i);
+          String nick = (emailNicksOrigV != null) ? (String) emailNicksOrigV.elementAt(i) : EmailRecord.getPersonalOrNick(emailOrig);
+          XMLElement addressFull = ContactInfoPanel.getContent(new XMLElement[] {
+                                          NamePanel.getContent(nick, null, null, null),
+                                          EmailPanel.getContent(EmailPanel.getTypes(), new String[] { emailShort }, null, 0) });
+          XMLElement addressPreview = ContactInfoPanel.getContentPreview(nick, null, new String[] { emailShort }, null, 0, null, null);
+
+          countProcessed ++;
+
+          BASymmetricKey key = new BASymmetricKey(32);
+          MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(recipients, key, parentComp);
+          MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
+          Msg_New_Rq request = new Msg_New_Rq(addrBook.getFolderShareRecord().shareId, null, links[0], data);
+          request.hashes = SendMessageRunner.prepareAddrHashes(data);
+          MessageAction action = new MessageAction(CommandCodes.MSG_Q_NEW, request);
+          // escape loop if CANCEL pressed
+          if (interrupted[0]) break;
+          // synchronize every 5 addresses
+          if (countProcessed % 5 == 0)
+            SIL.submitAndWait(action, 120000);
+          else
+            SIL.submitAndReturn(action);
+          progressBar.setValue(countProcessed);
+        }
+        if (progressDialog != null) {
+          progressDialog.dispose();
+        }
+      }
+    }
+  }
+
 
   public static void eliminateCachedAddresses(RecordFilter folderFilter, Vector emailNicksOrigV, Vector emailRecordsShortV, Vector emailRecordsLowerV, Vector emailRecordsOrigV) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -2237,13 +2228,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   }
 
   public static void checkUserRecordsForContactListAdition_Threaded(final Component parent, final Vector userRecordsV) {
-    Thread th = new Thread("Contact List User Checker") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Contact List User Checker") {
+      public void runTraced() {
         checkUserRecordsForContactListAdition(parent, userRecordsV);
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -2286,9 +2273,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       buttons[0].addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           dialog.dispose();
-          Thread th = new Thread("Contact Adding Thread") {
-            public void run() {
-              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+          Thread th = new ThreadTraced("Contact Adding Thread") {
+            public void runTraced() {
               for (int i=0; i<usersToAddV.size(); i++) {
                 UserRecord uRec = (UserRecord) usersToAddV.elementAt(i);
                 Long contactWithId = uRec.userId;
@@ -2325,9 +2311,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
                   SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
                 }
               } // end for
-              if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-              if (trace != null) trace.exit(getClass());
-              if (trace != null) trace.clear();
             } // end run()
           };
           th.setDaemon(true);
@@ -2612,7 +2595,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     // do gui action in a gui thread...
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "messageSentNotify.run()");
 
         // Mail: close the compose message Frame
         if (!isChatComposePanel) {

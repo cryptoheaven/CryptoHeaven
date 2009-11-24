@@ -15,7 +15,7 @@ package com.CH_gui.table;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.records.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
@@ -42,7 +42,7 @@ import javax.swing.table.TableModel;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -50,7 +50,7 @@ import javax.swing.table.TableModel;
  *
  * <b>$Revision: 1.31 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class RecordTableScrollPane extends JScrollPane implements VisualsSavable, DisposableObj {
 
@@ -406,9 +406,12 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
 
 
-  public class SelectionUpdater extends Thread {
+  public class SelectionUpdater extends ThreadTraced {
     private Record lastNotifyRecord;
-    public void run() {
+    public SelectionUpdater() {
+      super("Selection Updater");
+    }
+    public void runTraced() {
       while (true) {
         try {
           Thread.sleep(1000);
@@ -446,13 +449,13 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   /**
    * Worker that checks in the background for possible invalidated GUI that require refresh
    */
-  private static class SilentValidator extends Thread {
+  private static class SilentValidator extends ThreadTraced {
     RecordTableScrollPane recordTableToValidate = null;
     private SilentValidator(RecordTableScrollPane recordTable) {
+      super("Silent Validator");
       recordTableToValidate = recordTable;
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    public void runTraced() {
       while (true) {
         try {
           Thread.sleep(1000 + new java.util.Random().nextInt(1000)); // 1 + 1 seconds random delay
@@ -467,9 +470,6 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
         } catch (Throwable t) {
         }
       }
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(getClass());
-      if (trace != null) trace.clear();
     }
     private static RecordTableComponent getParentRecordTableComponent(Component c) {
       RecordTableComponent recordTableComponent = null;
@@ -525,7 +525,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       }
     }
   }
-  
+
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/

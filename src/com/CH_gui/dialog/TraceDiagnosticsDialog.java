@@ -108,9 +108,10 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
         if (trace != null) {
           Runtime runtime = Runtime.getRuntime();
 
-          trace.data(1, "max memory", Misc.getFormattedSize(runtime.maxMemory(), 4, 3));
-          trace.data(2, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
-          trace.data(3, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
+          trace.data(1, GlobalProperties.PROGRAM_FULL_NAME);
+          trace.data(2, "max memory", Misc.getFormattedSize(runtime.maxMemory(), 4, 3));
+          trace.data(3, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
+          trace.data(4, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
 
           trace.data(100, "List of Environmet Variables");
 
@@ -128,8 +129,8 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
           while (keyIter.hasNext()) {
             String key = (String) keyIter.next();
             String value = (String) propMap.get(key);
-            trace.data(100+count, key, value);
             count ++;
+            trace.data(100+count, key, value);
           }
         }
         if (trace != null) trace.exit(getClass());
@@ -170,8 +171,8 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     jFilename = new JMyLabel("File: ");
     jFilesize = new JMyLabel("Size: ");
 
-    Thread th = new Thread() {
-      public void run() {
+    Thread th = new ThreadTraced("Trace Size Updater") {
+      public void runTraced() {
         while (!closed) {
           boolean tracing = TraceProperties.isTraceEnabled();
           if (tracing && !jStatus.getText().equals(STATUS_RUNNING))
@@ -221,6 +222,11 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
 
   private void traceStop() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceDiagnosticsDialog.class, "traceStop()");
+    if (trace != null) {
+      Runtime runtime = Runtime.getRuntime();
+      trace.data(1, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
+      trace.data(2, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
+    }
     TraceProperties.setProperty("TraceEnabled", "false");
     Trace.initialLoad();
     if (trace != null) trace.exit(TraceDiagnosticsDialog.class);

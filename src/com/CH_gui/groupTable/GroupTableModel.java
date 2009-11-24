@@ -372,13 +372,13 @@ public class GroupTableModel extends RecordTableModel {
   private class GroupGUIUpdater implements Runnable {
     private FolderShareRecordEvent event;
     public GroupGUIUpdater(FolderShareRecordEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "GroupGUIUpdater(FolderShareRecordEvent event)");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupGUIUpdater.class, "GroupGUIUpdater(FolderShareRecordEvent event)");
       if (trace != null) trace.args(event);
       this.event = event;
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(GroupGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupGUIUpdater.class, "GroupGUIUpdater.run()");
 
       FolderShareRecord[] records = event.getFolderShareRecords();
       if (event.getEventType() == RecordEvent.SET) {
@@ -392,7 +392,7 @@ public class GroupTableModel extends RecordTableModel {
       }
 
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(GroupGUIUpdater.class);
     }
   }
 

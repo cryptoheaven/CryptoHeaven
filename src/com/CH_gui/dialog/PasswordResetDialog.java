@@ -23,7 +23,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.key.Key_KeyRecov_Co;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -231,87 +231,80 @@ public class PasswordResetDialog extends GeneralDialog {
   }
 
   private void fetchKeyRecovery(final Long[] subAccountsToManage) {
-    Thread th = new Thread("Key Recovery Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-        try {
-          ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.KEY_Q_GET_KEY_RECOVERY, new Obj_IDList_Co(subAccountsToManage)), 60000);
-          DefaultReplyRunner.nonThreadedRun(SIL, reply);
-          if (reply == null || !(reply.getMsgDataSet() instanceof Key_KeyRecov_Co)) {
-            MessageDialog.showErrorDialog(PasswordResetDialog.this, "Could not fetch required settings.  Please try again later.", "Recovery Temporarily Unavailable", true);
-            synchronized(monitor) {
-              closeDialog();
-              monitor.notifyAll();
-            }
-          } else {
-            Key_KeyRecov_Co recovSet = (Key_KeyRecov_Co) reply.getMsgDataSet();
-            synchronized(monitor) {
-              subAccountsRecoveryRecs = recovSet.recoveryRecords;
-              boolean anyAvailable = false;
-              // fetch any keys that we don't have in the cache
-              if (subAccountsRecoveryRecs != null && subAccountsRecoveryRecs.length > 0) {
-                Vector keysIDsV = new Vector();
-                for (int i=0; i<subAccountsRecoveryRecs.length; i++) {
-                  Long keyId = subAccountsRecoveryRecs[i].keyId;
-                  if (cache.getKeyRecord(keyId) == null)
-                    keysIDsV.addElement(keyId);
-                }
-                if (keysIDsV.size() > 0) {
-                  SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keysIDsV)), 60000);
-                }
-                for (int i=0; i<subAccountsRecoveryRecs.length; i++) {
-                  Long uID = cache.getKeyRecord(subAccountsRecoveryRecs[i].keyId).ownerUserId;
-                  int index = ArrayUtils.find(subAccountsToManage, uID);
-                  if (index >= 0) {
-                    anyAvailable = true;
-                    jSubAccountsNotes[index].setText("(reset available)");
-                    jSubAccountsNotes[index].setIcon(Images.get(ImageNums.STATUS_ONLINE16));
-                  }
-                }
-              }
-              boolean anyUnavailable = false;
-              for (int i=0; i<subAccountsToManage.length; i++) {
-                if (jSubAccountsNotes[i].getText().length() == 0) {
-                  anyUnavailable = true;
-                  Long uID = subAccountsToManage[i];
-                  UserRecord uRec = cache.getUserRecord(uID);
-                  if (!Misc.isBitSet(uRec.flags, UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY)) {
-                    jSubAccountsNotes[i].setText("(option disabled)");
-                    jSubAccountsNotes[i].setIcon(Images.get(ImageNums.STATUS_OFFLINE16));
-                  } else {
-                    jSubAccountsNotes[i].setText("(option enabled, user setup pending)");
-                    jSubAccountsNotes[i].setIcon(Images.get(ImageNums.STATUS_AWAY16));
-                  }
-                }
-              }
-              if (anyAvailable && anyUnavailable) {
-                jNote1.setText("Note:");
-                jNote2.setText("Password Reset is available only for the accounts marked with ");
-                jNote3.setText("");
-                jNote3.setIcon(Images.get(ImageNums.STATUS_ONLINE16));
-              } else if (anyAvailable) {
-                jNote1.setText("Summary:");
-                if (subAccountsToManage.length == 1)
-                  jNote2.setText("Password Reset is available for the selected account.");
-                else
-                  jNote2.setText("Password Reset is available for all of the selected accounts.");
-                jNote3.setText("");
-              } else {
-                jNote1.setText("Warning:");
-                if (subAccountsToManage.length == 1)
-                  jNote2.setText("Password Reset is not available for the selected account.");
-                else
-                  jNote2.setText("Password Reset is not available for the selected accounts.");
-                jNote3.setText("");
-              }
-              monitor.notifyAll();
-            }
+    Thread th = new ThreadTraced("Key Recovery Fetcher") {
+      public void runTraced() {
+        ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.KEY_Q_GET_KEY_RECOVERY, new Obj_IDList_Co(subAccountsToManage)), 60000);
+        DefaultReplyRunner.nonThreadedRun(SIL, reply);
+        if (reply == null || !(reply.getMsgDataSet() instanceof Key_KeyRecov_Co)) {
+          MessageDialog.showErrorDialog(PasswordResetDialog.this, "Could not fetch required settings.  Please try again later.", "Recovery Temporarily Unavailable", true);
+          synchronized(monitor) {
+            closeDialog();
+            monitor.notifyAll();
           }
-        } catch (Throwable t) {
+        } else {
+          Key_KeyRecov_Co recovSet = (Key_KeyRecov_Co) reply.getMsgDataSet();
+          synchronized(monitor) {
+            subAccountsRecoveryRecs = recovSet.recoveryRecords;
+            boolean anyAvailable = false;
+            // fetch any keys that we don't have in the cache
+            if (subAccountsRecoveryRecs != null && subAccountsRecoveryRecs.length > 0) {
+              Vector keysIDsV = new Vector();
+              for (int i=0; i<subAccountsRecoveryRecs.length; i++) {
+                Long keyId = subAccountsRecoveryRecs[i].keyId;
+                if (cache.getKeyRecord(keyId) == null)
+                  keysIDsV.addElement(keyId);
+              }
+              if (keysIDsV.size() > 0) {
+                SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keysIDsV)), 60000);
+              }
+              for (int i=0; i<subAccountsRecoveryRecs.length; i++) {
+                Long uID = cache.getKeyRecord(subAccountsRecoveryRecs[i].keyId).ownerUserId;
+                int index = ArrayUtils.find(subAccountsToManage, uID);
+                if (index >= 0) {
+                  anyAvailable = true;
+                  jSubAccountsNotes[index].setText("(reset available)");
+                  jSubAccountsNotes[index].setIcon(Images.get(ImageNums.STATUS_ONLINE16));
+                }
+              }
+            }
+            boolean anyUnavailable = false;
+            for (int i=0; i<subAccountsToManage.length; i++) {
+              if (jSubAccountsNotes[i].getText().length() == 0) {
+                anyUnavailable = true;
+                Long uID = subAccountsToManage[i];
+                UserRecord uRec = cache.getUserRecord(uID);
+                if (!Misc.isBitSet(uRec.flags, UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY)) {
+                  jSubAccountsNotes[i].setText("(option disabled)");
+                  jSubAccountsNotes[i].setIcon(Images.get(ImageNums.STATUS_OFFLINE16));
+                } else {
+                  jSubAccountsNotes[i].setText("(option enabled, user setup pending)");
+                  jSubAccountsNotes[i].setIcon(Images.get(ImageNums.STATUS_AWAY16));
+                }
+              }
+            }
+            if (anyAvailable && anyUnavailable) {
+              jNote1.setText("Note:");
+              jNote2.setText("Password Reset is available only for the accounts marked with ");
+              jNote3.setText("");
+              jNote3.setIcon(Images.get(ImageNums.STATUS_ONLINE16));
+            } else if (anyAvailable) {
+              jNote1.setText("Summary:");
+              if (subAccountsToManage.length == 1)
+                jNote2.setText("Password Reset is available for the selected account.");
+              else
+                jNote2.setText("Password Reset is available for all of the selected accounts.");
+              jNote3.setText("");
+            } else {
+              jNote1.setText("Warning:");
+              if (subAccountsToManage.length == 1)
+                jNote2.setText("Password Reset is not available for the selected account.");
+              else
+                jNote2.setText("Password Reset is not available for the selected accounts.");
+              jNote3.setText("");
+            }
+            monitor.notifyAll();
+          }
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -414,16 +407,13 @@ public class PasswordResetDialog extends GeneralDialog {
   /**
    * Thread that takes all input data and runs the action.
    */
-  private class OKThread extends Thread {
+  private class OKThread extends ThreadTraced {
     public OKThread() {
       super("PasswordResetDialog OKThread");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
-
+    public void runTraced() {
       setEnabledInputs(false);
-
       boolean error = false;
 
       // check if old password matches
@@ -468,10 +458,6 @@ public class PasswordResetDialog extends GeneralDialog {
         // if error occurred than enable inputs
         setEnabledInputs(true);
       }
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(OKThread.class);
-      if (trace != null) trace.clear();
     }
   }
 

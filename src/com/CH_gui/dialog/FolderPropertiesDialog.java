@@ -31,7 +31,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.file.FileUtilities;
@@ -47,7 +47,7 @@ import com.CH_gui.list.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -55,7 +55,7 @@ import com.CH_gui.list.*;
  *
  * <b>$Revision: 1.34 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderPropertiesDialog extends GeneralDialog implements VisualsSavable {
 
@@ -200,102 +200,102 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     else
       imageNum = ImageNums.FOLDER32;
     int posY = 0;
-    panel.add(new JMyLabel(Images.get(imageNum)), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(Images.get(imageNum)), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jFolderName, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jFolderName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(folderPair.getId().toString()), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(folderPair.getId().toString()), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     JLabel jType = new JMyLabel(folderPair.getFolderRecord().getFolderType(), folderPair.getIcon(), JLabel.LEFT);
-    panel.add(jType, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jType, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jFolderOwner = new JMyLabel(FETCHING_DATA);
-    panel.add(jFolderOwner, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jFolderOwner, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jSize = new JMyLabel(FETCHING_DATA);
-    panel.add(jSize, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jSize, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jSizeOnDisk = new JMyLabel(FETCHING_DATA);
-    panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contains")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contains")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContains = new JMyLabel(FETCHING_DATA);
-    panel.add(jContains, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jContains, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(Misc.getFormattedTimestamp(folderPair.getFolderRecord().dateCreated)), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(Misc.getFormattedTimestamp(folderPair.getFolderRecord().dateCreated)), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String dateUpdated = Misc.getFormattedTimestamp(folderPair.getFolderRecord().dateUpdated);
-    panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel("AES(256)"), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("AES(256)"), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String desc = folderPair.getFolderShareRecord().getFolderDesc();
     jFolderDesc = new JMyTextArea(desc != null ? desc : "", 4, 20);
     jFolderDesc.setWrapStyleWord(true);
     jFolderDesc.setLineWrap(true);
     jFolderDesc.getDocument().addDocumentListener(documentChangeListener);
-    panel.add(new JScrollPane(jFolderDesc), new GridBagConstraints(1, posY, 2, 3, 10, 10, 
+    panel.add(new JScrollPane(jFolderDesc), new GridBagConstraints(1, posY, 2, 3, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -332,7 +332,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
       newShareDesc = newDesc;
     }
     // reaname folder and set new comment
-    if (newName.length() > 0 && newShareName.length() > 0 && (!newName.equals(oldName) || !newDesc.equals(oldDesc) || !newShareName.equals(oldName) || !newShareDesc.equals(oldDesc))) { 
+    if (newName.length() > 0 && newShareName.length() > 0 && (!newName.equals(oldName) || !newDesc.equals(oldDesc) || !newShareName.equals(oldName) || !newShareDesc.equals(oldDesc))) {
       FolderShareRecord newFolderShare = (FolderShareRecord) oldFolderShare.clone();
       newFolderShare.setFolderName(newName);
 
@@ -399,177 +399,163 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
   private void submitShareChanges(final boolean applyToTree, final FolderPair[] children) {
 
-    Thread th = new Thread("Submitter of Share Changes") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
-
-        try {
-
-          FolderPair[] foldersToApply = new FolderPair[] { folderPair };
-          if (children != null && children.length > 0) {
-            if (applyToTree) {
-              foldersToApply = (FolderPair[]) ArrayUtils.concatinate(foldersToApply, children);
-              foldersToApply = (FolderPair[]) ArrayUtils.removeDuplicates(foldersToApply);
-            }
+    Thread th = new ThreadTraced("Submitter of Share Changes") {
+      public void runTraced() {
+        FolderPair[] foldersToApply = new FolderPair[] { folderPair };
+        if (children != null && children.length > 0) {
+          if (applyToTree) {
+            foldersToApply = (FolderPair[]) ArrayUtils.concatinate(foldersToApply, children);
+            foldersToApply = (FolderPair[]) ArrayUtils.removeDuplicates(foldersToApply);
           }
-
-          Vector allSharesToRemoveV = new Vector();
-          Vector allSharesToChangeV = new Vector();
-          Vector allSharesToAddV = new Vector();
-
-          for (int x=0; x<foldersToApply.length; x++) {
-
-            // which folder is being altered... in case of applying changes to sub-tree;
-            FolderPair folderPairChanged = foldersToApply[x];
-
-            // if my folder so I can change sharing of this folder
-            if (
-                (!folderPairChanged.getFolderRecord().isGroupType() && folderPairChanged.getFolderRecord().ownerUserId.equals(cache.getMyUserId())) ||
-                // or a group folder the one being changed in the dialog
-                (folderPairChanged.getFolderRecord().isGroupType() && folderPairChanged.getId().equals(folderPair.getId()))
-               ) {
-
-              // commit removal of old shares
-              FolderShareRecord[] existingShares = cache.getFolderShareRecordsForFolder(folderPairChanged.getId());
-              Vector wantedSharesV = folderSharingPanel.gatherWantedShares();
-              FolderShareRecord[][] shareChanges = FolderShareOps.getFolderShareChanges(existingShares, wantedSharesV, folderPairChanged);
-              if (shareChanges != null && shareChanges[0] != null && shareChanges[0].length > 0) {
-                allSharesToRemoveV.addAll(Arrays.asList(shareChanges[0]));
-              }
-              // commit changes to the old existing shares
-              if (shareChanges != null && shareChanges[1] != null && shareChanges[1].length > 0) {
-                allSharesToChangeV.addAll(Arrays.asList(shareChanges[1]));
-              }
-              // commit addition of new shares
-              // if (folderSharingPanel.jRadioDoShare.isSelected()) {
-                if (shareChanges != null && shareChanges[2] != null && shareChanges[2].length > 0) {
-                  FolderShareRecord[] newShares = shareChanges[2];
-
-                  // Fetch public keys for involved users that are not already fetched
-                  Vector userIDsV = new Vector();
-                  for (int i=0; i<newShares.length; i++) {
-                    Long ownerUserId = newShares[i].ownerUserId;
-                    KeyRecord keyRec = cache.getKeyRecordForUser(ownerUserId);
-                    if (keyRec == null || keyRec.plainPublicKey == null) {
-                      if (!userIDsV.contains(ownerUserId))
-                        userIDsV.addElement(ownerUserId);
-                    }
-                  }
-                  // We are lacking public KEYs, fetch them now.
-                  if (userIDsV.size() > 0) {
-                    Long[] userIDs = new Long[userIDsV.size()];
-                    userIDsV.toArray(userIDs);
-                    SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(userIDs)), 60000);
-                  }
-
-                  for (int i=0; i<newShares.length; i++) {
-                    String name = null;
-                    String desc = null;
-                    if (folderPairChanged.getId().equals(folderPair.getId())) {
-                      name = folderSharingPanel.jShareName.getText().trim();
-                      desc = folderSharingPanel.jShareDesc.getText().trim();
-                    } else {
-                      name = folderPairChanged.getFolderShareRecord().getFolderName();
-                      desc = folderPairChanged.getFolderShareRecord().getFolderDesc();
-                    }
-                    newShares[i].setFolderName(name);
-                    if (desc != null && desc.length() > 0) {
-                      newShares[i].setFolderDesc(desc);
-                    } else {
-                      newShares[i].setFolderDesc(null);
-                    }
-                    if (newShares[i].isOwnedByUser()) {
-                      KeyRecord kRec = cache.getKeyRecordForUser(newShares[i].ownerUserId);
-                      // we should have the public key of the user, but check just in case
-                      if (kRec != null) {
-                        newShares[i].seal(kRec);
-                      } else {
-                        MessageDialog.showErrorDialog(FolderPropertiesDialog.this, com.CH_gui.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Fetch_Error"));
-                        throw new RuntimeException(com.CH_gui.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."));
-                      }
-                    } else {
-                      FolderShareRecord groupShare = cache.getFolderShareRecordMy(newShares[i].ownerUserId, true);
-                      // we should have the key of the group, but check just in case
-                      if (groupShare != null) {
-                        newShares[i].seal(groupShare.getSymmetricKey());
-                      } else {
-                        MessageDialog.showErrorDialog(FolderPropertiesDialog.this, "Could not locate group's encryption key.  Operation terminated.", "Fetch Error");
-                        throw new RuntimeException("Could not locate group's encryption key.  Operation terminated.");
-                      }
-                    }
-                  }
-
-                  allSharesToAddV.addAll(Arrays.asList(newShares));
-                }
-              // }
-            }
-          } // end for
-
-          StringBuffer errorSB = new StringBuffer();
-          if (allSharesToRemoveV.size() > 0 && !folderSharingPanel.canRemove()) {
-            errorSB.append("You do not have sufficient privilege to REMOVE shares.\n");
-            allSharesToRemoveV.clear();
-          }
-          if (allSharesToChangeV.size() > 0 && !folderSharingPanel.canChange()) {
-            errorSB.append("You do not have sufficient privilege to MODIFY existing shares.\n");
-            allSharesToChangeV.clear();
-          }
-          if (allSharesToAddV.size() > 0 && !folderSharingPanel.canAdd()) {
-            errorSB.append("You do not have sufficient privilege to ADD new shares.\n");
-            allSharesToAddV.clear();
-          }
-          boolean anythingToDo = true;
-          if (errorSB.length() > 0) {
-            if (allSharesToRemoveV.size() > 0 || allSharesToChangeV.size() > 0 || allSharesToAddV.size() > 0) {
-              errorSB.append("\nWould you like to continue?");
-            } else {
-              anythingToDo = false;
-            }
-          }
-          if (errorSB.length() > 0) {
-            if (anythingToDo)
-              anythingToDo = MessageDialog.showDialogYesNo(null, errorSB.toString(), "Insufficient privileges...", MessageDialog.WARNING_MESSAGE);
-            else
-              MessageDialog.showDialog(null, errorSB.toString(), "Insufficient privileges...", MessageDialog.ERROR_MESSAGE, false);
-          }
-
-          if (anythingToDo) {
-            if (allSharesToRemoveV.size() > 0) {
-              Long[] IDs = RecordUtils.getIDs(allSharesToRemoveV);
-              Obj_IDList_Co request = new Obj_IDList_Co(IDs);
-              SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_REMOVE_FOLDER_SHARES, request));
-            }
-
-            if (allSharesToChangeV.size() > 0) {
-              FolderShareRecord[] changedShares = new FolderShareRecord[allSharesToChangeV.size()];
-              allSharesToChangeV.toArray(changedShares);
-              Fld_AltPerm_Rq request = new Fld_AltPerm_Rq(changedShares);
-              SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_ALTER_PERMISSIONS, request));
-            }
-
-            if (allSharesToAddV.size() > 0) {
-              FolderShareRecord[] newShares = new FolderShareRecord[allSharesToAddV.size()];
-              allSharesToAddV.toArray(newShares);
-              Fld_AddShares_Rq request = new Fld_AddShares_Rq();
-              request.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
-              request.groupShareIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getFolderSharesMyForFolders(cache.getFolderGroupIDsMy(), true)));
-              request.shareRecords = newShares;
-              SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_ADD_FOLDER_SHARES, request));
-            }
-          }
-
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+        Vector allSharesToRemoveV = new Vector();
+        Vector allSharesToChangeV = new Vector();
+        Vector allSharesToAddV = new Vector();
+
+        for (int x=0; x<foldersToApply.length; x++) {
+
+          // which folder is being altered... in case of applying changes to sub-tree;
+          FolderPair folderPairChanged = foldersToApply[x];
+
+          // if my folder so I can change sharing of this folder
+          if (
+              (!folderPairChanged.getFolderRecord().isGroupType() && folderPairChanged.getFolderRecord().ownerUserId.equals(cache.getMyUserId())) ||
+              // or a group folder the one being changed in the dialog
+              (folderPairChanged.getFolderRecord().isGroupType() && folderPairChanged.getId().equals(folderPair.getId()))
+             ) {
+
+            // commit removal of old shares
+            FolderShareRecord[] existingShares = cache.getFolderShareRecordsForFolder(folderPairChanged.getId());
+            Vector wantedSharesV = folderSharingPanel.gatherWantedShares();
+            FolderShareRecord[][] shareChanges = FolderShareOps.getFolderShareChanges(existingShares, wantedSharesV, folderPairChanged);
+            if (shareChanges != null && shareChanges[0] != null && shareChanges[0].length > 0) {
+              allSharesToRemoveV.addAll(Arrays.asList(shareChanges[0]));
+            }
+            // commit changes to the old existing shares
+            if (shareChanges != null && shareChanges[1] != null && shareChanges[1].length > 0) {
+              allSharesToChangeV.addAll(Arrays.asList(shareChanges[1]));
+            }
+            // commit addition of new shares
+            // if (folderSharingPanel.jRadioDoShare.isSelected()) {
+              if (shareChanges != null && shareChanges[2] != null && shareChanges[2].length > 0) {
+                FolderShareRecord[] newShares = shareChanges[2];
+
+                // Fetch public keys for involved users that are not already fetched
+                Vector userIDsV = new Vector();
+                for (int i=0; i<newShares.length; i++) {
+                  Long ownerUserId = newShares[i].ownerUserId;
+                  KeyRecord keyRec = cache.getKeyRecordForUser(ownerUserId);
+                  if (keyRec == null || keyRec.plainPublicKey == null) {
+                    if (!userIDsV.contains(ownerUserId))
+                      userIDsV.addElement(ownerUserId);
+                  }
+                }
+                // We are lacking public KEYs, fetch them now.
+                if (userIDsV.size() > 0) {
+                  Long[] userIDs = new Long[userIDsV.size()];
+                  userIDsV.toArray(userIDs);
+                  SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(userIDs)), 60000);
+                }
+
+                for (int i=0; i<newShares.length; i++) {
+                  String name = null;
+                  String desc = null;
+                  if (folderPairChanged.getId().equals(folderPair.getId())) {
+                    name = folderSharingPanel.jShareName.getText().trim();
+                    desc = folderSharingPanel.jShareDesc.getText().trim();
+                  } else {
+                    name = folderPairChanged.getFolderShareRecord().getFolderName();
+                    desc = folderPairChanged.getFolderShareRecord().getFolderDesc();
+                  }
+                  newShares[i].setFolderName(name);
+                  if (desc != null && desc.length() > 0) {
+                    newShares[i].setFolderDesc(desc);
+                  } else {
+                    newShares[i].setFolderDesc(null);
+                  }
+                  if (newShares[i].isOwnedByUser()) {
+                    KeyRecord kRec = cache.getKeyRecordForUser(newShares[i].ownerUserId);
+                    // we should have the public key of the user, but check just in case
+                    if (kRec != null) {
+                      newShares[i].seal(kRec);
+                    } else {
+                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, com.CH_gui.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Fetch_Error"));
+                      throw new RuntimeException(com.CH_gui.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."));
+                    }
+                  } else {
+                    FolderShareRecord groupShare = cache.getFolderShareRecordMy(newShares[i].ownerUserId, true);
+                    // we should have the key of the group, but check just in case
+                    if (groupShare != null) {
+                      newShares[i].seal(groupShare.getSymmetricKey());
+                    } else {
+                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, "Could not locate group's encryption key.  Operation terminated.", "Fetch Error");
+                      throw new RuntimeException("Could not locate group's encryption key.  Operation terminated.");
+                    }
+                  }
+                }
+
+                allSharesToAddV.addAll(Arrays.asList(newShares));
+              }
+            // }
+          }
+        } // end for
+
+        StringBuffer errorSB = new StringBuffer();
+        if (allSharesToRemoveV.size() > 0 && !folderSharingPanel.canRemove()) {
+          errorSB.append("You do not have sufficient privilege to REMOVE shares.\n");
+          allSharesToRemoveV.clear();
+        }
+        if (allSharesToChangeV.size() > 0 && !folderSharingPanel.canChange()) {
+          errorSB.append("You do not have sufficient privilege to MODIFY existing shares.\n");
+          allSharesToChangeV.clear();
+        }
+        if (allSharesToAddV.size() > 0 && !folderSharingPanel.canAdd()) {
+          errorSB.append("You do not have sufficient privilege to ADD new shares.\n");
+          allSharesToAddV.clear();
+        }
+        boolean anythingToDo = true;
+        if (errorSB.length() > 0) {
+          if (allSharesToRemoveV.size() > 0 || allSharesToChangeV.size() > 0 || allSharesToAddV.size() > 0) {
+            errorSB.append("\nWould you like to continue?");
+          } else {
+            anythingToDo = false;
+          }
+        }
+        if (errorSB.length() > 0) {
+          if (anythingToDo)
+            anythingToDo = MessageDialog.showDialogYesNo(null, errorSB.toString(), "Insufficient privileges...", MessageDialog.WARNING_MESSAGE);
+          else
+            MessageDialog.showDialog(null, errorSB.toString(), "Insufficient privileges...", MessageDialog.ERROR_MESSAGE, false);
+        }
+
+        if (anythingToDo) {
+          if (allSharesToRemoveV.size() > 0) {
+            Long[] IDs = RecordUtils.getIDs(allSharesToRemoveV);
+            Obj_IDList_Co request = new Obj_IDList_Co(IDs);
+            SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_REMOVE_FOLDER_SHARES, request));
+          }
+
+          if (allSharesToChangeV.size() > 0) {
+            FolderShareRecord[] changedShares = new FolderShareRecord[allSharesToChangeV.size()];
+            allSharesToChangeV.toArray(changedShares);
+            Fld_AltPerm_Rq request = new Fld_AltPerm_Rq(changedShares);
+            SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_ALTER_PERMISSIONS, request));
+          }
+
+          if (allSharesToAddV.size() > 0) {
+            FolderShareRecord[] newShares = new FolderShareRecord[allSharesToAddV.size()];
+            allSharesToAddV.toArray(newShares);
+            Fld_AddShares_Rq request = new Fld_AddShares_Rq();
+            request.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
+            request.groupShareIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getFolderSharesMyForFolders(cache.getFolderGroupIDsMy(), true)));
+            request.shareRecords = newShares;
+            SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_ADD_FOLDER_SHARES, request));
+          }
+        }
       }
     };
+    th.setPriority(Thread.MIN_PRIORITY);
     th.setDaemon(true);
     th.start();
   }
@@ -652,155 +638,145 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
 
   private void fetchData() {
-    Thread th = new Thread("Folder Properties Dialog Data Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Folder Properties Dialog Data Fetcher") {
+      public void runTraced() {
+        // fetch owner User Record
+        Long userId = folderPair.getFolderRecord().ownerUserId;
+        UserRecord uRec = cache.getUserRecord(userId);
+        if (uRec == null) {
+          SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userId)), 30000);
+          uRec = cache.getUserRecord(userId);
+        }
+        if (uRec == null) {
+          uRec = new UserRecord();
+          uRec.userId = userId;
+        }
+        jFolderOwner.setText(ListRenderer.getRenderedText(uRec));
+        jFolderOwner.setIcon(uRec.getIcon());
 
-        try {
-          // fetch owner User Record
-          Long userId = folderPair.getFolderRecord().ownerUserId;
-          UserRecord uRec = cache.getUserRecord(userId);
-          if (uRec == null) {
-            SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userId)), 30000);
-            uRec = cache.getUserRecord(userId);
-          }
-          if (uRec == null) {
-            uRec = new UserRecord();
-            uRec.userId = userId;
-          }
-          jFolderOwner.setText(ListRenderer.getRenderedText(uRec));
-          jFolderOwner.setIcon(uRec.getIcon());
+        // fetch folder size
 
-          // fetch folder size
+        FolderPair[] folderViewTree = cache.getFolderPairsViewAllDescending(new FolderPair[] { folderPair }, true);
+        FolderShareRecord[] shareViewTree = FolderPair.getFolderShareRecords(folderViewTree);
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_SIZE_SUMMARY, new Obj_IDList_Co(RecordUtils.getIDs(shareViewTree))), 120000);
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
 
-          FolderPair[] folderViewTree = cache.getFolderPairsViewAllDescending(new FolderPair[] { folderPair }, true);
-          FolderShareRecord[] shareViewTree = FolderPair.getFolderShareRecords(folderViewTree);
-          ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_SIZE_SUMMARY, new Obj_IDList_Co(RecordUtils.getIDs(shareViewTree))), 120000);
-          DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
+        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_SIZE_SUMMARY) {
+          Obj_List_Co data = (Obj_List_Co) msgAction.getMsgDataSet();
+          //System.out.println("data="+Misc.objToStr(data.objs));
+          // sum the size
+          long size = 0;
+          long sizeOnDisk = 0;
+          size += ((Long[]) data.objs[0])[2].longValue();
+          size += ((Long[]) data.objs[1])[2].longValue();
+          size += ((Long[]) data.objs[2])[2].longValue();
+          sizeOnDisk += ((Long[]) data.objs[0])[3].longValue();
+          sizeOnDisk += ((Long[]) data.objs[1])[3].longValue();
+          sizeOnDisk += ((Long[]) data.objs[2])[3].longValue();
 
-          if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_SIZE_SUMMARY) {
-            Obj_List_Co data = (Obj_List_Co) msgAction.getMsgDataSet();
-            //System.out.println("data="+Misc.objToStr(data.objs));
-            // sum the size
-            long size = 0;
-            long sizeOnDisk = 0;
-            size += ((Long[]) data.objs[0])[2].longValue();
-            size += ((Long[]) data.objs[1])[2].longValue();
-            size += ((Long[]) data.objs[2])[2].longValue();
-            sizeOnDisk += ((Long[]) data.objs[0])[3].longValue();
-            sizeOnDisk += ((Long[]) data.objs[1])[3].longValue();
-            sizeOnDisk += ((Long[]) data.objs[2])[3].longValue();
-
-            StringBuffer sb = new StringBuffer();
-            long countFiles = ((Long[]) data.objs[0])[0].longValue();
-            if (countFiles > 0) {
-              if (sb.length() > 0)
-                sb.append(", ");
-              sb.append(countFiles);
-              sb.append(' ');
-              sb.append(countFiles == 1 ? com.CH_gui.lang.Lang.rb.getString("File") : com.CH_gui.lang.Lang.rb.getString("Files"));
-            }
-
-            long countMsgs = ((Long[]) data.objs[1])[0].longValue();
-            if (countMsgs > 0) {
-              if (sb.length() > 0)
-                sb.append(", ");
-              sb.append(countMsgs);
-              sb.append(' ');
-              sb.append(countMsgs == 1 ? com.CH_gui.lang.Lang.rb.getString("Message") : com.CH_gui.lang.Lang.rb.getString("Messages"));
-            }
-
-            long countAddrs = ((Long[]) data.objs[2])[0].longValue();
-            if (countAddrs > 0) {
-              if (sb.length() > 0)
-                sb.append(", ");
-              sb.append(countAddrs);
-              sb.append(' ');
-              sb.append(countAddrs == 1 ? com.CH_gui.lang.Lang.rb.getString("Address") : com.CH_gui.lang.Lang.rb.getString("Addresses"));
-            }
-
-            long countMembers = ((Long[]) data.objs[3])[0].longValue();
-            if (countMembers > 0) {
-              if (sb.length() > 0)
-                sb.append(", ");
-              sb.append(countMembers);
-              sb.append(' ');
-              sb.append(countMembers == 1 ? com.CH_gui.lang.Lang.rb.getString("Member") : com.CH_gui.lang.Lang.rb.getString("Members"));
-            }
-
-            long countFolders = 0;
-            // subtract one for current folder (it is not contained inside itself)
-            switch (folderPair.getFolderRecord().folderType.shortValue()) {
-              case FolderRecord.FILE_FOLDER:
-              case FolderRecord.MESSAGE_FOLDER:
-              case FolderRecord.POSTING_FOLDER:
-              case FolderRecord.CHATTING_FOLDER:
-              case FolderRecord.ADDRESS_FOLDER:
-              case FolderRecord.WHITELIST_FOLDER:
-              case FolderRecord.RECYCLE_FOLDER:
-                countFolders = -1;
-            }
-            countFolders += ((Long[]) data.objs[0])[1].longValue();
-            countFolders += ((Long[]) data.objs[1])[1].longValue();
-            countFolders += ((Long[]) data.objs[2])[1].longValue();
+          StringBuffer sb = new StringBuffer();
+          long countFiles = ((Long[]) data.objs[0])[0].longValue();
+          if (countFiles > 0) {
             if (sb.length() > 0)
               sb.append(", ");
-            sb.append(countFolders);
+            sb.append(countFiles);
             sb.append(' ');
-            sb.append(countFolders == 1 ? "Folder" : "Folders");
-
-            /*
-            String suffix = "";
-            long countObjs = data.objId_1.longValue();
-            folderPair.getFolderRecord().objectCount = new Long(countObjs);
-            switch (folderPair.getFolderRecord().folderType.shortValue()) {
-              case FolderRecord.FILE_FOLDER:
-                suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("File") : com.CH_gui.lang.Lang.rb.getString("Files");
-                break;
-              case FolderRecord.MESSAGE_FOLDER:
-                suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Message") : com.CH_gui.lang.Lang.rb.getString("Messages");
-                break;
-              case FolderRecord.POSTING_FOLDER:
-                suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Posting") : com.CH_gui.lang.Lang.rb.getString("Postings");
-                break;
-              case FolderRecord.ADDRESS_FOLDER:
-                suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Address") : com.CH_gui.lang.Lang.rb.getString("Addresses");
-                break;
-              case FolderRecord.CONTACT_FOLDER:
-                suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Contact") : com.CH_gui.lang.Lang.rb.getString("Contacts");
-                break;
-              case FolderRecord.KEY_FOLDER:
-                suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Key") : com.CH_gui.lang.Lang.rb.getString("Keys");
-                break;
-            }
-
-            jContains.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("NUM_ITEM(S)"), new Object[] {data.objId_1.toString(), suffix}));
-             */
-
-            jContains.setText(sb.toString());
-            String oSize = "";
-            String dSize = "";
-            if (size > 0) {
-              oSize = Misc.getFormattedSize(size, 3, 2);
-              if (size >= 1000)
-                oSize += " (" + Misc.getFormattedSize(size, 10, 10) + ")";
-            }
-            if (sizeOnDisk > 0) {
-              dSize = Misc.getFormattedSize(sizeOnDisk, 3, 2);
-              if (sizeOnDisk >= 1000)
-                dSize += " (" + Misc.getFormattedSize(sizeOnDisk, 10, 10) + ")";
-            }
-            jSize.setText(oSize);
-            jSizeOnDisk.setText(dSize);
+            sb.append(countFiles == 1 ? com.CH_gui.lang.Lang.rb.getString("File") : com.CH_gui.lang.Lang.rb.getString("Files"));
           }
 
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
+          long countMsgs = ((Long[]) data.objs[1])[0].longValue();
+          if (countMsgs > 0) {
+            if (sb.length() > 0)
+              sb.append(", ");
+            sb.append(countMsgs);
+            sb.append(' ');
+            sb.append(countMsgs == 1 ? com.CH_gui.lang.Lang.rb.getString("Message") : com.CH_gui.lang.Lang.rb.getString("Messages"));
+          }
+
+          long countAddrs = ((Long[]) data.objs[2])[0].longValue();
+          if (countAddrs > 0) {
+            if (sb.length() > 0)
+              sb.append(", ");
+            sb.append(countAddrs);
+            sb.append(' ');
+            sb.append(countAddrs == 1 ? com.CH_gui.lang.Lang.rb.getString("Address") : com.CH_gui.lang.Lang.rb.getString("Addresses"));
+          }
+
+          long countMembers = ((Long[]) data.objs[3])[0].longValue();
+          if (countMembers > 0) {
+            if (sb.length() > 0)
+              sb.append(", ");
+            sb.append(countMembers);
+            sb.append(' ');
+            sb.append(countMembers == 1 ? com.CH_gui.lang.Lang.rb.getString("Member") : com.CH_gui.lang.Lang.rb.getString("Members"));
+          }
+
+          long countFolders = 0;
+          // subtract one for current folder (it is not contained inside itself)
+          switch (folderPair.getFolderRecord().folderType.shortValue()) {
+            case FolderRecord.FILE_FOLDER:
+            case FolderRecord.MESSAGE_FOLDER:
+            case FolderRecord.POSTING_FOLDER:
+            case FolderRecord.CHATTING_FOLDER:
+            case FolderRecord.ADDRESS_FOLDER:
+            case FolderRecord.WHITELIST_FOLDER:
+            case FolderRecord.RECYCLE_FOLDER:
+              countFolders = -1;
+          }
+          countFolders += ((Long[]) data.objs[0])[1].longValue();
+          countFolders += ((Long[]) data.objs[1])[1].longValue();
+          countFolders += ((Long[]) data.objs[2])[1].longValue();
+          if (sb.length() > 0)
+            sb.append(", ");
+          sb.append(countFolders);
+          sb.append(' ');
+          sb.append(countFolders == 1 ? "Folder" : "Folders");
+
+          /*
+          String suffix = "";
+          long countObjs = data.objId_1.longValue();
+          folderPair.getFolderRecord().objectCount = new Long(countObjs);
+          switch (folderPair.getFolderRecord().folderType.shortValue()) {
+            case FolderRecord.FILE_FOLDER:
+              suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("File") : com.CH_gui.lang.Lang.rb.getString("Files");
+              break;
+            case FolderRecord.MESSAGE_FOLDER:
+              suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Message") : com.CH_gui.lang.Lang.rb.getString("Messages");
+              break;
+            case FolderRecord.POSTING_FOLDER:
+              suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Posting") : com.CH_gui.lang.Lang.rb.getString("Postings");
+              break;
+            case FolderRecord.ADDRESS_FOLDER:
+              suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Address") : com.CH_gui.lang.Lang.rb.getString("Addresses");
+              break;
+            case FolderRecord.CONTACT_FOLDER:
+              suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Contact") : com.CH_gui.lang.Lang.rb.getString("Contacts");
+              break;
+            case FolderRecord.KEY_FOLDER:
+              suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("Key") : com.CH_gui.lang.Lang.rb.getString("Keys");
+              break;
+          }
+
+          jContains.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("NUM_ITEM(S)"), new Object[] {data.objId_1.toString(), suffix}));
+           */
+
+          jContains.setText(sb.toString());
+          String oSize = "";
+          String dSize = "";
+          if (size > 0) {
+            oSize = Misc.getFormattedSize(size, 3, 2);
+            if (size >= 1000)
+              oSize += " (" + Misc.getFormattedSize(size, 10, 10) + ")";
+          }
+          if (sizeOnDisk > 0) {
+            dSize = Misc.getFormattedSize(sizeOnDisk, 3, 2);
+            if (sizeOnDisk >= 1000)
+              dSize += " (" + Misc.getFormattedSize(sizeOnDisk, 10, 10) + ")";
+          }
+          jSize.setText(oSize);
+          jSizeOnDisk.setText(dSize);
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);

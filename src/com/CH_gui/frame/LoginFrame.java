@@ -37,7 +37,7 @@ import com.CH_co.service.records.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.dialog.*;
@@ -52,7 +52,7 @@ import com.CH_guiLib.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -60,7 +60,7 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.39 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class LoginFrame extends JFrame {
 
@@ -174,7 +174,7 @@ public class LoginFrame extends JFrame {
 
     this.loginCoordinator = loginCoordinator;
 
-    // Icon for the Frame 
+    // Icon for the Frame
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
       setIconImage(frameIcon.getImage());
@@ -354,8 +354,8 @@ public class LoginFrame extends JFrame {
     //okButton.setEnabled(isInputValid());
   }
 
-  /** Change dialog to Create New Account Dialog. 
-    * Add "Retype password" amd "Enter e-mail" fields plus labels 
+  /** Change dialog to Create New Account Dialog.
+    * Add "Retype password" amd "Enter e-mail" fields plus labels
     */
   private void changeModeToNewAccount() {
 
@@ -395,46 +395,46 @@ public class LoginFrame extends JFrame {
       currentEmailLabel.setVisible(false);
       currentEmail.setVisible(false);
     }
-    mainPanel.add(currentEmailLabel, new GridBagConstraints(1, 7, 1, 1, 0, 0, 
+    mainPanel.add(currentEmailLabel, new GridBagConstraints(1, 7, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
-    mainPanel.add(currentEmail, new GridBagConstraints(2, 7, 3, 1, 10, 0, 
+    mainPanel.add(currentEmail, new GridBagConstraints(2, 7, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
     // Account code wigets
     if (URLs.get(URLs.ACTIVATION_CODE_FIELD_REMOVED, "false").equalsIgnoreCase("true")) {
       // activation code items removed
     } else {
-      mainPanel.add(accountCodeLabel, new GridBagConstraints(1, 8, 1, 1, 0, 0, 
+      mainPanel.add(accountCodeLabel, new GridBagConstraints(1, 8, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
-      mainPanel.add(accountCode, new GridBagConstraints(2, 8, 3, 1, 10, 0, 
+      mainPanel.add(accountCode, new GridBagConstraints(2, 8, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
     }
 
     // Advanced options for key generation, etc...
-    mainPanel.add(advancedLabel, new GridBagConstraints(1, 12, 1, 1, 0, 0, 
+    mainPanel.add(advancedLabel, new GridBagConstraints(1, 12, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
-    mainPanel.add(advancedButton, new GridBagConstraints(2, 12, 3, 1, 10, 0, 
+    mainPanel.add(advancedButton, new GridBagConstraints(2, 12, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 5, 3, 5), 0, 0));
 
     // License wigets
-    mainPanel.add(licenseConditionLabel, new GridBagConstraints(1, 13, 4, 1, 10, 0, 
+    mainPanel.add(licenseConditionLabel, new GridBagConstraints(1, 13, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
-    mainPanel.add(licenseCheck, new GridBagConstraints(1, 14, 1, 1, 0, 0, 
+    mainPanel.add(licenseCheck, new GridBagConstraints(1, 14, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 5, 3, 5), 0, 0));
 
-    mainPanel.add(licenseButton, new GridBagConstraints(2, 14, 3, 1, 10, 0, 
+    mainPanel.add(licenseButton, new GridBagConstraints(2, 14, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 5, 3, 5), 0, 0));
 
     // time estimate
-    mainPanel.add(expectedTime, new GridBagConstraints(1, 15, 4, 1, 10, 0, 
+    mainPanel.add(expectedTime, new GridBagConstraints(1, 15, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
     // Password Length Warning
-    mainPanel.add(passwordConditionLabel, new GridBagConstraints(1, 16, 4, 1, 10, 0, 
+    mainPanel.add(passwordConditionLabel, new GridBagConstraints(1, 16, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 1, 1, 1), 20, 20));
 
     versionLabel.setVisible(false);
@@ -447,10 +447,8 @@ public class LoginFrame extends JFrame {
   }
 
   private void updateKeyGenerationTimeThreaded() {
-    Thread t = new Thread("KeyGenerationTimeEstimator") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+    Thread t = new ThreadTraced("KeyGenerationTimeEstimator") {
+      public void runTraced() {
         synchronized (estimateMonitor) {
           if (estimatedTime == null) {
             expectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
@@ -459,10 +457,6 @@ public class LoginFrame extends JFrame {
             estimatedTime = new Integer(expecTime);
           }
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     // change the priority of that thread to minimum
@@ -603,7 +597,7 @@ public class LoginFrame extends JFrame {
       if (socksProxyUsed.equals(Boolean.TRUE)) {
         prop.put("socksProxyHost", socksProxyAddress);
         prop.put("socksProxyPort", socksProxyPort.toString());
-      } 
+      }
     }
     prop.remove("proxySet");
     prop.remove("http.proxyHost");
@@ -627,7 +621,7 @@ public class LoginFrame extends JFrame {
         prop.put("firewallPort", httpProxyPort.toString());
         prop.put("httpProxyHost", httpProxyAddress);
         prop.put("httpProxyPort", httpProxyPort.toString());
-      } 
+      }
     }
     if (proxyAuthentication.equals(Boolean.TRUE)) {
       Authenticator.setDefault(new Authenticator() {
@@ -866,60 +860,60 @@ public class LoginFrame extends JFrame {
 
         int posY = 0;
 
-        panel.add(com.CH_gui.usrs.AccountOptionsSignaturesPanel.makeDivider(com.CH_gui.lang.Lang.rb.getString("title_Proxy_server")), new GridBagConstraints(0, posY, 4, 1, 0, 0, 
+        panel.add(com.CH_gui.usrs.AccountOptionsSignaturesPanel.makeDivider(com.CH_gui.lang.Lang.rb.getString("title_Proxy_server")), new GridBagConstraints(0, posY, 4, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         posY ++;
 
-        panel.add(jProxyUsed, new GridBagConstraints(0, posY, 4, 1, 0, 0, 
+        panel.add(jProxyUsed, new GridBagConstraints(0, posY, 4, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         posY ++;
 
-        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Server_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Server_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 2, 5), 0, 0));
-        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Proxy_address_to_use")), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Proxy_address_to_use")), new GridBagConstraints(1, posY, 1, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
-        panel.add(new JMyLabel(), new GridBagConstraints(2, posY, 1, 1, 0, 0, 
+        panel.add(new JMyLabel(), new GridBagConstraints(2, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Port")), new GridBagConstraints(3, posY, 1, 1, 5, 0, 
+        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Port")), new GridBagConstraints(3, posY, 1, 1, 5, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
         posY ++;
 
-        panel.add(jSocksProxyUsed, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+        panel.add(jSocksProxyUsed, new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 25, 2, 5), 0, 0));
-        panel.add(jSocksProxyAddress, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+        panel.add(jSocksProxyAddress, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-        panel.add(new JMyLabel(":"), new GridBagConstraints(2, posY, 1, 1, 0, 0, 
+        panel.add(new JMyLabel(":"), new GridBagConstraints(2, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-        panel.add(jSocksProxyPort, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
+        panel.add(jSocksProxyPort, new GridBagConstraints(3, posY, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
         posY ++;
 
-        panel.add(jHttpProxyUsed, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+        panel.add(jHttpProxyUsed, new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 25, 5, 5), 0, 0));
-        panel.add(jHttpProxyAddress, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+        panel.add(jHttpProxyAddress, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
-        panel.add(new JMyLabel(":"), new GridBagConstraints(2, posY, 1, 1, 0, 0, 
+        panel.add(new JMyLabel(":"), new GridBagConstraints(2, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-        panel.add(jHttpProxyPort, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
+        panel.add(jHttpProxyPort, new GridBagConstraints(3, posY, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
         posY ++;
 
-        panel.add(com.CH_gui.usrs.AccountOptionsSignaturesPanel.makeDivider("Proxy Authentication"), new GridBagConstraints(0, posY, 4, 1, 0, 0, 
+        panel.add(com.CH_gui.usrs.AccountOptionsSignaturesPanel.makeDivider("Proxy Authentication"), new GridBagConstraints(0, posY, 4, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 5, 5), 0, 0));
         posY ++;
 
-        panel.add(jProxyAuthentication, new GridBagConstraints(0, posY, 4, 1, 0, 0, 
+        panel.add(jProxyAuthentication, new GridBagConstraints(0, posY, 4, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 5, 5), 0, 0));
         posY ++;
 
-        panel.add(new JMyLabel("Username:"), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+        panel.add(new JMyLabel("Username:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 45, 2, 5), 0, 0));
-        panel.add(jProxyUsername, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+        panel.add(jProxyUsername, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
         posY ++;
-        panel.add(new JMyLabel("Password:"), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+        panel.add(new JMyLabel("Password:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 45, 5, 5), 0, 0));
-        panel.add(jProxyPassword, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+        panel.add(jProxyPassword, new GridBagConstraints(1, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
         posY ++;
 
@@ -1009,9 +1003,9 @@ public class LoginFrame extends JFrame {
     // combine remember username checkbox with version label
     JPanel rememberUserNamePanel = new JPanel();
     rememberUserNamePanel.setLayout(new GridBagLayout());
-    rememberUserNamePanel.add(rememberUserName, new GridBagConstraints(1, 1, 1, 1, 10, 0, 
+    rememberUserNamePanel.add(rememberUserName, new GridBagConstraints(1, 1, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 5), 0, 0));
-    rememberUserNamePanel.add(versionLabel, new GridBagConstraints(2, 1, 1, 1, 0, 0, 
+    rememberUserNamePanel.add(versionLabel, new GridBagConstraints(2, 1, 1, 1, 0, 0,
         GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 0), 0, 0));
 
     advancedLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Advanced_Options"));
@@ -1059,16 +1053,16 @@ public class LoginFrame extends JFrame {
 //    mainPanel.add(switchModeLink, new GridBagConstraints(1, 0, 4, 1, 10, 0, 
 //        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(1, 1, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(userName, new GridBagConstraints(2, 1, 3, 1, 10, 0, 
+    panel.add(userName, new GridBagConstraints(2, 1, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(passwordLabel, new GridBagConstraints(1, 4, 1, 1, 0, 0, 
+    panel.add(passwordLabel, new GridBagConstraints(1, 4, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(password, new GridBagConstraints(2, 4, 3, 1, 10, 0, 
+    panel.add(password, new GridBagConstraints(2, 4, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     if (capsLockWarning != null) {
       panel.add(capsLockWarning, new GridBagConstraints(2, 5, 3, 1, 10, 0,
@@ -1096,14 +1090,14 @@ public class LoginFrame extends JFrame {
     panel.add(changeServerLabel, new GridBagConstraints(4, 10, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 5, 5), 0, 0));
 
-    panel.add(rememberUserNamePanel, new GridBagConstraints(1, 11, 4, 1, 10, 0, 
+    panel.add(rememberUserNamePanel, new GridBagConstraints(1, 11, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
 //    mainPanel.add(versionLabel, new GridBagConstraints(4, 11, 1, 1, 0, 0, 
 //        GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(3, 5, 3, 5), 0, 0));
 
     // filler
-    panel.add(new JLabel(), new GridBagConstraints(1, 17, 4, 1, 10, 10, 
+    panel.add(new JLabel(), new GridBagConstraints(1, 17, 4, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
     return panel;
@@ -1260,7 +1254,7 @@ public class LoginFrame extends JFrame {
   private class OKActionListener implements ActionListener {
     /** The request for either login or create new account is being set here.
       * All fields are checked and if not correctly filled by the user
-      * appropriate error dialogs are displayed 
+      * appropriate error dialogs are displayed
       */
     public void actionPerformed (ActionEvent event) {
       String errorMsg = isInputValid();
@@ -1275,7 +1269,7 @@ public class LoginFrame extends JFrame {
     }
   }
 
-  private class OKThread extends Thread {
+  private class OKThread extends ThreadTraced {
     private JProgressBar jProgressBar;
     private int progressValue = 0;
 
@@ -1283,9 +1277,7 @@ public class LoginFrame extends JFrame {
       super("LoginFrame OKThread");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
-
+    public void runTraced() {
       // start clean
       login_request = null;
       newUser_request = null;
@@ -1300,7 +1292,7 @@ public class LoginFrame extends JFrame {
 
       login_request = new Usr_LoginSecSess_Rq(uRec, 0, GlobalProperties.PROGRAM_VERSION, GlobalProperties.PROGRAM_RELEASE, true, defaultSignupEmail);
 
-      /* set new account request */  
+      /* set new account request */
       if (isNewAccountDialog) {
         /* Empty re-type password field */
         char[] pass1 = password.getPassword();
@@ -1377,7 +1369,7 @@ public class LoginFrame extends JFrame {
             timer.start();
 
             mainPanel.remove(expectedTime);
-            mainPanel.add(jProgressBar, new GridBagConstraints(1, 15, 4, 1, 10, 0, 
+            mainPanel.add(jProgressBar, new GridBagConstraints(1, 15, 4, 1, 10, 0,
               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
             mainPanel.validate();
 
@@ -1388,7 +1380,7 @@ public class LoginFrame extends JFrame {
             expectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_has_completed_successfuly."));
 
             mainPanel.remove(jProgressBar);
-            mainPanel.add(expectedTime, new GridBagConstraints(1, 15, 4, 1, 10, 0, 
+            mainPanel.add(expectedTime, new GridBagConstraints(1, 15, 4, 1, 10, 0,
               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
             mainPanel.validate();
 
@@ -1396,19 +1388,19 @@ public class LoginFrame extends JFrame {
           }
 
           // Create new user request
-          newUser_request = createNewUserRequest(keyPair, 
-              getUserName(), login_request.userRecord.passwordHash, 
-              requestedEmailAddress, 
-              //null, 
-              currentEmail.getText().trim(), 
-              new Short((short) 1), null, null, 
+          newUser_request = createNewUserRequest(keyPair,
+              getUserName(), login_request.userRecord.passwordHash,
+              requestedEmailAddress,
+              //null,
+              currentEmail.getText().trim(),
+              new Short((short) 1), null, null,
               null
               );
 
           // Hide the key generation window if showing..
           // Do it on a delay as the user will wait a while before application loads.
           if (keyGenSplash != null) {
-            javax.swing.Timer splashWindowTimer = new javax.swing.Timer(5000, new ActionListener() { 
+            javax.swing.Timer splashWindowTimer = new javax.swing.Timer(5000, new ActionListener() {
               public void actionPerformed(ActionEvent event) {
                 if (keyGenSplash != null)
                   keyGenSplash.dispose();
@@ -1437,11 +1429,6 @@ public class LoginFrame extends JFrame {
       // if error occurred than enable inputs
       // ALSO in case the dialog is reshown, inputs should be enabled -- so always enable inputs
       setEnabledInputs(true);
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(OKThread.class);
-      if (trace != null) trace.clear();
-
     }
   }
 
@@ -1462,7 +1449,7 @@ public class LoginFrame extends JFrame {
     }
   }
 
-  /** Process a login window with an option of creating new account, 
+  /** Process a login window with an option of creating new account,
     * if login or creating of new account fails, returns false.
     * Note: Login request follows creating new account request.
     * @return true if login successful, and user info and keys fetched to cache
@@ -1507,17 +1494,17 @@ public class LoginFrame extends JFrame {
         // HTTP fetch server list and create ServerInterfaceLayer
         performConnect();
         // try to login...
-        loginProgMonitor = new LoginProgMonitor(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"), 
-                new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_a_Secure_Channel_and_Login"), 
-                                com.CH_gui.lang.Lang.rb.getString("label_Retrieve_Account_Information"), 
-                                //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"), 
+        loginProgMonitor = new LoginProgMonitor(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"),
+                new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_a_Secure_Channel_and_Login"),
+                                com.CH_gui.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
+                                //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"),
                                 com.CH_gui.lang.Lang.rb.getString("label_Load_Main_Program") } );
         loginCoordinator.setLoginProgMonitor(loginProgMonitor);
         loginSuccess = login(request, loginProgMonitor);
       }
 
       if (!loginSuccess) {      /* try again */
-        // Destroy the last unsuccessful SIL (might not exist if more than 
+        // Destroy the last unsuccessful SIL (might not exist if more than
         // one Login dialog was used at the same time when 'switching identity')
         ServerInterfaceLayer prevSIL = MainFrame.getServerInterfaceLayer();
         if (prevSIL != null) prevSIL.destroyServer();
@@ -1610,8 +1597,8 @@ public class LoginFrame extends JFrame {
   }
 
 
-  /** 
-   * Submit and fetch request to login 
+  /**
+   * Submit and fetch request to login
    * @return true on success, false on failure
    */
   private boolean login(Usr_LoginSecSess_Rq request, LoginProgMonitor loginProgMonitor) {
@@ -1832,7 +1819,7 @@ public class LoginFrame extends JFrame {
       if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer)) {
         // do the other operation right away
         UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer);
-        // retry same operation 2nd time 
+        // retry same operation 2nd time
         if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer)) {
           // do the other operation 2nd time and show message that key was not stored as it should
           UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer);

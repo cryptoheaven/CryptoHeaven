@@ -26,9 +26,9 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
-import com.CH_gui.action.Actions;
+import com.CH_gui.action.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
@@ -231,7 +231,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   /** 
    * Select All
    */
-  private class SelectAllAction extends AbstractAction {
+  private class SelectAllAction extends AbstractActionTraced {
     public SelectAllAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Select_All"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.SELECT_ALL16));
@@ -239,7 +239,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       jMessage.grabFocus();
       if (jMessage instanceof JTextComponent) {
         ((JTextComponent) jMessage).selectAll();
@@ -326,7 +326,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       public void actionPerformed(ActionEvent event) {
         if (msgLinkRecord != null && msgDataRecord != null) {
           boolean isForceSimpleHTML = msgDataRecord.isHtmlMail() && !isHTML;
-          Thread th = new Thread(new PrintRunnable(msgLinkRecord, msgDataRecord, isForceSimpleHTML, MsgPreviewPanel.this));
+          Thread th = new ThreadTraced(new PrintRunnable(msgLinkRecord, msgDataRecord, isForceSimpleHTML, MsgPreviewPanel.this), "Print Runner");
           th.setDaemon(true);
           th.start();
         }
@@ -365,9 +365,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         FolderPair inbox = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().msgFolderId));
         MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, inbox, new MsgLinkRecord[] { msgLinkRecord });
         // Add sender email address at once to Whitelist (free up AWT thread)
-        Thread th = new Thread("Not Spam Mover") {
-          public void run() {
-            Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Thread th = new ThreadTraced("Not Spam Mover") {
+          public void runTraced() {
             FolderPair whiteList = FolderOps.getOrCreateWhiteList(MainFrame.getServerInterfaceLayer());
             if (contactInfo != null) {
               String nick = contactInfo[0];
@@ -378,9 +377,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               emailStringRecordsV.addElement(email);
               MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksV, emailStringRecordsV, false, new FolderFilter(FolderRecord.WHITELIST_FOLDER), true, whiteList);
             }
-            if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-            if (trace != null) trace.exit(getClass());
-            if (trace != null) trace.clear();
           }
         };
         th.setDaemon(true);
@@ -813,7 +809,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     // do this at the end of all AWT events after the frame is already shown.
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "setRecipientsPanel.run()");
 
         // Don't do a flowing-resizable panel, just put a label style boxes
         //MsgPanelUtils.drawMsgRecipientsPanel(dataRecord, jRecipients, maxSize);
@@ -904,9 +900,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private void setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final JPanel _jLineAttachments) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final JPanel _jLineAttachments)");
     if (trace != null) trace.args(_msgLink, _dataRecord);
-    Thread fetcher = new Thread("Attachments Preview Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread fetcher = new ThreadTraced("Attachments Preview Fetcher") {
+      public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MsgPreviewPanel.setAttachmentsPanel.fetcher.runTraced()");
 
         Record[] attachments = null;
         int numOfAttachments = _dataRecord != null && _dataRecord.attachedFiles != null && _dataRecord.attachedMsgs != null ? _dataRecord.attachedFiles.shortValue() + _dataRecord.attachedMsgs.shortValue() : 0;
@@ -922,12 +918,13 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           final JLabel _fetchingLabel = fetchingLabel;
           javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MsgPreviewPanel.setAttachmentsPanel1.run()");
               setAttachmentsPanel_updateGUI(null, _numOfAttachments > 0 ? new Object[] { _fetchingLabel } : null, _dataRecord.getSubject(), _jAttachments, _jLineAttachments);
               if (trace != null) trace.exit(getClass());
             }
           });
         } catch (Throwable t) {
+          if (trace != null) trace.exception(getClass(), 100, t);
         }
         if (_msgLink != null  && numOfAttachments > 0) {
           attachments = AttachmentFetcherPopup.fetchAttachments(new MsgLinkRecord[] { _msgLink });
@@ -935,7 +932,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             final Record[] _attachments = attachments;
             javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
               public void run() {
-                Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+                Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MsgPreviewPanel.setAttachmentsPanel2.run()");
                 // draw attachments in GUI only if preview is still pointing to the same message
                 if (msgLinkRecord == _msgLink && msgDataRecord == _dataRecord) {
                   setAttachmentsPanel_updateGUI(_msgLink, _attachments, _dataRecord.getSubject(), _jAttachments, _jLineAttachments);
@@ -944,12 +941,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               }
             });
           } catch (Throwable t) {
+            if (trace != null) trace.exception(getClass(), 200, t);
           }
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     fetcher.setDaemon(true);
@@ -1077,8 +1073,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 Object[] objs = (Object[]) link.getDescription();
                 final MsgLinkRecord parentMsgLink = (MsgLinkRecord) objs[0];
                 final Object att = objs[1];
-                Thread th = new Thread() { // we must do the action on non-GUI thread
-                  public void run() {
+                Thread th = new ThreadTraced("Clip Player") { // we must do the action on non-GUI thread
+                  public void runTraced() {
                     if (att instanceof FileLinkRecord) {
                       final FileLinkRecord fileLink = (FileLinkRecord) att;
                       File file = null;
@@ -1158,8 +1154,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                   Object[] objs = (Object[]) link.getDescription();
                   final MsgLinkRecord parentMsgLink = (MsgLinkRecord) objs[0];
                   final Object att = objs[1];
-                  Thread th = new Thread() { // we must do the action on non-GUI thread
-                    public void run() {
+                  Thread th = new ThreadTraced("Clip Stopper") { // we must do the action on non-GUI thread
+                    public void runTraced() {
                       if (att instanceof FileLinkRecord) {
                         FileLinkRecord fileLink = (FileLinkRecord) att;
                         File file = null;
@@ -1184,8 +1180,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                   Object[] objs = (Object[]) link.getDescription();
                   final MsgLinkRecord parentMsgLink = (MsgLinkRecord) objs[0];
                   final Object att = objs[1];
-                  Thread th = new Thread() { // we must do the action on non-GUI thread
-                    public void run() {
+                  Thread th = new ThreadTraced("Clip Seeker") { // we must do the action on non-GUI thread
+                    public void runTraced() {
                       if (att instanceof FileLinkRecord) {
                         FileLinkRecord fileLink = (FileLinkRecord) att;
                         File file = null;
@@ -1559,12 +1555,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     private boolean isForceSimpleHTML;
     private Component context;
     public PrintRunnable(MsgLinkRecord msgLinkRecord, MsgDataRecord msgDataRecord, boolean isForceSimpleHTML, Component context) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrintRunnable.class, "PrintRunnable(MsgLinkRecord msgLinkRecord, MsgDataRecord msgDataRecord, boolean isForceSimpleHTML, Component context)");
       this.msgLinkRecord = msgLinkRecord;
       this.msgDataRecord = msgDataRecord;
       this.isForceSimpleHTML = isForceSimpleHTML;
       this.context = context;
+      if (trace != null) trace.exit(PrintRunnable.class);
     }
     public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrintRunnable.class, "PrintRunnable.run()");
+
       context.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       try {
         com.CH_gui.print.DocumentRenderer renderer = new com.CH_gui.print.DocumentRenderer();
@@ -1602,6 +1602,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         MessageDialog.showErrorDialog(context, "Error encountered while constructing a print preview.\n\nReason: " + t.toString() + "\n\n" + t.getMessage() + "\n\n" + Misc.getStack(t), "Print error", true);
       }
       context.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+      if (trace != null) trace.exit(PrintRunnable.class);
     }
   }
 
@@ -1681,19 +1683,23 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     Vector emailStringRecordsV;
     Vector emailRecordsOrigV;
     private PreviewGUIUpdater(MsgLinkRecord msgLink, MsgDataRecord msgData, Vector emailNicksV, Vector emailStringRecordsV, Vector emailRecordsOrigV) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PreviewGUIUpdater.class, "PreviewGUIUpdater(MsgLinkRecord msgLink, MsgDataRecord msgData, Vector emailNicksV, Vector emailStringRecordsV, Vector emailRecordsOrigV)");
       this.msgLink = msgLink;
       this.msgData = msgData;
       this.emailNicksV = emailNicksV;
       this.emailStringRecordsV = emailStringRecordsV;
       this.emailRecordsOrigV = emailRecordsOrigV;
+      if (trace != null) trace.exit(PreviewGUIUpdater.class);
     }
 
     public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PreviewGUIUpdater.class, "PreviewGUIUpdater.run()");
       updatePreviewNow(msgLink);
+      if (trace != null) trace.exit(PreviewGUIUpdater.class);
     }
 
     private void updatePreviewNow(MsgLinkRecord msgLink) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "updatePreviewNow(MsgLinkRecord msgLink)");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PreviewGUIUpdater.class, "updatePreviewNow(MsgLinkRecord msgLink)");
       if (trace != null) trace.args(msgLink);
 
       // global try
@@ -1831,9 +1837,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
       // global catch
       } catch (Throwable t) {
-        if (trace != null) trace.exception(getClass(), 400, t);
+        if (trace != null) trace.exception(PreviewGUIUpdater.class, 400, t);
       }
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(PreviewGUIUpdater.class);
     } // end updatePreviewNow()
   } // end private class PreviewGUIUpdater
 
@@ -1939,10 +1945,12 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private class MsgGUIUpdater implements Runnable {
     private RecordEvent event;
     public MsgGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
 
       if (event instanceof MsgLinkRecordEvent) {
         Record[] recs = event.getRecords();

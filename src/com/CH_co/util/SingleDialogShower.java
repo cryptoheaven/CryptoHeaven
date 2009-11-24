@@ -14,10 +14,9 @@ package com.CH_co.util;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Date;
 import javax.swing.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -33,9 +32,9 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.18 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class SingleDialogShower extends Thread {
+public class SingleDialogShower extends ThreadTraced {
 
   private SingleTokenArbiter arbiter;
   private Object key;
@@ -61,8 +60,7 @@ public class SingleDialogShower extends Thread {
     if (trace != null) trace.exit(SingleDialogShower.class);
   }
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+  public void runTraced() {
     if (!MiscGui.isAllGUIsuppressed()) {
       final Object token = new Object();
       if (arbiter.putToken(key, token)) {
@@ -92,8 +90,5 @@ public class SingleDialogShower extends Thread {
         });
       }
     }
-    if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-    if (trace != null) trace.exit(getClass());
-    if (trace != null) trace.clear();
   }
 }

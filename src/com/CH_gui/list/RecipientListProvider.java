@@ -164,10 +164,12 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
   private class GUIUpdater implements Runnable {
     private MsgDataRecordEvent event;
     public GUIUpdater(MsgDataRecordEvent e) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater(MsgDataRecordEvent e)");
       event = e;
+      if (trace != null) trace.exit(GUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater.run()");
       if (updatable != null && event.getEventType() == RecordEvent.SET) {
         final MsgDataRecord[] addresses = (MsgDataRecord[]) RecordUtils.filter(event.getMsgDataRecords(), new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR));
         if (addresses != null && addresses.length > 0) {
@@ -176,7 +178,7 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
         }
       }
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(GUIUpdater.class);
     }
   }
 

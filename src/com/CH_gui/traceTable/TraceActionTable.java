@@ -115,14 +115,14 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   /**
    * Refresh Trace List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Traces"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Trace_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TraceTableModel tableModel = (TraceTableModel) getTableModel();
       tableModel.refreshData();
     }
@@ -132,14 +132,14 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   /** 
    * Initiate a new contact.
    */
-  private class InitiateAction extends AbstractAction {
+  private class InitiateAction extends AbstractActionTraced {
     public InitiateAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TraceRecord tRec = (TraceRecord) getSelectedRecord();
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       UserRecord uRec = cache.getUserRecord(tRec.ownerUserId);
@@ -156,14 +156,14 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   /** 
    * Message a user.
    */
-  private class SendMessageAction extends AbstractAction {
+  private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       TraceRecord[] traceRecs = (TraceRecord[]) getSelectedRecords();
       UserRecord[] uRecs = getUserRecords(traceRecs);
       if (uRecs != null && uRecs.length > 0) {

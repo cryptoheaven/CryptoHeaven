@@ -273,10 +273,12 @@ public class ContactTableComponent extends RecordTableComponent {
   private class UserGUIUpdater implements Runnable {
     private UserRecordEvent event;
     public UserGUIUpdater(UserRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "UserGUIUpdater(UserRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(UserGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "UserGUIUpdater.run()");
 
       if (event.getEventType() == RecordEvent.SET) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();

@@ -16,6 +16,8 @@ import java.applet.*;
 import java.net.URL;
 import javax.sound.sampled.*;
 
+import com.CH_co.trace.*;
+
 /** 
  * <b>Copyright</b> &copy; 2001-2009
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
@@ -120,14 +122,14 @@ public class Sounds extends Object {
       }
     }
   }
-  private static class ClipPlayer extends Thread {
+  private static class ClipPlayer extends ThreadTraced {
     private int clipIndex;
 
     private ClipPlayer(int audioClipIndex) {
       super("ClipPlayer");
       this.clipIndex = audioClipIndex;
     }
-    public void run() {
+    public void runTraced() {
       if (!DEBUG__SUPPRESS_ALL_SOUNDS) {
         boolean isError = false;
         try {

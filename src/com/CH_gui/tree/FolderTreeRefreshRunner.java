@@ -19,8 +19,7 @@ import com.CH_cl.tree.*;
 
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.CommandCodes;
-
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.tree.*;
 
 import com.CH_gui.frame.MainFrame;
@@ -34,7 +33,7 @@ import com.CH_gui.frame.MainFrame;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class FolderTreeRefreshRunner extends Thread {
+public class FolderTreeRefreshRunner extends ThreadTraced {
 
   private FolderTree fTree;
   private static boolean refreshInProgress;
@@ -59,8 +58,8 @@ public class FolderTreeRefreshRunner extends Thread {
     if (trace != null) trace.exit(FolderTreeRefreshRunner.class);
   }
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeRefreshRunner.class, "run()");
+  public void runTraced() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeRefreshRunner.class, "FolderTreeRefreshRunner.runTraced()");
 
     boolean refreshNow = false;
 
@@ -134,8 +133,6 @@ public class FolderTreeRefreshRunner extends Thread {
 
     }
 
-    if (trace != null) trace.data(100, Thread.currentThread().getName() + " done.");
     if (trace != null) trace.exit(FolderTreeRefreshRunner.class);
-    if (trace != null) trace.clear();
   }
 } // end class FolderTreeRefreshRunner

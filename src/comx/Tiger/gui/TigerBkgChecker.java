@@ -25,6 +25,7 @@ import javax.swing.plaf.TextUI;
 import javax.swing.text.*;
 
 import com.CH_co.trace.Trace;
+import com.CH_gui.action.AbstractActionTraced;
 import com.CH_guiLib.gui.JMyPopupMenu;
 
 /**
@@ -33,12 +34,12 @@ import com.CH_guiLib.gui.JMyPopupMenu;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description:  
+ * Class Description:
  *
  * Component which can be added as listener to JTextComponents to perform spell
  * checking in a background thread.  Underlines with zig-zag mispelled words.
  *
- * Class Details: 
+ * Class Details:
  *
  *
  * <b>$Revision: 1.4 $</b>
@@ -51,13 +52,13 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
   public static boolean backgroundCheckEnabled = true;
 
 
-  private class ReplaceWordAction extends AbstractAction {
+  private class ReplaceWordAction extends AbstractActionTraced {
 
     private int len;
     private int offset;
 
-    public void actionPerformed(ActionEvent e) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReplaceWordAction.class, "actionPerformed(ActionEvent e)");
+    public void actionPerformedTraced(ActionEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReplaceWordAction.class, "actionPerformed(ActionEvent event)");
       removeMisspelledWord(offset);
       javax.swing.text.AttributeSet attrs = null;
       if (component.getDocument() instanceof StyledDocument) {
@@ -66,7 +67,7 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
       }
       try {
         component.getDocument().remove(offset, len);
-        component.getDocument().insertString(offset, e.getActionCommand(), attrs);
+        component.getDocument().insertString(offset, event.getActionCommand(), attrs);
       } catch (BadLocationException ex) {
         if (trace != null) trace.exception(ReplaceWordAction.class, 100, ex);
       }
@@ -82,16 +83,16 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
     }
   }
 
-  private class IgnoreAllAction extends AbstractAction {
+  private class IgnoreAllAction extends AbstractActionTraced {
 
     private String word;
 
-    public void actionPerformed(ActionEvent e) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(IgnoreAllAction.class, "actionPerformed(ActionEvent e)");
+    public void actionPerformedTraced(ActionEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(IgnoreAllAction.class, "actionPerformed(ActionEvent event)");
       try {
         session.getTempLexicon().addWord(word);
       } catch (Exception ex) {
-        if (trace != null) trace.data(90, "Can't add", word, e);
+        if (trace != null) trace.data(90, "Can't add", word, event);
         if (trace != null) trace.exception(IgnoreAllAction.class, 100, ex);
       }
       recheckAll(word);
@@ -106,12 +107,12 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
     }
   }
 
-  private class AddWordAction extends AbstractAction {
+  private class AddWordAction extends AbstractActionTraced {
 
     private String word;
 
-    public void actionPerformed(ActionEvent e) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AddWordAction.class, "actionPerformed(ActionEvent e)");
+    public void actionPerformedTraced(ActionEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AddWordAction.class, "actionPerformed(ActionEvent event)");
       if (userDictionary != null) {
         try {
           EditableLexicon _tmp = userDictionary;
@@ -294,7 +295,7 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
 
 
   protected boolean busy;
-  private Object busyMonitor = new Object();
+  private final Object busyMonitor = new Object();
   protected JTextComponent component;
   protected int caretPos;
   protected Vector misspelledWords;
@@ -414,18 +415,13 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
           result = session.check(parser, otherWord);
         else
           result = session.check(word, otherWord);
-        PropSpellingSession _tmp = session;
-        if ((result & session.AUTO_CHANGE_WORD_RSLT) != 0) {
-          PropSpellingSession _tmp1 = session;
-          result &= ~session.AUTO_CHANGE_WORD_RSLT;
-          PropSpellingSession _tmp2 = session;
-          result |= session.CONDITIONALLY_CHANGE_WORD_RSLT;
+        if ((result & PropSpellingSession.AUTO_CHANGE_WORD_RSLT) != 0) {
+          result &= ~PropSpellingSession.AUTO_CHANGE_WORD_RSLT;
+          result |= PropSpellingSession.CONDITIONALLY_CHANGE_WORD_RSLT;
         }
-        PropSpellingSession _tmp3 = session;
-        if ((result & session.MISSPELLED_WORD_RSLT) == 0) {
-          PropSpellingSession _tmp4 = session;
+        if ((result & PropSpellingSession.MISSPELLED_WORD_RSLT) == 0) {
           // no double word rules because only single words can be checked when typing (it would work inside text fragment inserts)
-          if ((result & session.CONDITIONALLY_CHANGE_WORD_RSLT) == 0)// && (result & session.DOUBLED_WORD_RSLT) == 0)
+          if ((result & PropSpellingSession.CONDITIONALLY_CHANGE_WORD_RSLT) == 0)// && (result & session.DOUBLED_WORD_RSLT) == 0)
             break label1;
         }
         try {
@@ -436,7 +432,6 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
         }
         break label0;
       }
-      PropSpellingSession _tmp5 = session;
       if (result == 0 && isInMisspelledWord(offset, offset + word.length()))
         removeMisspelledWord(offset);
     }
@@ -603,7 +598,6 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
         if (trace != null) trace.exception(TigerBkgChecker.class, 100, e);
       }
       if (text != null) {
-        PropSpellingSession _tmp = session;
         for (StringWordParser parser = new StringWordParser(text, !session.getOption(4096)); parser.hasMoreElements(); parser.nextWord()) {
           //checkWord(parser.getWord(), parser.getCursor(), parser);
           checkWord(parser.getWord(), parser.getCursor(), null);
@@ -874,14 +868,11 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
         if (trace != null) trace.exception(TigerBkgChecker.class, 100, e);
       }
       if (text != null) {
-        PropSpellingSession _tmp = session;
         StringWordParser parser = new StringWordParser(text, !session.getOption(4096));
         StringBuffer otherWord = new StringBuffer();
         do {
           if (trace != null) trace.data(110, "in do");
-          PropSpellingSession _tmp1 = session;
-          int result;
-          if ((result = session.check(parser, otherWord)) != 8) {
+          if (session.check(parser, otherWord) != 8) {
             checkWord(parser.getWord(), offset + parser.getCursor(), parser);
             parser.nextWord();
           } else {

@@ -12,7 +12,6 @@
 
 package com.CH_gui.frame;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -20,7 +19,7 @@ import com.CH_cl.monitor.*;
 import com.CH_cl.service.cache.*;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
@@ -84,24 +83,26 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
   /**
    * Switch to Full App.
    **/
-  private class SwitchToFullAction extends AbstractAction {
+  private class SwitchToFullAction extends AbstractActionTraced {
     public SwitchToFullAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Switch_To_Full_App"), Images.get(ImageNums.FRAME_LOCK32));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Switch_To_Full_App."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FRAME_LOCK32));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       // do it in the non-GUI thread so it doesn't block the display
-      new Thread(new Runnable() {
-        public void run() {
+      Thread th = new ThreadTraced("Switch To Full Runner") {
+        public void runTraced() {
           if (MainFrame.getSingleInstance() == null) {
             MainFrame mainFrame = new MainFrame(MsgTableStarterFrame.this, null, null);
             mainFrame.setLoginProgMonitor(new LoginProgMonitor("Initializing ...", new String[] { "Loading Main Window" }));
             mainFrame.loginComplete(true, mainFrame);
           }
         }
-      }).start();
+      };
+      th.setDaemon(true);
+      th.start();
     }
   }
 

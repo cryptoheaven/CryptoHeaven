@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.*;
 
 import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.MainFrame;
+import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgTable.*;
 
@@ -38,9 +38,8 @@ import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
-import com.CH_gui.frame.MsgPreviewFrame;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -454,13 +453,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   }
 
   private void pressedCopy() {
-    Thread th = new Thread("Attachment Copier") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
-
+    Thread th = new ThreadTraced("Attachment Copier") {
+      public void runTraced() {
         Object[] selections = jList.getSelectedValues();
         MsgLinkRecord[] mLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selections, MsgLinkRecord.class);
         FileLinkRecord[] fLinks = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selections, FileLinkRecord.class);
@@ -520,11 +514,6 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
           serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_SAVE_MSG_FILE_ATT, request));
         }
-
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -667,13 +656,13 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   private class ListGUIUpdater implements Runnable {
     private RecordEvent event;
     public ListGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ListGUIUpdater.class, "ListGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(ListGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ListGUIUpdater.class, "run()");
-
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ListGUIUpdater.class, "ListGUIUpdater.run()");
       listUpdate(event);
-
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
       if (trace != null) trace.exit(ListGUIUpdater.class);
     }

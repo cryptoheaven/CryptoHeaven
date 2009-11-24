@@ -35,7 +35,7 @@ import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.tree.*;
 import com.CH_co.util.*;
 
@@ -51,7 +51,7 @@ import com.CH_gui.tree.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *  This is a dialog that can serve two menu items: Create New Folder and Move Folder
  *  It displays a dialog where a user can enter necessary info and select the tree folder
  *  to which to add or move a folder
@@ -62,7 +62,7 @@ import com.CH_gui.tree.*;
  *
  * <b>$Revision: 1.35 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 
 public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable {
@@ -118,7 +118,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private DocumentChangeListener documentChangeListener;
   private FolderTypeActionListener folderTypeActionListener;
 
-  /** 
+  /**
    * Creates new  Move_NewFld_Dialog for moving a single folder or creating a new folder.
    */
   public Move_NewFld_Dialog(Dialog owner, FolderTreeModelCl treeModel, FolderPair selectedFolderPair, String title, boolean isNewFolder, short newFolderType, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
@@ -131,7 +131,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     mode = MODE__NEW_OR_MOVE_FOLDER;
     constructDialog(owner, treeModel, selectedFolderPair, isNewFolder, cache, addInitialContacts);
   }
-  /** 
+  /**
    * Creates new  Move_NewFld_Dialog for moving a single folder or creating a new folder.
    */
   public Move_NewFld_Dialog(Frame owner, FolderTreeModelCl treeModel, FolderPair selectedFolderPair, String title, boolean isNewFolder, short newFolderType, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
@@ -146,7 +146,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   }
 
 
-  /** 
+  /**
    * Creates new  Move_NewFld_Dialog for moving an array of files and/or folders.
    */
   public Move_NewFld_Dialog(Dialog owner, FolderPair[] folderPairs, FolderPair[] forbidenFolderPairs, FolderPair selectedFolderPair, String title, boolean isDescendantOk, FetchedDataCache cache) {
@@ -161,7 +161,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   }
 
 
-  /** 
+  /**
    * Creates new  Move_NewFld_Dialog for moving an array of messages and/or postings.
    * @param folderFilter the priority folder filter to be used instead of the default
    */
@@ -236,7 +236,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   }
 
   /** Initialize all components that will be placed in the main panel
-    * taking into consideration whether it is a new folder or move folder dialog 
+    * taking into consideration whether it is a new folder or move folder dialog
     */
   private void initPanelComponents(Component owner, MemberContactRecordI[] addInitialContacts){
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Move_NewFld_Dialog.class, "initPanelComponents(owner, addInitialContacts)");
@@ -251,7 +251,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     } else {
 
       jFolderType = new JMyComboBox(new FolderTypeComboBoxModel());
-      
+
       if (isNewFolder) {
         String folderName = newFolderType == FolderRecord.GROUP_FOLDER ? com.CH_gui.lang.Lang.rb.getString("folder_Group_Name") : com.CH_gui.lang.Lang.rb.getString("folder_Folder_Name");
         jFolderName = new JMyTextField(folderName);
@@ -377,7 +377,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   }
 
   /** Create and set panel with components initialized earlier in setPanelComponents() method
-    * using GridBagLayout and using global variables 
+    * using GridBagLayout and using global variables
     */
   private JPanel createMainPanel() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Move_NewFld_Dialog.class, "createMainPanel()");
@@ -387,40 +387,40 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
     int posY = 0;
     if (jFolderName != null) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(0, posY, 1, 1, 5, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-      panel.add(jFolderName, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+      panel.add(jFolderName, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     if (jFolderDesc != null) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 5, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-      panel.add(new JScrollPane(jFolderDesc), new GridBagConstraints(1, posY, 1, 3, 10, 2, 
+      panel.add(new JScrollPane(jFolderDesc), new GridBagConstraints(1, posY, 1, 3, 10, 2,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY += 3;
     }
 
     if (jFolderType != null) {
-      panel.add(new JLabel (com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 5, 0, 
+      panel.add(new JLabel (com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-      panel.add(jFolderType, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0)); 
+      panel.add(jFolderType, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     if (jTreeLabel != null) {
-      panel.add(jTreeLabel, new GridBagConstraints(0, posY, 2, 1, 15, 0, 
+      panel.add(jTreeLabel, new GridBagConstraints(0, posY, 2, 1, 15, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     if (treeScrollPane != null) {
-      panel.add(treeScrollPane, new GridBagConstraints(0, posY, 2, 1, 15, 10, 
+      panel.add(treeScrollPane, new GridBagConstraints(0, posY, 2, 1, 15, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
@@ -441,7 +441,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     }
     if (trace != null) trace.exit(Move_NewFld_Dialog.class, folderType);
     return folderType;
-  } 
+  }
 
   private JButton[] createButtons() {
 
@@ -482,7 +482,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     return isForbiden;
   }
 
-  /** 
+  /**
    * Gather data from panel components to set a chosen destination folder.
    * @return true for success.
    **/
@@ -494,7 +494,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     FolderTreeNode destinationNode = (FolderTreeNode) filteredTree.getLastSelectedPathComponent();
 
     // if destinationNode cannot be descendant of forbidenSubtrees, if so, show an error dialog
-    if (isDestinationForbiden(destinationNode)) { 
+    if (isDestinationForbiden(destinationNode)) {
       MessageDialog.showErrorDialog(this, com.CH_gui.lang.Lang.rb.getString("msg_Selected_destination_folder_is_not_a_valid_choice."), com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
     } else {
       if (destinationNode != null)
@@ -548,8 +548,8 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     }
   }
 
-  /** 
-   * Gather data from panel components to set a request to create a new folder 
+  /**
+   * Gather data from panel components to set a request to create a new folder
    * @return true for success.
    **/
   private boolean setNewFolderRequest() {
@@ -564,15 +564,15 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
       jFolderName.requestFocus();
     } else if (folderSharingPanel.shareTableModel.getRowCount() > 0 && folderSharingPanel.jShareName.getText().length() == 0) {
       MessageDialog.showErrorDialog(this, SHARE_FOLDER_NAME_EMPTY, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
-    } else if ( 
-              isSelectedChatting() && 
+    } else if (
+              isSelectedChatting() &&
               (numToKeep == null || numToKeep.shortValue() == 0) &&
               (keepAsOldAs == null || keepAsOldAs.intValue() == 0)
               )
     {
       MessageDialog.showErrorDialog(this, CHATTING_FOLDER_INVALID_INPUT, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
     } else if (
-              isSelectedChatting() && 
+              isSelectedChatting() &&
               folderSharingPanel.shareTableModel.getRowCount() == 0
             )
     {
@@ -604,7 +604,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
           parentFolder,
           getSelectedFolderType(),
           folderName, folderDesc,
-          shareName, shareDesc, 
+          shareName, shareDesc,
           numToKeep,
           keepAsOldAs,
           baSymmetricKey,
@@ -619,8 +619,8 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     return success;
   }
 
-  /** 
-   * Gather data from panel compnents to set a request to move a folder 
+  /**
+   * Gather data from panel compnents to set a request to move a folder
    * @return true for success.
    **/
   private boolean setMoveFolderRequest() {
@@ -689,10 +689,8 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private class OKActionListener implements ActionListener {
     public void actionPerformed (ActionEvent event) {
       // seperate AWT Thread from any potention network request in set request methods
-      Thread th = new Thread("Folder Creator") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+      Thread th = new ThreadTraced("Folder Creator") {
+        public void runTraced() {
           boolean canClose = false;
           if (isChooseDestination) {
             canClose = setChosenDestination();
@@ -729,10 +727,6 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
             else
               Move_NewFld_Dialog.this.setVisible(true);
           } // end canClose
-
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         } // end run()
       };
       th.setDaemon(true);

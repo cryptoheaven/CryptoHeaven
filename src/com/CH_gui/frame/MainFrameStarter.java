@@ -232,7 +232,6 @@ public class MainFrameStarter extends Object {
       Misc.systemExit(-2);
     }
     if (trace != null) trace.exit(MainFrameStarter.class);
-    if (trace != null) trace.clear();
   }
 
   private static void usageExit() {
@@ -447,7 +446,7 @@ public class MainFrameStarter extends Object {
               if (fldRec != null) {
                 Runnable msgSelect = new Runnable() {
                   public void run() {
-                    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+                    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrameStarter.loginComplete.msgSelect.run()");
                     if (trace != null) trace.data(10, "initial msgLinkId", msgLinkId);
                     FolderPair fPair = new FolderPair(cache.getFolderShareRecordMy(fldRec.folderId, true), fldRec);
                     mainStartupFrame[0] = new MsgTableStarterFrame(fPair, new MsgLinkRecord[] { msgLink }, true);
@@ -542,10 +541,12 @@ public class MainFrameStarter extends Object {
   private class ContactGUIUpdater implements Runnable {
     private ContactRecordEvent event;
     public ContactGUIUpdater(ContactRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater(ContactRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(ContactGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater.run()");
 
       ContactRecord[] records = event.getContactRecords();
       if (event.getEventType() == RecordEvent.SET) {
@@ -605,9 +606,11 @@ public class MainFrameStarter extends Object {
 
   private static class TitleGUIUpdater implements Runnable {
     public TitleGUIUpdater() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TitleGUIUpdater.class, "TitleGUIUpdater()");
+      if (trace != null) trace.exit(TitleGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TitleGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TitleGUIUpdater.class, "TitleGUIUpdater.run()");
 
       Frame frame = GeneralDialog.getDefaultParent();
       if (frame != null && frame instanceof JActionFrame)

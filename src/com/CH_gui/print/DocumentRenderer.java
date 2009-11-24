@@ -12,7 +12,9 @@
 
 package com.CH_gui.print;
 
+import com.CH_co.trace.Trace;
 import com.CH_co.util.HTML_ClickablePane;
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -97,8 +99,10 @@ public class DocumentRenderer implements Printable {
    * The constructor initializes the pFormat and PJob variables.
    */
   public DocumentRenderer() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DocumentRenderer.class, "DocumentRenderer()");
     pFormat = new PageFormat();
     pJob = PrinterJob.getPrinterJob();
+    if (trace != null) trace.exit(DocumentRenderer.class);
   }
 
   /**
@@ -123,7 +127,7 @@ public class DocumentRenderer implements Printable {
     pFormat = pJob.pageDialog(pFormat);
   }
 
-  /**  
+  /**
     The print method implements the Printable interface. Although Printables
     may be called to render a page more than once, each page is painted in
     order. We may, therefore, keep track of changes in the page being rendered
@@ -178,6 +182,8 @@ public class DocumentRenderer implements Printable {
     than PrinterJob.
   */
   public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DocumentRenderer.class, "print(Graphics graphics, PageFormat pageFormat, int pageIndex)");
+
     double scale = 1.0;
     Graphics2D graphics2D;
     View rootView;
@@ -195,7 +201,7 @@ public class DocumentRenderer implements Printable {
       graphics2D.scale(scale, scale);
     }
     //  V
-    graphics2D.setClip( (int) (pageFormat.getImageableX() / scale), 
+    graphics2D.setClip( (int) (pageFormat.getImageableX() / scale),
                         (int) (pageFormat.getImageableY() / scale),
                         (int) (pageFormat.getImageableWidth() / scale),
                         (int) (pageFormat.getImageableHeight() / scale));
@@ -209,26 +215,32 @@ public class DocumentRenderer implements Printable {
     graphics2D.translate(graphics2D.getClipBounds().getX(), graphics2D.getClipBounds().getY());
     //  VIII
     Rectangle allocation = new Rectangle( 0,
-                                          (int) -pageStartY, 
-                                          (int) (jeditorPane.getMinimumSize().getWidth()), 
+                                          (int) -pageStartY,
+                                          (int) (jeditorPane.getMinimumSize().getWidth()),
                                           (int) (jeditorPane.getPreferredSize().getHeight()));
     //  X
+    int rc = 0;
     if (printView(graphics2D,allocation,rootView)) {
-      return Printable.PAGE_EXISTS;
+      rc = Printable.PAGE_EXISTS;
     } else {
       pageStartY = 0;
       pageEndY = 0;
       currentPage = -1;
-      return Printable.NO_SUCH_PAGE;
+      rc = Printable.NO_SUCH_PAGE;
     }
+
+    if (trace != null) trace.exit(DocumentRenderer.class, rc);
+    return rc;
   }
 
   /**
    * print(JEditorPane) prints a Document contained within a JEDitorPane.
    */
   public void print(JEditorPane jedPane) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DocumentRenderer.class, "print(JEditorPane jedPane)");
     setDocument(jedPane);
     printDialog();
+    if (trace != null) trace.exit(DocumentRenderer.class);
   }
 
 //  /**
@@ -252,6 +264,7 @@ public class DocumentRenderer implements Printable {
    * printing in response to user input.
    */
   protected void printDialog() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DocumentRenderer.class, "printDialog()");
     if (pJob.printDialog()) {
       pJob.setPrintable(this, pFormat);
       try {
@@ -264,6 +277,7 @@ public class DocumentRenderer implements Printable {
         System.out.println("Error Printing Document");
       }
     }
+    if (trace != null) trace.exit(DocumentRenderer.class);
   }
 
   /**
@@ -359,6 +373,7 @@ public class DocumentRenderer implements Printable {
    * in a JEditorPane.
    */
   public void setDocument(JEditorPane jedPane) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DocumentRenderer.class, "setDocument(JEditorPane jedPane)");
     String type = jedPane.getContentType();
     String text = jedPane.getText();
     //jeditorPane = new JEditorPane(type, text);
@@ -368,6 +383,7 @@ public class DocumentRenderer implements Printable {
       jeditorPane = new JEditorPane(type, text);
 //    jeditorPane = new JEditorPane();
 //    setDocument(jedPane.getContentType(), jedPane.getDocument()); // setting from Document gives EXCEPTION !?!?
+    if (trace != null) trace.exit(DocumentRenderer.class);
   }
 
 //  /**

@@ -15,7 +15,7 @@ package com.CH_co.io;
 import java.util.*;
 
 import com.CH_co.monitor.Stats;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /** 
@@ -74,9 +74,9 @@ public class SpeedLimiter extends Object {
     // Make a thread to reset the global stats from time to time 
     // so that visual throughput display gets reset from time to time even if there are no requests
     // going through.
-    Thread globalStatReseter = new Thread("Global Stat Reseter") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread globalStatReseter = new ThreadTraced("Global Stat Reseter") {
+      public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "SpeedLimiter.static.globalStatReseter.runTraced()");
         boolean forever = true;
         while (forever) {
           try {
@@ -88,9 +88,7 @@ public class SpeedLimiter extends Object {
           if (Thread.interrupted())
             break;
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     globalStatReseter.setDaemon(true);

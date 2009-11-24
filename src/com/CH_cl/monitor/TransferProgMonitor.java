@@ -25,7 +25,7 @@ import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /** 
@@ -124,8 +124,8 @@ public class TransferProgMonitor extends JFrame implements ProgMonitor {
     setLocation(MiscGui.getSuggestedSpreadedWindowLocation(this));
     
     // delay visibility of this frame in case it will close super fast
-    Thread th = new Thread() {
-      public void run() {
+    Thread th = new ThreadTraced("Delayed Visibility of TransferProgMonitor") {
+      public void runTraced() {
         try { Thread.sleep(2000); } catch (InterruptedException x) { }
         synchronized (monitor) {
           if (!isClosed) {

@@ -153,10 +153,12 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
   private class MsgGUIUpdater implements Runnable {
     private MsgLinkRecordEvent e;
     public MsgGUIUpdater(MsgLinkRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(MsgLinkRecordEvent event)");
       this.e = event;
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
       if (e.getEventType() == MsgLinkRecordEvent.SET) {
         // only auto-scroll if single message arrived, this means chat session is in progress and folder content is not fetched
         MsgLinkRecord[] msgLinks = e.getMsgLinkRecords();
@@ -232,10 +234,12 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
   private class ChatGUIUpdater implements Runnable {
     private EventObject e;
     public ChatGUIUpdater(EventObject event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatGUIUpdater.class, "ChatGUIUpdater(EventObject event)");
       this.e = event;
+      if (trace != null) trace.exit(ChatGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatGUIUpdater.class, "ChatGUIUpdater.run()");
       Object s = e.getSource();
       if (s instanceof Obj_List_Co) {
         Obj_List_Co o = (Obj_List_Co) s;

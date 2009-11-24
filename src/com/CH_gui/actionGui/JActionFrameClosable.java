@@ -226,7 +226,7 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   /** 
    * Close the frame.
    **/
-  private class CloseAction extends AbstractAction {
+  private class CloseAction extends AbstractActionTraced {
     public CloseAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Close"), Images.get(ImageNums.DELETE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -234,7 +234,7 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Close"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       closeAction();
     }
   }

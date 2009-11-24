@@ -142,7 +142,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
    /**
     * Add a user.
     */
-  private class AddAccountAction extends AbstractAction {
+  private class AddAccountAction extends AbstractActionTraced {
     public AddAccountAction(int actionId) {
       super("Create New", Images.get(ImageNums.USER_NEW16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -150,7 +150,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_NEW24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(SubUserActionTable.this);
       if (w instanceof Frame) new CreateSubAccountsWizardDialog((Frame) w);
       else if (w instanceof Dialog) new CreateSubAccountsWizardDialog((Dialog) w);
@@ -160,7 +160,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Edit a user.
    */
-  private class EditAccountAction extends AbstractAction {
+  private class EditAccountAction extends AbstractActionTraced {
     public EditAccountAction(int actionId) {
       super("Edit Account", Images.get(ImageNums.USER_EDIT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -168,7 +168,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Edit"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] selectedRecords = (UserRecord[]) getSelectedRecords();
       if (selectedRecords != null) {
         Window w = SwingUtilities.windowForComponent(SubUserActionTable.this);
@@ -181,7 +181,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Remove a user.
    */
-  private class RemoveAccountAction extends AbstractAction {
+  private class RemoveAccountAction extends AbstractActionTraced {
     public RemoveAccountAction(int actionId) {
       super("Delete Account", Images.get(ImageNums.USER_DELETE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -189,7 +189,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] records = (UserRecord[]) getSelectedRecords();
       if (records != null && records.length > 0) {
         Window w = SwingUtilities.windowForComponent(SubUserActionTable.this);
@@ -211,7 +211,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Message a user.
    */
-  private class SendMessageAction extends AbstractAction {
+  private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -219,7 +219,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new MessageFrame(getSelectedRecords());
     }
   }
@@ -227,7 +227,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Refresh Sub Account List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super("Refresh Accounts", Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -235,7 +235,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       //putValue(Actions.TOOL_NAME, "Refresh");
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserTableModel tableModel = (UserTableModel) getTableModel();
       tableModel.refreshData(true);
     }
@@ -244,14 +244,14 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Open in seperate window
    */
-  private class OpenInSeperateWindowAction extends AbstractAction {
+  private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super("Clone Account List View", Images.get(ImageNums.CLONE_CONTACT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Display account list table in its own window.");
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       UserRecord myUserRec = cache.getUserRecord();
       if (myUserRec.isCapableToManageUserAccounts()) {
@@ -267,7 +267,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Add or remove contacts from sub-accounts
    */
-  private class AddRemoveContactsAction extends AbstractAction {
+  private class AddRemoveContactsAction extends AbstractActionTraced {
     public AddRemoveContactsAction(int actionId) {
       super("Manage Contacts", Images.get(ImageNums.CONTACT_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -275,7 +275,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Manage_Contacts"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] selectedRecords = (UserRecord[]) getSelectedRecords();
       if (selectedRecords == null || selectedRecords.length == 0) {
         FetchedDataCache cache = SIL.getFetchedDataCache();
@@ -290,7 +290,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Activate or Suspend selected sub-accounts
    */
-  private class ActivateSuspendAction extends AbstractAction {
+  private class ActivateSuspendAction extends AbstractActionTraced {
     public ActivateSuspendAction(int actionId) {
       super("Activate or Suspend ...", Images.get(ImageNums.USER_ACTIVATE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -298,7 +298,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_ACTIVATE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Activate_or_Suspend"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] records = (UserRecord[]) getSelectedRecords();
       if (records != null && records.length > 0) {
         Window w = SwingUtilities.windowForComponent(SubUserActionTable.this);
@@ -311,7 +311,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   /**
    * Reset User's Password of selected sub-accounts
    */
-  private class PasswordResetAction extends AbstractAction {
+  private class PasswordResetAction extends AbstractActionTraced {
     public PasswordResetAction(int actionId) {
       super("Password Reset ...", Images.get(ImageNums.USER_PASS_RESET16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -319,7 +319,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_PASS_RESET24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Password_Reset"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] records = (UserRecord[]) getSelectedRecords();
       if (records != null && records.length > 0) {
         Window w = SwingUtilities.windowForComponent(SubUserActionTable.this);

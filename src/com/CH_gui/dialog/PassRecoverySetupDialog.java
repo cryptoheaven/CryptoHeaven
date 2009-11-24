@@ -25,7 +25,7 @@ import com.CH_cl.service.ops.*;
 import com.CH_co.cryptx.*;
 import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -391,15 +391,13 @@ public class PassRecoverySetupDialog extends GeneralDialog {
   }
 
 
-  private class OKThread extends Thread {
+  private class OKThread extends ThreadTraced {
 
     public OKThread() {
       super("PassRecoverySetupDialog OKThread");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
-
+    public void runTraced() {
       setEnabledInputs(false);
       boolean error = false;
 
@@ -478,10 +476,6 @@ public class PassRecoverySetupDialog extends GeneralDialog {
         // if error occurred than enable inputs
         setEnabledInputs(true);
       }
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(OKThread.class);
-      if (trace != null) trace.clear();
     }
   }
 }

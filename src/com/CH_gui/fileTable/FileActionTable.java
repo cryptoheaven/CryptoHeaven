@@ -55,7 +55,7 @@ import com.CH_gui.tree.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -63,7 +63,7 @@ import com.CH_gui.tree.*;
  *
  * <b>$Revision: 1.42 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileActionTable extends RecordActionTable implements ActionProducerI {
 
@@ -99,9 +99,9 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private int leadingActionId = Actions.LEADING_ACTION_ID_FILE_ACTION_TABLE;
   private int leadingFolderActionId = Actions.LEADING_ACTION_ID_FOLDER_ACTION_TREE;
   private int leadingMsgActionId = Actions.LEADING_ACTION_ID_MSG_ACTION_TABLE;
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
 
-  private EventListenerList folderSelectionListenerList = new EventListenerList();
+  private final EventListenerList folderSelectionListenerList = new EventListenerList();
 
   /** Creates new FileActionTable */
   public FileActionTable() {
@@ -109,7 +109,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "FileActionTable()");
 
     initActions();
-    this.serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
+    this.SIL = MainFrame.getServerInterfaceLayer();
     ((FileTableModel) getTableModel()).setAutoUpdate(true);
 
     addDND(getJSortedTable());
@@ -232,13 +232,13 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
 
   // =====================================================================
-  // LISTENERS FOR THE MENU ITEMS        
+  // LISTENERS FOR THE MENU ITEMS
   // =====================================================================
 
-  /** 
+  /**
    * Open single file (no directories or multi selections)
    */
-  private class OpenFileAction extends AbstractAction {
+  private class OpenFileAction extends AbstractActionTraced {
     public OpenFileAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -246,18 +246,18 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Open"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FileRecord[] fileRecords = (FileRecord[]) getSelectedRecords();
       if (fileRecords != null && fileRecords.length == 1 && fileRecords[0] instanceof FileLinkRecord) {
         openFile((FileLinkRecord) fileRecords[0]);
       }
     }
   }
-  
-  /** 
-   * Download a file/directory to the local system using DownloadUtilities to do all the work 
+
+  /**
+   * Download a file/directory to the local system using DownloadUtilities to do all the work
    */
-  private class DownloadAction extends AbstractAction {
+  private class DownloadAction extends AbstractActionTraced {
     public DownloadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Download_..."), Images.get(ImageNums.IMPORT_FILE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -266,7 +266,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FileRecord[] fileRecords = (FileRecord[]) getSelectedRecords();
       if (fileRecords != null && fileRecords.length > 0) {
         DownloadUtilities.downloadFilesChoice(fileRecords, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
@@ -274,7 +274,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     }
   }
 
-  private class CopyAction extends AbstractAction {
+  private class CopyAction extends AbstractActionTraced {
     public CopyAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Copy_to_Folder_..."), Images.get(ImageNums.COPY16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -283,18 +283,15 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Copy"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CopyAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
+    public void actionPerformedTraced(ActionEvent event) {
       FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
       FolderPair chosenFolderPair = getMoveCopyDestination(false, false, true);
       if (chosenFolderPair != null) {
         File_MoveCopy_Rq request = prepareMoveCopyRequest(chosenFolderPair.getFolderShareRecord(), fLinks);
         if (request != null) {
-          serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_COPY_FILES, request));
+          SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_COPY_FILES, request));
         }
       }
-      if (trace != null) trace.exit(CopyAction.class);
     }
     private void updateText(int countSelectedFiles) {
       if (countSelectedFiles > 1) {
@@ -305,7 +302,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     }
   }
 
-  private class MoveAction extends AbstractAction {
+  private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Move_to_Folder_..."), Images.get(ImageNums.FILE_MOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -314,7 +311,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Move"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
       FolderPair[] fPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
       FolderPair chosenFolderPair = getMoveCopyDestination(true, fPairs != null && fPairs.length > 0, fLinks != null && fLinks.length > 0);
@@ -393,7 +390,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     if (trace != null) trace.exit(FileActionTable.class);
   }
 
-  private class DeleteAction extends AbstractAction {
+  private class DeleteAction extends AbstractActionTraced {
     public DeleteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_..."), Images.get(ImageNums.FILE_REMOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -402,10 +399,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DeleteAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
-
+    public void actionPerformedTraced(ActionEvent event) {
       FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
       FolderPair[] folderPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
 
@@ -451,7 +445,6 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         }
 
       }
-      if (trace != null) trace.exit(DeleteAction.class);
     }
     private void updateText(int countSelectedFiles) {
       if (countSelectedFiles > 1) {
@@ -462,14 +455,14 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     }
   }
 
-  private class PropertiesAction extends AbstractAction {
+  private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_File_Properties"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_General_Properties."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
       if (fileLinks != null && fileLinks.length == 1) {
         Window w = SwingUtilities.windowForComponent(FileActionTable.this);
@@ -488,7 +481,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Show the Message Compose frame with selected files as initial attachments.
    */
-  private class ForwardToAction extends AbstractAction {
+  private class ForwardToAction extends AbstractActionTraced {
     public ForwardToAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Forward_File_..."), Images.get(ImageNums.FORWARD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -497,7 +490,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Forward"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(FileActionTable.this)) {
         FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
         if (fileLinks != null && fileLinks.length > 0) {
@@ -517,7 +510,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Refresh File List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -526,7 +519,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       ((FileTableModel) getTableModel()).refreshData(true);
     }
   }
@@ -535,7 +528,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Mark selected items as SEEN
    */
-  private class MarkAsSeenAction extends AbstractAction {
+  private class MarkAsSeenAction extends AbstractActionTraced {
     public MarkAsSeenAction (int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Seen"), Images.get(ImageNums.FLAG_BLANK_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -544,7 +537,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Seen"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       markSelectedAs(StatRecord.FLAG_OLD);
     }
   }
@@ -552,7 +545,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Mark selected items as UNSEEN
    */
-  private class MarkAsUnseenAction extends AbstractAction {
+  private class MarkAsUnseenAction extends AbstractActionTraced {
     public MarkAsUnseenAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unseen"), Images.get(ImageNums.FLAG_GREEN_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -561,7 +554,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Unseen"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       markSelectedAs(StatRecord.FLAG_NEW);
     }
   }
@@ -569,7 +562,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Mark all items in the folder as SEEN
    */
-  private class MarkAllSeenAction extends AbstractAction {
+  private class MarkAllSeenAction extends AbstractActionTraced {
     public MarkAllSeenAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Seen"), Images.get(ImageNums.FLAG_BLANK_DOUBLE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -578,7 +571,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_All_Seen"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       markAllAs(StatRecord.FLAG_OLD);
     }
   }
@@ -586,7 +579,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Open in seperate window
    */
-  private class OpenInSeperateWindowAction extends AbstractAction {
+  private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -594,7 +587,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((FileTableModel) getTableModel()).getParentFolderPair();
       if (parentFolderPair != null)
         new FileTableFrame(parentFolderPair);
@@ -605,7 +598,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Open history stat dialog for selected file link object.
    */
-  private class TracePrivilegeAndHistoryAction extends AbstractAction {
+  private class TracePrivilegeAndHistoryAction extends AbstractActionTraced {
     public TracePrivilegeAndHistoryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Trace_File_Access"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -613,7 +606,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Record[] selected = getSelectedRecords();
       if (selected != null && selected.length >= 1) {
         Window w = SwingUtilities.windowForComponent(FileActionTable.this);
@@ -627,7 +620,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   /**
    * Show selected Folder's sharing panel so user can add/invite others.
    */
-  private class InviteAction extends AbstractAction {
+  private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -635,7 +628,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = FileActionTable.this.getTableModel().getParentFolderPair();
       boolean fromPopup = isActionActivatedFromPopup(event);
       if (fromPopup) {
@@ -731,9 +724,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           statsClones[i].mark = newMark;
 
         Stats_Update_Rq request = new Stats_Update_Rq(statsClones);
-
-        ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-        serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
+        SIL.submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
       }
     }
     if (trace != null) trace.exit(FileActionTable.class);
@@ -766,7 +757,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     //if (forDirs)
     //  isDescendantOk = false;
 
-    // If there are no selected folders, we are copying/moving files only and forbiden folder 
+    // If there are no selected folders, we are copying/moving files only and forbiden folder
     // will be the one that is parent to the selected file(s).
     if (forFiles) {
       FolderPair parentFolderPair = ((FileTableModel) getTableModel()).getParentFolderPair();
@@ -779,8 +770,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
 
     Move_NewFld_Dialog d = null;
-    if (w instanceof Frame) d = new Move_NewFld_Dialog((Frame) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache); 
-    else if (w instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache); 
+    if (w instanceof Frame) d = new Move_NewFld_Dialog((Frame) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache);
+    else if (w instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache);
 
     FolderPair chosenPair = null;
     if (d != null) {
@@ -852,7 +843,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   }
 
   /****************************************************************************/
-  /*        A c t i o n P r o d u c e r I                                  
+  /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
 
   /** @return all the acitons that this objects produces.
@@ -871,7 +862,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     actions[SORT_ASC_ACTION].setEnabled(true);
     actions[SORT_DESC_ACTION].setEnabled(true);
     actions[CUSTOMIZE_COLUMNS_ACTION].setEnabled(true);
-    for (int i=SORT_BY_FIRST_COLUMN_ACTION; i<SORT_BY_FIRST_COLUMN_ACTION+NUM_OF_SORT_COLUMNS; i++) 
+    for (int i=SORT_BY_FIRST_COLUMN_ACTION; i<SORT_BY_FIRST_COLUMN_ACTION+NUM_OF_SORT_COLUMNS; i++)
       actions[i].setEnabled(true);
 
     FileRecord[] records = (FileRecord[]) getSelectedRecords();

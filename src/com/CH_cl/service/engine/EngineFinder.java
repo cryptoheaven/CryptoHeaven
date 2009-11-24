@@ -12,12 +12,11 @@
 
 package com.CH_cl.service.engine;
 
-import com.CH_co.util.GlobalProperties;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /** 
@@ -26,7 +25,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,7 +33,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.17 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class EngineFinder extends Object {
 
@@ -42,7 +41,7 @@ public class EngineFinder extends Object {
    * Queries the HTTP server for the list of application servers qurrently accessible.
    * Based on the current query return the best-version-matching list of servers that is available.
    * Update the GlobalProperties with the newest response to server locations.
-   * When there are problems with connectivity to specified server, it will return last fetched list 
+   * When there are problems with connectivity to specified server, it will return last fetched list
    * of data servers for the specified http server with that http server attached at the end.
    * @param server consists of (String-hostname) (Integer-port)
    */
@@ -290,18 +289,13 @@ public class EngineFinder extends Object {
     if (trace != null) trace.args(maxWaitMillis);
     InputStream stream = null;
     final Object[] returnBuffer = new Object[1];
-    Thread fetcher = new Thread("EngineFinder server list fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-        InputStream returnStream = null;
+    Thread fetcher = new ThreadTraced("EngineFinder server list fetcher") {
+      public void runTraced() {
         try {
-          returnStream = url.openStream();
+          InputStream returnStream = url.openStream();
           returnBuffer[0] = returnStream;
-        } catch (Throwable t) {
+        } catch (IOException x) {
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     fetcher.setDaemon(true);

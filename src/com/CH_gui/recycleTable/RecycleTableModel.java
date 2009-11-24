@@ -604,10 +604,12 @@ public class RecycleTableModel extends RecordTableModel {
   private class RecycleGUIUpdater implements Runnable {
     private RecordEvent event;
     public RecycleGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleGUIUpdater.class, "RecycleGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(RecycleGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleGUIUpdater.class, "RecycleGUIUpdater.run()");
       fileAndFolderAndMsgUpdate(event);
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
       if (trace != null) trace.exit(RecycleGUIUpdater.class);

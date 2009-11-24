@@ -53,6 +53,8 @@ import com.CH_gui.table.*;
 
 public class JSortedTable extends JTable implements DisposableObj {
 
+  private static final boolean DISPLAY_SECONDARY_SORT_ORDER_ICON = false;
+
   TableHeaderSorter tableHeaderSorter = null;
 
   /** Creates new JSortedTable */
@@ -351,8 +353,10 @@ public class JSortedTable extends JTable implements DisposableObj {
         }
         /* last sorted column */
         else if (sortColumnIndex == 1) {
-          sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING : ImageNums.ORDER_DESCENDING;
-          sortIcon = Images.get(sortIconIndex);
+          if (DISPLAY_SECONDARY_SORT_ORDER_ICON) {
+            sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING : ImageNums.ORDER_DESCENDING;
+            sortIcon = Images.get(sortIconIndex);
+          }
           sortToolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("sort_Secondary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
         }
       }

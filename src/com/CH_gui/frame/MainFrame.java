@@ -26,7 +26,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
@@ -54,7 +54,7 @@ import javax.swing.border.EtchedBorder;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -62,7 +62,7 @@ import javax.swing.border.EtchedBorder;
  *
  * <b>$Revision: 1.72 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoordinatorI {
 
@@ -134,8 +134,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
     addWindowListener(new WindowAdapter() {
       public void windowIconified(WindowEvent e) {
-        Thread gc = new Thread("Garbage Collection") {
-          public void run() {
+        Thread gc = new ThreadTraced("Garbage Collection") {
+          public void runTraced() {
             System.gc();
           }
         };
@@ -209,7 +209,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       // TO-DO: Clean-up duplicate code...
       com.CH_cl.service.records.FolderRecUtil.clearFetchedIDs();
 
-      // Mark Active Status right away since the GUI timer is scheduled in intervals... 
+      // Mark Active Status right away since the GUI timer is scheduled in intervals...
       // if user was disconnected in INACTIVE state, he should be marked active now...
       InactivityEventQueue.getInstance().sendActiveFlagIfInactive();
 
@@ -228,7 +228,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               final Long selectFolderId = fldRec.folderId;
               Runnable folderSelect = new Runnable() {
                 public void run() {
-                  Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+                  Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrame.loginComplete.folderSelect.run()");
                   if (trace != null) trace.data(10, "selectFolderId", selectFolderId);
                   FolderTreeComponent treeComp = getMainTreeComponent();
                   treeComp.getFolderTreeScrollPane().getFolderTree().setSelectedFolder(selectFolderId);
@@ -242,7 +242,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               try { SwingUtilities.invokeAndWait(folderSelect); } catch (Throwable t) { }
               Runnable msgSelect = new Runnable() {
                 public void run() {
-                  Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+                  Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrame.loginComplete.msgSelect.run()");
                   if (trace != null) trace.data(10, "initial msgLinkId", msgLinkId);
                   tableComp.setSelectedId(msgLinkId);
                   if (trace != null) trace.exit(getClass());
@@ -256,9 +256,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         else if (initialFolderId != null) {
           final Long folderId = initialFolderId;
           initialFolderId = null;
-          Runnable folderSelect = new Runnable() {
+          Runnable folderSelect2 = new Runnable() {
             public void run() {
-              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+              Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrame.loginComplete.folderSelect2.run()");
               if (trace != null) trace.data(10, "initial folderId", folderId);
               FolderTreeComponent treeComp = getMainTreeComponent();
               treeComp.getFolderTreeScrollPane().getFolderTree().setSelectedFolder(folderId);
@@ -266,7 +266,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
             }
           };
           SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderId)), 20000);
-          try { SwingUtilities.invokeAndWait(folderSelect); } catch (Throwable t) { }
+          try { SwingUtilities.invokeAndWait(folderSelect2); } catch (Throwable t) { }
         }
         if (loginCoordinator != null) {
           loginCoordinator.readyForMainData();
@@ -301,7 +301,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   // =====================================================================
-  // MAIN FUNCTION    
+  // MAIN FUNCTION
   // =====================================================================
 
 
@@ -374,7 +374,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         String htmlText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_free_guest_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
         PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
       }
-      
+
       if (myUserRec != null) {
         // see if we should remind users to update their email address
         if (myUserRec.defaultEmlId.longValue() == -1 && !myUserRec.isFreePromoAccount() && !myUserRec.isHeld() && !myUserRec.isBusinessSubAccount()) {
@@ -397,8 +397,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     String propertyName = ContactActionTable.getTogglePropertyName(this);
     String oldShowS = GlobalProperties.getProperty(propertyName);
     boolean oldShow = oldShowS != null ? Boolean.valueOf(oldShowS).booleanValue() : false;
-    RecordFilter filter = new MultiFilter(new RecordFilter[] { 
-      new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow), 
+    RecordFilter filter = new MultiFilter(new RecordFilter[] {
+      new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
       new FolderFilter(FolderRecord.GROUP_FOLDER) }
     , MultiFilter.OR);
 
@@ -503,22 +503,22 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
     Insets insets = new MyInsets(0, 1, 0, 1);
     int posX = 0;
-    jStatusBar.add(jStatus, new GridBagConstraints(posX, 0, 1, 1, 10, 0, 
+    jStatusBar.add(jStatus, new GridBagConstraints(posX, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
     posX ++;
-    jStatusBar.add(jSize, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+    jStatusBar.add(jSize, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
-    jStatusBar.add(jTransferRate, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+    jStatusBar.add(jTransferRate, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
-    jStatusBar.add(jPing, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+    jStatusBar.add(jPing, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
-    jStatusBar.add(jConnections, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+    jStatusBar.add(jConnections, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
-    jStatusBar.add(jOnlineStatus, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+    jStatusBar.add(jOnlineStatus, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
 
     jStatusBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 14));
@@ -561,7 +561,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         } catch (Throwable t) {
         }
         if (displayOk) {
-          GlobalProperties.setProperty(PROPERTY_NAME__WELCOME_SCREEN_DATE, ""+todaysDate); 
+          GlobalProperties.setProperty(PROPERTY_NAME__WELCOME_SCREEN_DATE, ""+todaysDate);
         }
       }
       if (displayOk) {
@@ -644,13 +644,13 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   // =====================================================================
-  // LISTENERS FOR THE MENU ITEMS        
+  // LISTENERS FOR THE MENU ITEMS
   // =====================================================================
 
-  /** 
-   * Exit the program and store menus and chosen tools in configuration file 
+  /**
+   * Exit the program and store menus and chosen tools in configuration file
    **/
-  private class ExitAction extends AbstractAction {
+  private class ExitAction extends AbstractActionTraced {
     public ExitAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Exit"), Images.get(ImageNums.DELETE16));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Exit_the_application."));
@@ -658,7 +658,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Exit"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       exitAction();
     }
   }
@@ -666,16 +666,16 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show the About Dialog
    */
-  protected static class AboutAction extends AbstractAction {
+  protected static class AboutAction extends AbstractActionTraced {
     public AboutAction(int actionId) {
-      super(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"), 
+      super(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
             new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) }), Images.get(ImageNums.INFO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.INFO16));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new AboutDialog(GeneralDialog.getDefaultParent());
     }
   }
@@ -683,7 +683,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show the Change Password Dialog
    */
-  private class ChangePassAction extends AbstractAction {
+  private class ChangePassAction extends AbstractActionTraced {
     public ChangePassAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
@@ -691,7 +691,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       boolean isSetMode = false;
       Boolean isSet = isPasswordSet();
       if (isSet != null)
@@ -714,14 +714,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show the Change UserName Dialog
    */
-  private class ChangeUserNameAction extends AbstractAction {
+  private class ChangeUserNameAction extends AbstractActionTraced {
     public ChangeUserNameAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(MainFrame.this)) {
         new ChangeUserNameDialog(MainFrame.this);
       }
@@ -731,7 +731,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 //  /**
 //   * Show the Connection Options Dialog
 //   */
-//  private class ConnectionOptionsAction extends AbstractAction {
+//  private class ConnectionOptionsAction extends AbstractActionTraced {
 //    public ConnectionOptionsAction(int actionId) {
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Connection_Options"));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Connection_Options"));
@@ -739,7 +739,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 //      //putValue(Actions.TOOL_ICON, Images.get(ImageNums.COMP_NET32));
 //      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
 //    }
-//    public void actionPerformed(ActionEvent event) {
+//    public void actionPerformedTraced(ActionEvent event) {
 //      new ConnectionOptionsDialog(MainFrame.this);
 //    }
 //  }
@@ -748,14 +748,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show the Account Options Dialog
    */
-  private class AccountOptionsAction extends AbstractAction {
+  private class AccountOptionsAction extends AbstractActionTraced {
     public AccountOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Account_Options"), Images.get(ImageNums.USER_EDIT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Account_Options"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new AccountOptionsDialog(MainFrame.this);
     }
   }
@@ -764,14 +764,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Switch Identiry to login as a different user
    */
-  private class SwitchIdentityAction extends AbstractAction {
+  private class SwitchIdentityAction extends AbstractActionTraced {
     public SwitchIdentityAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Switch_Identity"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Log_off_current_identity_and_log_in_as_a_different_user."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new LoginFrame(MainFrame.this, null);
     }
   }
@@ -779,14 +779,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show dialog to Manage Sub-Accounts
    */
-  private class ManageSubAccountsAction extends AbstractAction {
+  private class ManageSubAccountsAction extends AbstractActionTraced {
     public ManageSubAccountsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Manage_User_Accounts"), Images.get(ImageNums.USER_MANAGE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       //putValue(Actions.TOOL_TIP, "Manage User Accounts");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_MANAGE24));
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent event) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       UserRecord myUserRec = cache.getUserRecord();
       if (myUserRec.isCapableToManageUserAccounts()) {
@@ -807,14 +807,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show dialog to Delete User Account
    */
-  private class DeleteMyAccountAction extends AbstractAction {
+  private class DeleteMyAccountAction extends AbstractActionTraced {
     public DeleteMyAccountAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Account_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_my_user_account."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent event) {
       new DeleteAccountDialog(MainFrame.this, true, null);
     }
   }
@@ -822,13 +822,13 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show import Address Book wizard
    */
-  private class ImportAddressBookAction extends AbstractAction {
+  private class ImportAddressBookAction extends AbstractActionTraced {
     public ImportAddressBookAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Import_Address_Book_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent event) {
       new AddressBookImportWizardDialog(MainFrame.this);
     }
   }
@@ -836,7 +836,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Open the General FAQ URL
    */
-  protected static class URLGeneralFAQAction extends AbstractAction {
+  protected static class URLGeneralFAQAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_FAQ_PAGE);
     public URLGeneralFAQAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_General_FAQ"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
@@ -844,7 +844,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       try {
         BrowserLauncher.openURL(url);
       } catch (Throwable t) {
@@ -856,7 +856,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Open the Quick Tour URL
    */
-  protected static class URLQuickTourAction extends AbstractAction {
+  protected static class URLQuickTourAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_QUICK_TOUR_PAGE);
     public URLQuickTourAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Quick_Tour"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
@@ -864,7 +864,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       try {
         BrowserLauncher.openURL(url);
       } catch (Throwable t) {
@@ -876,7 +876,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Open the User's Guide URL
    */
-  protected static class URLUsersGuideAction extends AbstractAction {
+  protected static class URLUsersGuideAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_USER_GUIDE_PAGE);
     public URLUsersGuideAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_User's_Guide"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
@@ -884,7 +884,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       try {
         BrowserLauncher.openURL(url);
       } catch (Throwable t) {
@@ -896,7 +896,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Open the Account Upgrade URL
    */
-  protected static class URLAccountUpgradeAction extends AbstractAction {
+  protected static class URLAccountUpgradeAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.SIGNUP_PAGE);
     public URLAccountUpgradeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Account_Upgrade"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
@@ -904,7 +904,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       String urlToOpen = this.url +"?UserID="+ SIL.getFetchedDataCache().getMyUserId();
       try {
         BrowserLauncher.openURL(urlToOpen);
@@ -917,24 +917,20 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Manage WhiteList
    */
-  protected static class ManageWhiteListAction extends AbstractAction {
+  protected static class ManageWhiteListAction extends AbstractActionTraced {
     public ManageWhiteListAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Manage_WhiteList_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Manage_WhiteList_..."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
-      Thread th = new Thread("Manage White List Action") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    public void actionPerformedTraced(ActionEvent event) {
+      Thread th = new ThreadTraced("Manage White List Action") {
+        public void runTraced() {
           FolderPair whiteListFolderPair = FolderOps.getOrCreateWhiteList(SIL);
           if (whiteListFolderPair != null) {
             new WhiteListTableFrame(whiteListFolderPair);
           }
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
       };
       th.setDaemon(true);
@@ -945,14 +941,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show the Setup Password Recovery Dialog
    */
-  private class SetupPasswordRecovery extends AbstractAction {
+  private class SetupPasswordRecovery extends AbstractActionTraced {
     public SetupPasswordRecovery(int actionId) {
       super("Setup Password Recovery");
       putValue(Actions.TOOL_TIP, "Setup Password Recovery");
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new PassRecoverySetupDialog(MainFrame.this);
     }
   }
@@ -960,14 +956,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Show the Trace Diagnostics Dialog
    */
-  private class TraceDiagnosticsAction extends AbstractAction {
+  private class TraceDiagnosticsAction extends AbstractActionTraced {
     public TraceDiagnosticsAction(int actionId) {
       super("Problem Reporting", Images.get(ImageNums.TOOLS_FIX16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Send Diagnostics Information");
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new TraceDiagnosticsDialog(MainFrame.this);
     }
   }
@@ -997,9 +993,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
 
     if (closed) {
-      Thread th = new Thread("Logout Request Sender") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Thread th = new ThreadTraced("Logout Request Sender") {
+        public void runTraced() {
+          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrame.exitAction.runTraced()");
           // from now on don't show any error messages when logging out and quitting.
           MiscGui.suppressAllGUI();
           // send logout
@@ -1015,9 +1011,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
             if (trace != null) trace.exception(MainFrame.class, 200, t);
           }
           Misc.systemExit(0);
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
           if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         } // end run()
       };
       th.setDaemon(true);
@@ -1110,10 +1104,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         }
       });
       // See if we have Password Recovery setup, if not open the Settings dialog
-      Thread passRecoveryEnforcer = new Thread("Password Recovery Settings enforcer") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+      Thread passRecoveryEnforcer = new ThreadTraced("Password Recovery Settings enforcer") {
+        public void runTraced() {
           // additional delay so we don't slow down loading of MainFrame
           try {
             Thread.sleep(2000);
@@ -1158,10 +1150,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               }
             }
           }
-
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-          if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
       };
       passRecoveryEnforcer.setDaemon(true);

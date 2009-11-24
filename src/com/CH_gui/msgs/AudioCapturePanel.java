@@ -31,7 +31,7 @@ package com.CH_gui.msgs;
 
 import com.CH_cl.service.ops.DownloadUtilities;
 import com.CH_co.gui.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import java.awt.*;
@@ -314,15 +314,16 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
   }
 
 //Inner class to capture data from microphone
-  class CaptureThread extends Thread {
+  class CaptureThread extends ThreadTraced {
     //An arbitrary-size temporary holding buffer
     byte buff[] = new byte[BUFFER_SIZE];
     TargetDataLine targetLine;
     public CaptureThread(TargetDataLine targetLine) {
+      super("Audio Capture Thread");
       this.targetLine = targetLine;
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "CaptureThread.run()");
       AudioInputStream ais = null;
       try {
         AudioFormat.Encoding targetEncoding = null;
@@ -382,23 +383,22 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
       isCapturing = false;
       setEnabledButtons();
 
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(getClass());
-      if (trace != null) trace.clear();
     }//end run
   }//end inner class CaptureThread
 //===================================//
 //Inner class to play back the data that was saved.
-  class PlayThread extends Thread {
+  class PlayThread extends ThreadTraced {
     byte buff[] = new byte[BUFFER_SIZE];
     AudioInputStream ais;
     SourceDataLine line;
     public PlayThread(AudioInputStream ais, SourceDataLine line) {
+      super("Audio Play Thread");
       this.ais = ais;
       this.line = line;
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "PlayThread.run()");
       try {
         int cnt;
         //Keep looping until the input read method returns -1 for empty stream.
@@ -422,24 +422,23 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
       }
       isPlaying = false;
       setEnabledButtons();
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(getClass());
-      if (trace != null) trace.clear();
     }//end run
   }//end inner class PlayThread
 //===================================//
 //Inner class to write captured data to file
-  class WriteThread extends Thread {
+  class WriteThread extends ThreadTraced {
     AudioInputStream ais;
     AudioFileFormat.Type fileType;
     File file;
     public WriteThread(AudioInputStream ais, AudioFileFormat.Type fileType, File file) {
+      super("Audio Write Thread");
       this.ais = ais;
       this.fileType = fileType;
       this.file = file;
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "WriteThread.run()");
       try {
         AudioSystem.write(ais, fileType, file);
       } catch (Throwable e) {
@@ -450,9 +449,7 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
       }
       isWriting = false;
       setEnabledButtons();
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(getClass());
-      if (trace != null) trace.clear();
     }//end run
   }//end inner class PlayThread
 //===================================//

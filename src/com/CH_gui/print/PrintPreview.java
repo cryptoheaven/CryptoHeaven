@@ -15,11 +15,9 @@ package com.CH_gui.print;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.util.*;
 import java.awt.print.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
 
 import com.CH_cl.service.cache.*;
 
@@ -28,7 +26,6 @@ import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.*;
 
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /**
@@ -64,11 +61,15 @@ public class PrintPreview extends JDialog {
 
   public PrintPreview(Printable target, String title, Dialog parent) {
     super(parent, title);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrintPreview.class, "PrintPreview(Printable target, String title, Dialog parent)");
     initialize(target, parent);
+    if (trace != null) trace.exit(PrintPreview.class);
   }
   public PrintPreview(Printable target, String title, Frame parent) {
     super(parent, title);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrintPreview.class, "PrintPreview(Printable target, String title, Frame parent)");
     initialize(target, parent);
+    if (trace != null) trace.exit(PrintPreview.class);
   }
 
   private void initialize(Printable target, Component parent) {
@@ -100,9 +101,8 @@ public class PrintPreview extends JDialog {
     JButton bt = new JMyButton("Print");
     ActionListener lst = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Thread th = new Thread(new Runnable() {
-          public void run() {
-            Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Thread th = new ThreadTraced("Print Thread") {
+          public void runTraced() {
             try {
               // Use default printer, no dialog
               setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -114,11 +114,8 @@ public class PrintPreview extends JDialog {
               ex.printStackTrace();
               System.err.println("Printing error: "+ex.toString());
             }
-            if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-            if (trace != null) trace.exit(getClass());
-            if (trace != null) trace.clear();
           }
-        });
+        };
         th.setDaemon(true);
         th.start();
       }
@@ -129,8 +126,8 @@ public class PrintPreview extends JDialog {
     bt = new JMyButton("Page Setup");
     lst = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Thread th = new Thread(new Runnable() {
-          public void run() {
+        Thread th = new ThreadTraced("Page Setup Thread") {
+          public void runTraced() {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if (printerJob == null) {
               printerJob = PrinterJob.getPrinterJob();
@@ -143,7 +140,7 @@ public class PrintPreview extends JDialog {
             initLayoutPreview(m_target, m_preview, pageFormat);
             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
           }
-        });
+        };
         th.setDaemon(true);
         th.start();
       }
@@ -165,8 +162,8 @@ public class PrintPreview extends JDialog {
     m_cbScale.setSelectedIndex(3);
     lst = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Thread runner = new Thread() {
-          public void run() {
+        Thread th = new ThreadTraced("Print Scale Thread") {
+          public void runTraced() {
             int scale = getSelectedScale();
             if (scale > 0) {
               int w = (int)(m_wPage*scale/100);
@@ -183,7 +180,8 @@ public class PrintPreview extends JDialog {
             }
           }
         };
-        runner.start();
+        th.setDaemon(true);
+        th.start();
       }
     };
     m_cbScale.addActionListener(lst);

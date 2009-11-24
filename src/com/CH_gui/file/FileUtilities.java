@@ -92,7 +92,7 @@ public class FileUtilities extends Object {
 
     Runnable afterKeyFetchRunner = new Runnable() {
       public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "renameFolderAndShares.afterKeyFetchRunner.run()");
 
         try {
           Hashtable groupIDsHT = null;

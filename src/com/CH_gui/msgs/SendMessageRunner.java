@@ -31,7 +31,7 @@ import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
@@ -52,7 +52,7 @@ import com.CH_gui.frame.MainFrame;
  * @author  Marcin Kurzawa
  * @version
  */
-public class SendMessageRunner extends Thread {
+public class SendMessageRunner extends ThreadTraced {
 
   private static final short TO = MsgLinkRecord.RECIPIENT_TYPE_TO;
   private static final short CC = MsgLinkRecord.RECIPIENT_TYPE_CC;
@@ -95,8 +95,8 @@ public class SendMessageRunner extends Thread {
   }
 
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+  public void runTraced() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "SendMessageRunner.runTraced()");
 
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     FetchedDataCache cache = SIL.getFetchedDataCache();
@@ -294,7 +294,7 @@ public class SendMessageRunner extends Thread {
           newMsgRequest.localFiles = localFileRequest;
           // skip the owner ID and owner type, threaded run=false
           replyClass = UploadUtilities.runUploadFileBunch(
-                            selectedLocalFileAttachments, sendMsgAction, localFileRequest, 
+                            selectedLocalFileAttachments, sendMsgAction, localFileRequest,
                             symmetricAttachmentsKey, (Long) null, (Short) null, false, SIL);
           if (trace != null) trace.data(90, "reply class", replyClass);
         }
@@ -320,14 +320,12 @@ public class SendMessageRunner extends Thread {
         } // end if all ok, close send dialog
       } // end if !error
     } catch (Throwable t) {
-      if (trace != null) trace.exception(getClass(), 200, t);
+      if (trace != null) trace.exception(SendMessageRunner.class, 200, t);
     }
 
     msgSendInfoProvider.setSendMessageInProgress(false);
 
-    if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-    if (trace != null) trace.exit(getClass());
-    if (trace != null) trace.clear();
+    if (trace != null) trace.exit(SendMessageRunner.class);
   } // end run()
 
 
@@ -388,7 +386,7 @@ public class SendMessageRunner extends Thread {
     return prepareMsgLinkRecords(new Record[][] { recipientsTO }, symmetricKey, false, null, parent, null);
   }
   /**
-   * Prepares links for sending... 
+   * Prepares links for sending...
    * @param isSavingAsDraft If in draft mode then use user's default draft folder as recipient, and output original recipient list in the StringBuffer
    * @param recipientsSB Buffer for original recipient list when in draft mode
    */
@@ -436,7 +434,7 @@ public class SendMessageRunner extends Thread {
           if (recipient instanceof UserRecord) {
             UserRecord uRec = (UserRecord) recipients[i];
             toUserId = uRec.userId;
-          } 
+          }
           else if (recipient instanceof ContactRecord) {
             ContactRecord cRec = (ContactRecord) recipients[i];
             toUserId = cRec.contactWithId;
@@ -458,7 +456,7 @@ public class SendMessageRunner extends Thread {
               linkRec.seal(kRec);
               toAdd = true;
             }
-          } // end if 
+          } // end if
           if (pass == SEALING_MSGS_PASS && toAdd) {
             linkRecordsV.addElement(linkRec);
           }

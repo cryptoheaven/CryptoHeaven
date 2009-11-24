@@ -12,6 +12,14 @@
 
 package com.CH_cl.util;
 
+import com.CH_co.trace.*;
+import com.CH_co.util.*;
+
+import java.io.File;
+import java.net.URL;
+import java.util.*;
+import javax.sound.sampled.*;
+
 /**
  * Playing an encoded audio file
  * Compressed formats can be handled depending on the
@@ -33,13 +41,6 @@ package com.CH_cl.util;
  * <b>$Revision: 1.0 $</b>
  * @author  Marcin Kurzawa
  */
-
-import com.CH_co.util.*;
-import java.io.File;
-
-import java.net.URL;
-import java.util.*;
-import javax.sound.sampled.*;
 
 public class DecodingAudioClipPlayer {
 
@@ -92,7 +93,7 @@ public class DecodingAudioClipPlayer {
       player.seekPlayIfPaused(millisecondPosition, controllingObj);
     }
   }
-    
+
   public static void close(File file) {
     if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
     ClipControl player = (ClipControl) filesPlayingHT.get(file);
@@ -147,7 +148,7 @@ public class DecodingAudioClipPlayer {
       // clip is already loaded so close the source stream
       ais.close();
 
-      // Create a thread to play back the data and start it running.  It will run 
+      // Create a thread to play back the data and start it running.  It will run
       // until all the data has been played back or stopPlayer() is called.
       ClipControl player = new ClipControl(fileOrURL, clip, callback);
       filesPlayingHT.put(fileOrURL, player);
@@ -256,8 +257,8 @@ public class DecodingAudioClipPlayer {
     public void run() {
       try {
         if (callbacksV != null) {
-          Thread th = new Thread() {
-            public void run() {
+          Thread th = new ThreadTraced("ClipControl") {
+            public void runTraced() {
               notifyLength();
               while (clip.isOpen()) {
                 synchronized (ClipControl.this) {

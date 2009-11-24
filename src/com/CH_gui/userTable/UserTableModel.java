@@ -347,10 +347,12 @@ public class UserTableModel extends RecordTableModel {
   private class UserGUIUpdater implements Runnable {
     private RecordEvent event;
     public UserGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "UserGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(UserGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "UserGUIUpdater.run()");
 
       Record[] records = event.getRecords();
       if (event.getEventType() == RecordEvent.SET) {

@@ -13,7 +13,6 @@
 package com.CH_gui.statTable;
 
 import java.util.*;
-import javax.swing.table.*;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
@@ -24,7 +23,7 @@ import com.CH_cl.service.records.filters.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.stat.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
@@ -145,10 +144,8 @@ public class StatTableModel extends RecordTableModel {
   }
 
   public synchronized void refreshData() {
-    Thread th = new Thread("Stat Refresher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+    Thread th = new ThreadTraced("Stat Refresher") {
+      public void runTraced() {
         removeData();
         Stats_Get_Rq request = new Stats_Get_Rq();
         if (parentObjLink instanceof MsgLinkRecord)
@@ -177,10 +174,6 @@ public class StatTableModel extends RecordTableModel {
           statsReply.stats = new StatRecord[0];
         }
         DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, reply);
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);

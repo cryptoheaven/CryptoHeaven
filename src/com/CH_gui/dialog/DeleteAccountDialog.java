@@ -26,7 +26,7 @@ import com.CH_cl.service.ops.*;
 import com.CH_co.cryptx.*;
 import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -40,7 +40,7 @@ import com.CH_gui.msgs.MsgPanelUtils;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -48,7 +48,7 @@ import com.CH_gui.msgs.MsgPanelUtils;
  *
  * <b>$Revision: 1.5 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class DeleteAccountDialog extends GeneralDialog {
 
@@ -133,12 +133,12 @@ public class DeleteAccountDialog extends GeneralDialog {
     warningLabel.setVerticalTextPosition(JLabel.TOP);
     warningLabel.setBorder(new EtchedBorder());
     warningLabel.setPreferredSize(new Dimension(410, 60));
-    panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 10, 1), 20, 20));
     posY ++;
 
     if (!isDeleteMyAccount) {
-      panel.add(new JMyLabel("Accounts selected for deletion are:"), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("Accounts selected for deletion are:"), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
       JPanel listPanel = new JPanel();
@@ -146,36 +146,36 @@ public class DeleteAccountDialog extends GeneralDialog {
       UserRecord[] subUsers = cache.getUserRecords(subAccountsToDelete);
       for (int i=0; i<subUsers.length; i++) {
         Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
-        listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0, 
+        listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
       }
 //      listPanel.add(new JLabel(), new GridBagConstraints(0, subUsers.length, 2, 1, 10, 10,
 //          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
       JScrollPane sc = new JScrollPane(listPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
       sc.getVerticalScrollBar().setUnitIncrement(5);
-      panel.add(sc, new GridBagConstraints(0, posY, 3, 1, 10, 10, 
+      panel.add(sc, new GridBagConstraints(0, posY, 3, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     String confirmPasswordLabel = com.CH_gui.lang.Lang.rb.getString("label_Please_enter_your_account_password_to_confirm_this_action.");
-    panel.add(new JMyLabel(confirmPasswordLabel), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JMyLabel(confirmPasswordLabel), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     JLabel userName = new JMyLabel(userRecord.handle);
     userName.setIcon(userRecord.getIcon());
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(userName, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(userName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 0), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -257,16 +257,13 @@ public class DeleteAccountDialog extends GeneralDialog {
   /**
    * Thread that takes all input data and runs the action.
    */
-  private class OKThread extends Thread {
+  private class OKThread extends ThreadTraced {
     public OKThread() {
       super("DeleteAccountDialog OKThread");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
-
+    public void runTraced() {
       setEnabledInputs(false);
-
       boolean error = false;
 
       // check if old password matches
@@ -304,10 +301,6 @@ public class DeleteAccountDialog extends GeneralDialog {
         // if error occurred than enable inputs
         setEnabledInputs(true);
       }
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(OKThread.class);
-      if (trace != null) trace.clear();
     }
   }
 

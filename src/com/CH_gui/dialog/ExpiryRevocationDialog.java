@@ -27,7 +27,7 @@ import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -156,34 +156,20 @@ public class ExpiryRevocationDialog extends GeneralDialog {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ExpiryRevocationDialog.class, "pressedOK()");
     closeDialog();
 
-    Thread th = new Thread("Change Expiry or Revocation - sending...") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
-
-        try {
-          MsgLinkRecord[] msgLinksToChange = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksToChangeV, MsgLinkRecord.class);
-          MsgDataRecord[] msgDatas = cache.getMsgDataRecords(MsgLinkRecord.getMsgIDs(msgLinksToChange));
-          Long[] msgIDs = RecordUtils.getIDs(msgDatas);
-          Timestamp dateExpired = jRevokeAccess.isSelected() ? new Timestamp(System.currentTimeMillis()) : (jNewExpiry.getDate() == null ? null : new Timestamp(jNewExpiry.getDate().getTime()));
-          Boolean isRevoked = Boolean.valueOf(jRevokeAccess.isSelected());
-          SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_EXPIRY, new Obj_List_Co(new Object[] { msgIDs, dateExpired, isRevoked })));
-
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
-        }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+    Thread th = new ThreadTraced("Change Expiry or Revocation - sending...") {
+      public void runTraced() {
+        MsgLinkRecord[] msgLinksToChange = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksToChangeV, MsgLinkRecord.class);
+        MsgDataRecord[] msgDatas = cache.getMsgDataRecords(MsgLinkRecord.getMsgIDs(msgLinksToChange));
+        Long[] msgIDs = RecordUtils.getIDs(msgDatas);
+        Timestamp dateExpired = jRevokeAccess.isSelected() ? new Timestamp(System.currentTimeMillis()) : (jNewExpiry.getDate() == null ? null : new Timestamp(jNewExpiry.getDate().getTime()));
+        Boolean isRevoked = Boolean.valueOf(jRevokeAccess.isSelected());
+        SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_EXPIRY, new Obj_List_Co(new Object[] { msgIDs, dateExpired, isRevoked })));
       }
     };
     th.setDaemon(true);
     th.start();
 
-    if (trace != null) trace.exit(ExpiryRevocationDialog.class);    
+    if (trace != null) trace.exit(ExpiryRevocationDialog.class);
   }
 
 
@@ -196,8 +182,8 @@ public class ExpiryRevocationDialog extends GeneralDialog {
     jRevokeAccess = new JMyRadioButton("Revoke Access");
     jChangeExpiry = new JMyRadioButton("Change Expiry Date");
     //jNewExpiry = new JMyCalendarDropdownField(DateFormat.MEDIUM, 3, 1);
-    jNewExpiry = new JMyCalendarDropdownField(DateFormat.MEDIUM, 3, 1, true, null, 
-          new String[] { "Never", "Tomorrow", "One Week", "Two Weeks", "One Month", "Custom..." }, 
+    jNewExpiry = new JMyCalendarDropdownField(DateFormat.MEDIUM, 3, 1, true, null,
+          new String[] { "Never", "Tomorrow", "One Week", "Two Weeks", "One Month", "Custom..." },
           new int[][] { { 0, -1 },
                         { Calendar.DAY_OF_MONTH, 1 },
                         { Calendar.WEEK_OF_YEAR, 1 },
@@ -237,28 +223,28 @@ public class ExpiryRevocationDialog extends GeneralDialog {
     panel.setLayout(new GridBagLayout());
 
     int posY = 0;
-    panel.add(AccountOptionsSignaturesPanel.makeDivider("Dates"), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(AccountOptionsSignaturesPanel.makeDivider("Dates"), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(Images.get(ImageNums.AUTO_RESPONDER32)), new GridBagConstraints(0, posY, 1, 4, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.AUTO_RESPONDER32)), new GridBagConstraints(0, posY, 1, 4, 0, 0,
         GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 2), 0, 0));
-    panel.add(new JMyLabel("I would like to..."), new GridBagConstraints(1, posY, 2, 1, 20, 0, 
+    panel.add(new JMyLabel("I would like to..."), new GridBagConstraints(1, posY, 2, 1, 20, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 2, 5), 0, 0));
-    panel.add(jRevokeAccess, new GridBagConstraints(1, posY+1, 2, 1, 20, 0, 
+    panel.add(jRevokeAccess, new GridBagConstraints(1, posY+1, 2, 1, 20, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 2, 2, 5), 0, 0));
-    panel.add(jChangeExpiry, new GridBagConstraints(1, posY+2, 2, 1, 20, 0, 
+    panel.add(jChangeExpiry, new GridBagConstraints(1, posY+2, 2, 1, 20, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 2, 2, 5), 0, 0));
     JPanel datePanel = new JPanel();
     datePanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     datePanel.setLayout(new BorderLayout(10, 0));
     datePanel.add(new JMyLabel("New Expiry:"), BorderLayout.WEST);
     datePanel.add(jNewExpiry, BorderLayout.CENTER);
-    panel.add(datePanel, new GridBagConstraints(1, posY+3, 2, 1, 10, 0, 
+    panel.add(datePanel, new GridBagConstraints(1, posY+3, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 2, 5, 5), 0, 0));
     posY += 4;
 
-    panel.add(AccountOptionsSignaturesPanel.makeDivider("Selected Object(s)"), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(AccountOptionsSignaturesPanel.makeDivider("Selected Object(s)"), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -289,19 +275,19 @@ public class ExpiryRevocationDialog extends GeneralDialog {
         }
       }
       // filler
-      panelToChange.add(new JMyLabel(), new GridBagConstraints(0, msgLinksToChangeV.size()*2, 2, 1, 10, 10, 
+      panelToChange.add(new JMyLabel(), new GridBagConstraints(0, msgLinksToChangeV.size()*2, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
-      panel.add(scrollToChange, new GridBagConstraints(0, posY, 3, 1, 10, 1+msgLinksToChangeV.size(), 
+      panel.add(scrollToChange, new GridBagConstraints(0, posY, 3, 1, 10, 1+msgLinksToChangeV.size(),
           GridBagConstraints.NORTH, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     if (msgLinksOtherV != null && msgLinksOtherV.size() > 0) {
-      panel.add(new JMyLabel("Warning: The following objects' access cannot be changed by You"), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("Warning: The following objects' access cannot be changed by You"), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
       posY ++;
-      panel.add(AccountOptionsSignaturesPanel.makeDivider("because You are not their originator."), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+      panel.add(AccountOptionsSignaturesPanel.makeDivider("because You are not their originator."), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
       posY ++;
 
@@ -329,10 +315,10 @@ public class ExpiryRevocationDialog extends GeneralDialog {
         }
       }
       // filler
-      panelOther.add(new JMyLabel(), new GridBagConstraints(0, msgLinksOtherV.size()*2, 2, 1, 10, 10, 
+      panelOther.add(new JMyLabel(), new GridBagConstraints(0, msgLinksOtherV.size()*2, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
-      panel.add(scrollOther, new GridBagConstraints(0, posY, 3, 1, 10, 1+msgLinksOtherV.size(), 
+      panel.add(scrollOther, new GridBagConstraints(0, posY, 3, 1, 10, 1+msgLinksOtherV.size(),
           GridBagConstraints.NORTH, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }

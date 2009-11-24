@@ -28,7 +28,7 @@ import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_co.monitor.*;
@@ -130,7 +130,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
    * those directories.
    * @param isThreadedRun if true means that this coordinator thread is allowed to start other helping threads, false for single thread execution.
    */
-  public static class UploadCoordinator extends Thread {
+  public static class UploadCoordinator extends ThreadTraced {
 
     private File[] files;
     private FolderShareRecord shareRecord;
@@ -157,14 +157,10 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       if (trace != null) trace.exit(UploadCoordinator.class);
     }
 
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadCoordinator.class, "run()");
-
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadCoordinator.class, "UploadCoordinator.runTraced()");
       uploadFiles(files, shareRecord, SIL, isThreadedRun);
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(UploadCoordinator.class);
-      if (trace != null) trace.clear();
     }
 
     private void uploadFiles(File[] files, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun) {
@@ -346,13 +342,12 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
   /**
    * Runs seal(s) and upload(s) of files.
    */
-  private static class UploadRunner extends Thread {
+  private static class UploadRunner extends ThreadTraced {
 
     private MessageAction msgActionToSend;
     private File_NewFiles_Rq request;
     private BASymmetricKey parentSymmetricKey;
     private ServerInterfaceLayer SIL;
-
 
     /**
      * In the effort to make this function universal for uploading files and sending messages with
@@ -377,14 +372,10 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       if (trace != null) trace.exit(UploadRunner.class);
     }
 
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadRunner.class, "run()");
-
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadRunner.class, "UploadRunner.runTraced()");
       nonThreadedRun(msgActionToSend, request, parentSymmetricKey, SIL);
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(UploadRunner.class);
-      if (trace != null) trace.clear();
     }
 
     /**

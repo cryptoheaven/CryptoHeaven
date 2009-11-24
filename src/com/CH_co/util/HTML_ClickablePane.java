@@ -22,7 +22,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_guiLib.util.HTML_utils;
 
 /**
@@ -114,22 +114,21 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     if (trace != null) trace.args(maxWaitMillis);
     HTML_ClickablePane pane = null;
     final Object[] returnBuffer = new Object[1];
-    Thread fetcher = new Thread("HTML_ClickablePane URL fetcher 1") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-        HTML_ClickablePane returnPane;
+    Thread fetcher = new ThreadTraced("HTML_ClickablePane URL fetcher 1") {
+      public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "HTML_ClickablePane.createNewAndLoaded.runTraced()");
         try {
-          returnPane = new HTML_ClickablePane(url, null);
+          HTML_ClickablePane returnPane = new HTML_ClickablePane(url, null);
           returnPane.setBorder(new EmptyBorder(0, 0, 0, 0));
           returnPane.setBackground(Color.white);
           returnBuffer[0] = returnPane;
-        } catch (Throwable t) {
+        } catch (IOException x) {
+          if (trace != null) trace.exception(getClass(), 100, x);
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
+    fetcher.setDaemon(true);
     fetcher.start();
     try {
       fetcher.join(maxWaitMillis);
@@ -158,16 +157,15 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     if (returnPane != null) {
       returnPane.setBorder(new EmptyBorder(0, 0, 0, 0));
       returnPane.setBackground(Color.white);
-      Thread fetcher = new Thread("HTML_ClickablePane URL fetcher 2") {
-        public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Thread fetcher = new ThreadTraced("HTML_ClickablePane URL fetcher 2") {
+        public void runTraced() {
+          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "HTML_ClickablePane.createNewAndLoading.runTraced()");
           try {
             returnPane.setPage(url);
-          } catch (Throwable t) {
+          } catch (IOException x) {
+            if (trace != null) trace.exception(getClass(), 100, x);
           }
-          if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
           if (trace != null) trace.exit(getClass());
-          if (trace != null) trace.clear();
         }
       };
       fetcher.setDaemon(true);
@@ -304,9 +302,9 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
   private void newClick(final URL url) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "newClick(URL url)");
     if (trace != null) trace.args(url);
-    Thread launcher = new Thread("Click Launcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread launcher = new ThreadTraced("Click Launcher") {
+      public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "HTML_ClickablePane.newClick.runTraced()");
         try {
           URLLauncher launcher = getRegisteredLauncher(url);
           if (launcher != null) {
@@ -314,12 +312,10 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
           } else {
             BrowserLauncher.openURL(url.toExternalForm());
           }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(HTML_ClickablePane.class, 100, t);
+        } catch (IOException x) {
+          if (trace != null) trace.exception(getClass(), 100, x);
         }
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     launcher.setDaemon(true);

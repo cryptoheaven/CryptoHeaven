@@ -393,7 +393,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
 
   /** Display a dialog so the user can customize the tool bar **/
-  private class CustomizeToolsAction extends AbstractAction {
+  private class CustomizeToolsAction extends AbstractActionTraced {
     public CustomizeToolsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Toolbar_..."), Images.get(ImageNums.TOOLS16));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Customize_Toolbar"));
@@ -401,27 +401,27 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new DualBox_Launcher(JActionFrame.this, toolBarModel);
     }
   }
 
 
   /** Display a dialog so the user can customize the menu bar **/
-  private class CustomizeMenuAction extends AbstractAction {
+  private class CustomizeMenuAction extends AbstractActionTraced {
     public CustomizeMenuAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Menus_..."), Images.get(ImageNums.TOOLS16));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Customize_Menu_Bar"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new MenuEditorDialog(JActionFrame.this);
     }
   }
 
 
-  private static class ToolTipsAction extends AbstractAction {
+  private static class ToolTipsAction extends AbstractActionTraced {
     public ToolTipsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Display_Tool_Tips"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Enable/Disable_Tool_Tip_help"));
@@ -429,13 +429,13 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       putValue(Actions.STATE_CHECK, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       AbstractButton button = (AbstractButton) event.getSource();
       ToolTipManager.sharedInstance().setEnabled(button.isSelected());
     }
   }
 
-  private class LookAndFeelAction extends AbstractAction {
+  private class LookAndFeelAction extends AbstractActionTraced {
     private String lafClassName;
     public LookAndFeelAction(UIManager.LookAndFeelInfo look, int actionId, ButtonGroup group) {
       super(look.getName());
@@ -448,11 +448,11 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformedTraced(ActionEvent event) {
       final String finalLafClassName = lafClassName;
       Runnable runnable = new Runnable() {
         public void run() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "LookAndFeelAction.actionPerformedTraced.run()");
           try {
             UIManager.setLookAndFeel(finalLafClassName);
             SwingUtilities.updateComponentTreeUI(JActionFrame.this);

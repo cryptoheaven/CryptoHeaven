@@ -13,21 +13,18 @@
 package com.CH_co.util;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-
+import com.CH_co.trace.*;
 import com.CH_gui.actionGui.JActionFrame;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
+import javax.swing.table.*;
 import javax.swing.text.*;
 
 /** 
@@ -230,8 +227,8 @@ public class MiscGui extends Object {
                 ((Frame)w).setState(Frame.NORMAL);
             }
             final Window window = w;
-            Thread th = new Thread(new Runnable() {
-              public void run() {
+            Thread th = new ThreadTraced("Nudger") {
+              public void runTraced() {
                 if (window.isShowing()) {
                   Point p = window.getLocation();
                   double d = 0;
@@ -249,7 +246,7 @@ public class MiscGui extends Object {
                 if (includeTitleRoll && window instanceof JActionFrame)
                   ((JActionFrame) window).triggerVisualUpdateNotificationRoll("  *ring*");
               }
-            });
+            };
             th.setDaemon(true);
             th.start();
           }

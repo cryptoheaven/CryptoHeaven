@@ -25,7 +25,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.sys.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /**
@@ -44,7 +44,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class AutoUpdater extends Thread {
+public class AutoUpdater extends ThreadTraced {
 
   private static int TINY_FILE_SIZE = 2048;
   private static int MAX_HEADER_SIZE = 1024;
@@ -78,9 +78,8 @@ public class AutoUpdater extends Thread {
     if (trace != null) trace.exit(AutoUpdater.class);
   }
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "run()");
-    if (trace != null) trace.data(10, "AutoUpdater running");
+  public void runTraced() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "AutoUpdater.runTraced()");
     if (!isRunning && !Misc.isRunningFromApplet() && !MiscGui.isAllGUIsuppressed()) {
       isRunning = true;
       lastRunStamp = System.currentTimeMillis();
@@ -159,9 +158,7 @@ public class AutoUpdater extends Thread {
       isRunning = false;
     }
     if (trace != null) trace.data(200, "AutoUpdater done");
-    if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
     if (trace != null) trace.exit(AutoUpdater.class);
-    if (trace != null) trace.clear();
   }
 
   public static boolean isRunningFromJar() {
@@ -452,27 +449,25 @@ public class AutoUpdater extends Thread {
     return rc;
   }
 
-  private static class ProcLauncher extends Thread {
+  private static class ProcLauncher extends ThreadTraced {
     String[] cmdarray;
     String[] envp;
     private ProcLauncher(String[] cmdarray, String[] envp) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "ProcLauncher(String[] cmdarray, String[] envp)");
+      super("ProcLauncher");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ProcLauncher.class, "ProcLauncher(String[] cmdarray, String[] envp)");
       if (trace != null) trace.args(cmdarray, envp);
       this.cmdarray = cmdarray;
       this.envp = envp;
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(ProcLauncher.class);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-      if (trace != null) trace.data(10, "ProcLauncher running");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ProcLauncher.class, "ProcLauncher.runTraced()");
       try {
         Runtime.getRuntime().exec(cmdarray, envp);
-      } catch (Throwable t) {
-        if (trace != null) trace.exception(getClass(), 100, t);
+      } catch (IOException e) {
+        if (trace != null) trace.exception(ProcLauncher.class, 100, e);
       }
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(getClass());
-      if (trace != null) trace.clear();
+      if (trace != null) trace.exit(ProcLauncher.class);
     }
   }
 

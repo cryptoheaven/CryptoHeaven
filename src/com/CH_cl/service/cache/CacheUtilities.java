@@ -20,7 +20,7 @@ import com.CH_cl.service.records.filters.*;
 import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /** 
@@ -188,13 +188,9 @@ public class CacheUtilities extends Object {
     // first unseal the specific message so its fast for the user in the view
     unlockPassProtectedMsgs(new MsgDataRecord[] { msgDataRecStartWith }, bodyKey);
     // next unseal any other message that might be using the same password...
-    Thread th = new Thread() {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("UnlockPassProtectedMsgs Runner") {
+      public void runTraced() {
         unlockPassProtectedMsgs(null, null);
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setPriority(Thread.MIN_PRIORITY);

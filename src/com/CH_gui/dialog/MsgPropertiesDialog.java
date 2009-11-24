@@ -17,7 +17,7 @@ import java.awt.event.*;
 import javax.swing.border.*;
 import javax.swing.*;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_cl.service.cache.*;
@@ -43,7 +43,7 @@ import com.CH_gui.msgs.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -51,7 +51,7 @@ import com.CH_gui.msgs.*;
  *
  * <b>$Revision: 1.37 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable {
 
@@ -367,64 +367,64 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       iconSamll = Images.get(ImageNums.ADDRESS16);
       typeText = com.CH_gui.lang.Lang.rb.getString("msgType_Address_Contact");
     }
-    panel.add(new JMyLabel(iconLarge), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(iconLarge), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jSubject, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jSubject, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     JLabel jType = new JMyLabel();
     jType.setText(typeText);
     jType.setIcon(iconSamll);
-    panel.add(jType, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jType, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(new JMyLabel(ListRenderer.getRenderedText(msgParent), ListRenderer.getRenderedIcon(msgParent), JLabel.LEFT), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(ListRenderer.getRenderedText(msgParent), ListRenderer.getRenderedIcon(msgParent), JLabel.LEFT), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jSize, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jSize, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
 
     jFromLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_From"));
-    panel.add(jFromLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jFromLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jFrom, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jFrom, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
 
     jReplyToLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reply_To"));
-    panel.add(jReplyToLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jReplyToLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jReplyTo, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jReplyTo, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
@@ -432,63 +432,63 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
     JScrollPane sc = new JScrollPane(jRecipientsTO, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     sc.getVerticalScrollBar().setUnitIncrement(5);
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_To")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_To")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10, 
+    panel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
     sc = new JScrollPane(jRecipientsCC, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     sc.getVerticalScrollBar().setUnitIncrement(5);
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Cc")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Cc")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10, 
+    panel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
     sc = new JScrollPane(jAttachments, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     sc.getVerticalScrollBar().setUnitIncrement(5);
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Attachments")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Attachments")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10, 
+    panel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jPriority, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    posY ++;
-
-
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Security")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jSecureLock, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jPriority, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Security")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jPasswordPane, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jSecureLock, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(new JMyLabel(msgLink.getStatusName()), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jPasswordPane, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
+    posY ++;
+
+
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
+    panel.add(new JMyLabel(msgLink.getStatusName()), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
@@ -502,31 +502,31 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Sent")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Sent")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(new JMyLabel(Misc.getFormattedTimestamp(msgLink.dateCreated)), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    posY ++;
-
-
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Received")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jDelivered, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(Misc.getFormattedTimestamp(msgLink.dateCreated)), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Expiration")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Received")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
-    panel.add(jExpiration, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    panel.add(jDelivered, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
+    posY ++;
+
+
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Expiration")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
+    panel.add(jExpiration, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(4, 5, 4, 5), 0, 0));
     if (jExpirationChange != null) {
-      panel.add(jExpirationChange, new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+      panel.add(jExpirationChange, new GridBagConstraints(2, posY, 1, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(4, 5, 4, 5), 0, 0));
     }
     posY ++;
@@ -558,124 +558,124 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
     int posY = 0;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(msgLink.msgLinkId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(msgLink.msgLinkId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(msgLink.msgId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(msgLink.msgId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     Long replyToMsgId = cache.getMsgDataRecord(msgLink.msgId).replyToMsgId;
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_In_reply_to")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_In_reply_to")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(replyToMsgId == null ? "" : replyToMsgId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(replyToMsgId == null ? "" : replyToMsgId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_User")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_User")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jSigningUser, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-
-
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jKeyID, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jSigningUser, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_Info")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jKeyInfo, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-
-
-
-    // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jKeyID, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-
-
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Verification")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_Info")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jVerifyOK, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-
-
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Plain_Message_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-    panel.add(jDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-
-
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Encrypted_Message_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-    panel.add(jEncDataDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jKeyInfo, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+
+
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Verification")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jDataCreated, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jVerifyOK, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Plain_Message_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(Misc.getFormattedTimestamp(msgLink.dateUpdated)), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    posY ++;
+    panel.add(jDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
+
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Encrypted_Message_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+    panel.add(jEncDataDigest, new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
+
+
+    // separator
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
+
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(jDataCreated, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
+
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(new JMyLabel(Misc.getFormattedTimestamp(msgLink.dateUpdated)), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     /*
-    panel.add(jTranscript, new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    panel.add(jTranscript, new GridBagConstraints(0, posY, 2, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
      */
 
     // Add a vertical filler.
-    panel.add(new JMyLabel(), new GridBagConstraints(1, posY, 2, 1, 10, 10, 
+    panel.add(new JMyLabel(), new GridBagConstraints(1, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
 
     return panel;
@@ -698,21 +698,21 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
     int posY = 0;
 
     jSubjectPlainLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Message_Subject_Plain_Text"));
-    panel.add(jSubjectPlainLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jSubjectPlainLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jSubjectPlain, new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(jSubjectPlain, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     jBodyPlainLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Message_Body_Plain_Text"));
-    panel.add(jBodyPlainLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jBodyPlainLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JScrollPane(jBodyPlain), new GridBagConstraints(1, posY, 2, 1, 10, 10, 
+    panel.add(new JScrollPane(jBodyPlain), new GridBagConstraints(1, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -723,54 +723,43 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
 
   private void fetchData() {
-    Thread th = new Thread("Message Properties Data Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Message Properties Data Fetcher") {
+      public void runTraced() {
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        // fetch Message Data
+        MsgDataRecord dataRecord = cache.getMsgDataRecord(msgLink.msgId);
 
-        try {
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-
-          // fetch Message Data
-          MsgDataRecord dataRecord = cache.getMsgDataRecord(msgLink.msgId);
-
-          // See if we have the senders public key to verify the body, if not, fetch it now.
-          // If we only had a brief, we won't have it and we'll have to try again after BODY FETCH
-          Long keyId = dataRecord.getSendPrivKeyId();
-          if (keyId != null && cache.getKeyRecord(keyId) == null) {
-            SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000);
-          }
-
-          // Data will never be null, its impossible to fetch links without some kind of data record.
-          // However, if its a brief, then there is no Text and no SendPrivKeyId
-          if (dataRecord.getEncText() == null) {
-            // If no body, fetch the body.
-            Obj_IDList_Co request = null;
-            if (msgParent instanceof FolderPair) {
-              request = new Obj_IDList_Co(new Long[] { ((FolderPair) msgParent).getFolderShareRecord().shareId, msgLink.msgLinkId });
-            } else {
-              request = new Obj_IDList_Co(new Long[] { null, msgLink.msgLinkId });
-            }
-            MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_BODY, request);
-            SIL.submitAndWait(msgAction, 60000);
-            // When the reply is processed, the MsgData record hold by our reference should be updated,
-            // also, the link will get updated with potentially new delivery timestamp, etc.
-
-            // Check if we still don't have the key - this is possible if we skipped the first key fetch due to having only a MSG BRIEF and NO BODY
-            keyId = dataRecord.getSendPrivKeyId();
-            if (keyId != null && cache.getKeyRecord(keyId) == null) {
-              SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000);
-              updateData(dataRecord);
-            }
-          } else {
-            updateData(dataRecord);
-          }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
+        // See if we have the senders public key to verify the body, if not, fetch it now.
+        // If we only had a brief, we won't have it and we'll have to try again after BODY FETCH
+        Long keyId = dataRecord.getSendPrivKeyId();
+        if (keyId != null && cache.getKeyRecord(keyId) == null) {
+          SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000);
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+        // Data will never be null, its impossible to fetch links without some kind of data record.
+        // However, if its a brief, then there is no Text and no SendPrivKeyId
+        if (dataRecord.getEncText() == null) {
+          // If no body, fetch the body.
+          Obj_IDList_Co request = null;
+          if (msgParent instanceof FolderPair) {
+            request = new Obj_IDList_Co(new Long[] { ((FolderPair) msgParent).getFolderShareRecord().shareId, msgLink.msgLinkId });
+          } else {
+            request = new Obj_IDList_Co(new Long[] { null, msgLink.msgLinkId });
+          }
+          MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_BODY, request);
+          SIL.submitAndWait(msgAction, 60000);
+          // When the reply is processed, the MsgData record hold by our reference should be updated,
+          // also, the link will get updated with potentially new delivery timestamp, etc.
+
+          // Check if we still don't have the key - this is possible if we skipped the first key fetch due to having only a MSG BRIEF and NO BODY
+          keyId = dataRecord.getSendPrivKeyId();
+          if (keyId != null && cache.getKeyRecord(keyId) == null) {
+            SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000);
+            updateData(dataRecord);
+          }
+        } else {
+          updateData(dataRecord);
+        }
       }
     };
     th.setDaemon(true);
@@ -979,10 +968,12 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
   private class MsgGUIUpdater implements Runnable {
     private MsgDataRecordEvent event;
     public MsgGUIUpdater(MsgDataRecordEvent e) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(MsgDataRecordEvent e)");
       event = e;
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
       if (event.getEventType() == MsgDataRecordEvent.SET) {
         MsgDataRecord[] msgDatas = event.getMsgDataRecords();
         if (msgDatas != null) {
@@ -995,11 +986,11 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
         }
       }
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
     }
   }
-        
-  
+
+
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/

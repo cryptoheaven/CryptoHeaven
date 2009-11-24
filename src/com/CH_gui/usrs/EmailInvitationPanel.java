@@ -85,7 +85,7 @@ public class EmailInvitationPanel extends JPanel implements ActionProducerI {
   /** 
    * Send E-mail Message to invite someone to join.
    */
-  private class SendEmailInvitationAction extends AbstractAction {
+  private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.MAIL_SEND_FAST_16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -93,7 +93,7 @@ public class EmailInvitationPanel extends JPanel implements ActionProducerI {
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_SEND_FAST_24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite_by_Email"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(EmailInvitationPanel.this);
       if (w instanceof Dialog)
         new InviteByEmailDialog((Dialog) w, initialAddressSource != null ? initialAddressSource.getText() : null);

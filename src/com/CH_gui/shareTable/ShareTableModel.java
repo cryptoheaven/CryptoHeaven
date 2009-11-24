@@ -268,10 +268,12 @@ public class ShareTableModel extends RecordTableModel {
   private class ModelUpdater implements Runnable {
     private FolderShareRecordEvent event;
     public ModelUpdater(FolderShareRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ModelUpdater.class, "ModelUpdater(FolderShareRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(ModelUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ModelUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ModelUpdater.class, "ModelUpdater.run()");
 
       if (trace != null) trace.args(event);
 

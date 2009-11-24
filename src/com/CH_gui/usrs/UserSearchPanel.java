@@ -37,7 +37,7 @@ import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 
 import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -365,7 +365,7 @@ public class UserSearchPanel extends JPanel {
   }
 
 
-  private class UserSearchRunner extends Thread {
+  private class UserSearchRunner extends ThreadTraced {
     private Usr_Search_Rq request;
     private UserSearchRunner(Usr_Search_Rq request) {
       super("UserSearchRunner");
@@ -373,47 +373,37 @@ public class UserSearchPanel extends JPanel {
       setDaemon(true);
     }
 
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSearchRunner.class, "run()");
+    public void runTraced() {
+      MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_SEARCH, request);
+      ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction, 30000);
 
-      try {
-        MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_SEARCH, request);
-        ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction, 30000);
+      DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
 
-        DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
-
-        boolean querySatisfied = false;
-        if (replyAction instanceof UsrAGetHandles) {
-          UsrAGetHandles handlesAction = (UsrAGetHandles) replyAction;
-          Usr_UsrHandles_Rp handlesSet = (Usr_UsrHandles_Rp) handlesAction.getMsgDataSet();
-          UserRecord[] uRecords = handlesSet.userRecords;
-          boolean isResultTruncated = uRecords != null && uRecords.length >= 10;
-          // get merged records
-          uRecords = SIL.getFetchedDataCache().getUserRecords(RecordUtils.getIDs(uRecords));
-          userActionTable.getTableModel().setData(uRecords);
-          userActionTable.setEnabledActions();
-          if (uRecords != null && uRecords.length > 0) {
-            querySatisfied = true;
-            userActionTable.getJSortedTable().getSelectionModel().setSelectionInterval(0, 0);
-          }
-          jNickname.selectAll();
-          jUserID.selectAll();
-          if (isResultTruncated)
-            MessageDialog.showInfoDialog(UserSearchPanel.this, "Displaying first few hits only.  Please narrow down your search.", "Search too broad.", false);
+      boolean querySatisfied = false;
+      if (replyAction instanceof UsrAGetHandles) {
+        UsrAGetHandles handlesAction = (UsrAGetHandles) replyAction;
+        Usr_UsrHandles_Rp handlesSet = (Usr_UsrHandles_Rp) handlesAction.getMsgDataSet();
+        UserRecord[] uRecords = handlesSet.userRecords;
+        boolean isResultTruncated = uRecords != null && uRecords.length >= 10;
+        // get merged records
+        uRecords = SIL.getFetchedDataCache().getUserRecords(RecordUtils.getIDs(uRecords));
+        userActionTable.getTableModel().setData(uRecords);
+        userActionTable.setEnabledActions();
+        if (uRecords != null && uRecords.length > 0) {
+          querySatisfied = true;
+          userActionTable.getJSortedTable().getSelectionModel().setSelectionInterval(0, 0);
         }
-
-        if (!querySatisfied) {
-          String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_the_query.");
-          String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
-          MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
-        }
-      } catch (Throwable t) {
-        if (trace != null) trace.exception(UserSearchRunner.class, 200, t);
+        jNickname.selectAll();
+        jUserID.selectAll();
+        if (isResultTruncated)
+          MessageDialog.showInfoDialog(UserSearchPanel.this, "Displaying first few hits only.  Please narrow down your search.", "Search too broad.", false);
       }
 
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(UserSearchRunner.class);
-      if (trace != null) trace.clear();
+      if (!querySatisfied) {
+        String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_the_query.");
+        String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
+        MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+      }
     }
   }
 

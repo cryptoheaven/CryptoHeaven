@@ -35,7 +35,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
@@ -119,7 +119,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     // Set default PERMITS into a sample user record which we are creating...
     this.userRecord = UserRecord.getDefaultUserSettings(UserRecord.STATUS_BUSINESS_SUB);
     // skip NOTIFY_EMAIL_YES because it needs a contact email address too
-    userRecord.notifyByEmail = new Short((short) Misc.setBit(false, userRecord.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES)); 
+    userRecord.notifyByEmail = new Short((short) Misc.setBit(false, userRecord.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
     UserRecord.trimChildToParent(userRecord, myUser);
 
     super.initialize();
@@ -133,9 +133,9 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
    * @return names for tabs
    */
   public String[] getWizardTabNames() {
-    return new String[] { com.CH_gui.lang.Lang.rb.getString("tab_User_Accounts"), 
-                          com.CH_gui.lang.Lang.rb.getString("tab_Options"), 
-                          com.CH_gui.lang.Lang.rb.getString("tab_Permissions"), 
+    return new String[] { com.CH_gui.lang.Lang.rb.getString("tab_User_Accounts"),
+                          com.CH_gui.lang.Lang.rb.getString("tab_Options"),
+                          com.CH_gui.lang.Lang.rb.getString("tab_Permissions"),
                           com.CH_gui.lang.Lang.rb.getString("tab_Summary") };
   }
   /**
@@ -177,7 +177,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
       synchronized (estimateMonitor) {
         estimatedTime = null;
       }
-    } 
+    }
     return rc;
   }
   /**
@@ -454,7 +454,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
       timer.stop();
     }
 
-    if (error) 
+    if (error)
       jProgressBar.setVisible(false);
 
     return !error;
@@ -469,11 +469,11 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     jAccounts.setLayout(new GridBagLayout());
 
     int posY = 0;
-    jAccounts.add(new JMyLabel("Username"), new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    jAccounts.add(new JMyLabel("Username"), new GridBagConstraints(0, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    jAccounts.add(new JMyLabel("Password"), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    jAccounts.add(new JMyLabel("Password"), new GridBagConstraints(1, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    jAccounts.add(new JMyLabel("Email Address"), new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    jAccounts.add(new JMyLabel("Email Address"), new GridBagConstraints(2, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -483,7 +483,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
         addAccountFields();
       }
     });
-    jAccounts.add(jAddMore, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    jAccounts.add(jAddMore, new GridBagConstraints(0, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -492,7 +492,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
         "specified or only the nickname without domain is specified, <br>" +
         "the system will try to assign a default email address in the <br>" +
         "form of:  nickname@yourDomain.com");
-    jAccounts.add(jAccountsNote, new GridBagConstraints(0, posY, 1, 3, 10, 0, 
+    jAccounts.add(jAccountsNote, new GridBagConstraints(0, posY, 1, 3, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -521,16 +521,16 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
     int posY = jUsernamesV.size();
 
-    jAccounts.add((JComponent) jUsernamesV.lastElement(), new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    jAccounts.add((JComponent) jUsernamesV.lastElement(), new GridBagConstraints(0, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    jAccounts.add((JComponent) jPasswordsV.lastElement(), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    jAccounts.add((JComponent) jPasswordsV.lastElement(), new GridBagConstraints(1, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    jAccounts.add((JComponent) jEmailV.lastElement(), new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    jAccounts.add((JComponent) jEmailV.lastElement(), new GridBagConstraints(2, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jAccounts.add(jAddMore, new GridBagConstraints(0, posY+1, 1, 1, 10, 0, 
+    jAccounts.add(jAddMore, new GridBagConstraints(0, posY+1, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    jAccounts.add(jAccountsNote, new GridBagConstraints(0, posY+2, 3, 1, 10, 0, 
+    jAccounts.add(jAccountsNote, new GridBagConstraints(0, posY+2, 3, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     jAccounts.revalidate();
@@ -556,34 +556,34 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
     int posY = 0;
 
-    panel.add(jSummaryLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jSummaryLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jAdvancedLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jAdvancedLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jAdvancedButton, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jAdvancedButton, new GridBagConstraints(1, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
-    
-    panel.add(jCheckContactsForUsers, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+
+    panel.add(jCheckContactsForUsers, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
-    panel.add(jCheckContactsToMe, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jCheckContactsToMe, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(4, 5, 4, 5), 0, 0));
     posY ++;
 
-    panel.add(jExpectedTime, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jExpectedTime, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jProgressBar, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jProgressBar, new GridBagConstraints(0, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     // filler
-    panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 2, 1, 10, 10, 
+    panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 2, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
 
     return panel;
@@ -741,10 +741,8 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
   }
 
   private void updateKeyGenerationTimeThreaded() {
-    Thread t = new Thread("KeyGenerationTimeEstimator") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
+    Thread th = new ThreadTraced("KeyGenerationTimeEstimator") {
+      public void runTraced() {
         synchronized (estimateMonitor) {
           if (estimatedTime == null) {
             jExpectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
@@ -754,15 +752,12 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
             validate();
           }
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     // change the priority of that thread to minimum
-    t.setPriority(Thread.MIN_PRIORITY);
-    t.start();
+    th.setPriority(Thread.MIN_PRIORITY);
+    th.setDaemon(true);
+    th.start();
   }
 
   private int estimateKeyGenerationTimeNow(int keyLength, int certainty) {

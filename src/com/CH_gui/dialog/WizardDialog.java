@@ -18,7 +18,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import com.CH_co.gui.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
@@ -45,7 +45,7 @@ public abstract class WizardDialog extends GeneralDialog {
   private static final int DEFAULT_CANCEL_INDEX = 3;
 
   private Component parent;
-  
+
   private JTabbedPane jTabbedPane;
   private int selectedTabIndex = 0;
   private int selectedTabIndexPrev = 0;
@@ -57,7 +57,7 @@ public abstract class WizardDialog extends GeneralDialog {
 
   /** Creates new WizardDialog */
   public WizardDialog(Frame parent, String title) {
-    super(parent, title); 
+    super(parent, title);
     this.parent = parent;
   }
   public WizardDialog(Dialog parent, String title) {
@@ -117,7 +117,7 @@ public abstract class WizardDialog extends GeneralDialog {
 
 //    panel.add(new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
 //        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    panel.add(jTabbedPane, new GridBagConstraints(0, 1, 1, 1, 10, 10, 
+    panel.add(jTabbedPane, new GridBagConstraints(0, 1, 1, 1, 10, 10,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
     jTabbedPane.addChangeListener(new ChangeListener() {
@@ -196,13 +196,12 @@ public abstract class WizardDialog extends GeneralDialog {
   /**
    * Thread that takes all input data and runs the action.
    */
-  private class FinishThread extends Thread {
+  private class FinishThread extends ThreadTraced {
 
     public FinishThread() {
       super("Wizard Dialog FinishThread");
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FinishThread.class, "run()");
+    public void runTraced() {
       setEnabledInputs(false);
       // change the priority of this thread to minimum
       setPriority(MIN_PRIORITY);
@@ -220,11 +219,6 @@ public abstract class WizardDialog extends GeneralDialog {
         setEnabledInputs(true);
         validate();
       }
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(FinishThread.class);
-      if (trace != null) trace.clear();
-
     }
   } // end class OKThread
 

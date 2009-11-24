@@ -19,22 +19,18 @@ import java.sql.Timestamp;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
 
-import com.CH_co.cryptx.*;
 import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /**
@@ -139,7 +135,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
       //warningLabel.setVerticalTextPosition(JLabel.TOP);
       warningLabel.setBorder(new EtchedBorder());
       warningLabel.setPreferredSize(new Dimension(410, 40));
-      panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+      panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 1, 1), 20, 20));
       posY ++;
       if (initialRecoveryRecord.lastFetched != null && initialRecoveryRecord.lastFetched.compareTo(reportSince) > 0) {
@@ -148,30 +144,34 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
           fetchText = "Password Hint and Challenge questions retrieved on:";
         else
           fetchText = "Attempt to retrieve you uninitialized Password Recovery settings was made on:";
-        panel.add(new JMyLabel(fetchText), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel(fetchText), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 1, 5), 0, 0));
         posY ++;
-        panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastFetched)), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastFetched)), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 25, 5, 5), 0, 0));
         posY ++;
       }
       if (initialRecoveryRecord.lastFailed != null && initialRecoveryRecord.lastFailed.compareTo(reportSince) > 0) {
-        panel.add(new JMyLabel("Password Question and Answer challenge failed on:"), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel("Password Question and Answer challenge failed on:"), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 1, 5), 0, 0));
         posY ++;
-        panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastFailed)), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastFailed)), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 25, 5, 5), 0, 0));
         posY ++;
       }
       if (initialRecoveryRecord.lastRecovered != null && initialRecoveryRecord.lastRecovered.compareTo(reportSince) > 0) {
-        panel.add(new JMyLabel("Password Recovery completed successfully on:"), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel("Password Recovery completed successfully on:"), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 1, 5), 0, 0));
         posY ++;
-        panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastRecovered)), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastRecovered)), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 25, 5, 5), 0, 0));
         posY ++;
+      } else {
+        panel.add(new JMyLabel("Password was not recovered."), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+        posY ++;
       }
-      panel.add(new JMyLabel("You cannot disable this security notice."), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+      panel.add(new JMyLabel("You cannot disable this security notice."), new GridBagConstraints(0, posY, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(10, 5, include24ExpiryNote ? 1:5, 5), 0, 0));
       posY ++;
       if (include24ExpiryNote) {
@@ -189,15 +189,15 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
       //warningLabel.setVerticalTextPosition(JLabel.TOP);
       warningLabel.setBorder(new EtchedBorder());
       warningLabel.setPreferredSize(new Dimension(410, 40));
-      panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+      panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 1, 1), 20, 20));
       posY ++;
     } else {
-      panel.add(new JMyLabel("Password Hint:"), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+      panel.add(new JMyLabel("Password Hint:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(10, 5, 5, 5), 0, 0));
       JMyTextField hintField = new JMyTextField(initialRecoveryRecord.hint);
       hintField.setEditable(false);
-      panel.add(hintField, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+      panel.add(hintField, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 5, 5, 5), 0, 0));
       posY ++;
 
@@ -208,30 +208,30 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
         //warningLabel.setVerticalTextPosition(JLabel.TOP);
         warningLabel.setBorder(new EtchedBorder());
         warningLabel.setPreferredSize(new Dimension(410, 40));
-        panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+        panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 1, 10, 1), 20, 20));
         posY ++;
       }
 
-      panel.add(new JMyLabel("Recovery Questions:"), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+      panel.add(new JMyLabel("Recovery Questions:"), new GridBagConstraints(0, posY, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
       if (initialRecoveryRecord.isEnabledRecovery() && initialRecoveryRecord.isEnabledQA()) {
 
-        panel.add(new JMyLabel("Please note that the exact spelling of Answers is required."), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+        panel.add(new JMyLabel("Please note that the exact spelling of Answers is required."), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
         posY ++;
 
         for (int i=0; i<jAs.length; i++) {
-          panel.add(new JMyLabel("Question " + (i+1) + ":"), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+          panel.add(new JMyLabel("Question " + (i+1) + ":"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
               GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 1, 5), 0, 0));
-          panel.add(new JMyLabel(initialRecoveryRecord.questions[i]), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+          panel.add(new JMyLabel(initialRecoveryRecord.questions[i]), new GridBagConstraints(1, posY, 1, 1, 10, 0,
               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
           posY ++;
-          panel.add(new JMyLabel("Answer " + (i+1) + ":"), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+          panel.add(new JMyLabel("Answer " + (i+1) + ":"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
               GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 5, 5, 5), 0, 0));
-          panel.add(jAs[i], new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+          panel.add(jAs[i], new GridBagConstraints(1, posY, 1, 1, 10, 0,
               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
           posY ++;
         }
@@ -242,14 +242,14 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
         //warningLabel.setVerticalTextPosition(JLabel.TOP);
         warningLabel.setBorder(new EtchedBorder());
         warningLabel.setPreferredSize(new Dimension(410, 40));
-        panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+        panel.add(warningLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 1, 1, 1), 10, 10));
         posY ++;
       }
     }
 
     // filler
-    panel.add(new JLabel(), new GridBagConstraints(0, posY, 1, 1, 0, 10, 
+    panel.add(new JLabel(), new GridBagConstraints(0, posY, 1, 1, 0, 10,
         GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(0,0,0,0), 0, 0));
 
     return panel;
@@ -275,17 +275,14 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
     }
   }
 
-  private class OKThread extends Thread {
+  private class OKThread extends ThreadTraced {
 
     public OKThread() {
       super("PassRecoveryRecoverDialog OKThread");
       setDaemon(true);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(OKThread.class, "run()");
-
+    public void runTraced() {
       setEnabledInputs(false);
-
       boolean error = false;
 
       int countAnswers = 0;
@@ -343,7 +340,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
               letter.setBorder(new LineBorder(Color.lightGray));
               letter.setHorizontalAlignment(JLabel.CENTER);
               letter.setFont(letter.getFont().deriveFont(Font.BOLD));
-              passPanel.add(letter, new GridBagConstraints(i, 0, 1, 1, 0, 0, 
+              passPanel.add(letter, new GridBagConstraints(i, 0, 1, 1, 0, 0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(2, 2, 2, 2), 10, 10));
             }
             JOptionPane.showMessageDialog(PassRecoveryRecoverDialog.this, mainPanel, "Password", JOptionPane.INFORMATION_MESSAGE);
@@ -368,10 +365,6 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
         setEnabledInputs(true);
         recoveredPassword = null;
       }
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-      if (trace != null) trace.exit(OKThread.class);
-      if (trace != null) trace.clear();
     }
   }
 }

@@ -15,7 +15,6 @@ package com.CH_gui.table;
 
 import com.CH_gui.action.*;
 import com.CH_gui.contactTable.*;
-import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
@@ -38,7 +37,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import java.awt.*;
@@ -55,7 +54,7 @@ import javax.swing.event.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -63,7 +62,7 @@ import javax.swing.event.*;
  *
  * <b>$Revision: 1.32 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public abstract class RecordTableComponent extends JPanel implements VisualsSavable, DisposableObj {
 
@@ -100,7 +99,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
   private FolderShareListener folderShareListener;
 
 
-  /** 
+  /**
    * Creates new RecordTableComponent.
    * @param recordTableScrollPane is often an RecordActionTable which is a subclass of RecordTableScrollPane
    */
@@ -191,26 +190,26 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     jFilterPanel = new JPanel(new GridBagLayout());
     jFilterPanel.setVisible(false);
     jFilterPanel.setBorder(new LineBorder(Color.darkGray, 1));
-    jFilterPanel.add(new JMyLabel("Look for:"), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jFilterPanel.add(new JMyLabel("Look for:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
-    jFilterPanel.add(jFilterField, new GridBagConstraints(1, 0, 1, 1, 10, 0, 
+    jFilterPanel.add(jFilterField, new GridBagConstraints(1, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 3), 0, 0));
-    jFilterPanel.add(jFilterGoButton, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+    jFilterPanel.add(jFilterGoButton, new GridBagConstraints(2, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     if (jFilterClearButton != null) {
-      jFilterPanel.add(jFilterClearButton, new GridBagConstraints(3, 0, 1, 1, 0, 0, 
+      jFilterPanel.add(jFilterClearButton, new GridBagConstraints(3, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     }
-    jFilterPanel.add(jFilterMsgBodyCheck, new GridBagConstraints(4, 0, 1, 1, 10, 0, 
+    jFilterPanel.add(jFilterMsgBodyCheck, new GridBagConstraints(4, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 3), 0, 0));
-    jFilterPanel.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0, 
+    jFilterPanel.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    jFilterPanel.add(jFilterCloseButton, new GridBagConstraints(6, 0, 1, 1, 0, 0, 
+    jFilterPanel.add(jFilterCloseButton, new GridBagConstraints(6, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jTitlePanel = new JPanel(new BorderLayout(0, 0));
     jTitlePanel.add(jTitleLabel, BorderLayout.CENTER);
     jDescriptionPanel = new JPanel(new BorderLayout(0, 0));
-    jDescriptionPanel.add(jDescriptionLabel, BorderLayout.CENTER); 
+    jDescriptionPanel.add(jDescriptionLabel, BorderLayout.CENTER);
     jUtilityButtonPanel = new JPanel(new GridBagLayout());
 
     init();
@@ -311,7 +310,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
   }
   public void addUtilityComponent(JComponent utilityComponent) {
     int count = jUtilityButtonPanel.getComponentCount();
-    jUtilityButtonPanel.add(utilityComponent, new GridBagConstraints(10-count, 0, 1, 1, 0, 0, 
+    jUtilityButtonPanel.add(utilityComponent, new GridBagConstraints(10-count, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     this.jUtilityButtonPanel.revalidate();
   }
@@ -364,37 +363,37 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     }
 
     int posY = 0;
-    jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
-    jTopPanel.add(jTitlePanel, new GridBagConstraints(0, posY, 1, 2, 0, 0, 
+    jTopPanel.add(jTitlePanel, new GridBagConstraints(0, posY, 1, 2, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 5), 0, 0));
-    jTopPanel.add(jDescriptionPanel, new GridBagConstraints(1, posY, 1, 2, 10, 0, 
+    jTopPanel.add(jDescriptionPanel, new GridBagConstraints(1, posY, 1, 2, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
-    jTopPanel.add(jUtilityButtonPanel, new GridBagConstraints(2, posY, 1, 1, 0, 0, 
+    jTopPanel.add(jUtilityButtonPanel, new GridBagConstraints(2, posY, 1, 1, 0, 0,
         GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(1, 1, 1, 1), 0, 0));
 
-    add(jTopPanel, new GridBagConstraints(0, 0, 1, 1, 10, 0, 
+    add(jTopPanel, new GridBagConstraints(0, 0, 1, 1, 10, 0,
         GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
     if (refreshButton != null) {
-      jUtilityButtonPanel.add(refreshButton, new GridBagConstraints(10, 0, 1, 1, 0, 0, 
+      jUtilityButtonPanel.add(refreshButton, new GridBagConstraints(10, 0, 1, 1, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (cloneButton != null) {
-      jUtilityButtonPanel.add(cloneButton, new GridBagConstraints(9, 0, 1, 1, 0, 0, 
+      jUtilityButtonPanel.add(cloneButton, new GridBagConstraints(9, 0, 1, 1, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (splitLayoutButton != null) {
-      jUtilityButtonPanel.add(splitLayoutButton, new GridBagConstraints(8, 0, 1, 1, 0, 0, 
+      jUtilityButtonPanel.add(splitLayoutButton, new GridBagConstraints(8, 0, 1, 1, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (filterButton != null) {
-      jUtilityButtonPanel.add(filterButton, new GridBagConstraints(7, 0, 1, 1, 0, 0, 
+      jUtilityButtonPanel.add(filterButton, new GridBagConstraints(7, 0, 1, 1, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     /*
-    add(recordTableScrollPane, new GridBagConstraints(0, 1, 5, 1, 60, 60, 
+    add(recordTableScrollPane, new GridBagConstraints(0, 1, 5, 1, 60, 60,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
      */
 
@@ -449,7 +448,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
 //      emptyPane.setOpaque(false);
 //      cards.add(pane, "template");
 //    }
-    add(cards, new GridBagConstraints(0, 1, 1, 1, 20, 20, 
+    add(cards, new GridBagConstraints(0, 1, 1, 1, 20, 20,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     // Since we want initially to show the table, wait SHOW_DELAY seconds and if it doesn't fill,
     // show the template.
@@ -508,8 +507,8 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
           else
             cardLayout.show(cards, "emptyFilterResultsTemplate");
         }
-        if (rowCount == 0 && 
-              (   (fsr != null && !model.isContentFetched(fsr.shareId)) || 
+        if (rowCount == 0 &&
+              (   (fsr != null && !model.isContentFetched(fsr.shareId)) ||
                   (fsr == null && model instanceof ContactTableModel)
               )
            )
@@ -547,15 +546,11 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
   } // end showTableOrDelayedTemplate()
 
   private void performEmptyTableCheck_Threaded() {
-    Thread th = new Thread(new Runnable() {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Empty Table Checker") {
+      public void runTraced() {
         performEmptyTableCheck();
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
-    }, "Empty Table Checker");
+    };
     th.setDaemon(true);
     th.start();
   }
@@ -669,7 +664,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     if (trace != null) trace.exit(RecordTableComponent.class);
   }
 
-  /** 
+  /**
    * Sets the title of the folder to reflect the description of the given folder.
    */
   private void changeTitle(Long folderId) {
@@ -697,7 +692,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
       jTitleLabel.setIcon(titleIcon);
     }
   }
-  /** 
+  /**
    * Sets the description of the folder to reflect the description of the given folder.
    */
   private void changeDescription(Long folderId) {
@@ -779,14 +774,16 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
       javax.swing.SwingUtilities.invokeLater(new GUIUpdater(event));
     }
   }
-  
+
   private class GUIUpdater implements Runnable {
     private FolderShareRecordEvent event;
     public GUIUpdater(FolderShareRecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater(FolderShareRecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(GUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater.run()");
 
       if (recordTableScrollPane != null) {
         FolderPair folderPair = recordTableScrollPane.getTableModel().getParentFolderPair();
@@ -798,7 +795,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
               if (parentShare.equals(shareRecords[i])) {
                 if (event.getEventType() == RecordEvent.SET) {
                   changeTitle(shareRecords[i].folderId);
-                } 
+                }
                 changeDescription(shareRecords[i].folderId);
                 break;
               }
@@ -899,7 +896,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
 
     if (!suppressVisualsSavable) {
       try {
-        StringTokenizer st = new StringTokenizer(visuals);  
+        StringTokenizer st = new StringTokenizer(visuals);
         st.nextToken();
         st.nextToken();
         int width = Integer.parseInt(st.nextToken());

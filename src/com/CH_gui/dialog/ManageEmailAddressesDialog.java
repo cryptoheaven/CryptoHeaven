@@ -22,17 +22,14 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
-import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
@@ -231,7 +228,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
       limitEmlAddrs = 1;
     else if (selectedUserRecord.isBusinessAccount())
       limitEmlAddrs = EmailRecord.MAX_EMAIL_ADDRESSES_BUSINESS;
-    else 
+    else
       limitEmlAddrs = EmailRecord.MAX_EMAIL_ADDRESSES_PERSONAL;
     // fill list with data
     fetchData(selectedUserRecord);
@@ -244,11 +241,11 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
 
     int posY = 0;
 
-    panel.add(AccountOptionsSignaturesPanel.makeDivider("E-mail Address management"), new GridBagConstraints(0, posY, 4, 1, 10, 0, 
+    panel.add(AccountOptionsSignaturesPanel.makeDivider("E-mail Address management"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(Images.get(ImageNums.SIGNATURE32)), new GridBagConstraints(0, posY, 1, 2, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.SIGNATURE32)), new GridBagConstraints(0, posY, 1, 2, 0, 0,
         GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     URL signupURL = null;
     if (selectedUserRecord != null) {
@@ -258,38 +255,38 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
       }
     }
     if (selectedUserRecord != null && selectedUserRecord.isFreePromoAccount()) {
-      panel.add(new JMyLabel("Demo accounts have e-mail address management disabled."), new GridBagConstraints(1, posY, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("Demo accounts have e-mail address management disabled."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
-      panel.add(new JMyLinkLabel("Click here to upgrade.", signupURL), new GridBagConstraints(1, posY+1, 3, 1, 10, 0, 
+      panel.add(new JMyLinkLabel("Click here to upgrade.", signupURL), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     } else if (selectedUserRecord != null && selectedUserRecord.isBusinessAccount()) {
-      panel.add(new JMyLabel("You are allowed up to '"+limitEmlAddrs+"' personalized e-mail addresses per account."), new GridBagConstraints(1, posY, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("You are allowed up to '"+limitEmlAddrs+"' personalized e-mail addresses per account."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel("All changes to e-mail addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("All changes to e-mail addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     } else {
-      panel.add(new JMyLabel("You are allowed upto '"+limitEmlAddrs+"' personalized e-mail addresses."), new GridBagConstraints(1, posY, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("You are allowed upto '"+limitEmlAddrs+"' personalized e-mail addresses."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
 //      panel.add(new JMyLinkLabel("Click here to upgrade.", signupURL), new GridBagConstraints(1, posY+1, 3, 1, 10, 0, 
 //          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel("All changes to your e-mail addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0, 
+      panel.add(new JMyLabel("All changes to your e-mail addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     }
     posY += 2;
 
-    panel.add(AccountOptionsSignaturesPanel.makeDivider("E-mail Addresses"), new GridBagConstraints(0, posY, 4, 1, 10, 0, 
+    panel.add(AccountOptionsSignaturesPanel.makeDivider("E-mail Addresses"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
     posY ++;
 
-    panel.add(new JScrollPane(jEmlList), new GridBagConstraints(1, posY, 2, 5, 10, 10, 
+    panel.add(new JScrollPane(jEmlList), new GridBagConstraints(1, posY, 2, 5, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 2, 5, 5), 0, 0));
-    panel.add(jNew, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
+    panel.add(jNew, new GridBagConstraints(3, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
-    panel.add(jRemove, new GridBagConstraints(3, posY+1, 1, 1, 0, 0, 
+    panel.add(jRemove, new GridBagConstraints(3, posY+1, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-    panel.add(jRename, new GridBagConstraints(3, posY+2, 1, 1, 0, 0, 
+    panel.add(jRename, new GridBagConstraints(3, posY+2, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-    panel.add(jSetAsDefault, new GridBagConstraints(3, posY+3, 1, 1, 0, 0, 
+    panel.add(jSetAsDefault, new GridBagConstraints(3, posY+3, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
     posY += 5;
 
@@ -297,59 +294,53 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
   }
 
   private void fetchData(final UserRecord forUserRecord) {
-    Thread th = new Thread("Manage Email Addresses Domains Fetcher") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Manage Email Addresses Domains Fetcher") {
+      public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "ManageEmailAddressesDialog.fetchData.runTraced()");
 
-        try {
-          // fetch all available domains and all current email addresses
-          Obj_List_Co request = new Obj_List_Co();
-          request.objs = new Object[] { forUserRecord.userId, Boolean.TRUE };
-          if (trace != null) trace.data(10, "about to get domains and email addresses");
-          ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.EML_Q_GET_DOMAINS, request), 30000);
-          if (trace != null) trace.data(11, "about to run reply", reply);
-          if (reply != null) {
-            DefaultReplyRunner.nonThreadedRun(SIL, reply);
-            ProtocolMsgDataSet set = reply.getMsgDataSet();
-            if (set instanceof Obj_List_Co) {
-              Obj_List_Co set2 = (Obj_List_Co) set;
-              final String[] domains = (String[]) set2.objs[0];
-              final EmailRecord[] emailRecs = ((Eml_Get_Rp) set2.objs[1]).emailRecords;
-              if (trace != null) trace.data(12, "about to set gui with fetched data");
-              // Perform GUI updates in a GUI-safe-thread
-              SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                  // fill GUI with data
-                  defaultEmailRecords = emailRecs;
-                  defaultEmailDomains = domains;
-                  // sort fetched data
-                  if (defaultEmailRecords != null && defaultEmailRecords.length > 1)
-                    Arrays.sort(defaultEmailRecords, new ListComparator());
-                  if (defaultEmailDomains != null && defaultEmailDomains.length > 1)
-                    Arrays.sort(defaultEmailDomains);
-                  int defaultEmlIndex = -1;
-                  listEmlsV.clear();
-                  if (defaultEmailRecords != null) {
-                    for (int i=0; i<defaultEmailRecords.length; i++) {
-                      listEmlsV.addElement(defaultEmailRecords[i].getEmailAddressFull());
-                      if (forUserRecord.defaultEmlId.equals(defaultEmailRecords[i].emlId))
-                        defaultEmlIndex = i;
-                    }
+        // fetch all available domains and all current email addresses
+        Obj_List_Co request = new Obj_List_Co();
+        request.objs = new Object[] { forUserRecord.userId, Boolean.TRUE };
+        if (trace != null) trace.data(10, "about to get domains and email addresses");
+        ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.EML_Q_GET_DOMAINS, request), 30000);
+        if (trace != null) trace.data(11, "about to run reply", reply);
+        if (reply != null) {
+          DefaultReplyRunner.nonThreadedRun(SIL, reply);
+          ProtocolMsgDataSet set = reply.getMsgDataSet();
+          if (set instanceof Obj_List_Co) {
+            Obj_List_Co set2 = (Obj_List_Co) set;
+            final String[] domains = (String[]) set2.objs[0];
+            final EmailRecord[] emailRecs = ((Eml_Get_Rp) set2.objs[1]).emailRecords;
+            if (trace != null) trace.data(12, "about to set gui with fetched data");
+            // Perform GUI updates in a GUI-safe-thread
+            SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                // fill GUI with data
+                defaultEmailRecords = emailRecs;
+                defaultEmailDomains = domains;
+                // sort fetched data
+                if (defaultEmailRecords != null && defaultEmailRecords.length > 1)
+                  Arrays.sort(defaultEmailRecords, new ListComparator());
+                if (defaultEmailDomains != null && defaultEmailDomains.length > 1)
+                  Arrays.sort(defaultEmailDomains);
+                int defaultEmlIndex = -1;
+                listEmlsV.clear();
+                if (defaultEmailRecords != null) {
+                  for (int i=0; i<defaultEmailRecords.length; i++) {
+                    listEmlsV.addElement(defaultEmailRecords[i].getEmailAddressFull());
+                    if (forUserRecord.defaultEmlId.equals(defaultEmailRecords[i].emlId))
+                      defaultEmlIndex = i;
                   }
-                  defaultEml = defaultEmlIndex;
-                  jEmlList.setListData(listEmlsV);
-                  setEnabledButtons();
                 }
-              });
-            }
+                defaultEml = defaultEmlIndex;
+                jEmlList.setListData(listEmlsV);
+                setEnabledButtons();
+              }
+            });
           }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
         if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -358,59 +349,48 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
 
 
   private void pressedOk() {
-    Thread th = new Thread("Manage Email Addresses Commiter") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        try {
-          Vector emlsToCreateV = (Vector) listEmlsV.clone();
-          Vector emlIDsToDeleteV = new Vector();
-          Vector emlsToDeleteV = new Vector();
-          Vector emlsNoChangeV = new Vector();
-          // find email addresses to delete
-          for (int i=0; i<defaultEmailRecords.length; i++) {
-            EmailRecord emlRec = defaultEmailRecords[i];
-            String addr = emlRec.getEmailAddressFull();
-            boolean found = false;
-            int index = EmailRecord.findEmailAddress(emlsToCreateV, addr);
-            // Check if the "Personal" part is the same, if changed then treat it as a different email address
-            if (index >= 0) {
-              String emlToCreate = (String) emlsToCreateV.elementAt(index);
-              if (!EmailRecord.isAddressEqualStrict(emlToCreate, addr))
-                index = -1;
-            }
-            if (index < 0) {
-              emlIDsToDeleteV.addElement(emlRec.emlId);
-              emlsToDeleteV.addElement(addr);
-            } else {
-              emlsToCreateV.removeElementAt(index);
-              emlsNoChangeV.addElement(addr);
-            }
+    Thread th = new ThreadTraced("Manage Email Addresses Commiter") {
+      public void runTraced() {
+        Vector emlsToCreateV = (Vector) listEmlsV.clone();
+        Vector emlIDsToDeleteV = new Vector();
+        Vector emlsToDeleteV = new Vector();
+        Vector emlsNoChangeV = new Vector();
+        // find email addresses to delete
+        for (int i=0; i<defaultEmailRecords.length; i++) {
+          EmailRecord emlRec = defaultEmailRecords[i];
+          String addr = emlRec.getEmailAddressFull();
+          int index = EmailRecord.findEmailAddress(emlsToCreateV, addr);
+          // Check if the "Personal" part is the same, if changed then treat it as a different email address
+          if (index >= 0) {
+            String emlToCreate = (String) emlsToCreateV.elementAt(index);
+            if (!EmailRecord.isAddressEqualStrict(emlToCreate, addr))
+              index = -1;
           }
-          String[] emlsToCreate = (String[]) ArrayUtils.toArray(emlsToCreateV, String.class);
-          Long[] emlIDsToDelete = (Long[]) ArrayUtils.toArray(emlIDsToDeleteV, Long.class);
-          if (emlsToCreate != null && emlsToCreate.length == 0)
-            emlsToCreate = null;
-          if (emlIDsToDelete != null && emlIDsToDelete.length == 0)
-            emlIDsToDelete = null;
-          String emlDefault = null;
-          if (defaultEml >= 0)
-            emlDefault = (String) listEmlsV.elementAt(defaultEml);
-          ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.EML_Q_MANAGE, new Obj_List_Co(new Object[] { selectedUserRecord.userId, emlsToCreate, emlIDsToDelete, emlDefault })), 60000);
-          DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-          if (msgAction != null && msgAction.getActionCode() > 0) {
-            setVisible(false);
-            dispose();
-            if (accountOptionsDialog != null)
-              accountOptionsDialog.refreshEmailAddressFromCache();
+          if (index < 0) {
+            emlIDsToDeleteV.addElement(emlRec.emlId);
+            emlsToDeleteV.addElement(addr);
+          } else {
+            emlsToCreateV.removeElementAt(index);
+            emlsNoChangeV.addElement(addr);
           }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+        String[] emlsToCreate = (String[]) ArrayUtils.toArray(emlsToCreateV, String.class);
+        Long[] emlIDsToDelete = (Long[]) ArrayUtils.toArray(emlIDsToDeleteV, Long.class);
+        if (emlsToCreate != null && emlsToCreate.length == 0)
+          emlsToCreate = null;
+        if (emlIDsToDelete != null && emlIDsToDelete.length == 0)
+          emlIDsToDelete = null;
+        String emlDefault = null;
+        if (defaultEml >= 0)
+          emlDefault = (String) listEmlsV.elementAt(defaultEml);
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.EML_Q_MANAGE, new Obj_List_Co(new Object[] { selectedUserRecord.userId, emlsToCreate, emlIDsToDelete, emlDefault })), 60000);
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
+        if (msgAction != null && msgAction.getActionCode() > 0) {
+          setVisible(false);
+          dispose();
+          if (accountOptionsDialog != null)
+            accountOptionsDialog.refreshEmailAddressFromCache();
+        }
       }
     };
     th.setDaemon(true);
@@ -501,15 +481,15 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
     // create dialog panel
     JPanel panel = new JPanel();
     panel.setLayout(new GridBagLayout());
-    panel.add(new JMyLabel(label), new GridBagConstraints(0, 0, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(label), new GridBagConstraints(0, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
-    panel.add(jInput, new GridBagConstraints(0, 1, 1, 1, 10, 0, 
+    panel.add(jInput, new GridBagConstraints(0, 1, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 3, 5), 0, 0));
-    panel.add(new JMyLabel(label2), new GridBagConstraints(0, 2, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(label2), new GridBagConstraints(0, 2, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 2, 5), 0, 0));
-    panel.add(jDisplayAs, new GridBagConstraints(0, 3, 1, 1, 10, 0, 
+    panel.add(jDisplayAs, new GridBagConstraints(0, 3, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
-    panel.add(new JLabel(), new GridBagConstraints(0, 4, 1, 1, 10, 10, 
+    panel.add(new JLabel(), new GridBagConstraints(0, 4, 1, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     JButton jOk = new JMyButton("OK");
     JButton jCancel = new JMyButton("Cancel");

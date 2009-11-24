@@ -240,10 +240,12 @@ public class ContactTableModel extends RecordTableModel {
   private class ContactGUIUpdater implements Runnable {
     private RecordEvent event;
     public ContactGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(ContactGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactGUIUpdater.class, "ContactGUIUpdater.run()");
 
       Record[] recs = event.getRecords();
       if (recs != null && recs.length > 0) {

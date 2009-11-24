@@ -268,10 +268,12 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   private static class ChatFrameDispatcher implements Runnable {
     private EventObject event;
     public ChatFrameDispatcher(EventObject event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatFrameDispatcher.class, "ChatFrameDispatcher(EventObject event)");
       this.event = event;
+      if (trace != null) trace.exit(ChatFrameDispatcher.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatFrameDispatcher.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatFrameDispatcher.class, "ChatFrameDispatcher.run()");
       if (event instanceof MsgLinkRecordEvent) {
         MsgLinkRecord[] msgLinks = ((MsgLinkRecordEvent) event).getMsgLinkRecords();
         // Just-in-time chat updates always come singulairly, 1 msg link.
@@ -343,10 +345,12 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   private class FolderGUIUpdater implements Runnable {
     private RecordEvent event;
     public FolderGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(FolderGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater.run()");
 
       Record[] records = null;
       if (event instanceof FolderRecordEvent) {

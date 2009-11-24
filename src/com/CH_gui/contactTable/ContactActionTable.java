@@ -242,7 +242,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /** 
    * Initiate a new contact.
    */
-  private static class NewContactAction extends AbstractAction {
+  private static class NewContactAction extends AbstractActionTraced {
     public NewContactAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Find_Friends_and_Associates_..."), Images.get(ImageNums.USER_FIND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -250,18 +250,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_FIND24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Find"));
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(NewContactAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
+    public void actionPerformedTraced(ActionEvent event) {
       new FindUserFrame();
-      if (trace != null) trace.exit(NewContactAction.class);
     }
   }
 
   /** 
    * Create a new group.
    */
-  private class NewGroupAction extends AbstractAction {
+  private class NewGroupAction extends AbstractActionTraced {
     public NewGroupAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Create_Group"), Images.get(ImageNums.GROUP_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -269,20 +266,17 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GROUP_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Group"));
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(NewGroupAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(ContactActionTable.this)) {
         chatOrShareSpace(false, FolderRecord.GROUP_FOLDER, event);
       }
-      if (trace != null) trace.exit(NewGroupAction.class);
     }
   }
 
   /** 
    * Accept contact(s).
    */
-  private class AcceptDeclineAction extends AbstractAction {
+  private class AcceptDeclineAction extends AbstractActionTraced {
     public AcceptDeclineAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Accept_/_Decline_Contact(s)_..."), Images.get(ImageNums.CONTACT_CHECK16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -290,25 +284,20 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_CHECK24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Accept"));
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AcceptDeclineAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
-
+    public void actionPerformedTraced(ActionEvent event) {
       ContactRecord[] contacts = (ContactRecord[]) getSelectedInstancesOf(ContactRecord.class);
       if (contacts != null && contacts.length > 0) {
         for (int i=0; i<contacts.length; i++) {
           new AcceptDeclineContactDialog(GeneralDialog.getDefaultParent(), contacts[i]);
         }
       }
-
-      if (trace != null) trace.exit(AcceptDeclineAction.class);
     }
   }
 
   /** 
    * Ignore contact request and Remove the contact object.
    */
-  private class RemoveAction extends AbstractAction {
+  private class RemoveAction extends AbstractActionTraced {
     public RemoveAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Contact_..."), Images.get(ImageNums.CONTACT_DELETE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -316,7 +305,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       String messageText = com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_delete_selected_contact(s)?");
       String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
       boolean option = MessageDialog.showDialogYesNo(ContactActionTable.this, messageText, title);
@@ -351,7 +340,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /** 
    * Send a new message to contact(s).
    */
-  private class NewMessageAction extends AbstractAction {
+  private class NewMessageAction extends AbstractActionTraced {
     public NewMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -359,7 +348,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       boolean fp = isActionActivatedFromPopup(event);
       if (!UserOps.isShowWebAccountRestrictionDialog(ContactActionTable.this)) {
         Object sourceObj = event.getSource();
@@ -388,7 +377,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /** 
    * Send a new message to contact(s).
    */
-  private class NewAddressAction extends AbstractAction {
+  private class NewAddressAction extends AbstractActionTraced {
     public NewAddressAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Address_Book"), Images.get(ImageNums.ADDRESS_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -396,7 +385,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_ADD24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Object sourceObj = event.getSource();
       // Do not prefill the from field when user presses tool bar action button.
       if (sourceObj instanceof JActionButton) {
@@ -469,14 +458,14 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /** 
    * Show Contact Properties Dialog.
    */
-  private class PropertiesAction extends AbstractAction {
+  private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Contact_Properties"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_Properties_of_the_selected_Contact."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Record record = getSelectedRecord();
       if (record instanceof ContactRecord) {
         Window w = SwingUtilities.windowForComponent(ContactActionTable.this);
@@ -494,7 +483,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /**
    * Refresh Contact List.
    */
-  private class RefreshAction extends AbstractAction {
+  private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Contacts"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -502,7 +491,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       ContactTableModel tableModel = (ContactTableModel) getTableModel();
       tableModel.removeData();
       FetchedDataCache.getSingleInstance().clearContactRecords();
@@ -514,7 +503,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /**
    * Show/Hide incoming Contacts
    */
-  private class ToggleIncomingAction extends AbstractAction {
+  private class ToggleIncomingAction extends AbstractActionTraced {
     private Boolean lastSetShow = null;
     public ToggleIncomingAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Show_Other's_Contacts"), Images.get(ImageNums.ARROW_DOUBLE16));
@@ -523,12 +512,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ARROW_DOUBLE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "actionPerformed(ActionEvent event)");
+    public void actionPerformedTraced(ActionEvent event) {
       boolean newShow = !(isShowing().booleanValue());
       setShowModel(newShow);
       setShowGUI(newShow);
-      if (trace != null) trace.exit(getClass());
     }
     private Boolean isShowing() {
       Window w = SwingUtilities.windowForComponent(ContactActionTable.this);
@@ -606,7 +593,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /**
    * Open in seperate window
    */
-  private static class OpenInSeperateWindowAction extends AbstractAction {
+  private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Contact_List_View"), Images.get(ImageNums.CLONE_CONTACT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -614,13 +601,13 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       new ContactTableFrame();
     }
   }
 
 
-  private class ChatAction extends AbstractAction {
+  private class ChatAction extends AbstractActionTraced {
     public ChatAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Chat"), Images.get(ImageNums.CHAT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -628,7 +615,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CHAT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Chat"));
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       chatOrShareSpace(true, (short) 0, event);
     } // end actionPerformed
   } // end class ChatAction 
@@ -637,7 +624,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /** 
    * Send E-mail Message to invite someone to join.
    */
-  private class SendEmailInvitationAction extends AbstractAction {
+  private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.PEOPLE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -646,7 +633,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(ContactActionTable.this);
       if (w instanceof Dialog) new InviteByEmailDialog((Dialog) w, null);
       else if (w instanceof Frame) new InviteByEmailDialog((Frame) w, null);
@@ -656,7 +643,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /** Display a dialog for creation of new folder shared between selected contacts.
     * Submit Create New Folder request 
     */
-  private class CreateSharedSpaceAction extends AbstractAction {
+  private class CreateSharedSpaceAction extends AbstractActionTraced {
     public CreateSharedSpaceAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Create_Shared_Space_..."), Images.get(ImageNums.FOLDER_NEW_SHARED16, true));
       putValue(Actions.ACTION_ID, new Integer(actionId));
@@ -664,13 +651,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_NEW_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Shared_Space"));
     }
-    public void actionPerformed(ActionEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CreateSharedSpaceAction.class, "actionPerformed(ActionEvent event)");
-      if (trace != null) trace.args(event);
+    public void actionPerformedTraced(ActionEvent event) {
       if (!UserOps.isShowWebAccountRestrictionDialog(ContactActionTable.this)) {
         chatOrShareSpace(false, (short) 0, event);
       }
-      if (trace != null) trace.exit(CreateSharedSpaceAction.class);
     }
   }
 

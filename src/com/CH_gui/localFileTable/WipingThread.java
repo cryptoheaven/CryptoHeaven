@@ -19,8 +19,7 @@ import com.CH_cl.monitor.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
-import com.CH_co.monitor.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /** 
@@ -29,7 +28,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -37,9 +36,9 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.15 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class WipingThread extends Thread {
+public class WipingThread extends ThreadTraced {
 
   private File[] filesToWipe;
   private JFileChooser jFileChooser;
@@ -53,8 +52,7 @@ public class WipingThread extends Thread {
     setDaemon(true);
   }
 
-  public void run() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+  public void runTraced() {
     WipeProgMonitor progMonitor = new WipeProgMonitor();
     InterruptibleInputStream in = new InterruptibleInputStream(new RandomInputStream(Rnd.getSecureRandom()));
     progMonitor.setInterrupt(in);
@@ -72,9 +70,6 @@ public class WipingThread extends Thread {
       }
     } // end for
     progMonitor.allDone();
-    if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-    if (trace != null) trace.exit(getClass());
-    if (trace != null) trace.clear();
   }
 
 }

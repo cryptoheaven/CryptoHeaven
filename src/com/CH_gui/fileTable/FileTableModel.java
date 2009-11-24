@@ -454,10 +454,12 @@ public class FileTableModel extends RecordTableModel {
   private class FileGUIUpdater implements Runnable {
     private RecordEvent event;
     public FileGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileGUIUpdater.class, "FileGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(FileGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileGUIUpdater.class, "FileGUIUpdater.run()");
       fileAndFolderUpdate(event);
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
       if (trace != null) trace.exit(FileGUIUpdater.class);

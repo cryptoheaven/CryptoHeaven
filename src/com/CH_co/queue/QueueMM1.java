@@ -12,7 +12,7 @@
 
 package com.CH_co.queue;
 
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -21,7 +21,7 @@ import com.CH_co.trace.Trace;
  * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class QueueMM1 extends Object {
 
@@ -99,7 +99,7 @@ public class QueueMM1 extends Object {
     return fifo;
   }
 
-  /** Finish up processing of the queue and clear the queue.  
+  /** Finish up processing of the queue and clear the queue.
       All items outstanding in the queue will be processed
       by the processor.  No new items can be accepted.
       Invalidates Queue.  Finished Queue cannot be restarted. */
@@ -115,7 +115,7 @@ public class QueueMM1 extends Object {
     if (trace != null) trace.exit(QueueMM1.class);
   }
 
-  /** Kill processing of the queue and clear the queue.  
+  /** Kill processing of the queue and clear the queue.
       All items outstanding in the queue will not be processed.
       Invalidates Queue.  Killed Queue cannot be restarted.  */
   public void kill() {
@@ -157,7 +157,7 @@ public class QueueMM1 extends Object {
   /**
    * Private Thread that serves/runs the elements coming out of the queue.
    */
-  private class PrivateQueueServer extends Thread {
+  private class PrivateQueueServer extends ThreadTraced {
 
     private PrivateQueueServer(String name) {
       super(name);
@@ -166,11 +166,12 @@ public class QueueMM1 extends Object {
       if (trace != null) trace.exit(PrivateQueueServer.class);
     }
 
-    /** For private use only! 
+    /** For private use only!
         The running queue-server.
     */
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrivateQueueServer.class, "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PrivateQueueServer.class, "PrivateQueueServer.runTraced()");
+
       while (true) {
         // Curtesy to other threads -- since we are in an infinite loop here.
         yield();
@@ -192,7 +193,7 @@ public class QueueMM1 extends Object {
 
         if (killing) break;
 
-        // *** BEGIN Feed Objects to the processor 
+        // *** BEGIN Feed Objects to the processor
         synchronized (processingMonitor) {
           if (fifo.size()>0) {
             //Object nextObj = ((FifoReaderI) fifo).peek();
@@ -203,24 +204,22 @@ public class QueueMM1 extends Object {
               if (processingFunction != null)
                 processingFunction.processQueuedObject(nextObj);
             } catch (Throwable t) {
-              if (trace != null) trace.exception(QueueMM1.class, 40, t);
+              if (trace != null) trace.exception(PrivateQueueServer.class, 40, t);
             }
 
             //((FifoReaderI) fifo).remove();
           }
         }
-        // *** END Feed Objects to the processor 
+        // *** END Feed Objects to the processor
 
         if (finishing && fifo.size() == 0) {
           if (trace != null) trace.data(50, "Breaking out of the while(true) loop.");
           break;
         }
-      } // end while 
+      } // end while
       processingFunction = null;
 
-      if (trace != null) trace.data(90, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(PrivateQueueServer.class);
-      if (trace != null) trace.clear();
     }
   }
 

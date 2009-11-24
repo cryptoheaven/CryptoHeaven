@@ -31,12 +31,10 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.key.*;
 import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -45,7 +43,7 @@ import com.CH_guiLib.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -53,7 +51,7 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.29 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ContactPropertiesDialog extends GeneralDialog { 
 
@@ -91,7 +89,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
   // track if dialog close method was called to prevent certain updates
   private boolean isClosed;
-  private Object monitor = new Object();
+  private final Object monitor = new Object();
 
 
   /** Creates new ContactPropertiesDialog */
@@ -139,64 +137,54 @@ public class ContactPropertiesDialog extends GeneralDialog {
   }
 
   private void fetchHandles() {
-    Thread th = new Thread("Contact Properties Get Handles") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Contact Properties Get Handles") {
+      public void runTraced() {
+        Obj_IDList_Co request = new Obj_IDList_Co();
+        request.IDs = new Long[] { contactRecord.ownerUserId, contactRecord.contactWithId, contactRecord.creatorId };
+        request.IDs = (Long[]) ArrayUtils.removeDuplicates(request.IDs);
+        MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_HANDLES, request);
+        ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
+        DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
 
-        try {
-          Obj_IDList_Co request = new Obj_IDList_Co();
-          request.IDs = new Long[] { contactRecord.ownerUserId, contactRecord.contactWithId, contactRecord.creatorId };
-          request.IDs = (Long[]) ArrayUtils.removeDuplicates(request.IDs);
-          MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_HANDLES, request);
-          ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
-          DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-
-          if (replyMsg != null) {
-            synchronized (monitor) {
-              if (!isClosed) {
-                synchronized (getTreeLock()) {
-                  if (replyMsg.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
-                    UserRecord uRec = cache.getUserRecord(contactRecord.creatorId);
-                    if (uRec != null) {
-                      jContactCreator.setText(uRec.shortInfo());
-                      jContactCreator.setIcon(uRec.getIcon());
-                    } else {
-                      jContactCreator.setText("Unknown User ("+contactRecord.creatorId+")");
-                    }
-                    String handleFor = null;
-                    String handleBy = null;
-                    uRec = cache.getUserRecord(contactRecord.ownerUserId);
-                    if (uRec != null) {
-                      handleFor = "'" + uRec.handle + "'";
-                      jContactOwner.setText(uRec.shortInfo());
-                      jContactOwner.setIcon(uRec.getIcon());
-                    } else {
-                      handleFor = "'Unknown User ("+contactRecord.ownerUserId+")'";
-                      jContactOwner.setText("Unknown User ("+contactRecord.ownerUserId+")");
-                    }
-                    uRec = cache.getUserRecord(contactRecord.contactWithId);
-                    if (uRec != null) {
-                      handleBy = "'" + uRec.handle + "'";
-                      jContactWith.setText(uRec.shortInfo());
-                      jContactWith.setIcon(uRec.getIcon());
-                    } else {
-                      handleBy = "'Unknown User ("+contactRecord.contactWithId+")'";
-                      jContactWith.setText("Unknown User ("+contactRecord.contactWithId+")");
-                    }
-                    jPermissionsLabel.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {handleFor, handleBy}));
-                    setEnabledButtons();
+        if (replyMsg != null) {
+          synchronized (monitor) {
+            if (!isClosed) {
+              synchronized (getTreeLock()) {
+                if (replyMsg.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
+                  UserRecord uRec = cache.getUserRecord(contactRecord.creatorId);
+                  if (uRec != null) {
+                    jContactCreator.setText(uRec.shortInfo());
+                    jContactCreator.setIcon(uRec.getIcon());
+                  } else {
+                    jContactCreator.setText("Unknown User ("+contactRecord.creatorId+")");
                   }
-                } // end synchronized
-              }
-            } // end synchronized
-          }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
+                  String handleFor = null;
+                  String handleBy = null;
+                  uRec = cache.getUserRecord(contactRecord.ownerUserId);
+                  if (uRec != null) {
+                    handleFor = "'" + uRec.handle + "'";
+                    jContactOwner.setText(uRec.shortInfo());
+                    jContactOwner.setIcon(uRec.getIcon());
+                  } else {
+                    handleFor = "'Unknown User ("+contactRecord.ownerUserId+")'";
+                    jContactOwner.setText("Unknown User ("+contactRecord.ownerUserId+")");
+                  }
+                  uRec = cache.getUserRecord(contactRecord.contactWithId);
+                  if (uRec != null) {
+                    handleBy = "'" + uRec.handle + "'";
+                    jContactWith.setText(uRec.shortInfo());
+                    jContactWith.setIcon(uRec.getIcon());
+                  } else {
+                    handleBy = "'Unknown User ("+contactRecord.contactWithId+")'";
+                    jContactWith.setText("Unknown User ("+contactRecord.contactWithId+")");
+                  }
+                  jPermissionsLabel.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {handleFor, handleBy}));
+                  setEnabledButtons();
+                }
+              } // end synchronized
+            }
+          } // end synchronized
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -204,54 +192,44 @@ public class ContactPropertiesDialog extends GeneralDialog {
   }
 
   private void fetchPubKeys() {
-    Thread th = new Thread("Contact Properties Get Public Key") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
+    Thread th = new ThreadTraced("Contact Properties Get Public Key") {
+      public void runTraced() {
+        Obj_IDList_Co request = new Obj_IDList_Co();
 
-        try {
-          Obj_IDList_Co request = new Obj_IDList_Co();
+        request.IDs = new Long[] { contactRecord.ownerUserId, contactRecord.contactWithId };
 
-          request.IDs = new Long[] { contactRecord.ownerUserId, contactRecord.contactWithId };
+        MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
+        ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
+        DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
 
-          MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-          ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
-          DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-
-          if (replyMsg != null) {
-            synchronized (monitor) {
-              if (!isClosed) {
-                synchronized (getTreeLock()) {
-                  if (replyMsg.getActionCode() == CommandCodes.KEY_A_GET_PUBLIC_KEYS) {
-                    Key_PubKeys_Rp replyData = (Key_PubKeys_Rp) replyMsg.getMsgDataSet();
-                    KeyRecord[] kRecs = replyData.keyRecords;
-                    if (kRecs != null && kRecs.length == 2) {
-                      KeyRecord ownerKey = null;
-                      KeyRecord otherKey = null;
-                      if (kRecs[0].ownerUserId.equals(contactRecord.ownerUserId)) {
-                        ownerKey = kRecs[0];
-                        otherKey = kRecs[1];
-                      } else {
-                        ownerKey = kRecs[1];
-                        otherKey = kRecs[0];
-                      }
-                      jOwnerEncryption.setText(ownerKey.plainPublicKey.shortInfo() + "/" + "AES(256)");
-                      jOwnerEncryption.setIcon(ownerKey.getIcon());
-                      jOtherEncryption.setText(otherKey.plainPublicKey.shortInfo() + "/" + "AES(256)");
-                      jOtherEncryption.setIcon(otherKey.getIcon());
-                      setEnabledButtons();
+        if (replyMsg != null) {
+          synchronized (monitor) {
+            if (!isClosed) {
+              synchronized (getTreeLock()) {
+                if (replyMsg.getActionCode() == CommandCodes.KEY_A_GET_PUBLIC_KEYS) {
+                  Key_PubKeys_Rp replyData = (Key_PubKeys_Rp) replyMsg.getMsgDataSet();
+                  KeyRecord[] kRecs = replyData.keyRecords;
+                  if (kRecs != null && kRecs.length == 2) {
+                    KeyRecord ownerKey = null;
+                    KeyRecord otherKey = null;
+                    if (kRecs[0].ownerUserId.equals(contactRecord.ownerUserId)) {
+                      ownerKey = kRecs[0];
+                      otherKey = kRecs[1];
+                    } else {
+                      ownerKey = kRecs[1];
+                      otherKey = kRecs[0];
                     }
+                    jOwnerEncryption.setText(ownerKey.plainPublicKey.shortInfo() + "/" + "AES(256)");
+                    jOwnerEncryption.setIcon(ownerKey.getIcon());
+                    jOtherEncryption.setText(otherKey.plainPublicKey.shortInfo() + "/" + "AES(256)");
+                    jOtherEncryption.setIcon(otherKey.getIcon());
+                    setEnabledButtons();
                   }
-                } // end synchronized
-              }
-            } // end synchronized
-          }
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
+                }
+              } // end synchronized
+            }
+          } // end synchronized
         }
-
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
       }
     };
     th.setDaemon(true);
@@ -301,82 +279,82 @@ public class ContactPropertiesDialog extends GeneralDialog {
     jContactName.getDocument().addDocumentListener(documentChangeListener);
 
     int posY = 0;
-    panel.add(new JMyLabel(Images.get(ImageNums.CONTACT32)), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.CONTACT32)), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jContactName, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jContactName, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(contactRecord.contactId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(contactRecord.contactId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Creator")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Creator")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContactCreator = new JMyLabel(FETCHING_DATA);
-    panel.add(jContactCreator, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jContactCreator, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContactOwner = new JMyLabel(FETCHING_DATA);
-    panel.add(jContactOwner, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jContactOwner, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_With")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_With")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContactWith = new JMyLabel(FETCHING_DATA);
-    panel.add(jContactWith, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jContactWith, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     short s = contactRecord.status.shortValue();
     String status = ContactRecUtil.getStatusText(contactRecord.status, contactRecord.ownerUserId);
     ImageIcon icon = ContactRecUtil.getStatusIcon(contactRecord.status, contactRecord.ownerUserId);
-    panel.add(new JMyLabel(status, icon, JLabel.LEFT), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(status, icon, JLabel.LEFT), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Owner's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Owner's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jOwnerEncryption = new JMyLabel(FETCHING_DATA);
-    panel.add(jOwnerEncryption, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jOwnerEncryption, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jOtherEncryption = new JMyLabel(FETCHING_DATA);
-    panel.add(jOtherEncryption, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(jOtherEncryption, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -412,20 +390,20 @@ public class ContactPropertiesDialog extends GeneralDialog {
     jEnableAudibleOnlineNotify.addChangeListener(changeListener);
 
     jPermissionsLabel = new JMyLabel(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {"contact owner", "other party"}));
-    panel.add(jPermissionsLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jPermissionsLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     int reciprocalButtonPosY = posY;
-    panel.add(jAllowMessaging, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    panel.add(jAllowMessaging, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
-    panel.add(jAllowFolderSharing, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    panel.add(jAllowFolderSharing, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
-    panel.add(jNotifyOfOnlineStatus, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    panel.add(jNotifyOfOnlineStatus, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
-    panel.add(jEnableAudibleOnlineNotify, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(jEnableAudibleOnlineNotify, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     {
       final ContactRecord otherContact = cache.getContactRecordOwnerWith(contactRecord.contactWithId, contactRecord.ownerUserId);
@@ -459,7 +437,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
         });
       }
       if (jReciprocalButton != null) {
-        panel.add(jReciprocalButton, new GridBagConstraints(1, reciprocalButtonPosY, 1, 3, 0, 0, 
+        panel.add(jReciprocalButton, new GridBagConstraints(1, reciprocalButtonPosY, 1, 3, 0, 0,
               GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       }
     }
@@ -467,28 +445,28 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Date_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Date_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(Misc.getFormattedTimestamp(contactRecord.dateCreated)), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(Misc.getFormattedTimestamp(contactRecord.dateCreated)), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Date_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Date_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     //String dateUpdated = fileLink.recordUpdated != null ? dateFormat.format(fileLink.recordUpdated) : "";
     String dateUpdated = Misc.getFormattedTimestamp(contactRecord.dateUpdated);
-    panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // filler
-    panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 2, 1, 10, 10, 
+    panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
@@ -519,7 +497,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     }
     return !jContactName.getText().trim().equals(oldName);
   }
-  
+
   private boolean isPermitsChanged() {
     int newPermits = getNewPermits();
     return newPermits != contactRecord.permits.intValue();
@@ -546,65 +524,50 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
     closeDialog();
 
-    Thread th = new Thread("Change Contact Properties - sending...") {
-      public void run() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
-
-        // change the priority of this thread to minimum
-        setPriority(MIN_PRIORITY);
-
-        try {
-          // apply Name Change
-          if (isNameChanged()) {
-            Long userId = null;
-            Long otherUserId = null;
-            if (amIOwner) {
-              userId = contactRecord.ownerUserId;
-              otherUserId = contactRecord.contactWithId;
-            } else {
-              userId = contactRecord.contactWithId;
-              otherUserId = contactRecord.ownerUserId;
-            }
-            ContactRecord c1 = cache.getContactRecordOwnerWith(userId, otherUserId);
-            ContactRecord c2 = cache.getContactRecordOwnerWith(otherUserId, userId);
-            boolean renamed = false;
-            if (c1 != null && c1.isOfActiveType()) {
-              int code = CommandCodes.CNT_Q_RENAME_MY_CONTACT;
-              SIL.submitAndReturn(new MessageAction(code, prepareDataSet(c1)));
-              if (c1.equals(contactRecord))
-                renamed = true;
-            }
-            if (c2 != null && c2.isOfActiveType()) {
-              int code = CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME;
-              SIL.submitAndReturn(new MessageAction(code, prepareDataSet(c2)));
-              if (c2.equals(contactRecord))
-                renamed = true;
-            }
-
-            if (!renamed) {
-              int code = amIOwner ? CommandCodes.CNT_Q_RENAME_MY_CONTACT : CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME;
-              SIL.submitAndReturn(new MessageAction(code, prepareDataSet(contactRecord)));
-            }
+    Thread th = new ThreadTraced("Change Contact Properties - sending...") {
+      public void runTraced() {
+        // apply Name Change
+        if (isNameChanged()) {
+          Long userId = null;
+          Long otherUserId = null;
+          if (amIOwner) {
+            userId = contactRecord.ownerUserId;
+            otherUserId = contactRecord.contactWithId;
+          } else {
+            userId = contactRecord.contactWithId;
+            otherUserId = contactRecord.ownerUserId;
+          }
+          ContactRecord c1 = cache.getContactRecordOwnerWith(userId, otherUserId);
+          ContactRecord c2 = cache.getContactRecordOwnerWith(otherUserId, userId);
+          boolean renamed = false;
+          if (c1 != null && c1.isOfActiveType()) {
+            int code = CommandCodes.CNT_Q_RENAME_MY_CONTACT;
+            SIL.submitAndReturn(new MessageAction(code, prepareDataSet(c1)));
+            if (c1.equals(contactRecord))
+              renamed = true;
+          }
+          if (c2 != null && c2.isOfActiveType()) {
+            int code = CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME;
+            SIL.submitAndReturn(new MessageAction(code, prepareDataSet(c2)));
+            if (c2.equals(contactRecord))
+              renamed = true;
           }
 
-          // apply Permits Change
-          if (isPermitsChanged()) {
-            int newPermits = getNewPermits();
-            if (trace != null) trace.data(80, ""+contactRecord.permits, ""+newPermits);
-            int code = amIOwner ? CommandCodes.CNT_Q_ALTER_SETTINGS : CommandCodes.CNT_Q_ALTER_PERMITS;
-            Object[] objs = new Object[] { contactRecord.contactId, new Integer(newPermits) };
-            Obj_List_Co dataSet = new Obj_List_Co();
-            dataSet.objs = objs;
-            SIL.submitAndReturn(new MessageAction(code, dataSet));
+          if (!renamed) {
+            int code = amIOwner ? CommandCodes.CNT_Q_RENAME_MY_CONTACT : CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME;
+            SIL.submitAndReturn(new MessageAction(code, prepareDataSet(contactRecord)));
           }
-
-        } catch (Throwable t) {
-          if (trace != null) trace.exception(getClass(), 100, t);
         }
 
-        if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
-        if (trace != null) trace.exit(getClass());
-        if (trace != null) trace.clear();
+        // apply Permits Change
+        if (isPermitsChanged()) {
+          int newPermits = getNewPermits();
+          int code = amIOwner ? CommandCodes.CNT_Q_ALTER_SETTINGS : CommandCodes.CNT_Q_ALTER_PERMITS;
+          Object[] objs = new Object[] { contactRecord.contactId, new Integer(newPermits) };
+          Obj_List_Co dataSet = new Obj_List_Co();
+          dataSet.objs = objs;
+          SIL.submitAndReturn(new MessageAction(code, dataSet));
+        }
       }
     };
     th.setDaemon(true);

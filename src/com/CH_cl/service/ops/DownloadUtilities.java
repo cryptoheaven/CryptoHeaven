@@ -27,7 +27,7 @@ import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
 import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import java.awt.Component;
@@ -253,7 +253,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
    * on the local system and launches a file download thread to carry on downloads into
    * those directories.
    */
-  public static class DownloadCoordinator extends Thread {
+  public static class DownloadCoordinator extends ThreadTraced {
 
     private Record[] toDownload;
     private MsgLinkRecord[] fromMsgs;  // set only when fetching file attachments from specified messages, else NULL
@@ -291,14 +291,10 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
       if (trace != null) trace.exit(DownloadCoordinator.class);
     }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "run()");
-
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "DownloadCoordinator.runTraced()");
       downloadRecords(toDownload, fromMsgs, destDir, false, true, null, SIL);
-
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(DownloadCoordinator.class);
-      if (trace != null) trace.clear();
     }
 
     private void downloadRecords(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTreeAtOnce, Collection excludeDirsAlreadyDone, ServerInterfaceLayer SIL) {
@@ -630,7 +626,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
 
-  public static class DownloadFileRunner extends Thread {
+  public static class DownloadFileRunner extends ThreadTraced {
 
     private MessageAction msgAction;
     private File destDir;
@@ -665,8 +661,8 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       if (trace != null) trace.exit(DownloadFileRunner.class);
     }
 
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadFileRunner.class, "run()");
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadFileRunner.class, "DownloadFileRunner.runTraced()");
 
       int maxHeavyWorkers = SIL.getMaxHeavyWorkerCount();
       int maxThreadsInSynchronizedBlock = maxHeavyWorkers;
@@ -699,9 +695,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       // we are already in a dedicated thread so execute the action synchronously
       DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
 
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(DownloadFileRunner.class);
-      if (trace != null) trace.clear();
     }
   } // end inner class DownloadRunner
 }

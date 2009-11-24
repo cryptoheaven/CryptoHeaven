@@ -143,7 +143,7 @@ public class HTTP_Socket extends Socket {
       dumpSocket();
       final Socket[] socketReturnBuf = new Socket[1];
       final boolean[] socketTimeout = new boolean[1];
-      Thread th = new Thread(new Runnable() {
+      Thread th = new Thread("Socket Creator") {
         public void run() {
           try {
             //System.out.print("Making socket to " + proxyHost + ":" + proxyPort + "... ");
@@ -159,7 +159,7 @@ public class HTTP_Socket extends Socket {
           } catch (Throwable t) {
           }
         }
-      }, "Socket Creator");
+      };
       th.setDaemon(true);
       th.start();
       //System.out.print("Joining... ");
@@ -203,10 +203,10 @@ public class HTTP_Socket extends Socket {
         // Try to make a direct socket....
         makeSocket(proxyHost, proxyPort, CONNECTION_SOCKET_TIMEOUT);
         // make the asynchronous SOCKET sending and reciving threads
-        th = new Thread(new Sending(), "HTTP_Socket-Sending");
+        th = new ThreadTraced(new Sending(), "HTTP_Socket-Sending");
         th.setDaemon(true);
         th.start();
-        th = new Thread(new Reciving(), "HTTP_Socket-Reciving");
+        th = new ThreadTraced(new Reciving(), "HTTP_Socket-Reciving");
         th.setDaemon(true);
         th.start();
       }
@@ -214,16 +214,16 @@ public class HTTP_Socket extends Socket {
       // use multiple sending/receiving threads for better HTTP concurrency
       for (int i=0; i<NUMBER_OF_CONCURRENT_COMMUNICATION_THREADS; i++) {
         // make the synchronous HTTP sending-reciving thread
-        th = new Thread(new SendingAndReciving(), "HTTP_Socket-SendingAndReciving");
+        th = new ThreadTraced(new SendingAndReciving(), "HTTP_Socket-SendingAndReciving");
         th.setDaemon(true);
         th.start();
       }
 
       // create data translating threads to connect streams with lists
-      th = new Thread(new SendConverter(), "HTTP_Socket-SendConverter");
+      th = new ThreadTraced(new SendConverter(), "HTTP_Socket-SendConverter");
       th.setDaemon(true);
       th.start();
-      th = new Thread(new ReciveConverter(), "HTTP_Socket-ReciveConverter");
+      th = new ThreadTraced(new ReciveConverter(), "HTTP_Socket-ReciveConverter");
       th.setDaemon(true);
       th.start();
 
@@ -328,8 +328,12 @@ public class HTTP_Socket extends Socket {
 
 
   private class ReciveConverter implements Runnable {
+    private ReciveConverter() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReciveConverter.class, "ReciveConverter()");
+      if (trace != null) trace.exit(ReciveConverter.class);
+    }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReciveConverter.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReciveConverter.class, "ReciveConverter.run()");
       try {
         boolean anyOut = false;
         while (!closed) {
@@ -400,16 +404,18 @@ public class HTTP_Socket extends Socket {
       synchronized (recvFifo) {
         recvFifo.notifyAll();
       }
-      if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(ReciveConverter.class);
-      if (trace != null) trace.clear();
     } // end run()
   } // end class ReciveConverter
 
 
   private class Sending implements Runnable {
+    private Sending() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Sending.class, "Sending()");
+      if (trace != null) trace.exit(Sending.class);
+    }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Sending.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Sending.class, "Sending.run()");
       try {
         while (!closed) {
           // slow down streams if there is a backlog
@@ -513,17 +519,19 @@ public class HTTP_Socket extends Socket {
       synchronized (recvFifo) {
         recvFifo.notifyAll();
       }
-      if (trace != null) trace.data(500, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(Sending.class);
-      if (trace != null) trace.clear();
     } // end run()
   } // end class Sending
 
 
   private class Reciving implements Runnable {
     final static String CRLF = "\r\n";
+    private Reciving() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Reciving.class, "Reciving()");
+      if (trace != null) trace.exit(Reciving.class);
+    }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Reciving.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Reciving.class, "Reciving.run()");
       try {
         while (!closed) {
           // slow down streams if there is a backlog
@@ -578,16 +586,18 @@ public class HTTP_Socket extends Socket {
       synchronized (recvFifo) {
         recvFifo.notifyAll();
       }
-      if (trace != null) trace.data(500, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(Reciving.class);
-      if (trace != null) trace.clear();
     } // end run()
   } // end class Reciving
 
 
   private class SendingAndReciving implements Runnable {
+    private SendingAndReciving() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendingAndReciving.class, "SendingAndReciving()");
+      if (trace != null) trace.exit(SendingAndReciving.class);
+    }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendingAndReciving.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendingAndReciving.class, "SendingAndReciving.run()");
       try {
         while (!closed) {
           // slow down streams if there is a backlog
@@ -813,16 +823,18 @@ public class HTTP_Socket extends Socket {
       synchronized (recvFifo) {
         recvFifo.notifyAll();
       }
-      if (trace != null) trace.data(500, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(SendingAndReciving.class);
-      if (trace != null) trace.clear();
     } // end run()
   } // end class SendingAndReciving
 
 
   private class SendConverter implements Runnable {
+    private SendConverter() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendConverter.class, "SendConverter()");
+      if (trace != null) trace.exit(SendConverter.class);
+    }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendConverter.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendConverter.class, "SendConverter.run()");
       try {
         while (!closed && !closing) {
           //System.out.println("SendConverter:run():while()");
@@ -893,9 +905,7 @@ public class HTTP_Socket extends Socket {
       synchronized (sendFifo) {
         sendFifo.notifyAll();
       }
-      if (trace != null) trace.data(500, Thread.currentThread().getName() + " done.");
       if (trace != null) trace.exit(SendConverter.class);
-      if (trace != null) trace.clear();
     } // end run()
   } // end class SendConverter
 

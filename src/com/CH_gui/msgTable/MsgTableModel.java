@@ -1002,10 +1002,12 @@ public class MsgTableModel extends RecordTableModel {
   private class MsgGUIUpdater implements Runnable {
     private RecordEvent event;
     public MsgGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(RecordEvent event)");
       this.event = event;
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
     }
     public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "run()");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
 
       if (event instanceof MsgLinkRecordEvent) {
         Record[] records = event.getRecords();
