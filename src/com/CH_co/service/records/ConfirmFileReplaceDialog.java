@@ -17,8 +17,6 @@ import java.awt.event.*;
 
 import javax.swing.border.*;
 import javax.swing.*;
-import javax.swing.event.*;
-
 import java.io.*;
 
 import com.CH_co.gui.*;

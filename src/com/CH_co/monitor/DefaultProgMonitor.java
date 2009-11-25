@@ -12,9 +12,6 @@
 
 package com.CH_co.monitor;
 
-import java.awt.event.*;
-import javax.swing.*;
-
 import com.CH_co.service.msg.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;

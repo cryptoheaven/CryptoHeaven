@@ -16,8 +16,6 @@ import javax.swing.*;
 
 import java.awt.event.*;
 import java.awt.*;
-import java.applet.*;
-
 import java.util.LinkedList;
 
 import com.CH_co.gui.*;
@@ -64,12 +62,12 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
   private boolean cancelled;
   private Interruptible interrupt;
 
-  private Object monitor = new Object();
+  private final Object monitor = new Object();
 
 
   private String name;
 
-  private static Object counterMonitor = new Object();
+  private static final Object counterMonitor = new Object();
   private static int counter = 0;
 
 

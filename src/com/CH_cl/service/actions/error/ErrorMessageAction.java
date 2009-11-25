@@ -12,9 +12,6 @@
 
 package com.CH_cl.service.actions.error;
 
-import java.awt.*;
-import javax.swing.*;
-
 import com.CH_cl.service.actions.*;
 
 import com.CH_co.service.msg.MessageAction;

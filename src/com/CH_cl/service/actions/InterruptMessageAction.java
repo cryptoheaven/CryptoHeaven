@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.actions;
 
-import javax.swing.JOptionPane;
-
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.trace.Trace;
