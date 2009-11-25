@@ -151,6 +151,8 @@ public class MainFrameStarter extends Object {
               }.start();
             } catch (Throwable t) {
             }
+          } else if (args[i].equalsIgnoreCase("-no-splash")) {
+            // already handled so ignore this...
           } else if (args[i].equalsIgnoreCase("-privateLabelURL")) {
             // already loaded so ignore this...
             i ++;
@@ -188,13 +190,13 @@ public class MainFrameStarter extends Object {
             else if (onOff.equalsIgnoreCase("off") || onOff.equalsIgnoreCase("false"))
               JActionFrame.ENABLE_MENU_CUSTOMIZATION_ACTION = false;
           } else if (args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("/?") || args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("/help")) {
-            System.out.println("Usage 1: [-D[!]<propertiesDir>] [-privateLabelURL <URL>] [-username <username>] [<-password <password>>|<-password-blank>] [-signup] [-signupEmail <emailAddress>] [-folderId <id>] [-msgLinkId <id>]");
+            System.out.println("Usage 1: [-D[!]<propertiesDir>] [-privateLabelURL <URL>] [-username <username>] [<-password <password>>|<-password-blank>] [-signup] [-signupEmail <emailAddress>] [-folderId <id>] [-msgLinkId <id>] [-no-splash]");
             System.out.println("Usage 2: -localKeyChangePass <localKeyId> <old name> <old password> <new name> <new password>");
+            System.out.println("Usage 3: -version");
             Misc.systemExit(-1);
           } else {
+            // ignore invalid arguments... only print out a warning
             System.out.println("Warning: invalid argument " + args[i]);
-            //[-D[!]<propertiesDir>] [noLogin] [exitWhenMainFrameLoaded] [-privateLabelURL <URL>] [-username <username>] [-password <password>] [-password-blank] [-signup] [-signupEmail <emailAddress>] [-folderId <id>] [-msgLinkId <id>]
-            //usageExit();
           }
         }
       }

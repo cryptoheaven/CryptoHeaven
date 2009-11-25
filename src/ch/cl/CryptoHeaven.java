@@ -243,61 +243,66 @@ public class CryptoHeaven extends Object {
   public static void main(String[] args) {
     // Controls of private label load
     boolean privateLabelLoaded = false;
+    boolean skipSplashScreen = false;
 
     // Save original arguments incase we need to restart the application
     if (args != null)
       AutoUpdater.setOriginalArgs(args);
 
-    if (args != null && args.length == 1 && args[0].equals("-version")) {
-      System.out.println(GlobalProperties.PROGRAM_FULL_NAME);
-      System.exit(0);
-    }
+    if (args != null) {
+      for (int i=0; i<args.length; i++) {
+        if (args[i].equals("-version")) {
+          System.out.println(GlobalProperties.PROGRAM_FULL_NAME);
+          System.exit(0);
+        } else if (args[i].equals("-no-splash")) {
+          skipSplashScreen = true;
+        } else if (args[i].equals("-localKeyChangePass")) {
+          // Ability to recrypt locally stored keys for new name and password.
+          String sKeyId = args[i+1];
+          String oldName = args[i+2];
+          String oldPass = args[i+3];
+          String newName = args[i+4];
+          String newPass = args[i+5];
+          i += 5;
 
-    // Ability to recrypt locally stored keys for new name and password.
-    if (args != null && args.length > 0) {
-      if (args[0].equals("-localKeyChangePass")) {
-        try {
-          String sKeyId = args[1];
-          String oldName = args[2];
-          String oldPass = args[3];
-          String newName = args[4];
-          String newPass = args[5];
+          try {
+            // Check if the encrypted private part of the key is stored remotely... if so we will need to send an update.
+            String keyPropertyName = "Enc" + RSAPrivateKey.OBJECT_NAME + "_" + sKeyId;
+            GlobalSubProperties keyProperties = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+            String oldProperty = keyProperties.getProperty(keyPropertyName);
+            if (oldProperty == null || oldProperty.length() == 0) {
+              throw new IllegalArgumentException("Key not found.");
+            } else {
+              BASymCipherBlock oldEncPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(oldProperty));
+              BAEncodedPassword oldPasscode = UserRecord.getBAEncodedPassword(oldPass.toCharArray(), oldName);
+              BAEncodedPassword newPasscode = UserRecord.getBAEncodedPassword(newPass.toCharArray(), newName);
 
-          // Check if the encrypted private part of the key is stored remotely... if so we will need to send an update.
-          String keyPropertyName = "Enc" + RSAPrivateKey.OBJECT_NAME + "_" + sKeyId;
-          GlobalSubProperties keyProperties = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
-          String oldProperty = keyProperties.getProperty(keyPropertyName);
-          if (oldProperty == null || oldProperty.length() == 0) {
-            throw new IllegalArgumentException("Key not found.");
-          } else {
-            BASymCipherBlock oldEncPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(oldProperty));
-            BAEncodedPassword oldPasscode = UserRecord.getBAEncodedPassword(oldPass.toCharArray(), oldName);
-            BAEncodedPassword newPasscode = UserRecord.getBAEncodedPassword(newPass.toCharArray(), newName);
+              SymmetricSmallBlockCipher symCipher = new SymmetricSmallBlockCipher(oldPasscode);
+              // see if our encoded password will decrypt the encrypted private key
+              BASymPlainBlock privateKeyBA =  symCipher.blockDecrypt(oldEncPrivateKey);
+              symCipher = new SymmetricSmallBlockCipher(newPasscode);
+              BASymCipherBlock newEncPrivateKey = symCipher.blockEncrypt(privateKeyBA);
+              keyProperties.setProperty(keyPropertyName, newEncPrivateKey.getHexContent());
+              keyProperties.store();
+            }
 
-            SymmetricSmallBlockCipher symCipher = new SymmetricSmallBlockCipher(oldPasscode);
-            // see if our encoded password will decrypt the encrypted private key
-            BASymPlainBlock privateKeyBA =  symCipher.blockDecrypt(oldEncPrivateKey);
-            symCipher = new SymmetricSmallBlockCipher(newPasscode);
-            BASymCipherBlock newEncPrivateKey = symCipher.blockEncrypt(privateKeyBA);
-            keyProperties.setProperty(keyPropertyName, newEncPrivateKey.getHexContent());
-            keyProperties.store();
+          } catch (Throwable t) {
+            System.out.println("Error: " + t.getMessage());
+            System.out.println("Arguments: -localKeyChangePass <localKeyId> <old name> <old password> <new name> <new password>");
+            System.out.println("Example: -localKeyChangePass 56789 \"John Blank\" oldpass \"John New\" newpass");
           }
-
-        } catch (Throwable t) {
-          System.out.println("Error: " + t.getMessage());
-          System.out.println("Arguments: -localKeyChangePass <localKeyId> <old name> <old password> <new name> <new password>");
-          System.out.println("Example: -localKeyChangePass 56789 \"John Blank\" oldpass \"John New\" newpass");
-        }
-        System.exit(0);
-      } else if (args[0].equals("-privateLabelURL")) {
-        String privateLabelURL = args[1];
-        try {
-          URLs.loadPrivateLabel(privateLabelURL);
-          privateLabelLoaded = true;
-        } catch (Throwable t) {
-          System.out.println("Error loading private label: " + privateLabelURL);
-          System.out.println("Arguments: -privateLabelURL <URL-of-xml-file>");
-          System.out.println("Example: -privateLabelURL http://mycompany.com/my-cryptoheaven.xml");
+          System.exit(0);
+        } else if (args[i].equals("-privateLabelURL")) {
+          String privateLabelURL = args[i+1];
+          i++;
+          try {
+            URLs.loadPrivateLabel(privateLabelURL);
+            privateLabelLoaded = true;
+          } catch (Throwable t) {
+            System.out.println("Error loading private label: " + privateLabelURL);
+            System.out.println("Arguments: -privateLabelURL <URL-of-xml-file>");
+            System.out.println("Example: -privateLabelURL http://mycompany.com/my-cryptoheaven.xml");
+          }
         }
       }
     }
@@ -313,18 +318,22 @@ public class CryptoHeaven extends Object {
     }
 
     setDebug();
-    JWindow splashWindow = new JWindow();
-    Container c = splashWindow.getContentPane();
-    JLabel splashImage = new JLabel();
-    splashImage.setIcon(Images.get(ImageNums.LOGO_KEY_MAIN));
-    c.add(splashImage, BorderLayout.CENTER);
-    splashWindow.pack();
-    MiscGui.setSuggestedWindowLocation(null, splashWindow);
-    splashWindow.setVisible(true);
+
+    JWindow splashWindow = null;
+    if (!skipSplashScreen) {
+      splashWindow = new JWindow();
+      Container c = splashWindow.getContentPane();
+      JLabel splashImage = new JLabel();
+      splashImage.setIcon(Images.get(ImageNums.LOGO_KEY_MAIN));
+      c.add(splashImage, BorderLayout.CENTER);
+      splashWindow.pack();
+      MiscGui.setSuggestedWindowLocation(null, splashWindow);
+      splashWindow.setVisible(true);
+    }
 
     com.CH_gui.frame.MainFrameStarter.main(args, splashWindow);
 
-    if (splashWindow.isShowing()) {
+    if (splashWindow != null && splashWindow.isShowing()) {
       splashWindow.setVisible(false);
       splashWindow.dispose();
     }
