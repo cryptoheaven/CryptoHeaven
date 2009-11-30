@@ -919,7 +919,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
               Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MsgPreviewPanel.setAttachmentsPanel1.run()");
-              setAttachmentsPanel_updateGUI(null, _numOfAttachments > 0 ? new Object[] { _fetchingLabel } : null, _dataRecord.getSubject(), _jAttachments, _jLineAttachments);
+              String subject = _dataRecord != null ? _dataRecord.getSubject() : null;
+              setAttachmentsPanel_updateGUI(null, _numOfAttachments > 0 ? new Object[] { _fetchingLabel } : null, subject, _jAttachments, _jLineAttachments);
               if (trace != null) trace.exit(getClass());
             }
           });
@@ -935,7 +936,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MsgPreviewPanel.setAttachmentsPanel2.run()");
                 // draw attachments in GUI only if preview is still pointing to the same message
                 if (msgLinkRecord == _msgLink && msgDataRecord == _dataRecord) {
-                  setAttachmentsPanel_updateGUI(_msgLink, _attachments, _dataRecord.getSubject(), _jAttachments, _jLineAttachments);
+                  String subject = _dataRecord != null ? _dataRecord.getSubject() : null;
+                  setAttachmentsPanel_updateGUI(_msgLink, _attachments, subject, _jAttachments, _jLineAttachments);
                 } // end if still the same message in preview
                 if (trace != null) trace.exit(getClass());
               }

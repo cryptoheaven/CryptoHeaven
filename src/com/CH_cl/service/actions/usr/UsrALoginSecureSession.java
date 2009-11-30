@@ -93,6 +93,8 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
           if (property != null && property.length() > 0) {
             encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+            // migrate private key filename change, so store file location if the properties...
+            addPathToLastPrivKeyPaths(keyPropertyFileName);
           }
           // also try the alternate paths to key file
           else {
@@ -121,6 +123,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
       if (privateKey == null && encPrivateKey == null) {
         javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
         fc.setDialogTitle("Open Private Key file:");
+        fc.setSelectedFile(null);
         int retVal = fc.showOpenDialog(null);
         if (retVal == javax.swing.JFileChooser.APPROVE_OPTION) {
           java.io.File file = fc.getSelectedFile();
@@ -131,19 +134,8 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
           if (property != null && property.length() > 0) {
             encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-            { // remember the filename for next time -- TRIM the list to at most 5 paths
-              String paths = GlobalProperties.getProperty("PrivKeyFilePaths", "");
-              paths = file.getAbsolutePath() + "|" + paths;
-              int index = -1;
-              int KEEP_MAX_PATHS = 5;
-              for (int i=0; i<KEEP_MAX_PATHS; i++) {
-                index = paths.indexOf('|', index+1);
-                if (index < 0) break;
-              }
-              if (index > 0) paths = paths.substring(0, index);
-              GlobalProperties.setProperty("PrivKeyFilePaths", paths);
-              GlobalProperties.store();
-            }
+            // remember the filename for next time -- TRIM the list to at most 5 paths
+            addPathToLastPrivKeyPaths(file.getAbsolutePath());
           }
         }
       }
@@ -225,4 +217,22 @@ public class UsrALoginSecureSession extends ClientMessageAction {
     return null;
   }
 
+  public static void addPathToLastPrivKeyPaths(String addPath) {
+    String pathList = GlobalProperties.getProperty("PrivKeyFilePaths", "");
+    String[] paths = pathList.split("[\\|]+");
+    if (ArrayUtils.find(paths, addPath) < 0) {
+      pathList = addPath;
+      int countAdded = 1;
+      for (int i=0; i<paths.length; i++) {
+        if (paths[i].length() > 0) {
+          pathList += "|" + paths[i];
+          countAdded ++;
+          if (countAdded >= 5)
+            break;
+        }
+      }
+      GlobalProperties.setProperty("PrivKeyFilePaths", pathList);
+      GlobalProperties.store();
+    }
+  }
 }

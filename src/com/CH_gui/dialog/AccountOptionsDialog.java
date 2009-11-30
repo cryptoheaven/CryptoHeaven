@@ -12,17 +12,12 @@
 
 package com.CH_gui.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
+import com.CH_cl.util.GlobalSubProperties;
 
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.gui.*;
@@ -33,12 +28,19 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
-import com.CH_gui.frame.MainFrame;
+import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.usrs.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.border.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -148,7 +150,8 @@ public class AccountOptionsDialog extends GeneralDialog {
     JPanel pane = createMainPanel(myUserRecord, userRecords);
 
     if (isChangingMyUserRecord) {
-      isMyKeyLocal = KeyOps.isKeyStoredLocally(cache.getKeyRecordMyCurrent().keyId);
+      isMyKeyLocal = !Misc.isBitSet(cache.getUserRecord().flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
+      //isMyKeyLocal = KeyOps.isKeyStoredLocally(cache.getKeyRecordMyCurrent().keyId);
     }
 
     if (maxDialogWidth > 0) {
@@ -759,7 +762,36 @@ public class AccountOptionsDialog extends GeneralDialog {
     if (isChangingMyUserRecord) {
       // if key should be send to server...
       if (isMyKeyLocal == checks.jKeyOnServer.isSelected()) {
-        UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), checks.jKeyOnServer.isSelected());
+        final boolean storeKeyOnServer = checks.jKeyOnServer.isSelected();
+        Thread th = new ThreadTraced("Private Key Location Changer") {
+          public void runTraced() {
+            StringBuffer errorBuffer = new StringBuffer();
+            boolean error = false;
+            try {
+              if (!storeKeyOnServer) {
+                GlobalSubProperties keyProps = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+                String defaultFileName = keyProps.getPropertiesFullFileName();
+                File chosenFile = LoginFrame.choosePrivKeyStorageFile(new File(defaultFileName));
+                if (chosenFile != null) {
+                  error = !UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), storeKeyOnServer, chosenFile, errorBuffer);
+                }
+              } else {
+                error = !UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), storeKeyOnServer, null, errorBuffer);
+              }
+              if (error) {
+                String where = storeKeyOnServer ? "on the server" : "locally";
+                String msg = "Private key could not be stored " + where + "!";
+                if (errorBuffer.length() > 0)
+                  msg += errorBuffer.toString();
+                MessageDialog.showErrorDialog(null, msg, "Key Storage Failed", true);
+              }
+            } catch (Throwable t) {
+              MessageDialog.showErrorDialog(null, t.getMessage(), "Key Storage Failed");
+            }
+          }
+        };
+        th.setDaemon(true);
+        th.start();
       }
       // if sound enablement changed
       if (isSoundEnabled != jEnableSound.isSelected()) {

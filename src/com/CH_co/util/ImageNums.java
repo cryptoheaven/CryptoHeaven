@@ -268,6 +268,7 @@ public class ImageNums extends Object {
   public static final int TOOLS16;
   public static final int TOOLS24;
   public static final int TOOLS_FIX16;
+  public static final int TOOLS_FIX32;
   public static final int ATTACH16;
   public static final int ATTACH_14x12;
   public static final int ATTACH24;
@@ -308,9 +309,9 @@ public class ImageNums extends Object {
   public static final int MAIL_COMPOSE_TO_MEMBER24;
   public static final int MAIL_SEND16;
   public static final int MAIL_SEND24;
-  public static final int MAIL_SEND_FAST_16;
-  public static final int MAIL_SEND_FAST_24;
-  public static final int MAIL_SEND_FAST_32;
+  public static final int MAIL_SEND_INVITE_16;
+  public static final int MAIL_SEND_INVITE_24;
+  public static final int MAIL_SEND_INVITE_32;
   public static final int MAIL_RECIPIENTS16;
   public static final int MAIL_RECIPIENTS24;
   public static final int MAIL_COPY16;
@@ -556,7 +557,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[315+50]; // plus emotions
+    images = new String[316+50]; // plus emotions
 
 
     /******************************************************************
@@ -1157,6 +1158,9 @@ public class ImageNums extends Object {
     TOOLS_FIX16 = i;
     images[i] = "ToolsFix16"; i++;
 
+    TOOLS_FIX32 = i;
+    images[i] = "ToolsFix32"; i++;
+
     ATTACH16 = i;
     images[i] = "attach-small"; i++;
 
@@ -1262,14 +1266,14 @@ public class ImageNums extends Object {
     images[i] = "SendMail24"; i++;
 
 
-    MAIL_SEND_FAST_16 = i;
-    images[i] = "SendMailFast16"; i++;
+    MAIL_SEND_INVITE_16 = i;
+    images[i] = "mail-send-invite16"; i++;
 
-    MAIL_SEND_FAST_24 = i;
-    images[i] = "SendMailFast24"; i++;
+    MAIL_SEND_INVITE_24 = i;
+    images[i] = "mail-send-invite24"; i++;
 
-    MAIL_SEND_FAST_32 = i;
-    images[i] = "SendMailFast32"; i++;
+    MAIL_SEND_INVITE_32 = i;
+    images[i] = "mail-send-invite32"; i++;
 
 
     MAIL_RECIPIENTS16 = i;

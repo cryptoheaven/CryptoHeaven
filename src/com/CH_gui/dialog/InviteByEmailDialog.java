@@ -142,7 +142,7 @@ public class InviteByEmailDialog extends GeneralDialog {
     jInviteHeader.setHorizontalTextPosition(JButton.RIGHT);
 
     int posY = 0;
-    jInviteHeader.setIcon(Images.get(ImageNums.MAIL_SEND_FAST_32));
+    jInviteHeader.setIcon(Images.get(ImageNums.MAIL_SEND_INVITE_32));
     panel.add(jInviteHeader, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
     posY ++;

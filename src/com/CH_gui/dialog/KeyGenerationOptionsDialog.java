@@ -16,14 +16,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-
 import java.util.*;
 
 import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /** 

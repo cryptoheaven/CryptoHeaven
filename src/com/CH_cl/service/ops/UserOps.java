@@ -12,12 +12,8 @@
 
 package com.CH_cl.service.ops;
 
-import java.awt.Component;
-import java.security.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.records.EmailAddressRecord;
@@ -31,6 +27,12 @@ import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.awt.Component;
+import java.io.File;
+import java.security.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -105,17 +107,19 @@ public class UserOps extends Object {
     if (trace != null) trace.exit(UserOps.class);
   }
 
-  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, BAEncodedPassword ba, boolean storeKeyOnServer) {
-    return sendPasswordChange(SIL, null, ba, storeKeyOnServer, null);
+  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, BAEncodedPassword ba, boolean storeKeyOnServer, File privateKeyFile, StringBuffer errorBuffer) {
+    return sendPasswordChange(SIL, null, ba, storeKeyOnServer, null, privateKeyFile, errorBuffer);
   }
-  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer) {
-    return sendPasswordChange(SIL, newUserName, ba, storeKeyOnServer, null);
+  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, StringBuffer errorBuffer) {
+    return sendPasswordChange(SIL, newUserName, ba, storeKeyOnServer, null, null, errorBuffer);
   }
-  private static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode)");
+  private static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errorBuffer) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errorBuffer)");
     if (trace != null) trace.args(SIL, newUserName, ba);
     if (trace != null) trace.args(storeKeyOnServer);
     if (trace != null) trace.args(actionCode);
+    if (trace != null) trace.args(privateKeyFile);
+    if (trace != null) trace.args(errorBuffer);
 
     boolean error = false;
     boolean storeKeyOnLocal = !storeKeyOnServer;
@@ -130,33 +134,42 @@ public class UserOps extends Object {
 
     // Check if the encrypted private part of the key is stored remotely... if so we will need to send an update.
     String keyPropertyName = "Enc" + RSAPrivateKey.OBJECT_NAME + "_" + keyRecord.keyId;
-    GlobalSubProperties keyProperties = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+    GlobalSubProperties keyProperties = new GlobalSubProperties(privateKeyFile, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
     String oldProperty = keyProperties.getProperty(keyPropertyName);
     boolean wasLocalKey = (oldProperty != null && oldProperty.length() > 0);
+    boolean storedLocally = false;
 
     // If key is to be stored locally, do it first before removing it from remote storage.
     if (storeKeyOnLocal) {
-      keyProperties.setProperty(keyPropertyName, keyRecord.getEncPrivateKey().getHexContent());
-      keyProperties.store();
+      try {
+        keyProperties.setProperty(keyPropertyName, keyRecord.getEncPrivateKey().getHexContent());
+        keyProperties.store();
+        UsrALoginSecureSession.addPathToLastPrivKeyPaths(keyProperties.getPropertiesFullFileName());
+        storedLocally = true;
+      } catch (Throwable t) {
+        if (errorBuffer != null) errorBuffer.append("\n\n"+t.getLocalizedMessage());
+        error = true;
+      }
     }
 
-    Usr_AltUsrPass_Rq updateKeyRequest = createAltUserPassRequest(SIL, newUserName, ba, storeKeyOnServer);
-    MessageAction updateKeyAction = new MessageAction(actionCode.intValue(), updateKeyRequest);
-    ClientMessageAction msgAction = SIL.submitAndFetchReply(updateKeyAction, 60000);
-
-    if (msgAction == null || msgAction.getActionCode() < 0) {
-      error = true;
-    } else {
-      cache.setEncodedPassword(ba);
-      UserRecord userRec = cache.getUserRecord();
-      userRec.passwordHash = ba.getHashValue();
-      if (newUserName != null)
-        userRec.handle = newUserName;
-      // The original login user record wasn't in cache so now that we have it, lets update it here.
-      ((Usr_LoginSecSess_Rq) SIL.getLoginMsgDataSet()).userRecord = userRec;
+    if (!error) {
+      Usr_AltUsrPass_Rq updateKeyRequest = createAltUserPassRequest(SIL, newUserName, ba, storeKeyOnServer);
+      MessageAction updateKeyAction = new MessageAction(actionCode.intValue(), updateKeyRequest);
+      ClientMessageAction msgAction = SIL.submitAndFetchReply(updateKeyAction, 60000);
+      if (msgAction == null || msgAction.getActionCode() < 0) {
+        if (errorBuffer != null) errorBuffer.append("\n\nserver failed to respond");
+        error = true;
+      } else {
+        cache.setEncodedPassword(ba);
+        UserRecord userRec = cache.getUserRecord();
+        userRec.passwordHash = ba.getHashValue();
+        if (newUserName != null)
+          userRec.handle = newUserName;
+        // The original login user record wasn't in cache so now that we have it, lets update it here.
+        ((Usr_LoginSecSess_Rq) SIL.getLoginMsgDataSet()).userRecord = userRec;
+      }
+      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
     }
-
-    DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
 
     // if all ok
     if (!error && storeKeyOnServer && wasLocalKey) {
@@ -170,7 +183,7 @@ public class UserOps extends Object {
         // password change on local keys failed, restore local key storage
         keyProperties.setProperty(keyPropertyName, oldProperty);
         keyProperties.store();
-      } else if (storeKeyOnLocal && !wasLocalKey) {
+      } else if (storeKeyOnLocal && !wasLocalKey && storedLocally) {
         // delete the key from local storage...
         keyProperties.remove(keyPropertyName);
         keyProperties.store();

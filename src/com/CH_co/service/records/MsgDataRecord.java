@@ -408,7 +408,7 @@ public class MsgDataRecord extends Record {
     } else {
       if (trace != null) trace.data(200, "rawRecipients were null");
     }
-    if (trace != null) trace.data(300, "recipients value on exit is", recipients);
+    if (trace != null) trace.data(300, "final recipients value", recipients);
     if (trace != null) trace.exit(MsgDataRecord.class);
   }
 

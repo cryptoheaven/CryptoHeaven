@@ -47,7 +47,7 @@ public class FileChooser extends JFileChooser {
   private File newSelectedFiles[] = null;
   private boolean isDownloadChooser;
 
-  private static Object monitor = new Object();
+  private static final Object monitor = new Object();
 
   /** 
    * Plays a role of public constructor.

@@ -39,15 +39,16 @@ public class GlobalSubProperties extends Properties {
   private static Hashtable fileHT;
 
   public GlobalSubProperties(String subFileNameKey) {
-    this.alternateFileNamePart = subFileNameKey;
-    load();
+    this(null, subFileNameKey);
   }
 
   public GlobalSubProperties(File subFile, String subFileNameKey) {
     this.alternateFileNamePart = subFileNameKey;
-    if (fileHT == null)
-      fileHT = new Hashtable();
-    fileHT.put(subFileNameKey, subFile);
+    if (subFile != null) {
+      if (fileHT == null)
+        fileHT = new Hashtable();
+      fileHT.put(subFileNameKey, subFile);
+    }
     load();
   }
 

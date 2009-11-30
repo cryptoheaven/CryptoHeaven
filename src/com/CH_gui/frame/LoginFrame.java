@@ -12,17 +12,6 @@
 
 package com.CH_gui.frame;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.Keymap;
-import javax.swing.Timer;
-
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.net.*;
-
 import com.CH_cl.monitor.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
@@ -45,6 +34,17 @@ import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.io.File;
+import java.net.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.text.Keymap;
+import javax.swing.Timer;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -143,6 +143,7 @@ public class LoginFrame extends JFrame {
   private int keyLength = KeyRecord.DEFAULT__KEY_LENGTH;
   private int certainty = KeyRecord.DEFAULT__CERTAINTY;
   private boolean storeRemoteFlag = true;
+  private File localPrivKeyFile = null;
 
   private RSAKeyPair keyPair;
   private int usedKeyLength = -1;
@@ -1217,8 +1218,33 @@ public class LoginFrame extends JFrame {
   }
 
 
+  public static File choosePrivKeyStorageFile(File defaultFileChoice) {
+    File chosenFile = null;
+    javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+    fc.setSelectedFile(defaultFileChoice);
+    fc.setDialogTitle("Save Private Key file:");
+    while (true) {
+      int retVal = fc.showSaveDialog(null);
+      if (retVal == javax.swing.JFileChooser.APPROVE_OPTION) {
+        java.io.File file = fc.getSelectedFile();
+        if (file.exists()) {
+          boolean overwriteOk = MessageDialog.showDialogYesNo(null, "Overwrite existing file?\n\nAre you sure you want to add this key to the already existing file?\n\n"+file.getAbsolutePath(), "Overwrite existing file?");
+          if (!overwriteOk)
+            continue; // retry the loop
+        }
+        chosenFile = file;
+        break;
+      } else {
+        break;
+      }
+    }
+    return chosenFile;
+  }
+
+
   private class AdvancedListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
+      boolean prevStoreRemoteFlag = storeRemoteFlag;
       KeyGenerationOptionsDialog d = new KeyGenerationOptionsDialog(LoginFrame.this, keyLength, certainty, Boolean.valueOf(storeRemoteFlag));
       if (d.isOK()) {
         if (keyLength != d.getKeyLength() || certainty != d.getCertainty()) {
@@ -1230,7 +1256,16 @@ public class LoginFrame extends JFrame {
           }
           updateKeyGenerationTimeThreaded();
         }
-        storeRemoteFlag = d.getStoreRemoteFlag().booleanValue();
+        boolean tempStoreRemoteFlag = d.getStoreRemoteFlag().booleanValue();
+        if (tempStoreRemoteFlag) {
+          storeRemoteFlag = tempStoreRemoteFlag;
+        } else if (prevStoreRemoteFlag != tempStoreRemoteFlag) {
+          File privKeyFile = choosePrivKeyStorageFile(new File("private-key.properties"));
+          if (privKeyFile != null) {
+            localPrivKeyFile = privKeyFile;
+            storeRemoteFlag = tempStoreRemoteFlag;
+          }
+        }
       }
     }
   }
@@ -1816,15 +1851,19 @@ public class LoginFrame extends JFrame {
 
       // Try uploading the key, if upload fails try to store it on local disk, repeat once if errors continue.
       // It is critical that one of these finishes OK, or else the account will become inoperable.
-      if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer)) {
+      StringBuffer errorBuffer = new StringBuffer();
+      if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer, localPrivKeyFile, errorBuffer)) {
         // do the other operation right away
-        UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer);
+        UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer, localPrivKeyFile, errorBuffer);
         // retry same operation 2nd time
-        if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer)) {
+        if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer, localPrivKeyFile, errorBuffer)) {
           // do the other operation 2nd time and show message that key was not stored as it should
-          UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer);
+          UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer, localPrivKeyFile, errorBuffer);
           String where = storeKeyOnServer ? "on the server" : "locally";
-          MessageDialog.showErrorDialog(null, "Private key could not be stored " + where + "!", com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
+          String msg = "Private key could not be stored " + where + "!";
+          if (errorBuffer.length() > 0)
+            msg += errorBuffer.toString();
+          MessageDialog.showErrorDialog(null, msg, com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"), true);
         }
       }
     } catch (Throwable t) {

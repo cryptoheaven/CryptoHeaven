@@ -68,7 +68,7 @@ public class ChangePasswordDialog extends GeneralDialog {
 
   private CheckDocumentListener checkDocumentListener;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
 
   private boolean isSetMode = false;
@@ -79,8 +79,8 @@ public class ChangePasswordDialog extends GeneralDialog {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChangePasswordDialog.class, "ChangePasswordDialog(Frame frame)");
 
     this.isSetMode = isSetMode;
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
 
     JButton[] buttons = createButtons();
     JPanel panel = createMainPanel();
@@ -280,14 +280,24 @@ public class ChangePasswordDialog extends GeneralDialog {
       }
 
       if (!error) {
-        boolean isLocalKey = KeyOps.isKeyStoredLocally(cache.getKeyRecordMyCurrent().keyId);
-        boolean success = UserOps.sendPasswordChange(serverInterfaceLayer, ba, !isLocalKey);
+        boolean isMyKeyLocal = !Misc.isBitSet(cache.getUserRecord().flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
+        //boolean isLocalKey = KeyOps.isKeyStoredLocally(cache.getKeyRecordMyCurrent().keyId);
+        StringBuffer errorBuffer = new StringBuffer();
+        boolean success = UserOps.sendPasswordChange(SIL, ba, !isMyKeyLocal, null, errorBuffer);
         error = !success;
+
+        if (error) {
+          String where = !isMyKeyLocal ? "on the server" : "locally";
+          String msg = "Private key could not be stored " + where + "!";
+          if (errorBuffer.length() > 0)
+            msg += errorBuffer.toString();
+          MessageDialog.showErrorDialog(null, msg, "Key Storage Failed", true);
+        }
       }
 
       // see if we need to re-setup Password Recovery
       if (!error) {
-        serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_CHALLENGE, new Obj_List_Co(cache.getMyUserId())), 30000);
+        SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_CHALLENGE, new Obj_List_Co(cache.getMyUserId())), 30000);
         if (cache.getMyPassRecoveryRecord() == null)
           new PassRecoverySetupDialog(MainFrame.getSingleInstance());
       }

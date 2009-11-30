@@ -163,7 +163,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     panel.setLayout(new GridBagLayout());
 
     jHeader = new JMyLabel("<html><font size='+1'>Diagnostics Information Gathering and Reporting</font><br><ol><li>Press 'Start Diagnostics'.</li><li>Perform the shortest usage case that<br>demonstrates the problem.</li><li>Press 'Stop and Send' and briefly describe the<br>problem in a message window.</li></ol></html>");
-    jHeader.setIcon(Images.get(ImageNums.MAIL_SEND_FAST_32));
+    jHeader.setIcon(Images.get(ImageNums.TOOLS_FIX32));
     jHeader.setHorizontalTextPosition(SwingConstants.TRAILING);
     jHeader.setVerticalTextPosition(SwingConstants.TOP);
 
@@ -226,6 +226,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
       Runtime runtime = Runtime.getRuntime();
       trace.data(1, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
       trace.data(2, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
+      trace.data(3, "TRACE STOP");
     }
     TraceProperties.setProperty("TraceEnabled", "false");
     Trace.initialLoad();
