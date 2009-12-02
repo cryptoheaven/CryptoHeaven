@@ -41,6 +41,7 @@ public class ImageNums extends Object {
   public static final int PRIME_CERTEINTY32;
   public static final int STORE_REMOTE32;
   public static final int RECYCLE_LARGE;
+  public static final int RECYCLE_LARGE_CLEAR;
 
   public static final int TRANSPARENT16;
   //public static final int WAIT16;
@@ -114,6 +115,7 @@ public class ImageNums extends Object {
   public static final int FLD_MAIL_POST_CLOSED_SHARED16;
 
   public static final int FLD_CLEAR16;
+  public static final int FLD_CLEAR48;
   public static final int FLD_RECYCLE_CLEAR16;
   public static final int FLD_RECYCLE_CLEAR24;
   public static final int FLD_RECYCLE_EMPTY16;
@@ -434,6 +436,7 @@ public class ImageNums extends Object {
   public static final int FILE_MOVE24;
   public static final int FILE_REMOVE16;
   public static final int FILE_REMOVE24;
+  public static final int FILE_REMOVE48;
   public static final int FILE_REPLACE32;
   public static final int IMPORT_FILE16;
   public static final int IMPORT_FILE24;
@@ -557,7 +560,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[316+50]; // plus emotions
+    images = new String[319+50]; // plus emotions
 
 
     /******************************************************************
@@ -588,6 +591,9 @@ public class ImageNums extends Object {
 
     RECYCLE_LARGE = i;
     images[i] = "recycle-large"; i++;
+
+    RECYCLE_LARGE_CLEAR = i;
+    images[i] = "recycle-large-clear"; i++;
 
     TRANSPARENT16 = i;
     images[i] = "Transparent16"; i++;
@@ -785,6 +791,9 @@ public class ImageNums extends Object {
 
     FLD_CLEAR16 = i;
     images[i] = "FldClear16"; i++;
+
+    FLD_CLEAR48 = i;
+    images[i] = "FldClear48"; i++;
 
     FLD_RECYCLE_CLEAR16 = i;
     images[i] = "FldRecycleClear16"; i++;
@@ -1588,6 +1597,9 @@ public class ImageNums extends Object {
 
     FILE_REMOVE24 = i;
     images[i] = "FileRemove24"; i++;
+
+    FILE_REMOVE48 = i;
+    images[i] = "FileRemove48"; i++;
 
     FILE_REPLACE32 = i;
     images[i] = "FileReplace32"; i++;

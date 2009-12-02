@@ -13,7 +13,6 @@
 package com.CH_gui.fileTable;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 
 import java.awt.*;
@@ -29,7 +28,6 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -44,7 +42,6 @@ import com.CH_gui.action.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.folder.*;
 import com.CH_gui.frame.*;
-import com.CH_gui.list.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
@@ -406,39 +403,9 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       if ((fileLinks != null && fileLinks.length > 0) || (folderPairs != null && folderPairs.length > 0)) {
         String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        JPanel panel = new JPanel();
-        panel.setMaximumSize(new Dimension(500, 200));
-        panel.setLayout(new BorderLayout(0, 10));
-        panel.add(new JMyLabel(messageText), BorderLayout.NORTH);
-        JPanel itemPanel = new JPanel();
-        itemPanel.setBorder(new EmptyBorder(0,0,0,0));
-        itemPanel.setLayout(new GridBagLayout());
-        int itemCount = 0;
-        for (int i=0; folderPairs!=null && i<folderPairs.length; i++) {
-          itemCount ++;
-          JLabel item = new JMyLabel(ListRenderer.getRenderedText(folderPairs[i]));
-          item.setIcon(ListRenderer.getRenderedIcon(folderPairs[i]));
-          itemPanel.add(item, new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
-        }
-        if (itemCount > 0) {
-          itemCount ++;
-          itemPanel.add(new JMyLabel("Any sub-folders will also be deleted."), new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
-        }
-        for (int i=0; fileLinks!=null && i<fileLinks.length; i++) {
-          itemCount ++;
-          JLabel item = new JMyLabel(ListRenderer.getRenderedText(fileLinks[i]));
-          item.setIcon(ListRenderer.getRenderedIcon(fileLinks[i]));
-          itemPanel.add(item, new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
-        }
-        if (itemCount > 4) {
-          JScrollPane sc = new JScrollPane(itemPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-          sc.getVerticalScrollBar().setUnitIncrement(16);
-          panel.add(sc, BorderLayout.CENTER);
-        } else {
-          panel.add(itemPanel, BorderLayout.CENTER);
-        }
-        boolean option = MessageDialog.showDialogYesNo(FileActionTable.this, panel, title, MessageDialog.RECYCLE_MESSAGE);
-        if (option == true) {
+        Record[] toDelete = RecordUtils.concatinate(folderPairs, fileLinks);
+        boolean confirmed = MsgActionTable.showConfirmationDialog(FileActionTable.this, title, messageText, toDelete, MessageDialog.RECYCLE_MESSAGE);
+        if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
           doMoveOrSaveAttachmentsAction(recycleFolderPair, fileLinks, folderPairs);

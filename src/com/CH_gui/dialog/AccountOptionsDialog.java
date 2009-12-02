@@ -69,6 +69,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 
   private JCheckBox jEnableSound;
   private JCheckBox jEnableAntialiasing;
+  private JCheckBox jResetLocalSettings;
 
   private JCheckBox jIncludeChangesToAccounts;
 
@@ -526,6 +527,12 @@ public class AccountOptionsDialog extends GeneralDialog {
       bottomPanel.add(jEnableAntialiasing, new GridBagConstraints(0, posY, 4, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
+
+      jResetLocalSettings = new JMyCheckBox("Reset local settings.", false);
+      jResetLocalSettings.addChangeListener(checkBoxListener);
+      bottomPanel.add(jResetLocalSettings, new GridBagConstraints(0, posY, 4, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+      posY ++;
     }
 
     // filler
@@ -803,19 +810,27 @@ public class AccountOptionsDialog extends GeneralDialog {
         GlobalProperties.setProperty(MiscGui.ANTIALIASING_ENABLEMENT_PROPERTY, ""+enable);
         MiscGui.setAntiAliasingEnabled(enable);
       }
+      if (jResetLocalSettings.isSelected()) {
+        GlobalProperties.resetMyAndGlobalProperties();
+        GlobalProperties.store();
+        MessageDialog.showInfoDialog(null, "Local settings reset and reinitialized.", "Confirmation", false);
+      }
     }
 
     if (jActivationCode.getText().trim().length() > 0) {
       String code = jActivationCode.getText().trim();
-      if (code.equalsIgnoreCase("reinitialize trace"))
+      if (code.equalsIgnoreCase("reinitialize trace")) {
         TraceProperties.initialLoad();
-      // After applying the code, reload the welcome screen
-      Runnable afterJob = new Runnable() {
-        public void run() {
-          MainFrame.getSingleInstance().setDefaultWelcomeScreenPane();
-        }
-      };
-      SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_APPLY_CODE, new Obj_List_Co(new Object[] { uRec.userId, code })), 60000, afterJob, null);
+        MessageDialog.showInfoDialog(null, "Trace reinitialized.", "Confirmation", false);
+      } else {
+        // After applying the code, reload the welcome screen
+        Runnable afterJob = new Runnable() {
+          public void run() {
+            MainFrame.getSingleInstance().setDefaultWelcomeScreenPane();
+          }
+        };
+        SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_APPLY_CODE, new Obj_List_Co(new Object[] { uRec.userId, code })), 60000, afterJob, null);
+      }
     }
 
     if (requestAutoUpdate) {
@@ -984,6 +999,7 @@ public class AccountOptionsDialog extends GeneralDialog {
               !userRecords[0].flags.equals(checks.getNewFlagSetting(userRecords[0])) ||
               (isChangingMyUserRecord && isSoundEnabled != jEnableSound.isSelected()) ||
               (isChangingMyUserRecord && isAntialiasingEnabled != jEnableAntialiasing.isSelected()) ||
+              (isChangingMyUserRecord && jResetLocalSettings.isSelected()) ||
               !newDefaultEmail.equals(defaultEmail) ||
               (storageLimit != null && !storageLimit.equals(userRecords[0].storageLimit)) ||
               (transferLimit != null && !transferLimit.equals(userRecords[0].transferLimit)) ||

@@ -28,10 +28,7 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.stat.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.monitor.*;
@@ -43,10 +40,7 @@ import com.CH_gui.dialog.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.folder.*;
 import com.CH_gui.frame.*;
-import com.CH_gui.list.*;
 import com.CH_gui.msgTable.*;
-import com.CH_gui.msgs.AudioCapturePanel;
-import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 
@@ -106,7 +100,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private int leadingMsgActionId = Actions.LEADING_ACTION_ID_MSG_ACTION_TABLE;
   private ServerInterfaceLayer serverInterfaceLayer;
 
-  private EventListenerList folderSelectionListenerList = new EventListenerList();
+  private final EventListenerList folderSelectionListenerList = new EventListenerList();
 
   /** Creates new RecycleActionTable */
   public RecycleActionTable() {
@@ -351,7 +345,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
       FolderPair[] folderPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedInstancesOf(MsgLinkRecord.class);
 
-      doDeleteAction(folderPairs, fileLinks, msgLinks, true, RecycleActionTable.this);
+      doDeleteAction(folderPairs, fileLinks, msgLinks, RecycleActionTable.this);
     }
   }
 
@@ -544,7 +538,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair folderToEmpty = RecycleActionTable.this.getTableModel().getParentFolderPair();
-      FolderActionTree.doEmptyAction(folderToEmpty, true, true, RecycleActionTable.this);
+      FolderActionTree.doEmptyAction(folderToEmpty, true, RecycleActionTable.this);
     }
   }
 
@@ -612,68 +606,17 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   /**
    * Delete specified files and folders, present a confirmation dialog if desired
    */
-  public static void doDeleteAction(FolderPair[] folderPairs, FileLinkRecord[] fileLinks, MsgLinkRecord[] msgLinks, boolean withDialogConfirmation, Component parent) {
+  private static void doDeleteAction(FolderPair[] folderPairs, FileLinkRecord[] fileLinks, MsgLinkRecord[] msgLinks, Component parent) {
     if ((fileLinks != null && fileLinks.length > 0) || (folderPairs != null && folderPairs.length > 0) || (msgLinks != null && msgLinks.length > 0)) {
 
-      boolean confirmed = !withDialogConfirmation;
+      boolean confirmed = false;
 
-      if (withDialogConfirmation) {
-        String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
-        StringBuffer messageText = new StringBuffer(com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_delete_the_following_object(s)?"));
+      String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
+      String messageText = com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_delete_the_following_object(s)?");
 
-        if (fileLinks != null && fileLinks.length > 0) {
-          messageText.append("\n\nSelected files are: \n");
-          for (int i=0; i<fileLinks.length; i++) {
-            if (i>0) 
-              messageText.append(", \n");
-            messageText.append("   ");
-            messageText.append(ListRenderer.getRenderedText(fileLinks[i]));
-          }
-        }
-
-        if (msgLinks != null && msgLinks.length > 0) {
-          boolean anyMsgs = false;
-          boolean anyAddr = false;
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-          for (int i=0; i<msgLinks.length; i++) {
-            MsgDataRecord msgData = cache.getMsgDataRecord(msgLinks[i].msgId);
-            if (msgData == null || msgData.isTypeMessage()) {
-              if (!anyMsgs)
-                messageText.append("\n\nSelected messages are: \n");
-              if (anyMsgs)
-                messageText.append(", \n");
-              messageText.append("   ");
-              messageText.append(ListRenderer.getRenderedText(msgLinks[i]));
-              anyMsgs = true;
-            }
-          }
-          for (int i=0; i<msgLinks.length; i++) {
-            MsgDataRecord msgData = cache.getMsgDataRecord(msgLinks[i].msgId);
-            if (msgData != null && msgData.isTypeAddress()) {
-              if (!anyAddr)
-                messageText.append("\n\nSelected addresses are: \n");
-              if (anyAddr)
-                messageText.append(", \n");
-              messageText.append("   ");
-              messageText.append(ListRenderer.getRenderedText(msgLinks[i]));
-              anyAddr = true;
-            }
-          }
-        }
-
-        if (folderPairs != null && folderPairs.length > 0) {
-          messageText.append("\n\nSelected folders are: \n");
-          for (int i=0; i<folderPairs.length; i++) {
-            if (i>0) 
-              messageText.append(", \n");
-            messageText.append("   ");
-            messageText.append(ListRenderer.getRenderedText(folderPairs[i], false, true, false));
-          }
-          messageText.append("\n\nAll sub-folders stored inside the selected folders, if any exist, will also be deleted.");
-        }
-
-        confirmed = MessageDialog.showDialogYesNo(parent, messageText.toString(), title, MessageDialog.WARNING_MESSAGE);
-      }
+      Record[] toDelete = RecordUtils.concatinate(folderPairs, fileLinks);
+      toDelete = RecordUtils.concatinate(toDelete, msgLinks);
+      confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, toDelete, MessageDialog.DELETE_MESSAGE);
       if (confirmed == true) {
         if (fileLinks != null && fileLinks.length > 0) {
           Long[] fileIDs = RecordUtils.getIDs(fileLinks);

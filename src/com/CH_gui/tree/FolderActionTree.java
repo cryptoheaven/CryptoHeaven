@@ -46,7 +46,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 
@@ -348,33 +347,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       if (folderPairs != null && folderPairs.length > 0) {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        JPanel panel = new JPanel();
-        panel.setMaximumSize(new Dimension(500, 200));
-        panel.setLayout(new BorderLayout(0, 10));
-        panel.add(new JMyLabel(messageText), BorderLayout.NORTH);
-        JPanel itemPanel = new JPanel();
-        itemPanel.setBorder(new EmptyBorder(0,0,0,0));
-        itemPanel.setLayout(new GridBagLayout());
-        int itemCount = 0;
-        for (int i=0; folderPairs!=null && i<folderPairs.length; i++) {
-          itemCount ++;
-          JLabel item = new JMyLabel(ListRenderer.getRenderedText(folderPairs[i]));
-          item.setIcon(ListRenderer.getRenderedIcon(folderPairs[i]));
-          itemPanel.add(item, new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
-        }
-        if (itemCount > 0) {
-          itemCount ++;
-          itemPanel.add(new JMyLabel("Any sub-folders will also be deleted."), new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
-        }
-        if (itemCount > 4) {
-          JScrollPane sc = new JScrollPane(itemPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-          sc.getVerticalScrollBar().setUnitIncrement(5);
-          panel.add(sc, BorderLayout.CENTER);
-        } else {
-          panel.add(itemPanel, BorderLayout.CENTER);
-        }
-        boolean option = MessageDialog.showDialogYesNo(FolderActionTree.this, panel, title, MessageDialog.RECYCLE_MESSAGE);
-        if (option == true) {
+        boolean confirmed = MsgActionTable.showConfirmationDialog(FolderActionTree.this, title, messageText, folderPairs, MessageDialog.RECYCLE_MESSAGE);
+        if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
           FileActionTable.doMoveOrSaveAttachmentsAction(recycleFolderPair, null, folderPairs);
@@ -1082,7 +1056,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = getActionFolderPair();
       if (fPair != null) {
-        doEmptyAction(fPair, fPair.getFolderRecord().folderType.shortValue() == FolderRecord.RECYCLE_FOLDER, true, FolderActionTree.this);
+        doEmptyAction(fPair, fPair.getFolderRecord().folderType.shortValue() == FolderRecord.RECYCLE_FOLDER, FolderActionTree.this);
       }
     }
     private FolderPair getActionFolderPair() {
@@ -1120,21 +1094,12 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
   }
 
-  public static void doEmptyAction(final FolderPair folderToEmpty, boolean includeSubTree, boolean withDialogConfirmation, Component parent) {
-    boolean confirmed = !withDialogConfirmation;
-    if (withDialogConfirmation) {
-      String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
-      JPanel panel = new JPanel();
-      panel.setLayout(new BorderLayout(5, 5));
-      panel.add(new JMyLabel("Are you sure you want to permanently delete items from the"), BorderLayout.NORTH);
-      JLabel folderLabel = new JMyLabel(ListRenderer.getRenderedText(folderToEmpty));
-      folderLabel.setIcon(ListRenderer.getRenderedIcon(folderToEmpty));
-      folderLabel.setIconTextGap(3);
-      folderLabel.setBorder(new EmptyBorder(5, 15, 5, 0));
-      panel.add(folderLabel, BorderLayout.CENTER);
-      panel.add(new JMyLabel("folder?"), BorderLayout.SOUTH);
-      confirmed = MessageDialog.showDialogYesNo(parent, panel, title, MessageDialog.WARNING_MESSAGE);
-    }
+  public static void doEmptyAction(final FolderPair folderToEmpty, boolean includeSubTree, Component parent) {
+    String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
+    String messageText = "<html>Are you sure you want to <b>permanently delete</b> items from the <br>following folder?  This action cannot be reversed.</html>";
+    short folderType = folderToEmpty.getFolderRecord().folderType.shortValue();
+    int messageType = folderType == FolderRecord.RECYCLE_FOLDER ? MessageDialog.EMPTY_RECYCLE_FOLDER : MessageDialog.EMPTY_SPAM_FOLDER;
+    boolean confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, new Record[] { folderToEmpty }, messageType);
     if (confirmed) {
       Obj_IDs_Co request = new Obj_IDs_Co();
       request.IDs = new Long[][] { null, { folderToEmpty.getFolderShareRecord().shareId } };

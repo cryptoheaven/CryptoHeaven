@@ -433,7 +433,7 @@ public class AccountOptionPermitChecks extends Object {
     posY ++;
 
     // remove this option as it is not implemented yet -- panel is NULL
-    jAccountDelete = new JMyCheckBox("Permit destruction of account.");
+    jAccountDelete = new JMyCheckBox("Permit deletion of account.");
     jAccountDeleteUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jAccountDelete, jAccountDeleteUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_ENABLE_ACCOUNT_DELETE, checkBoxListener, posY);
     posY ++;

@@ -35,10 +35,11 @@ import javax.swing.*;
 public class CryptoHeaven extends Object {
 
   private static boolean DEBUG = false;
+  private static String[][] DEFAULT_PROPERTIES;
 
   static {
     try {
-      String[][] DEFAULT_PROPERTIES = new String[][] {
+      DEFAULT_PROPERTIES = new String[][] {
           //{"key",                       "value"},
 
           {"MenuTreeModel."+com.CH_gui.frame.AddressFrame.visualsClassKeyName+"_VS_Ver4", "Program Menus|-1|0|(|File|-10|70|(|Save|750|83|83|130|Save as Draft|764|-1|-1|-1|Separator|0|Select Recipients|751|82|82|130|Select Attachments|752|76|76|130|Voice Recording Panel|768|-1|-1|-1|Priority|-21|80|(|FYI|756|-1|49|130|Normal|757|-1|50|130|High|758|-1|51|130|)|Show Advanced|761|-1|-1|-1|Separator|0|Close|800|67|67|650|)|Edit|-23|69|(|Undo|759|85|90|130|Redo|760|82|89|130|Separator|0|Cut|753|88|88|130|Copy|754|67|67|130|Paste|755|86|86|130|)|Tools|-70|84|(|Spelling ...|765|-1|118|130|Edit user dictionary ...|766|-1|-1|-1|Spelling preferences ...|767|-1|-1|-1|Separator|0|Customize Toolbar ...|101|-1|-1|-1|Customize Menus ...|102|-1|-1|-1|)|Plugins|-100000|80|)|"},
@@ -143,13 +144,22 @@ public class CryptoHeaven extends Object {
 //          {com.CH_gui.tree.FolderTreeComponent.visualsClassKeyName+"_VS","Dimension width 232 height 296"},
 
         };
-
-      // set initial default properties if they were not loaded from file
-      for (int i=0; i<DEFAULT_PROPERTIES.length; i++) {
-        if (GlobalProperties.getProperty(DEFAULT_PROPERTIES[i][0]) == null)
-          GlobalProperties.setProperty(DEFAULT_PROPERTIES[i][0], DEFAULT_PROPERTIES[i][1]);
-      }
+      initDefaultProperties();
     } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  public static void initDefaultProperties() {
+    // set initial default properties if they were not loaded from file
+    for (int i=0; i<DEFAULT_PROPERTIES.length; i++) {
+      try {
+        if (GlobalProperties.getProperty(DEFAULT_PROPERTIES[i][0]) == null) {
+          GlobalProperties.setProperty(DEFAULT_PROPERTIES[i][0], DEFAULT_PROPERTIES[i][1]);
+        }
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
     }
   }
 

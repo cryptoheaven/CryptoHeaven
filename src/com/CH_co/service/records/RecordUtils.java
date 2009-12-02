@@ -230,7 +230,7 @@ public class RecordUtils extends Object {
       if (rec != null) {
         Long id = rec.getId();
         Record o = (Record) removeFromMap.remove(id);
-        // if found in map put to resolt vector,
+        // if found in map put to result vector,
         // else put the queried item from array to result vector.
         if (o == null) {
           resultsV.addElement(rec); // DON'T clone

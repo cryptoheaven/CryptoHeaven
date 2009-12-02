@@ -361,28 +361,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (msgLinks != null && msgLinks.length > 0) {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        JPanel panel = new JPanel();
-        panel.setMaximumSize(new Dimension(500, 200));
-        panel.setLayout(new BorderLayout(0, 10));
-        panel.add(new JMyLabel(messageText), BorderLayout.NORTH);
-        JPanel itemPanel = new JPanel();
-        itemPanel.setBorder(new EmptyBorder(0,0,0,0));
-        itemPanel.setLayout(new GridBagLayout());
-        int itemCount = 0;
-        for (int i=0; i<msgLinks.length; i++) {
-          itemCount ++;
-          JLabel item = new JMyLabel(ListRenderer.getRenderedText(msgLinks[i]));
-          item.setIcon(ListRenderer.getRenderedIcon(msgLinks[i]));
-          itemPanel.add(item, new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
-        }
-        if (itemCount > 4) {
-          JScrollPane sc = new JScrollPane(itemPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-          sc.getVerticalScrollBar().setUnitIncrement(16);
-          panel.add(sc, BorderLayout.CENTER);
-        } else {
-          panel.add(itemPanel, BorderLayout.CENTER);
-        }
-        boolean option = MessageDialog.showDialogYesNo(MsgActionTable.this, panel, title, MessageDialog.RECYCLE_MESSAGE);
+        boolean option = showConfirmationDialog(MsgActionTable.this, title, messageText, msgLinks, MessageDialog.RECYCLE_MESSAGE);
         if (option == true) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
@@ -390,6 +369,48 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         }
       }
     }
+  }
+
+  public static boolean showConfirmationDialog(Component parent, String title, String messageText, Record[] recordsInQuestion, int messageType) {
+    boolean option = true;
+    String confirmationProperty = "ConfirmationDialog-skip-"+messageType;
+    String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", true);
+    boolean confirmationValue = false;
+    try {
+      confirmationValue = Boolean.valueOf(confirmationPropertyValue).booleanValue();
+    } catch (Throwable t) {
+    }
+    if (!confirmationValue) {
+      option = false;
+      JPanel panel = new JPanel();
+      panel.setMaximumSize(new Dimension(500, 200));
+      panel.setLayout(new BorderLayout(0, 10));
+      panel.add(new JMyLabel(messageText), BorderLayout.NORTH);
+      JPanel itemPanel = new JPanel();
+      itemPanel.setBorder(new EmptyBorder(0,0,0,0));
+      itemPanel.setLayout(new GridBagLayout());
+      int itemCount = 0;
+      for (int i=0; i<recordsInQuestion.length; i++) {
+        itemCount ++;
+        JLabel item = new JMyLabel(ListRenderer.getRenderedText(recordsInQuestion[i]));
+        item.setIcon(ListRenderer.getRenderedIcon(recordsInQuestion[i]));
+        itemPanel.add(item, new GridBagConstraints(0, itemCount, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3,15,3,0), 0, 0));
+      }
+      if (itemCount > 4) {
+        JScrollPane sc = new JScrollPane(itemPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sc.getVerticalScrollBar().setUnitIncrement(16);
+        panel.add(sc, BorderLayout.CENTER);
+      } else {
+        panel.add(itemPanel, BorderLayout.CENTER);
+      }
+      JCheckBox itemQuestion = new JMyCheckBox("Skip this confirmation dialog in the future.", false);
+      panel.add(itemQuestion, BorderLayout.SOUTH);
+      option = MessageDialog.showDialogYesNo(parent, panel, title, messageType);
+      if (itemQuestion.isSelected()) {
+        GlobalProperties.setProperty(confirmationProperty, "true", true);
+      }
+    }
+    return option;
   }
 
   /**

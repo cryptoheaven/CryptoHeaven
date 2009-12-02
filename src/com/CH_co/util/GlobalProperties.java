@@ -12,10 +12,12 @@
 
 package com.CH_co.util;
 
+import ch.cl.CryptoHeaven;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.trace.TraceProperties;
+
 import java.io.*;
 import java.util.*;
-
-import com.CH_co.trace.TraceProperties;
 
 /**
  * This class acts as a central repository for an program specific
@@ -48,7 +50,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 8;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 490;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 494;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -175,6 +177,8 @@ public class GlobalProperties extends Object {
   // build 486 Addition of global try-catch-trace for new Threads and all Actions so we can trace any problems better in Diagnostics
   // build 488 Initial creation of accounts and Export of Private Key gives user option to choose key file storage.
   // build 490 Fix exception in launching message preview threat due to null data record, change "Invite by Email" icons and "Problem Reporting" large icon
+  // build 492 Removing chat participant did not change table header description, refresh was required.
+  // build 494 Change Delete Confirmation dialogs and include "Skip in the future" option.
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
@@ -292,8 +296,7 @@ public class GlobalProperties extends Object {
 
   /** Get the value of a property for this key. */
   public static String getProperty (String key) {
-    String property = key != null ? properties.getProperty(key) : null;
-    return property;
+    return getProperty(key, null, false);
   }
 
   /**
@@ -301,18 +304,43 @@ public class GlobalProperties extends Object {
    * <i>value</i> if the property was not set.
    */
   public static String getProperty (String key, String value) {
-    String property = key != null ? properties.getProperty(key, value) : value;
+    return getProperty(key, value, false);
+  }
+  public static String getProperty (String key, String value, boolean isUserSensitive) {
+    String property = value;
+    if (key != null) {
+      if (isUserSensitive) {
+        property = properties.getProperty(getUserPropertyPrefix() + key, value);
+      } else {
+        property = properties.getProperty(key, value);
+      }
+    }
     return property;
+  }
+  private static String getUserPropertyPrefix() {
+    return getGeneralUserPropertyPrefix() + FetchedDataCache.getSingleInstance().getMyUserId() + "-";
+  }
+  private static String getGeneralUserPropertyPrefix() {
+    return "UID-";
   }
 
   /**
-   * Set a property value.  Calls the hashtable method put. 
-   * Provided for parallelism with the getProperties method. 
+   * Set a property value.  Calls the hashtable method put.
+   * Provided for parallelism with the getProperties method.
    * Enforces use of strings for property keys and values.
    * @return the previous value of the specified key, or null if it did not have one.
    */
   public static String setProperty(String key, String value) {
     return (String) properties.setProperty(key, value);
+  }
+  public static String setProperty(String key, String value, boolean isUserSensitive) {
+    String property = null;
+    if (isUserSensitive) {
+      property = (String) properties.setProperty(getUserPropertyPrefix() + key, value);
+    } else {
+      property = (String) properties.setProperty(key, value);
+    }
+    return property;
   }
 
   /**
@@ -339,6 +367,29 @@ public class GlobalProperties extends Object {
     return properties.propertyNames();
   }
 
+  /**
+   * Removes all local properties that are global and for current user.
+   */
+  public static void resetMyAndGlobalProperties() {
+    Enumeration keys = properties.keys();
+    String myUserPropertyPrefix = getUserPropertyPrefix();
+    String generalUserPropertyPrefix = getGeneralUserPropertyPrefix();
+    Vector removeKeysV = new Vector();
+    while (keys.hasMoreElements()) {
+      String key = (String) keys.nextElement();
+      if (!key.startsWith(generalUserPropertyPrefix) || key.startsWith(myUserPropertyPrefix)) {
+        if (!key.startsWith("LastUserName") &&
+                !key.startsWith("EncRSAPrivateKey") &&
+                !key.equals("ServerList")
+                )
+          removeKeysV.addElement(key);
+      }
+    }
+    for (int i=0; i<removeKeysV.size(); i++) {
+      GlobalProperties.remove((String) removeKeysV.elementAt(i));
+    }
+    CryptoHeaven.initDefaultProperties();
+  }
 
 
   // ********** storing is private *********

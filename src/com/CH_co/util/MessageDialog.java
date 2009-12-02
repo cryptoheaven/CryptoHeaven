@@ -44,6 +44,9 @@ public class MessageDialog extends Object {
   public static final int WARNING_MESSAGE = 9003;
   public static final int ERROR_MESSAGE = 9004;
   public static final int RECYCLE_MESSAGE = 9005;
+  public static final int DELETE_MESSAGE = 9006;
+  public static final int EMPTY_RECYCLE_FOLDER = 9007;
+  public static final int EMPTY_SPAM_FOLDER = 9008;
 
   /** Show dialog with "OK" button */
   public static void showDialog(Component parent, String messageText, String title, int messageType, boolean modal) {
@@ -140,6 +143,15 @@ public class MessageDialog extends Object {
           break;
         case RECYCLE_MESSAGE:
           icon = new JMyLabel(Images.get(ImageNums.RECYCLE_LARGE));
+          break;
+        case DELETE_MESSAGE:
+          icon = new JMyLabel(Images.get(ImageNums.FILE_REMOVE48));
+          break;
+        case EMPTY_RECYCLE_FOLDER:
+          icon = new JMyLabel(Images.get(ImageNums.RECYCLE_LARGE_CLEAR));
+          break;
+        case EMPTY_SPAM_FOLDER:
+          icon = new JMyLabel(Images.get(ImageNums.FLD_CLEAR48));
           break;
       }
 
@@ -311,6 +323,8 @@ public class MessageDialog extends Object {
           Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
           break;
         case WARNING_MESSAGE :
+        case EMPTY_RECYCLE_FOLDER :
+        case EMPTY_SPAM_FOLDER :
           Sounds.playAsynchronous(Sounds.DIALOG_WARN);
           break;
         case INFORMATION_MESSAGE :
@@ -318,6 +332,7 @@ public class MessageDialog extends Object {
           break;
         case QUESTION_MESSAGE :
         case RECYCLE_MESSAGE :
+        case DELETE_MESSAGE :
           Sounds.playAsynchronous(Sounds.DIALOG_QUESTION);
           break;
       }

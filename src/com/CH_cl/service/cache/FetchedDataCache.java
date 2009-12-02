@@ -962,6 +962,17 @@ public class FetchedDataCache extends Object {
         for (int i=0; i<records.length; i++) folderShareRecordMap_byFldId.remove(records[i].folderId, records[i]);
         for (int i=0; i<records.length; i++) folderShareRecordMap_byOwnerId.remove(records[i].ownerUserId, records[i]);
       }
+
+      // removing shares sometimes causes folder tree description changes or table heading description changes
+      for (int i=0; i<records.length; i++) {
+        // Clear folder cached data if applicable.
+        FolderShareRecord sRec = records[i];
+        FolderRecord fRec = getFolderRecord(sRec.folderId);
+        if (fRec != null) {
+          fRec.invalidateCachedValues();
+        }
+      }
+
       fireFolderShareRecordUpdated(records, RecordEvent.REMOVE);
 
       // Convert our removed shares to folder records, so we can remove them from the listeners.

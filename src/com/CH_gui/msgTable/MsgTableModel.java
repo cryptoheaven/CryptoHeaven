@@ -700,6 +700,17 @@ public class MsgTableModel extends RecordTableModel {
             }
           }
 
+          if (toAddFrom || toAddSent) {
+            sb.append(MsgPanelUtils.HTML_FONT_START);
+          }
+
+          if (toAddFrom) {
+            sb.append("<FONT COLOR=#9c2950>");
+            sb.append("<strong>");
+            sb.append(fromName);
+            sb.append("</strong>");
+          }
+
           if (toAddPriority) {
             if (msgData.isImpHigh(msgData.importance.shortValue()))
               sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.PRIORITY_HIGH_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
@@ -723,17 +734,6 @@ public class MsgTableModel extends RecordTableModel {
             }
           }
 
-          if (toAddFrom || toAddSent) {
-            sb.append(MsgPanelUtils.HTML_FONT_START);
-          }
-
-          if (toAddFrom) {
-            sb.append("<FONT COLOR=#9c2950>");
-            sb.append("<strong>");
-            sb.append(fromName);
-            sb.append("</strong>");
-          }
-
           if (toAddSent) {
             sb.append("<FONT size='-2' COLOR=#777777>");
             if (toAddFrom)
@@ -745,7 +745,6 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom || toAddSent) {
-            //sb.append("</SMALL></FONT> ");
             sb.append("</FONT> ");
             sb.append(MsgPanelUtils.HTML_FONT_END);
           }

@@ -691,6 +691,8 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
       jTitleLabel.setText(titleName);
       jTitleLabel.setIcon(titleIcon);
     }
+    jTitleLabel.revalidate();
+    jTitleLabel.repaint();
   }
   /**
    * Sets the description of the folder to reflect the description of the given folder.
@@ -763,6 +765,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
       jDescriptionLabel.setText("<html>"+desc+"</html>"); // html gives us multi-line label capability
     }
     jDescriptionLabel.revalidate();
+    jDescriptionLabel.repaint();
   }
 
   /**
@@ -784,7 +787,6 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     }
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater.run()");
-
       if (recordTableScrollPane != null) {
         FolderPair folderPair = recordTableScrollPane.getTableModel().getParentFolderPair();
         if (folderPair != null) {
@@ -792,10 +794,12 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
           if (parentShare != null) {
             FolderShareRecord[] shareRecords = event.getFolderShareRecords();
             for (int i=0; i<shareRecords.length; i++) {
-              if (parentShare.equals(shareRecords[i])) {
+              // If changing any of this folder's shares
+              if (parentShare.folderId.equals(shareRecords[i].folderId)) {
                 if (event.getEventType() == RecordEvent.SET) {
                   changeTitle(shareRecords[i].folderId);
                 }
+                // participants might have been ADDED or REMOVED
                 changeDescription(shareRecords[i].folderId);
                 break;
               }

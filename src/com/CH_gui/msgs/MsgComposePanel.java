@@ -921,24 +921,31 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
               msgComponents.setSelectedCopy(true);
             }
 
-            boolean staged = isStagedSecure();
-            boolean canceled = false;
-            if (!staged && anyEmailAddresses && !isSavingAsDraft)
-              canceled = !showStagedSecureChoiceDialog(emailAddresses);
-            if (!canceled) {
-              if (isStagedSecure() != staged) {
-                actionPerformedNoVeto();
-              } else {
-                boolean showRegularEmailQuestion = anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
-                if (!showRegularEmailQuestion) {
-                  new SendMessageRunner(MsgComposePanel.this).start();
+            final boolean _staged = isStagedSecure();
+            final boolean _anyEmailAddresses = anyEmailAddresses;
+            final EmailAddressRecord[] _emailAddresses = emailAddresses;
+
+            SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                boolean canceled = false;
+                if (!_staged && _anyEmailAddresses && !isSavingAsDraft)
+                  canceled = !showStagedSecureChoiceDialog(_emailAddresses);
+                if (!canceled) {
+                  if (isStagedSecure() != _staged) {
+                    actionPerformedNoVeto();
+                  } else {
+                    boolean showRegularEmailQuestion = _anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
+                    if (!showRegularEmailQuestion) {
+                      new SendMessageRunner(MsgComposePanel.this).start();
+                    } else {
+                      showRegularEmailWarningBeforeAndSend(_emailAddresses);
+                    }
+                  }
                 } else {
-                  showRegularEmailWarningBeforeAndSend(emailAddresses);
+                  setSendMessageInProgress(false);
                 }
               }
-            } else {
-              setSendMessageInProgress(false);
-            }
+            });
           } else {
             // If no recipient or user not found and user search window was cancelled, then resume message composer
             setSendMessageInProgress(false);
