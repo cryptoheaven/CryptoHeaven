@@ -94,7 +94,7 @@ public class FolderPurgingPanel extends JPanel {
     setLayout(new GridBagLayout());
 
     int posY = 0;
-    add(new JMyLabel(Images.get(ImageNums.RECYCLE_LARGE)), new GridBagConstraints(0, posY, 1, 2, 0, 0,
+    add(new JMyLabel(Images.get(ImageNums.FLD_RECYCLE48)), new GridBagConstraints(0, posY, 1, 2, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jPurgeMsg = new JMyLabel();
     add(jPurgeMsg, new GridBagConstraints(1, posY, 1, 1, 10, 0,

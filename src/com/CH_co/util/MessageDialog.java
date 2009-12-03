@@ -142,13 +142,13 @@ public class MessageDialog extends Object {
           icon = new JMyLabel((Icon) UIManager.getLookAndFeelDefaults().get("OptionPane.errorIcon"));
           break;
         case RECYCLE_MESSAGE:
-          icon = new JMyLabel(Images.get(ImageNums.RECYCLE_LARGE));
+          icon = new JMyLabel(Images.get(ImageNums.FLD_RECYCLE48));
           break;
         case DELETE_MESSAGE:
           icon = new JMyLabel(Images.get(ImageNums.FILE_REMOVE48));
           break;
         case EMPTY_RECYCLE_FOLDER:
-          icon = new JMyLabel(Images.get(ImageNums.RECYCLE_LARGE_CLEAR));
+          icon = new JMyLabel(Images.get(ImageNums.FLD_RECYCLE_CLEAR48));
           break;
         case EMPTY_SPAM_FOLDER:
           icon = new JMyLabel(Images.get(ImageNums.FLD_CLEAR48));

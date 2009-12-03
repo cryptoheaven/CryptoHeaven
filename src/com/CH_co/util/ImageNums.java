@@ -40,8 +40,6 @@ public class ImageNums extends Object {
   public static final int KEY_LENGTH32;
   public static final int PRIME_CERTEINTY32;
   public static final int STORE_REMOTE32;
-  public static final int RECYCLE_LARGE;
-  public static final int RECYCLE_LARGE_CLEAR;
 
   public static final int TRANSPARENT16;
   //public static final int WAIT16;
@@ -116,8 +114,10 @@ public class ImageNums extends Object {
 
   public static final int FLD_CLEAR16;
   public static final int FLD_CLEAR48;
+  public static final int FLD_RECYCLE48;
   public static final int FLD_RECYCLE_CLEAR16;
   public static final int FLD_RECYCLE_CLEAR24;
+  public static final int FLD_RECYCLE_CLEAR48;
   public static final int FLD_RECYCLE_EMPTY16;
   public static final int FLD_RECYCLE_EMPTY_SHARED16;
 
@@ -589,12 +589,6 @@ public class ImageNums extends Object {
     STORE_REMOTE32 = i;
     images[i] = "StoreRemote32"; i++;
 
-    RECYCLE_LARGE = i;
-    images[i] = "recycle-large"; i++;
-
-    RECYCLE_LARGE_CLEAR = i;
-    images[i] = "recycle-large-clear"; i++;
-
     TRANSPARENT16 = i;
     images[i] = "Transparent16"; i++;
 
@@ -800,6 +794,12 @@ public class ImageNums extends Object {
 
     FLD_RECYCLE_CLEAR24 = i;
     images[i] = "FldRecycleClear24"; i++;
+
+    FLD_RECYCLE48 = i;
+    images[i] = "FldRecycle48"; i++;
+
+    FLD_RECYCLE_CLEAR48 = i;
+    images[i] = "FldRecycleClear48"; i++;
 
     FLD_RECYCLE_EMPTY16 = i;
     images[i] = "FldRecycleEmpty16"; i++;

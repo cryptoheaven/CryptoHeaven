@@ -14,7 +14,6 @@ package com.CH_gui.gui;
 
 import java.awt.*;
 import java.awt.geom.*;
-import javax.swing.*;
 
 import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
