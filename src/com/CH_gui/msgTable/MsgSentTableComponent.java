@@ -12,7 +12,6 @@
 
 package com.CH_gui.msgTable;
 
-import com.CH_gui.gui.Template;
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.gui.*;
