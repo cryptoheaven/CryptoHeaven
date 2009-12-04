@@ -13,6 +13,7 @@
 package com.CH_gui.localFileTable;
 
 import java.awt.dnd.*;
+import java.awt.Point;
 import javax.swing.*;
 import java.util.*;
 import java.io.*;
@@ -63,6 +64,9 @@ public class LocalFileDND_DragGestureListener extends Object implements DragGest
    * private inner nested class.
    */
   private class LocalFileDND_DragSourceListener implements DragSourceListener {
+
+    private Point lastPt;
+
     /**
      * this message goes to DragSourceListener, informing it that the dragging 
      * has ended
@@ -102,12 +106,16 @@ public class LocalFileDND_DragGestureListener extends Object implements DragGest
      * 
      */
     public void dragOver (DragSourceDragEvent event) {
-      int action = event.getTargetActions();
-      DragSourceContext dsc = event.getDragSourceContext();
-      if (action == DnDConstants.ACTION_MOVE)
-        dsc.setCursor(DragSource.DefaultMoveDrop);
-      else if (action == DnDConstants.ACTION_COPY)
-        dsc.setCursor(DragSource.DefaultCopyDrop);
+      Point pt = event.getLocation();
+      if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+        lastPt = pt;
+        int action = event.getTargetActions();
+        DragSourceContext dsc = event.getDragSourceContext();
+        if (action == DnDConstants.ACTION_MOVE)
+          dsc.setCursor(DragSource.DefaultMoveDrop);
+        else if (action == DnDConstants.ACTION_COPY)
+          dsc.setCursor(DragSource.DefaultCopyDrop);
+      }
     }
 
     /**

@@ -12,8 +12,10 @@
 
 package com.CH_gui.recycleTable;
 
-import java.awt.dnd.*;
 import com.CH_co.trace.Trace;
+
+import java.awt.dnd.*;
+import java.awt.Point;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -32,6 +34,8 @@ import com.CH_co.trace.Trace;
  * @version 
  */
 public class RecycleDND_DragSourceListener extends Object implements DragSourceListener {
+
+  private Point lastPt;
 
   /** Creates new RecycleDND_DragSourceListener */
   public RecycleDND_DragSourceListener() {
@@ -70,12 +74,16 @@ public class RecycleDND_DragSourceListener extends Object implements DragSourceL
    * 
    */
   public void dragOver (DragSourceDragEvent event) {
-    int action = event.getTargetActions();
-    DragSourceContext dsc = event.getDragSourceContext();
-    if (action == DnDConstants.ACTION_MOVE)
-      dsc.setCursor(DragSource.DefaultMoveDrop);
-    else if (action == DnDConstants.ACTION_COPY)
-      dsc.setCursor(DragSource.DefaultCopyDrop);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      int action = event.getTargetActions();
+      DragSourceContext dsc = event.getDragSourceContext();
+      if (action == DnDConstants.ACTION_MOVE)
+        dsc.setCursor(DragSource.DefaultMoveDrop);
+      else if (action == DnDConstants.ACTION_COPY)
+        dsc.setCursor(DragSource.DefaultCopyDrop);
+    }
   }
 
   /**

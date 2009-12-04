@@ -361,7 +361,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (msgLinks != null && msgLinks.length > 0) {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        boolean option = showConfirmationDialog(MsgActionTable.this, title, messageText, msgLinks, MessageDialog.RECYCLE_MESSAGE);
+        boolean option = showConfirmationDialog(MsgActionTable.this, title, messageText, msgLinks, MessageDialog.RECYCLE_MESSAGE, true);
         if (option == true) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
@@ -371,14 +371,17 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     }
   }
 
-  public static boolean showConfirmationDialog(Component parent, String title, String messageText, Record[] recordsInQuestion, int messageType) {
+  public static boolean showConfirmationDialog(Component parent, String title, String messageText, Record[] recordsInQuestion, int messageType, boolean isSkippable) {
     boolean option = true;
-    String confirmationProperty = "ConfirmationDialog-skip-"+messageType;
-    String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", true);
     boolean confirmationValue = false;
-    try {
-      confirmationValue = Boolean.valueOf(confirmationPropertyValue).booleanValue();
-    } catch (Throwable t) {
+    String confirmationProperty = null;
+    if (isSkippable) {
+      confirmationProperty = "ConfirmationDialog-skip-"+messageType;
+      String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", true);
+      try {
+        confirmationValue = Boolean.valueOf(confirmationPropertyValue).booleanValue();
+      } catch (Throwable t) {
+      }
     }
     if (!confirmationValue) {
       option = false;
@@ -403,10 +406,13 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       } else {
         panel.add(itemPanel, BorderLayout.CENTER);
       }
-      JCheckBox itemQuestion = new JMyCheckBox("Skip this confirmation dialog in the future.", false);
-      panel.add(itemQuestion, BorderLayout.SOUTH);
+      JCheckBox itemQuestion = null;
+      if (isSkippable) {
+        itemQuestion = new JMyCheckBox("Skip this confirmation dialog in the future.", false);
+        panel.add(itemQuestion, BorderLayout.SOUTH);
+      }
       option = MessageDialog.showDialogYesNo(parent, panel, title, messageType);
-      if (itemQuestion.isSelected()) {
+      if (isSkippable && itemQuestion.isSelected()) {
         GlobalProperties.setProperty(confirmationProperty, "true", true);
       }
     }

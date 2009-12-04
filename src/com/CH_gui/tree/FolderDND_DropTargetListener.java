@@ -277,7 +277,6 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
       if (path != null)
         pairs = tree.getLastPathComponentFolderPairs(new TreePath[] { path });
 
-      short type;
       boolean isFolderAccepted = false;
       boolean isFileAccepted = false;
       boolean isDropAccepted = false;

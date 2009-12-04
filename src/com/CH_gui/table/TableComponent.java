@@ -684,6 +684,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               initMsgDraftsTableComponent();
               msgDraftsPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_MSG);
               msgDraftsSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgDraftsTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
+              //msgDraftsSplitPane = createSplitPane(msgDraftsTableComponent, msgDraftsPreviewPanel, "_" + msgDraftsTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
               msgDraftsTableComponent.addPreviewComponent(msgDraftsSplitPane, msgDraftsPreviewPanel);
             }
             c = msgDraftsTableComponent;
@@ -839,6 +840,10 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     JSplitPane splitPane = new JSplitPaneVS(propertyName, orientation, recordTableComp, viewer, resizeWeight);
     splitPane.setOneTouchExpandable(false);
     if (splitPane.getDividerSize() > 5) splitPane.setDividerSize(5);
+
+//    if (viewer instanceof RecordSelectionListener) {
+//      recordTableComp.addPreviewComponent(splitPane, viewer);
+//    }
 
     return splitPane;
   }

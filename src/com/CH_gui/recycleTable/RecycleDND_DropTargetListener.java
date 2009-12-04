@@ -56,6 +56,7 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
 
   private boolean originalSelectionSaved;
   private Record[] originallySelectedRecords;
+  private Point lastPt;
 
   /** Creates new RecycleDND_DropTargetListener */
   protected RecycleDND_DropTargetListener(RecycleActionTable recycleActionTable) {
@@ -69,8 +70,12 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    updateCursor(event);
-    highlightMouseOverFolder(event);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      updateCursor(event);
+      highlightMouseOverFolder(event);
+    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {

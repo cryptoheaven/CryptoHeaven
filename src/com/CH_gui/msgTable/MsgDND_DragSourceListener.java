@@ -14,6 +14,7 @@ package com.CH_gui.msgTable;
 
 import java.awt.dnd.*;
 import com.CH_co.trace.Trace;
+import java.awt.Point;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -32,6 +33,8 @@ import com.CH_co.trace.Trace;
  * @version 
  */
 public class MsgDND_DragSourceListener extends Object implements DragSourceListener {
+
+  private Point lastPt;
 
   /** Creates new MsgDND_DragSourceListener */
   public MsgDND_DragSourceListener() {
@@ -74,13 +77,17 @@ public class MsgDND_DragSourceListener extends Object implements DragSourceListe
    * 
    */
   public void dragOver (DragSourceDragEvent event) {
-    //System.out.println("MsgRecordDragSourceListener.dragOver " + Thread.currentThread() + " event = " + event);
-    int action = event.getTargetActions();
-    DragSourceContext dsc = event.getDragSourceContext();
-    if (action == DnDConstants.ACTION_MOVE)
-      dsc.setCursor(DragSource.DefaultMoveDrop);
-    else if (action == DnDConstants.ACTION_COPY)
-      dsc.setCursor(DragSource.DefaultCopyDrop);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      //System.out.println("MsgRecordDragSourceListener.dragOver " + Thread.currentThread() + " event = " + event);
+      int action = event.getTargetActions();
+      DragSourceContext dsc = event.getDragSourceContext();
+      if (action == DnDConstants.ACTION_MOVE)
+        dsc.setCursor(DragSource.DefaultMoveDrop);
+      else if (action == DnDConstants.ACTION_COPY)
+        dsc.setCursor(DragSource.DefaultCopyDrop);
+    }
   }
 
   /**

@@ -26,6 +26,8 @@ import java.util.*;
 import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -1006,6 +1008,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
   private class ListDropTargetListener implements DropTargetListener {
 
     private JList dndDropList;
+    private Point lastPt;
 
     private ListDropTargetListener(JList dropList) {
       dndDropList = dropList;
@@ -1028,7 +1031,33 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
      * is invoked when a drag operation is going on
      */
     public void dragOver (DropTargetDragEvent event) {
-      updateCursor(event);
+      Point pt = event.getLocation();
+      if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+        lastPt = pt;
+        updateCursor(event);
+      }
+      /*
+      if (!DragSource.isDragImageSupported()) {
+        Point pt = event.getLocation();
+        if (_pt == null || _pt.x != pt.x || _pt.y != pt.y) {
+          _pt = pt;
+          Point wpt = dndDropList.getLocation();
+          System.out.println("pt="+pt);
+          System.out.println("wpt="+wpt);
+          // Erase the last ghost image and cue line
+          if (_raGhost != null) {
+            paintImmediately(_raGhost.getBounds());
+          }
+          // Remember where you are about to draw the new ghost image
+          if (_raGhost == null) _raGhost = new Rectangle();
+          _raGhost.setRect(wpt.x + pt.x - _ptOffset.x, wpt.y + pt.y - _ptOffset.y, _imgGhost.getWidth(), _imgGhost.getHeight());
+          // Draw the ghost image
+          System.out.println("drawing image at "+_raGhost);
+          Graphics2D g2 = (Graphics2D) getGraphics();
+          g2.drawImage(_imgGhost, AffineTransform.getTranslateInstance(_raGhost.getX(), _raGhost.getY()), null);
+        }
+      }
+       */
     }
     private void updateCursor(DropTargetDragEvent event) {
       try {
@@ -1123,8 +1152,12 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     }
   } // end private class ListDropTargetListener
 
+  Point _ptOffset;
+  Point _pt;
+  Rectangle _raGhost;
+  BufferedImage _imgGhost;
 
-  private class ListDragGestureListener implements DragGestureListener{
+  private class ListDragGestureListener implements DragGestureListener {
 
     private JList dndSourceList;
 
@@ -1142,7 +1175,47 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
       if (selected != null && selected.length > 0){
         ListTransferable objs = new ListTransferable(selected);
         // as the name suggests, starts the dragging
-        event.getDragSource().startDrag(event, null, objs, new ListDragSourceListener());
+        if (true || !DragSource.isDragImageSupported()) {
+          event.startDrag(null, objs, new ListDragSourceListener());
+        } else {
+          // Point inside the component that recognizes the gesture starting from its origin
+          Point ptDragOrigin = event.getDragOrigin();
+          Component component = event.getComponent();
+
+          JList jList = (JList) component;
+          int index = jList.getSelectedIndex();
+          Rectangle raPath = jList.getCellBounds(index, index);
+          if (_ptOffset == null) _ptOffset = new Point();
+          _ptOffset.setLocation(ptDragOrigin.x-raPath.x, ptDragOrigin.y-raPath.y);
+
+          ListCellRenderer renderer = jList.getCellRenderer();
+          JLabel lbl = (JLabel) renderer.getListCellRendererComponent(jList, selected[0], index, true, false);
+
+          // The layout manager normally does this...
+          lbl.setSize(raPath.width, raPath.height);
+          // Get a buffered image of the selection for dragging a ghost image
+          _imgGhost = new BufferedImage(raPath.width, raPath.height, BufferedImage.TYPE_INT_ARGB_PRE);
+          // Get a graphics context for this image
+          Graphics2D g2 = _imgGhost.createGraphics();
+          // Make the image ghostlike
+          g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 0.5f));
+          // Ask the cell renderer to paint itself into the BufferedImage
+          lbl.paint(g2);
+          // Locate the JLabel's icon so you don't paint under it
+          Icon icon = lbl.getIcon();
+          int nStartOfText = (icon == null) ? 0 : icon.getIconWidth()+lbl.getIconTextGap();
+          // Use DST_OVER to cause under-painting to occur
+          g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OVER, 0.5f));
+          // Use system colors to match the existing decor
+          g2.setPaint(new GradientPaint(nStartOfText, 0, SystemColor.controlShadow, getWidth(), 0, new Color(255,255,255,0)));
+          // Paint under the JLabel's text
+          g2.fillRect(nStartOfText, 0, getWidth(), _imgGhost.getHeight());
+          // Finished with the graphics context now
+          g2.dispose();
+          // Pass the drag image just in case the platform IS supporting it
+          System.out.println("Start Dragging with image");
+          event.startDrag(null, _imgGhost, ptDragOrigin, objs, new ListDragSourceListener());
+        }
       } else {
         //System.out.println( "nothing was selected");   
       }

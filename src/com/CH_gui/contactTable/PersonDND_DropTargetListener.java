@@ -52,6 +52,7 @@ import com.CH_gui.userTable.*;
 public class PersonDND_DropTargetListener extends Object implements DropTargetListener {
 
   private RecordActionTable recordActionTable;
+  private Point lastPt;
 
   /** Creates new PersonDND_DropTargetListener */
   public PersonDND_DropTargetListener(ContactActionTable contactActionTable) {
@@ -78,18 +79,21 @@ public class PersonDND_DropTargetListener extends Object implements DropTargetLi
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    Point location = event.getLocation();
-    JSortedTable jTable = recordActionTable.getJSortedTable();
-    int row = jTable.rowAtPoint(location);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      JSortedTable jTable = recordActionTable.getJSortedTable();
+      int row = jTable.rowAtPoint(pt);
 
-    boolean flavorSupported = isDropFlavourSupported(event);
-    if (row >= 0 && flavorSupported) {
-      Record[] selected = recordActionTable.getSelectedRecords();
-      if (!jTable.getSelectionModel().isSelectedIndex(row) || selected == null || selected.length == 0)
-        jTable.getSelectionModel().setSelectionInterval(row, row);
+      boolean flavorSupported = isDropFlavourSupported(event);
+      if (row >= 0 && flavorSupported) {
+        Record[] selected = recordActionTable.getSelectedRecords();
+        if (!jTable.getSelectionModel().isSelectedIndex(row) || selected == null || selected.length == 0)
+          jTable.getSelectionModel().setSelectionInterval(row, row);
+      }
+
+      updateCursor(event);
     }
-
-    updateCursor(event);
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {

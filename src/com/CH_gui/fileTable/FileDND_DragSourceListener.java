@@ -12,8 +12,10 @@
 
 package com.CH_gui.fileTable;
 
-import java.awt.dnd.*;
 import com.CH_co.trace.Trace;
+
+import java.awt.dnd.*;
+import java.awt.Point;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009
@@ -21,7 +23,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -29,9 +31,11 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.10 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileDND_DragSourceListener extends Object implements DragSourceListener {
+
+  private Point lastPt;
 
   /** Creates new FileDND_DragSourceListener */
   public FileDND_DragSourceListener() {
@@ -40,27 +44,27 @@ public class FileDND_DragSourceListener extends Object implements DragSourceList
   }
 
   /**
-   * this message goes to DragSourceListener, informing it that the dragging 
+   * this message goes to DragSourceListener, informing it that the dragging
    * has ended
-   * 
+   *
    */
-  public void dragDropEnd (DragSourceDropEvent event) { 
+  public void dragDropEnd (DragSourceDropEvent event) {
     //System.out.println("FileDND_DragSourceListener.dragDropEnd " + Thread.currentThread() + " event = " + event);
   }
 
   /**
-   * this message goes to DragSourceListener, informing it that the dragging 
+   * this message goes to DragSourceListener, informing it that the dragging
    * has entered the DropSite
-   * 
+   *
    */
   public void dragEnter (DragSourceDragEvent event) {
     //System.out.println("FileDND_DragSourceListener.dragEnter " + Thread.currentThread() + " event = " + event);
   }
 
   /**
-   * this message goes to DragSourceListener, informing it that the dragging 
+   * this message goes to DragSourceListener, informing it that the dragging
    * has exited the DropSite
-   * 
+   *
    */
   public void dragExit (DragSourceEvent event) {
     //System.out.println("FileDND_DragSourceListener.dragExit " + Thread.currentThread() + " event = " + event);
@@ -68,23 +72,27 @@ public class FileDND_DragSourceListener extends Object implements DragSourceList
   }
 
   /**
-   * this message goes to DragSourceListener, informing it that the dragging is currently 
+   * this message goes to DragSourceListener, informing it that the dragging is currently
    * ocurring over the DropSite
-   * 
+   *
    */
   public void dragOver (DragSourceDragEvent event) {
-    //System.out.println("FileDND_DragSourceListener.dragOver " + Thread.currentThread() + " event = " + event);
-    int action = event.getTargetActions();
-    DragSourceContext dsc = event.getDragSourceContext();
-    if (action == DnDConstants.ACTION_MOVE)
-      dsc.setCursor(DragSource.DefaultMoveDrop);
-    else if (action == DnDConstants.ACTION_COPY)
-      dsc.setCursor(DragSource.DefaultCopyDrop);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      //System.out.println("FileDND_DragSourceListener.dragOver " + Thread.currentThread() + " event = " + event);
+      int action = event.getTargetActions();
+      DragSourceContext dsc = event.getDragSourceContext();
+      if (action == DnDConstants.ACTION_MOVE)
+        dsc.setCursor(DragSource.DefaultMoveDrop);
+      else if (action == DnDConstants.ACTION_COPY)
+        dsc.setCursor(DragSource.DefaultCopyDrop);
+    }
   }
 
   /**
    * is invoked when the user changes the dropAction
-   * 
+   *
    */
   public void dropActionChanged ( DragSourceDragEvent event) {
     //System.out.println("FileDND_DragSourceListener.dropActionChanged " + Thread.currentThread() + " event = " + event);

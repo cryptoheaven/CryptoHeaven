@@ -347,7 +347,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       if (folderPairs != null && folderPairs.length > 0) {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        boolean confirmed = MsgActionTable.showConfirmationDialog(FolderActionTree.this, title, messageText, folderPairs, MessageDialog.RECYCLE_MESSAGE);
+        boolean confirmed = MsgActionTable.showConfirmationDialog(FolderActionTree.this, title, messageText, folderPairs, MessageDialog.RECYCLE_MESSAGE, true);
         if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
@@ -1099,7 +1099,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     String messageText = "<html>Are you sure you want to <b>permanently delete</b> items from the <br>following folder?  This action cannot be reversed.</html>";
     short folderType = folderToEmpty.getFolderRecord().folderType.shortValue();
     int messageType = folderType == FolderRecord.RECYCLE_FOLDER ? MessageDialog.EMPTY_RECYCLE_FOLDER : MessageDialog.EMPTY_SPAM_FOLDER;
-    boolean confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, new Record[] { folderToEmpty }, messageType);
+    boolean confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, new Record[] { folderToEmpty }, messageType, false);
     if (confirmed) {
       Obj_IDs_Co request = new Obj_IDs_Co();
       request.IDs = new Long[][] { null, { folderToEmpty.getFolderShareRecord().shareId } };

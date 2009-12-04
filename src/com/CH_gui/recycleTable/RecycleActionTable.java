@@ -616,7 +616,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 
       Record[] toDelete = RecordUtils.concatinate(folderPairs, fileLinks);
       toDelete = RecordUtils.concatinate(toDelete, msgLinks);
-      confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, toDelete, MessageDialog.DELETE_MESSAGE);
+      confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, toDelete, MessageDialog.DELETE_MESSAGE, false);
       if (confirmed == true) {
         if (fileLinks != null && fileLinks.length > 0) {
           Long[] fileIDs = RecordUtils.getIDs(fileLinks);

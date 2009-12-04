@@ -49,6 +49,7 @@ import com.CH_gui.tree.*;
 public class MsgDND_DropTargetListener extends Object implements DropTargetListener {
 
   private MsgActionTable msgActionTable;
+  private Point lastPt;
 
   /** Creates new MsgDND_DropTargetListener */
   public MsgDND_DropTargetListener(MsgActionTable msgActionTable) {
@@ -62,7 +63,11 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    updateCursor(event);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      updateCursor(event);
+    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {

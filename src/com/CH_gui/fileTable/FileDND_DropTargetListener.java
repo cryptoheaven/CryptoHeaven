@@ -55,6 +55,8 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
   private boolean originalSelectionSaved;
   private Record[] originallySelectedRecords;
 
+  private Point lastPt;
+
   /** Creates new FileDND_DropTargetListener */
   protected FileDND_DropTargetListener(FileActionTable fileActionTable) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDND_DropTargetListener.class, "FileDND_DropTargetListener(FileActionTable fileActionTable)");
@@ -68,9 +70,13 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    //System.out.println("FileDND_DropTargetListener.dragOver");
-    updateCursor(event);
-    highlightMouseOverFolder(event);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      //System.out.println("FileDND_DropTargetListener.dragOver");
+      updateCursor(event);
+      highlightMouseOverFolder(event);
+    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {

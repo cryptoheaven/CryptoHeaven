@@ -220,17 +220,32 @@ public class FolderTree extends JTree implements DisposableObj {
 
             StringBuffer newNameSB = new StringBuffer();
             if (updateNoteSB.length() > 0) {
-              newNameSB.append("<html><b>"); // string "<html><b>" is in determination is renderer should make this bold... skip closing tags!
+              boolean isSpamFolder = fRec.folderId.equals(FetchedDataCache.getSingleInstance().getUserRecord().junkFolderId);
+              boolean isRecycleFolder = fRec.isRecycleType();
+              boolean isHTML = false;
+              // skip BOLD for Spam folder
+              if (!isSpamFolder && !isRecycleFolder) {
+                newNameSB.append("<html><b>"); // string "<html><b>" is in determination is renderer should make this bold... skip closing tags!
+                isHTML = true;
+              }
               newNameSB.append(text);
-              newNameSB.append(' ');
-              newNameSB.append(updateNoteSB);
+              if (!isRecycleFolder) {
+                newNameSB.append(' ');
+                newNameSB.append(updateNoteSB);
+              }
               if (ownerAndChatNotes.length() > 0) {
-                //newNameSB.append("</b>"); -- skipping closing tag for renderer
+                if (isHTML) {
+                  //newNameSB.append("</b>"); -- skipping closing tag for renderer
+                }
                 newNameSB.append(" : ");
                 newNameSB.append(ownerAndChatNotes);
-                //newNameSB.append("</html>"); -- skipping closing tag for renderer
+                if (isHTML) {
+                  //newNameSB.append("</html>"); -- skipping closing tag for renderer
+                }
               } else {
-                //newNameSB.append("</b></html>"); -- skipping closing tag for renderer
+                if (isHTML) {
+                  //newNameSB.append("</b></html>"); -- skipping closing tag for renderer
+                }
               }
             } else if (ownerAndChatNotes.length() > 0) {
               if (text.length() > 0) {

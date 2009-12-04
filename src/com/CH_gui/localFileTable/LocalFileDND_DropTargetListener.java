@@ -14,6 +14,7 @@ package com.CH_gui.localFileTable;
 
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
+import java.awt.Point;
 import javax.swing.*;
 import java.util.*;
 import java.io.*;
@@ -22,8 +23,6 @@ import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.MainFrame;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.io.*;
-import com.CH_co.monitor.*;
 import com.CH_co.util.*;
 import com.CH_co.service.records.*;
 
@@ -36,7 +35,7 @@ import com.CH_cl.service.ops.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -44,10 +43,13 @@ import com.CH_cl.service.ops.*;
  *
  * <b>$Revision: 1.12 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class LocalFileDND_DropTargetListener extends Object implements DropTargetListener {
+
   private JFileChooser jFileChooser;
+  private Point lastPt;
+
   /** Creates new LocalFileDND_DropTargetListener */
   protected LocalFileDND_DropTargetListener(JFileChooser fileChooser) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LocalFileDND_DropTargetListener.class, "LocalFileDND_DropTargetListener()");
@@ -61,8 +63,12 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    //System.out.println("dragOver");
-    updateCursor(event);
+    Point pt = event.getLocation();
+    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
+      lastPt = pt;
+      //System.out.println("dragOver");
+      updateCursor(event);
+    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     //System.out.println("updateCursor");

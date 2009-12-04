@@ -156,6 +156,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
 
   private UndoManager undoMngr;
 
+  private Point lastDndPt;
 
   /** Creates new MsgComposePanel */
   public MsgComposePanel(Record[] initialRecipients) {
@@ -2466,7 +2467,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    updateCursor(event);
+    Point pt = event.getLocation();
+    if (lastDndPt == null || lastDndPt.x != pt.x || lastDndPt.y != pt.y) {
+      lastDndPt = pt;
+      updateCursor(event);
+    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {
