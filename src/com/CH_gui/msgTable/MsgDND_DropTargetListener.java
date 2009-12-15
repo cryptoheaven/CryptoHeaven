@@ -27,7 +27,6 @@ import com.CH_cl.service.cache.*;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
-import com.CH_gui.sortedTable.*;
 import com.CH_gui.tree.*;
 
 /** 
@@ -94,7 +93,6 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
   public void dragExit(DropTargetEvent event) {
   }
   public void drop(DropTargetDropEvent event) {
-    Point location = event.getLocation();
     try {
       Transferable tr = event.getTransferable();
 

@@ -37,7 +37,7 @@ import com.CH_gui.recycleTable.*;
  */
 public class MsgDND_Transferable extends Object implements Transferable {
 
-  public static final DataFlavor MSG_RECORD_FLAVOR = new DataFlavor(MsgDND_TransferableData.class, "MsgRecordIDs");
+  public static final DataFlavor MSG_RECORD_FLAVOR = new DataFlavor(MsgDND_TransferableData.class, "MsgLinkIDs");
   private static final DataFlavor flavors[] = { MSG_RECORD_FLAVOR, RecycleDND_Transferable.RECYCLE_RECORD_FLAVOR };
   private MsgDND_TransferableData data;
 

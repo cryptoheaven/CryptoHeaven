@@ -375,7 +375,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               Vector emailStringRecordsV = new Vector();
               emailNicksV.addElement(nick);
               emailStringRecordsV.addElement(email);
-              MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksV, emailStringRecordsV, false, new FolderFilter(FolderRecord.WHITELIST_FOLDER), true, whiteList);
+              MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksV, emailStringRecordsV, false, new FolderFilter(FolderRecord.WHITELIST_FOLDER), true, whiteList, true);
             }
           }
         };

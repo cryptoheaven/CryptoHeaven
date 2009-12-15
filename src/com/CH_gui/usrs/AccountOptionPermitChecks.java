@@ -244,7 +244,7 @@ public class AccountOptionPermitChecks extends Object {
       jIncludeChangesToOptions.addChangeListener(checkBoxListener);
       centerPanel.add(jIncludeChangesToOptions, BorderLayout.NORTH);
     }
-    centerPanel.add(new JMyLabel("User Settings"), BorderLayout.WEST);
+    centerPanel.add(new JMyLabel("Security Settings"), BorderLayout.WEST);
     centerPanel.add(new JMyLabel(), BorderLayout.CENTER);
     if (isUpdatePermitsMode) {
       centerPanel.add(new JMyLabel("Allow User to Change the Setting"), BorderLayout.EAST);
@@ -259,66 +259,7 @@ public class AccountOptionPermitChecks extends Object {
     bottomPanel.setLayout(new GridBagLayout());
 
     int posY = 0;
-
-    jSpamInternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_messages_from_outside_of_Contact_List."));
-    jSpamInternalUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jSpamInternal, jSpamInternalUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_INTER, checkBoxListener, posY);
-    posY ++;
-
-    jSpamRegEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_regular_external_e-mail."));
-    jSpamRegEmailUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jSpamRegEmail, jSpamRegEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_REG_EMAIL, checkBoxListener, posY);
-    posY ++;
-
-    jSpamSslEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_encrypted_external_e-mail."));
-    jSpamSslEmailUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jSpamSslEmail, jSpamSslEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_SSL_EMAIL, checkBoxListener, posY);
-    posY ++;
-
-    if (jNotify == null) {
-      jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_e-mail_notification_when_new_messages_arrive."));
-      jNotifyUpdate = new JMyCheckBox();
-      addCheckBoxes(null, jNotify, jNotifyUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
-      posY ++;
-    }
-
-    if (jNotifySubjectAddress == null) {
-      jNotifySubjectAddress = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
-      jNotifySubjectAddressUpdate = new JMyCheckBox();
-      addCheckBoxes(bottomPanel, jNotifySubjectAddress, jNotifySubjectAddressUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, checkBoxListener, posY);
-      posY ++;
-    }
-
-//    jSpamBlockNumeric = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Block_default_numeric_e-mail_address_for_external_e-mail."));
-//    jSpamBlockNumericUpdate = new JMyCheckBox();
-//    addCheckBoxes(bottomPanel, includeUpdate, jSpamBlockNumeric, jSpamBlockNumericUpdate, myUserRecord.acceptingSpam, userRecord.acceptingSpam, UserRecord.ACC_SPAM_BLOCK_REG_NUMERIC_ADDRESS, checkBoxListener, posY);
-//    posY ++;
-
-    jSecureReplyLink = new JMyCheckBox("Include secure reply link in external e-mail.");
-    jSecureReplyLinkUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jSecureReplyLink, jSecureReplyLinkUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, true, checkBoxListener, posY);
-    posY ++;
-
-    jWarnExternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Display_a_warning_before_sending_unencrypted_e-mail."));
-    jWarnExternalUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jWarnExternal, jWarnExternalUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_WARN_EXTERNAL, checkBoxListener, posY);
-    posY ++;
-
-    jSwitchPreview = new JMyCheckBox("Preview Rich Text email in Plain Text mode.");
-    jSwitchPreviewUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jSwitchPreview, jSwitchPreviewUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE, checkBoxListener, posY);
-    posY ++;
-
-    jAutoUpdates = new JMyCheckBox("Enable automatic software updates.");
-    jAutoUpdatesUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jAutoUpdates, jAutoUpdatesUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_DISABLE_AUTO_UPDATES, true, checkBoxListener, posY);
-    posY ++;
-
-    jUserOffline = new JMyCheckBox("Enable 'User Offline' pop-up notification during chat.");
-    jUserOfflineUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USER_OFFLINE_POPUP, checkBoxListener, posY);
-    posY ++;
-
+    
     jKeyOnServer = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Store_encrypted_Private_Key_on_the_server."));
     jKeyOnServer.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -362,10 +303,75 @@ public class AccountOptionPermitChecks extends Object {
       }
     }
 
+    jSpamInternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_messages_from_outside_of_Contact_List."));
+    jSpamInternalUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jSpamInternal, jSpamInternalUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_INTER, checkBoxListener, posY);
+    posY ++;
+
+    jSpamRegEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_regular_external_e-mail."));
+    jSpamRegEmailUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jSpamRegEmail, jSpamRegEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_REG_EMAIL, checkBoxListener, posY);
+    posY ++;
+
+    jSpamSslEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_encrypted_external_e-mail."));
+    jSpamSslEmailUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jSpamSslEmail, jSpamSslEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_SSL_EMAIL, checkBoxListener, posY);
+    posY ++;
+
+//    jSpamBlockNumeric = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Block_default_numeric_e-mail_address_for_external_e-mail."));
+//    jSpamBlockNumericUpdate = new JMyCheckBox();
+//    addCheckBoxes(bottomPanel, includeUpdate, jSpamBlockNumeric, jSpamBlockNumericUpdate, myUserRecord.acceptingSpam, userRecord.acceptingSpam, UserRecord.ACC_SPAM_BLOCK_REG_NUMERIC_ADDRESS, checkBoxListener, posY);
+//    posY ++;
+
+    jWarnExternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Display_a_warning_before_sending_unencrypted_e-mail."));
+    jWarnExternalUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jWarnExternal, jWarnExternalUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_WARN_EXTERNAL, checkBoxListener, posY);
+    posY ++;
+
+    jSwitchPreview = new JMyCheckBox("Preview Rich Text email in Plain Text mode.");
+    jSwitchPreviewUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jSwitchPreview, jSwitchPreviewUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE, checkBoxListener, posY);
+    posY ++;
+
+    if (jNotify == null) {
+      jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_e-mail_notification_when_new_messages_arrive."));
+      jNotifyUpdate = new JMyCheckBox();
+      addCheckBoxes(null, jNotify, jNotifyUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
+      posY ++;
+    }
+
+    if (jNotifySubjectAddress == null) {
+      jNotifySubjectAddress = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
+      jNotifySubjectAddressUpdate = new JMyCheckBox();
+      addCheckBoxes(bottomPanel, jNotifySubjectAddress, jNotifySubjectAddressUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, checkBoxListener, posY);
+      posY ++;
+    }
+
+    // Account Options divider
+    bottomPanel.add(new JMyLabel("Account Options"), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
+    jSecureReplyLink = new JMyCheckBox("Include secure reply link in external e-mail.");
+    jSecureReplyLinkUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jSecureReplyLink, jSecureReplyLinkUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, true, checkBoxListener, posY);
+    posY ++;
+
+    jUserOffline = new JMyCheckBox("Enable 'User Offline' pop-up notification during chat.");
+    jUserOfflineUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USER_OFFLINE_POPUP, checkBoxListener, posY);
+    posY ++;
+
     jUseEnterKeyChatSend = new JMyCheckBox("Use ENTER key to send messages during chat sessions.");
     jUseEnterKeyChatSendUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jUseEnterKeyChatSend, jUseEnterKeyChatSendUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES, checkBoxListener, posY);
     posY ++;
+
+    jAutoUpdates = new JMyCheckBox("Enable automatic software updates.");
+    jAutoUpdatesUpdate = new JMyCheckBox();
+    addCheckBoxes(bottomPanel, includeUpdate, jAutoUpdates, jAutoUpdatesUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_DISABLE_AUTO_UPDATES, true, checkBoxListener, posY);
+    posY ++;
+
 
     // filler
     bottomPanel.add(new JMyLabel(), new GridBagConstraints(0, posY, 2, 1, 0, 10,

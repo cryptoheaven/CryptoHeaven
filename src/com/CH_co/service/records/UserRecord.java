@@ -352,6 +352,12 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     return passcode;
   }
 
+  public String getCapitalizedHandle() {
+    char handleFirstLetter = handle != null && handle.length() > 0 ? handle.charAt(0) : ' ';
+    String handleRest = handle != null && handle.length() > 1 ? handle.substring(1) : "";
+    return Character.toUpperCase(handleFirstLetter) + handleRest;
+  }
+
   public boolean isAutoResp() {
     return autoResp != null && autoResp.charValue() == 'Y';
   }

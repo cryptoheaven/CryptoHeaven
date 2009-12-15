@@ -64,6 +64,7 @@ public class AccountOptionsDialog extends GeneralDialog {
   private static final int DEFAULT_CANCEL_INDEX = 1;
 
   private JMyTextOptionField jDefaultEmail;
+  private JMyLabel jEncryption;
   private JTextField jContactEmail;
   private JTextField jActivationCode;
 
@@ -173,6 +174,23 @@ public class AccountOptionsDialog extends GeneralDialog {
       private AutoResponderRecord autoResponderRecord = null;
       public void runTraced() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "AccountOptionsDialog.fetchData.runTraced()");
+
+        // fetch User's Encryption info
+        if (userRecords.length == 1) {
+          UserRecord user = cache.getUserRecord(userRecords[0].userId);
+          KeyRecord key = cache.getKeyRecord(user.currentKeyId);
+          if (key == null || key.plainPublicKey == null) {
+            Obj_IDList_Co request = new Obj_IDList_Co();
+            request.IDs = new Long[] { user.currentKeyId };
+            MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, request);
+            SIL.submitAndWait(msgAction, 30000);
+            key = cache.getKeyRecord(user.currentKeyId);
+          }
+          if (key != null) {
+            jEncryption.setText(key.plainPublicKey.shortInfo() + "/" + "AES(256)");
+            jEncryption.setIcon(key.getIcon());
+          }
+        }
 
         // fetch a single sub user account info
         {
@@ -382,6 +400,15 @@ public class AccountOptionsDialog extends GeneralDialog {
     topPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     topPanel.setLayout(new GridBagLayout());
 
+    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Account_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+    JLabel jAccountStatus = new JMyLabel(userRec.getAccountType());
+    if (userRec.isHeld())
+      jAccountStatus.setIcon(Images.get(ImageNums.WARNING16));
+    topPanel.add(jAccountStatus, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
     JLabel accNameLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Account_Name"));
     JLabel accName = new JMyLabel(ListRenderer.getRenderedText(userRec));
     topPanel.add(accNameLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
@@ -391,7 +418,6 @@ public class AccountOptionsDialog extends GeneralDialog {
     topPanel.add(accName, new GridBagConstraints(2, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
-
 
     JLabel emlAddrLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_E-mail_Address"));
     EmailAddressRecord emlRec = new EmailAddressRecord("");
@@ -424,6 +450,13 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
+    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+    jEncryption = new JMyLabel("...");
+    topPanel.add(jEncryption, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
+
     topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Last_Login_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     String loginDate = Misc.getFormattedTimestamp(userRec.dateLastLogin);
@@ -431,36 +464,18 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Last_Logout_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    String logoutDate = Misc.getFormattedTimestamp(userRec.dateLastLogout);
-    topPanel.add(new JMyLabel(logoutDate), new GridBagConstraints(1, posY, 2, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Account_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    JLabel jAccountStatus = new JMyLabel(userRec.getAccountType());
-    if (userRec.isHeld())
-      jAccountStatus.setIcon(Images.get(ImageNums.WARNING16));
-    topPanel.add(jAccountStatus, new GridBagConstraints(1, posY, 2, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
+//    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Last_Logout_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+//        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+//    String logoutDate = Misc.getFormattedTimestamp(userRec.dateLastLogout);
+//    topPanel.add(new JMyLabel(logoutDate), new GridBagConstraints(1, posY, 2, 1, 10, 0,
+//        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+//    posY ++;
 
     topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jActivationCode = new JMyTextField();
     jActivationCode.getDocument().addDocumentListener(documentChangeListener);
     topPanel.add(jActivationCode, new GridBagConstraints(1, posY, 2, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
-
-    jContactEmail = new JMyTextField(userRec.emailAddress);
-    jContactEmail.getDocument().addDocumentListener(documentChangeListener);
-    //topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_E-mail")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Send_notifications_to_address")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    topPanel.add(jContactEmail, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -501,6 +516,25 @@ public class AccountOptionsDialog extends GeneralDialog {
     checks.jNotifyUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotify, checks.jNotifyUpdate, myUserRec.notifyByEmail, userRec.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
     posY ++;
+
+    jContactEmail = new JMyTextField(userRec.emailAddress);
+    jContactEmail.getDocument().addDocumentListener(documentChangeListener);
+    final JMyLabel jSendNotificationsLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Send_notifications_to_address"));
+    bottomPanel.add(jSendNotificationsLabel, new GridBagConstraints(0, posY, 2, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 25, 5, 5), 0, 0));
+    posY ++;
+    bottomPanel.add(jContactEmail, new GridBagConstraints(0, posY, 2, 1, 10, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 25, 5, 5), 0, 0));
+    posY ++;
+    checks.jNotify.addChangeListener(new ChangeListener() {
+      public void stateChanged(ChangeEvent e) {
+        boolean isSelected = checks.jNotify.isSelected();
+        jSendNotificationsLabel.setEnabled(isSelected);
+        jContactEmail.setEnabled(isSelected);
+      }
+    });
+    jSendNotificationsLabel.setEnabled(userRec.isNotifyByEmail());
+    jContactEmail.setEnabled(userRec.isNotifyByEmail());
 
     checks.jNotifySubjectAddress = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
     checks.jNotifySubjectAddressUpdate = new JMyCheckBox();

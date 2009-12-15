@@ -12,13 +12,6 @@
 
 package com.CH_gui.userTable;
 
-import javax.swing.*;
-import javax.swing.event.*;
-
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-
 import com.CH_gui.action.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
@@ -28,10 +21,13 @@ import com.CH_gui.table.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.service.records.*;
-import com.CH_co.service.msg.dataSets.*;
-import com.CH_co.service.msg.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2009

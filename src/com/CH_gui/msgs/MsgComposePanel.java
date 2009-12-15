@@ -1557,7 +1557,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           }
         } else if (rec instanceof FolderRecord) {
           FolderRecord fldRec = (FolderRecord) rec;
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderRecord fRec = cache.getFolderRecord(fldRec.folderId);
           if (fRec == null || cache.getFolderShareRecordMy(fRec.folderId, true) == null) {
             if (badFoldersV == null) badFoldersV = new Vector();
@@ -1914,12 +1913,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   }
 
   public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter) {
-    checkEmailAddressesForAddressBookAdition_Threaded(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, folderFilter, false, null);
+    checkEmailAddressesForAddressBookAdition_Threaded(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, folderFilter, false, null, false);
   }
-  public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter, final boolean forceAddAtOnce, final FolderPair toAddressBook) {
+  public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter, final boolean forceAddAtOnce, final FolderPair toAddressBook, final boolean skipProgressBar) {
     Thread th = new ThreadTraced("Address Book Email Checker") {
       public void runTraced() {
-        checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, false, folderFilter, forceAddAtOnce, toAddressBook);
+        checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, false, folderFilter, forceAddAtOnce, toAddressBook, skipProgressBar);
       }
     };
     th.setDaemon(true);
@@ -1931,9 +1930,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
    * xxx To-Do: enforce check in specified folder filter type
    */
   public static Vector checkEmailAddressesForAddressBookAdition(Component parent, Vector emailNicksV, Vector emailStringRecordsV, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter) {
-    return checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, performCheckOnly, folderFilter, false, null);
+    return checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, performCheckOnly, folderFilter, false, null, false);
   }
-  public static Vector checkEmailAddressesForAddressBookAdition(final Component parent, Vector emailNicksV, Vector emailStringRecordsV, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter, boolean forceAddAtOnce, final FolderPair toAddressBook) {
+  public static Vector checkEmailAddressesForAddressBookAdition(final Component parent, Vector emailNicksV, Vector emailStringRecordsV, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter, boolean forceAddAtOnce, final FolderPair toAddressBook, final boolean skipProgressBar) {
 
     final Vector emailRecordsShortV = new Vector();
     final Vector emailRecordsLowerV = new Vector();
@@ -2071,7 +2070,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         }
 
         if (forceAddAtOnce) {
-          new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV).start();
+          new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV, skipProgressBar).start();
         } else {
           JButton[] buttons = new JButton[3];
           buttons[0] = new JButton("Add at Once");
@@ -2081,7 +2080,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           buttons[0].addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               dialog.dispose();
-              new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV).start();
+              new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV, skipProgressBar).start();
             }
           });
           buttons[1].addActionListener(new ActionListener() {
@@ -2121,8 +2120,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     private Component parentComp;
     private FolderPair toAddressBook;
     private Vector emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV;
+    private boolean skipProgressBar;
 
-    public AddAtOnceThread(String name, Component parentComp, FolderPair toAddressBook, Vector emailRecordsLowerV, Vector emailRecordsShortV, Vector emailRecordsOrigV, Vector emailNicksOrigV) {
+    public AddAtOnceThread(String name, Component parentComp, FolderPair toAddressBook, Vector emailRecordsLowerV, Vector emailRecordsShortV, Vector emailRecordsOrigV, Vector emailNicksOrigV, boolean skipProgressBar) {
       super(name);
       this.parentComp = parentComp;
       this.toAddressBook = toAddressBook;
@@ -2130,6 +2130,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       this.emailRecordsShortV = emailRecordsShortV;
       this.emailRecordsOrigV = emailRecordsOrigV;
       this.emailNicksOrigV = emailNicksOrigV;
+      this.skipProgressBar = skipProgressBar;
     }
     public void runTraced() {
       FolderPair addrBook = toAddressBook;
@@ -2139,29 +2140,32 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         int countProcessed = 0;
         final boolean[] interrupted = new boolean[] { false };
         ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-        JProgressBar progressBar = new JProgressBar(0, emailRecordsLowerV.size());
-        JPanel progressPanel = new JPanel();
-        progressPanel.setLayout(new GridBagLayout());
-        progressPanel.add(new JMyLabel("Addresses are being imported into your Address Book, please wait..."), new GridBagConstraints(0, 0, 1, 1, 10, 0,
-            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-        progressPanel.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 10, 0,
-            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-        JButton[] buttons = new JButton[1];
-        buttons[0] = new JButton("Cancel");
-        buttons[0].addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            interrupted[0] = true;
-          }
-        });
-        //JDialog infoDialog = MessageDialog.showDialog(parentComp, progressPanel, "Import in Progress...", MessageDialog.INFORMATION_MESSAGE, buttons, null, false);
+        JProgressBar progressBar = null;
         GeneralDialog progressDialog = null;
-        Window w = SwingUtilities.windowForComponent(parentComp);
-        if (parentComp instanceof Frame)
-          progressDialog = new GeneralDialog((Frame) w, "Import in Progress...", buttons, -1, 0, progressPanel);
-        else if (parentComp instanceof Dialog)
-          progressDialog = new GeneralDialog((Dialog) w, "Import in Progress...", buttons, -1, 0, progressPanel);
-        else
-          progressDialog = new GeneralDialog("Import in Progress...", buttons, -1, 0, progressPanel);
+        if (!skipProgressBar) {
+          progressBar = new JProgressBar(0, emailRecordsLowerV.size());
+          JPanel progressPanel = new JPanel();
+          progressPanel.setLayout(new GridBagLayout());
+          progressPanel.add(new JMyLabel("Addresses are being imported into your Address Book, please wait..."), new GridBagConstraints(0, 0, 1, 1, 10, 0,
+              GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+          progressPanel.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 10, 0,
+              GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+          JButton[] buttons = new JButton[1];
+          buttons[0] = new JButton("Cancel");
+          buttons[0].addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              interrupted[0] = true;
+            }
+          });
+          //JDialog infoDialog = MessageDialog.showDialog(parentComp, progressPanel, "Import in Progress...", MessageDialog.INFORMATION_MESSAGE, buttons, null, false);
+          Window w = SwingUtilities.windowForComponent(parentComp);
+          if (parentComp instanceof Frame)
+            progressDialog = new GeneralDialog((Frame) w, "Import in Progress...", buttons, -1, 0, progressPanel);
+          else if (parentComp instanceof Dialog)
+            progressDialog = new GeneralDialog((Dialog) w, "Import in Progress...", buttons, -1, 0, progressPanel);
+          else
+            progressDialog = new GeneralDialog("Import in Progress...", buttons, -1, 0, progressPanel);
+        }
 
         for (int i=0; i<emailRecordsLowerV.size(); i++) {
           String emailShort = (String) emailRecordsShortV.elementAt(i);
@@ -2188,7 +2192,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
             SIL.submitAndWait(action, 120000);
           else
             SIL.submitAndReturn(action);
-          progressBar.setValue(countProcessed);
+          if (progressBar != null)
+            progressBar.setValue(countProcessed);
         }
         if (progressDialog != null) {
           progressDialog.dispose();
@@ -2494,7 +2499,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
         FileDND_TransferableData data = (FileDND_TransferableData) tr.getTransferData(FileDND_Transferable.FILE_RECORD_FLAVOR);
         if (data.fileRecordIDs[1] != null && data.fileRecordIDs[1].length > 0) {
           event.acceptDrop(DnDConstants.ACTION_COPY);
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FileLinkRecord[] fLinks = cache.getFileLinkRecords(data.fileRecordIDs[1]);
           addAdditionalAttachments(fLinks);
         }
@@ -2510,7 +2514,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           msgLinkIDs = ((AddrDND_TransferableData) tr.getTransferData(AddrDND_Transferable.ADDR_RECORD_FLAVOR)).msgLinkIDs;
         if (msgLinkIDs != null && msgLinkIDs.length > 0) {
           event.acceptDrop(DnDConstants.ACTION_COPY);
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(msgLinkIDs);
           addAdditionalAttachments(mLinks);
         }

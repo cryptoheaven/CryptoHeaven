@@ -455,7 +455,7 @@ public class Misc extends Object {
       sbPlain.append("Hello!\n\n");
     }
     sbPlain.append(
-      "INVITATION" +
+      "INVITATION From " + uRec.getCapitalizedHandle() +
       "\n\n" +
       "I would like to invite you to use "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" if you are not already doing so.  This will allow us to exchange messages, chat or share data in utmost privacy. " +
       "\n\n" +
@@ -469,7 +469,7 @@ public class Misc extends Object {
       "\n\n\n" +
       "Sincerely," +
       "\n" +
-      uRec.shortInfo());
+      uRec.getCapitalizedHandle());
     text[0] = sbPlain.toString();
     // html version
     StringBuffer sbHtml = new StringBuffer();
@@ -483,7 +483,7 @@ public class Misc extends Object {
     }
     sbHtml.append(
       "<p>" +
-      "INVITATION" +
+      "INVITATION From " + uRec.getCapitalizedHandle() +
       "</p><p>" +
       "I would like to invite you to use "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" if you are not already doing so.  This will allow us to exchange messages, chat or share data in utmost privacy. " +
       "</p><p>" +
@@ -497,7 +497,7 @@ public class Misc extends Object {
       "</p><br>" +
       "Sincerely,"+
       "<br>" +
-      Misc.encodePlainIntoHtml(uRec.shortInfo()));
+      Misc.encodePlainIntoHtml(uRec.getCapitalizedHandle()));
     text[1] = sbHtml.toString();
     return text;
   }

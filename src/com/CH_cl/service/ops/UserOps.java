@@ -156,7 +156,7 @@ public class UserOps extends Object {
       Usr_AltUsrPass_Rq updateKeyRequest = createAltUserPassRequest(SIL, newUserName, ba, storeKeyOnServer);
       MessageAction updateKeyAction = new MessageAction(actionCode.intValue(), updateKeyRequest);
       ClientMessageAction msgAction = SIL.submitAndFetchReply(updateKeyAction, 60000);
-      if (msgAction == null || msgAction.getActionCode() < 0) {
+      if (msgAction == null || msgAction.getActionCode() <= 0) {
         if (errorBuffer != null) errorBuffer.append("\n\nserver failed to respond");
         error = true;
       } else {
@@ -557,7 +557,7 @@ public class UserOps extends Object {
     MessageAction updateKeyAction = new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_UPDATE, updatePassRecoveryRequest);
     ClientMessageAction msgAction = SIL.submitAndFetchReply(updateKeyAction, 60000);
 
-    if (msgAction == null || msgAction.getActionCode() < 0) {
+    if (msgAction == null || msgAction.getActionCode() <= 0) {
       error = true;
     }
 
