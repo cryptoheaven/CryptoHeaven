@@ -454,9 +454,16 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
           if (keyEvent.getKeyCode() == KeyEvent.VK_TAB && secondaryProvider != null && list.getSelectedValue() == secondaryProvider) {
             focusEscapeWithTab = true;
           } else {
+            boolean appendComma = !isSingleItemList && keyEvent.getKeyChar() != ',';
             int index = list.getSelectedIndex();
-            boolean appendComma = !isSingleItemList && !(keyEvent.getKeyChar() == ',');
-            selectFromList(index, appendComma);
+            if (secondaryProvider != null && list.getSelectedValue() == secondaryProvider) {
+              // If hit an "Action" item then it must be through ENTER to activate it
+              if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+                selectFromList(index, appendComma);
+              }
+            } else {
+              selectFromList(index, appendComma);
+            }
           }
           keyEvent.consume();
           if (focusEscapeWithTab || isSingleItemList) {
