@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -28,7 +28,7 @@ import com.CH_co.util.*;
 
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -398,7 +398,7 @@ public class FolderOps extends Object {
     Long junkFolderId = userRecord.junkFolderId;
     if (junkFolderId == null || cache.getFolderRecord(junkFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam e-mail is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk e-mail"
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {

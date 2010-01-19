@@ -10,12 +10,13 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.gui;
+package com.CH_cl.service.cache.event;
 
-import java.awt.Insets;
-import com.CH_co.util.MiscGui;
+import com.CH_cl.service.cache.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.service.records.InvEmlRecord;
 
-/**
+/** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
@@ -27,20 +28,21 @@ import com.CH_co.util.MiscGui;
  * Class Details:
  *
  *
- * <b>$Revision: $</b>
+ * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
  * @version
  */
-public class MyInsets extends Insets {
+public class InvEmlRecordEvent extends RecordEvent {
 
-  /** Creates new MyInsets */
-  public MyInsets(int top, int left, int bottom, int right) {
-    super(t(top), t(left), t(bottom), t(right));
+  /** Creates new InvEmlRecordEvent */
+  public InvEmlRecordEvent(FetchedDataCache source, InvEmlRecord[] invEmlRecords, int eventType) {
+    super(source, invEmlRecords, eventType);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InvEmlRecordEvent.class, "InvEmlRecordEvent()");
+    if (trace != null) trace.exit(InvEmlRecordEvent.class);
   }
 
-  private static int t(int i) {
-    int ii = MiscGui.isSmallScreen() ? (i+1) / 2 : i;
-    return ii;
+  public InvEmlRecord[] getInvEmlRecords() {
+    return (InvEmlRecord[]) records;
   }
 
 }

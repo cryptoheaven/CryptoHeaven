@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -16,21 +16,20 @@ import java.security.*;
 import java.util.*;
 import javax.swing.event.EventListenerList;
 
-import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.cryptx.*;
-
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
 import com.CH_cl.util.GlobalSubProperties;
 
+import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -52,6 +51,7 @@ public class FetchedDataCache extends Object {
   public static final boolean DEBUG__SUPPRESS_EVENTS_MSGS = false;
   public static final boolean DEBUG__SUPPRESS_EVENTS_FILES = false;
   public static final boolean DEBUG__SUPPRESS_EVENTS_FOLDERS = false;
+  public static final boolean DEBUG__SUPPRESS_EVENTS_INV_EMLS = false;
   public static final boolean DEBUG__SUPPRESS_EVENTS_KEYS = false;
   public static final boolean DEBUG__SUPPRESS_EVENTS_USERS = false;
   public static final boolean DEBUG__SUPPRESS_EVENTS_CONTACTS = false;
@@ -79,6 +79,7 @@ public class FetchedDataCache extends Object {
   MultiHashtable folderShareRecordMap_byOwnerId;
   SortedMap fileLinkRecordMap;
   SortedMap fileDataRecordMap;
+  SortedMap invEmlRecordMap;
   SortedMap keyRecordMap;
   SortedMap contactRecordMap;
   SortedMap msgLinkRecordMap;
@@ -134,6 +135,7 @@ public class FetchedDataCache extends Object {
     folderShareRecordMap_byOwnerId = new MultiHashtable(true);
     fileLinkRecordMap = new TreeMap();
     fileDataRecordMap = new TreeMap();
+    invEmlRecordMap = new TreeMap();
     keyRecordMap = new TreeMap();
     contactRecordMap = new TreeMap();
     msgLinkRecordMap = new TreeMap();
@@ -151,7 +153,7 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Clears the cach to remove all of its data.
+   * Clears the cache to remove all of its data.
    */
   public void clear() {
     synchronized (this) {
@@ -163,6 +165,7 @@ public class FetchedDataCache extends Object {
       removeEmailRecords(getEmailRecords());
       removeFolderRecords(getFolderRecords());
       removeFolderShareRecords(getFolderShareRecords());
+      removeInvEmlRecords(getInvEmlRecords());
       removeKeyRecords(getKeyRecords());
       removeUserRecords(getUserRecords());
 
@@ -184,6 +187,7 @@ public class FetchedDataCache extends Object {
       folderShareRecordMap.clear();
       folderShareRecordMap_byFldId.clear();
       folderShareRecordMap_byOwnerId.clear();
+      invEmlRecordMap.clear();
       keyRecordMap.clear();
       userRecordMap.clear();
       bodyKeys.clear();
@@ -290,7 +294,7 @@ public class FetchedDataCache extends Object {
    *********************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addUserRecords(UserRecord[] userRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addUserRecords(UserRecord[])");
@@ -330,7 +334,7 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cach and fires appropriate event.
+   * Removes records from the cache and fires appropriate event.
    */
   public void removeUserRecords(UserRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeUserRecords(UserRecord[])");
@@ -473,7 +477,7 @@ public class FetchedDataCache extends Object {
    ***********************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addFolderRecords(FolderRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderRecords(FolderRecord[])");
@@ -495,7 +499,7 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cach and fires appropriate event.
+   * Removes records from the cache and fires appropriate event.
    */
   public void removeFolderRecords(FolderRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFolderRecords(FolderRecord[])");
@@ -950,7 +954,7 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cach and fires appropriate event.
+   * Removes records from the cache and fires appropriate event.
    */
   public void removeFolderShareRecords(FolderShareRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFolderShareRecords(FolderShareRecord[])");
@@ -1450,7 +1454,7 @@ public class FetchedDataCache extends Object {
    *************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addFileLinkRecords(FileLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFileLinkRecords(FileLinkRecord[])");
@@ -1508,7 +1512,7 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cach and fires appropriate event.
+   * Removes records from the cache and fires appropriate event.
    */
   public void removeFileLinkRecords(FileLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFileLinkRecords(FileLinkRecord[])");
@@ -1645,7 +1649,7 @@ public class FetchedDataCache extends Object {
    *************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addFileDataRecords(FileDataRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFileDataRecords(FileDataRecord[])");
@@ -1678,13 +1682,85 @@ public class FetchedDataCache extends Object {
   }
 
 
+  /***********************************
+   ***   InvEmlRecord operations   ***
+   ***********************************/
+
+  /**
+   * Adds new records or record updates into the cache and fires appropriate event.
+   */
+  public void addInvEmlRecords(InvEmlRecord[] records) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addInvEmlRecords(InvEmlRecord[] invEmlRecords)");
+    if (trace != null) trace.args(records);
+
+    if (records != null && records.length > 0) {
+      synchronized (this) {
+        records = (InvEmlRecord[]) RecordUtils.merge(invEmlRecordMap, records);
+      }
+      fireInvEmlRecordUpdated(records, RecordEvent.SET);
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  /**
+   * Removes records from the cache and fires appropriate event.
+   */
+  public void removeInvEmlRecords(InvEmlRecord[] records) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeInvEmlRecords(InvEmlRecord[])");
+    if (trace != null) trace.args(records);
+
+    if (records != null && records.length > 0) {
+      synchronized (this) {
+        records = (InvEmlRecord[]) RecordUtils.remove(invEmlRecordMap, records);
+      }
+      fireInvEmlRecordUpdated(records, RecordEvent.REMOVE);
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  /**
+   * @return ALL InvEmlRecords stored in the cache.
+   */
+  public synchronized InvEmlRecord[] getInvEmlRecords() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getInvEmlRecords()");
+
+    Vector invEmlsV = new Vector();
+    invEmlsV.addAll(invEmlRecordMap.values());
+    InvEmlRecord[] invEmls = (InvEmlRecord[]) ArrayUtils.toArray(invEmlsV, InvEmlRecord.class);
+
+    if (trace != null) trace.exit(FetchedDataCache.class, invEmls);
+    return invEmls;
+  }
+
+  /**
+   * @return all InvEmlRecords matching specified IDs
+   */
+  public synchronized InvEmlRecord[] getInvEmlRecords(Long[] IDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getInvEmlRecords(Long[] IDs)");
+    if (trace != null) trace.args(IDs);
+
+    Vector recsV = new Vector();
+    if (IDs != null) {
+      for (int i=0; i<IDs.length; i++) {
+        InvEmlRecord rec = (InvEmlRecord) invEmlRecordMap.get(IDs[i]);
+        if (rec != null)
+          recsV.addElement(rec);
+      }
+    }
+    InvEmlRecord[] recs = (InvEmlRecord[]) ArrayUtils.toArray(recsV, InvEmlRecord.class);
+
+    if (trace != null) trace.exit(FetchedDataCache.class, recs);
+    return recs;
+  }
+
   /********************************
    ***   KeyRecord operations   ***
    ********************************/
 
   /**
-
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addKeyRecords(KeyRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addKeyRecords(KeyRecord[])");
@@ -1745,7 +1821,7 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cach and fires appropriate event.
+   * Removes records from the cache and fires appropriate event.
    */
   public void removeKeyRecords(KeyRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeKeyRecords(KeyRecord[])");
@@ -1832,7 +1908,7 @@ public class FetchedDataCache extends Object {
    ************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addContactRecords(ContactRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addContactRecords(ContactRecord[])");
@@ -2074,7 +2150,7 @@ public class FetchedDataCache extends Object {
    ************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addMsgLinkRecords(MsgLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgLinkRecords(MsgLinkRecord[] records)");
@@ -2247,7 +2323,7 @@ public class FetchedDataCache extends Object {
   /**
    * We need data Records in the cache before the message table can display contents.
    * For that reason, the event will be fired when we are done with both, links and datas.
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addMsgLinkAndDataRecords(MsgLinkRecord linkRecord, MsgDataRecord dataRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgLinkAndDataRecords(MsgLinkRecord linkRecord, MsgDataRecord dataRecord)");
@@ -2584,7 +2660,7 @@ public class FetchedDataCache extends Object {
    ************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addMsgDataRecords(MsgDataRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgDataRecords(MsgDataRecord[] records)");
@@ -2748,7 +2824,7 @@ public class FetchedDataCache extends Object {
    ************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addStatRecords(StatRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addStatRecords(StatRecord[])");
@@ -2866,7 +2942,7 @@ public class FetchedDataCache extends Object {
    ************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addEmailRecords(EmailRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addEmailRecords(EmailRecord[])");
@@ -2995,7 +3071,7 @@ public class FetchedDataCache extends Object {
    ***************************************/
 
   /**
-   * Adds new records or record updates into the cach and fires appropriate event.
+   * Adds new records or record updates into the cache and fires appropriate event.
    */
   public void addAddrHashRecords(AddrHashRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addAddrHashRecords(AddrHashRecord[] records)");
@@ -3459,6 +3535,60 @@ public class FetchedDataCache extends Object {
           int oldPriority = Thread.currentThread().getPriority();
           Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((FileLinkRecordListener)listeners[i+1]).fileLinkRecordUpdated(e);
+          Thread.currentThread().setPriority(oldPriority);
+        }
+      }
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+
+
+  /******************************************
+   ***   InvEmlRecord Listener handling   ***
+   ******************************************/
+
+  public synchronized void addInvEmlRecordListener(InvEmlRecordListener l) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addInvEmlRecordListener(InvEmlRecordListener)");
+    if (trace != null) trace.args(l);
+    myListenerList.add(InvEmlRecordListener.class, l);
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  public synchronized void removeInvEmlRecordListener(InvEmlRecordListener l) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeInvEmlRecordListener(InvEmlRecordListener)");
+    if (trace != null) trace.args(l);
+    myListenerList.remove(InvEmlRecordListener.class, l);
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+
+  /**
+   * Notify all listeners that have registered interest for
+   * notification on this event type.  The event instance
+   * is lazily created using the parameters passed into
+   * the fire method.
+   */
+  protected void fireInvEmlRecordUpdated(InvEmlRecord[] records, int eventType) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireInvEmlRecordUpdated(InvEmlRecord[], int eventType)");
+    if (trace != null) trace.args(records);
+    if (trace != null) trace.args(eventType);
+
+    if (!DEBUG__SUPPRESS_EVENTS_INV_EMLS) {
+      // Guaranteed to return a non-null array
+      Object[] listeners = myListenerList.getListenerList();
+      InvEmlRecordEvent e = null;
+      // Process the listeners last to first, notifying
+      // those that are interested in this event
+      for (int i = listeners.length-2; i>=0; i-=2) {
+        if (listeners[i] == InvEmlRecordListener.class) {
+          // Lazily create the event:
+          if (e == null)
+            e = new InvEmlRecordEvent(this, records, eventType);
+          int oldPriority = Thread.currentThread().getPriority();
+          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+          ((InvEmlRecordListener)listeners[i+1]).invEmlRecordUpdated(e);
           Thread.currentThread().setPriority(oldPriority);
         }
       }
