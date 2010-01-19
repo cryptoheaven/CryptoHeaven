@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -49,7 +49,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -79,6 +79,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
   private JPanel jDescriptionPanel;
   private JPanel jUtilityButtonPanel;
   private JPanel jFilterPanel;
+  private int countTopPanels = 0;
 
   private RecordTableScrollPane recordTableScrollPane;
   private Object title; // Record or String
@@ -279,12 +280,14 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
    * Setting it to 'null' resets the custom title setting.
    * Use this method if you want to control the GUI elements like alignment or icon positioning...
    */
-  public void setDescription(JLabel jDescriptionLabel) {
-    if (jDescriptionLabel != null) {
-      this.jDescriptionLabel = jDescriptionLabel;
+  public void setDescription(JComponent jDescription) {
+    if (jDescription != null) {
+      if (jDescription instanceof JLabel) {
+        this.jDescriptionLabel = (JLabel) jDescription;
+        this.description = jDescriptionLabel.getText();
+      }
       jDescriptionPanel.removeAll();
-      jDescriptionPanel.add(jDescriptionLabel, BorderLayout.CENTER);
-      this.description = jDescriptionLabel.getText();
+      jDescriptionPanel.add(jDescription, BorderLayout.CENTER);
     } else {
       setDescription((String) null);
     }
@@ -307,6 +310,11 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     splitPane.setBottomComponent(mainPreviewComp);
 
     mainCardPanel.add(BorderLayout.CENTER, splitPane);
+  }
+  public void addTopPanel(JComponent topPanel) {
+    add(topPanel, new GridBagConstraints(0, countTopPanels, 1, 1, 10, 0,
+        GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    countTopPanels++;
   }
   public void addUtilityComponent(JComponent utilityComponent) {
     int count = jUtilityButtonPanel.getComponentCount();
@@ -373,8 +381,9 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     jTopPanel.add(jUtilityButtonPanel, new GridBagConstraints(2, posY, 1, 1, 0, 0,
         GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(1, 1, 1, 1), 0, 0));
 
-    add(jTopPanel, new GridBagConstraints(0, 0, 1, 1, 10, 0,
+    add(jTopPanel, new GridBagConstraints(0, countTopPanels, 1, 1, 10, 0,
         GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    countTopPanels ++;
 
     if (refreshButton != null) {
       jUtilityButtonPanel.add(refreshButton, new GridBagConstraints(10, 0, 1, 1, 0, 0,
@@ -448,7 +457,8 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
 //      emptyPane.setOpaque(false);
 //      cards.add(pane, "template");
 //    }
-    add(cards, new GridBagConstraints(0, 1, 1, 1, 20, 20,
+    // add main table as 10'th element leaving room for addon components
+    add(cards, new GridBagConstraints(0, 10, 1, 1, 20, 20,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     // Since we want initially to show the table, wait SHOW_DELAY seconds and if it doesn't fill,
     // show the template.

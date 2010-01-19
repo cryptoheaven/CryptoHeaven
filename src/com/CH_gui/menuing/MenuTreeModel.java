@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -29,7 +29,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -84,7 +84,7 @@ public class MenuTreeModel extends Object {
             // Find User Frame
             "Add to Contact List ...|600|-1|-1|-1|"+
             "Message User(s) ...|601|"+KeyEvent.VK_M+"|"+KeyEvent.VK_M+"|"+Event.CTRL_MASK+"|"+
-            "Compose E-mail Invitation ...|1000|-1|-1|-1|"+
+            "Compose Email Invitation ...|1000|-1|-1|-1|"+
             "Separator|0|"+
             // Main Frame
             "New Folder ...|300|"+KeyEvent.VK_N+"|"+KeyEvent.VK_N+"|"+Event.CTRL_MASK+"|"+
@@ -291,7 +291,7 @@ public class MenuTreeModel extends Object {
             // Find User Frame
             "Add to Contact List ...|600|-1|-1|-1|"+
             "Message User(s) ...|601|-1|-1|-1|"+
-            "Compose E-mail Invitation ...|1000|"+KeyEvent.VK_E+"|"+KeyEvent.VK_E+"|"+Event.CTRL_MASK+"|"+
+            "Compose Email Invitation ...|1000|"+KeyEvent.VK_E+"|"+KeyEvent.VK_E+"|"+Event.CTRL_MASK+"|"+
             "Separator|0|"+
             // Main Frame
             "New Message|503|-1|-1|-1|"+

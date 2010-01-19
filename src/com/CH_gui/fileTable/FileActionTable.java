@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -47,7 +47,7 @@ import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -458,11 +458,9 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(FileActionTable.this)) {
-        FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
-        if (fileLinks != null && fileLinks.length > 0) {
-          new MessageFrame(null, fileLinks);
-        }
+      FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+      if (fileLinks != null && fileLinks.length > 0) {
+        new MessageFrame(null, fileLinks);
       }
     }
     private void updateText(int countSelectedFiles) {

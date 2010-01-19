@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -47,7 +47,7 @@ import javax.swing.text.Keymap;
 import javax.swing.Timer;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -151,7 +151,7 @@ public class LoginFrame extends JFrame {
 
   // Error messages
   public static final String RETYPE_PASSWORD_ERROR = com.CH_gui.lang.Lang.rb.getString("msg_Re-typed_Password_does_not_match...");
-  private static final String EMAIL_NULL = com.CH_gui.lang.Lang.rb.getString("msg_Proceed_without_E-mail_address...");
+  private static final String EMAIL_NULL = com.CH_gui.lang.Lang.rb.getString("msg_Proceed_without_Email_address...");
 
   private static String OK_BUTTON_LOGIN_MODE = com.CH_gui.lang.Lang.rb.getString("button_Login");
   private static String OK_BUTTON_NEW_ACCOUNT_MODE = com.CH_gui.lang.Lang.rb.getString("button_Create");
@@ -194,7 +194,11 @@ public class LoginFrame extends JFrame {
     getRootPane().setDefaultButton(defaultButton);
 
     getContentPane().add("North", jLogo);
-    getContentPane().add("Center", new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+    if (getToolkit().getScreenSize().height >= 600) {
+      getContentPane().add("Center", mainPanel);
+    } else {
+      getContentPane().add("Center", new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+    }
     getContentPane().add("South", MiscGui.createButtonPanel(buttons));
 
     // connect 'X' window button to cancel
@@ -356,7 +360,7 @@ public class LoginFrame extends JFrame {
   }
 
   /** Change dialog to Create New Account Dialog.
-    * Add "Retype password" amd "Enter e-mail" fields plus labels
+    * Add "Retype password" amd "Enter email" fields plus labels
     */
   private void changeModeToNewAccount() {
 
@@ -453,7 +457,7 @@ public class LoginFrame extends JFrame {
         synchronized (estimateMonitor) {
           if (estimatedTime == null) {
             expectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
-            int expecTime = estimateKeyGenerationTimeNow(keyLength, certainty);
+            int expecTime = estimateKeyGenerationTimeNow(keyLength, certainty)+1;
             expectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] {new Integer(expecTime)}));
             estimatedTime = new Integer(expecTime);
           }
@@ -478,7 +482,7 @@ public class LoginFrame extends JFrame {
   public static JLabel getPasswordHint() {
     JLabel warningLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password_length_recommendation..."));
     warningLabel.setIcon(Images.get(ImageNums.SHIELD32));
-    warningLabel.setBorder(new EtchedBorder());
+    warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
     warningLabel.setHorizontalAlignment(JLabel.LEFT);
     warningLabel.setVerticalTextPosition(JLabel.TOP);
     return warningLabel;
@@ -729,7 +733,7 @@ public class LoginFrame extends JFrame {
     password = new JMyPasswordKeyboardField(com.CH_gui.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."), defaultPassword);
     try {
       boolean capsLockState = getToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
-      capsLockWarning = new JMyLabel("Caps Lock in ON");
+      capsLockWarning = new JMyLabel("Caps Lock is ON");
       capsLockWarning.setIcon(Images.get(ImageNums.WARNING16));
       capsLockWarning.setVisible(capsLockState);
       capsLockTimer = new Timer(100, new ActionListener() {
@@ -983,11 +987,11 @@ public class LoginFrame extends JFrame {
     }
     initiateProxySettings();
 
-//    newEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_E-mail_Address"));
+//    newEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
 //    newEmail = new JMyTextComboBox("", new String[] { "@"+URLs.get(URLs.DOMAIN_MAIL) });
 //    newEmail.setEditable(true);
 
-    currentEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_E-mail_Address"));
+    currentEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Email_Address"));
     currentEmail = new JMyTextField(defaultSignupEmail);
 
     String rememberStr = com.CH_gui.lang.Lang.rb.getString("check_Remember_my_Username_on_this_computer.");
@@ -1055,10 +1059,10 @@ public class LoginFrame extends JFrame {
 //        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 5, 5, 5), 0, 0));
 
     panel.add(userName, new GridBagConstraints(2, 1, 3, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 5, 5, 5), 0, 0));
 
     panel.add(passwordLabel, new GridBagConstraints(1, 4, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -1067,7 +1071,7 @@ public class LoginFrame extends JFrame {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     if (capsLockWarning != null) {
       panel.add(capsLockWarning, new GridBagConstraints(2, 5, 3, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 5, 5, 5), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 5, 0, 5), 0, 0));
     }
 
     //if (URLs.get(URLs.SERVER_FIELD_REMOVED, "false").equalsIgnoreCase("true")) {
@@ -1170,7 +1174,7 @@ public class LoginFrame extends JFrame {
                 errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
               }
             } else {
-              errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Specified_e-mail_address_does_not_appear_to_be_in_a_valid_format...");
+              errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
             }
           } else {
             errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_The_retyped_password_does_not_match_the_entered_password.");
@@ -1346,7 +1350,7 @@ public class LoginFrame extends JFrame {
         for (int i=0; i<pass2.length; i++)
           pass2[i] = 0;
 
-        // Standardise and validate e-mail address
+        // Standardise and validate email address
         String requestedEmailAddress = null;
         if (!error) {
           String eName = getUserName();
@@ -1361,9 +1365,9 @@ public class LoginFrame extends JFrame {
           }
         }
 
-        // empty e-mail warning
+        // empty email warning
         if (!error && (currentEmail.getText() == null || currentEmail.getText().trim().length() == 0)) {
-          String title = com.CH_gui.lang.Lang.rb.getString("title_No_E-mail_Specified");
+          String title = com.CH_gui.lang.Lang.rb.getString("title_No_Email_Specified");
           boolean option = MessageDialog.showDialogYesNo(LoginFrame.this, EMAIL_NULL, title);
           if (option == false) {
             error = true;
@@ -1903,7 +1907,7 @@ public class LoginFrame extends JFrame {
       if (replyChkAction2 != null && replyChkAction2.getActionCode() >= 0) {
         chkEmailOk = true;
       } else if (replyChkAction2 != null && replyChkAction2.getActionCode() < 0) {
-        MessageDialog.showWarningDialog(null, "E-mail address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.", com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
+        MessageDialog.showWarningDialog(null, "Email address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.", com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
       }
 
       // username and email address check passed, create new user account now...
@@ -1972,7 +1976,7 @@ public class LoginFrame extends JFrame {
     // addrShareRecord
     newUser_request.addrShareRecord = new FolderShareRecord();
     newUser_request.addrShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Address_Book"));
-    newUser_request.addrShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Saved_E-mail_Addresses"));
+    newUser_request.addrShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Saved_Email_Addresses"));
     newUser_request.addrShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.addrShareRecord.seal(symKeyFldShares);
 
@@ -2000,7 +2004,7 @@ public class LoginFrame extends JFrame {
     // junkShareRecord
     newUser_request.junkShareRecord = new FolderShareRecord();
     newUser_request.junkShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Spam"));
-    newUser_request.junkShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Suspected_spam_e-mail_is_deposited_here"));
+    newUser_request.junkShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Suspected_spam_email_is_deposited_here"));
     newUser_request.junkShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.junkShareRecord.seal(symKeyFldShares);
 

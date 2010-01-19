@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -28,7 +28,7 @@ import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -83,13 +83,13 @@ public class EmailInvitationPanel extends JPanel implements ActionProducerI {
   }
 
   /** 
-   * Send E-mail Message to invite someone to join.
+   * Send Email Message to invite someone to join.
    */
   private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.MAIL_SEND_INVITE_16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_E-mail_Message_to_invite_others_to_join_the_service."));
+      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Email_Message_to_invite_others_to_join_the_service."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_SEND_INVITE_24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite_by_Email"));
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -45,7 +45,7 @@ import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -391,11 +391,9 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(RecycleActionTable.this)) {
-        LinkRecordI[] links = (LinkRecordI[]) getSelectedInstancesOf(LinkRecordI.class);
-        if (links != null && links.length > 0) {
-          new MessageFrame(null, links);
-        }
+      LinkRecordI[] links = (LinkRecordI[]) getSelectedInstancesOf(LinkRecordI.class);
+      if (links != null && links.length > 0) {
+        new MessageFrame(null, links);
       }
     }
   }

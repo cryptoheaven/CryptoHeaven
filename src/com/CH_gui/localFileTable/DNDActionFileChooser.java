@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -36,15 +36,14 @@ import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
 import com.CH_gui.menuing.*;
 import com.CH_gui.msgTable.*;
-import com.CH_gui.tree.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -52,7 +51,7 @@ import com.CH_gui.tree.*;
  *
  * <b>$Revision: 1.30 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class DNDActionFileChooser extends DNDFileChooser implements ActionProducerI, VisualsSavable {
 
@@ -85,7 +84,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
 
     assignMousePopupListeners(this);
     addPropertyChangeListener(JFileChooser.SELECTED_FILES_CHANGED_PROPERTY, new PropertyChangeListener() {
-      // This method gets called when a bound property is changed. 
+      // This method gets called when a bound property is changed.
       public void propertyChange(PropertyChangeEvent evt) {
         setEnabledActions();
       }
@@ -97,7 +96,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DNDFileChooser.class, "assignDropAndDragComponents(Component c)");
     if (trace != null) trace.args(c);
 
-    if (c != null && 
+    if (c != null &&
           (
             c instanceof JList ||
             c instanceof JViewport
@@ -188,7 +187,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         JCheckBox[] jFiles = new JCheckBox[files.length];
-        JLabel q = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_securely_and_permanently_wipe_the_selected_files_from_your_local_file_system?")); 
+        JLabel q = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_securely_and_permanently_wipe_the_selected_files_from_your_local_file_system?"));
         panel.add(q, new GridBagConstraints(0, 0, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
         JPanel innerPanel = new JPanel();
@@ -306,8 +305,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
     Long myFilesFolderId = cache.getUserRecord().fileFolderId;
     FolderPair myFiles = new FolderPair(cache.getFolderShareRecordMy(myFilesFolderId, false), cache.getFolderRecord(myFilesFolderId));
     Move_NewFld_Dialog d = null;
-    if (w instanceof Frame) d = new Move_NewFld_Dialog((Frame) w, allFolderPairs, folderPairs, myFiles, title, isDescendantOk, cache); 
-    else if (w instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) w, allFolderPairs, folderPairs, myFiles, title, isDescendantOk, cache); 
+    if (w instanceof Frame) d = new Move_NewFld_Dialog((Frame) w, allFolderPairs, folderPairs, myFiles, title, isDescendantOk, cache);
+    else if (w instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) w, allFolderPairs, folderPairs, myFiles, title, isDescendantOk, cache);
 
     FolderPair chosenPair = null;
     if (d != null) {

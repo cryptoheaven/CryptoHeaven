@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -39,7 +39,7 @@ import com.CH_gui.postTable.PostTableCellRenderer;
 import com.CH_guiLib.util.HTML_utils;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -555,7 +555,7 @@ public class MsgTableModel extends RecordTableModel {
           if (msgData != null)
             value = msgData.importance;
           break;
-        // E-mail Address
+        // Email Address
         case 16:
           if (msgData != null)
             value = msgData.email;

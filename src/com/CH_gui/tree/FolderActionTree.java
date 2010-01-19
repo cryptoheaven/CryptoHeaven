@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -50,7 +50,7 @@ import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -249,37 +249,35 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
-        short newFolderType = 0;
-        boolean isChatAction = false;
-        FolderTreeNode folderNode = (FolderTreeNode) getLastSelectedPathComponent();
-        if (folderNode != null) {
-          FolderPair folderPair = folderNode.getFolderObject();
-          if (folderPair != null) {
-            switch (folderPair.getFolderRecord().folderType.shortValue()) {
-              case FolderRecord.CATEGORY_MAIL_FOLDER:
-                newFolderType = FolderRecord.MESSAGE_FOLDER;
-                break;
-              case FolderRecord.CATEGORY_FILE_FOLDER:
-                newFolderType = FolderRecord.FILE_FOLDER;
-                break;
-              case FolderRecord.CATEGORY_CHAT_FOLDER:
-                // do chat action
-                isChatAction = true;
-                newFolderType = -1;
-                ContactActionTable.chatOrShareSpace(FolderActionTree.this, null, false, true, (short) 0);
-                break;
-              case FolderRecord.CATEGORY_GROUP_FOLDER:
-                newFolderType = FolderRecord.GROUP_FOLDER;
-                break;
-            }
+      short newFolderType = 0;
+      boolean isChatAction = false;
+      FolderTreeNode folderNode = (FolderTreeNode) getLastSelectedPathComponent();
+      if (folderNode != null) {
+        FolderPair folderPair = folderNode.getFolderObject();
+        if (folderPair != null) {
+          switch (folderPair.getFolderRecord().folderType.shortValue()) {
+            case FolderRecord.CATEGORY_MAIL_FOLDER:
+              newFolderType = FolderRecord.MESSAGE_FOLDER;
+              break;
+            case FolderRecord.CATEGORY_FILE_FOLDER:
+              newFolderType = FolderRecord.FILE_FOLDER;
+              break;
+            case FolderRecord.CATEGORY_CHAT_FOLDER:
+              // do chat action
+              isChatAction = true;
+              newFolderType = -1;
+              ContactActionTable.chatOrShareSpace(FolderActionTree.this, null, false, true, (short) 0);
+              break;
+            case FolderRecord.CATEGORY_GROUP_FOLDER:
+              newFolderType = FolderRecord.GROUP_FOLDER;
+              break;
           }
         }
-        if (!isChatAction) {
-          Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
-          if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
-          else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
-        }
+      }
+      if (!isChatAction) {
+        Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
+        if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
+        else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
       }
     }
     private void updateIconAndText(FolderPair[] selectedFolderPairs) {
@@ -659,18 +657,16 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Post"));
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
-        FolderPair pair = getLastSelectedPair();
-        if (pair != null) {
-          if (pair.getFolderRecord().folderType.shortValue() == FolderRecord.ADDRESS_FOLDER ||
-              pair.getFolderRecord().folderType.shortValue() == FolderRecord.WHITELIST_FOLDER) {
-            new AddressFrame(pair);
-          } else {
-            new MessageFrame(pair);
-          }
+      FolderPair pair = getLastSelectedPair();
+      if (pair != null) {
+        if (pair.getFolderRecord().folderType.shortValue() == FolderRecord.ADDRESS_FOLDER ||
+            pair.getFolderRecord().folderType.shortValue() == FolderRecord.WHITELIST_FOLDER) {
+          new AddressFrame(pair);
         } else {
-          new MessageFrame();
+          new MessageFrame(pair);
         }
+      } else {
+        new MessageFrame();
       }
     }
     private void updateIconAndText(FolderPair[] selectedFolderPairs) {

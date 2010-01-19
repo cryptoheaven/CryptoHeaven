@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -28,7 +28,7 @@ import com.CH_gui.contactTable.*;
 import com.CH_gui.gui.Template;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -57,9 +57,11 @@ public class ContactTableFrame extends JActionFrameClosable {
     UserRecord myUserRec = cache.getUserRecord();
     RecordFilter filter = new MultiFilter(new RecordFilter[] { 
       new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
-      new FolderFilter(FolderRecord.GROUP_FOLDER) } //, myUserRec != null ? myUserRec.userId : null) }
+      new FolderFilter(FolderRecord.GROUP_FOLDER),
+      new InvEmlFilter(true, false) }
     , MultiFilter.OR);
     ContactTableComponent mainComponent = new ContactTableComponent(cache.getContactRecords(), filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true);
+    mainComponent.addTopContactBuildingPanel();
 
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -12,13 +12,16 @@
 
 package com.CH_guiLib.gui;
 
-import java.awt.*;
-import javax.swing.JTextField;
-
+import com.CH_co.gui.JMyLabel;
 import com.CH_co.util.MiscGui;
 
+import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import javax.swing.JTextField;
+
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -34,6 +37,12 @@ import com.CH_co.util.MiscGui;
  * @version
  */
 public class JMyTextField extends JTextField {
+
+  private Color originalColor = null;
+  private Color hintColor = null;
+  private Font originalFont = null;
+  private Font hintFont = null;
+  private String hintText = null;
 
   /** Creates new JMyTextField */
   public JMyTextField() {
@@ -57,6 +66,39 @@ public class JMyTextField extends JTextField {
   public JMyTextField(String s) {
     super(s);
     MiscGui.initKeyBindings(this);
+  }
+
+  public void setUnfocusedEmptyText(String text) {
+    JMyLabel dummyLabel = new JMyLabel();
+    hintText = text;
+    originalColor = getForeground();
+    hintColor = getBackground().darker();
+    originalFont = dummyLabel.getFont();
+    hintFont = originalFont.deriveFont(Font.ITALIC);
+
+    addFocusListener(new FocusListener() {
+      public void focusGained(FocusEvent e) {
+        if (getText().trim().equalsIgnoreCase(hintText.trim())) {
+          setText("");
+          setFont(originalFont);
+          setForeground(originalColor);
+        }
+      }
+
+      public void focusLost(FocusEvent e) {
+        if (getText().trim().equals("") || getText().trim().equalsIgnoreCase(hintText.trim())) {
+          setText(hintText);
+          setFont(hintFont);
+          setForeground(hintColor);
+          setCaretPosition(0);
+        }
+      }
+    });
+
+    setText(hintText);
+    setFont(hintFont);
+    setForeground(hintColor);
+    setCaretPosition(0);
   }
 
   public void paint(Graphics g) {

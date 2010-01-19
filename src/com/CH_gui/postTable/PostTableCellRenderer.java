@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -33,7 +33,7 @@ import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -251,12 +251,14 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
           MsgTableModel mtm = (MsgTableModel) tableModel;
           MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
           MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
-          Object obj = mtm.getValueAtRawColumn(mLink, rawColumn, false);
           if (pLink != null) {
-            Object pObj = mtm.getValueAtRawColumn(pLink, rawColumn, false);
-            if (obj.equals(pObj)) {
-              ((MsgTableCellRenderer) renderer).setText(null);
-              ((MsgTableCellRenderer) renderer).setIcon(null);
+            Object obj = mtm.getValueAtRawColumn(mLink, rawColumn, false);
+            if (obj != null) {
+              Object pObj = mtm.getValueAtRawColumn(pLink, rawColumn, false);
+              if (obj.equals(pObj)) {
+                ((MsgTableCellRenderer) renderer).setText(null);
+                ((MsgTableCellRenderer) renderer).setIcon(null);
+              }
             }
           }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -31,7 +31,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>  
@@ -225,6 +225,11 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
     else if (value instanceof ObjectsProviderUpdaterI) {
       label = value.toString();
+    }
+    else if (value instanceof InvEmlRecord) {
+      InvEmlRecord rec = (InvEmlRecord) value;
+      String msg = rec.msg != null && rec.msg.length() > 0 ? "<FONT size='-2' COLOR=#777777>"+rec.msg+"</FONT>" : "";
+      label = "<html><body>"+rec.emailAddr+" "+msg+"</body></html>";
     }
 
     if (label == null) {

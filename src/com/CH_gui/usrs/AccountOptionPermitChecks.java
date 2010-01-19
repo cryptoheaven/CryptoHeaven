@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -23,7 +23,7 @@ import com.CH_co.service.records.UserRecord;
 import com.CH_co.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -308,22 +308,22 @@ public class AccountOptionPermitChecks extends Object {
     addCheckBoxes(bottomPanel, includeUpdate, jSpamInternal, jSpamInternalUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_INTER, checkBoxListener, posY);
     posY ++;
 
-    jSpamRegEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_regular_external_e-mail."));
+    jSpamRegEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_regular_external_email."));
     jSpamRegEmailUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSpamRegEmail, jSpamRegEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_REG_EMAIL, checkBoxListener, posY);
     posY ++;
 
-    jSpamSslEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_encrypted_external_e-mail."));
+    jSpamSslEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_encrypted_external_email."));
     jSpamSslEmailUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSpamSslEmail, jSpamSslEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_SSL_EMAIL, checkBoxListener, posY);
     posY ++;
 
-//    jSpamBlockNumeric = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Block_default_numeric_e-mail_address_for_external_e-mail."));
+//    jSpamBlockNumeric = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Block_default_numeric_email_address_for_external_email."));
 //    jSpamBlockNumericUpdate = new JMyCheckBox();
 //    addCheckBoxes(bottomPanel, includeUpdate, jSpamBlockNumeric, jSpamBlockNumericUpdate, myUserRecord.acceptingSpam, userRecord.acceptingSpam, UserRecord.ACC_SPAM_BLOCK_REG_NUMERIC_ADDRESS, checkBoxListener, posY);
 //    posY ++;
 
-    jWarnExternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Display_a_warning_before_sending_unencrypted_e-mail."));
+    jWarnExternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Display_a_warning_before_sending_unencrypted_email."));
     jWarnExternalUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jWarnExternal, jWarnExternalUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_WARN_EXTERNAL, checkBoxListener, posY);
     posY ++;
@@ -334,7 +334,7 @@ public class AccountOptionPermitChecks extends Object {
     posY ++;
 
     if (jNotify == null) {
-      jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_e-mail_notification_when_new_messages_arrive."));
+      jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
       jNotifyUpdate = new JMyCheckBox();
       addCheckBoxes(null, jNotify, jNotifyUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
       posY ++;
@@ -352,7 +352,7 @@ public class AccountOptionPermitChecks extends Object {
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    jSecureReplyLink = new JMyCheckBox("Include secure reply link in external e-mail.");
+    jSecureReplyLink = new JMyCheckBox("Include secure reply link in external email.");
     jSecureReplyLinkUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSecureReplyLink, jSecureReplyLinkUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, true, checkBoxListener, posY);
     posY ++;

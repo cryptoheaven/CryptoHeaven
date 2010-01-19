@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -55,7 +55,7 @@ import com.CH_gui.tree.*;
 import com.CH_guiLib.util.HTML_utils;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -298,14 +298,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         ) {
           new AddressFrame(pair);
         } else {
-          if (!UserOps.isShowWebAccountRestrictionDialog(MsgActionTable.this)) {
-            new MessageFrame(pair);
-          }
+          new MessageFrame(pair);
         }
       } else {
-        if (!UserOps.isShowWebAccountRestrictionDialog(MsgActionTable.this)) {
-          new MessageFrame();
-        }
+        new MessageFrame();
       }
     }
   }
@@ -548,11 +544,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(MsgActionTable.this)) {
-        MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedRecords();
-        if (msgLinks != null && msgLinks.length > 0) {
-          new MessageFrame(null, msgLinks);
-        }
+      MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedRecords();
+      if (msgLinks != null && msgLinks.length > 0) {
+        new MessageFrame(null, msgLinks);
       }
     }
   }
@@ -2051,8 +2045,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           actions[INVITE_SENDER_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Invite_Sender"));
           actions[INVITE_SENDER_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Invite_Message_Sender_to_Contact_List"));
         } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
-          actions[INVITE_SENDER_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Invite_by_E-mail"));
-          actions[INVITE_SENDER_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Invite_by_E-mail"));
+          actions[INVITE_SENDER_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Invite_by_Email"));
+          actions[INVITE_SENDER_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Invite_by_Email"));
         } else {
           actions[INVITE_SENDER_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Invite"));
           actions[INVITE_SENDER_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Invite"));

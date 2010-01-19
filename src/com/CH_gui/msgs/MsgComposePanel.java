@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -61,7 +61,7 @@ import com.CH_gui.msgTable.*;
 import comx.Tiger.gui.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -257,7 +257,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     initActions();
     initComponents();
     initCopyToSent();
-    //setBorder(new EtchedBorder());
     setBorder(new EmptyBorder(0,0,0,0));
     setAttachmentsPanel();
     setPriorityPanel();
@@ -395,20 +394,23 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
               recipientCount ++;
               if (recipient instanceof ContactRecord ||
                   recipient instanceof UserRecord ||
-                  recipient instanceof InternetAddressRecord
+                  recipient instanceof InternetAddressRecord ||
+                  recipient instanceof InvEmlRecord
               ) {
                 enableCopyToOutgoing = true;
+              } else if (recipient instanceof FolderPair) {
+                FolderPair fPair = (FolderPair) recipient;
+                FolderRecord fRec = fPair.getFolderRecord();
+                if (fRec.isAddressType() || fRec.isGroupType()) {
+                  enableCopyToOutgoing = true;
+                }
               } else if (recipient instanceof MsgDataRecord) {
                 MsgDataRecord mData = (MsgDataRecord) recipient;
-                if (mData.isTypeAddress())
+                if (mData.isTypeAddress()) {
                   enableCopyToOutgoing = true;
-//              } else if (recipient instanceof FolderPair) {
-//                FolderPair fPair = (FolderPair) recipient;
-//                FolderRecord fRec = fPair.getFolderRecord();
-//                if (fRec.isAddressType() || fRec.isGroupType())
-//                  enableCopyToOutgoing = true;
+                }
               }
-            }
+            } // end if recipient != null
           }
         }
       }
@@ -893,13 +895,15 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           if (!isCanceled && (anyRecipients || isSavingAsDraft)) {
             // Check if any attachments, if so then warn before skipping them for external recipients.
             // Also warn about non-encryption of external email.
-            EmailAddressRecord[] emailAddresses = null;
+            EmailAddressRecord[] emailRecs = null;
+            InvEmlRecord[] invEmlRecs = null;
             int selectedRecipientsCount = 0;
             for (int i=0; i<selectedRecipients.length; i++) {
-              emailAddresses = (EmailAddressRecord[]) ArrayUtils.concatinate(emailAddresses, ArrayUtils.gatherAllOfType(selectedRecipients[i], EmailAddressRecord.class));
+              emailRecs = (EmailAddressRecord[]) ArrayUtils.concatinate(emailRecs, ArrayUtils.gatherAllOfType(selectedRecipients[i], EmailAddressRecord.class));
+              invEmlRecs = (InvEmlRecord[]) ArrayUtils.concatinate(invEmlRecs, ArrayUtils.gatherAllOfType(selectedRecipients[i], InvEmlRecord.class));
               selectedRecipientsCount += selectedRecipients[i].length;
             }
-            emailAddresses = (EmailAddressRecord[]) ArrayUtils.removeDuplicates(emailAddresses);
+            Record[] emailAddresses = (Record[]) ArrayUtils.concatinate(emailRecs, invEmlRecs, Record.class);
 
             // Check if any attachments, to see if we should force the external-email-no-attachments warning
             boolean anyAttachments = false;
@@ -924,7 +928,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
 
             final boolean _staged = isStagedSecure();
             final boolean _anyEmailAddresses = anyEmailAddresses;
-            final EmailAddressRecord[] _emailAddresses = emailAddresses;
+            final Record[] _emailAddresses = (Record[]) ArrayUtils.removeDuplicates(emailAddresses);
 
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
@@ -957,8 +961,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       th.start();
       if (trace != null) trace.exit(getClass());
     }
-    private boolean showStagedSecureChoiceDialog(final EmailAddressRecord[] emailAddresses) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "showStagedSecureChoiceDialog(final EmailAddressRecord[] emailAddresses)");
+    private boolean showStagedSecureChoiceDialog(final Record[] emailAddresses) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "showStagedSecureChoiceDialog(final Record[] emailAddresses)");
       if (trace != null) trace.args(emailAddresses);
       final boolean[] okReturnBuffer = new boolean[] { false };
 
@@ -986,14 +990,20 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       JPanel emlListPanel = new JPanel();
       emlListPanel.setLayout(new GridBagLayout());
       for (int i=0; i<emailAddresses.length; i++) {
-        emlListPanel.add(new JMyLabel(emailAddresses[i].address, Images.get(ImageNums.EMAIL_SYMBOL_SMALL), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
+        Icon icon = ListRenderer.getRenderedIcon(emailAddresses[i]);
+        String label = ListRenderer.getRenderedText(emailAddresses[i], false, false, true);
+        emlListPanel.add(new JMyLabel(label, icon, JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
       }
       emlListPanel.add(new JLabel(), new GridBagConstraints(0, emailAddresses.length, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-      JScrollPane sc = new JScrollPane(emlListPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-      sc.getVerticalScrollBar().setUnitIncrement(5);
-      panel.add(sc, new GridBagConstraints(0, posY, 2, 1, 10, 10,
+      JComponent listPane = emlListPanel;
+      if (emailAddresses.length >= 3) {
+        JScrollPane sc = new JScrollPane(emlListPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sc.getVerticalScrollBar().setUnitIncrement(5);
+        listPane = sc;
+      }
+      panel.add(listPane, new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(10, 10, 10, 10), 0, 0));
       posY ++;
       final JRadioButton jSendPlain = new JMyRadioButton("Send in Plain Text", false);
@@ -1068,8 +1078,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       if (trace != null) trace.exit(getClass(), okReturnBuffer[0]);
       return okReturnBuffer[0];
     }
-    private void showRegularEmailWarningBeforeAndSend(final EmailAddressRecord[] emlAddrs) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "showRegularEmailWarningBeforeAndSend(EmailAddressRecord[] emlAddrs)");
+    private void showRegularEmailWarningBeforeAndSend(final Record[] emlAddrs) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "showRegularEmailWarningBeforeAndSend(Record[] emlAddrs)");
       if (trace != null) trace.args(emlAddrs);
       String hrefStart = "<a href=\""+URLs.get(URLs.TELL_A_FRIEND_PAGE)+"\">";
       String hrefEnd = "</a>";
@@ -1082,7 +1092,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           if (!e.isConsumed()) {
             StringBuffer initialEmails = new StringBuffer();
             for (int i=0; i<emlAddrs.length; i++) {
-              initialEmails.append(emlAddrs[i].address);
+              String label = ListRenderer.getRenderedText(emlAddrs[i], false, false, true);
+              initialEmails.append(label);
               if (i+1<emlAddrs.length)
                 initialEmails.append(", ");
             }
@@ -1572,7 +1583,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     }
     StringBuffer errorSB = new StringBuffer();
     appendInvalidRecipientErrorMsg(errorSB, badContactsV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
-    appendInvalidRecipientErrorMsg(errorSB, badAddressesV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_e-mail_address_present..."));
+    appendInvalidRecipientErrorMsg(errorSB, badAddressesV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
     appendInvalidRecipientErrorMsg(errorSB, badFoldersV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
     if (errorSB.length() > 0) {
       String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
@@ -1635,6 +1646,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           recipients[i] = rec;
           anyConverted = true;
         }
+      } else if (rec instanceof InvEmlRecord) {
+        InvEmlRecord invRec = (InvEmlRecord) rec;
+        rec = new EmailAddressRecord(invRec.emailAddr);
+        recipients[i] = rec;
+        anyConverted = true;
       }
 
       if (rec instanceof EmailAddressRecord) {
@@ -1889,9 +1905,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           if (recipients[i] != null) {
             for (int k=0; k<recipients[i].length; k++) {
               Record rec = recipients[i][k];
-              if (rec instanceof EmailAddressRecord) {
-                EmailAddressRecord eRec = (EmailAddressRecord) rec;
-                String addr = eRec.address.trim();
+              if (rec instanceof EmailAddressRecord || rec instanceof InvEmlRecord) {
+                String addr = null;
+                if (rec instanceof EmailAddressRecord)
+                  addr = ((EmailAddressRecord) rec).address.trim();
+                else if (rec instanceof InvEmlRecord)
+                  addr = ((InvEmlRecord) rec).emailAddr.trim();
                 if (emailStringRecordsV == null) emailStringRecordsV = new Vector();
                 if (!emailStringRecordsV.contains(addr))
                   emailStringRecordsV.addElement(addr);
@@ -2809,7 +2828,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           Window w = SwingUtilities.windowForComponent(this);
           if (w instanceof JFrame)
             ((JFrame) w).getTitle();
-          String message = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "Please provide both name and e-mail address." : "Please provide at least the subject or body for your message.";
+          String message = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "Please provide both name and email address." : "Please provide at least the subject or body for your message.";
           MessageDialog.showWarningDialog(w, message, title, false);
           veto = true;
         } else if (msgComponents.getAudioCapturePanel().anyCapturedAndNotAttached()) {

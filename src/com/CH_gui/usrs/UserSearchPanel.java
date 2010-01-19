@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -40,12 +40,12 @@ import com.CH_co.util.*;
 import com.CH_co.trace.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -53,7 +53,7 @@ import com.CH_co.trace.*;
  *
  * <b>$Revision: 1.33 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class UserSearchPanel extends JPanel {
 
@@ -75,7 +75,7 @@ public class UserSearchPanel extends JPanel {
   JButton jSearch;
 
   private String[] lastSearchStrings;
-  private static int matchBITS = 
+  private static int matchBITS =
       StringHighlighter.MATCH_STRING__EXACT |
       StringHighlighter.MATCH_STRING__TRIMMED |
       StringHighlighter.MATCH_STRING__NO_CASE |
@@ -95,7 +95,7 @@ public class UserSearchPanel extends JPanel {
     SIL = MainFrame.getServerInterfaceLayer();
     createPanel(withUserActions, withInviteActions, customSearchHeader, isPassRecoveryMode);
 
-    if (searchString != null) {
+    if (searchString != null && searchString.length() > 0) {
       Long userId = null;
       try {
         userId = new Long(searchString);
@@ -105,7 +105,7 @@ public class UserSearchPanel extends JPanel {
         jUserID.setText(userId.toString());
       else
         jNickname.setText(searchString);
-      searchAction();
+      searchAction(true);
     }
 
     if (trace != null) trace.exit(UserSearchPanel.class);
@@ -140,20 +140,23 @@ public class UserSearchPanel extends JPanel {
   private void createPanel(boolean withUserActions, boolean withInviteActions, String customSearchHeader, boolean isPassRecoveryMode) {
     JPanel mainPanel = new JPanel();
     mainPanel.setLayout(new GridBagLayout());
-    mainPanel.setBorder(new EtchedBorder());
+    if (!isPassRecoveryMode) {
+      mainPanel.setBorder(new LineBorder(mainPanel.getBackground().darker(), 1, true));
+    }
 
     JPanel invitePanel = null;
     if (!isPassRecoveryMode) {
       invitePanel = new JPanel();
       invitePanel.setLayout(new GridBagLayout());
-      invitePanel.setBorder(new EtchedBorder());
+      invitePanel.setBorder(new LineBorder(invitePanel.getBackground().darker(), 1, true));
     }
 
     // Overall, we have a border layout with two panels insede, the main, and invitation button.
-    setLayout(new BorderLayout());
+    setLayout(new BorderLayout(0, 1));
     add(mainPanel, BorderLayout.CENTER);
-    if (invitePanel != null)
+    if (invitePanel != null) {
       add(invitePanel, BorderLayout.SOUTH);
+    }
 
     // create radio buttons first
     jRadioNicExact = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Exact"));
@@ -174,7 +177,7 @@ public class UserSearchPanel extends JPanel {
 
     jNickname = new JMyTextField();
     jUserID = new JMyTextField();
-    
+
     if (isPassRecoveryMode) {
       userActionTable = new PassRecoveryUserActionTable();
       userActionTable.getJSortedTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -218,7 +221,7 @@ public class UserSearchPanel extends JPanel {
 
     if (isPassRecoveryMode) {
       JLabel logo = new JLabel(Images.get(ImageNums.LOGO_BANNER_MAIN));
-      mainPanel.add(logo, new GridBagConstraints(0, posY, 7, 1, 0, 0, 
+      mainPanel.add(logo, new GridBagConstraints(0, posY, 7, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
@@ -228,54 +231,54 @@ public class UserSearchPanel extends JPanel {
       introStr = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Search_the_world_wide__SERVICE_COMMUNITY_NAME__for_your_Friends_and_Associates_by_specifying_their_username,_email_address,_or_ID."), new Object[] { URLs.get(URLs.SERVICE_COMMUNITY_NAME) });
     JLabel intro = new JMyLabel(introStr);
     intro.setIcon(Images.get(ImageNums.USER_FIND32));
-    mainPanel.add(intro, new GridBagConstraints(0, posY, 7, 1, 0, 0, 
+    mainPanel.add(intro, new GridBagConstraints(0, posY, 7, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username(s)")), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username(s)")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 5), 0, 0));
-    mainPanel.add(jNickname, new GridBagConstraints(2, posY, 5, 1, 10, 0, 
+    mainPanel.add(jNickname, new GridBagConstraints(2, posY, 5, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 8, 5), 0, 0));
-    mainPanel.add(jRadioNicExact, new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    mainPanel.add(jRadioNicExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioNicNoCase, new GridBagConstraints(3, posY, 1, 1, 10, 0, 
+    mainPanel.add(jRadioNicNoCase, new GridBagConstraints(3, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioNicPartial, new GridBagConstraints(4, posY, 1, 1, 10, 0, 
+    mainPanel.add(jRadioNicPartial, new GridBagConstraints(4, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioNicPhonetic, new GridBagConstraints(5, posY, 2, 1, 10, 0, 
+    mainPanel.add(jRadioNicPhonetic, new GridBagConstraints(5, posY, 2, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_ID")), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_ID")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 5), 0, 0));
-    mainPanel.add(jUserID, new GridBagConstraints(2, posY, 5, 1, 10, 0, 
+    mainPanel.add(jUserID, new GridBagConstraints(2, posY, 5, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
     posY ++;
 
     // Two radio buttons combined in one row.
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0, 
+    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 8, 5), 0, 0));
-    mainPanel.add(jRadioIDExact, new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    mainPanel.add(jRadioIDExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioIDPartial, new GridBagConstraints(3, posY, 1, 1, 10, 0, 
+    mainPanel.add(jRadioIDPartial, new GridBagConstraints(3, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
     // Search button
-    mainPanel.add(createSearchButton(), new GridBagConstraints(4, posY, 3, 2, 0, 0, 
+    mainPanel.add(createSearchButton(), new GridBagConstraints(4, posY, 3, 2, 0, 0,
       GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     posY ++; // search button takes 2 vertical lines
 
     if (isPassRecoveryMode) {
-      mainPanel.add(new JMyLabel("Please select your account from the search results below:"), new GridBagConstraints(0, posY, 7, 1, 0, 0, 
+      mainPanel.add(new JMyLabel("Please select your account from the search results below:"), new GridBagConstraints(0, posY, 7, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
-    mainPanel.add(userActionTable, new GridBagConstraints(0, posY, 7, 1, 10, 10, 
+    mainPanel.add(userActionTable, new GridBagConstraints(0, posY, 7, 1, 10, 10,
       GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -289,14 +292,14 @@ public class UserSearchPanel extends JPanel {
 //          actionButtons[i].setHorizontalTextPosition(JButton.RIGHT);
 //          actionButtons[i].setVerticalTextPosition(JButton.CENTER);
         }
-        mainPanel.add(MiscGui.createButtonPanel(actionButtons), new GridBagConstraints(0, posY, 7, 1, 0, 0, 
+        mainPanel.add(MiscGui.createButtonPanel(actionButtons), new GridBagConstraints(0, posY, 7, 1, 0, 0,
           GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
         posY ++;
       }
     }
     if (invitePanel != null) {
       emailInvitationPanel = new EmailInvitationPanel(jNickname, withInviteActions);
-      invitePanel.add(emailInvitationPanel, new GridBagConstraints(0, 0, 1, 1, 10, 0, 
+      invitePanel.add(emailInvitationPanel, new GridBagConstraints(0, 0, 1, 1, 10, 0,
           GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     }
 
@@ -305,6 +308,9 @@ public class UserSearchPanel extends JPanel {
   }
 
   private void searchAction() {
+    searchAction(false);
+  }
+  private void searchAction(boolean broaderSearchIfNoResults) {
     boolean inputValid = true;
     String id = jUserID.getText().trim();
     String nick = jNickname.getText().trim();
@@ -360,20 +366,25 @@ public class UserSearchPanel extends JPanel {
       }
       request.includeEmailRecords = true;
 
-      new UserSearchRunner(request).start();
+      new UserSearchRunner(request, broaderSearchIfNoResults).start();
     }
   }
 
 
   private class UserSearchRunner extends ThreadTraced {
     private Usr_Search_Rq request;
-    private UserSearchRunner(Usr_Search_Rq request) {
+    private boolean broaderSearchIfNoResults;
+    private UserSearchRunner(Usr_Search_Rq request, boolean broaderSearchIfNoResults) {
       super("UserSearchRunner");
       this.request = request;
+      this.broaderSearchIfNoResults = broaderSearchIfNoResults;
       setDaemon(true);
     }
 
     public void runTraced() {
+      runTraced(broaderSearchIfNoResults);
+    }
+    private void runTraced(boolean broaderSearchIfNoResults) {
       MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_SEARCH, request);
       ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction, 30000);
 
@@ -400,9 +411,21 @@ public class UserSearchPanel extends JPanel {
       }
 
       if (!querySatisfied) {
-        String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_the_query.");
-        String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
-        MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+        if (broaderSearchIfNoResults && (request.idMode == 1 || request.handleMode ==  4)) {
+          if (request.idMode == 1) {
+            jRadioIDPartial.setSelected(true);
+            request.idMode = 2;
+          }
+          if (request.handleMode == 4) {
+            jRadioNicPartial.setSelected(true);
+            request.handleMode = 2;
+          }
+          runTraced(false);
+        } else {
+          String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
+          String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
+          MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+        }
       }
     }
   }

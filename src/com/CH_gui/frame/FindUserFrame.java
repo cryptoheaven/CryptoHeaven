@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -26,7 +26,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -54,16 +54,16 @@ public class FindUserFrame extends JActionFrameClosable {
 
   /** Creates new FindUserFrame */
   public FindUserFrame() {
-    this(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    this(com.CH_gui.lang.Lang.rb.getString("button_Close"), null);
   }
 
   /** Creates new FindUserFrame */
-  public FindUserFrame(String closeButtonText) {
+  public FindUserFrame(String closeButtonText, String searchString) {
     super(com.CH_gui.lang.Lang.rb.getString("title_Find_Friends_and_Associates"), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FindUserFrame.class, "FindUserFrame()");
 
     this.closeButtonText = closeButtonText;
-    this.userSearchPanel = new UserSearchPanel(false, false, null, null, false);
+    this.userSearchPanel = new UserSearchPanel(false, false, null, searchString, false);
     final JButton[] buttons = createButtons();
 
     JPanel mainPanel = new JPanel();

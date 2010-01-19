@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -46,10 +46,10 @@ import java.util.Date;
 import java.util.Properties;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -382,7 +382,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           int count = Integer.parseInt(GlobalProperties.getProperty(propertyKey, "0"));
           if (count < 3) {
             GlobalProperties.setProperty(propertyKey, ""+(count+1));
-            JComponent comp = new HTML_ClickablePane("Choose your personalized 'E-mail Address', click here to open 'Account Options'");
+            JComponent comp = new HTML_ClickablePane("Choose your personalized 'Email Address', click here to open 'Account Options'");
             comp.addMouseListener(new MouseAdapter() {
               public void mouseClicked(MouseEvent e) {
                 actions[ACCOUNT_OPTIONS_ACTION].actionPerformed(new ActionEvent(this, 0, ""));
@@ -399,13 +399,15 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     boolean oldShow = oldShowS != null ? Boolean.valueOf(oldShowS).booleanValue() : false;
     RecordFilter filter = new MultiFilter(new RecordFilter[] {
       new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
-      new FolderFilter(FolderRecord.GROUP_FOLDER) }
+      new FolderFilter(FolderRecord.GROUP_FOLDER),
+      new InvEmlFilter(true, false) }
     , MultiFilter.OR);
 
     // Remember old ContactTableComponent for cleanup -- incase we are re-initializing screen
     ContactTableComponent oldContactComp = contactComp;
     // Make new main TableComponent
     contactComp = new ContactTableComponent(filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true);
+    contactComp.addTopContactBuildingPanel();
 
     JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.8d);
     vSplit.setOneTouchExpandable(false);
@@ -469,61 +471,90 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     Dimension dim = null;
 
     JLabel jStatus = Stats.getStatusLabel();
-    jStatus.setBorder(new EtchedBorder());
 
     JLabel jSize = Stats.getSizeLabel();
-    jSize.setBorder(new EtchedBorder());
     dim = new Dimension(80, 14);
     jSize.setMinimumSize(dim);
     jSize.setPreferredSize(dim);
 
     JLabel jTransferRate = Stats.getTransferRateLabel();
-    jTransferRate.setBorder(new EtchedBorder());
     dim = new Dimension(120, 14);
     jTransferRate.setMinimumSize(dim);
     jTransferRate.setPreferredSize(dim);
 
     JLabel jPing = Stats.getPingLabel();
-    jPing.setBorder(new EtchedBorder());
     dim = new Dimension(60, 14);
     jPing.setMinimumSize(dim);
     jPing.setPreferredSize(dim);
 
     JLabel jConnections = Stats.getConnectionsLabel();
-    jConnections.setBorder(new EtchedBorder());
     dim = new Dimension(26, 14);
     jConnections.setMinimumSize(dim);
     jConnections.setPreferredSize(dim);
 
     JLabel jOnlineStatus = Stats.getOnlineLabel();
-    jOnlineStatus.setBorder(new EtchedBorder());
     dim = new Dimension(90, 14);
     jOnlineStatus.setMinimumSize(dim);
     jOnlineStatus.setPreferredSize(dim);
 
     Insets insets = new MyInsets(0, 1, 0, 1);
+    Insets insets0 = new MyInsets(0, 0, 0, 0);
+
     int posX = 0;
+
     jStatusBar.add(jStatus, new GridBagConstraints(posX, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
     posX ++;
+    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
+    posX ++;
+
     jStatusBar.add(jSize, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
+    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
+    posX ++;
+
     jStatusBar.add(jTransferRate, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
+    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
+    posX ++;
+
     jStatusBar.add(jPing, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
+    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
+    posX ++;
+
     jStatusBar.add(jConnections, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
     posX ++;
+    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
+    posX ++;
+
     jStatusBar.add(jOnlineStatus, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
 
     jStatusBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 14));
+    jStatusBar.setBorder(new LineBorder(jStatusBar.getBackground().darker(), 1, true));
 
     return jStatusBar;
+  }
+
+  private static JComponent makeStatusSeparator(int sepSize) {
+    JPanel sep = new JPanel();
+    sep.setLayout(null);
+    sep.setSize(new java.awt.Dimension(1, sepSize));
+    sep.setMaximumSize(new java.awt.Dimension(1, sepSize));
+    sep.setMinimumSize(new java.awt.Dimension(1, sepSize));
+    sep.setPreferredSize(new java.awt.Dimension(1, sepSize));
+    sep.setBackground(sep.getBackground().darker());
+    return sep;
   }
 
   public FolderTreeComponent getMainTreeComponent(Component forComponent) {

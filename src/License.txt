@@ -1,6 +1,6 @@
 CryptoHeaven Service License Agreement
 
-Copyright (c) 2001-2009 CryptoHeaven Development Team.  All rights reserved.
+Copyright (c) 2001-2010 CryptoHeaven Development Team.  All rights reserved.
 
 The CryptoHeaven Development Team, its parents, subsidiaries, affiliates, officers, directors, associates, and employees, individually and collectively referred to as "CHDT", grants you a non-exclusive and non-transferable license for the use of the CryptoHeaven Service and Software including without limitation any related software, storage and communication services which may be offered from time to time by CHDT for use with your CryptoHeaven account, subject to the following conditions and terms of service referred hereto as the "TOS".
 
