@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -44,7 +44,7 @@ import com.CH_gui.msgs.*;
 import com.CH_gui.usrs.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -747,7 +747,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
           if (estimatedTime == null) {
             jExpectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
             validate();
-            estimatedTime = new Integer(estimateKeyGenerationTimeNow(keyLength, certainty));
+            estimatedTime = new Integer(estimateKeyGenerationTimeNow(keyLength, certainty)+1);
             jExpectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] { estimatedTime }));
             validate();
           }

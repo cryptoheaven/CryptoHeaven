@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -35,7 +35,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.msgs.MsgPanelUtils;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -131,7 +131,7 @@ public class DeleteAccountDialog extends GeneralDialog {
     warningLabel.setText(changeUserNameLabel);
     warningLabel.setHorizontalAlignment(JLabel.LEFT);
     warningLabel.setVerticalTextPosition(JLabel.TOP);
-    warningLabel.setBorder(new EtchedBorder());
+    warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
     warningLabel.setPreferredSize(new Dimension(410, 60));
     panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 10, 1), 20, 20));
@@ -151,9 +151,15 @@ public class DeleteAccountDialog extends GeneralDialog {
       }
 //      listPanel.add(new JLabel(), new GridBagConstraints(0, subUsers.length, 2, 1, 10, 10,
 //          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-      JScrollPane sc = new JScrollPane(listPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-      sc.getVerticalScrollBar().setUnitIncrement(5);
-      panel.add(sc, new GridBagConstraints(0, posY, 3, 1, 10, 10,
+      JComponent mainList = null;
+      if (subUsers.length > 5) {
+        JScrollPane sc = new JScrollPane(listPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sc.getVerticalScrollBar().setUnitIncrement(5);
+        mainList = sc;
+      } else {
+        mainList = listPanel;
+      }
+      panel.add(mainList, new GridBagConstraints(0, posY, 3, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -28,7 +28,7 @@ import javax.mail.internet.*;
 import javax.swing.tree.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -318,6 +318,7 @@ public class EmailSendingAttOps extends Object {
           contentType = data.isHtmlMail() ? "text/html" : "text/plain";
         }
         if (node.isRoot() && includeReplyLink) {
+          body += com.CH_co.service.ops.EmailSendingOps.getEmailBannerDivider(contentType);
           body += com.CH_co.service.ops.EmailSendingOps.getSecureReplyBanner(data.senderUserId, data.getSubject(), contentType, null);
         }
         part.setContent(body, contentType);

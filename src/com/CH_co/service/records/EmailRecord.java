@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@ import java.util.*;
 import com.CH_co.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -38,7 +38,7 @@ public class EmailRecord extends Record {
 
   public static final int MAX_EMAIL_ADDRESSES_DEMO = 1;
   public static final int MAX_EMAIL_ADDRESSES_PERSONAL = 5;
-  public static final int MAX_EMAIL_ADDRESSES_BUSINESS = 12;
+  public static final int MAX_EMAIL_ADDRESSES_BUSINESS = 20;
 
 
   public Long emlId;
@@ -341,11 +341,11 @@ public class EmailRecord extends Record {
   }
 
   /**
-   * A little dumb e-mail format checker, only checks few things.
+   * A little dumb email format checker, only checks few things.
    * Name and domain must start and end with letter or digit.
    * Forbiden character sets list.
    * @param email is an Email Address in the simple form, without any personal part, just nick@domain
-   * @return true if e-mail address has a good chance to be valid, false if it certainly is invalid.
+   * @return true if email address has a good chance to be valid, false if it certainly is invalid.
    */
   public static boolean isEmailFormatValid(String email) {
     String[] forbidenSets = new String[] { " ","\t","\n" };

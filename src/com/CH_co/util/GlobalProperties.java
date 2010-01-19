@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -24,7 +24,7 @@ import java.util.*;
  * properties. It reads an (program).properties file containing program-
  * specific properties. <p>
  *
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -46,11 +46,11 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_RELEASE_FINAL = 3;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 2.9f;
-  public static final short PROGRAM_VERSION_MINOR = 9;
+  public static final float PROGRAM_VERSION = 3.0f;
+  public static final short PROGRAM_VERSION_MINOR = 0;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 498;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 500;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -181,6 +181,8 @@ public class GlobalProperties extends Object {
   // build 494 Change Delete Confirmation dialogs and include "Skip in the future" option.
   // build 496 User Options dialog changes
   // build 498 Sending Invites also adds those email addresses to the Address Book
+  // build 500 Invited Email Addresses show in the contact list with function to re-send invite.
+  // build 502 Contact building screen in main application pane after login.
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;

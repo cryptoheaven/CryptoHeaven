@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -21,7 +21,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>  
@@ -116,6 +116,24 @@ public class ContactRecord extends Record implements MemberContactRecordI {
     if (status != null) {
       short s = status.shortValue();
       rc = (s == STATUS_ACCEPTED_ACKNOWLEDGED || isOnlineStatus(s));
+    }
+    return rc;
+  }
+
+  public boolean isOfActiveTypeAnyState() {
+    boolean rc = false;
+    if (status != null) {
+      short s = status.shortValue();
+      rc = (s == STATUS_ACCEPTED || s == STATUS_ACCEPTED_ACKNOWLEDGED || isOnlineStatus(s));
+    }
+    return rc;
+  }
+
+  public boolean isOfDeclinedTypeAnyState() {
+    boolean rc = false;
+    if (status != null) {
+      short s = status.shortValue();
+      rc = (s == STATUS_DECLINED || s == STATUS_DECLINED_ACKNOWLEDGED);
     }
     return rc;
   }

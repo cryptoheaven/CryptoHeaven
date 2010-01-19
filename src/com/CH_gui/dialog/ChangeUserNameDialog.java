@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -35,7 +35,7 @@ import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -126,7 +126,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
     warningLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Change_Username_hint_text"));
     warningLabel.setHorizontalAlignment(JLabel.LEFT);
     warningLabel.setVerticalTextPosition(JLabel.TOP);
-    warningLabel.setBorder(new EtchedBorder());
+    warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
     warningLabel.setPreferredSize(new Dimension(410, 60));
     panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 10, 1), 20, 20));

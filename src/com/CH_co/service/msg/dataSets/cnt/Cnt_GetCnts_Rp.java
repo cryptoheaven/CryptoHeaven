@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -15,27 +15,28 @@ package com.CH_co.service.msg.dataSets.cnt;
 import java.io.IOException;
 
 import com.CH_co.monitor.ProgMonitor;
-import com.CH_co.util.Misc;
-
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
-import com.CH_co.service.records.ContactRecord;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.records.*;
+import com.CH_co.util.Misc;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
- * 
+ * </a><br>All rights reserved.<p>
+ *
  * Get My Contacts
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
 
   // <numOfContacts> { <contactId> <folderId> <ownerUserId> <contactWithId> <creatorId> <status> <permits> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote> <dateCreated> <dateUpdated> }*
+  // <numOfInvEmls> { <id> <emailAddr> <sentByUID> <fromName> <fromEmail> <msg> <dateSent> }*
   public ContactRecord[] contactRecords;
+  public InvEmlRecord[] invEmlRecords;
 
   /** Creates new Cnt_GetCnts_Rp */
   public Cnt_GetCnts_Rp() {
@@ -66,13 +67,13 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         dataOut.writeLongObj(contactRecords[i].folderId);
         dataOut.writeLongObj(contactRecords[i].ownerUserId);
         dataOut.writeLongObj(contactRecords[i].contactWithId);
-        if (clientBuild >= 35) 
+        if (clientBuild >= 35)
           dataOut.writeLongObj(contactRecords[i].creatorId);
         if (clientBuild < 260 || serverBuild < 260) // for old clients and engines, translate the status
           dataOut.writeSmallint(ContactRecord.isOnlineStatus(contactRecords[i].status) ? new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE) : contactRecords[i].status);
         else
           dataOut.writeSmallint(contactRecords[i].status);
-        if (clientBuild >= 28) 
+        if (clientBuild >= 28)
           dataOut.writeInteger(contactRecords[i].permits);
         dataOut.writeBytes(contactRecords[i].getEncOwnerNote());
         dataOut.writeLongObj(contactRecords[i].getOtherKeyId());
@@ -80,6 +81,25 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         dataOut.writeBytes(contactRecords[i].getEncOtherNote());
         dataOut.writeTimestamp(contactRecords[i].dateCreated);
         dataOut.writeTimestamp(contactRecords[i].dateUpdated);
+      }
+    }
+
+    if (clientBuild >= 500 && serverBuild >= 500) {
+      if (invEmlRecords == null)
+        dataOut.write(0);
+      else {
+        dataOut.write(1);
+        dataOut.writeShort(invEmlRecords.length);
+        for (int i=0; i<invEmlRecords.length; i++) {
+          dataOut.writeLongObj(invEmlRecords[i].id);
+          dataOut.writeString(invEmlRecords[i].emailAddr);
+          dataOut.writeLongObj(invEmlRecords[i].sentByUID);
+          dataOut.writeString(invEmlRecords[i].fromName);
+          dataOut.writeString(invEmlRecords[i].fromEmail);
+          dataOut.writeString(invEmlRecords[i].msg);
+          dataOut.writeTimestamp(invEmlRecords[i].dateSent);
+          dataOut.writeBooleanObj(invEmlRecords[i].removed);
+        }
       }
     }
   } // end writeToStream()
@@ -114,11 +134,32 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         contactRecords[i].dateUpdated = dataIn.readTimestamp();
       }
     }
+
+    if (clientBuild >= 500 && serverBuild >= 500) {
+      indicator = dataIn.read();
+      if (indicator == 0)
+        invEmlRecords = null;
+      else {
+        invEmlRecords = new InvEmlRecord[dataIn.readShort()];
+        for (int i=0; i<invEmlRecords.length; i++) {
+          invEmlRecords[i] = new InvEmlRecord();
+          invEmlRecords[i].id = dataIn.readLongObj();
+          invEmlRecords[i].emailAddr = dataIn.readString();
+          invEmlRecords[i].sentByUID = dataIn.readLongObj();
+          invEmlRecords[i].fromName = dataIn.readString();
+          invEmlRecords[i].fromEmail = dataIn.readString();
+          invEmlRecords[i].msg = dataIn.readString();
+          invEmlRecords[i].dateSent = dataIn.readTimestamp();
+          invEmlRecords[i].removed = dataIn.readBooleanObj();
+        }
+      }
+    }
   } // end initFromStream()
 
   public String toString() {
     return "[Cnt_GetCnts_Rp"
       + ": contactRecords=" + Misc.objToStr(contactRecords)
+      + ": invEmlRecords=" + Misc.objToStr(invEmlRecords)
       + "]";
   }
 }

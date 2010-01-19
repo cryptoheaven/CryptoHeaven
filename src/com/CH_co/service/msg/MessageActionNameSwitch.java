@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -18,7 +18,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -96,8 +96,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.USR_Q_SEARCH), "Search For Users" },
       // Check for availability of User Name
       { new Integer(CommandCodes.USR_Q_CHECK_AVAIL), "Check availability of Username" },
-      // Send E-mail Invitation
-      { new Integer(CommandCodes.USR_Q_SEND_EMAIL_INVITATION), "Send E-mail Invitation" },
+      // Send Email Invitation
+      { new Integer(CommandCodes.USR_Q_SEND_EMAIL_INVITATION), "Send Email Invitation" },
       // Get Accessors
       { new Integer(CommandCodes.USR_Q_GET_ACCESSORS), "Track Accessors" },
       // Calculate Cummulative Usage
@@ -115,7 +115,7 @@ public class MessageActionNameSwitch extends Object {
       // Get Emails
       { new Integer(CommandCodes.EML_Q_GET), "Get Email Address" },
       // Get Available Domains
-      { new Integer(CommandCodes.EML_Q_GET_DOMAINS), "Get Available E-mail Domains" },
+      { new Integer(CommandCodes.EML_Q_GET_DOMAINS), "Get Available Email Domains" },
       // Create Emails 
       { new Integer(CommandCodes.EML_Q_CREATE), "Create Email Address" },
       // Alter Emails 
@@ -159,7 +159,7 @@ public class MessageActionNameSwitch extends Object {
       // New Private Default Draft Folder
       { new Integer(CommandCodes.FLD_Q_NEW_DFT_DRAFT_OR_GET_OLD), "Prepare Draft Folder" },
       // New Private Default Junk Folder
-      { new Integer(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD), "Prepare Spam Folder" }, // "Junk e-mail"
+      { new Integer(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD), "Prepare Spam Folder" }, // "Junk email"
       // Alter Folder Attributes
       { new Integer(CommandCodes.FLD_Q_ALTER_FLD_ATTR), "Alter Folder Attributes" },
       // Alter Share Strings
@@ -311,6 +311,14 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.KEY_A_GET_KEY_RECOVERY), "Get Password Reset settings" },
 
 
+      // =======================
+      // *** InvEml Commands ***
+      // =======================
+
+      // Remove My InvEmls
+      { new Integer(CommandCodes.INV_Q_REMOVE), "Remove Invitation" },
+
+
       // =====================
       // *** Stat Commands ***
       // =====================
@@ -318,7 +326,6 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.STAT_Q_UPDATE), "Update Object Statistics" },
       // Fetch All Object Stats
       { new Integer(CommandCodes.STAT_Q_FETCH_ALL_OBJ_STATS), "Fetch Access History and Privileges" },
-
 
 
       // =============================
@@ -398,7 +405,7 @@ public class MessageActionNameSwitch extends Object {
       // Get Emails
       { new Integer(CommandCodes.EML_A_GET), "Get Email Address" },
       // Get Available Domains
-      { new Integer(CommandCodes.EML_A_GET_DOMAINS), "Get Available E-mail Domains" },
+      { new Integer(CommandCodes.EML_A_GET_DOMAINS), "Get Available Email Domains" },
       // Remove Emails
       { new Integer(CommandCodes.EML_A_REMOVE), "Remove Email Address" },
 

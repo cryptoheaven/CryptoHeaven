@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -20,7 +20,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>  
@@ -497,7 +497,7 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     toUpgrade.notifyByEmail = new Short((short) upgradeUserSettingBits(toUpgrade.notifyByEmail, defUsr.notifyByEmail, keepOldPermits, EMAIL_MASK__NO_GRANT));
     toUpgrade.acceptingSpam = new Short((short) upgradeUserSettingBits(toUpgrade.acceptingSpam, defUsr.acceptingSpam, keepOldPermits, ACC_SPAM_MASK__NO_GRANT));
     toUpgrade.flags = new Long(upgradeUserSettingBits(toUpgrade.flags, defUsr.flags, keepOldPermits, FLAG_MASK__NO_GRANT));
-    // make sure that "Send notifications by e-mail" are off when there is no e-mail address set.
+    // make sure that "Send notifications by email" are off when there is no email address set.
     boolean validEmailFormat = EmailRecord.gatherAddresses(toUpgrade.emailAddress) != null;
     toUpgrade.notifyByEmail = new Short((short) Misc.setBit(validEmailFormat, toUpgrade.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES)); 
     toUpgrade.status = new Short(newStatus);
@@ -531,30 +531,23 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
       case STATUS_PROMO:
         notify = EMAIL_NOTIFY_YES | 
                  EMAIL_WARN_EXTERNAL | 
-                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
+                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS |
+                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS__NO_UPDATE |
                  EMAIL_MASK__NO_GRANT;
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL | 
                   ACC_SPAM_YES_INTER | 
-                  ACC_SPAM_MASK__NO_UPDATE | 
                   ACC_SPAM_MASK__NO_GRANT;
         flags = FLAG_ENABLE_ACCOUNT_DELETE | 
-                //FLAG_ENABLE_CREATING_SUBACCOUNTS__MASTER_CAPABLE |
-                //FLAG_ENABLE_GIVEN_CONTACTS_ALTER |
-                //FLAG_ENABLE_GIVEN_CONTACTS_DELETE |
-                //FLAG_ENABLE_GIVEN_EMAILS_ALTER |
-                //FLAG_ENABLE_GIVEN_EMAILS_DELETE |
-                //FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION |
-                //FLAG_ENABLE_NICKNAME_CHANGE |
                 // web accounts can change password, promos can't
                 (status == STATUS_WEB ? FLAG_ENABLE_PASSWORD_CHANGE : 0) | 
                 FLAG_USER_OFFLINE_POPUP | 
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
-                //FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_MASK__NO_GRANT | 
                 FLAG_MASK__NO_UPDATE;
-        notify = Misc.setBit(true, notify, EMAIL_WARN_EXTERNAL__NO_UPDATE);
+        flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
+        flags = Misc.setBit(false, flags, FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_UPDATE);
         break;
       case STATUS_GUEST:
       case STATUS_PAID:
@@ -567,17 +560,10 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
                   ACC_SPAM_YES_INTER | 
                   ACC_SPAM_MASK__NO_GRANT;
         flags = FLAG_ENABLE_ACCOUNT_DELETE | 
-                //FLAG_ENABLE_CREATING_SUBACCOUNTS__MASTER_CAPABLE |
-                //FLAG_ENABLE_GIVEN_CONTACTS_ALTER |
-                //FLAG_ENABLE_GIVEN_CONTACTS_DELETE |
-                //FLAG_ENABLE_GIVEN_EMAILS_ALTER |
-                //FLAG_ENABLE_GIVEN_EMAILS_DELETE |
-                //FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION |
                 FLAG_ENABLE_NICKNAME_CHANGE | 
                 FLAG_ENABLE_PASSWORD_CHANGE | 
                 FLAG_USER_OFFLINE_POPUP | 
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
-                //FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_MASK__NO_GRANT | 
                 FLAG_MASK__NO_UPDATE;
@@ -605,10 +591,8 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
                 FLAG_ENABLE_PASSWORD_CHANGE | 
                 FLAG_USER_OFFLINE_POPUP | 
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
-                //FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE |
-                //FLAG_MASK__NO_GRANT | 
                 FLAG_MASK__NO_UPDATE;
         flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE);
@@ -623,22 +607,12 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL | 
                   ACC_SPAM_YES_INTER;
-        flags = //FLAG_ENABLE_ACCOUNT_DELETE | 
-                //FLAG_ENABLE_CREATING_SUBACCOUNTS__MASTER_CAPABLE | 
-                //FLAG_ENABLE_GIVEN_CONTACTS_ALTER | 
-                //FLAG_ENABLE_GIVEN_CONTACTS_DELETE | 
-                //FLAG_ENABLE_GIVEN_EMAILS_ALTER | 
-                //FLAG_ENABLE_GIVEN_EMAILS_DELETE | 
-                FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION | 
-                //FLAG_ENABLE_NICKNAME_CHANGE | 
+        flags = FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION | 
                 FLAG_ENABLE_PASSWORD_CHANGE | 
                 FLAG_USER_OFFLINE_POPUP | 
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
-                //FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
-                //FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE |
                 FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY |
-                //FLAG_MASK__NO_GRANT | 
                 FLAG_MASK__NO_UPDATE;
         flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS__NO_UPDATE);
@@ -772,16 +746,16 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     sb.append("\n");
 
     sb.append("Account page\n");
-    getFlagInfo("Send e-mail notification when new messages arrive", notifyByEmail, EMAIL_NOTIFY_YES, sb);
+    getFlagInfo("Send email notification when new messages arrive", notifyByEmail, EMAIL_NOTIFY_YES, sb);
     getFlagInfo("Include sender address and message subject", notifyByEmail, EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, sb);
     sb.append("\n");
 
     sb.append("Options page\n");
     getFlagInfo("Accept messages from outside of Contact List", acceptingSpam, ACC_SPAM_YES_INTER, sb);
-    getFlagInfo("Accept regular external e-mail", acceptingSpam, ACC_SPAM_YES_REG_EMAIL, sb);
-    getFlagInfo("Accept encrypted external e-mail", acceptingSpam, ACC_SPAM_YES_SSL_EMAIL, sb);
-    getFlagInfo("Do not include secure reply link in external e-mail", flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, sb);
-    getFlagInfo("Display a warning before sending unencrypted e-mail", notifyByEmail, EMAIL_WARN_EXTERNAL, sb);
+    getFlagInfo("Accept regular external email", acceptingSpam, ACC_SPAM_YES_REG_EMAIL, sb);
+    getFlagInfo("Accept encrypted external email", acceptingSpam, ACC_SPAM_YES_SSL_EMAIL, sb);
+    getFlagInfo("Do not include secure reply link in external email", flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, sb);
+    getFlagInfo("Display a warning before sending unencrypted email", notifyByEmail, EMAIL_WARN_EXTERNAL, sb);
     getFlagInfo("Preview Rich Text email in Plain Text mode", notifyByEmail, EMAIL_MANUAL_SELECT_PREVIEW_MODE, sb);
     getFlagInfo("Disable auto updates", flags, FLAG_DISABLE_AUTO_UPDATES, sb);
     getFlagInfo("User offline popup", flags, FLAG_USER_OFFLINE_POPUP, sb);

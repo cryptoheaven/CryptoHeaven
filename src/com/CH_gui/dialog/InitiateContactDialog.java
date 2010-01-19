@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -36,7 +36,7 @@ import com.CH_gui.frame.MainFrame;
 import com.CH_guiLib.gui.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -91,10 +91,9 @@ public class InitiateContactDialog extends GeneralDialog {
   private void initialize(Component owner, Long[] contactWithIds) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "initialize(Component owner, Long[] contactWithIds)");
     this.contactWithIds = contactWithIds;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    this.shareId = cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId;
     this.SIL = MainFrame.getServerInterfaceLayer();
-    this.cache = SIL.getFetchedDataCache();FetchedDataCache.getSingleInstance();
+    this.cache = SIL.getFetchedDataCache();
+    this.shareId = cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId;
 
     JButton[] jButtons = createButtons();
     JPanel jPanel = createPanel();

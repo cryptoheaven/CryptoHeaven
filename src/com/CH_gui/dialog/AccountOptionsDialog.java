@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -43,7 +43,7 @@ import javax.swing.event.*;
 import javax.swing.border.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -419,7 +419,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
-    JLabel emlAddrLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_E-mail_Address"));
+    JLabel emlAddrLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
     EmailAddressRecord emlRec = new EmailAddressRecord("");
     defaultEmail = emlRec.address.toLowerCase();
     ActionListener emlAction = new ActionListener() {
@@ -512,7 +512,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 
     posY = 0;
 
-    checks.jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_e-mail_notification_when_new_messages_arrive."));
+    checks.jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
     checks.jNotifyUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotify, checks.jNotifyUpdate, myUserRec.notifyByEmail, userRec.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
     posY ++;
@@ -603,9 +603,15 @@ public class AccountOptionsDialog extends GeneralDialog {
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
     }
-    JScrollPane sc = new JScrollPane(listPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    sc.getVerticalScrollBar().setUnitIncrement(5);
-    topPanel.add(sc, new GridBagConstraints(1, posY, 2, 1, 10, 10,
+    JComponent mainList = null;
+    if (subUsers.length > 5) {
+      JScrollPane sc = new JScrollPane(listPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+      sc.getVerticalScrollBar().setUnitIncrement(5);
+      mainList = sc;
+    } else {
+      mainList = listPanel;
+    }
+    topPanel.add(mainList, new GridBagConstraints(1, posY, 2, 1, 10, 10,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -644,7 +650,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 
     posY = 0;
 
-    checks.jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_e-mail_notification_when_new_messages_arrive."));
+    checks.jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
     checks.jNotifyUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotify, checks.jNotifyUpdate, myUserRec.notifyByEmail, AccountOptionPermitChecks.getMostCommonNotifyByEmailBits(subUsers), UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
     posY ++;
@@ -1042,7 +1048,7 @@ public class AccountOptionsDialog extends GeneralDialog {
             )
          )
       {
-        // When there is no e-mail provided, notify must be off too.
+        // When there is no email provided, notify must be off too.
         boolean ok = ((newEmail.length() == 0 && !checks.jNotify.isSelected()) || newEmail.length() > 0);
         jOk.setEnabled(ok);
       } else {

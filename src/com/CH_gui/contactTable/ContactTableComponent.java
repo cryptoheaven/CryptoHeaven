@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -31,6 +31,9 @@ import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.ActionUtilities;
+import com.CH_gui.dialog.InviteByEmailDialog;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.table.*;
@@ -38,12 +41,12 @@ import com.CH_gui.table.*;
 import com.CH_guiLib.gui.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -51,12 +54,14 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.25 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ContactTableComponent extends RecordTableComponent {
 
   private JMyListCombo combo;
   private UserListener userListener;
+  private JMyTextField jAddEmail;
+  private String addEmailHint = " add email@address or user";
 
   /** Creates new ContactTableComponent */
   /*
@@ -72,12 +77,7 @@ public class ContactTableComponent extends RecordTableComponent {
     super(new ContactActionTable(contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "ContactTableComponent(Record contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction)");
     if (trace != null) trace.args(contactFilter, emptyTemplateName, backTemplateName);
-    JLabel titleLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("compTitle_Contacts"));
-    titleLabel.setIcon(Images.get(ImageNums.FLD_CNT_CLOSED16));
-    setTitle(titleLabel);
-    addUtilityComponent();
-    userListener = new UserListener();
-    FetchedDataCache.getSingleInstance().addUserRecordListener(userListener);
+    initialize();
     if (trace != null) trace.exit(ContactTableComponent.class);
   }
   /** Creates new ContactTableComponent */
@@ -85,13 +85,38 @@ public class ContactTableComponent extends RecordTableComponent {
     super(new ContactActionTable(initialData, contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "ContactTableComponent(Record[] initialData, Record contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction)");
     if (trace != null) trace.args(initialData, contactFilter, emptyTemplateName, backTemplateName);
+    initialize();
+    if (trace != null) trace.exit(ContactTableComponent.class);
+  }
+
+  private void initialize() {
     JLabel titleLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("compTitle_Contacts"));
     titleLabel.setIcon(Images.get(ImageNums.FLD_CNT_CLOSED16));
     setTitle(titleLabel);
     addUtilityComponent();
     userListener = new UserListener();
     FetchedDataCache.getSingleInstance().addUserRecordListener(userListener);
-    if (trace != null) trace.exit(ContactTableComponent.class);
+  }
+
+  public void addTopContactBuildingPanel() {
+    JPanel addAddressPanel = new JPanel(new BorderLayout(0,0));
+    Color panelColor = addAddressPanel.getBackground();
+    jAddEmail = new JMyTextField();
+    jAddEmail.setPreferredSize(new Dimension(100, 18));
+    jAddEmail.setBackground(panelColor);
+    jAddEmail.setBorder(new LineBorder(panelColor.darker(), 1));
+    jAddEmail.setUnfocusedEmptyText(addEmailHint);
+    final Action addAction = new AddEmailAddressAction();
+    AbstractButton addButton = ActionUtilities.makeSmallComponentToolButton(addAction);
+    jAddEmail.addKeyListener(new KeyAdapter() {
+      public void keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER)
+          addAction.actionPerformed(null);
+      }
+    });
+    addAddressPanel.add(jAddEmail, BorderLayout.CENTER);
+    addAddressPanel.add(addButton, BorderLayout.EAST);
+    addTopPanel(addAddressPanel);
   }
 
   /**
@@ -160,6 +185,27 @@ public class ContactTableComponent extends RecordTableComponent {
     return visualsClassKeyName;
   }
 
+  private class AddEmailAddressAction extends AbstractActionTraced {
+    public AddEmailAddressAction() {
+      super("Add", Images.get(ImageNums.ADD14));
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      if (MainFrame.isLoggedIn()) {
+        String text = jAddEmail.getText().trim();
+        if (text.equalsIgnoreCase(addEmailHint.trim()))
+          text = "";
+        String[] addresses = EmailRecord.gatherAddresses(text);
+        if (addresses != null && addresses.length > 0) {
+          InviteByEmailDialog.doInvite(text, "", null);
+        } else {
+          new FindUserFrame(com.CH_gui.lang.Lang.rb.getString("button_Close"), text);
+        }
+        if (text.length() > 0)
+          jAddEmail.setText("");
+      }
+    }
+  }
+
   private static class ChangeStatusAction implements ActionListener {
     short status;
     public ChangeStatusAction(short status) {
@@ -172,16 +218,17 @@ public class ContactTableComponent extends RecordTableComponent {
       }
     }
   }
+
   private class CustomizeAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
       if (MainFrame.isLoggedIn()) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        panel.add(new JMyLabel("Change my Available status to Away after a period of inactivity."), new GridBagConstraints(0, 0, 2, 1, 0, 0, 
+        panel.add(new JMyLabel("Change my Available status to Away after a period of inactivity."), new GridBagConstraints(0, 0, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-        panel.add(new JMyLabel("Available status", Images.get(ImageNums.STATUS_ONLINE16), JLabel.LEADING), new GridBagConstraints(0, 1, 2, 1, 0, 0, 
+        panel.add(new JMyLabel("Available status", Images.get(ImageNums.STATUS_ONLINE16), JLabel.LEADING), new GridBagConstraints(0, 1, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 5, 5), 0, 0));
-        panel.add(new JMyLabel("Away status", Images.get(ImageNums.STATUS_AWAY16), JLabel.LEADING), new GridBagConstraints(0, 2, 2, 1, 0, 0, 
+        panel.add(new JMyLabel("Away status", Images.get(ImageNums.STATUS_AWAY16), JLabel.LEADING), new GridBagConstraints(0, 2, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 5, 5), 0, 0));
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         Integer awayMinutes = new Integer(UserSettingsRecord.DEFAULT__AWAY_MINUTES);
@@ -204,11 +251,11 @@ public class ContactTableComponent extends RecordTableComponent {
             jMinutes.setEnabled(!jNever.isSelected());
           }
         });
-        panel.add(jMinutesLabel, new GridBagConstraints(0, 3, 1, 1, 0, 0, 
+        panel.add(jMinutesLabel, new GridBagConstraints(0, 3, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 3, 5), 0, 0));
-        panel.add(jMinutes, new GridBagConstraints(1, 3, 1, 1, 0, 0, 
+        panel.add(jMinutes, new GridBagConstraints(1, 3, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 3, 5), 0, 0));
-        panel.add(jNever, new GridBagConstraints(0, 4, 2, 1, 0, 0, 
+        panel.add(jNever, new GridBagConstraints(0, 4, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 5, 5), 0, 0));
         final JButton[] buttons = new JButton[2];
         buttons[0] = new JMyButton("OK");
@@ -292,7 +339,7 @@ public class ContactTableComponent extends RecordTableComponent {
     }
   }
 
-   
+
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/

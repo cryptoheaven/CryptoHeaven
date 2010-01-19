@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -15,7 +15,7 @@ package com.CH_co.service.msg;
 import com.CH_co.trace.Trace;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -123,7 +123,7 @@ public class CommandCodes extends Object {
   // Check for availability of User Name
   public static final int USR_Q_CHECK_AVAIL = 1075;
 
-  // Send E-mail Invitation
+  // Send Email Invitation
   public static final int USR_Q_SEND_EMAIL_INVITATION = 1080;
 
   // Get Accessors
@@ -456,6 +456,12 @@ public class CommandCodes extends Object {
   public static final int ORG_Q_GET_ORG = 1700;
   public static final int ORG_A_GET_ORG = 10700;
 
+  // =======================
+  // *** InvEml Commands ***
+  // =======================
+
+  // Remove My InvEmls
+  public static final int INV_Q_REMOVE = 2100;
 
   // =============================
   // *** System level messages ***

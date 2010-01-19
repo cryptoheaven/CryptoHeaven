@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -34,6 +34,8 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 import com.CH_cl.tree.*;
 
+import com.CH_co.gui.JMyLabel;
+import com.CH_co.gui.MyInsets;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -41,9 +43,10 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+import com.CH_gui.list.ListRenderer;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -120,6 +123,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     } else {
       contactTableModel.setData(FetchedDataCache.getSingleInstance().getContactRecords());
       contactTableModel.updateData(FetchedDataCache.getSingleInstance().getFolderPairsMyOfType(FolderRecord.GROUP_FOLDER, true));
+      contactTableModel.updateData(FetchedDataCache.getSingleInstance().getInvEmlRecords());
     }
 
     addDND(getJSortedTable());
@@ -192,7 +196,14 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
    */
   public MemberContactRecordI[] getSelectedMemberContacts() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedMemberContacts()");
-    MemberContactRecordI[] records = (MemberContactRecordI[]) ArrayUtils.toArray(getSelectedRecordsV(), MemberContactRecordI.class);
+    Vector selectedRecsV = getSelectedRecordsV();
+    Vector selectedMembersV = new Vector();
+    for (int i=0; i<selectedRecsV.size(); i++) {
+      Record rec = (Record) selectedRecsV.elementAt(i);
+      if (rec instanceof MemberContactRecordI)
+        selectedMembersV.addElement(rec);
+    }
+    MemberContactRecordI[] records = (MemberContactRecordI[]) ArrayUtils.toArray(selectedMembersV, MemberContactRecordI.class);
     if (trace != null) trace.exit(ContactActionTable.class, records);
     return records;
   }
@@ -267,9 +278,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Group"));
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(ContactActionTable.this)) {
-        chatOrShareSpace(false, FolderRecord.GROUP_FOLDER, event);
-      }
+      chatOrShareSpace(false, FolderRecord.GROUP_FOLDER, event);
     }
   }
 
@@ -323,6 +332,18 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         if (groups != null && groups.length > 0) {
           new FolderActionTree.DeleteRunner(ContactActionTable.this, groups, false).start();
         }
+        InvEmlRecord[] invites = (InvEmlRecord[]) getSelectedInstancesOf(InvEmlRecord.class);
+        if (invites != null && invites.length > 0) {
+          Obj_IDList_Co request = new Obj_IDList_Co();
+          request.IDs = RecordUtils.getIDs(invites);
+          // hide the removed invites
+          for (int i=0; i<invites.length; i++)
+            invites[i].removed = Boolean.TRUE;
+          // add updated records to the cache so listeners can update
+          FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
+          cache.addInvEmlRecords(invites);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.INV_Q_REMOVE, request));
+        }
       }
     }
     private void updateText(int countSelectedContacts) {
@@ -350,24 +371,22 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
     public void actionPerformedTraced(ActionEvent event) {
       boolean fp = isActionActivatedFromPopup(event);
-      if (!UserOps.isShowWebAccountRestrictionDialog(ContactActionTable.this)) {
-        Object sourceObj = event.getSource();
-        // Do not prefill the from field when user presses tool bar action button.
-        if (sourceObj instanceof JActionButton) {
-          new MessageFrame();
+      Object sourceObj = event.getSource();
+      // Do not prefill the from field when user presses tool bar action button.
+      if (sourceObj instanceof JActionButton) {
+        new MessageFrame();
+      } else {
+        // Determine if action from menu, popup menu or shortcut
+        // If action is from popup menu, prefill the To: field in the new message
+        boolean fromPopup = isActionActivatedFromPopup(event);
+        Record[] selectedRecords = null;
+        if (fromPopup) selectedRecords = getSelectedRecords();
+        //Record[] initialRecipients = MsgPanelUtils.getOrFetchFamiliarUsers(selectedRecords);
+        Record[] initialRecipients = selectedRecords;
+        if (initialRecipients != null && initialRecipients.length > 0) {
+          new MessageFrame(initialRecipients);
         } else {
-          // Determine if action from menu, popup menu or shortcut
-          // If action is from popup menu, prefill the To: field in the new message
-          boolean fromPopup = isActionActivatedFromPopup(event);
-          Record[] selectedRecords = null;
-          if (fromPopup) selectedRecords = getSelectedRecords();
-          //Record[] initialRecipients = MsgPanelUtils.getOrFetchFamiliarUsers(selectedRecords);
-          Record[] initialRecipients = selectedRecords;
-          if (initialRecipients != null && initialRecipients.length > 0) {
-            new MessageFrame(initialRecipients);
-          } else {
-            new MessageFrame();
-          }
+          new MessageFrame();
         }
       }
     }
@@ -579,11 +598,13 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       ContactTableModel tableModel = (ContactTableModel) ContactActionTable.this.getTableModel();
       RecordFilter filter = new MultiFilter(new RecordFilter[] { 
         new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, isShow), 
-        new FolderFilter(FolderRecord.GROUP_FOLDER) }//, myUserRec != null ? myUserRec.userId : null) }
+        new FolderFilter(FolderRecord.GROUP_FOLDER),
+        new InvEmlFilter(true, false) }
       , MultiFilter.OR);
       tableModel.setFilter(filter);
       tableModel.setData(cache.getContactRecords());
       tableModel.updateData(cache.getFolderPairsMyOfType(FolderRecord.GROUP_FOLDER, true));
+      tableModel.updateData(cache.getInvEmlRecords());
       String propertyName = getTogglePropertyName(SwingUtilities.windowForComponent(ContactActionTable.this));
       GlobalProperties.setProperty(propertyName, Boolean.valueOf(isShow).toString());
     }
@@ -622,22 +643,50 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /** 
-   * Send E-mail Message to invite someone to join.
+   * Send Email Message to invite someone to join.
    */
   private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.PEOPLE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_E-mail_Message_to_invite_others_to_join_the_service."));
+      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Email_Message_to_invite_others_to_join_the_service."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.PEOPLE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      Window w = SwingUtilities.windowForComponent(ContactActionTable.this);
-      if (w instanceof Dialog) new InviteByEmailDialog((Dialog) w, null);
-      else if (w instanceof Frame) new InviteByEmailDialog((Frame) w, null);
+      InvEmlRecord[] invEmls = (InvEmlRecord[]) getSelectedInstancesOf(InvEmlRecord.class);
+      sendEmailInvitationAction(invEmls);
     }
+  }
+
+  private void sendEmailInvitationAction(Record[] initialEmailRecs) {
+    String initialEmails = getEmailAddrs(initialEmailRecs);
+    Window w = SwingUtilities.windowForComponent(ContactActionTable.this);
+    if (w instanceof Dialog) new InviteByEmailDialog((Dialog) w, initialEmails);
+    else if (w instanceof Frame) new InviteByEmailDialog((Frame) w, initialEmails);
+  }
+
+  private String getEmailAddrs(Record[] invEmlRecs) {
+    String invEmails = "";
+    Vector emailsLowerV = new Vector();
+    Vector emailsOrigV = new Vector();
+    InvEmlRecord[] invEmls = (InvEmlRecord[]) ArrayUtils.gatherAllOfType(invEmlRecs, InvEmlRecord.class);
+    if (invEmls != null && invEmls.length > 0) {
+      for (int i=0; i<invEmls.length; i++) {
+        String addr = invEmls[i].emailAddr;
+        if (!emailsLowerV.contains(addr.toLowerCase())) {
+          emailsLowerV.addElement(addr.toLowerCase());
+          emailsOrigV.addElement(addr);
+        }
+      }
+      for (int i=0; i<emailsOrigV.size(); i++) {
+        if (invEmails.length() > 0)
+          invEmails += ", ";
+        invEmails += emailsOrigV.elementAt(i);
+      }
+    }
+    return invEmails;
   }
 
   /** Display a dialog for creation of new folder shared between selected contacts.
@@ -652,21 +701,70 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Shared_Space"));
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(ContactActionTable.this)) {
-        chatOrShareSpace(false, (short) 0, event);
-      }
+      chatOrShareSpace(false, (short) 0, event);
     }
   }
 
 
-  private void chatOrShareSpace(boolean isChat, short folderType, ActionEvent event) {
-    boolean fromPopup = isActionActivatedFromPopup(event);
+  private void chatOrShareSpace(final boolean isChat, final short folderType, ActionEvent event) {
+    final boolean fromPopup = isActionActivatedFromPopup(event);
     MemberContactRecordI[] selectedRecords = null;
+    InvEmlRecord[] selectedInvEmls = null;
     if (fromPopup) {
       selectedRecords = ContactActionTable.this.getSelectedMemberContacts();
+      selectedInvEmls = (InvEmlRecord[]) getSelectedInstancesOf(InvEmlRecord.class);
     }
-    chatOrShareSpace(ContactActionTable.this, selectedRecords, fromPopup, isChat, folderType);
+    if (selectedInvEmls != null && selectedInvEmls.length > 0) {
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridBagLayout());
+
+      int posY = 0;
+      String msgText1 = "The following users have not yet created their accounts:";
+      panel.add(new JMyLabel(msgText1), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
+      posY ++;
+      JPanel emlListPanel = new JPanel();
+      emlListPanel.setLayout(new GridBagLayout());
+      for (int i=0; i<selectedInvEmls.length; i++) {
+        Icon icon = ListRenderer.getRenderedIcon(selectedInvEmls[i]);
+        String label = ListRenderer.getRenderedText(selectedInvEmls[i], false, false, true);
+        emlListPanel.add(new JMyLabel(label, icon, JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+      }
+      emlListPanel.add(new JLabel(), new GridBagConstraints(0, selectedInvEmls.length, 2, 1, 10, 10,
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+      JComponent listPane = emlListPanel;
+      if (selectedInvEmls.length >= 3) {
+        JScrollPane sc = new JScrollPane(emlListPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sc.getVerticalScrollBar().setUnitIncrement(5);
+        listPane = sc;
+      }
+      panel.add(listPane, new GridBagConstraints(0, posY, 2, 1, 10, 10,
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(10, 10, 10, 10), 0, 0));
+      posY ++;
+
+      panel.add(new JMyLabel("Would you like to invite them now?"), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
+      posY ++;
+
+      final Record[] _initialEmailRecs = selectedInvEmls;
+      ActionListener yesAction = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          sendEmailInvitationAction(_initialEmailRecs);
+        }
+      };
+      final MemberContactRecordI[] _selectedRecords = selectedRecords;
+      ActionListener noAction = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          chatOrShareSpace(ContactActionTable.this, _selectedRecords, fromPopup, isChat, folderType);
+        }
+      };
+      MessageDialog.showDialogYesNo(this, panel, "User account required.", MessageDialog.QUESTION_MESSAGE, true, yesAction, noAction);
+    } else {
+      chatOrShareSpace(ContactActionTable.this, selectedRecords, fromPopup, isChat, folderType);
+    }
   }
+
   public static void chatOrShareSpace(Component parent, MemberContactRecordI[] selectedRecords, boolean fromPopup, boolean isChat, short folderType) {
     if (!fromPopup || selectedRecords == null || selectedRecords.length == 0) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -793,6 +891,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       boolean messageOk = true;
       boolean addressOk = true;
       boolean acceptDeclineOk = true;
+      boolean propsOk = true;
 
       Record[] records = getSelectedRecords();
 
@@ -819,6 +918,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
             addressOk = false;
             acceptDeclineOk = false;
           }
+          if (records[i] instanceof InvEmlRecord) {
+            propsOk = false;
+          }
         }
       }
 
@@ -835,7 +937,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         actions[REMOVE_ACTION].setEnabled(true);
         actions[MESSAGE_ACTION].setEnabled(messageOk);
         actions[ADDRESS_ACTION].setEnabled(addressOk);
-        actions[PROPERTIES_ACTION].setEnabled(true);
+        actions[PROPERTIES_ACTION].setEnabled(propsOk);
         actions[CHAT_ACTION].setEnabled(true);
         actions[CREATE_SHARED_SPACE_ACTION].setEnabled(true);
       } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -21,6 +21,18 @@ import com.CH_co.util.URLs;
  */
 public class EmailSendingOps {
 
+  public static String getEmailBannerDivider(String contentType) {
+    String bannerDivider = "";
+    if (contentType != null) {
+      if (contentType.equalsIgnoreCase("text/plain")) {
+        bannerDivider = "\n\n---";
+      } else if (contentType.equalsIgnoreCase("text/html")) {
+        bannerDivider = "\n<p></p>\n---";
+      }
+    }
+    return bannerDivider;
+  }
+
   public static String getSecureReplyBanner(Long userId, String messageSubject, String contentType, String toEmailAddress) {
     String secureReplyBanner = "";
     if (contentType != null) {
@@ -36,9 +48,9 @@ public class EmailSendingOps {
           replyURL += "&fromEmail=" + java.net.URLEncoder.encode(addrs[addrs.length-1]);
       }
       if (contentType.equalsIgnoreCase("text/plain")) {
-        secureReplyBanner = "\n\n___________________________________________________________\nSend a secure reply:\n"+replyURL;
+        secureReplyBanner = "\nSecure Reply:\n"+replyURL;
       } else if (contentType.equalsIgnoreCase("text/html")) {
-        secureReplyBanner = "\n<p></p>\n<hr>\nSend a secure reply:<br><a href=\""+replyURL+"\">"+replyPage+"</a>";
+        secureReplyBanner = "\n<br>Secure Reply:<br><a href=\""+replyURL+"\">"+replyPage+"</a>";
       }
     }
     return secureReplyBanner;

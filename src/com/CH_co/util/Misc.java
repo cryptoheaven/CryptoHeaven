@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.zip.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p> 
@@ -447,7 +447,7 @@ public class Misc extends Object {
     String signupEmailURLhtml = "http://www.cryptoheaven.com/ch/pickup.jsp?se=" + URLEncoder.encode(sendToEmail);
     // plain version
     StringBuffer sbPlain = new StringBuffer();
-    if (personalMessage.length() > 0) {
+    if (personalMessage != null && personalMessage.length() > 0) {
       sbPlain.append(personalMessage);
       sbPlain.append("\n\n\n");
     }
@@ -473,7 +473,7 @@ public class Misc extends Object {
     text[0] = sbPlain.toString();
     // html version
     StringBuffer sbHtml = new StringBuffer();
-    if (personalMessage.length() > 0) {
+    if (personalMessage != null && personalMessage.length() > 0) {
       sbHtml.append("<p>");
       sbHtml.append(encodePlainIntoHtml(personalMessage));
       sbHtml.append("</p><br>");

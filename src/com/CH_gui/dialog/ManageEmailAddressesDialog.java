@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -39,7 +39,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.usrs.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -83,13 +83,13 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
 
   /** Creates new ManageEmailAddressesDialog */
   public ManageEmailAddressesDialog(Dialog owner, UserRecord userRecord, AccountOptionsDialog accountOptionsDialog) {
-    super(owner, "Manage E-mail Addresses");
+    super(owner, "Manage Email Addresses");
     this.selectedUserRecord = userRecord;
     this.accountOptionsDialog = accountOptionsDialog;
     initialize(owner);
   }
   public ManageEmailAddressesDialog(Frame owner, UserRecord userRecord, AccountOptionsDialog accountOptionsDialog) {
-    super(owner, "Manage E-mail Addresses");
+    super(owner, "Manage Email Addresses");
     this.selectedUserRecord = userRecord;
     this.accountOptionsDialog = accountOptionsDialog;
     initialize(owner);
@@ -148,12 +148,12 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
                     setDefaultEml(0);
                 }
               } else {
-                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate E-mail Address '" + text + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
+                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate Email Address '" + text + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
               }
             }
           }
         };
-        String modalReturn = showInputDialog(ManageEmailAddressesDialog.this, null, "Type in your new e-mail address:", "Display as:", "New E-mail Address", OKAction);
+        String modalReturn = showInputDialog(ManageEmailAddressesDialog.this, null, "Type in your new email address:", "Display as:", "New Email Address", OKAction);
       }
     });
 
@@ -197,12 +197,12 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
                   jEmlList.repaint();
                 }
               } else {
-                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate E-mail Address '" + text + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
+                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate Email Address '" + text + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
               }
             }
           }
         };
-        String modalReturn = showInputDialog(ManageEmailAddressesDialog.this, _emlAddr, "Edit your e-mail address:", "Display as:", "Edit E-mail Address", OKAction);
+        String modalReturn = showInputDialog(ManageEmailAddressesDialog.this, _emlAddr, "Edit your email address:", "Display as:", "Edit Email Address", OKAction);
       }
     });
 
@@ -241,7 +241,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
 
     int posY = 0;
 
-    panel.add(AccountOptionsSignaturesPanel.makeDivider("E-mail Address management"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
+    panel.add(AccountOptionsSignaturesPanel.makeDivider("Email Address management"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
     posY ++;
 
@@ -255,26 +255,26 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
       }
     }
     if (selectedUserRecord != null && selectedUserRecord.isFreePromoAccount()) {
-      panel.add(new JMyLabel("Demo accounts have e-mail address management disabled."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
+      panel.add(new JMyLabel("Demo accounts have email address management disabled."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
       panel.add(new JMyLinkLabel("Click here to upgrade.", signupURL), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     } else if (selectedUserRecord != null && selectedUserRecord.isBusinessAccount()) {
-      panel.add(new JMyLabel("You are allowed up to '"+limitEmlAddrs+"' personalized e-mail addresses per account."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
+      panel.add(new JMyLabel("You are allowed up to '"+limitEmlAddrs+"' personalized email addresses per account."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel("All changes to e-mail addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
+      panel.add(new JMyLabel("All changes to email addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     } else {
-      panel.add(new JMyLabel("You are allowed upto '"+limitEmlAddrs+"' personalized e-mail addresses."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
+      panel.add(new JMyLabel("You are allowed upto '"+limitEmlAddrs+"' personalized email addresses."), new GridBagConstraints(1, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
 //      panel.add(new JMyLinkLabel("Click here to upgrade.", signupURL), new GridBagConstraints(1, posY+1, 3, 1, 10, 0, 
 //          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel("All changes to your e-mail addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
+      panel.add(new JMyLabel("All changes to your email addresses take effect immediately."), new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     }
     posY += 2;
 
-    panel.add(AccountOptionsSignaturesPanel.makeDivider("E-mail Addresses"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
+    panel.add(AccountOptionsSignaturesPanel.makeDivider("Email Addresses"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
     posY ++;
 
@@ -505,7 +505,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
           OKActionListener.actionPerformed(new ActionEvent(event.getSource(), 0, fullEmlAddr));
         } else {
           jInput.getTextField().selectAll();
-          MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Invalid E-mail Address '" + emlAddr + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
+          MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Invalid Email Address '" + emlAddr + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
         }
       }
     });

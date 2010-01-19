@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -33,7 +33,7 @@ import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -216,7 +216,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
     warningLabel.setText("<html>Password recovery allows you (and everyone else) to recover a lost password. Please setup your recovery questions and answers so that you and only you can answer them. This is an optional feature, and if you choose to use it your account security will depend on the quality of the questions and answers that you provide.</html>");
     warningLabel.setHorizontalAlignment(JLabel.LEFT);
     warningLabel.setVerticalTextPosition(JLabel.TOP);
-    warningLabel.setBorder(new EtchedBorder());
+    warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
     warningLabel.setPreferredSize(new Dimension(390, 85));
     panel.add(warningLabel, new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 5, 1), 20, 20));
@@ -244,7 +244,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
 
     panelRec = new JPanel();
     panelRec.setLayout(new GridBagLayout());
-    panelRec.setBorder(new EtchedBorder());
+    panelRec.setBorder(new LineBorder(panelRec.getBackground().darker(), 1, true));
     panel.add(panelRec, new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, insets3333, 0, 0));
     posY ++;
@@ -255,7 +255,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
 
     panelPlainRec = new JPanel();
     panelPlainRec.setLayout(new GridBagLayout());
-    panelPlainRec.setBorder(new EtchedBorder());
+    panelPlainRec.setBorder(new LineBorder(panelPlainRec.getBackground().darker(), 1, true));
     panelRec.add(panelPlainRec, new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, insets3333, 0, 0));
     posY ++;
@@ -266,7 +266,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
 
     panelEncRec = new JPanel();
     panelEncRec.setLayout(new GridBagLayout());
-    panelEncRec.setBorder(new EtchedBorder());
+    panelEncRec.setBorder(new LineBorder(panelEncRec.getBackground().darker(), 1, true));
     panelRec.add(panelEncRec, new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, insets3333, 0, 0));
     posY ++;

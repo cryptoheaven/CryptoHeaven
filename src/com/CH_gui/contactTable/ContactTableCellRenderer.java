@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -13,7 +13,6 @@
 package com.CH_gui.contactTable;
 
 import java.awt.*;
-import java.sql.Timestamp;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -25,11 +24,10 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.records.ContactRecUtil;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>

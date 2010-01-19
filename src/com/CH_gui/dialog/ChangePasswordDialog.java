@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -36,7 +36,7 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -129,7 +129,7 @@ public class ChangePasswordDialog extends GeneralDialog {
       warningLabel.setText("<html>Your account is not password protected.  Please protect your account with a password to prevent unauthorized access.</html>");
       warningLabel.setHorizontalAlignment(JLabel.LEFT);
       warningLabel.setVerticalTextPosition(JLabel.TOP);
-      warningLabel.setBorder(new EtchedBorder());
+      warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
       warningLabel.setPreferredSize(new Dimension(410, 40));
       panel.add(warningLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 1, 1), 20, 20));

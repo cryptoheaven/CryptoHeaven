@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -20,7 +20,7 @@ import com.CH_co.util.*;
 import com.CH_gui.msgTable.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -48,7 +48,7 @@ public class AddressTableCellRenderer extends MsgTableCellRenderer {
 
     int rawColumn = getRawColumn(table, column);
 
-    // E-mail Address
+    // Email Address
     if (rawColumn == 16) {
       if (((String) value).length() > 0)
         setIcon(Images.get(ImageNums.EMAIL_SYMBOL_SMALL));

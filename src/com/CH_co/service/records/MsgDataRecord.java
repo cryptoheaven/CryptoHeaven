@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -26,7 +26,7 @@ import com.CH_co.util.*;
 import com.CH_guiLib.util.HTML_utils;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -78,7 +78,7 @@ public class MsgDataRecord extends Record {
   public static final char RECIPIENT_EMAIL_NEWS = 'n';
   public static final char RECIPIENT_COPY = 'c';
   public static final char RECIPIENT_COPY_BLIND = 'd';
-  // Incoming e-mail from external systems will have
+  // Incoming email from external systems will have
   public static final char RECIPIENT_FROM_EMAIL = 'f';
   public static final char RECIPIENT_REPLY_TO = 'r';
 

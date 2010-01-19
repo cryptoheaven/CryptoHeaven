@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -34,7 +34,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -272,7 +272,7 @@ public class OpenSaveCancelDialog extends GeneralDialog {
     posY ++;
 
     JPanel warnPanel = new JPanel();
-    warnPanel.setBorder(new EtchedBorder());
+    warnPanel.setBorder(new LineBorder(warnPanel.getBackground().darker(), 1, true));
     warnPanel.setLayout(new GridBagLayout());
     warnPanel.add(new JMyLabel(Images.get(ImageNums.SHIELD32)), new GridBagConstraints(0, 0, 1, 3, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));

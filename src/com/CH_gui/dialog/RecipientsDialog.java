@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -40,7 +40,7 @@ import com.CH_guiLib.gui.*;
 import com.CH_gui.list.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -217,7 +217,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
 
     panel.setLayout(new GridBagLayout());
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Search_by_name,_select_from_list,_or_enter_an_e-mail_address")), new GridBagConstraints(0, 0, 2, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Search_by_name,_select_from_list,_or_enter_an_email_address")), new GridBagConstraints(0, 0, 2, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     jSearchName = new JMyTextField(40);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -15,7 +15,7 @@ package com.CH_co.util;
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -257,6 +257,7 @@ public class ImageNums extends Object {
 
   public static final int DELETE16;
   public static final int DELETE24;
+  public static final int ADD14;
   public static final int GO16;
   public static final int X15;
   public static final int GO_NEXT16;
@@ -560,7 +561,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[319+50]; // plus emotions
+    images = new String[320+50]; // plus emotions
 
 
     /******************************************************************
@@ -1132,6 +1133,9 @@ public class ImageNums extends Object {
 
     DELETE24 = i;
     images[i] = "Delete24"; i++;
+
+    ADD14 = i;
+    images[i] = "add14"; i++;
 
     GO16 = i;
     images[i] = "Go16"; i++;
