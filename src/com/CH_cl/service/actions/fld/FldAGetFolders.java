@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.Vector;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -261,7 +261,7 @@ public class FldAGetFolders extends ClientMessageAction {
               Thread.sleep(3000);
             } catch(Throwable t) {
             }
-            // Check if we have a Spam (Junk e-mail) folder, if not, create it
+            // Check if we have a Spam (Junk email) folder, if not, create it
             FolderOps.getOrCreateJunkFolder(SIL);
             // Check if we have a Recycle Bin folder, if not, create it
             if (GlobalProperties.PROGRAM_BUILD_NUMBER >= 358) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -29,7 +29,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p> 
@@ -50,7 +50,10 @@ public class CntAGetContacts extends ClientMessageAction {
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CntAGetContacts.class, "runAction(Connection)");
 
-    ContactRecord[] contactRecords = ((Cnt_GetCnts_Rp) getMsgDataSet()).contactRecords;
+    Cnt_GetCnts_Rp dataSet = (Cnt_GetCnts_Rp) getMsgDataSet();
+    ContactRecord[] contactRecords = dataSet.contactRecords;
+    InvEmlRecord[] invEmlRecords = dataSet.invEmlRecords;
+
     FetchedDataCache cache = getFetchedDataCache();
     UserRecord myUser = cache.getUserRecord();
     Long userId = cache.getMyUserId();
@@ -116,6 +119,55 @@ public class CntAGetContacts extends ClientMessageAction {
         contactRecords[i].folderId = myUser.contactFolderId;
 
     cache.addContactRecords(contactRecords);
+    // Check to see if any of the cached InvEmlRecords need to be hidden
+    if (contactRecords != null && contactRecords.length > 0) {
+      InvEmlRecord[] allInvEmls = cache.getInvEmlRecords();
+      if (allInvEmls != null && allInvEmls.length > 0) {
+        Vector updatedInvEmlsV = new Vector();
+        for (int i=0; i<contactRecords.length; i++) {
+          ContactRecord cRec = contactRecords[i];
+          if (cRec.ownerUserId.equals(userId) && cRec.isOfActiveTypeAnyState()) {
+            for (int k=0; k<allInvEmls.length; k++) {
+              InvEmlRecord invEml = allInvEmls[k];
+              if (!invEml.removed.booleanValue() && invEml.sentByUID.equals(userId) && invEml.emailAddr.equalsIgnoreCase(cRec.getOwnerNote())) {
+                invEml.removed = Boolean.TRUE;
+                updatedInvEmlsV.addElement(invEml);
+              }
+            }
+          }
+        }
+        // update matching InvEmlRecords in the cache so that listeners can register the change
+        if (updatedInvEmlsV.size() > 0) {
+          InvEmlRecord[] updatedInvEmls = (InvEmlRecord[]) ArrayUtils.toArray(updatedInvEmlsV, InvEmlRecord.class);
+          cache.addInvEmlRecords(updatedInvEmls);
+        }
+      }
+    }
+
+    // Add InvEmlRecords but HIDE the invitations which are not Removed and have Active contacts with the same name
+    if (invEmlRecords != null && invEmlRecords.length > 0) {
+      Vector filteredInvEmlRecordsV = new Vector();
+      ContactRecord[] allMyContactRecords = cache.getContactRecordsForUsers(new Long[] { userId });
+      for (int i=0; i<invEmlRecords.length; i++) {
+        InvEmlRecord invEmlRec = invEmlRecords[i];
+        boolean shouldKeep = true;
+        if (!invEmlRec.removed.booleanValue() && allMyContactRecords != null) {
+          for (int k=0; k<allMyContactRecords.length; k++) {
+            ContactRecord cRec = allMyContactRecords[k];
+            if (cRec.ownerUserId.equals(userId) && cRec.isOfActiveTypeAnyState() && invEmlRec.sentByUID.equals(userId) && invEmlRec.emailAddr.equalsIgnoreCase(cRec.getOwnerNote())) {
+              shouldKeep = false;
+              break;
+            }
+          }
+        }
+        if (shouldKeep)
+          filteredInvEmlRecordsV.addElement(invEmlRec);
+      }
+      if (filteredInvEmlRecordsV.size() > 0) {
+        InvEmlRecord[] filteredInvEmlRecs = (InvEmlRecord[]) ArrayUtils.toArray(filteredInvEmlRecordsV, InvEmlRecord.class);
+        cache.addInvEmlRecords(filteredInvEmlRecs);
+      }
+    }
 
     // See if we got any new contacts that need to be recrypted.
     if (contactRecords != null) {

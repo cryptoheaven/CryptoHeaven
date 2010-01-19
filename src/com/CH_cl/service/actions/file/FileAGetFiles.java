@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -13,6 +13,7 @@
 package com.CH_cl.service.actions.file;
 
 import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.msg.MsgAGet;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.RecordEvent;
 
@@ -28,7 +29,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -172,7 +173,7 @@ public class FileAGetFiles extends ClientMessageAction {
           long startTime = getStamp();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
-          double multiplier = 3000.0 / ellapsed; // adjust the new fetch size so that it takes about 3 seconds
+          double multiplier = ((double) MsgAGet.MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time
           // multiplier cannot make too drastic of a change
           multiplier = Math.max(0.2, Math.min(10.0, multiplier));
 

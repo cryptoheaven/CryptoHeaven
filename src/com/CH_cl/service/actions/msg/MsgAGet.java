@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -30,7 +30,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.stat.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2009
+ * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
@@ -46,6 +46,8 @@ import com.CH_co.service.msg.dataSets.stat.*;
  * @version
  */
 public class MsgAGet extends ClientMessageAction {
+
+  public static int MAX_BATCH_MILLIS = 2000;
 
   /** Creates new MsgAGet */
   public MsgAGet() {
@@ -414,7 +416,7 @@ public class MsgAGet extends ClientMessageAction {
           long startTime = getStamp();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
-          double multiplier = 3000.0 / ellapsed; // adjust the new fetch size so that it takes about 3 seconds
+          double multiplier = ((double) MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time
           // multiplier cannot make too drastic of a change
           multiplier = Math.max(0.2, Math.min(10.0, multiplier));
 
