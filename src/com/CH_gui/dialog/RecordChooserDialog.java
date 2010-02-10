@@ -224,7 +224,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
 
 
     // create the tree
-    folderTreeComponent = new FolderTreeComponent(false, new FolderFilter(folderTypes), folderPairs);
+    folderTreeComponent = new FolderTreeComponent(false, new FolderFilter(folderTypes), folderPairs, false);
     folderTreeComponent.setBorder(new EmptyBorder(0,0,0,0));
     folderTreeComponent.setPreferredSize(new Dimension(200, 300));
     // create the tables holder

@@ -42,6 +42,8 @@ import com.CH_co.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import javax.swing.*;
@@ -350,12 +352,12 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
       if (splitLayoutAction != null)
         splitLayoutButton = ActionUtilities.makeSmallComponentToolButton(splitLayoutAction);
       if (filterAction != null) {
-        filterButton = ActionUtilities.makeSmallComponentToolButton(filterAction);
-        final AbstractButton _filterButton = filterButton;
-        filterButton.addItemListener(new ItemListener() {
-          public void itemStateChanged(ItemEvent event) {
-            if (jFilterPanel != null) {
-              boolean setVisible = _filterButton.isSelected();
+        filterAction.addPropertyChangeListener(new PropertyChangeListener() {
+          public void propertyChange(PropertyChangeEvent evt) {
+            String name = evt.getPropertyName();
+            Object valueNew = evt.getNewValue();
+            if (jFilterPanel != null && name.equalsIgnoreCase("state")) {
+              boolean setVisible = ((Boolean) valueNew).booleanValue();
               jFilterPanel.setVisible(setVisible);
               if (!setVisible) {
                 setFilterNarrowing(null, jFilterMsgBodyCheck.isSelected());
@@ -367,6 +369,8 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
             }
           }
         });
+        // skip Search Button in utility bar, it already is in the mail toolbar
+        // filterButton = ActionUtilities.makeSmallComponentToolButton(filterAction);
       }
     }
 

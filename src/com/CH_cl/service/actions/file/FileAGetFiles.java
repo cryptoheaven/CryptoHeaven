@@ -170,7 +170,7 @@ public class FileAGetFiles extends ClientMessageAction {
 
           short numMax = fetchNumMax.shortValue();
 
-          long startTime = getStamp();
+          long startTime = getStampTime();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
           double multiplier = ((double) MsgAGet.MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time

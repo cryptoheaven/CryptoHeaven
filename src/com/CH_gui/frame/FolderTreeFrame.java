@@ -50,7 +50,7 @@ public class FolderTreeFrame extends JActionFrameClosable {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord[] fRecs = cache.getFolderRecords();
     FolderPair[] fPairs = CacheUtilities.convertRecordsToPairs(fRecs);
-    FolderTreeComponent mainComponent = new FolderTreeComponent(true, recordFilter, fPairs);
+    FolderTreeComponent mainComponent = new FolderTreeComponent(true, recordFilter, fPairs, true);
     setMainTreeComponent(mainComponent);
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);
 

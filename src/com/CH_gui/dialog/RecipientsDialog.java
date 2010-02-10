@@ -14,28 +14,17 @@ package com.CH_gui.dialog;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.*;
 import java.util.*;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.gui.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.list.*;
 

@@ -273,7 +273,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
   private class CopyAction extends AbstractActionTraced {
     public CopyAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_to_Folder_..."), Images.get(ImageNums.COPY16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_..."), Images.get(ImageNums.COPY16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_file_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
@@ -301,7 +301,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
   private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Move_to_Folder_..."), Images.get(ImageNums.FILE_MOVE16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Move_..."), Images.get(ImageNums.FILE_MOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_selected_file_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_MOVE24));
@@ -450,7 +450,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
    */
   private class ForwardToAction extends AbstractActionTraced {
     public ForwardToAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Forward_File_..."), Images.get(ImageNums.FORWARD16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Forward_..."), Images.get(ImageNums.FORWARD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Forward"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FORWARD24));
@@ -461,13 +461,6 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
       if (fileLinks != null && fileLinks.length > 0) {
         new MessageFrame(null, fileLinks);
-      }
-    }
-    private void updateText(int countSelectedFiles) {
-      if (countSelectedFiles > 1) {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Forward_Files_..."));
-      } else {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Forward_File_..."));
       }
     }
   }
@@ -483,6 +476,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       ((FileTableModel) getTableModel()).refreshData(true);
@@ -551,6 +545,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((FileTableModel) getTableModel()).getParentFolderPair();
@@ -592,6 +587,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = FileActionTable.this.getTableModel().getParentFolderPair();
@@ -935,13 +931,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     CopyAction copyAction = (CopyAction) actions[COPY_ACTION];
     MoveAction moveAction = (MoveAction) actions[MOVE_ACTION];
     DeleteAction deleteAction = (DeleteAction) actions[DELETE_ACTION];
-    ForwardToAction forwardToAction = (ForwardToAction) actions[FORWARD_ACTION];
-    DownloadAction downloadAction = (DownloadAction) actions[DOWNLOAD_ACTION];
 
     copyAction.updateText(count);
     moveAction.updateText(count);
     deleteAction.updateText(count);
-    forwardToAction.updateText(count);
 
     if (noFolderPairs)
       Stats.setSize(totalSize != null ? totalSize.longValue() : -1);

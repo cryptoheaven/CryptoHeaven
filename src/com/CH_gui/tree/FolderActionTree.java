@@ -531,6 +531,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Folder_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new FolderTreeRefreshRunner(FolderActionTree.this).start();
@@ -547,6 +548,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_folder_tree_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FOLDER24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new FolderTreeFrame(FolderActionTree.this.getFolderTreeModel().getFilter());

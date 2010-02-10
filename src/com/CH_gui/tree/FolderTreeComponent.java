@@ -64,7 +64,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "FolderTreeComponent(boolean withActions)");
     if (trace != null) trace.args(withActions);
     this.folderTreeScrollPane = new FolderTreeScrollPane(withActions);
-    init();
+    init(false);
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
   /** 
@@ -76,20 +76,21 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     if (trace != null) trace.args(withActions);
     if (trace != null) trace.args(filter);
     this.folderTreeScrollPane = new FolderTreeScrollPane(withActions, filter);
-    init();
+    init(false);
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
   /** 
    * Creates new FolderTreeComponent.
    * @param filter specifies the record filter for the tree.
    */
-  public FolderTreeComponent(boolean withActions, RecordFilter filter, FolderPair[] initialFolderPairs) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "FolderTreeComponent(boolean withActions, RecordFilter filter, FolderPair[] initialFolderPairs)");
+  public FolderTreeComponent(boolean withActions, RecordFilter filter, FolderPair[] initialFolderPairs, boolean withExploreUtilityTool) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "FolderTreeComponent(boolean withActions, RecordFilter filter, FolderPair[] initialFolderPairs, boolean withExploreUtilityTool)");
     if (trace != null) trace.args(withActions);
     if (trace != null) trace.args(filter);
     if (trace != null) trace.args(initialFolderPairs);
+    if (trace != null) trace.args(withExploreUtilityTool);
     this.folderTreeScrollPane = new FolderTreeScrollPane(withActions, filter, initialFolderPairs);
-    init();
+    init(withExploreUtilityTool);
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
 
@@ -100,7 +101,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
   public FolderTreeComponent(FolderTree folderTree) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "FolderTreeComponent()");
     this.folderTreeScrollPane = new FolderTreeScrollPane(folderTree, true);
-    init();
+    init(false);
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
 
@@ -120,8 +121,9 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     folderTreeScrollPane.getFolderTree().removeTreeSelectionListeners();
   }
 
-  private void init() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "init()");
+  private void init(boolean withExploreUtilityTool) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "init(boolean withExploreUtilityTool)");
+    if (trace != null) trace.args(withExploreUtilityTool);
 
     // So the split panes are not limited in movement, but must have at least visible header.
     setMinimumSize(new Dimension(0, 24));
@@ -136,7 +138,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
       FolderActionTree actionTree = (FolderActionTree) folderTree;
       Action refreshAction = actionTree.getRefreshAction();
       Action cloneAction = actionTree.getCloneAction();
-      Action exploreAction = actionTree.getExploreAction();
+      Action exploreAction = withExploreUtilityTool ? actionTree.getExploreAction() : null;
 
       if (refreshAction != null)
         refreshButton = ActionUtilities.makeSmallComponentToolButton(refreshAction);

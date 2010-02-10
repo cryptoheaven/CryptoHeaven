@@ -48,9 +48,9 @@ public class EmailSendingOps {
           replyURL += "&fromEmail=" + java.net.URLEncoder.encode(addrs[addrs.length-1]);
       }
       if (contentType.equalsIgnoreCase("text/plain")) {
-        secureReplyBanner = "\nSecure Reply:\n"+replyURL;
+        secureReplyBanner = "\nSecure Reply (option enabled):\n"+replyURL;
       } else if (contentType.equalsIgnoreCase("text/html")) {
-        secureReplyBanner = "\n<br>Secure Reply:<br><a href=\""+replyURL+"\">"+replyPage+"</a>";
+        secureReplyBanner = "\n<br>Secure Reply (option enabled):<br><a href=\""+replyURL+"\">"+replyPage+"</a>";
       }
     }
     return secureReplyBanner;

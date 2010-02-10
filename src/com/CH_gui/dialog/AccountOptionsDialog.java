@@ -457,12 +457,12 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Last_Login_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    String loginDate = Misc.getFormattedTimestamp(userRec.dateLastLogin);
-    topPanel.add(new JMyLabel(loginDate), new GridBagConstraints(1, posY, 2, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    posY ++;
+//    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Last_Login_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+//        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+//    String loginDate = Misc.getFormattedTimestamp(userRec.dateLastLogin);
+//    topPanel.add(new JMyLabel(loginDate), new GridBagConstraints(1, posY, 2, 1, 10, 0,
+//        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+//    posY ++;
 
 //    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Last_Logout_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
 //        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));

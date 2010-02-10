@@ -311,7 +311,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
    */
   private class CopyAction extends AbstractActionTraced {
     public CopyAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_to_Folder_..."), Images.get(ImageNums.MAIL_COPY16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_..."), Images.get(ImageNums.MAIL_COPY16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_message(s)_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COPY24));
@@ -328,7 +328,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
    */
   private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Move_to_Folder_..."), Images.get(ImageNums.MAIL_MOVE16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Move_..."), Images.get(ImageNums.MAIL_MOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_selected_message(s)_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_MOVE24));
@@ -420,9 +420,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
    */
   private class RevokeAction extends AbstractActionTraced {
     public RevokeAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Revoke_Message(s)_..."), Images.get(ImageNums.STOPWATCH_ALERT16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Revoke_..."), Images.get(ImageNums.STOPWATCH_ALERT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke_selected_message(s)."));
+      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Revoke"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -467,6 +467,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = MsgActionTable.this.getTableModel().getParentFolderPair();
@@ -536,7 +537,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
    */
   private class ForwardToAction extends AbstractActionTraced {
     public ForwardToAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Forward_Message(s)_..."), Images.get(ImageNums.FORWARD16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Forward_..."), Images.get(ImageNums.FORWARD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Forward"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FORWARD24));
@@ -946,6 +947,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
       RecordTableModel tableModel = getTableModel();
       if (tableModel instanceof MsgTableModel) {
         if (((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_ADDRESS ||
@@ -1022,6 +1024,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_message_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_MSG24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
       RecordTableModel tableModel = getTableModel();
       if (tableModel instanceof MsgTableModel) {
         if (((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_ADDRESS ||
@@ -1226,8 +1229,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         if (((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_ADDRESS ||
             ((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_WHITELIST
         ) {
-          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Edit_Address"));
-          putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Edit_Address"));
+          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Edit_..."));
+          putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Edit_..."));
           putValue(Actions.MENU_ICON, Images.get(ImageNums.ADDRESS_EDIT16));
           putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_EDIT24));
           putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Edit"));
@@ -1288,6 +1291,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       mts.resort();
 
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       JSortedTable jst = getJSortedTable();
@@ -1312,6 +1316,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Open_the_selected_object_in_its_own_view."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Open"));
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((MsgTableModel) getTableModel()).getParentFolderPair();
@@ -1972,25 +1977,6 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         }
       }
 
-      if (actions[REVOKE_ACTION] != null) {
-        if (selectionObjType == MsgDataRecord.OBJ_TYPE_MSG) {
-          actions[REVOKE_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Revoke_Message(s)_..."));
-          actions[REVOKE_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke_selected_message(s)."));
-          actions[REVOKE_ACTION].putValue(Actions.MENU_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
-          actions[REVOKE_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
-        } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
-          actions[REVOKE_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Revoke_Address(es)_..."));
-          actions[REVOKE_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke_selected_address(es)."));
-          actions[REVOKE_ACTION].putValue(Actions.MENU_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
-          actions[REVOKE_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
-        } else {
-          actions[REVOKE_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Revoke_..."));
-          actions[REVOKE_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke_selected_object(s)."));
-          actions[REVOKE_ACTION].putValue(Actions.MENU_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
-          actions[REVOKE_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
-        }
-      }
-
       if (actions[PROPERTIES_ACTION] != null) {
         if (selectionObjType == MsgDataRecord.OBJ_TYPE_MSG) {
           actions[PROPERTIES_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Message_Properties"));
@@ -1998,16 +1984,6 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
           actions[PROPERTIES_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Address_Properties"));
           actions[PROPERTIES_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_properties_of_selected_address."));
-        }
-      }
-
-      if (actions[FORWARD_ACTION] != null) {
-        if (selectionObjType == MsgDataRecord.OBJ_TYPE_MSG) {
-          actions[FORWARD_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Forward_Message(s)_..."));
-        } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
-          actions[FORWARD_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Forward_Address(es)_..."));
-        } else {
-          actions[FORWARD_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Forward_Object(s)_..."));
         }
       }
 
@@ -2061,8 +2037,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.REPLY_TO_MSG24));
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Post_Reply"));
         } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
-          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Edit_Address"));
-          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Edit_Address"));
+          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Edit_..."));
+          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Edit_..."));
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.MENU_ICON, Images.get(ImageNums.ADDRESS_EDIT16));
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_EDIT24));
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Edit"));

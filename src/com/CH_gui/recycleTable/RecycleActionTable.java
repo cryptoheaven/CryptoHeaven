@@ -277,7 +277,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 // Copy action is kind-of useless in Recycle Bin
 //  private class CopyAction extends AbstractActionTraced {
 //    public CopyAction(int actionId) {
-//      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_to_Folder_..."), Images.get(ImageNums.COPY16));
+//      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_..."), Images.get(ImageNums.COPY16));
 //      putValue(Actions.ACTION_ID, new Integer(actionId));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_file_to_another_folder."));
 //      putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
@@ -311,7 +311,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 
   private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Move_to_Folder_..."), Images.get(ImageNums.FILE_MOVE16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Move_..."), Images.get(ImageNums.FILE_MOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_selected_file_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_MOVE24));

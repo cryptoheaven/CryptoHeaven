@@ -509,6 +509,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Contact_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       ContactTableModel tableModel = (ContactTableModel) getTableModel();
@@ -530,6 +531,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_other's_contacts_with_you."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ARROW_DOUBLE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       boolean newShow = !(isShowing().booleanValue());
@@ -621,6 +623,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_contact_list_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new ContactTableFrame();

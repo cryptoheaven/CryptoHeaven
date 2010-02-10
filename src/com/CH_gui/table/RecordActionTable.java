@@ -344,6 +344,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.TOOL_TIP, "Split Left-Right");
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
       init();
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -437,6 +438,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FIND24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Search"));
       putValue(Actions.STATE_CHECK, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
     }
@@ -458,6 +460,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.SELECTED_RADIO, Boolean.valueOf(set));
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
       getTableModel().setSortDirButtonGroup(group);
     }
     public void actionPerformedTraced(ActionEvent actionEvent) {
@@ -493,6 +496,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
       getTableModel().setSortButtonGroup(group);
     }
     public void actionPerformedTraced(ActionEvent actionEvent) {
@@ -516,6 +520,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_columns_to_render_in_the_table."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent actionEvent) {
       CustomizeColumnsDialog d = null;

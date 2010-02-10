@@ -339,7 +339,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     FolderTreeComponent oldTreeComp = getMainTreeComponent();
     // Remove the Contact Folders from display
     // FolderTreeComponent treeComp = new FolderTreeComponent(true);
-    FolderTreeComponent treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true));
+    FolderTreeComponent treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true), false);
     setMainTreeComponent(treeComp);
 
     // Get displayable welcome screen in the empty table component.

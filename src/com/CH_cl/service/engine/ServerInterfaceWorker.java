@@ -73,7 +73,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   /** Where all replies are submited */
   private FifoWriterI replyFifoWriterI;
   /** Where all requests are taken from */
-  private PriorityFifoReaderI requestPriorityFifoReaderI;
+  private final PriorityFifoReaderI requestPriorityFifoReaderI;
   /** Holder of streams and general IO stuff */
   private ClientSessionContext sessionContext;
   /** Thread that constantly reads from the wire and converts bytes to messages and places them on replyFifoWriterI. */
@@ -84,7 +84,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   // All actions before they are sent, we hash them into a table so we can properly interrupt them
   // and release any waiting processes in an event of a failure in the writer or reader process.
   // The key is message stamp.
-  private Hashtable outgoingInterruptableActionsHT;
+  private final Hashtable outgoingInterruptableActionsHT;
 
   /** Login message action that should be used for login. */
   private MessageAction loginMsgAction;
@@ -95,11 +95,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private boolean finished = false;
   private static int workerCount = 0;
 
-  private Object busyMonitor = new Object();
+  private final Object busyMonitor = new Object();
   private int busyCount = 0;
 
   private long idleStartDate;
-  private Object idleStartDateMonitor = new Object();
+  private final Object idleStartDateMonitor = new Object();
 
   private boolean isPersistantWorker = false;
 
@@ -107,7 +107,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
    * Monitor completion of HEAVY jobs so that requests for heavy jobs are sent one at a time and replies read
    * before the same worker can send a request for a heavy job.
    */
-  private Object readerDoneMonitor = new Object();
+  private final Object readerDoneMonitor = new Object();
 
   private long creationTimestamp;
 
@@ -271,7 +271,6 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       destroyWorker();
       attemptLoginMessageAction = null;
       replyFifoWriterI = null;
-      requestPriorityFifoReaderI = null;
       reader = null;
       writer = null;
     } catch (Throwable t) {
@@ -351,6 +350,17 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             progressMonitor.setInterrupt(ServerInterfaceWorker.this);
 
             msgAction = ClientMessageAction.readActionFromStream(dataIn, sessionContext, msgActionCode, msgActionStamp);
+
+            // response speed monitoring
+            if (trace != null) {
+              long startTime = msgAction.getStampTime();
+              long endTime = System.currentTimeMillis();
+              long ms = endTime-startTime;
+              if (ms >= 0 && ms < 90000) {
+                if (trace != null) trace.data(50, "Round trip time for " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()) + " took " + (endTime-startTime)+" ms. ");
+                //System.out.println(""+(endTime-startTime)+" ms. " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()));
+              }
+            }
 
             progressMonitor.setCancellable(msgAction);
 

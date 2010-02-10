@@ -1624,10 +1624,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
    * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
    * @return true if anything was converted.
    */
-  private boolean convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertEmailsToWebAccounts) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertEmailsToWebAccounts)");
+  private boolean convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertNotHostedEmailsToWebAccounts) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertNotHostedEmailsToWebAccounts)");
     if (trace != null) trace.args(recipients);
-    if (trace != null) trace.args(convertEmailsToWebAccounts);
+    if (trace != null) trace.args(convertNotHostedEmailsToWebAccounts);
 
     boolean anyConverted = false;
     Vector unknownEmailsV = new Vector();
@@ -1694,7 +1694,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
       if (trace != null) trace.data(40, unknownEmailsV);
       Object[] emls = new Object[unknownEmailsV.size()];
       unknownEmailsV.toArray(emls);
-      Object[] set = new Object[] { emls, Boolean.valueOf(convertEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
+      Object[] set = new Object[] { emls, Boolean.valueOf(convertNotHostedEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
       SIL.submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
     }
     // fetch unknown users
@@ -1716,8 +1716,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           EmailRecord eRec = cache.getEmailRecord(addr);
 
           Long userID = null;
+          boolean isEmailHosted = false;
           if (eRec != null) {
             userID = eRec.userId;
+            isEmailHosted = eRec.isHosted();
             if (trace != null) trace.data(70, addr);
           } else {
             // see if numeric
@@ -1733,7 +1735,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
           }
 
           if (userID != null) {
-            boolean includeWebUsers = convertEmailsToWebAccounts;
+            boolean includeWebUsers = convertNotHostedEmailsToWebAccounts || isEmailHosted;
             Record familiar = MsgPanelUtils.convertUserIdToFamiliarUser(userID, true, false, includeWebUsers);
             if (trace != null) trace.data(100, familiar);
             if (familiar != null) {

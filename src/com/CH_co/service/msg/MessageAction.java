@@ -27,14 +27,14 @@ import com.CH_co.service.msg.dataSets.Str_Rp;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
- * 
+ * </a><br>All rights reserved.<p>
+ *
  * Basic action of the client or the server in response to the msessage data received.
  * Cancel relates to individual requests as cancelled by for example a progress monitor.
  * Interrupt relates to chains of requests where some reply may cause subsequent requests.
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MessageAction extends Message implements Cancellable {
 
@@ -43,8 +43,10 @@ public class MessageAction extends Message implements Cancellable {
 
 
   private int actionCode;
-  private long uniqueTimeStamp;
+  private long uniqueStamp;
   private static long lastUniqueTimeStamp;
+  private static int stampSubNumber;
+  private static int stampSubNumberMax = 1000;
 
   private boolean cancelled;
   private Interrupter interrupter;
@@ -68,17 +70,17 @@ public class MessageAction extends Message implements Cancellable {
   public MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, boolean timeStamp) {
     this(actionCode, protocolMsgDataSet, timeStamp == true ? nextStamp() : 0, false, null, null);
   }
-  private MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, long uniqueTimeStamp, boolean cancelled, Interrupter interrupter, Interruptible interruptible) {
+  private MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, long uniqueStamp, boolean cancelled, Interrupter interrupter, Interruptible interruptible) {
     super(protocolMsgDataSet);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, long stamp, boolean cancelled, Interrupter interrupter, Interruptible interruptible)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, long uniqueStamp, boolean cancelled, Interrupter interrupter, Interruptible interruptible)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args("protocolMsgDataSet:... (too Long)");
-    if (trace != null) trace.args(uniqueTimeStamp);
+    if (trace != null) trace.args(uniqueStamp);
     if (trace != null) trace.args(cancelled);
     if (trace != null) trace.args(interrupter, interruptible);
 
     this.actionCode = actionCode;
-    this.uniqueTimeStamp = uniqueTimeStamp;
+    this.uniqueStamp = uniqueStamp;
     this.cancelled = cancelled;
     this.interrupter = interrupter;
     this.interruptible = interruptible;
@@ -91,13 +93,13 @@ public class MessageAction extends Message implements Cancellable {
    * Protected constructors used in ReplyMessageAction where stamp is copied from request message.
    */
   protected MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, MessageAction originalRequest) {
-    this(actionCode, protocolMsgDataSet, originalRequest.uniqueTimeStamp, originalRequest.cancelled, null, null);
+    this(actionCode, protocolMsgDataSet, originalRequest.uniqueStamp, originalRequest.cancelled, null, null);
   }
   protected MessageAction(int actionCode, String strMsg, MessageAction originalRequest) {
-    this(actionCode, new Str_Rp(strMsg), originalRequest.uniqueTimeStamp, originalRequest.cancelled, null, null);
+    this(actionCode, new Str_Rp(strMsg), originalRequest.uniqueStamp, originalRequest.cancelled, null, null);
   }
   protected MessageAction(int actionCode, MessageAction originalRequest) { // called by ReplyMessageAction
-    this(actionCode, (ProtocolMsgDataSet) null, originalRequest.uniqueTimeStamp, originalRequest.cancelled, null, null);
+    this(actionCode, (ProtocolMsgDataSet) null, originalRequest.uniqueStamp, originalRequest.cancelled, null, null);
   }
 
 
@@ -116,12 +118,12 @@ public class MessageAction extends Message implements Cancellable {
   }
 
 
-  public int getActionCode() { 
+  public int getActionCode() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "getActionCode()");
     if (trace != null) trace.exit(MessageAction.class, actionCode);
-    return actionCode; 
+    return actionCode;
   }
-  public void setActionCode(int code) { 
+  public void setActionCode(int code) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "setActionCode(int code)");
     if (trace != null) trace.args(code);
     actionCode = code;
@@ -130,19 +132,36 @@ public class MessageAction extends Message implements Cancellable {
 
   private static long nextStamp() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "nextStamp()");
+    long returnStamp = 0;
     long nextUniqueTimeStamp = System.currentTimeMillis();
-    while (nextUniqueTimeStamp == lastUniqueTimeStamp) {
-      try { Thread.sleep(1); } catch (InterruptedException e) { }
-      nextUniqueTimeStamp = System.currentTimeMillis();
+    if (nextUniqueTimeStamp != lastUniqueTimeStamp) {
+      stampSubNumber = 0;
+    } else {
+      stampSubNumber ++;
+      if (stampSubNumber >= stampSubNumberMax) {
+        stampSubNumber = 0;
+        while (nextUniqueTimeStamp == lastUniqueTimeStamp) {
+          try { Thread.sleep(1); } catch (InterruptedException e) { }
+          nextUniqueTimeStamp = System.currentTimeMillis();
+        }
+      }
     }
     lastUniqueTimeStamp = nextUniqueTimeStamp;
-    if (trace != null) trace.exit(MessageAction.class, nextUniqueTimeStamp);
-    return nextUniqueTimeStamp;
+    returnStamp = nextUniqueTimeStamp*stampSubNumberMax + stampSubNumber;
+    if (trace != null) trace.exit(MessageAction.class, returnStamp);
+    return returnStamp;
   }
+
   public long getStamp() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "getStamp()");
-    if (trace != null) trace.exit(MessageAction.class, uniqueTimeStamp);
-    return uniqueTimeStamp;
+    if (trace != null) trace.exit(MessageAction.class, uniqueStamp);
+    return uniqueStamp;
+  }
+  public long getStampTime() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "getStampTime()");
+    long stampTime = uniqueStamp/stampSubNumberMax;
+    if (trace != null) trace.exit(MessageAction.class, stampTime);
+    return stampTime;
   }
 
 
@@ -150,7 +169,7 @@ public class MessageAction extends Message implements Cancellable {
   public void writeToStream(DataOutputStream2 out, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "writeToStream(DataOutputStream2, short clientBuild, short serverBuild)");
     // Other thread may try to push notification as well, so
-    // MessageAction synchronizes write to ensure than massages are atomic. 
+    // MessageAction synchronizes write to ensure than massages are atomic.
 
     // only one thread should be writing to a stream at a time
     synchronized(out) {
@@ -158,18 +177,18 @@ public class MessageAction extends Message implements Cancellable {
       if (trace != null) trace.data(10, "actionCode", actionCode);
       out.writeInt(actionCode);
 
-      if (trace != null) trace.data(20, "uniqueTimeStamp", uniqueTimeStamp);
-      out.writeLong(uniqueTimeStamp);
+      if (trace != null) trace.data(20, "uniqueStamp", uniqueStamp);
+      out.writeLong(uniqueStamp);
 
       if (trace != null) trace.data(30, "this", this);
 
-      ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(uniqueTimeStamp);
-      progressMonitor.startSend(actionCode, uniqueTimeStamp);
+      ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(uniqueStamp);
+      progressMonitor.startSend(actionCode, uniqueStamp);
       String actionInfoName = MessageActionNameSwitch.getActionInfoName(actionCode);
       progressMonitor.startSendAction(actionInfoName);
       super.writeToStream(out, progressMonitor, clientBuild, serverBuild);
       progressMonitor.doneSendAction(actionInfoName);
-      progressMonitor.doneSend(actionCode, uniqueTimeStamp);
+      progressMonitor.doneSend(actionCode, uniqueStamp);
 
       out.flush();
     }
@@ -211,7 +230,7 @@ public class MessageAction extends Message implements Cancellable {
   }
 
   // Other thread may try to read notification as well, so
-  // MessageAction synchronizes read to ensure than massages are atomic. 
+  // MessageAction synchronizes read to ensure than massages are atomic.
   protected void initFromStream(DataInputStream2 in, int actionCode, short clientBuild, short serverBuild) throws IOException, DataSetException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "initFromStream(DataInputStream2, int actionCode, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(actionCode);
@@ -234,7 +253,7 @@ public class MessageAction extends Message implements Cancellable {
 
     synchronized(in) {
       this.actionCode = actionCode;
-      this.uniqueTimeStamp = stamp;
+      this.uniqueStamp = stamp;
 
       ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(stamp);
       progressMonitor.startReceive(actionCode, stamp);
@@ -249,14 +268,14 @@ public class MessageAction extends Message implements Cancellable {
 
   public void copyAllFromAction(MessageAction sourceAction) {
     this.actionCode = sourceAction.actionCode;
-    this.uniqueTimeStamp = sourceAction.uniqueTimeStamp;
+    this.uniqueStamp = sourceAction.uniqueStamp;
     this.sessionContext = sourceAction.sessionContext;
     super.copyDataSetFromMessage(sourceAction);
   }
 
 
-  /** 
-   * Initialize the Message Action with the context of the communications through which it came. 
+  /**
+   * Initialize the Message Action with the context of the communications through which it came.
    */
   protected void setCommonContext(CommonSessionContext sessionContext) {
     this.sessionContext = sessionContext;
@@ -301,7 +320,7 @@ public class MessageAction extends Message implements Cancellable {
   public String toString() {
     return "["+Misc.getClassNameWithoutPackage(getClass())
       + ": actionCode="     + actionCode
-      + ", uniqueTimeStamp="+ uniqueTimeStamp
+      + ", uniqueStamp="    + uniqueStamp
       + ", sessionContext=" + sessionContext
       + ", super="          + super.toString()
       + "]";
@@ -310,9 +329,9 @@ public class MessageAction extends Message implements Cancellable {
   public String formatForDisplay() {
     String text = ""
       + " actionCode = " + getActionCode()
-      + "\n uniqueTimeStamp = " + getStamp()
+      + "\n uniqueStamp = " + getStamp()
       + "\n data set class= " + Misc.getClassNameWithoutPackage(getMsgDataSet().getClass())
-      + "\n data set = " + getMsgDataSet().toStringLongFormat() 
+      + "\n data set = " + getMsgDataSet().toStringLongFormat()
       + "\n session context = " + sessionContext;
     return text;
   }

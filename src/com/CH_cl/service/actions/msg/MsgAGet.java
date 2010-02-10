@@ -413,7 +413,7 @@ public class MsgAGet extends ClientMessageAction {
           short numNew = fetchNumNew.shortValue();
           short numMax = fetchNumMax.shortValue();
 
-          long startTime = getStamp();
+          long startTime = getStampTime();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
           double multiplier = ((double) MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time

@@ -26,8 +26,6 @@ import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 
 import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.service.records.*;
@@ -70,15 +68,12 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   private int leadingActionId = Actions.LEADING_ACTION_ID_GROUP_ACTION_TABLE;
   private int leadingFolderActionId = Actions.LEADING_ACTION_ID_FOLDER_ACTION_TREE;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
-
   /** Creates new GroupActionTable, fetches the initial data from the database. */
   public GroupActionTable() {
     super(new GroupTableModel());
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupActionTable.class, "GroupActionTable()");
 
     initActions();
-    this.serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
     ((GroupTableModel) getTableModel()).setAutoUpdate(true);
 
     addDND(getJSortedTable());
