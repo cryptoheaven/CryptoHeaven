@@ -46,6 +46,7 @@ public class ImageNums extends Object {
   public static final int STATUS_WAITING16;
   public static final int STOPWATCH16;
   public static final int STOPWATCH_ALERT16;
+  public static final int STOPWATCH_ALERT24;
   public static final int STOPWATCH_WARN16;
   public static final int WARNING16;
 
@@ -561,7 +562,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[320+50]; // plus emotions
+    images = new String[321+50]; // plus emotions
 
 
     /******************************************************************
@@ -601,6 +602,9 @@ public class ImageNums extends Object {
 
     STOPWATCH_ALERT16 = i;
     images[i] = "StopwatchAlert16"; i++;
+
+    STOPWATCH_ALERT24 = i;
+    images[i] = "StopwatchAlert24"; i++;
 
     STOPWATCH_WARN16 = i;
     images[i] = "StopwatchWarn16"; i++;

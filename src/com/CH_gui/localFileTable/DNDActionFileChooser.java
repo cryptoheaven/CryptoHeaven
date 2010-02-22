@@ -189,11 +189,12 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
         JCheckBox[] jFiles = new JCheckBox[files.length];
         JLabel q = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_securely_and_permanently_wipe_the_selected_files_from_your_local_file_system?"));
         panel.add(q, new GridBagConstraints(0, 0, 1, 1, 0, 0,
-            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         JPanel innerPanel = new JPanel();
-        innerPanel.setBorder(new EtchedBorder());
+        innerPanel.setBorder(new EmptyBorder(0,0,0,0));
         innerPanel.setLayout(new GridBagLayout());
-        panel.add(new JScrollPane(innerPanel), new GridBagConstraints(0, 1, 1, 1, 10, 10,
+        JScrollPane scrollPane = new JScrollPane(innerPanel);
+        panel.add(scrollPane, new GridBagConstraints(0, 1, 1, 1, 10, 10,
             GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
         for (int i=0; i<files.length; i++) {
           File f = files[i];
@@ -206,8 +207,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
           label.setIcon(icon);
           innerPanel.add(jFiles[i], new GridBagConstraints(0, i, 1, 1, 0, 0,
               GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 1), 0, 0));
-          innerPanel.add(label, new GridBagConstraints(1, i, 1, 1, 0, 0,
-              GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 1, 2, 5), 0, 0));
+          innerPanel.add(label, new GridBagConstraints(1, i, 1, 1, 10, 0,
+              GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 1, 2, 5), 0, 0));
         }
 
         // show question dialog

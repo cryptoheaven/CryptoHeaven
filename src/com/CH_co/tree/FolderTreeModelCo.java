@@ -209,7 +209,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
         }
       }
 
-      // Order the list of additions and removals and do those operation in order to minimize 
+      // Order the list of additions and removals and do those operation in order to minimize
       // the GUI tree chaos (expansions and structural changes and jumping nodes)
       if (inOrder) {
         orderedProcess_AddOrRemove(true, toAddFolderPairsV);
@@ -262,7 +262,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     addNode(folderPair, true);
   }
   private synchronized void addNode(FolderPair folderPair, boolean inOrder) {
-    addNode(folderPair, true, false);
+    addNode(folderPair, inOrder, false);
   }
   private synchronized void addNode(FolderPair folderPair, boolean inOrder, boolean suppressReccur) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCo.class, "addNode(FolderPair, inOrder, suppressReccur)");
@@ -314,7 +314,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
       // if parent ID has changed -- move the tree branch to new parent
       if (!oldParentId.equals(parentId)) {
         // live chatting folders have dynamic names so always remove/insert them to keep proper sort ordering
-        if (!fRec.isDynamicName() && 
+        if (!fRec.isDynamicName() &&
                 ((oldParentId.longValue() < 0 && folderPair.isViewRoot()) ||
                 (oldParentId.equals(folderPair.getFileViewParentId())))
                 ) {
@@ -533,8 +533,8 @@ public class FolderTreeModelCo extends DefaultTreeModel {
 
   public void insertNodeInto(FolderTreeNode newChild, FolderTreeNode parent, int index) {
     folderNodesHT.put(newChild.getFolderObject().getId(), newChild);
-    // Cache the new parent Id in child's view hierarchy so cache queries can find 
-    //children by view (case of parent not being availble when only child folder 
+    // Cache the new parent Id in child's view hierarchy so cache queries can find
+    //children by view (case of parent not being availble when only child folder
     //is available through granted share)
     if (parent != null && parent.getFolderObject() != null)
       newChild.getFolderObject().getFolderShareRecord().guiViewParentId = parent.getFolderObject().getId();

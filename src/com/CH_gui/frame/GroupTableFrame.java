@@ -45,7 +45,7 @@ public class GroupTableFrame extends JActionFrameClosable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableFrame.class, "GroupTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 
-    GroupTableComponent mainComponent = new GroupTableComponent();
+    GroupTableComponent mainComponent = new GroupTableComponent4Frame();
     mainComponent.initData(folderPair.getId());
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);
 

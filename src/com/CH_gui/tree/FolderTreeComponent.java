@@ -21,9 +21,11 @@ import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.action.*;
+import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.menuing.*;
 import com.CH_gui.folder.*;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,7 +44,7 @@ import javax.swing.tree.TreePath;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -50,13 +52,16 @@ import javax.swing.tree.TreePath;
  *
  * <b>$Revision: 1.23 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class FolderTreeComponent extends JPanel implements FolderSelectionListener, VisualsSavable, DisposableObj {
+public class FolderTreeComponent extends JPanel implements FolderSelectionListener, ToolBarProducerI, VisualsSavable, DisposableObj {
 
   private FolderTreeScrollPane folderTreeScrollPane;
 
-  /** 
+  private JLabel jTitleLabel;
+  private ToolBarModel toolBarModel;
+
+  /**
    * Creates new FolderTreeComponent.
    * @param filter is nullable and specifies the record filter for the tree.
    */
@@ -67,7 +72,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     init(false);
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
-  /** 
+  /**
    * Creates new FolderTreeComponent.
    * @param filter specifies the record filter for the tree.
    */
@@ -79,7 +84,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     init(false);
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
-  /** 
+  /**
    * Creates new FolderTreeComponent.
    * @param filter specifies the record filter for the tree.
    */
@@ -94,7 +99,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
 
-  /** 
+  /**
    * Creates new FolderTreeComponent.
    * Auto Fetch.
    */
@@ -125,6 +130,10 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeComponent.class, "init(boolean withExploreUtilityTool)");
     if (trace != null) trace.args(withExploreUtilityTool);
 
+    // If we don't have global from toolbars, we'll setup content toolbars
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      toolBarModel = initToolBarModel(MiscGui.getVisualsKeyName(this), null, null);
+
     // So the split panes are not limited in movement, but must have at least visible header.
     setMinimumSize(new Dimension(0, 24));
     setLayout(new GridBagLayout());
@@ -148,26 +157,39 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
         exploreButton = ActionUtilities.makeSmallComponentToolButton(exploreAction);
     }
 
+    int posY = 0;
 
-    JLabel label = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("title_Folders"));
-    add(label, new GridBagConstraints(0, 0, 1, 1, 10, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
-
+    jTitleLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("title_Folders"));
+    add(jTitleLabel, new GridBagConstraints(0, posY, 1, 1, 10, 0,
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 0, 5), 0, 0));
+    JLabel minRowHeight = new JLabel(" ");
+    add(minRowHeight, new GridBagConstraints(1, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 0, 3, 0), 0, 0));
     if (cloneButton != null)
-      add(cloneButton, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
+      add(cloneButton, new GridBagConstraints(2, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
     if (exploreButton != null)
-      add(exploreButton, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
+      add(exploreButton, new GridBagConstraints(3, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
     if (refreshButton != null)
-      add(refreshButton, new GridBagConstraints(3, 0, 1, 1, 0, 0, 
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
+      add(refreshButton, new GridBagConstraints(4, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    posY ++;
 
-    add(folderTreeScrollPane, new GridBagConstraints(0, 1, 4, 1, 10, 10, 
-        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+    if (toolBarModel != null) {
+      add(toolBarModel.getToolBar(), new GridBagConstraints(0, posY, 5, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      posY ++;
+    }
+
+    add(folderTreeScrollPane, new GridBagConstraints(0, posY, 5, 1, 10, 10,
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this), "Dimension width 160 height 260"));
     installMouseListener();
+
+    if (toolBarModel != null)
+      toolBarModel.addComponentActions(this);
 
     if (trace != null) trace.exit(FolderTreeComponent.class);
   }
@@ -178,6 +200,22 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
       addMouseListener(new PopupMouseAdapter(this, (ActionProducerI) folderTreeScrollPane.getFolderTree()));
   }
 
+  /***********************************************************
+  *** T o o l B a r P r o d u c e r I    interface methods ***
+  ***********************************************************/
+  public ToolBarModel getToolBarModel() {
+    return toolBarModel;
+  }
+  public String getToolBarTitle() {
+    return jTitleLabel.getText();
+  }
+  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+      toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : propertyKeyName, false);
+    if (toolBarModel != null && sourceComponent != null)
+      toolBarModel.addComponentActions(sourceComponent);
+    return toolBarModel;
+  }
 
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
@@ -202,7 +240,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     if (trace != null) trace.args(visuals);
 
     try {
-      StringTokenizer st = new StringTokenizer(visuals);  
+      StringTokenizer st = new StringTokenizer(visuals);
       st.nextToken();
       st.nextToken();
       int width = Integer.parseInt(st.nextToken());

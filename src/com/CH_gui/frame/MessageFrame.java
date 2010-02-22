@@ -22,6 +22,7 @@ import com.CH_gui.msgs.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.MiscGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -102,6 +103,8 @@ public class MessageFrame extends JActionFrameClosable {
 
     composePanel = new MsgComposePanel(initialRecipients);
     composePanel.setSubject(subject);
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
 
     // all JActionFrames already size themself
@@ -118,9 +121,10 @@ public class MessageFrame extends JActionFrameClosable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg)");
     if (trace != null) trace.args(initialRecipients, replyToMsg);
 
-    //composePanel = new MsgComposePanel((Record[][]) null);
     composePanel = new MsgComposePanel(initialRecipients, null, MsgDataRecord.OBJ_TYPE_MSG, false, true);
     composePanel.setReplyTo_Threaded(replyToMsg, initialRecipients);
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
 
     // all JActionFrames already size themself
@@ -142,6 +146,8 @@ public class MessageFrame extends JActionFrameClosable {
       MsgLinkRecord forwardMsg = (MsgLinkRecord) attachments[0];
       composePanel.setForwardBody_Threaded(forwardMsg);
     }
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
 
     // all JActionFrames already size themself
@@ -158,6 +164,8 @@ public class MessageFrame extends JActionFrameClosable {
     if (trace != null) trace.args(initialRecipients, attachFiles);
 
     composePanel = new MsgComposePanel(new Record[][] { initialRecipients }, attachFiles);
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
 
     // all JActionFrames already size themself
@@ -193,6 +201,8 @@ public class MessageFrame extends JActionFrameClosable {
       else if (draftData instanceof MsgLinkRecord)
         composePanel.setFromDraft_Threaded((MsgLinkRecord) draftData, isDeleteDraftAfterSave);
     }
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
 
     // all JActionFrames already size themself

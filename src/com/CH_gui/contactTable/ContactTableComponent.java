@@ -73,27 +73,34 @@ public class ContactTableComponent extends RecordTableComponent {
   }
    */
   /** Creates new ContactTableComponent */
-  public ContactTableComponent(RecordFilter contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction) {
-    super(new ContactActionTable(contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "ContactTableComponent(Record contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction)");
+  public ContactTableComponent(RecordFilter contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction, boolean suppressToolbar, boolean suppressUtilityBar) {
+    super(new ContactActionTable(contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName, null, suppressToolbar, suppressUtilityBar, false);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "ContactTableComponent(Record contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction, boolean suppressToolbar, boolean suppressUtilityBar)");
     if (trace != null) trace.args(contactFilter, emptyTemplateName, backTemplateName);
-    initialize();
+    if (trace != null) trace.args(withDoubleClickAction);
+    if (trace != null) trace.args(suppressToolbar);
+    if (trace != null) trace.args(suppressUtilityBar);
+    initialize(suppressUtilityBar);
     if (trace != null) trace.exit(ContactTableComponent.class);
   }
   /** Creates new ContactTableComponent */
-  public ContactTableComponent(Record[] initialData, RecordFilter contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction) {
-    super(new ContactActionTable(initialData, contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "ContactTableComponent(Record[] initialData, Record contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction)");
+  public ContactTableComponent(Record[] initialData, RecordFilter contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction, boolean suppressToolbar, boolean suppressUtilityBar) {
+    super(new ContactActionTable(initialData, contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName, null, suppressToolbar, suppressUtilityBar, false);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "ContactTableComponent(Record[] initialData, Record contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction, boolean suppressToolbar, boolean suppressUtilityBar)");
     if (trace != null) trace.args(initialData, contactFilter, emptyTemplateName, backTemplateName);
-    initialize();
+    if (trace != null) trace.args(withDoubleClickAction);
+    if (trace != null) trace.args(suppressToolbar);
+    if (trace != null) trace.args(suppressUtilityBar);
+    initialize(suppressUtilityBar);
     if (trace != null) trace.exit(ContactTableComponent.class);
   }
 
-  private void initialize() {
+  private void initialize(boolean suppressUtilityComponent) {
     JLabel titleLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("compTitle_Contacts"));
     titleLabel.setIcon(Images.get(ImageNums.FLD_CNT_CLOSED16));
     setTitle(titleLabel);
-    addUtilityComponent();
+    if (!suppressUtilityComponent)
+      addUtilityComponent();
     userListener = new UserListener();
     FetchedDataCache.getSingleInstance().addUserRecordListener(userListener);
   }
@@ -175,14 +182,6 @@ public class ContactTableComponent extends RecordTableComponent {
     combo.setBorder(new EmptyBorder(0,0,0,0));
 
     addUtilityComponent(combo);
-  }
-
-  /*******************************************************
-  *** V i s u a l s S a v a b l e    interface methods ***
-  *******************************************************/
-  public static final String visualsClassKeyName = "ContactTableComponent";
-  public String getVisualsClassKeyName() {
-    return visualsClassKeyName;
   }
 
   private class AddEmailAddressAction extends AbstractActionTraced {
@@ -327,7 +326,7 @@ public class ContactTableComponent extends RecordTableComponent {
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserGUIUpdater.class, "UserGUIUpdater.run()");
 
-      if (event.getEventType() == RecordEvent.SET) {
+      if (event.getEventType() == RecordEvent.SET && combo != null) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         UserRecord userRecord = cache.getUserRecord();
         int myStatusIndex = getStatusIndexFromChar(userRecord != null ? userRecord.online : new Character(UserRecord.ONLINE_INVISIBLE));
@@ -343,6 +342,10 @@ public class ContactTableComponent extends RecordTableComponent {
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/
+  public static final String visualsClassKeyName = "ContactTableComponent";
+  public String getVisualsClassKeyName() {
+    return visualsClassKeyName;
+  }
 
   public Integer getVisualsVersion() {
     return new Integer(1);

@@ -549,23 +549,8 @@ public class ArrayUtils extends Object {
     Vector selectedV = new Vector();
     if (source != null) {
       for (int i=0; i<source.length; i++) {
-        if (source[i].getClass().equals(type))
+        if (type.isAssignableFrom(source[i].getClass()))
           selectedV.addElement(source[i]);
-        else {
-          // check the inheritance tree
-          Class sourceClass = source[i].getClass();
-          while (true) {
-            // quit at root OBJECT -- it has no superclass
-            if (sourceClass.equals(Object.class))
-              break;
-            Class superClass = sourceClass.getSuperclass();
-            if (superClass.equals(type)) {
-              selectedV.addElement(source[i]);
-              break;
-            }
-            sourceClass = superClass;
-          } // end while (true)
-        } // end else check tree
       } // end for
     }
     Object[] objs = toArray(selectedV, type);

@@ -16,10 +16,10 @@ package com.CH_co.util;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public interface VisualsSavable {
 
@@ -28,7 +28,7 @@ public interface VisualsSavable {
   public void restoreVisuals(String visuals);
 
   public String getVisualsClassKeyName();
-  
+
   public String getExtension();
 
   public Integer getVisualsVersion();

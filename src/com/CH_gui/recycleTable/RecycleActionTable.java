@@ -575,8 +575,8 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = RecycleActionTable.this.getTableModel().getParentFolderPair();
-      boolean fromPopup = isActionActivatedFromPopup(event);
-      if (fromPopup) {
+      boolean useSelected = isActionActivatedFromPopup(event);
+      if (useSelected) {
         Record[] selectedRecords = (Record[]) getSelectedInstancesOf(FolderPair.class);
         if (selectedRecords != null) {
           if (selectedRecords.length > 1) {

@@ -45,13 +45,13 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public static final String SHARE_LOCAL_DESC = "Local File System View";
 
   public static final String CATEGORY_FILE_NAME = "File Folders";
-  public static final String CATEGORY_FILE_DESC = "File Folders [DESCRIPTION]";
+  public static final String CATEGORY_FILE_DESC = " "; //"File Folders [DESCRIPTION]";
   public static final String CATEGORY_MAIL_NAME = "eMail Folders";
-  public static final String CATEGORY_MAIL_DESC = "eMail Folders [DESCRIPTION]";
+  public static final String CATEGORY_MAIL_DESC = " "; //"eMail Folders [DESCRIPTION]";
   public static final String CATEGORY_CHAT_NAME = "Instant Message History";
-  public static final String CATEGORY_CHAT_DESC = "Instant Message History [DESCRIPTION]";
+  public static final String CATEGORY_CHAT_DESC = " "; //"Instant Message History [DESCRIPTION]";
   public static final String CATEGORY_GROUP_NAME = "Groups";
-  public static final String CATEGORY_GROUP_DESC = "Groups [DESCRIPTION]";
+  public static final String CATEGORY_GROUP_DESC = " "; //"Groups [DESCRIPTION]";
 
   public static final short SHOW_HIDE__ALWAYS_SHOW = 1;
   public static final short SHOW_HIDE__HIDE_WHEN_NOTHING_NEW = 2;

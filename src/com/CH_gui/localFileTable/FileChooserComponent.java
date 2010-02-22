@@ -23,7 +23,8 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
-import com.CH_gui.list.*;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.menuing.ToolBarModel;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -31,7 +32,7 @@ import com.CH_gui.list.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -39,27 +40,29 @@ import com.CH_gui.list.*;
  *
  * <b>$Revision: 1.19 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class FileChooserComponent extends JPanel implements VisualsSavable {
+public class FileChooserComponent extends JPanel implements ToolBarProducerI, VisualsSavable {
 
+  private ToolBarModel toolBarModel;
+  private JLabel jTitleLabel;
   private JFileChooser jFileChooser;
   private String propertyName;
 
   public FileChooserComponent(String propertyName) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileChooserComponent.class, "FileChooserComponent(String propertyName)");
     this.propertyName = propertyName;
-    
+
     jFileChooser = new DNDActionFileChooser(propertyName);
     jFileChooser.setMultiSelectionEnabled(true);
     jFileChooser.setControlButtonsAreShown(false);
     init();
-    
+
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this)));
-    
+
     if (trace != null) trace.exit(FileChooserComponent.class);
   }
-  /** 
+  /**
    * Creates new FileChooserComponent.
    */
   public FileChooserComponent(File currentDirectory) {
@@ -80,7 +83,7 @@ public class FileChooserComponent extends JPanel implements VisualsSavable {
 
     if (trace != null) trace.exit(FileChooserComponent.class);
   }
-  
+
   public JFileChooser getJFileChooser() {
     return jFileChooser;
   }
@@ -88,6 +91,8 @@ public class FileChooserComponent extends JPanel implements VisualsSavable {
   private void init() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileChooserComponent.class, "init()");
     setLayout(new GridBagLayout());
+
+    toolBarModel = initToolBarModel(MiscGui.getVisualsKeyName(this), null, null);
 
     AbstractButton refreshButton = null;
     AbstractButton cloneButton = null;
@@ -103,26 +108,59 @@ public class FileChooserComponent extends JPanel implements VisualsSavable {
         cloneButton = ActionUtilities.makeSmallComponentToolButton(cloneAction);
     }
 
-    JLabel titleLabel = new JMyLabel(FolderShareRecord.SHARE_LOCAL_NAME);
-    titleLabel.setIcon(Images.get(ImageNums.MY_COMPUTER16));
-    add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 10, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    int posY = 0;
+
+    jTitleLabel = new JMyLabel(FolderShareRecord.SHARE_LOCAL_NAME);
+    jTitleLabel.setIcon(Images.get(ImageNums.MY_COMPUTER16));
+    add(jTitleLabel, new GridBagConstraints(0, posY, 1, 1, 10, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 3, 0, 5), 0, 0));
+    JLabel minRowHeight = new JLabel(" ");
+    add(minRowHeight, new GridBagConstraints(1, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 0, 3, 0), 0, 0));
 
     if (refreshButton != null) {
-      add(refreshButton, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 1, 0, 1), 0, 0));
+      add(refreshButton, new GridBagConstraints(3, posY, 1, 1, 0, 0,
+          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (cloneButton != null) {
-      add(cloneButton, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 1, 0, 1), 0, 0));
+      add(cloneButton, new GridBagConstraints(2, posY, 1, 1, 0, 0,
+          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    }
+    posY ++;
+
+    if (toolBarModel != null) {
+      add(toolBarModel.getToolBar(), new GridBagConstraints(0, posY, 4, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      posY ++;
     }
 
-    add(jFileChooser, new GridBagConstraints(0, 1, 3, 1, 10, 10, 
-        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+    add(jFileChooser, new GridBagConstraints(0, posY, 4, 1, 10, 10,
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+
+    if (toolBarModel != null)
+      toolBarModel.addComponentActions(this);
 
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this), "Dimension width 160 height 180"));
 
     if (trace != null) trace.exit(FileChooserComponent.class);
+  }
+
+
+  /***********************************************************
+  *** T o o l B a r P r o d u c e r I    interface methods ***
+  ***********************************************************/
+  public ToolBarModel getToolBarModel() {
+    return toolBarModel;
+  }
+  public String getToolBarTitle() {
+    return jTitleLabel.getText();
+  }
+  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+      toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : propertyKeyName, false);
+    if (toolBarModel != null && sourceComponent != null)
+      toolBarModel.addComponentActions(sourceComponent);
+    return toolBarModel;
   }
 
 
@@ -151,7 +189,7 @@ public class FileChooserComponent extends JPanel implements VisualsSavable {
 
     try {
       if (visuals != null && visuals.length() > 0) {
-        StringTokenizer st = new StringTokenizer(visuals);  
+        StringTokenizer st = new StringTokenizer(visuals);
         st.nextToken();
         st.nextToken();
         int width = Integer.parseInt(st.nextToken());

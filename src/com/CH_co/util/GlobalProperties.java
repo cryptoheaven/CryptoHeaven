@@ -46,11 +46,11 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_RELEASE_FINAL = 3;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.0f;
+  public static final float PROGRAM_VERSION = 3.1f;
   public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 502;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 504;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;

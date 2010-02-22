@@ -76,7 +76,7 @@ import comx.Tiger.gui.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MsgComposePanel extends JPanel implements ActionProducerI, DropTargetListener, DisposableObj, MsgTypeManagerI, MsgComposeManagerI, MsgSendInfoProviderI, UndoManagerI, VetoRisibleI {
+public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarProducerI, DropTargetListener, DisposableObj, MsgTypeManagerI, MsgComposeManagerI, MsgSendInfoProviderI, UndoManagerI, VetoRisibleI {
 
   public static final String PROPERTY_NAME__SHOW_ALL_HEADERS = "showAllHeaders";
 
@@ -157,6 +157,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
   private UndoManager undoMngr;
 
   private Point lastDndPt;
+
+  private ToolBarModel toolBarModel;
 
   /** Creates new MsgComposePanel */
   public MsgComposePanel(Record[] initialRecipients) {
@@ -2482,6 +2484,24 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, DropTarg
     if (actions[SAVE_AS_DRAFT_ACTION].isEnabled() != enableDraft) {
       actions[SAVE_AS_DRAFT_ACTION].setEnabled(enableDraft);
     }
+  }
+
+
+  /***********************************************************
+  *** T o o l B a r P r o d u c e r I    interface methods ***
+  ***********************************************************/
+  public ToolBarModel getToolBarModel() {
+    return toolBarModel;
+  }
+  public String getToolBarTitle() {
+    return "Message Compose Toolbar";
+  }
+  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+      toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : getToolBarTitle(), false);
+    if (toolBarModel != null && sourceComponent != null)
+      toolBarModel.addComponentActions(sourceComponent);
+    return toolBarModel;
   }
 
 

@@ -35,7 +35,7 @@ import com.CH_gui.list.List_Viewable;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -43,7 +43,7 @@ import com.CH_gui.list.List_Viewable;
  *
  * <b>$Revision: 1.20 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ToolBarModel extends Object {
 
@@ -52,6 +52,9 @@ public class ToolBarModel extends Object {
   private String toolBarPropertyName;
   /** GUI reflection of the model */
   private JToolBar jToolBar;
+
+  /** Force addition of all tools even if they were ommited in the properties. */
+  private boolean forceAddAllTools;
 
   /** Vector stores sequence of MenuActionItem objects **/
   private Vector toolBarModel;
@@ -64,10 +67,15 @@ public class ToolBarModel extends Object {
   }
   /** Creates new ToolBarModel */
   public ToolBarModel(String toolBarPropertyName, String name) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "ToolBarModel(String toolBarPropertyName)");
-    if (trace != null) trace.args(toolBarPropertyName);
+    this(toolBarPropertyName, name, false);
+  }
+  public ToolBarModel(String toolBarPropertyName, String name, boolean forceAddAllTools) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "ToolBarModel(String toolBarPropertyName, String name, boolean forceAddAllTools)");
+    if (trace != null) trace.args(toolBarPropertyName, name);
+    if (trace != null) trace.args(forceAddAllTools);
 
     this.toolBarPropertyName = toolBarPropertyName;
+    this.forceAddAllTools = forceAddAllTools;
 
     String toolSequence = GlobalProperties.getProperty("ToolBarModel."+toolBarPropertyName);
     if (toolSequence == null)
@@ -91,6 +99,7 @@ public class ToolBarModel extends Object {
     }
     jToolBar = new JToolBar(name, orientation);
     jToolBar.setFloatable(false);
+    jToolBar.setVisible(false);
 
     if (trace != null) trace.exit(ToolBarModel.class);
   }
@@ -120,6 +129,26 @@ public class ToolBarModel extends Object {
     return jToolBar;
   }
 
+  /**
+   * Add menus and tools.
+   * @return true if new component causes addition of menus or tools
+   */
+  public synchronized ToolBarModel addComponentActions(Component source) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "addComponentActions(Component)");
+    if (trace != null) trace.args(source);
+
+    if (source != null) {
+      if (trace != null) trace.args(Misc.getClassNameWithoutPackage(source.getClass()));
+      Action[] actionArray = ActionUtils.getActionsRecursively(source);
+      addActions(actionArray);
+      // When component is added, make sure the state of actions is updated.
+      ActionUtils.setEnabledActionsRecur(source);
+    }
+
+    if (trace != null) trace.exit(ToolBarModel.class, this);
+    return this;
+  }
+
   public synchronized void addActions(Action[] actionArray) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "addActions(Action[] actionArray)");
 
@@ -128,6 +157,7 @@ public class ToolBarModel extends Object {
       // Go through the array and store all unique groups in a hashtable
       // where a key is the old group and value is the new replacement group.
       Hashtable ht = null;
+      boolean isAnyMadeVisible = false;
 
       for (int i=0; i<actionArray.length; i++) {
         Action action = actionArray[i];
@@ -164,15 +194,20 @@ public class ToolBarModel extends Object {
           }
 
           // if the tool is ment to be visible and it was made visible...
-          if (toolItem.isDefaultProperty() && ensureToolIsVisible(toolItem)) {
-            // see if we need to add any separators
-            addSeparatorsToTools();
+          if (forceAddAllTools || toolItem.isDefaultProperty()) {
+            if (ensureToolIsVisible(toolItem)) {
+              isAnyMadeVisible = true;
+              // see if we need to add any separators
+              addSeparatorsToTools();
+            }
           }
         } // end include
       } // end for
       if (ht != null)
         ht.clear();
 
+      if (isAnyMadeVisible && !jToolBar.isVisible())
+        jToolBar.setVisible(true);
       jToolBar.revalidate();
       jToolBar.repaint();
     }
@@ -315,8 +350,8 @@ public class ToolBarModel extends Object {
             v.addElement(toolItem);
           } else {
             Action action = toolItem.getAction();
-            if (!(action instanceof RecordActionTable.SortByColumnAction || 
-                  action instanceof RecordActionTable.SortAscDescAction || 
+            if (!(action instanceof RecordActionTable.SortByColumnAction ||
+                  action instanceof RecordActionTable.SortAscDescAction ||
                   action instanceof RecordActionTable.CustomizeColumnsAction)) {
               v.addElement(toolItem);
             }
@@ -402,14 +437,24 @@ public class ToolBarModel extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "rebuildToolBar()");
 
     jToolBar.removeAll();
+    boolean isAnyMadeVisible = false;
+
     for (int i=0; i<toolBarModel.size(); i++) {
       MenuActionItem toolItem = (MenuActionItem) toolBarModel.elementAt(i);
       // since we removed all items, we must reset isShowing
       toolItem.setShowing(false);
-      if (toolItem.isDefaultProperty() && toolItem.getAction() != null)
-        ensureToolIsVisible(toolItem);
+      if (toolItem.isDefaultProperty() && toolItem.getAction() != null) {
+        if (ensureToolIsVisible(toolItem)) {
+          isAnyMadeVisible = true;
+        }
+      }
     }
     addSeparatorsToTools();
+
+    if (isAnyMadeVisible && !jToolBar.isVisible())
+      jToolBar.setVisible(true);
+    if (!isAnyMadeVisible && jToolBar.isVisible())
+      jToolBar.setVisible(false);
 
     jToolBar.revalidate();
     jToolBar.repaint();

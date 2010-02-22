@@ -350,6 +350,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     if (chatTableComponent == null) {
       chatTableComponent = new ChatTableComponent();
       chatComposePanel = new MsgComposePanel(null, MsgDataRecord.OBJ_TYPE_MSG, true);
+      if (chatTableComponent.getToolBarModel() != null)
+        chatTableComponent.getToolBarModel().addComponentActions(chatComposePanel);
       Window w = SwingUtilities.windowForComponent(this);
       if (w instanceof JActionFrame) {
         ((JActionFrame)w).addComponentActions(chatTableComponent);
@@ -699,7 +701,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           // make sure we have the chat table component;
           initChatTableComponent();
           if (chatSplitPane == null) {
-            chatSplitPane = createSplitPane(chatTableComponent, chatComposePanel, "_chatComp", JSplitPane.VERTICAL_SPLIT, 0.75d);
+            chatSplitPane = createSplitPane(chatTableComponent, chatComposePanel, "_chatComp", JSplitPane.VERTICAL_SPLIT, 0.90d);
           }
           c = chatSplitPane;
           break;

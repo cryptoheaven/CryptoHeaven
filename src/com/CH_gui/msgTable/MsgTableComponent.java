@@ -43,7 +43,7 @@ public class MsgTableComponent extends RecordTableComponent {
     this(Template.get(Template.EMPTY_MAIL), Template.get(Template.NONE), Template.get(Template.CATEGORY_MAIL), msgPreviewMode);
   }
   public MsgTableComponent(String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean msgPreviewMode) {
-    super(new MsgActionTable(msgPreviewMode), emptyTemplateName, backTemplateName, categoryTemplateName, msgPreviewMode);
+    super(new MsgActionTable(msgPreviewMode), emptyTemplateName, backTemplateName, categoryTemplateName, false, false, msgPreviewMode);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableComponent.class, "MsgTableComponent()");
     if (trace != null) trace.exit(MsgTableComponent.class);
   }

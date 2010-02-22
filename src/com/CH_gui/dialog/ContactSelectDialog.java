@@ -145,7 +145,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
                           true, myUserRec != null ? myUserRec.userId : null),
       folderFilter }
     , MultiFilter.OR);
-    ContactTableComponent contactTableComponent = new ContactTableComponent(initialRecords, filter, Template.get(Template.NONE), Template.get(Template.BACK_CONTACTS), false);
+    ContactTableComponent contactTableComponent = new ContactTableComponent(initialRecords, filter, Template.get(Template.NONE), Template.get(Template.BACK_CONTACTS), false, true, true);
     contactTable = contactTableComponent;
     recordSelectionListener = new RecordSelectionListener();
     contactTable.getActionTable().getJSortedTable().getSelectionModel().addListSelectionListener(recordSelectionListener);

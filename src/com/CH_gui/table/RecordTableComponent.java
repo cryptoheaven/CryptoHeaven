@@ -40,6 +40,7 @@ import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
+import com.CH_gui.actionGui.JActionFrame;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -66,7 +67,7 @@ import javax.swing.event.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public abstract class RecordTableComponent extends JPanel implements VisualsSavable, DisposableObj {
+public abstract class RecordTableComponent extends JPanel implements ToolBarProducerI, VisualsSavable, DisposableObj {
 
   private JLabel jTitleLabel;
   private JLabel jDescriptionLabel;
@@ -77,10 +78,11 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
   private JButton jFilterCloseButton;
 
   private JPanel jTopPanel;
+  private JPanel jFilterPanel;
   private JPanel jTitlePanel;
   private JPanel jDescriptionPanel;
   private JPanel jUtilityButtonPanel;
-  private JPanel jFilterPanel;
+  private ToolBarModel toolBarModel;
   private int countTopPanels = 0;
 
   private RecordTableScrollPane recordTableScrollPane;
@@ -110,20 +112,22 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     this(recordTableScrollPane, Template.get(Template.NONE), Template.get(Template.NONE));
   }
   public RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName) {
-    this(recordTableScrollPane, emptyTemplateName, Template.get(Template.NONE), Template.get(Template.NONE), false);
+    this(recordTableScrollPane, emptyTemplateName, Template.get(Template.NONE), Template.get(Template.NONE), false, false, false);
   }
   public RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, boolean suppressVisualsSavable) {
-    this(recordTableScrollPane, emptyTemplateName, Template.get(Template.NONE), Template.get(Template.NONE), suppressVisualsSavable);
+    this(recordTableScrollPane, emptyTemplateName, Template.get(Template.NONE), Template.get(Template.NONE), false, false, suppressVisualsSavable);
   }
   public RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, String backTemplateName) {
-    this(recordTableScrollPane, emptyTemplateName, backTemplateName, Template.get(Template.NONE), false);
+    this(recordTableScrollPane, emptyTemplateName, backTemplateName, Template.get(Template.NONE), false, false, false);
   }
   public RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, String backTemplateName, String categoryTemplateName) {
-    this(recordTableScrollPane, emptyTemplateName, backTemplateName, categoryTemplateName, false);
+    this(recordTableScrollPane, emptyTemplateName, backTemplateName, categoryTemplateName, false, false, false);
   }
-  public RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean suppressVisualsSavable) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableComponent.class, "RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean suppressVisualsSavable)");
+  public RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableComponent.class, "RecordTableComponent(RecordTableScrollPane recordTableScrollPane, String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable)");
     if (trace != null) trace.args(recordTableScrollPane, emptyTemplateName, backTemplateName, categoryTemplateName);
+    if (trace != null) trace.args(suppressToolbar);
+    if (trace != null) trace.args(suppressUtilityBar);
     if (trace != null) trace.args(suppressVisualsSavable);
 
     this.recordTableScrollPane = recordTableScrollPane;
@@ -213,7 +217,13 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     jTitlePanel.add(jTitleLabel, BorderLayout.CENTER);
     jDescriptionPanel = new JPanel(new BorderLayout(0, 0));
     jDescriptionPanel.add(jDescriptionLabel, BorderLayout.CENTER);
-    jUtilityButtonPanel = new JPanel(new GridBagLayout());
+
+    if (!suppressUtilityBar)
+      jUtilityButtonPanel = new JPanel(new GridBagLayout());
+
+    // If we don't have global from toolbars, we'll setup content toolbars
+    if (!suppressToolbar)
+      toolBarModel = initToolBarModel(MiscGui.getVisualsKeyName(this), null, null);
 
     init();
 
@@ -224,9 +234,11 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     // Listen on folder changes so we can adjust title and description
     FetchedDataCache.getSingleInstance().addFolderShareRecordListener(folderShareListener = new FolderShareListener());
 
+    if (toolBarModel != null)
+      toolBarModel.addComponentActions(this);
+
     if (trace != null) trace.exit(RecordTableComponent.class);
   }
-
 
   public void removeRecordListeners() {
     if (recordTableScrollPane != null) {
@@ -238,7 +250,6 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     }
   }
 
-
   public RecordActionTable getActionTable() {
     if (recordTableScrollPane instanceof RecordActionTable)
       return (RecordActionTable) recordTableScrollPane;
@@ -249,6 +260,9 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     return recordTableScrollPane;
   }
 
+  public JPanel getTopPanel() {
+    return jTopPanel;
+  }
 
   /**
    * Setting the title overwrites the default title construction when initData() is called.
@@ -263,6 +277,9 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     }
     else if (lastFolderId != null)
       changeTitle(lastFolderId);
+  }
+  public void setTitleIcon(Icon icon) {
+    jTitleLabel.setIcon(icon);
   }
   /**
    * Setting the description overwrites the default description construction when initData() is called.
@@ -319,10 +336,12 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     countTopPanels++;
   }
   public void addUtilityComponent(JComponent utilityComponent) {
-    int count = jUtilityButtonPanel.getComponentCount();
-    jUtilityButtonPanel.add(utilityComponent, new GridBagConstraints(10-count, 0, 1, 1, 0, 0,
-        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-    this.jUtilityButtonPanel.revalidate();
+    if (jUtilityButtonPanel != null) {
+      int count = jUtilityButtonPanel.getComponentCount();
+      jUtilityButtonPanel.add(utilityComponent, new GridBagConstraints(10-count, 0, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+      this.jUtilityButtonPanel.revalidate();
+    }
   }
 
   private void init() {
@@ -338,7 +357,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     AbstractButton splitLayoutButton = null;
     AbstractButton filterButton = null;
 
-    if (recordTableScrollPane instanceof RecordActionTable) {
+    if (jUtilityButtonPanel != null && recordTableScrollPane instanceof RecordActionTable) {
       RecordActionTable actionTable = (RecordActionTable) recordTableScrollPane;
       Action refreshAction = actionTable.getRefreshAction();
       Action cloneAction = actionTable.getCloneAction();
@@ -375,35 +394,51 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     }
 
     int posY = 0;
-    jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
-        GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    posY ++;
-    jTopPanel.add(jTitlePanel, new GridBagConstraints(0, posY, 1, 2, 0, 0,
-        GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 5), 0, 0));
+    if (toolBarModel == null) {
+      jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
+          GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      posY ++;
+    }
+    jTopPanel.add(jTitlePanel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 3, 0, 5), 0, 0)); // 1 pixel smaller insets than description to accomodate "shared" folder icons that are larger
     jTopPanel.add(jDescriptionPanel, new GridBagConstraints(1, posY, 1, 2, 10, 0,
-        GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
-    jTopPanel.add(jUtilityButtonPanel, new GridBagConstraints(2, posY, 1, 1, 0, 0,
-        GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(1, 1, 1, 1), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(3, 5, 3, 5), 0, 0));
+    JLabel minRowHeight = new JLabel(" ");
+    jTopPanel.add(minRowHeight, new GridBagConstraints(2, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 0, 3, 0), 0, 0));
+    if (jUtilityButtonPanel != null) {
+      jTopPanel.add(jUtilityButtonPanel, new GridBagConstraints(3, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    }
+    posY += 2;
+    if (toolBarModel != null) {
+      jTopPanel.add(toolBarModel.getToolBar(), new GridBagConstraints(0, posY, 4, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      posY ++;
+      jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 4, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      posY ++;
+    }
 
     add(jTopPanel, new GridBagConstraints(0, countTopPanels, 1, 1, 10, 0,
-        GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     countTopPanels ++;
 
     if (refreshButton != null) {
       jUtilityButtonPanel.add(refreshButton, new GridBagConstraints(10, 0, 1, 1, 0, 0,
-          GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (cloneButton != null) {
       jUtilityButtonPanel.add(cloneButton, new GridBagConstraints(9, 0, 1, 1, 0, 0,
-          GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (splitLayoutButton != null) {
       jUtilityButtonPanel.add(splitLayoutButton, new GridBagConstraints(8, 0, 1, 1, 0, 0,
-          GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     if (filterButton != null) {
       jUtilityButtonPanel.add(filterButton, new GridBagConstraints(7, 0, 1, 1, 0, 0,
-          GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     /*
     add(recordTableScrollPane, new GridBagConstraints(0, 1, 5, 1, 60, 60,
@@ -463,7 +498,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
 //    }
     // add main table as 10'th element leaving room for addon components
     add(cards, new GridBagConstraints(0, 10, 1, 1, 20, 20,
-        GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     // Since we want initially to show the table, wait SHOW_DELAY seconds and if it doesn't fill,
     // show the template.
     // If template exists for this table...
@@ -668,6 +703,7 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
     if (fRec != null) {
       jTopPanel.setVisible(!fRec.isCategoryType());
     }
+    jTopPanel.setVisible(true);
     if (title == null) {
       changeTitle(folderId);
     }
@@ -884,6 +920,22 @@ public abstract class RecordTableComponent extends JPanel implements VisualsSava
       recordTableScrollPane.getTableModel().setFilterNarrowing(null);
   }
 
+  /***********************************************************
+  *** T o o l B a r P r o d u c e r I    interface methods ***
+  ***********************************************************/
+  public ToolBarModel getToolBarModel() {
+    return toolBarModel;
+  }
+  public String getToolBarTitle() {
+    return jTitleLabel.getText();
+  }
+  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+      toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : propertyKeyName, false);
+    if (toolBarModel != null && sourceComponent != null)
+      toolBarModel.addComponentActions(sourceComponent);
+    return toolBarModel;
+  }
 
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***

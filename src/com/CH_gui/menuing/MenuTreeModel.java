@@ -94,7 +94,7 @@ public class MenuTreeModel extends Object {
             "New Address|511|-1|-1|-1|"+
             "Separator|0|"+
             "Upload File ...|902|"+KeyEvent.VK_U+"|"+KeyEvent.VK_U+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
-            "Upload To Folder ...|303|"+KeyEvent.VK_U+"|"+KeyEvent.VK_U+"|"+Event.CTRL_MASK+"|"+
+            "Upload ...|303|"+KeyEvent.VK_U+"|"+KeyEvent.VK_U+"|"+Event.CTRL_MASK+"|"+
             "Download File(s) ...|400|"+KeyEvent.VK_D+"|"+KeyEvent.VK_D+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
             "Download Folder(s) ...|304|"+KeyEvent.VK_D+"|"+KeyEvent.VK_D+"|"+Event.CTRL_MASK+"|"+
             "Separator|0|"+
@@ -300,7 +300,7 @@ public class MenuTreeModel extends Object {
             "Create Shared Space ...|510|-1|-1|-1|"+
             //"Separator|0|"+
             "Upload File ...|902|-1|-1|-1|"+
-            "Upload To Folder ...|303|-1|-1|-1|"+
+            "Upload ...|303|-1|-1|-1|"+
             //"Separator|0|"+
             "Open|716|-1|-1|-1|"+
             "Download File(s) ...|400|-1|-1|-1|"+

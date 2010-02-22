@@ -108,10 +108,11 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private static final int SPLIT_LAYOUT_ACTION = 26;
   public static final int FILTER_ACTION = 27;
   private static final int DOWNLOAD_ACTION = 28;
+  private static final int MSG_COMPOSE_ACTION = 29;
 
-  private static final int SORT_ASC_ACTION = 29;
-  private static final int SORT_DESC_ACTION = 30;
-  private static final int SORT_BY_FIRST_COLUMN_ACTION = 31;
+  private static final int SORT_ASC_ACTION = 30;
+  private static final int SORT_DESC_ACTION = 31;
+  private static final int SORT_BY_FIRST_COLUMN_ACTION = 32;
   private static final int CUSTOMIZE_COLUMNS_ACTION = SORT_BY_FIRST_COLUMN_ACTION + NUM_OF_SORT_COLUMNS;
 
   private static final int NUM_ACTIONS = CUSTOMIZE_COLUMNS_ACTION + 1;
@@ -173,6 +174,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     actions = new Action[NUM_ACTIONS];
     if (!msgPreviewMode)
       actions[NEW_ACTION] = new NewAction(leadingActionId + NEW_ACTION);
+    actions[MSG_COMPOSE_ACTION] = new MsgComposeAction(leadingActionId + MSG_COMPOSE_ACTION);
     actions[COPY_ACTION] = new CopyAction(leadingActionId + COPY_ACTION);
     //if (!msgPreviewMode) {
       actions[MOVE_ACTION] = new MoveAction(leadingActionId + MOVE_ACTION);
@@ -307,6 +309,24 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   }
 
   /**
+   * Compose a new message
+   */
+  private class MsgComposeAction extends AbstractActionTraced {
+    public MsgComposeAction(int actionId) {
+      super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
+      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      new MessageFrame();
+    }
+  }
+
+  /**
    * Copy selected message(s) to another folder
    */
   private class CopyAction extends AbstractActionTraced {
@@ -423,7 +443,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       super(com.CH_gui.lang.Lang.rb.getString("action_Revoke_..."), Images.get(ImageNums.STOPWATCH_ALERT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT16));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Revoke"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -920,6 +940,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_from_selected_Draft_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_FROM_DRAFT24));
+      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_from_Draft"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       MsgLinkRecord msgLink = (MsgLinkRecord) getSelectedRecord();
@@ -1664,16 +1685,14 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       fireRecordSelectionChanged();
     }
 
+    // Always enable compose message action.
+    actions[MSG_COMPOSE_ACTION].setEnabled(true);
+
     if (!msgPreviewMode) {
       // Always enable the threaded view checkbox.
       actions[THREADED_VIEW_ACTION].setEnabled(true);
       // Always enable Invite action
       actions[INVITE_ACTION].setEnabled(true);
-      // Always enable Split Layout action
-      if (actions[SPLIT_LAYOUT_ACTION] != null) {
-        actions[SPLIT_LAYOUT_ACTION].setEnabled(true);
-        ((SplitLayoutAction) actions[SPLIT_LAYOUT_ACTION]).updateTextAndIcon();
-      }
       // Always enable Filter action
       actions[FILTER_ACTION].setEnabled(true);
       // Always enable sort actions
@@ -1763,14 +1782,15 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     }
 
     boolean isPostReplyToFolderOk = true;
-    boolean isParentAFolder = false;
+    boolean isParentNonCategoryFolder = false;
     boolean isPrintOk = false;
     {
       RecordTableModel model = getTableModel();
       if (model != null) {
         FolderPair fPair = model.getParentFolderPair();
         if (fPair != null && fPair.getId() != null) {
-          isParentAFolder = true;
+          if (fPair.getFolderRecord() != null)
+            isParentNonCategoryFolder = !fPair.getFolderRecord().isCategoryType();
           isPrintOk = !(fPair.getFolderRecord() != null && fPair.getFolderRecord().isCategoryType());
           UserRecord uRec = cache.getUserRecord();
           if (uRec != null) {
@@ -1786,6 +1806,11 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     boolean isPrevOk = viewTable.advanceSelection(false, true, null, null, -1, true);
     actions[ITERATE_NEXT_ACTION].setEnabled(isNextOk);
     actions[ITERATE_PREV_ACTION].setEnabled(isPrevOk);
+
+    if (actions[SPLIT_LAYOUT_ACTION] != null) {
+      actions[SPLIT_LAYOUT_ACTION].setEnabled(isParentNonCategoryFolder);
+      ((SplitLayoutAction) actions[SPLIT_LAYOUT_ACTION]).updateTextAndIcon();
+    }
 
     int count = 0;
     if (records != null) {
@@ -1822,9 +1847,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       actions[DOWNLOAD_ACTION].setEnabled(true);
       actions[COPY_ACTION].setEnabled(true);
       //if (!msgPreviewMode) {
-        actions[MOVE_ACTION].setEnabled(isParentAFolder && true);
-        actions[DELETE_ACTION].setEnabled(isParentAFolder && true);
-        actions[REVOKE_ACTION].setEnabled(isParentAFolder && true);
+        actions[MOVE_ACTION].setEnabled(isParentNonCategoryFolder && true);
+        actions[DELETE_ACTION].setEnabled(isParentNonCategoryFolder && true);
+        actions[REVOKE_ACTION].setEnabled(isParentNonCategoryFolder && true);
       //}
       actions[PROPERTIES_ACTION].setEnabled(true);
       actions[FORWARD_ACTION].setEnabled(true);
@@ -1849,9 +1874,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       actions[DOWNLOAD_ACTION].setEnabled(true);
       actions[COPY_ACTION].setEnabled(true);
       //if (!msgPreviewMode) {
-        actions[MOVE_ACTION].setEnabled(isParentAFolder && true);
-        actions[DELETE_ACTION].setEnabled(isParentAFolder && true);
-        actions[REVOKE_ACTION].setEnabled(isParentAFolder && true);
+        actions[MOVE_ACTION].setEnabled(isParentNonCategoryFolder && true);
+        actions[DELETE_ACTION].setEnabled(isParentNonCategoryFolder && true);
+        actions[REVOKE_ACTION].setEnabled(isParentNonCategoryFolder && true);
       //}
       actions[PROPERTIES_ACTION].setEnabled(false);
       actions[FORWARD_ACTION].setEnabled(true);
@@ -1876,9 +1901,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
 
     Window w = SwingUtilities.windowForComponent(this);
     if (!msgPreviewMode) {
-      actions[NEW_ACTION].setEnabled(isParentAFolder);
-      actions[REFRESH_ACTION].setEnabled(isParentAFolder && w != null);
-      actions[OPEN_IN_SEPERATE_WINDOW_ACTION].setEnabled(isParentAFolder && w != null);
+      actions[NEW_ACTION].setEnabled(isParentNonCategoryFolder);
+      actions[REFRESH_ACTION].setEnabled(isParentNonCategoryFolder && w != null);
+      actions[OPEN_IN_SEPERATE_WINDOW_ACTION].setEnabled(isParentNonCategoryFolder && w != null);
       // change text accordingly to selected items
       InviteAction inviteAction = (InviteAction) actions[INVITE_ACTION];
       inviteAction.updateText();

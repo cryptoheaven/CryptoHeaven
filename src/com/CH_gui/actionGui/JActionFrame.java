@@ -26,9 +26,14 @@ import com.CH_gui.tree.*;
 
 import com.CH_cl.service.ops.*;
 
+import com.CH_co.gui.JMyButton;
+import com.CH_co.gui.JMyLabel;
+import com.CH_co.gui.MyInsets;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import com.CH_gui.table.RecordTableComponent;
+import com.CH_guiLib.gui.JMyRadioButton;
 import javax.swing.tree.DefaultTreeModel;
 
 /** 
@@ -37,7 +42,7 @@ import javax.swing.tree.DefaultTreeModel;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -45,9 +50,12 @@ import javax.swing.tree.DefaultTreeModel;
  *
  * <b>$Revision: 1.39 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public abstract class JActionFrame extends JFrame implements ContainerListener, ActionProducerI, VisualsSavable {
+public abstract class JActionFrame extends JFrame implements ContainerListener, ActionProducerI, ToolBarProducerI, VisualsSavable {
+
+  public static boolean ENABLE_FRAME_TOOLBARS = false;
+  private boolean isWithToolBars = false;
 
   private static Integer versionedVisualsSavable = new Integer(4);
 
@@ -84,15 +92,16 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     if (trace != null) trace.args(withToolBar);
     frameDefaultTitle = title;
     frameTitle = title;
+    isWithToolBars = withToolBar;
 
     if (withMenuBar) {
       if (trace != null) trace.data(10, "creating menu bar");
       menuTreeModel = new MenuTreeModel(MiscGui.getVisualsKeyName(this));
       setJMenuBar(menuTreeModel.getMenuBar());
     }
-    if (withToolBar) {
+    if (withToolBar && ENABLE_FRAME_TOOLBARS) {
       if (trace != null) trace.data(20, "creating tool bar");
-      toolBarModel = new ToolBarModel(MiscGui.getVisualsKeyName(this), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Toolbar"), new Object[] {title}));
+      toolBarModel = initToolBarModel(MiscGui.getVisualsKeyName(this), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Toolbar"), new Object[] {title}), null);
     }
 
     Container contentPane = getContentPane();
@@ -109,13 +118,13 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     if (menuTreeModel != null) {
       if (trace != null) trace.data(50, "menu not null, add mouse popup listener");
       // Default Popup menu creator.
-      // When popup triger click is done on the general area in the frame, 
+      // When popup triger click is done on the general area in the frame,
       // the deepest action producer at that spot should produce be asked to produce its own menu,
       // without registering that action producer with a seperate mouse adapter.
       // This doesn't seem to work in general as the event seems to be consumed before this
       // mouse adapter gets to act on it.  However, it works when clicking on the menu bar outside
       // of menu areas.
-      addMouseListener(new MouseAdapter() { 
+      addMouseListener(new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MouseAdapter.class, "mouseClicked(MouseEvent e)");
           if (trace != null) trace.args(e);
@@ -304,7 +313,16 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     if (trace != null) trace.exit(JActionFrame.class, toolBarModel);
     return toolBarModel;
   }
-
+  public String getToolBarTitle() {
+    return "Main Toolbar";
+  }
+  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
+    if (JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+      toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : propertyKeyName, false);
+    if (toolBarModel != null && sourceComponent != null)
+      toolBarModel.addComponentActions(sourceComponent);
+    return toolBarModel;
+  }
 
   /**
    * Default exit operation is to save frame properties and visual preferences
@@ -354,13 +372,13 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     if (ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS)
       looks = UIManager.getInstalledLookAndFeels();
 
-    // tool tips 
+    // tool tips
     int numActions = 1;
     // + L&F
     if (ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS)
       numActions += looks.length;
     // + customize toolbar
-    if (toolBarModel != null)
+    if (isWithToolBars)
       numActions ++;
     // + customize menus
     if (ENABLE_MENU_CUSTOMIZATION_ACTION) {
@@ -370,16 +388,17 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
     actions = new Action[numActions];
 
+    int index = 0;
     // Lets leave the tool tips exclusively for the main frame.
     if ( !(this instanceof JActionFrameClosable) )
-      actions[0] = new ToolTipsAction(leadingActionId);
+      actions[index++] = new ToolTipsAction(leadingActionId);
 
-    if (toolBarModel != null)
-      actions[1] = new CustomizeToolsAction(leadingActionId+1);
+    if (isWithToolBars)
+      actions[index++] = new CustomizeToolsAction(leadingActionId+1);
 
     if (ENABLE_MENU_CUSTOMIZATION_ACTION) {
       if (menuTreeModel != null)
-        actions[2] = new CustomizeMenuAction(leadingActionId+2);
+        actions[index++] = new CustomizeMenuAction(leadingActionId+2);
     }
 
     if (ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS) {
@@ -402,7 +421,78 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      new DualBox_Launcher(JActionFrame.this, toolBarModel);
+      if (toolBarModel != null) {
+        new DualBox_Launcher(JActionFrame.this, toolBarModel);
+      } else {
+        // gather toolbars
+        ToolBarProducerI[] toolBarProducers = (ToolBarProducerI[]) MiscGui.getComponentsRecursively(JActionFrame.this, ToolBarProducerI.class);
+        final Vector liveProducersV = new Vector();
+        for (int i=0; i<toolBarProducers.length; i++) {
+          if (toolBarProducers[i].getToolBarModel() != null) {
+            liveProducersV.addElement(toolBarProducers[i]);
+          }
+        }
+
+        if (liveProducersV.size() == 0) {
+
+        } else if (liveProducersV.size() == 1) {
+          new DualBox_Launcher(JActionFrame.this, ((ToolBarProducerI) liveProducersV.elementAt(0)).getToolBarModel());
+        } else {
+          JPanel choicePanel = new JPanel(new GridBagLayout());
+          int posY = 0;
+          choicePanel.add(new JMyLabel("Which Toolbar would you like to customize?"), new GridBagConstraints(0, posY, 1, 1, 10, 0,
+              GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
+          posY ++;
+          final JRadioButton[] choices = new JRadioButton[liveProducersV.size()];
+          ButtonGroup group = new ButtonGroup();
+          for (int i=0; i<liveProducersV.size(); i++) {
+            ToolBarProducerI producer = (ToolBarProducerI) liveProducersV.elementAt(i);
+            String name = producer.getToolBarTitle();
+            if (producer instanceof RecordTableComponent) {
+              RecordTableComponent recTable = (RecordTableComponent) producer;
+              try {
+                String folderType = recTable.getRecordTableScrollPane().getTableModel().getParentFolderPair().getFolderRecord().getFolderType();
+                if (folderType != null)
+                  name =  folderType + " : " + name;
+              } catch (Throwable t) {
+              }
+            }
+            JMyRadioButton radio = new JMyRadioButton(name);
+            choices[i] = radio;
+            choicePanel.add(radio, new GridBagConstraints(0, posY, 1, 1, 10, 0,
+              GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 5, 10), 0, 0));
+            posY ++;
+            group.add(radio);
+          }
+          // Filler
+          choicePanel.add(new JLabel(), new GridBagConstraints(0, posY, 1, 1, 10, 10,
+            GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+          posY ++;
+          choices[0].setSelected(true);
+          JButton jEdit = new JMyButton("Customize");
+          jEdit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+              ToolBarModel tModel = null;
+              for (int i=0; i<liveProducersV.size(); i++) {
+                if (choices[i].isSelected()) {
+                  tModel = ((ToolBarProducerI) liveProducersV.elementAt(i)).getToolBarModel();
+                  break;
+                }
+              }
+              new DualBox_Launcher(JActionFrame.this, tModel);
+              SwingUtilities.windowForComponent((Component) event.getSource()).dispose();
+            }
+          });
+          JButton jCancel = new JMyButton("Cancel");
+          jCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+              SwingUtilities.windowForComponent((Component) event.getSource()).dispose();
+            }
+          });
+          JButton[] jButtons = new JButton[] { jEdit, jCancel };
+          MessageDialog.showDialog(JActionFrame.this, choicePanel, "Choose toolbar for customization.", MessageDialog.QUESTION_MESSAGE, jButtons, null, false);
+        }
+      }
     }
   }
 
@@ -622,9 +712,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
 
   /****************************************************************************/
-  /*        A c t i o n P r o d u c e r I                                  
+  /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
-  /** 
+  /**
    * ActionProducerI interface method.
    * @return all the acitons that this objects produces.
    */
@@ -689,7 +779,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         pack();
         isPackingSize = true;
       } else {
-        StringTokenizer st = new StringTokenizer(visuals);  
+        StringTokenizer st = new StringTokenizer(visuals);
         st.nextToken();
         st.nextToken();
         int width = Integer.parseInt(st.nextToken());
@@ -897,7 +987,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
             newTitle = roll(state, (state.tempTitle != null ? state.tempTitle : frameTitle) + " ");
           else if (state.runningMode == MODE_ANIM)
             newTitle = anim(state, state.tempTitle != null ? state.tempTitle : frameTitle);
-          else if (state.runningMode == MODE_STILL) 
+          else if (state.runningMode == MODE_STILL)
             newTitle = state.tempTitle != null ? state.tempTitle : frameTitle;
         }
       }

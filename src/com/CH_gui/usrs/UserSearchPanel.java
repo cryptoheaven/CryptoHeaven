@@ -12,6 +12,7 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_gui.menuing.ToolBarModel;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -38,6 +39,7 @@ import com.CH_co.service.records.*;
 
 import com.CH_co.util.*;
 import com.CH_co.trace.*;
+import com.CH_gui.actionGui.JActionFrame;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -55,7 +57,7 @@ import com.CH_co.trace.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class UserSearchPanel extends JPanel {
+public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
   private ServerInterfaceLayer SIL;
 
@@ -63,6 +65,7 @@ public class UserSearchPanel extends JPanel {
   JTextField jUserID;
   public UserActionTable userActionTable;
   public EmailInvitationPanel emailInvitationPanel;
+  private ToolBarModel toolBarModel;
 
   JRadioButton jRadioNicExact;
   JRadioButton jRadioNicNoCase;
@@ -94,6 +97,9 @@ public class UserSearchPanel extends JPanel {
 
     SIL = MainFrame.getServerInterfaceLayer();
     createPanel(withUserActions, withInviteActions, customSearchHeader, isPassRecoveryMode);
+
+    if (toolBarModel != null)
+      toolBarModel.addComponentActions(this);
 
     if (searchString != null && searchString.length() > 0) {
       Long userId = null;
@@ -218,6 +224,13 @@ public class UserSearchPanel extends JPanel {
     jUserID.setColumns(15);
 
     int posY = 0;
+
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && !isPassRecoveryMode) {
+      JToolBar toolBar = initToolBarModel(MiscGui.getVisualsKeyName(userActionTable), null, userActionTable).getToolBar();
+      mainPanel.add(toolBar, new GridBagConstraints(0, posY, 7, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      posY ++;
+    }
 
     if (isPassRecoveryMode) {
       JLabel logo = new JLabel(Images.get(ImageNums.LOGO_BANNER_MAIN));
@@ -368,6 +381,24 @@ public class UserSearchPanel extends JPanel {
 
       new UserSearchRunner(request, broaderSearchIfNoResults).start();
     }
+  }
+
+
+  /***********************************************************
+  *** T o o l B a r P r o d u c e r I    interface methods ***
+  ***********************************************************/
+  public ToolBarModel getToolBarModel() {
+    return toolBarModel;
+  }
+  public String getToolBarTitle() {
+    return "User Search Toolbar";
+  }
+  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+      toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : getToolBarTitle(), false);
+    if (toolBarModel != null && sourceComponent != null)
+      toolBarModel.addComponentActions(sourceComponent);
+    return toolBarModel;
   }
 
 

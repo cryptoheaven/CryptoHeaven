@@ -866,7 +866,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         // After applying the code, reload the welcome screen
         Runnable afterJob = new Runnable() {
           public void run() {
-            MainFrame.getSingleInstance().setDefaultWelcomeScreenPane();
+            MainFrame.getSingleInstance().setDefaultWelcomeScreenPanel();
           }
         };
         SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_APPLY_CODE, new Obj_List_Co(new Object[] { uRec.userId, code })), 60000, afterJob, null);

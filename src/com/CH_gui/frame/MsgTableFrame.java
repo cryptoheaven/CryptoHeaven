@@ -99,6 +99,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       folderType = folderPair.getFolderRecord().folderType.shortValue();
 
     mainTableComponent = null;
+    boolean isBringOutToolBar = false;
     JComponent mainComponent = null;
     JSplitPane mainSplitPane = null;
     // message folder/address folder
@@ -131,7 +132,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         if (initialData.length > 1) {
           if (objType == MsgDataRecord.OBJ_TYPE_MSG) {
             //mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_msg", JSplitPane.VERTICAL_SPLIT, 0.33d);
-            mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.33d);
+            mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.4d);
           } else {
             //mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_addr", JSplitPane.HORIZONTAL_SPLIT, 0.5d);
             mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
@@ -143,6 +144,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
           p.setLayout(new CardLayout());
           p.add(msgPreviewPanel, "top");
           p.add(mainTableComponent, "bottom"); // essentially hidden from view in the card layout
+          isBringOutToolBar = true;
           mainTableComponent.getActionTable().addRecordSelectionListener(msgPreviewPanel);
           mainComponent = p;
           RecordTableScrollPane scrollPane = mainTableComponent.getRecordTableScrollPane();
@@ -154,7 +156,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       } else {
         if (objType == MsgDataRecord.OBJ_TYPE_MSG) {
           //mainSplitPane = createSplitPane(getVisualsClassKeyName() + "_msg", JSplitPane.VERTICAL_SPLIT, 0.33d);
-          mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.33d);
+          mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.4d);
         } else {
           //mainSplitPane = createSplitPane(getVisualsClassKeyName() + "_addr", JSplitPane.HORIZONTAL_SPLIT, 0.5d);
           mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
@@ -168,9 +170,11 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       boolean isChatting = folderPair.getFolderRecord().isChatting();
       // chatting folder
       if (isChatting) {
-        mainTableComponent = new ChatTableComponent();
+        mainTableComponent = new ChatTableComponent4Frame();
         MsgComposePanel msgComposePanel = new MsgComposePanel(folderPair, MsgDataRecord.OBJ_TYPE_MSG, true);
-        mainSplitPane = createSplitPane(mainTableComponent, msgComposePanel, "_chat", JSplitPane.VERTICAL_SPLIT, 0.75d);
+        if (mainTableComponent.getToolBarModel() != null)
+          mainTableComponent.getToolBarModel().addComponentActions(msgComposePanel);
+        mainSplitPane = createSplitPane(mainTableComponent, msgComposePanel, "_chat", JSplitPane.VERTICAL_SPLIT, 0.90d);
         mainComponent = mainSplitPane;
       }
       // posting folder
@@ -213,6 +217,8 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       }
     }
 
+    if (!ENABLE_FRAME_TOOLBARS && mainTableComponent != null && isBringOutToolBar)
+      this.getContentPane().add(mainTableComponent.getToolBarModel().getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);
     // all JActionFrames already size themself
     setVisible(true);

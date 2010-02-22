@@ -60,7 +60,7 @@ public class ContactTableFrame extends JActionFrameClosable {
       new FolderFilter(FolderRecord.GROUP_FOLDER),
       new InvEmlFilter(true, false) }
     , MultiFilter.OR);
-    ContactTableComponent mainComponent = new ContactTableComponent(cache.getContactRecords(), filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true);
+    ContactTableComponent mainComponent = new ContactTableComponent4Frame(cache.getContactRecords(), filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
     mainComponent.addTopContactBuildingPanel();
 
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);

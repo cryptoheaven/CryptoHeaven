@@ -34,6 +34,7 @@ import com.CH_gui.actionGui.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.table.RecordTableComponent;
 import com.CH_gui.table.TableComponent;
 import com.CH_gui.tree.FolderTreeComponent;
 
@@ -90,7 +91,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private static MainFrame singleInstance;
 
   private LoginProgMonitor loginProgMonitor;
-  private JScrollPane welcomeScreenPane;
+  private JPanel welcomeScreenPanel;
 
   private static final String PROPERTY_NAME_PREFIX__PERSONALIZE_EMAIL_ADDRESS_COUNT = "PersonalizeEmailAddressCount";
 
@@ -347,14 +348,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     Long userId = null;
     if (myUserRec != null)
       userId = myUserRec.userId;
-    welcomeScreenPane = new JScrollPane();
-    welcomeScreenPane.setBorder(new EmptyBorder(0,0,0,0));
-    setDefaultWelcomeScreenPane();
+    welcomeScreenPanel = new JPanel();
+    welcomeScreenPanel.setBorder(new EmptyBorder(0,0,0,0));
+    setDefaultWelcomeScreenPanel();
 
     // Remember old TableComponent for cleanup -- incase we are re-initializing screen
     TableComponent oldTableComp = tableComp;
     // Make new main TableComponent
-    tableComp = new TableComponent("Browse", welcomeScreenPane);
+    tableComp = new TableComponent("Browse", welcomeScreenPanel);
 
     // Check or display the 'upgrade' popup window.
     {
@@ -406,13 +407,13 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     // Remember old ContactTableComponent for cleanup -- incase we are re-initializing screen
     ContactTableComponent oldContactComp = contactComp;
     // Make new main TableComponent
-    contactComp = new ContactTableComponent(filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true);
+    contactComp = new ContactTableComponent(filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
     contactComp.addTopContactBuildingPanel();
 
-    JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.8d);
+    JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d);
     vSplit.setOneTouchExpandable(false);
     if (vSplit.getDividerSize() > 5) vSplit.setDividerSize(5);
-    JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.15d);
+    JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.20d);
     hSplit.setOneTouchExpandable(false);
     if (hSplit.getDividerSize() > 5) hSplit.setDividerSize(5);
 
@@ -439,7 +440,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     tableComp.initPostTableComponent();
     tableComp.initChatTableComponent();
     tableComp.initGroupTableComponent();
-    tableComp.initLocalFileTableComponent();
+    //tableComp.initLocalFileTableComponent();
     tableComp.initKeyTableComponent();
     tableComp.initRecycleTableComponent();
 
@@ -569,10 +570,18 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /** Sets the default welcome screen component */
-  public void setDefaultWelcomeScreenPane() {
+  public void setDefaultWelcomeScreenPanel() {
     Long userId = SIL.getFetchedDataCache().getMyUserId();
-    Component welcomePane = getWelcomeScreenComponent(URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId, false);
-    welcomeScreenPane.setViewportView(welcomePane);
+    Component welcomeComp = getWelcomeScreenComponent(URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId, false);
+    welcomeScreenPanel.removeAll();
+    welcomeScreenPanel.setLayout(new BorderLayout());
+    RecordTableComponent recTableComp = new ContactTableComponent4Frame(null, null, null, null, false, false, true);
+    UserRecord userRec = SIL.getFetchedDataCache().getUserRecord();
+    String username = userRec != null ? userRec.handle : "";
+    recTableComp.setTitle("Welcome " + username);
+    recTableComp.setTitleIcon(null); // remove the 16x16 transparent default icon
+    welcomeScreenPanel.add(recTableComp.getTopPanel(), BorderLayout.NORTH);
+    welcomeScreenPanel.add(new JScrollPane(welcomeComp), BorderLayout.CENTER);
   }
 
   /** Create a welcome screen message component for the new user or regular login component to established user */

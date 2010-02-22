@@ -84,6 +84,9 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   public static final int INVITE_ACTION = 12;
   private static final int INVITE_POPUP_ACTION = 13;
   private static final int EMPTY_FOLDER_ACTION = 14;
+  private static final int MSG_COMPOSE_ACTION = 15;
+
+  private static final int NUM_ACTIONS = MSG_COMPOSE_ACTION + 1;
 
   private int leadingActionId = Actions.LEADING_ACTION_ID_FOLDER_ACTION_TREE;
   private int leadingMsgActionId = Actions.LEADING_ACTION_ID_MSG_ACTION_TABLE;
@@ -193,8 +196,9 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
 
 
   private void initActions() {
-    actions = new Action[15];
+    actions = new Action[NUM_ACTIONS];
     actions[NEW_FOLDER_ACTION] = new NewFolderAction(leadingActionId + NEW_FOLDER_ACTION);
+    actions[MSG_COMPOSE_ACTION] = new MsgComposeAction(leadingActionId + MSG_COMPOSE_ACTION);
     actions[MOVE_FOLDER_ACTION] = new MoveFolderAction(leadingActionId + MOVE_FOLDER_ACTION);
     actions[DELETE_FOLDER_ACTION] = new DeleteFolderAction(leadingActionId + DELETE_FOLDER_ACTION);
     actions[UPLOAD_ACTION] = new UploadAction(leadingActionId + UPLOAD_ACTION);
@@ -306,6 +310,24 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
   }
 
+  /**
+   * Compose a new message
+   */
+  private class MsgComposeAction extends AbstractActionTraced {
+    public MsgComposeAction(int actionId) {
+      super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
+      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      new MessageFrame();
+    }
+  }
+
   /** Display a dialog so the user can choose to which folder the move should be done.
     * Submit Move Folder request
     */
@@ -369,7 +391,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
    */
   private class UploadAction extends AbstractActionTraced {
     public UploadAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Upload_To_Folder_..."), Images.get(ImageNums.EXPORT16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Upload_..."), Images.get(ImageNums.EXPORT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Upload"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.EXPORT24));
@@ -405,7 +427,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Download_Folder"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.IMPORT_FOLDER24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download_Folder"));
+      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -1256,6 +1278,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       actions[NEW_FOLDER_ACTION].setEnabled(true);
       actions[UPLOAD_ACTION].setEnabled(true);
       actions[EMPTY_FOLDER_ACTION].setEnabled(true); // if no suitable folder is selected, this will empty the Recycle Bin
+      actions[MSG_COMPOSE_ACTION].setEnabled(true);
 
       int count = getSelectionCount();
       int countPairs = 0;

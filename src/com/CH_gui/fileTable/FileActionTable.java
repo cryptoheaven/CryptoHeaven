@@ -591,8 +591,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = FileActionTable.this.getTableModel().getParentFolderPair();
-      boolean fromPopup = isActionActivatedFromPopup(event);
-      if (fromPopup) {
+      boolean useSelected = isActionActivatedFromPopup(event);
+      if (useSelected) {
         Record[] selectedRecords = getSelectedInstancesOf(FolderPair.class);
         if (selectedRecords != null) {
           if (selectedRecords.length > 1) {
@@ -886,6 +886,18 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       }
     }
 
+    boolean isParentNonCategoryFolder = false;
+    {
+      RecordTableModel model = getTableModel();
+      if (model != null) {
+        FolderPair fPair = model.getParentFolderPair();
+        if (fPair != null && fPair.getId() != null) {
+          if (fPair.getFolderRecord() != null)
+            isParentNonCategoryFolder = !fPair.getFolderRecord().isCategoryType();
+        }
+      }
+    }
+
     if (count == 0) {
       actions[OPEN_FILE_ACTION].setEnabled(false);
       actions[DOWNLOAD_ACTION].setEnabled(false);
@@ -925,8 +937,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     }
 
     Window w = SwingUtilities.windowForComponent(this);
-    actions[OPEN_IN_SEPERATE_WINDOW_ACTION].setEnabled(w != null);
-    actions[REFRESH_ACTION].setEnabled(w != null);
+    actions[OPEN_IN_SEPERATE_WINDOW_ACTION].setEnabled(isParentNonCategoryFolder && w != null);
+    actions[REFRESH_ACTION].setEnabled(isParentNonCategoryFolder && w != null);
 
     CopyAction copyAction = (CopyAction) actions[COPY_ACTION];
     MoveAction moveAction = (MoveAction) actions[MOVE_ACTION];

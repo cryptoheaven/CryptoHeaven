@@ -370,24 +370,17 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
     }
     public void actionPerformedTraced(ActionEvent event) {
-      boolean fp = isActionActivatedFromPopup(event);
-      Object sourceObj = event.getSource();
-      // Do not prefill the from field when user presses tool bar action button.
-      if (sourceObj instanceof JActionButton) {
-        new MessageFrame();
+      // Determine if action from menu, popup menu or shortcut
+      // If action is from popup menu, prefill the To: field in the new message
+      boolean useSelected = isActionActivatedFromPopup(event);
+      Record[] selectedRecords = null;
+      if (useSelected) selectedRecords = getSelectedRecords();
+      //Record[] initialRecipients = MsgPanelUtils.getOrFetchFamiliarUsers(selectedRecords);
+      Record[] initialRecipients = selectedRecords;
+      if (initialRecipients != null && initialRecipients.length > 0) {
+        new MessageFrame(initialRecipients);
       } else {
-        // Determine if action from menu, popup menu or shortcut
-        // If action is from popup menu, prefill the To: field in the new message
-        boolean fromPopup = isActionActivatedFromPopup(event);
-        Record[] selectedRecords = null;
-        if (fromPopup) selectedRecords = getSelectedRecords();
-        //Record[] initialRecipients = MsgPanelUtils.getOrFetchFamiliarUsers(selectedRecords);
-        Record[] initialRecipients = selectedRecords;
-        if (initialRecipients != null && initialRecipients.length > 0) {
-          new MessageFrame(initialRecipients);
-        } else {
-          new MessageFrame();
-        }
+        new MessageFrame();
       }
     }
   }
@@ -666,6 +659,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private void sendEmailInvitationAction(Record[] initialEmailRecs) {
     String initialEmails = getEmailAddrs(initialEmailRecs);
     Window w = SwingUtilities.windowForComponent(ContactActionTable.this);
+    if (w == null) w = MainFrame.getSingleInstance();
     if (w instanceof Dialog) new InviteByEmailDialog((Dialog) w, initialEmails);
     else if (w instanceof Frame) new InviteByEmailDialog((Frame) w, initialEmails);
   }
@@ -710,10 +704,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   private void chatOrShareSpace(final boolean isChat, final short folderType, ActionEvent event) {
-    final boolean fromPopup = isActionActivatedFromPopup(event);
+    final boolean useSelected = isActionActivatedFromPopup(event);
     MemberContactRecordI[] selectedRecords = null;
     InvEmlRecord[] selectedInvEmls = null;
-    if (fromPopup) {
+    if (useSelected) {
       selectedRecords = ContactActionTable.this.getSelectedMemberContacts();
       selectedInvEmls = (InvEmlRecord[]) getSelectedInstancesOf(InvEmlRecord.class);
     }
@@ -759,29 +753,28 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       final MemberContactRecordI[] _selectedRecords = selectedRecords;
       ActionListener noAction = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          chatOrShareSpace(ContactActionTable.this, _selectedRecords, fromPopup, isChat, folderType);
+          chatOrShareSpace(ContactActionTable.this, _selectedRecords, useSelected, isChat, folderType);
         }
       };
       MessageDialog.showDialogYesNo(this, panel, "User account required.", MessageDialog.QUESTION_MESSAGE, true, yesAction, noAction);
     } else {
-      chatOrShareSpace(ContactActionTable.this, selectedRecords, fromPopup, isChat, folderType);
+      chatOrShareSpace(ContactActionTable.this, selectedRecords, useSelected, isChat, folderType);
     }
   }
 
-  public static void chatOrShareSpace(Component parent, MemberContactRecordI[] selectedRecords, boolean fromPopup, boolean isChat, short folderType) {
-    if (!fromPopup || selectedRecords == null || selectedRecords.length == 0) {
+  public static void chatOrShareSpace(Component parent, MemberContactRecordI[] selectedRecords, boolean useSelected, boolean isChat, short folderType) {
+    if (!useSelected || selectedRecords == null || selectedRecords.length == 0) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       ContactRecord[] contacts = cache.getContactRecordsMyActive();
       if (contacts != null && contacts.length > 0) {
         Window w = SwingUtilities.windowForComponent(parent);
-        if (w instanceof Dialog || w instanceof Frame) {
-          ContactSelectDialog d = null;
-          if (w instanceof Dialog) 
-            d = new ContactSelectDialog((Dialog) w, true);
-          else
-            d = new ContactSelectDialog((Frame) w, true);
-          selectedRecords = d.getSelectedMemberContacts();
-        }
+        if (w == null) w = MainFrame.getSingleInstance();
+        ContactSelectDialog d = null;
+        if (w instanceof Dialog)
+          d = new ContactSelectDialog((Dialog) w, true);
+        else if (w instanceof Frame)
+          d = new ContactSelectDialog((Frame) w, true);
+        selectedRecords = d.getSelectedMemberContacts();
       } else {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
         String messageText = null;
@@ -852,6 +845,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       treeModel.addNodes(cache.getFolderPairs(new FixedFilter(true), true));
     }
     Window w = SwingUtilities.windowForComponent(parent);
+    if (w == null) w = MainFrame.getSingleInstance();
     String title = folderType == FolderRecord.GROUP_FOLDER ? com.CH_gui.lang.Lang.rb.getString("title_Create_New_Shared_Group") : com.CH_gui.lang.Lang.rb.getString("title_Create_New_Shared_Space");
     if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts); 
     else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts); 

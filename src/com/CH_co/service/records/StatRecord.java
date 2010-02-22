@@ -112,16 +112,16 @@ public class StatRecord extends Record { // implicit no-argument constructor
     String info = null;
     switch (flag.intValue()) {
       case STATUS__UNSEEN_UNDELIVERED:
-        info = "Unseen/Undelivered";
+        info = "Unseen/Never Opened";
         break;
       case STATUS__SEEN_UNDELIVERED:
-        info = "Seen/Undelivered";
+        info = "Seen/Never Opened";
         break;
       case STATUS__UNSEEN_DELIVERED:
-        info = "Unseen/Delivered";
+        info = "Unseen/Previously Opened";
         break;
       case STATUS__SEEN_DELIVERED:
-        info = "Seen/Delivered";
+        info = "Seen/Previously Opened";
         break;
     }
     return info;

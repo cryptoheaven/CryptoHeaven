@@ -1261,25 +1261,27 @@ public class MiscGui extends Object {
     return name;
   }
 
-  /** 
+  /**
    * Gets recursively Components from all Components that descend from <code> c </code>.
    */
-  private static void fillComponentsRecursively(Component c, java.util.List targetList) {
+  private static void fillComponentsRecursively(Component c, java.util.List targetList, Class instanceOf) {
     if (c != null) {
-      if (!targetList.contains(c))
-        targetList.add(c);
+      if (!targetList.contains(c)) {
+        if (instanceOf == null || instanceOf.isAssignableFrom(c.getClass()))
+          targetList.add(c);
+      }
       Component[] components = null;
       for (int i=0; i<2; i++) {
         if (i == 0 && c instanceof ComponentContainerI) {
           components = ((ComponentContainerI)c).getPotentiallyHiddenComponents();
         } else if (i == 1 && c instanceof Container) {
-          components = ((Container)c).getComponents();  
+          components = ((Container)c).getComponents();
         }
         if (components != null) {
           for (int k=0; k<components.length; k++) {
             Component compK = components[k];
             if (compK != null) {
-              fillComponentsRecursively(compK, targetList);
+              fillComponentsRecursively(compK, targetList, instanceOf);
             }
           }
         }
@@ -1288,18 +1290,19 @@ public class MiscGui extends Object {
   }
 
 
-  /** 
+  /**
    * Gets recursively all Components that <code> c </code> contains
    * merges them and returns as an array of Components.
    */
   public static Component[] getComponentsRecursively(Component c) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MiscGui.class, "getComponentsRecursively(Component c)");
-
+    return (Component[]) getComponentsRecursively(c, null);
+  }
+  public static Object[] getComponentsRecursively(Component c, Class instanceOf) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MiscGui.class, "getComponentsRecursively(Component c, Class instanceOf)");
     LinkedList targetList = new LinkedList();
-    fillComponentsRecursively(c, targetList);
-    Component[] componentArray = (Component[]) ArrayUtils.toArray(targetList, Component.class);
+    fillComponentsRecursively(c, targetList, instanceOf);
+    Object[] componentArray = ArrayUtils.toArray(targetList, instanceOf == null ? Component.class : instanceOf);
     int length = componentArray != null ? componentArray.length : 0;
-
     if (trace != null) trace.exit(MiscGui.class, length);
     return componentArray;
   }
