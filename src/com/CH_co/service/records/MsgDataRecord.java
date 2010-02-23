@@ -1117,7 +1117,7 @@ public class MsgDataRecord extends Record {
 
       // un-sealed data
       if (record.subject            != null) subject          = record.subject;
-      // if encText is present, copy the possibly null textBody and textError variables
+      // if encText is present, copy the possibly null textBody and textErr variables
       if (record.encText            != null) textBody         = record.textBody;
       if (record.encText            != null) textErr          = record.textErr;
       if (record.encText            != null) encodedHTMLData  = record.encodedHTMLData;
@@ -1176,7 +1176,7 @@ public class MsgDataRecord extends Record {
       + ", recipients="         + Misc.objToStr(recipients)
       + ", subject="            + Misc.objToStr(subject)
       + ", textBody="           + (textBody != null && textBody.length() < 255 ? Misc.objToStr(textBody) : (textBody != null ? "too long length="+textBody.length() : null))
-      + ", textError="          + Misc.objToStr(textErr)
+      + ", textErr="            + Misc.objToStr(textErr)
       + ", digest="             + digest
       + ", signedDigest="       + signedDigest
       + ", encDigest="          + encDigest

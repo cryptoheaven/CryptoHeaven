@@ -1788,10 +1788,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       RecordTableModel model = getTableModel();
       if (model != null) {
         FolderPair fPair = model.getParentFolderPair();
+        isPrintOk = fPair == null || !fPair.getFolderRecord().isCategoryType();
         if (fPair != null && fPair.getId() != null) {
-          if (fPair.getFolderRecord() != null)
-            isParentNonCategoryFolder = !fPair.getFolderRecord().isCategoryType();
-          isPrintOk = !(fPair.getFolderRecord() != null && fPair.getFolderRecord().isCategoryType());
+          isParentNonCategoryFolder = !fPair.getFolderRecord().isCategoryType();
           UserRecord uRec = cache.getUserRecord();
           if (uRec != null) {
             FolderRecord fRec = fPair.getFolderRecord();

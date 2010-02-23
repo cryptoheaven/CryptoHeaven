@@ -21,10 +21,10 @@ import com.CH_co.trace.Trace;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ArrayUtils extends Object {
 
@@ -139,7 +139,7 @@ public class ArrayUtils extends Object {
     return bytes;
   }
   public static int hexCharsToByte(char hexDigit1, char hexDigit2) {
-    int b1 = 0; 
+    int b1 = 0;
     int b2 = 0;
     char ch1 = hexDigit1;
     char ch2 = hexDigit2;
@@ -208,11 +208,11 @@ public class ArrayUtils extends Object {
   }
 
 
-  /** @return a new array of bytes of length=wantedLength or source if the 
-   *  wantedLength is the length of the source array. 
+  /** @return a new array of bytes of length=wantedLength or source if the
+   *  wantedLength is the length of the source array.
    */
   public static byte[] fixLength(byte[] source, int wantedLength) {
-    if (source.length == wantedLength) 
+    if (source.length == wantedLength)
       return source;
 
     int availDataLen = source.length < wantedLength ? source.length : wantedLength;
@@ -234,7 +234,7 @@ public class ArrayUtils extends Object {
    * Order is always preserved.
    */
   public static Object[] mergeWithoutDuplicates (Object[] a1, Object[] a2) {
-    if (a1 != null && a2 != null && !a1.getClass().equals(a2.getClass())) 
+    if (a1 != null && a2 != null && !a1.getClass().equals(a2.getClass()))
       throw new IllegalArgumentException("Runtime instances of arrays do not match!");
 
     HashSet hs = new HashSet();
@@ -453,7 +453,7 @@ public class ArrayUtils extends Object {
     if (source != null && source.length > 0 && anyDuplicates(source)) {
       // remove duplicates from source[]
       HashSet hs = new HashSet();
-      // vector used to preserve the order 
+      // vector used to preserve the order
       Vector objsV = new Vector();
       for (int i=0; i<source.length; i++) {
         Object o = source[i];
@@ -496,7 +496,7 @@ public class ArrayUtils extends Object {
     }
     return result;
   }
-  
+
   /**
    * Removes only the leading elements of the source array that 'equals()' the 'toRemove' object.
    * @param source
@@ -524,7 +524,7 @@ public class ArrayUtils extends Object {
     }
     return result;
   }
-  
+
   /**
    * @return an array of objects from the source array that match the type specified.
    * Object classes are compared, instances subclassing specified type are considered different.
@@ -562,6 +562,9 @@ public class ArrayUtils extends Object {
    * This method is performance optimized.
    */
   public static String replaceKeyWords(String str, String[][] sets) {
+    return replaceKeyWords(str, sets, null, null);
+  }
+  public static String replaceKeyWords(String str, String[][] sets, String[] skipBeginTags, String[] skipEndTags) {
     int numOfSets = sets.length;
     char[] chars = null;
     for (int i=0; str!=null && i<numOfSets; i++) {
@@ -571,6 +574,7 @@ public class ArrayUtils extends Object {
       StringBuffer resultB = new StringBuffer(str.length());
       boolean anyFound = false;
       while ((start = str.indexOf(set[0], oldStart)) >= 0) {
+        boolean isInsideSkipSegment = isInsideSegment(str, start, skipBeginTags, skipEndTags);
         anyFound = true;
         if (start > oldStart) {
           int len = start-oldStart;
@@ -578,10 +582,13 @@ public class ArrayUtils extends Object {
           str.getChars(oldStart, start, chars, 0);
           resultB.append(chars, 0, len);
         }
-        resultB.append(set[1]);
+        if (!isInsideSkipSegment)
+          resultB.append(set[1]);
+        else
+          resultB.append(set[0]);
         start += set[0].length();
         oldStart = start;
-      }
+      } // end while
       if (anyFound) {
         if (oldStart < str.length()) {
           int end = str.length();
@@ -591,9 +598,51 @@ public class ArrayUtils extends Object {
           resultB.append(chars, 0, len);
         }
         str = resultB.toString();
+      } // end anyFound
+    } // end for
+    return str;
+  }
+  private static boolean isInsideSegment(String str, int start, String[] startTags, String[] endTags) {
+    boolean isAfterStartTag = false;
+    boolean isBeforeEndTag = isBeforeEndTag(str, start, startTags, endTags);
+    if (isBeforeEndTag) {
+      // reverse the String and tags to search for beginning of the matching tag.
+      String strR = new StringBuffer(str).reverse().toString();
+      String[] startTagsR = new String[endTags.length];
+      String[] endTagsR = new String[startTags.length];
+      for (int i=0; i<startTagsR.length; i++) {
+        startTagsR[i] = new StringBuffer(endTags[i]).reverse().toString();
+      }
+      for (int i=0; i<endTagsR.length; i++) {
+        endTagsR[i] = new StringBuffer(startTags[i]).reverse().toString();
+      }
+      int startR = str.length()-start;
+      isAfterStartTag = isBeforeEndTag(strR, startR, startTagsR, endTagsR);
+    }
+    return isBeforeEndTag && isAfterStartTag;
+  }
+  private static boolean isBeforeEndTag(String str, int start, String[] startTags, String[] endTags) {
+    int behindFirstEndTag = Integer.MAX_VALUE;
+    int behindFirstStartTag = Integer.MAX_VALUE;
+    if (endTags != null) {
+      for (int i=0; i<endTags.length; i++) {
+        String tag = endTags[i];
+        int index;
+        if ((index = str.indexOf(tag, start)) >= 0) {
+          behindFirstEndTag = Math.min(behindFirstEndTag, index);
+        }
+      }
+      if (behindFirstEndTag < Integer.MAX_VALUE && startTags != null) {
+        for (int i=0; i<startTags.length; i++) {
+          String tag = startTags[i];
+          int index;
+          if ((index = str.indexOf(tag, start)) >= 0) {
+            behindFirstStartTag = Math.min(behindFirstStartTag, index);
+          }
+        }
       }
     }
-    return str;
+    return behindFirstEndTag < behindFirstStartTag;
   }
 
   /**

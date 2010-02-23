@@ -1271,7 +1271,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
                 {"<p><p><p><p>", "<p><p>"},
                 {"<p><p><p>", "<p><p>"},
                 {"<p><p><p>", "<p><p>"},
-            });
+            }, new String[] { "<PRE>", "<pre>" }, new String[] { "</PRE>", "</pre>"} );
         }
         content[3] = quotedMsgBody;
       } else {
