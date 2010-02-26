@@ -560,9 +560,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jLineSubject.add(jHTML, new GridBagConstraints(5, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineSubject.add(jAttachment, new GridBagConstraints(6, 0, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 1, 1, 1), 0, 0));
+          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
     jLineSubject.add(jPrint, new GridBagConstraints(7, 0, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 1, 1, 1), 0, 0));
+          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
 
     JLabel jMinHeight_att = new JMyLabel(" ");
