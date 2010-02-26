@@ -440,7 +440,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     tableComp.initPostTableComponent();
     tableComp.initChatTableComponent();
     tableComp.initGroupTableComponent();
-    //tableComp.initLocalFileTableComponent();
+    tableComp.initLocalFileTableComponent();
     tableComp.initKeyTableComponent();
     tableComp.initRecycleTableComponent();
 
