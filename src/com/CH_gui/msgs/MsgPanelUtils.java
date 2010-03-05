@@ -463,11 +463,7 @@ public class MsgPanelUtils extends Object {
                 label = new JMyLabel();
               }
               label.setText(HTML_START + "<b>"+setHeader+"</b>" + HTML_END);
-              if (setIndex == 0) {
-                label.setBorder(new EmptyBorder(2,0,2,5));
-              } else {
-                label.setBorder(new EmptyBorder(2,0,2,5));
-              }
+              label.setBorder(new EmptyBorder(2,0,2,5));
               label.setIcon(null);
               label.setIconTextGap(5);
               jFlowPanel.add(label);
@@ -618,28 +614,26 @@ public class MsgPanelUtils extends Object {
 
     // Remove old components/Views if any
     try {
-      if (jMessage instanceof Container) {
-        Container cnt = jMessage;
-        Component[] comps = cnt.getComponents();
-        if (comps != null) {
-          //System.out.println("comps length = " + comps.length);
-          for (int i=0; i<comps.length; i++) {
-            Component comp = comps[i];
-            if (comp instanceof Container) {
-              Container cnt2 = (Container) comp;
-              Component[] comps2 = cnt2.getComponents();
-              if (comps2 != null) {
-                //System.out.println("cmps2 length = " + comps2.length);
-                for (int j=0; j<comps2.length; j++) {
-                  Component comp2 = comps2[j];
-                  //System.out.println("j " + comp2.getName() + ", " + comp2.getClass() + ", " + comp2.getClass().getName() + ", " + comp2.getClass().getSimpleName());
-                  cnt2.remove(comps2[j]);
-                }
+      Container cnt = jMessage;
+      Component[] comps = cnt.getComponents();
+      if (comps != null) {
+        //System.out.println("comps length = " + comps.length);
+        for (int i=0; i<comps.length; i++) {
+          Component comp = comps[i];
+          if (comp instanceof Container) {
+            Container cnt2 = (Container) comp;
+            Component[] comps2 = cnt2.getComponents();
+            if (comps2 != null) {
+              //System.out.println("cmps2 length = " + comps2.length);
+              for (int j=0; j<comps2.length; j++) {
+                Component comp2 = comps2[j];
+                //System.out.println("j " + comp2.getName() + ", " + comp2.getClass() + ", " + comp2.getClass().getName() + ", " + comp2.getClass().getSimpleName());
+                cnt2.remove(comps2[j]);
               }
             }
-            //System.out.println("i " + comp.getName() + ", " + comp.getClass() + ", " + comp.getClass().getName() + ", " + comp.getClass().getSimpleName());
-            cnt.remove(comp);
           }
+          //System.out.println("i " + comp.getName() + ", " + comp.getClass() + ", " + comp.getClass().getName() + ", " + comp.getClass().getSimpleName());
+          cnt.remove(comp);
         }
       }
     } catch (Throwable t) {
@@ -1034,7 +1028,6 @@ public class MsgPanelUtils extends Object {
     Hasher.Set matchingSet = null;
     pass = pass.trim();
     Hasher.Set set = new Hasher.Set(pass.toCharArray());
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (set.passwordHash.equals(msgDataRecord.bodyPassHash)) {
       matchingSet = set;
     } else {

@@ -50,7 +50,7 @@ public class UserTableModel extends RecordTableModel {
   private Long parentUserId;
 
   /* parentIds for which the sub-account user records has been fetched already */
-  private static Vector fetchedIds = new Vector();
+  private static final Vector fetchedIds = new Vector();
 
   private static String STR_USER_NAME = com.CH_gui.lang.Lang.rb.getString("column_Username");
   private static String STR_USER_ID = com.CH_gui.lang.Lang.rb.getString("column_User_ID");
@@ -240,7 +240,7 @@ public class UserTableModel extends RecordTableModel {
         int rowCount = getRowCount();
         Vector recordsToRemove = new Vector();
         for (int row=0; row<rowCount; row++) {
-          Record rec = getRowObject(row);
+          Record rec = getRowObjectNoTrace(row);
           if (rec instanceof UserRecord) {
             recordsToRemove.addElement(rec);
           }

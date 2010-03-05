@@ -13,7 +13,6 @@
 package com.CH_gui.shareTable;
 
 import java.util.*;
-import javax.swing.table.*;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;

@@ -361,7 +361,6 @@ public class MsgTableModel extends RecordTableModel {
 
           folderPair = new FolderPair(shareRec, folderRec);
           setParentFolderPair(folderPair);
-          Long shareId = folderPair.getFolderShareRecord().shareId;
 
           // add all messages for this folder
           MsgLinkRecord[] linkRecords = cache.getMsgLinkRecordsForFolder(folderId);
@@ -872,7 +871,7 @@ public class MsgTableModel extends RecordTableModel {
           int rowCount = getRowCount();
           Vector linksToRemove = new Vector();
           for (int row=0; row<rowCount; row++) {
-            Record rec = getRowObject(row);
+            Record rec = getRowObjectNoTrace(row);
             if (rec instanceof MsgLinkRecord) {
               linksToRemove.addElement(rec);
             }

@@ -303,14 +303,14 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
             }
           }
         }
-      } else if (event instanceof EventObject) {
+      } else {
         Obj_List_Co reply = (Obj_List_Co) event.getSource();
         Object[] objs = reply.objs;
 
         Long folderId = (Long) objs[0];
         Long ringingUserId = (Long) objs[1];
-        Long[] allUserIDs = (Long[]) ArrayUtils.toArrayType((Object[]) objs[2], Long.class);
-        Long[] distributionUserIDs = (Long[]) ArrayUtils.toArrayType((Object[]) objs[3], Long.class);
+//        Long[] allUserIDs = (Long[]) ArrayUtils.toArrayType((Object[]) objs[2], Long.class);
+//        Long[] distributionUserIDs = (Long[]) ArrayUtils.toArrayType((Object[]) objs[3], Long.class);
 
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         UserRecord myUserRec = cache.getUserRecord();

@@ -511,20 +511,21 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           }
         }
 
-        synchronized (dataIn) {
-          // Write the incoming Message Action to the queue.
-          replyFifoWriterI.add(msgAction);
-          // case of requested "Recycle" running the action does nothing, recycle the reader/writer here
-          if (msgActionCode == CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE) {
-            // If disconnecting a NOTIFY session, then request another one before old one disconnects
-            if (isMainWorker())
-              workerManager.submitAndReturn(new MessageAction(CommandCodes.SYS_Q_NOTIFY));
-            // Give a change for user to complete login and claim another main session (if required) 
-            // with another Worker to prevent "puk-puk-puk" for its contacts
-            try { Thread.sleep(15000); } catch (InterruptedException x) { }
-            finishReading(false);
-            sessionContext.releaseLoginStreamers();
-          } else {
+        // Write the incoming Message Action to the queue.
+        replyFifoWriterI.add(msgAction);
+        // case of requested "Recycle" running the action does nothing, recycle the reader/writer here
+        if (msgActionCode == CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE) {
+          // If disconnecting a NOTIFY session, then request another one before old one disconnects
+          if (isMainWorker())
+            workerManager.submitAndReturn(new MessageAction(CommandCodes.SYS_Q_NOTIFY));
+          // Give a change for user to complete login and claim another main session (if required)
+          // with another Worker to prevent "puk-puk-puk" for its contacts
+          try { Thread.sleep(15000); } catch (InterruptedException x) { }
+          finishReading(false);
+          sessionContext.releaseLoginStreamers();
+        }
+        if (msgActionCode != CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE) {
+          synchronized (dataIn) {
             try {
               if (trace != null) trace.data(50, "Wait till stream is secured or threads released.");
               dataIn.wait(60000);
@@ -532,8 +533,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             }
             if (trace != null) trace.data(55, "Woke up from waiting for secured streams or unlock upon login error.");
             workerManager.workerLoginComplete(ServerInterfaceWorker.this, loginSuccessful);
-          }
-        } // end synchronized
+          } // end synchronized
+        }
 
       } // end if LOGIN aciton or LOGIN error
       else {
@@ -706,9 +707,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               JobFifo.isJobComputationallyIntensive(msgActionCode)
               // No need to synchronize on Login since this is done in
               // processOutgoingMsgAction() and would cause a deadlock here.
-              ) 
+              )
           {
-          //if (!isMainWorker()) {
             synchronized (readerDoneMonitor) {
               processOutgoingMsgAction(msgAction);
               // wait for reader to finish processing reply before we can continue to the next request

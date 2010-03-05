@@ -1009,19 +1009,29 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(10, 10, 10, 10), 0, 0));
       posY ++;
       final JRadioButton jSendPlain = new JMyRadioButton("Send in Plain Text", false);
-      final JRadioButton jSendEncrypted = new JMyRadioButton("Send Encrypted with Question and Answer", false);
+      //final JRadioButton jSendEncrypted = new JMyRadioButton("Send Encrypted with Question and Answer", false);
+      final JRadioButton jSendEncrypted = new JMyRadioButton("Send Encrypted", false);
+      final JCheckBox jQuestionAndAnswer = new JMyCheckBox("Encrypt with Question and Answer", false);
       ButtonGroup group = new ButtonGroup();
       group.add(jSendPlain);
       group.add(jSendEncrypted);
       final JTextField jQuestion = new JMyTextField(10);
       final JTextField jPassword = new JMyTextField(10);
+      jQuestionAndAnswer.setEnabled(false);
       jQuestion.setEnabled(false);
       jPassword.setEnabled(false);
 
       jSendEncrypted.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
-          jQuestion.setEnabled(jSendEncrypted.isSelected());
-          jPassword.setEnabled(jSendEncrypted.isSelected());
+          jQuestionAndAnswer.setEnabled(jSendEncrypted.isSelected());
+          jQuestion.setEnabled(jSendEncrypted.isSelected() && jQuestionAndAnswer.isSelected());
+          jPassword.setEnabled(jSendEncrypted.isSelected() && jQuestionAndAnswer.isSelected());
+        }
+      });
+      jQuestionAndAnswer.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent e) {
+          jQuestion.setEnabled(jSendEncrypted.isSelected() && jQuestionAndAnswer.isSelected());
+          jPassword.setEnabled(jSendEncrypted.isSelected() && jQuestionAndAnswer.isSelected());
         }
       });
 
@@ -1039,13 +1049,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       panel.add(jSendEncrypted, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 25, 2, 10), 0, 0));
       posY ++;
+      panel.add(jQuestionAndAnswer, new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 45, 2, 10), 0, 0));
+      posY ++;
       panel.add(new JMyLabel("Question:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 45, 2, 5), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 65, 2, 5), 0, 0));
       panel.add(jQuestion, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 10), 0, 0));
       posY ++;
       panel.add(new JMyLabel("Answer:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 45, 10, 5), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 65, 10, 5), 0, 0));
       panel.add(jPassword, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 10, 10), 0, 0));
       posY ++;
@@ -1059,9 +1072,14 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         public void actionPerformed(ActionEvent e) {
           if (jSendPlain.isSelected() || jSendEncrypted.isSelected()) {
             msgComponents.setStagedSecure(jSendEncrypted.isSelected());
-            msgComponents.setQuestion(jQuestion.getText());
-            // strip password leaving only letters and digits
-            String passStripped = MsgPanelUtils.getTrimmedPassword(jPassword.getText());
+            String question = "";
+            String passStripped = "";
+            if (jSendEncrypted.isSelected() && jQuestionAndAnswer.isSelected()) {
+              question = jQuestion.getText();
+              // strip password leaving only letters and digits
+              passStripped = MsgPanelUtils.getTrimmedPassword(jPassword.getText());
+            }
+            msgComponents.setQuestion(question);
             msgComponents.setPassword(passStripped);
             okReturnBuffer[0] = true;
             SwingUtilities.windowForComponent((Component) e.getSource()).dispose();

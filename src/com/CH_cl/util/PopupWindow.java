@@ -62,20 +62,18 @@ public class PopupWindow extends JWindow {
   // Last time timer was activated.
   private long lastTime;
 
-  private static PopupWindow singleInstance;
-  private static final Object singleInstanceMonitor = new Object();
+  private static final Object objMonitor = new Object();
 
   /**
    * @returns a single instance of the class.
    */
   public static PopupWindow getSingleInstance() {
-    synchronized (singleInstanceMonitor) {
-      if (singleInstance == null) {
-        singleInstance = new PopupWindow();
-      }
-      return singleInstance;
-    }
+    return SingletonHolder.INSTANCE;
   }
+  private static class SingletonHolder {
+    private static final PopupWindow INSTANCE = new PopupWindow();
+  }
+
 
   /** Creates new PopupWindow */
   private PopupWindow(float pixelsPerSecond, float framesPerSecond, int pauseMillis) {
@@ -122,7 +120,7 @@ public class PopupWindow extends JWindow {
   }
 
   public void addForScrolling(JComponent componentToScroll) {
-    synchronized (singleInstanceMonitor) {
+    synchronized (objMonitor) {
       if (pausing) {
         pausingSoFar = 0;
       }
@@ -158,7 +156,7 @@ public class PopupWindow extends JWindow {
    * Hides and resets the window.
    */
   public void dismiss() {
-    synchronized (singleInstanceMonitor) {
+    synchronized (objMonitor) {
       setVisible(false);
       scroller.removeAll();
       dirDown = true;
@@ -173,8 +171,7 @@ public class PopupWindow extends JWindow {
   }
 
   public void dispose() {
-    synchronized (singleInstanceMonitor) {
-      singleInstance = null;
+    synchronized (objMonitor) {
       super.dispose();
     }
   }
@@ -192,7 +189,7 @@ public class PopupWindow extends JWindow {
 
   private class TimerListener implements ActionListener {
     public void actionPerformed(ActionEvent event) {
-      synchronized (singleInstanceMonitor) {
+      synchronized (objMonitor) {
         long currentTime = System.currentTimeMillis();
         long delayed = currentTime - lastTime;
         if (lastTime == 0) {

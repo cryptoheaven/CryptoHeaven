@@ -24,7 +24,6 @@ import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /**
@@ -76,7 +75,7 @@ public class GroupTableCellRenderer extends RecordTableCellRenderer {
             setIcon(ListRenderer.getRenderedIcon(gRec));
             setText(ListRenderer.getRenderedText(gRec));
           } else if (shareRecord.isOwnedByGroup()) {
-            setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_Group_(GROUP-ID)"), new Object[] {shareRecord.ownerUserId}));
+            setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Group_(GROUP-ID)"), new Object[] {shareRecord.ownerUserId}));
             setIcon(Images.get(ImageNums.PEOPLE16));
           } else {
             setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {shareRecord.ownerUserId}));

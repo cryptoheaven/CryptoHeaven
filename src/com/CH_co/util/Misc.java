@@ -122,6 +122,7 @@ public class Misc extends Object {
    * @return a representation of specified object as a string, appended to the StringBuffer;
    */
   public static void objToStr(Object obj, StringBuffer strB) {
+    int MAX_ITEMS_TO_LIST = 50;
     if (obj == null) { 
       strB.append("null");
     } else {
@@ -130,7 +131,7 @@ public class Misc extends Object {
         int len = Array.getLength(obj);
         if (obj instanceof byte[]) {
           strB.append("BYTES[len="); strB.append(len); strB.append("](");
-          if (len > 512) {
+          if (len > MAX_ITEMS_TO_LIST) {
             strB.append("too many to list");
           } else {
             strB.append(ArrayUtils.toString((byte[]) obj));
@@ -138,7 +139,7 @@ public class Misc extends Object {
           strB.append(')');
         } else {
           strB.append("ARRAY[len="); strB.append(len); strB.append("](");
-          if (len > 512) {
+          if (len > MAX_ITEMS_TO_LIST) {
             strB.append("too many to list");
           } else {
             for (int i=0; i<len; i++) {
@@ -153,7 +154,7 @@ public class Misc extends Object {
         Vector v = (Vector) obj;
         int len = v.size();
         strB.append("Vector[len="); strB.append(len); strB.append("](");
-        if (len > 512) {
+        if (len > MAX_ITEMS_TO_LIST) {
           strB.append("too many to list");
         } else {
           for (int i=0; i<len; i++) {
@@ -172,7 +173,7 @@ public class Misc extends Object {
         } else {
           strB.append(keys.size()); strB.append("](");
           int len = map.size();
-          if (len > 512) {
+          if (len > MAX_ITEMS_TO_LIST) {
             strB.append("too many to list");
           } else {
             Iterator iter = keys.iterator();
@@ -373,19 +374,8 @@ public class Misc extends Object {
     DateFormat formatter;
 
     if (diff < hoursToMilliseconds(16)) {
-      //formatter = new SimpleDateFormat(includeSeconds ? "HH:mm:ss" :"HH:mm");
       formatter = DateFormat.getTimeInstance(includeSeconds ? DateFormat.MEDIUM : DateFormat.SHORT);
-    } else if (diff < daysToMilliseconds(2)) {
-      //formatter = new SimpleDateFormat(includeSeconds ? "EEE, HH:mm:ss" : "EEE, HH:mm");
-      //formatter = DateFormat.getDateInstance();
-      formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    } else if (diff < daysToMilliseconds(90)) {
-      //formatter = new SimpleDateFormat("MMM dd, HH:mm");
-      //formatter = DateFormat.getDateInstance();
-      formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     } else {
-      //formatter = new SimpleDateFormat("MMM dd, yyyy");
-      //formatter = DateFormat.getDateInstance();
       formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     }
 

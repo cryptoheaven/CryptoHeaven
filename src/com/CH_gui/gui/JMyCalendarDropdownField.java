@@ -364,9 +364,9 @@ public class JMyCalendarDropdownField extends JPanel implements ActionListener, 
   }
 
   public void propertyChange(PropertyChangeEvent propertychangeevent) {
-    String s = propertychangeevent.getPropertyName();
+    String propName = propertychangeevent.getPropertyName();
     if (propertychangeevent.getSource() == this) {
-      if (propertychangeevent.getPropertyName().equals("labeledBy")) {
+      if (propName.equals("labeledBy")) {
         Object obj = propertychangeevent.getNewValue();
         if (obj != null && (obj instanceof JLabel)) {
           JLabel jlabel = (JLabel)obj;
@@ -374,13 +374,13 @@ public class JMyCalendarDropdownField extends JPanel implements ActionListener, 
           field.getAccessibleContext().setAccessibleName(jlabel.getText());
         }
       } else
-        if (propertychangeevent.getPropertyName().equals("UAKey")) {
+        if (propName.equals("UAKey")) {
           Object obj1 = propertychangeevent.getNewValue();
           field.putClientProperty("UAKey", obj1);
           button.putClientProperty("UAKey", obj1);
         }
     } else
-      if (propertychangeevent.getSource() == getAccessibleContext() && propertychangeevent.getPropertyName().equals("AccessibleName")) {
+      if (propertychangeevent.getSource() == getAccessibleContext() && propName.equals("AccessibleName")) {
         String s1 = (String)propertychangeevent.getNewValue();
         field.getAccessibleContext().setAccessibleName(s1);
         button.getAccessibleContext().setAccessibleName(s1);

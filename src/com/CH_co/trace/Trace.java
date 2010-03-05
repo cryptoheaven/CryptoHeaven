@@ -74,6 +74,9 @@ public class Trace extends Object {
 
   private static String[] headings;
 
+  private int pauseCount;
+//  private static Hashtable tracePauseCount;
+
   /** Creates new Trace */
   private Trace() {
     stack = new Stack();
@@ -268,6 +271,57 @@ public class Trace extends Object {
       exit(c, null, false);
     }
   }
+  public boolean isPaused() {
+    synchronized (staticMonitor) {
+      return pauseCount > 0;
+    }
+  }
+  public int pause() {
+    int token = 0;
+    synchronized (staticMonitor) {
+      token = pauseCount;
+      pauseCount ++;
+    }
+    return token;
+  }
+  public void resume(int token) {
+    synchronized (staticMonitor) {
+      pauseCount = token;
+    }
+  }
+//  public static boolean isPaused() {
+//    synchronized (staticMonitor) {
+//      Integer hashCode = new Integer(Thread.currentThread().hashCode());
+//      if (tracePauseCount == null) return false;
+//      Integer pauseCount = (Integer) tracePauseCount.get(hashCode);
+//      return pauseCount != null;
+//    }
+//  }
+//  public static Integer pause() {
+//    Integer token = null;
+//    synchronized (staticMonitor) {
+//      Integer hashCode = new Integer(Thread.currentThread().hashCode());
+//      if (tracePauseCount == null) tracePauseCount = new Hashtable();
+//      Integer pauseCount = (Integer) tracePauseCount.get(hashCode);
+//      token = pauseCount;
+//      if (pauseCount == null)
+//        tracePauseCount.put(hashCode, new Integer(1));
+//      else
+//        tracePauseCount.put(hashCode, new Integer(pauseCount.intValue()+1));
+//    }
+//    return token;
+//  }
+//  public static void resume(Integer token) {
+//    synchronized (staticMonitor) {
+//      if (tracePauseCount != null) {
+//        Integer hashCode = new Integer(Thread.currentThread().hashCode());
+//        if (token == null)
+//          tracePauseCount.remove(hashCode);
+//        else
+//          tracePauseCount.put(hashCode, token);
+//      }
+//    }
+//  }
 
 
 
@@ -517,42 +571,44 @@ public class Trace extends Object {
    * Prints String or Throwable.
    */
   private void addLine(Object obj) {
-    String str = null;
-    Throwable t = null;
-    if (obj instanceof String)
-      str = (String) obj;
-    else if (obj instanceof Throwable)
-      t = (Throwable) obj;
+    if (!isPaused()) {
+      String str = null;
+      Throwable t = null;
+      if (obj instanceof String)
+        str = (String) obj;
+      else if (obj instanceof Throwable)
+        t = (Throwable) obj;
 
-    synchronized (staticMonitor) {
-      StringBuffer strBuffer = new StringBuffer();
-      String strDate = new SimpleDateFormat("hh:mm:ss.SSS ").format(new Date());
-      strBuffer.append(strDate);
+      synchronized (staticMonitor) {
+        StringBuffer strBuffer = new StringBuffer();
+        String strDate = new SimpleDateFormat("hh:mm:ss.SSS ").format(new Date());
+        strBuffer.append(strDate);
 
-      if (stack.size() < headings.length)
-        strBuffer.append(headings[stack.size()]);
-      else {
-        for (int i=0; i<stack.size(); i++) {
-          strBuffer.append("| ");
+        if (stack.size() < headings.length)
+          strBuffer.append(headings[stack.size()]);
+        else {
+          for (int i=0; i<stack.size(); i++) {
+            strBuffer.append("| ");
+          }
         }
-      }
 
-      Thread thisThread = Thread.currentThread();
-      if (thisThread != lastThread) {
-        output("");
-        output("Thread -- " + thisThread.getName() + " ID=" + thisThread.hashCode() + " obj=" + thisThread);
-        output("");
-      }
-      if (str != null) {
-        strBuffer.append(str);
-        output(strBuffer.toString());
-      }
-      else if (t != null) {
-        output(Misc.getStack(t));
-      }
+        Thread thisThread = Thread.currentThread();
+        if (thisThread != lastThread) {
+          output("");
+          output("Thread -- " + thisThread.getName() + " ID=" + thisThread.hashCode() + " obj=" + thisThread);
+          output("");
+        }
+        if (str != null) {
+          strBuffer.append(str);
+          output(strBuffer.toString());
+        }
+        else if (t != null) {
+          output(Misc.getStack(t));
+        }
 
-      lastThread = thisThread;
-    } // end synchronized
+        lastThread = thisThread;
+      } // end synchronized
+    }
   }
 
   private void output(String str) {

@@ -230,7 +230,7 @@ public class JSortedTable extends JTable implements DisposableObj {
     * Viewed rows are converted to model rows and returned
     */
   public Object[] getSelectedRowObjects() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JSortedTable.class, "getSelectedRows()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JSortedTable.class, "getSelectedRowObjects()");
 
     Vector data = ((DefaultTableModel)this.getRawModel()).getDataVector();
     int[] selectedRows = this.getSelectedRows();

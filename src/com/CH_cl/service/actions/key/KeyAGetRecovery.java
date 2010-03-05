@@ -16,8 +16,6 @@ import com.CH_cl.service.actions.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.service.msg.MessageAction;
-import com.CH_co.service.msg.dataSets.key.*;
-import com.CH_co.service.records.KeyRecoveryRecord;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -40,7 +38,7 @@ public class KeyAGetRecovery extends ClientMessageAction {
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyAGetKeyPairs.class, "runAction(Connection)");
 
-    KeyRecoveryRecord[] recoveryRecords = ((Key_KeyRecov_Co) getMsgDataSet()).recoveryRecords;
+    //KeyRecoveryRecord[] recoveryRecords = ((Key_KeyRecov_Co) getMsgDataSet()).recoveryRecords;
 
     if (trace != null) trace.exit(KeyAGetKeyPairs.class, null);
     return null;

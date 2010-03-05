@@ -554,7 +554,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
             return "<html><i>Search for people outside of your Contact List</i></html>";
           }
         };
-        jRecipientsInput[recipientType].addKeyListener(new TypeAheadPopupList(new RecipientListProvider(true, false, false, false, true), userSearchProvider, false, false));
+        jRecipientsInput[recipientType].addKeyListener(new TypeAheadPopupList(new RecipientListProvider(true, false, false, false, true), userSearchProvider, false));
         jRecipients[recipientType] = new JPanel();
         jRecipients[recipientType].setLayout(new BorderLayout(0, 0));
         jRecipients[recipientType].setBorder(new EmptyBorder(0,0,0,0));
@@ -1220,7 +1220,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
       if (isForceOutputInHTMLPrintHeader || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         content[0] = "text/html";
-        UserRecord me = cache.getUserRecord();
         content[1] = 
             (isForceOutputInHTMLPrintHeader ? "<font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") + 

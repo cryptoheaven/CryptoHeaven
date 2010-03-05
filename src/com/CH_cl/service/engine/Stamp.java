@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_gui.groupTable;
+package com.CH_cl.service.engine;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -18,18 +18,34 @@ package com.CH_gui.groupTable;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
+ * Stamp/Long object wrapper to avoid using incorrect synchronization on cachable Long objects.
  *
  * @author  Marcin Kurzawa
  * @version
  */
-public class GroupTableComponent4Frame extends GroupTableComponent {
+public class Stamp {
 
-  /*******************************************************
-  *** V i s u a l s S a v a b l e    interface methods ***
-  *******************************************************/
-  public static final String visualsClassKeyName = "GroupTableComponent4Frame";
-  public String getVisualsClassKeyName() {
-    return visualsClassKeyName;
+  private long value;
+
+  protected Stamp(long value) {
+    this.value = value;
   }
 
+  protected long longValue() {
+    return value;
+  }
+
+  /**
+   * Auto-Generated hashCode method.
+   * @return
+   */
+  public int hashCode() {
+    int hash = 7;
+    hash = 59 * hash + (int) (this.value ^ (this.value >>> 32));
+    return hash;
+  }
+
+  public boolean equals(Object o) {
+    return o instanceof Stamp && ((Stamp) o).value == value;
+  }
 }

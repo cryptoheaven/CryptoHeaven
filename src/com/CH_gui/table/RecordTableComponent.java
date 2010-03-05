@@ -22,14 +22,12 @@ import com.CH_gui.menuing.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.recycleTable.*;
-import com.CH_gui.tree.*;
-
-import com.CH_guiLib.gui.*;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.records.ContactRecUtil;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.gui.*;
@@ -41,12 +39,17 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.actionGui.JActionFrame;
+import com.CH_guiLib.gui.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -80,10 +83,15 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private JPanel jTopPanel;
   private JPanel jFilterPanel;
   private JPanel jTitlePanel;
-  private JPanel jDescriptionPanel;
+  private JPanel jDescriptionPanel1;
+  private JPanel jDescriptionPanel2;
+  private JPanel jOfflinePanel;
   private JPanel jUtilityButtonPanel;
   private ToolBarModel toolBarModel;
   private int countTopPanels = 0;
+
+  private boolean isDescriptionLabelShown = false;
+  private boolean isParticipantComponentsListed = false;
 
   private RecordTableScrollPane recordTableScrollPane;
   private Object title; // Record or String
@@ -102,7 +110,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 
   private boolean suppressVisualsSavable;
   private FolderShareListener folderShareListener;
-
+  private ContactListener contactListener;
 
   /**
    * Creates new RecordTableComponent.
@@ -147,6 +155,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     });
     jFilterGoButton = new JMyButton(Images.get(ImageNums.GO16));
     jFilterGoButton.setBorder(new EmptyBorder(0,0,0,0));
+    jFilterGoButton.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jFilterGoButton.setOpaque(true);
     jFilterGoButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     jFilterGoButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -165,6 +175,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 //      }
 //    });
     jFilterMsgBodyCheck = new JMyCheckBox();
+    jFilterMsgBodyCheck.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jFilterMsgBodyCheck.setOpaque(true);
     RecordTableModel tableModel = recordTableScrollPane.getTableModel();
     if (tableModel instanceof MsgTableModel) {
       MsgTableModel msgTableModel = (MsgTableModel) tableModel;
@@ -196,7 +208,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     jTopPanel = new JPanel(new GridBagLayout());
     jFilterPanel = new JPanel(new GridBagLayout());
     jFilterPanel.setVisible(false);
-    jFilterPanel.setBorder(new LineBorder(Color.darkGray, 1));
+    //jFilterPanel.setBorder(new LineBorder(Color.darkGray, 1));
+    jFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
     jFilterPanel.add(new JMyLabel("Look for:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jFilterPanel.add(jFilterField, new GridBagConstraints(1, 0, 1, 1, 10, 0,
@@ -208,15 +221,25 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     }
     jFilterPanel.add(jFilterMsgBodyCheck, new GridBagConstraints(4, 0, 1, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 3), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jFilterPanel.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     jFilterPanel.add(jFilterCloseButton, new GridBagConstraints(6, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jTitlePanel = new JPanel(new BorderLayout(0, 0));
     jTitlePanel.add(jTitleLabel, BorderLayout.CENTER);
-    jDescriptionPanel = new JPanel(new BorderLayout(0, 0));
-    jDescriptionPanel.add(jDescriptionLabel, BorderLayout.CENTER);
+    jDescriptionPanel1 = new JPanel(new BorderLayout(0, 0));
+    jDescriptionPanel1.add(jDescriptionLabel, BorderLayout.CENTER);
+    isDescriptionLabelShown = true;
+    jDescriptionPanel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    jDescriptionPanel2.setVisible(false);
+    jOfflinePanel = new JPanel(new BorderLayout(0, 0));
+    jOfflinePanel.setVisible(false);
+    //jOfflinePanel.setBorder(new LineBorder(Color.BLACK, 1));
+    jOfflinePanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    JMyLabel label = new JMyLabel("All participants are offline, new messages will be delivered when they sign in.");
+    label.setBorder(new EmptyBorder(3, 3, 3, 3));
+    jOfflinePanel.add(label, BorderLayout.CENTER);
 
     if (!suppressUtilityBar)
       jUtilityButtonPanel = new JPanel(new GridBagLayout());
@@ -233,6 +256,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 
     // Listen on folder changes so we can adjust title and description
     FetchedDataCache.getSingleInstance().addFolderShareRecordListener(folderShareListener = new FolderShareListener());
+    // Listen on Contact changes so we can adjust participants
+    FetchedDataCache.getSingleInstance().addContactRecordListener(contactListener = new ContactListener());
 
     if (toolBarModel != null)
       toolBarModel.addComponentActions(this);
@@ -243,10 +268,14 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public void removeRecordListeners() {
     if (recordTableScrollPane != null) {
       recordTableScrollPane.removeRecordSelectionListeners();
-      if (folderShareListener != null) {
-        FetchedDataCache.getSingleInstance().removeFolderShareRecordListener(folderShareListener);
-        folderShareListener = null;
-      }
+    }
+    if (folderShareListener != null) {
+      FetchedDataCache.getSingleInstance().removeFolderShareRecordListener(folderShareListener);
+      folderShareListener = null;
+    }
+    if (contactListener != null) {
+      FetchedDataCache.getSingleInstance().removeContactRecordListener(contactListener);
+      contactListener = null;
     }
   }
 
@@ -281,37 +310,39 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public void setTitleIcon(Icon icon) {
     jTitleLabel.setIcon(icon);
   }
-  /**
-   * Setting the description overwrites the default description construction when initData() is called.
-   * Setting it to 'null' resets the custom title setting.
-   */
-  public void setDescription(String description) {
-    this.description = description;
-    if (description != null) {
-      jDescriptionLabel.setText("<html>"+description+"</html>"); // html gives us multi-line label capability
-      jDescriptionLabel.revalidate();
-    } else if (lastFolderId != null) {
-      changeDescription(lastFolderId);
-    }
-  }
-  /**
-   * Setting the description overwrites the default description construction when initData() is called.
-   * Setting it to 'null' resets the custom title setting.
-   * Use this method if you want to control the GUI elements like alignment or icon positioning...
-   */
-  public void setDescription(JComponent jDescription) {
-    if (jDescription != null) {
-      if (jDescription instanceof JLabel) {
-        this.jDescriptionLabel = (JLabel) jDescription;
-        this.description = jDescriptionLabel.getText();
-      }
-      jDescriptionPanel.removeAll();
-      jDescriptionPanel.add(jDescription, BorderLayout.CENTER);
-    } else {
-      setDescription((String) null);
-    }
-    this.jDescriptionPanel.revalidate();
-  }
+//  /**
+//   * Setting the description overwrites the default description construction when initData() is called.
+//   * Setting it to 'null' resets the custom title setting.
+//   */
+//  public void setDescription(String description) {
+//    this.description = description;
+//    if (description != null) {
+//      jDescriptionLabel.setText("<html>"+description+"</html>"); // html gives us multi-line label capability
+//      jDescriptionLabel.revalidate();
+//    } else if (lastFolderId != null) {
+//      changeDescription(lastFolderId);
+//    }
+//  }
+//  /**
+//   * Setting the description overwrites the default description construction when initData() is called.
+//   * Setting it to 'null' resets the custom title setting.
+//   * Use this method if you want to control the GUI elements like alignment or icon positioning...
+//   */
+//  public void setDescription(JComponent jDescription) {
+//    if (jDescription != null) {
+//      if (jDescription instanceof JLabel) {
+//        this.jDescriptionLabel = (JLabel) jDescription;
+//        this.description = jDescriptionLabel.getText();
+//      }
+//      jDescriptionPanel.removeAll();
+//      jDescriptionPanel.setLayout(new BorderLayout(0, 0));
+//      jDescriptionPanel.add(jDescription, BorderLayout.CENTER);
+//    } else {
+//      setDescription((String) null);
+//    }
+//    this.jDescriptionPanel.revalidate();
+//  }
+  //public void setDescriptionParticipants(String prefix, String postfix, Folder)
   public void addPreviewComponent(JSplitPane splitPane, JComponent previewComponent) {
     mainPreviewComp = previewComponent;
 
@@ -395,13 +426,13 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 
     int posY = 0;
     if (toolBarModel == null) {
-      jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 3, 1, 10, 0,
+      jTopPanel.add(jFilterPanel, new GridBagConstraints(0, posY, 4, 1, 10, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
     jTopPanel.add(jTitlePanel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 3, 0, 5), 0, 0)); // 1 pixel smaller insets than description to accomodate "shared" folder icons that are larger
-    jTopPanel.add(jDescriptionPanel, new GridBagConstraints(1, posY, 1, 2, 10, 0,
+    jTopPanel.add(jDescriptionPanel1, new GridBagConstraints(1, posY, 1, 2, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(3, 5, 3, 5), 0, 0));
     JLabel minRowHeight = new JLabel(" ");
     jTopPanel.add(minRowHeight, new GridBagConstraints(2, posY, 1, 1, 0, 0,
@@ -419,6 +450,12 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
+    jTopPanel.add(jOfflinePanel, new GridBagConstraints(0, posY, 4, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    posY ++;
+    jTopPanel.add(jDescriptionPanel2, new GridBagConstraints(0, posY, 4, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 0, 3, 0), 0, 0));
+    posY ++;
 
     add(jTopPanel, new GridBagConstraints(0, countTopPanels, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
@@ -748,6 +785,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
    * Sets the description of the folder to reflect the description of the given folder.
    */
   private void changeDescription(Long folderId) {
+    boolean isParticipantsPanelMade = false;
+    boolean isAnyOnline = false;
     if (folderId == null) {
       jDescriptionLabel.setText(null);
     } else {
@@ -775,8 +814,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 !shareDesc.startsWith(originalDesc)) {
               desc = shareDesc;
             } else {
-              String[] notes = FolderTree.getOwnerAndChatNote(fRec);
-              desc = "Participants: " + notes[0] + " " + notes[1];
+              //String[] notes = FolderTree.getOwnerAndChatNote(fRec);
+              //desc = "Participants: " + notes[0] + " " + notes[1];
               // correct the Chat Log title to ommit the participants...
               String name  = share.getFolderName();
               String defaultChatFolderName = com.CH_gui.lang.Lang.rb.getString("folderName_Chat_Log");
@@ -793,7 +832,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 desc = "Private " + fRec.getFolderType();
                 if (fRec.isChatting() && fRec.numOfShares.shortValue() == 1)
                   desc += " archive.";
-              } else {
+              } else if (fRec.isGroupType()) {
                 if (fRec.ownerUserId.equals(cache.getMyUserId()))
                   desc = "Your shared " + fRec.getFolderType();
                 else {
@@ -807,15 +846,158 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               }
             }
           }
-        }
+
+          if (fRec != null && fRec.numOfShares.shortValue() > 1 && !fRec.isGroupType()) {
+            isParticipantsPanelMade = true;
+            isParticipantComponentsListed = true;
+            JPanel panel = null;
+            // prep panels
+            if (desc == null || desc.length() == 0) {
+              jDescriptionPanel1.removeAll();
+              jDescriptionPanel1.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+              jDescriptionPanel2.setVisible(false);
+              panel = jDescriptionPanel1;
+              isDescriptionLabelShown = false;
+            } else {
+              if (!isDescriptionLabelShown) {
+                jDescriptionPanel1.removeAll();
+                jDescriptionPanel1.setLayout(new BorderLayout(0, 0));
+                jDescriptionPanel1.add(jDescriptionLabel, BorderLayout.CENTER);
+                isDescriptionLabelShown = true;
+              }
+              jDescriptionPanel2.removeAll();
+              jDescriptionPanel2.setVisible(true);
+              panel = jDescriptionPanel2;
+            }
+            Record[] participants = getFolderParticipants(fRec);
+            Record owner = participants[0];
+            // sort the list, first active contacts, then other contacts, then groups, then users
+            Arrays.sort(participants, new Comparator() {
+              public int compare(Object o1, Object o2) {
+                int rc = 0;
+                rc = new Integer(getSortInstanceValue(o1)).compareTo(new Integer(getSortInstanceValue(o2)));
+                if (rc == 0 && o1 instanceof ContactRecord && o2 instanceof ContactRecord) {
+                  rc = -((ContactRecord) o1).status.compareTo(((ContactRecord) o2).status);
+                }
+                if (rc == 0) {
+                  ListRenderer.getRenderedText(o1).compareTo(ListRenderer.getRenderedText(o2));
+                }
+                return rc;
+              }
+              private int getSortInstanceValue(Object o) {
+                if (o instanceof ContactRecord)
+                  return 1;
+                else if (o instanceof FolderRecord)
+                  return 2;
+                else if (o instanceof UserRecord)
+                  return 3;
+                else
+                  return 4;
+              }
+            });
+            for (int i=0; i<participants.length; i++) {
+              String text = ListRenderer.getRenderedText(participants[i]);
+              if (participants[i] instanceof UserRecord) {
+                UserRecord uRec = (UserRecord) participants[i];
+                if (uRec.userId.equals(cache.getMyUserId())) {
+                  text = "me";
+                  continue; // skip myself in the list
+                } else {
+                  text = uRec.handle != null && uRec.handle.length() > 0 ? uRec.handle : uRec.shortInfo();
+                }
+              } else if (participants[i] instanceof ContactRecord) {
+                ContactRecord cRec = (ContactRecord) participants[i];
+                isAnyOnline |= cRec.isOnlineStatus();
+              } else if (participants[i] instanceof FolderRecord) {
+                FolderRecord fldRec = (FolderRecord) participants[i];
+                if (fldRec.isGroupType()) {
+                  isAnyOnline = true;
+                }
+              }
+              // participants got sorted so compare using "equals" method
+              if (participants[i].equals(owner))
+                text = "[" + text + "]";
+              JLabel label = new JMyLabel(text);
+              label.setBorder(new EmptyBorder(0,3,0,3));
+              label.setIconTextGap(2);
+              if (participants[i] instanceof ContactRecord) {
+                ContactRecord contactRecord = (ContactRecord) participants[i];
+                label.setIcon(ContactRecUtil.getStatusIcon(contactRecord.status, contactRecord.ownerUserId));
+              } else {
+                label.setIcon(ListRenderer.getRenderedIcon(participants[i]));
+              }
+              panel.add(label);
+            }
+            jOfflinePanel.setVisible(fRec.isChatting() && !isAnyOnline);
+          }
+        } // end share != null
       } catch (Throwable t) {
         // if I'm not logged in, we can expect Exception, just note it in description...
+        System.out.println(t.getMessage());
+        t.printStackTrace();
         desc = "Folder could not be located.";
       }
       jDescriptionLabel.setText("<html>"+desc+"</html>"); // html gives us multi-line label capability
     }
-    jDescriptionLabel.revalidate();
-    jDescriptionLabel.repaint();
+    if (!isParticipantsPanelMade) {
+      if (isParticipantComponentsListed) {
+        isParticipantComponentsListed = false;
+        jDescriptionPanel2.setVisible(false);
+        jOfflinePanel.setVisible(false);
+      }
+      if (!isDescriptionLabelShown) {
+        jDescriptionPanel1.removeAll();
+        jDescriptionPanel1.setLayout(new BorderLayout(0, 0));
+        jDescriptionPanel1.add(jDescriptionLabel, BorderLayout.CENTER);
+        isDescriptionLabelShown = true;
+      }
+    }
+    jDescriptionPanel1.revalidate();
+    jDescriptionPanel1.repaint();
+    if (jDescriptionPanel2.isVisible()) {
+      jDescriptionPanel2.revalidate();
+      jDescriptionPanel2.repaint();
+    }
+  }
+
+  /**
+   *
+   * @param fRec
+   * @return Array of all participants starting with folder owner
+   */
+  public Record[] getFolderParticipants(FolderRecord fRec) {
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    Long ownerUserId = fRec.ownerUserId;
+    Vector participantsV = new Vector();
+    participantsV.addElement(MsgPanelUtils.convertUserIdToFamiliarUser(ownerUserId, true, true));
+    FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
+    for (int i=0; i<allShares.length; i++) {
+      FolderShareRecord share = allShares[i];
+      // all participants other than owner because he is already added
+      if (share.isOwnedByGroup() || !share.isOwnedBy(ownerUserId, (Long[]) null)) {
+        Record recipient = null;
+        if (share.isOwnedByUser())
+          recipient = MsgPanelUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, true);
+        else
+          recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
+        if (recipient != null)
+          participantsV.addElement(recipient);
+        else {
+          if (share.isOwnedByUser()) {
+            UserRecord usrRec = new UserRecord();
+            usrRec.userId = share.ownerUserId;
+            participantsV.addElement(usrRec);
+          } else {
+            FolderRecord fldRec = new FolderRecord();
+            fldRec.folderId = share.ownerUserId;
+            fldRec.folderType = new Short(FolderRecord.GROUP_FOLDER);
+            participantsV.addElement(fldRec);
+          }
+        }
+      }
+    }
+    Record[] participants = (Record[]) ArrayUtils.toArray(participantsV, Record.class);
+    return participants;
   }
 
   /**
@@ -828,10 +1010,20 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
   }
 
+  /**
+   * Contacts listener to update participants list when they change.
+   */
+  private class ContactListener implements ContactRecordListener {
+    public void contactRecordUpdated(ContactRecordEvent event) {
+      // to prevent deadlocks, run in seperate thread
+      javax.swing.SwingUtilities.invokeLater(new GUIUpdater(event));
+    }
+  }
+
   private class GUIUpdater implements Runnable {
-    private FolderShareRecordEvent event;
-    public GUIUpdater(FolderShareRecordEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater(FolderShareRecordEvent event)");
+    private RecordEvent event;
+    public GUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater(RecordEvent event)");
       this.event = event;
       if (trace != null) trace.exit(GUIUpdater.class);
     }
@@ -842,16 +1034,24 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         if (folderPair != null) {
           FolderShareRecord parentShare = folderPair.getFolderShareRecord();
           if (parentShare != null) {
-            FolderShareRecord[] shareRecords = event.getFolderShareRecords();
-            for (int i=0; i<shareRecords.length; i++) {
-              // If changing any of this folder's shares
-              if (parentShare.folderId.equals(shareRecords[i].folderId)) {
-                if (event.getEventType() == RecordEvent.SET) {
-                  changeTitle(shareRecords[i].folderId);
+            if (event instanceof FolderShareRecordEvent) {
+              FolderShareRecordEvent shareEvent = (FolderShareRecordEvent) event;
+              FolderShareRecord[] shareRecords = shareEvent.getFolderShareRecords();
+              for (int i=0; i<shareRecords.length; i++) {
+                // If changing any of this folder's shares
+                if (parentShare.folderId.equals(shareRecords[i].folderId)) {
+                  if (event.getEventType() == RecordEvent.SET) {
+                    changeTitle(shareRecords[i].folderId);
+                  }
+                  // participants might have been ADDED or REMOVED
+                  changeDescription(shareRecords[i].folderId);
+                  break;
                 }
-                // participants might have been ADDED or REMOVED
-                changeDescription(shareRecords[i].folderId);
-                break;
+              }
+            } else if (event instanceof ContactRecordEvent) {
+              // contact status change, update description if we are listing participants
+              if (isParticipantComponentsListed) {
+                changeDescription(parentShare.folderId);
               }
             }
           }

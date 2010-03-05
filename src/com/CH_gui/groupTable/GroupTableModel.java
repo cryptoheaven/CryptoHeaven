@@ -13,14 +13,12 @@
 package com.CH_gui.groupTable;
 
 import java.util.*;
-import javax.swing.table.*;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
@@ -48,7 +46,7 @@ import com.CH_gui.table.*;
 public class GroupTableModel extends RecordTableModel {
 
   // FolderShareIds for which records have been fetched already.
-  private static Vector fetchedIds = new Vector();
+  private static final Vector fetchedIds = new Vector();
 
   private FolderShareListener shareListener;
 
@@ -161,7 +159,6 @@ public class GroupTableModel extends RecordTableModel {
 
           folderPair = new FolderPair(shareRec, folderRec);
           setParentFolderPair(folderPair);
-          Long shareId = folderPair.getFolderShareRecord().shareId;
 
           // add all shares
           FolderShareRecord[] folderShares = cache.getFolderShareRecordsForFolder(folderId);

@@ -37,7 +37,7 @@ import javax.swing.tree.TreePath;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -45,7 +45,7 @@ import javax.swing.tree.TreePath;
  *
  * <b>$Revision: 1.26 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderTree extends JTree implements DisposableObj {
 
@@ -88,7 +88,7 @@ public class FolderTree extends JTree implements DisposableObj {
   /** Creates new FolderTree */
   public FolderTree(FolderTreeModelCl treeModel) {
     super(treeModel);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "FolderTree(FolderTreeNode)");  
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "FolderTree(FolderTreeNode)");
     init();
     if (trace != null) trace.exit(FolderTree.class);
   }
@@ -110,13 +110,13 @@ public class FolderTree extends JTree implements DisposableObj {
 
 
   protected void suppressSelection(boolean value) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "suppressSelection(boolean value)");  
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "suppressSelection(boolean value)");
     if (trace != null) trace.args(value);
     selectionSuppressed = value;
     if (trace != null) trace.exit(FolderTree.class);
   }
   public boolean isSelectionSuppressed() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "isSelectionSuppressed()");  
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "isSelectionSuppressed()");
     boolean rc = selectionSuppressed;
     if (trace != null) trace.exit(FolderTree.class, rc);
     return rc;
@@ -134,7 +134,7 @@ public class FolderTree extends JTree implements DisposableObj {
   }
 
 
-  /** 
+  /**
    * Overwrite the method from super class to get the string for the label.
    * @return string for each node label
    */
@@ -361,24 +361,25 @@ public class FolderTree extends JTree implements DisposableObj {
           boolean foundMine = false;
           for (int i=0; i<allShares.length; i++) {
             FolderShareRecord share = allShares[i];
-            Long shareOwnerUserId = share.ownerUserId;
-            if (share.isOwnedByGroup() || 
-                (!share.isOwnedBy(ownerUserId, (Long[]) null) && 
+            if (share.isOwnedByGroup() ||
+                (!share.isOwnedBy(ownerUserId, (Long[]) null) &&
                 !share.isOwnedBy(myUserId, (Long[]) null))) {
               if (appended)
                 sb.append(" / ");
               Record recipient = null;
               if (share.isOwnedByUser())
-                recipient = MsgPanelUtils.convertUserIdToFamiliarUser(shareOwnerUserId, true, true);
+                recipient = MsgPanelUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, true);
               else
                 recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
-              if (recipient != null) 
+              if (recipient != null)
                 sb.append(ListRenderer.getRenderedText(recipient));
               else {
                 if (share.isOwnedByUser())
-                  sb.append("User ("+share.ownerUserId+")");
+                  sb.append(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {share.ownerUserId}));
+                  //sb.append("User ("+share.ownerUserId+")");
                 else
-                  sb.append("Group ("+share.ownerUserId+")");
+                  sb.append(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Group_(GROUP-ID)"), new Object[] {share.ownerUserId}));
+                  //sb.append("Group ("+share.ownerUserId+")");
               }
               appended = true;
             } else if (share.isOwnedBy(myUserId, (Long[]) null)) {
@@ -470,7 +471,7 @@ public class FolderTree extends JTree implements DisposableObj {
 
     Long[] ids = new Long[folderPairs.length];
 
-    for (int i=0; i<folderPairs.length; i++) 
+    for (int i=0; i<folderPairs.length; i++)
       ids[i] = folderPairs[i].getFolderRecord().getId();
 
     return ids;
@@ -482,7 +483,7 @@ public class FolderTree extends JTree implements DisposableObj {
 
     Long[] shareIds = new Long[folderPairs.length];
 
-    for (int i=0; i<folderPairs.length; i++) 
+    for (int i=0; i<folderPairs.length; i++)
       shareIds[i] = folderPairs[i].getFolderShareRecord().shareId;
 
     return shareIds;
@@ -493,7 +494,7 @@ public class FolderTree extends JTree implements DisposableObj {
 
     FolderTreeNode[] lastNodes = new FolderTreeNode[treePaths.length];
 
-    for (int i=0; i<treePaths.length; i++) 
+    for (int i=0; i<treePaths.length; i++)
       lastNodes[i] = (FolderTreeNode) treePaths[i].getLastPathComponent();
 
     return lastNodes;

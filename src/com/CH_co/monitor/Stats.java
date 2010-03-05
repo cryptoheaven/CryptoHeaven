@@ -42,8 +42,8 @@ public class Stats extends Object {
 
   // All progress monitors should update this label with the current status change.... (used for status bar)
   protected static JLabel jLastStatus;
-  protected static LinkedList statusHistoryL = new LinkedList();
-  protected static LinkedList statusHistoryDatesL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
+  protected static final LinkedList statusHistoryL = new LinkedList();
+  protected static final LinkedList statusHistoryDatesL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
   private static final int MAX_HISTORY_SIZE = 100;
 
   protected static ImageIcon staticPic;
@@ -85,14 +85,18 @@ public class Stats extends Object {
     }
   }
 
-  public static void adjustFonts(AffineTransform transform) {
-    Font font = jLastStatus.getFont().deriveFont(transform);
-    jLastStatus.setFont(font);
-    jPing.setFont(font);
-    jOnlineStatus.setFont(font);
-    jConnections.setFont(font);
-    jTransferRate.setFont(font);
-    jSize.setFont(font);
+  public static void adjustFontSize(AffineTransform transform) {
+    Font font = null;
+    if (jLastStatus != null)
+      font = jLastStatus.getFont().deriveFont(transform);
+    if (font != null) {
+      if (jLastStatus != null) jLastStatus.setFont(font);
+      if (jPing != null) jPing.setFont(font);
+      if (jOnlineStatus != null) jOnlineStatus.setFont(font);
+      if (jConnections != null) jConnections.setFont(font);
+      if (jTransferRate != null) jTransferRate.setFont(font);
+      if (jSize != null) jSize.setFont(font);
+    }
   }
 
   public static void installStatsLabelMouseAdapter(MouseListener listener) {
@@ -187,8 +191,6 @@ public class Stats extends Object {
   }
 
   public static void setConnections(int connectionCount, int[] connectionTypeCounts) {
-    Random rnd = new Random();
-    int i = rnd.nextInt();
     synchronized (monitor) {
       if (jConnections != null) {
         jConnections.setText("" + connectionCount);

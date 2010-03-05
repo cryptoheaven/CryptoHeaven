@@ -133,19 +133,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       splashWindow.dispose();
     }
 
-    addWindowListener(new WindowAdapter() {
-      public void windowIconified(WindowEvent e) {
-        Thread gc = new ThreadTraced("Garbage Collection") {
-          public void runTraced() {
-            System.gc();
-          }
-        };
-        gc.setDaemon(true);
-        gc.setPriority(Thread.MIN_PRIORITY);
-        gc.start();
-      }
-    });
-
     // set default parent to multi-progress monitors to the main window
     MultiProgressMonitor.setDefaultParentComponent(this);
 
@@ -575,7 +562,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     Component welcomeComp = getWelcomeScreenComponent(URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId, false);
     welcomeScreenPanel.removeAll();
     welcomeScreenPanel.setLayout(new BorderLayout());
-    RecordTableComponent recTableComp = new ContactTableComponent4Frame(null, null, null, null, false, false, true);
+    RecordTableComponent recTableComp = new ContactTableComponent4Frame(null, new FixedFilter(false), null, null, false, false, true);
     UserRecord userRec = SIL.getFetchedDataCache().getUserRecord();
     String username = userRec != null ? userRec.handle : "";
     recTableComp.setTitle("Welcome " + username);

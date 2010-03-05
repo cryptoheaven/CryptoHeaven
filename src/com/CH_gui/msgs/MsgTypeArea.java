@@ -558,11 +558,6 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
 
   public void setCaretAtTheTop() {
     JTextComponent textComp = getTextComponent();
-    Caret caret = textComp.getCaret();
-//    if (caret != null) {
-//      caret.setVisible(true);
-//      caret.setSelectionVisible(true);
-//    }
     boolean caretSet = false;
     try {
       Document d = textComp.getDocument();

@@ -119,7 +119,8 @@ public class FileTextLexicon extends StreamTextLexicon {
   public static boolean isFileTextLexicon(String s) {
     try {
       FileTextLexicon filetextlexicon = new FileTextLexicon(s);
-      filetextlexicon = null;
+      if (filetextlexicon != null)
+        return true;
     } catch (Exception exception) {
       return false;
     }

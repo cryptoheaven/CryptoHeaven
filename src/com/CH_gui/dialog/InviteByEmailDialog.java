@@ -21,20 +21,14 @@ import javax.swing.event.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
-
-import com.CH_cl.service.ops.KeyOps;
-import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.filters.FolderFilter;
+
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.Cnt_NewCnt_Rq;
 import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.ContactRecord;
-import com.CH_co.service.records.EmailRecord;
-import com.CH_co.service.records.FolderRecord;
-import com.CH_co.service.records.KeyRecord;
-import com.CH_co.service.records.UserRecord;
+import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
@@ -192,7 +186,7 @@ public class InviteByEmailDialog extends GeneralDialog {
 
     final String emailAddresses = emlAddresses != null ? emlAddresses.trim() : null;
     final String personalMsg = personalMessage != null ? personalMessage.trim() : null;
-    final String[] texts = Misc.getEmailInvitationText(personalMsg, null, FetchedDataCache.getSingleInstance().getUserRecord());
+    //final String[] texts = Misc.getEmailInvitationText(personalMsg, null, FetchedDataCache.getSingleInstance().getUserRecord());
 
     // gather email addresses and nicks for adding to AddressBook
     final Vector emailAddressesV = new Vector();
@@ -268,7 +262,7 @@ public class InviteByEmailDialog extends GeneralDialog {
 
             // Send invites by Email
             // skip if email already belongs to my active or declined contact
-            String filteredEmlAddresses = "";
+            StringBuffer filteredEmlAddressesSB = new StringBuffer();
             for (int i=0; i<emailAddressesV.size(); i++) {
               String emlAddr = (String) emailAddressesV.elementAt(i);
               EmailRecord emlRec = cache.getEmailRecord(emlAddr);
@@ -282,15 +276,15 @@ public class InviteByEmailDialog extends GeneralDialog {
                 }
               }
               if (emlAddr != null) {
-                if (filteredEmlAddresses.length() > 0)
-                  filteredEmlAddresses += ",";
-                filteredEmlAddresses += emlAddr;
+                if (filteredEmlAddressesSB.length() > 0)
+                  filteredEmlAddressesSB.append(",");
+                filteredEmlAddressesSB.append(emlAddr);
               }
             }
             boolean inviteSuccess = true;
-            if (filteredEmlAddresses.length() > 0) {
+            if (filteredEmlAddressesSB.length() > 0) {
               Obj_List_Co request = new Obj_List_Co();
-              request.objs = new String[] { filteredEmlAddresses, personalMsg };
+              request.objs = new String[] { filteredEmlAddressesSB.toString(), personalMsg };
               ClientMessageAction msgActionInv = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_SEND_EMAIL_INVITATION, request), 120000);
               DefaultReplyRunner.nonThreadedRun(SIL, msgActionInv);
               inviteSuccess = msgActionInv != null && msgActionInv.getActionCode() >= 0;

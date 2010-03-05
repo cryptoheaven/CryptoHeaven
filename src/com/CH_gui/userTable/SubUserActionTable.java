@@ -383,12 +383,6 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       actions[MESSAGE_ACTION].setEnabled(false);
       actions[ACTIVATE_SUSPEND_ACTION].setEnabled(false);
       actions[PASSWORD_RESET].setEnabled(false);
-    } else if (count == 1) {
-      actions[EDIT_ACCOUNT_ACTION].setEnabled(true);
-      actions[REMOVE_ACCOUNT_ACTION].setEnabled(true);
-      actions[MESSAGE_ACTION].setEnabled(messageOk);
-      actions[ACTIVATE_SUSPEND_ACTION].setEnabled(true);
-      actions[PASSWORD_RESET].setEnabled(true);
     } else {
       actions[EDIT_ACCOUNT_ACTION].setEnabled(true);
       actions[REMOVE_ACCOUNT_ACTION].setEnabled(true);

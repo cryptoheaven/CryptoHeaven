@@ -221,17 +221,18 @@ public class UsrALoginSecureSession extends ClientMessageAction {
     String pathList = GlobalProperties.getProperty("PrivKeyFilePaths", "");
     String[] paths = pathList.split("[\\|]+");
     if (ArrayUtils.find(paths, addPath) < 0) {
-      pathList = addPath;
+      StringBuffer pathListSB = new StringBuffer(addPath);
       int countAdded = 1;
       for (int i=0; i<paths.length; i++) {
         if (paths[i].length() > 0) {
-          pathList += "|" + paths[i];
+          pathListSB.append("|");
+          pathListSB.append(paths[i]);
           countAdded ++;
           if (countAdded >= 5)
             break;
         }
       }
-      GlobalProperties.setProperty("PrivKeyFilePaths", pathList);
+      GlobalProperties.setProperty("PrivKeyFilePaths", pathListSB.toString());
       GlobalProperties.store();
     }
   }

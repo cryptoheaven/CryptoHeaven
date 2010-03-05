@@ -14,25 +14,17 @@ package com.CH_gui.table;
 
 import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.sortedTable.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.sql.Timestamp;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
+import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.table.TableModel;
 
 /** 
@@ -41,7 +33,7 @@ import javax.swing.table.TableModel;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -49,7 +41,7 @@ import javax.swing.table.TableModel;
  *
  * <b>$Revision: 1.21 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer {
 
@@ -175,7 +167,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
     if (str != null) {
       if (stringHighlighter != null && stringHighlighter.hasHighlightingStr()) {
         String[] visualsReturnBuffer = new String[1];
-        int match = StringHighlighter.matchStrings(str, stringHighlighter, true, visualsReturnBuffer);
+        StringHighlighter.matchStrings(str, stringHighlighter, true, visualsReturnBuffer);
         if (visualsReturnBuffer[0] != null)
           str = visualsReturnBuffer[0];
       }
@@ -305,13 +297,12 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
       panel.add(arrow, BorderLayout.WEST);
       panel.add(renderer, BorderLayout.CENTER);
       /*
-      panel.add(arrow, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+      panel.add(arrow, new GridBagConstraints(0, 0, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-      panel.add(renderer, new GridBagConstraints(1, 0, 1, 1, 10, 10, 
+      panel.add(renderer, new GridBagConstraints(1, 0, 1, 1, 10, 10,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
         */
       identLevel --;
-      renderer = panel;
       panel.setBorder(RecordTableCellRenderer.getIndentedBorder(identLevel, isIconized));
       renderer = panel;
     } else {

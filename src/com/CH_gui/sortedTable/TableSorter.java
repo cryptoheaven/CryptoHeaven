@@ -34,7 +34,7 @@ import com.CH_gui.table.*;
  * Class Description:
  *
  *
- * Class Details:   Sorts by raw columns, not model columns, hence it is 
+ * Class Details:   Sorts by raw columns, not model columns, hence it is
  *                  possible to sort by hidden as well as shown columns.
  *
  *
@@ -75,7 +75,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
     fireSortNotification(true);
 
     synchronized (this) {
-      // do the rest 
+      // do the rest
       super.setRawModel(model);
       reallocateIndexes();
 
@@ -238,7 +238,6 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
   private void resort(TableModelEvent tableModelEvent) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableSorter.class, "resort(TableModelEvent tableModelEvent)");
     if (trace != null) trace.args(tableModelEvent);
-    if (trace != null) trace.data(10, "getRawModel()", getRawModel());
     // skip sorting for item updates
     boolean suppressSort = suppressUpdateSorts() && tableModelEvent != null && tableModelEvent.getType() == TableModelEvent.UPDATE;
     // fire before we adjust indexes because selection saving involves using valid indexes!
@@ -292,7 +291,18 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
 //        }
 
         /** This call sorts entire table where compare() method of 'this' object is used. */
-        Arrays.sort(objs, TableSorter.this);
+        if (trace != null) trace.data(10, "calling Arrays.sort()");
+        int token = 0;
+        if (trace != null) token = trace.pause();
+        try {
+          Arrays.sort(objs, TableSorter.this);
+        } catch (Throwable t) {
+          if (trace != null) trace.resume(token);
+          if (trace != null) trace.exception(TableSorter.class, 15, t);
+        }
+        if (trace != null) trace.resume(token);
+        if (trace != null) trace.data(20, "returned from Arrays.sort()");
+
         sortPostProcessing(objs);
 
         for (int i=0; i<length; i++) {
@@ -416,7 +426,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
   }
 
   /**
-   * Return the index of the row in the model whose data is being displayed in 
+   * Return the index of the row in the model whose data is being displayed in
    * the row viewRowIndex in the display or -1 if invalid view row is specified.
    */
   int convertMyRowIndexToModel(int viewRowIndex) {

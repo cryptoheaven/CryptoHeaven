@@ -189,6 +189,13 @@ public class MainFrameStarter extends Object {
               JActionFrame.ENABLE_MENU_CUSTOMIZATION_ACTION = true;
             else if (onOff.equalsIgnoreCase("off") || onOff.equalsIgnoreCase("false"))
               JActionFrame.ENABLE_MENU_CUSTOMIZATION_ACTION = false;
+          } else if (args[0].equals("-trace")) {
+            i++;
+            String onOff = args[i];
+            if (onOff.equalsIgnoreCase("on") || onOff.equalsIgnoreCase("true"))
+              TraceDiagnosticsDialog.traceStart();
+            else if (onOff.equalsIgnoreCase("off") || onOff.equalsIgnoreCase("false"))
+              TraceDiagnosticsDialog.traceStop();
           } else if (args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("/?") || args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("/help")) {
             System.out.println("Usage 1: [-D[!]<propertiesDir>] [-privateLabelURL <URL>] [-username <username>] [<-password <password>>|<-password-blank>] [-signup] [-signupEmail <emailAddress>] [-folderId <id>] [-msgLinkId <id>] [-no-splash]");
             System.out.println("Usage 2: -localKeyChangePass <localKeyId> <old name> <old password> <new name> <new password>");
@@ -312,7 +319,7 @@ public class MainFrameStarter extends Object {
     }
 
     // Fix the static labels in the Stats bar
-    Stats.adjustFonts(at);
+    Stats.adjustFontSize(at);
 
     // Change default label color to black
     try {
@@ -394,11 +401,11 @@ public class MainFrameStarter extends Object {
   }
 
   private static class StarterLoginCoordinator implements LoginCoordinatorI {
-    private Long initialFolderId;
+//    private Long initialFolderId;
     private Long initialMsgLinkId;
 
     private StarterLoginCoordinator(Long initialFolderId, Long initialMsgLinkId) {
-      this.initialFolderId = initialFolderId;
+//      this.initialFolderId = initialFolderId;
       this.initialMsgLinkId = initialMsgLinkId;
     }
 

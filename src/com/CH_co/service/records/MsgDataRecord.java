@@ -90,6 +90,8 @@ public class MsgDataRecord extends Record {
   public static final short OBJ_TYPE_MSG = 1;
   public static final short OBJ_TYPE_ADDR = 2;
 
+  public static final String WARNING_BACKGROUND_COLOR = "FFFF99";
+
   public Long msgId;
   public Short objType;   // either OBJ_TYPE_MSG or OBJ_TYPE_ADDR, if address, use importance FYI/NORMAL/HIGH in PLAIN only for compatibility with older clients
   public Long replyToMsgId;
@@ -645,7 +647,7 @@ public class MsgDataRecord extends Record {
     String tablePre = isPlain ? "" : 
             "<table border='0' cellspacing='0' cellpadding='0'>"
               +"<tr>"
-                +"<td width='100%' bgcolor='#FFFF99'>";
+                +"<td width='100%' bgcolor='#"+WARNING_BACKGROUND_COLOR+"'>";
     String tablePost = isPlain ? "" : 
                 "</td>"
               +"</tr>"

@@ -51,7 +51,7 @@ import com.CH_gui.list.ListRenderer;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -59,7 +59,7 @@ import com.CH_gui.list.ListRenderer;
  *
  * <b>$Revision: 1.41 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ContactActionTable extends RecordActionTable implements ActionProducerI {
 
@@ -247,10 +247,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   // =====================================================================
-  // LISTENERS FOR THE MENU ITEMS        
+  // LISTENERS FOR THE MENU ITEMS
   // =====================================================================
 
-  /** 
+  /**
    * Initiate a new contact.
    */
   private static class NewContactAction extends AbstractActionTraced {
@@ -266,7 +266,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  /** 
+  /**
    * Create a new group.
    */
   private class NewGroupAction extends AbstractActionTraced {
@@ -282,7 +282,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  /** 
+  /**
    * Accept contact(s).
    */
   private class AcceptDeclineAction extends AbstractActionTraced {
@@ -303,7 +303,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  /** 
+  /**
    * Ignore contact request and Remove the contact object.
    */
   private class RemoveAction extends AbstractActionTraced {
@@ -358,7 +358,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
 
-  /** 
+  /**
    * Send a new message to contact(s).
    */
   private class NewMessageAction extends AbstractActionTraced {
@@ -386,7 +386,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
 
-  /** 
+  /**
    * Send a new message to contact(s).
    */
   private class NewAddressAction extends AbstractActionTraced {
@@ -450,8 +450,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
                 }
               }
               if (!batched) {
-                XMLElement draftData = ContactInfoPanel.getContent(new XMLElement[] { 
-                                                NamePanel.getContent(fullName, null, null, null), 
+                XMLElement draftData = ContactInfoPanel.getContent(new XMLElement[] {
+                                                NamePanel.getContent(fullName, null, null, null),
                                                 EmailPanel.getContent(EmailPanel.getTypes(), new String[] { emailAddress }, null, 0) });
                 new AddressFrame(fullName, fPairs, draftData);
               }
@@ -467,7 +467,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
 
-  /** 
+  /**
    * Show Contact Properties Dialog.
    */
   private class PropertiesAction extends AbstractActionTraced {
@@ -591,8 +591,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       UserRecord myUserRec = cache.getUserRecord();
       ContactTableModel tableModel = (ContactTableModel) ContactActionTable.this.getTableModel();
-      RecordFilter filter = new MultiFilter(new RecordFilter[] { 
-        new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, isShow), 
+      RecordFilter filter = new MultiFilter(new RecordFilter[] {
+        new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, isShow),
         new FolderFilter(FolderRecord.GROUP_FOLDER),
         new InvEmlFilter(true, false) }
       , MultiFilter.OR);
@@ -635,10 +635,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     public void actionPerformedTraced(ActionEvent event) {
       chatOrShareSpace(true, (short) 0, event);
     } // end actionPerformed
-  } // end class ChatAction 
+  } // end class ChatAction
 
 
-  /** 
+  /**
    * Send Email Message to invite someone to join.
    */
   private class SendEmailInvitationAction extends AbstractActionTraced {
@@ -665,7 +665,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   private String getEmailAddrs(Record[] invEmlRecs) {
-    String invEmails = "";
+    StringBuffer invEmailsSB = new StringBuffer();
     Vector emailsLowerV = new Vector();
     Vector emailsOrigV = new Vector();
     InvEmlRecord[] invEmls = (InvEmlRecord[]) ArrayUtils.gatherAllOfType(invEmlRecs, InvEmlRecord.class);
@@ -678,16 +678,16 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         }
       }
       for (int i=0; i<emailsOrigV.size(); i++) {
-        if (invEmails.length() > 0)
-          invEmails += ", ";
-        invEmails += emailsOrigV.elementAt(i);
+        if (invEmailsSB.length() > 0)
+          invEmailsSB.append(", ");
+        invEmailsSB.append(emailsOrigV.elementAt(i).toString());
       }
     }
-    return invEmails;
+    return invEmailsSB.toString();
   }
 
   /** Display a dialog for creation of new folder shared between selected contacts.
-    * Submit Create New Folder request 
+    * Submit Create New Folder request
     */
   private class CreateSharedSpaceAction extends AbstractActionTraced {
     public CreateSharedSpaceAction(int actionId) {
@@ -809,15 +809,16 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           }
         }
       }
-      if (isChat && !anyUserOnline) {
-        MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Must_select_at_least_one_online_user"), com.CH_gui.lang.Lang.rb.getString("msgTitle_User_Offline"), false);
-      } else if (!createSharedSpaceOk) {
-        MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
+      if (isChat) {
+//        if (!anyUserOnline) {
+//          // show offline warning
+//          MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Must_select_at_least_one_online_user"), com.CH_gui.lang.Lang.rb.getString("msgTitle_User_Offline"), false);
+//        }
+        doChat(selectedRecords);
+      } else if (createSharedSpaceOk) {
+        doSharedSpace(parent, selectedRecords, folderType);
       } else {
-        if (isChat)
-          doChat(selectedRecords);
-        else 
-          doSharedSpace(parent, selectedRecords, folderType);
+        MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
       }
     }
   }
@@ -847,12 +848,12 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     Window w = SwingUtilities.windowForComponent(parent);
     if (w == null) w = MainFrame.getSingleInstance();
     String title = folderType == FolderRecord.GROUP_FOLDER ? com.CH_gui.lang.Lang.rb.getString("title_Create_New_Shared_Group") : com.CH_gui.lang.Lang.rb.getString("title_Create_New_Shared_Space");
-    if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts); 
-    else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts); 
+    if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts);
+    else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts);
   }
 
   /****************************************************************************/
-  /*        A c t i o n P r o d u c e r I                                  
+  /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
 
   /** @return all the acitons that this objects produces.
@@ -874,7 +875,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       actions[SORT_ASC_ACTION].setEnabled(true);
       actions[SORT_DESC_ACTION].setEnabled(true);
       actions[CUSTOMIZE_COLUMNS_ACTION].setEnabled(true);
-      for (int i=SORT_BY_FIRST_COLUMN_ACTION; i<SORT_BY_FIRST_COLUMN_ACTION+NUM_OF_SORT_COLUMNS; i++) 
+      for (int i=SORT_BY_FIRST_COLUMN_ACTION; i<SORT_BY_FIRST_COLUMN_ACTION+NUM_OF_SORT_COLUMNS; i++)
         actions[i].setEnabled(true);
 
       // initiate always enabled
@@ -960,7 +961,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
 
-  /** 
+  /**
    * Send a request to fetch contacts for the current user from the server
    * if contacts were not fetched for yet, otherwise get them from cache
    */
@@ -976,7 +977,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     if (trace != null) trace.exit(ContactActionTable.class);
   }
 
-  /** 
+  /**
    * Re-Add my groups to the cache so that listeners can grab them
    */
   public void reAddGroupsToCache() {

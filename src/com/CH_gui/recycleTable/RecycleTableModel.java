@@ -40,7 +40,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -48,7 +48,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.2 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class RecycleTableModel extends RecordTableModel {
 
@@ -74,7 +74,7 @@ public class RecycleTableModel extends RecordTableModel {
   protected static final String STR_LINK_ID = com.CH_gui.lang.Lang.rb.getString("column_Link_ID");
   protected static final String STR_DATA_ID = com.CH_gui.lang.Lang.rb.getString("column_Data_ID");
 
-  static final ColumnHeaderData columnHeaderData = 
+  static final ColumnHeaderData columnHeaderData =
       new ColumnHeaderData(new Object[][]
         { { null, STR_NAME, STR_FROM, STR_TYPE, STR_SIZE, STR_CREATED, STR_DELETED, STR_LINK_ID, STR_DATA_ID },
           { STR_FLAG, STR_NAME, STR_FROM, STR_TYPE, STR_SIZE, STR_CREATED, STR_DELETED, STR_LINK_ID, STR_DATA_ID },
@@ -186,7 +186,6 @@ public class RecycleTableModel extends RecordTableModel {
 
           folderPair = new FolderPair(shareRec, folderRec);
           setParentFolderPair(folderPair);
-          Long shareId = folderPair.getFolderShareRecord().shareId;
 
           // Add the child folders, include viewChildren
           FolderPair[] childFolderPairs = cache.getFolderPairsViewChildren(folderId, true);
@@ -237,7 +236,7 @@ public class RecycleTableModel extends RecordTableModel {
     else
       return null;
   }
-    
+
   public static Collection getSearchTextFor(Record searchableObj, boolean includeMsgBody) {
     Collection sb = new LinkedList();
     if (searchableObj instanceof FileLinkRecord)
@@ -290,7 +289,7 @@ public class RecycleTableModel extends RecordTableModel {
       FileLinkRecord fileLink = (FileLinkRecord) record;
 
       switch (column) {
-        case 0: 
+        case 0:
           StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
           if (stat != null) {
             value = stat.getFlag();
@@ -337,16 +336,16 @@ public class RecycleTableModel extends RecordTableModel {
       MsgLinkRecord msgLink = (MsgLinkRecord) record;
 
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
+      MsgDataRecord msgData = forSortOnly ? cache.getMsgDataRecordNoTrace(msgLink.msgId) : cache.getMsgDataRecord(msgLink.msgId);
 
       switch (column) {
-        case 0: 
-          StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+        case 0:
+          StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
           if (stat != null)
             value = stat.getFlag();
           break;
         // Subject or Posting or Address Name
-        case 1: 
+        case 1:
           value = ListRenderer.getRenderedText(msgData, false, false, true);
           break;
         // From
@@ -448,7 +447,7 @@ public class RecycleTableModel extends RecordTableModel {
   }
 
 
-  /** 
+  /**
    * Send a request to fetch files and msg briefs for the <code> shareId </code> from the server
    * if files were not fetched for this folder, otherwise get them from cache
    * @param force true to force a fetch from the database
@@ -469,7 +468,7 @@ public class RecycleTableModel extends RecordTableModel {
           Vector fileLinksToRemove = new Vector();
           Vector msgLinksToRemove = new Vector();
           for (int row=0; row<rowCount; row++) {
-            Record rec = getRowObject(row);
+            Record rec = getRowObjectNoTrace(row);
             if (rec instanceof FileLinkRecord) {
               fileLinksToRemove.addElement(rec);
             } else if (rec instanceof MsgLinkRecord) {
@@ -541,7 +540,7 @@ public class RecycleTableModel extends RecordTableModel {
     } // end synchronized
 
     if (trace != null) trace.exit(RecycleTableModel.class);
-  } 
+  }
 
   /**
    * Checks if folder share's content of a given ID was already retrieved.

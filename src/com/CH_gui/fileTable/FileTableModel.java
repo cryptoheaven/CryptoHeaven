@@ -55,7 +55,7 @@ public class FileTableModel extends RecordTableModel {
   private FolderListener folderListener;
 
   /* folderShareIds for which the files has been fetched already */
-  private static Vector fetchedIds = new Vector();
+  private static final Vector fetchedIds = new Vector();
 
   protected static final String STR_FILE_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_File_Folder");
   protected static final String STR_SHARED_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_Shared_Folder");
@@ -176,7 +176,6 @@ public class FileTableModel extends RecordTableModel {
 
           folderPair = new FolderPair(shareRec, folderRec);
           setParentFolderPair(folderPair);
-          Long shareId = folderPair.getFolderShareRecord().shareId;
 
           // Add the child folders, include viewChildren
           FolderPair[] childFolderPairs = cache.getFolderPairsViewChildren(folderId, true);
@@ -347,7 +346,7 @@ public class FileTableModel extends RecordTableModel {
           int rowCount = getRowCount();
           Vector linksToRemove = new Vector();
           for (int row=0; row<rowCount; row++) {
-            Record rec = getRowObject(row);
+            Record rec = getRowObjectNoTrace(row);
             if (rec instanceof FileLinkRecord) {
               linksToRemove.addElement(rec);
             }

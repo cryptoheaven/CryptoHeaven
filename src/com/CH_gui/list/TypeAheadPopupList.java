@@ -49,7 +49,6 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
   private ObjectsProviderUpdaterI provider;
   private ObjectsProviderUpdaterI secondaryProvider;
   private boolean isSingleItemList;
-  private boolean isSecondaryProviderDefaultable;
   private javax.swing.Timer noFocusUnPopTimer;
   private ActionListener noFocusUnPopActionListener;
   private String lastNonFocusPopText = null;
@@ -76,17 +75,16 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
     this(provider, null);
   }
   public TypeAheadPopupList(ObjectsProviderUpdaterI provider, ObjectsProviderUpdaterI secondaryProvider) {
-    this(provider, secondaryProvider, false, false);
+    this(provider, secondaryProvider, false);
   }
   public TypeAheadPopupList(ObjectsProviderUpdaterI provider, boolean isSingleItemList) {
-    this(provider, null, isSingleItemList, false);
+    this(provider, null, isSingleItemList);
   }
-  public TypeAheadPopupList(ObjectsProviderUpdaterI provider, ObjectsProviderUpdaterI secondaryProvider, boolean isSingleItemList, boolean isSecondaryProviderDefaultable) {
+  public TypeAheadPopupList(ObjectsProviderUpdaterI provider, ObjectsProviderUpdaterI secondaryProvider, boolean isSingleItemList) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TypeAheadPopupList.class, "TypeAheadPopupList()");
     this.provider = provider;
     this.secondaryProvider = secondaryProvider;
     this.isSingleItemList = isSingleItemList;
-    this.isSecondaryProviderDefaultable = isSecondaryProviderDefaultable;
     if (trace != null) trace.exit(TypeAheadPopupList.class);
   }
 

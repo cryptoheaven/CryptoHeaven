@@ -38,7 +38,6 @@ public class Digester extends Object {
     MessageDigest digest = null;
     try {
       digest = MessageDigest.getInstance(algorithm);
-      algorithm = digest.getAlgorithm();
     } catch (Throwable t) {
       if (algorithm.equals("SHA256") || algorithm.equals("SHA-256")) {
         digest = new com.CH_co.cryptx.SHA256();

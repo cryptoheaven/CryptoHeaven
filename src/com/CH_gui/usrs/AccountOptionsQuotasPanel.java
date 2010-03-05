@@ -334,17 +334,17 @@ public class AccountOptionsQuotasPanel extends JPanel {
       if (st.hasMoreTokens()) {
         val = st.nextToken();
         // separate digits and letters into value and units
-        String chars = "";
-        String digits = "";
+        StringBuffer charsSB = new StringBuffer();
+        StringBuffer digitsSB = new StringBuffer();
         for (int i=0; i<val.length(); i++) {
           char ch = val.charAt(i);
           if (Character.isLetter(ch))
-            chars = chars + ch;
+            charsSB.append(ch);
           else if (Character.isDigit(ch))
-            digits = digits + ch;
+            digitsSB.append(ch);
         }
-        val = digits;
-        units = chars;
+        val = digitsSB.toString();
+        units = charsSB.toString();
       }
       if (units.length() == 0 || st.hasMoreTokens())
         units = st.nextToken();

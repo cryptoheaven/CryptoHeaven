@@ -325,8 +325,9 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   public static void doMoveOrSaveAttachmentsAction(FolderPair chosenFolderPair, FileLinkRecord[] fLinks, FolderPair[] fPairs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "doMoveOrSaveAttachmentsAction(FolderPair chosenFolderPair, FileLinkRecord[] fLinks, FolderPair[] fPairs)");
     if (trace != null) trace.args(chosenFolderPair, fLinks, fPairs);
-    ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
     if (chosenFolderPair != null) {
+      ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+      final FetchedDataCache cache = SIL.getFetchedDataCache();
       // move files
       File_MoveCopy_Rq request = prepareMoveCopyRequest(chosenFolderPair.getFolderShareRecord(), fLinks);
       if (request != null) { // fLinks can not be empty if request was generated
@@ -337,7 +338,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
         FolderRecord sourceFolder = null;
         if (fLinks[0].ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER)
-          sourceFolder = FetchedDataCache.getSingleInstance().getFolderRecord(fLinks[0].ownerObjId);
+          sourceFolder = cache.getFolderRecord(fLinks[0].ownerObjId);
 
         // create runnable to run after reply is received that will update new object count
         final FolderRecord _sourceFolder = sourceFolder;
@@ -345,12 +346,20 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         if (sourceFolder != null) {
           newCountUpdate = new Runnable() {
             public void run() {
-              FetchedDataCache.getSingleInstance().statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
+              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
             }
           };
         }
 
-        serverInterfaceLayer.submitAndReturn(new MessageAction(actionCode, request), 30000, newCountUpdate, newCountUpdate);
+        // if Move then immediatelly remove links so that source GUI table responds FAST, when action comes back from server destination folder will update
+        if (actionCode == CommandCodes.FILE_Q_MOVE_FILES && sourceFolder != null) {
+          FolderShareRecord sourceShare = cache.getFolderShareRecordMy(sourceFolder.folderId, true);
+          FolderShareRecord chosenShare = chosenFolderPair.getFolderShareRecord();
+          if (sourceShare.canDelete.shortValue() == FolderShareRecord.YES && chosenShare.canWrite.shortValue() == FolderShareRecord.YES)
+            cache.removeFileLinkRecords(fLinks);
+        }
+
+        SIL.submitAndReturn(new MessageAction(actionCode, request), 30000, newCountUpdate, newCountUpdate);
       }
       // move folders
       if (fPairs != null && fPairs.length > 0) {
@@ -367,19 +376,19 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
             // create runnable to run after reply is received that will update new object count
             FolderRecord sourceFolder = null;
             if (fLinks != null && fLinks.length > 0 && fLinks[0].ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-              sourceFolder = FetchedDataCache.getSingleInstance().getFolderRecord(fLinks[0].ownerObjId);
+              sourceFolder = cache.getFolderRecord(fLinks[0].ownerObjId);
             }
             final FolderRecord _sourceFolder = sourceFolder;
             Runnable newCountUpdate = null;
             if (sourceFolder != null) {
               newCountUpdate = new Runnable() {
                 public void run() {
-                  FetchedDataCache.getSingleInstance().statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
+                  cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
                 }
               };
             }
 
-            serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_MOVE_FOLDER, folderRequest), 30000, newCountUpdate, newCountUpdate);
+            SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_MOVE_FOLDER, folderRequest), 30000, newCountUpdate, newCountUpdate);
           }
         }
       }
@@ -652,7 +661,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     FileTableModel tableModel = (FileTableModel) getTableModel();
     Vector linksV = new Vector();
     for (int i=0; i<tableModel.getRowCount(); i++) {
-      Record rec = tableModel.getRowObject(i);
+      Record rec = tableModel.getRowObjectNoTrace(i);
       if (rec instanceof FileLinkRecord)
         linksV.addElement(rec);
     }
@@ -874,7 +883,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     if (!anyUnseen) {
       FileTableModel tableModel = (FileTableModel) getTableModel();
       for (int i=0; i<tableModel.getRowCount(); i++) {
-        FileRecord fRec = (FileRecord) tableModel.getRowObject(i);
+        FileRecord fRec = (FileRecord) tableModel.getRowObjectNoTrace(i);
         if (fRec instanceof FileLinkRecord) {
           FileLinkRecord fLink = (FileLinkRecord) fRec;
           StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);

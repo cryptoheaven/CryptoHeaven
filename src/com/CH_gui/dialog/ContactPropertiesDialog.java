@@ -321,7 +321,6 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
     panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    short s = contactRecord.status.shortValue();
     String status = ContactRecUtil.getStatusText(contactRecord.status, contactRecord.ownerUserId);
     ImageIcon icon = ContactRecUtil.getStatusIcon(contactRecord.status, contactRecord.ownerUserId);
     panel.add(new JMyLabel(status, icon, JLabel.LEFT), new GridBagConstraints(1, posY, 1, 1, 10, 0,

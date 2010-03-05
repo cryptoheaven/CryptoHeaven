@@ -13,7 +13,6 @@
 package com.CH_gui.msgTable;
 
 import java.awt.*;
-import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -37,10 +36,10 @@ public class MsgSentTableCellRenderer extends MsgTableCellRenderer {
   private static Color sentMsgAltColorSelected = new Color(202, 194, 184);
   private static Color[] altBkColors = new Color[] { sentMsgAltColor, sentMsgAltColorSelected };
 
-  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-    Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    return renderer;
-  }
+//  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//    Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//    return renderer;
+//  }
 
   /**
    * Provide alternate row background colors.

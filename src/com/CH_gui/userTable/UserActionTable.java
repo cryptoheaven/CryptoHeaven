@@ -211,9 +211,6 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
     if (count == 0) {
       actions[INITIATE_ACTION].setEnabled(false);
       actions[MESSAGE_ACTION].setEnabled(false);
-    } else if (count == 1) {
-      actions[INITIATE_ACTION].setEnabled(initiateOk);
-      actions[MESSAGE_ACTION].setEnabled(messageOk);
     } else {
       actions[INITIATE_ACTION].setEnabled(initiateOk);
       actions[MESSAGE_ACTION].setEnabled(messageOk);

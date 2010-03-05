@@ -314,7 +314,7 @@ public class PropSpellingSession extends SpellingSession
       } else
       if (s1.equalsIgnoreCase("resource"))
       {
-        java.io.InputStream inputstream = getClass().getResourceAsStream(s);
+        java.io.InputStream inputstream = PropSpellingSession.class.getResourceAsStream(s);
         if (null == inputstream)
           throw new Exception();
         if (s2.equalsIgnoreCase("t"))

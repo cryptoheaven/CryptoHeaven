@@ -39,7 +39,6 @@ public class ListUtils extends Object {
   public static void filterAndHighlight(JList sourceList, StringHighlighterI highlighter, boolean tighter, ListModel fullList) {
     if (!highlighter.hasHighlightingStr()) {
       DefaultListModel newSourceListModel = new DefaultListModel();
-      ListModel oldSourceListModel = sourceList.getModel();
       int size = fullList.getSize();
       for (int i=0; i<size; i++) {
         Object element = fullList.getElementAt(i);

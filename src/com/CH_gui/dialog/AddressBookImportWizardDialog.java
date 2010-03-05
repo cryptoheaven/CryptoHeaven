@@ -825,9 +825,6 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   private String[] makeDestinationDataFromRowData(String[] rowData) {
     String[] mappedData = new String[destinationFields.length];
 
-    DefaultTableModel model = (DefaultTableModel) jMappingTable.getModel();
-    Vector rowsV = model.getDataVector();
-
     for (int i=0; i<destinationFields.length; i++) {
       String destField = destinationFields[i];
       // Find mapping for destination field

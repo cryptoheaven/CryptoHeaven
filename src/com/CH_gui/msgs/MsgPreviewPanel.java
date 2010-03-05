@@ -80,7 +80,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private static final short[] RECIPIENT_TYPES = new short[] { TO, CC, BCC };
 
   public static final int LINK_RELATIVE_FONT_SIZE = -2;
-  private static final Color LINK_BG_FOCUS_COLOR = Color.yellow;
+  //private static final Color LINK_BG_FOCUS_COLOR = Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR);
+  private static final Color LINK_BG_FOCUS_COLOR = Color.yellow; // more saturated is better because the link is small
   private static final int MIN_DIVIDER_RESTORE = 25;
 
   private JPanel jLinePriority;
@@ -621,13 +622,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
   private JComponent makeTextPane(boolean forHTML) {
     JComponent textComp = null;
-    JComponent jHtmlMsg = null;
+    HTML_ClickablePane jHtmlMsg = null;
     JTextArea jTextMsg = null;
     if (forHTML) {
       jHtmlMsg = new HTML_ClickablePane(no_selected_msg_html);
-      //jHtmlMsg = new HtmlPanel();
-      if (jHtmlMsg instanceof JTextComponent)
-        ((JTextComponent) jHtmlMsg).setEditable(false);
+      jHtmlMsg.setEditable(false);
     } else {
       jTextMsg = new JMyTextArea();
       jTextMsg.setWrapStyleWord(true);

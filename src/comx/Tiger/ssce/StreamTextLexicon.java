@@ -254,7 +254,7 @@ public class StreamTextLexicon extends MemTextLexicon {
           StringBuffer stringbuffer = new StringBuffer();
           int i = 0;
           do {
-            if (i >= s1.length() || s != null)
+            if (i >= s1.length())
               break;
             if (s1.charAt(i) > '\377') {
               s = "UnicodeBig";

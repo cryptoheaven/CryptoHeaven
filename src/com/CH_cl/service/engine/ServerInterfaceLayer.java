@@ -85,14 +85,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public static final long DEFAULT_MAX_FILE_SIZE_FOR_MAIN_CONNECTION = 50 * 1024;
 
   // The maximum number of connections to the server that we may establish.
-  public static final int DEFAULT_MAX_CONNECTION_COUNT = 3; 
+  public static final int DEFAULT_MAX_CONNECTION_COUNT = 3;
 
   private int maxConnectionCount = DEFAULT_MAX_CONNECTION_COUNT;
   public static final String PROPERTY_NAME_MAX_CONNECTION_COUNT = "ServerInterfaceLayer" + "_maxConnCount";
 
   /** Vector of connection workers. */
   private final Vector workers = new Vector();
-  /** All the ready messages go through this queue. 
+  /** All the ready messages go through this queue.
       No jobs are being run by that queue, they are handled to the submitting threads to be run. */
   private QueueMM1 executionQueue;
   /** Job Queue */
@@ -123,16 +123,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /** When a worker fails, remember its type to try to delay next one of the same type being created.
    * Re-connection mechanizm spawns multiple threads trying to connect to different hosts/ports with
    * possibly different connection protocols. We will delay the type that failed last to give better chance
-   * for other to succeed first before this one connects again.  This should help to fight providers 
+   * for other to succeed first before this one connects again.  This should help to fight providers
    * deteriorating and breaking certain connection types.
    * Static variable because it is a property of our Internet provider connectivity, so must be global for all SILs.
    */
   private static Class penalizedSocketType;
-  private final int DELAY_PENALIZED_CONNECTION_TYPE = 5000;
+  private static final int DELAY_PENALIZED_CONNECTION_TYPE = 5000;
   // always delay protocoled sockets just a tiny bit to allow plain Socket some advantage of being first to connect...
-  private final int DELAY_PROTOCOLED_CONNECTION  = 1500;
+  private static final int DELAY_PROTOCOLED_CONNECTION  = 1500;
 
-  /** 
+  /**
    * Main Worker should send Ping-Pong to retain a persistant connection.
    * Also, this worker will handle the small item's queue.
    */
@@ -149,12 +149,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private BurstableMonitor burstableMonitorWorkerCreatings;
   private BurstableMonitor burstableMonitorWorkerCreationTrials;
   private BurstableMonitor burstableMonitorWorkersExceptions;
-  
-  /** 
+
+  /**
    * Creates new ServerInterfaceLayer
    * @param connectedSocket through which communication will take place
    */
-  public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient) { 
+  public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient) {
     this(hostsAndPorts, null, null, isClient);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts);
@@ -166,7 +166,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @param independentExecutor if null, IndependentClientQueueExecutionFunction will be used.
    * @param connectedSocket through which communication will take place
    */
-  public ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient) { 
+  public ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts, independentExecutor, fixedMaxConnectionCount);
     if (trace != null) trace.args(isClient);
@@ -225,7 +225,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     // Create the job queue
     this.jobFifo = new JobFifo();
 
-    // Create the independent execution queue 
+    // Create the independent execution queue
     independentExecutor = independentExecutor != null ? independentExecutor : new IndependentClientQueueExecutionFunction(this);
     this.independentExecutionQueue = new QueueMM1("Independent Exec Queue", independentExecutor);
 
@@ -437,7 +437,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           burstableMonitorWorkersExceptions.passThrough();
 
           // Schedule a retry in 30 seconds.
-          // If new requests come, they will cause an immediate retry through 
+          // If new requests come, they will cause an immediate retry through
           // submit job mechanism, so no worry that we are waiting too much time.
           Timer timer = new Timer(true);
           timer.schedule(new TimerTask() {
@@ -510,7 +510,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     warnIfOnAWTthread();
 
-    Long lStamp = new Long(msgAction.getStamp());
+    Stamp lStamp = new Stamp(msgAction.getStamp());
     ClientMessageAction replyMsg = null;
 
     synchronized (stampList) {
@@ -587,8 +587,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /**
    * Removes and returns the reply message from the done list.
    */
-  private ClientMessageAction findAndRemoveMsgForStamp(Vector v, Long l) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "findAndRemoveMsgForStamp(Vector, Long)");
+  private ClientMessageAction findAndRemoveMsgForStamp(Vector v, Stamp l) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "findAndRemoveMsgForStamp(Vector, Stamp)");
     if (trace != null) trace.args(v);
     if (trace != null) trace.args(l);
 
@@ -790,7 +790,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Make sure that at least one additional worker aside from the persistant connection 
+   * Make sure that at least one additional worker aside from the persistant connection
    * worker exists.  Useful as a preparation for file upload to establish a connection
    * prior to having the transaction ready to minimize the delay.
    */
@@ -823,7 +823,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       synchronized (workers) {
         int countAllWorkers = workers.size();
         if (trace != null) trace.data(10, "numberOfWorkersToCreate", numberOfWorkersToCreate);
-        // Create the calculated number of additional/new workers to 
+        // Create the calculated number of additional/new workers to
         // ensure that enough workers are free to handle the job queue.
         for (int i=0; i<numberOfWorkersToCreate; i++) {
           // Control throughput of worker creation as a safety mechanism for server connectivity
@@ -945,9 +945,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 } else {
                   if (trace != null) trace.data(31, "no auto-login message to restamp");
                 }
-                worker = new ServerInterfaceWorker(socket, this, this, 
-                                                   getReplyFifoWriterI(), 
-                                                   getRequestPriorityFifoReaderI(), 
+                worker = new ServerInterfaceWorker(socket, this, this,
+                                                   getReplyFifoWriterI(),
+                                                   getRequestPriorityFifoReaderI(),
                                                    lastLoginMessageAction);
                 if (trace != null) trace.data(40, "ServerInterfaceWorker instantiated");
               }
@@ -962,7 +962,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 break;
               }
             } catch (Throwable t) {
-              // increment host index for next trial 
+              // increment host index for next trial
               currentHostIndex = (currentHostIndex + 1) % hostsAndPorts.length;
               if (trace != null) trace.exception(ServerInterfaceLayer.class, 70, t);
               String errMsg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server at " + hostsAndPorts[hostIndexCompletedFirst][0] + " on port " + hostsAndPorts[hostIndexCompletedFirst][1] + ".  "
@@ -1240,7 +1240,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     synchronized (stampList) {
       Enumeration e = stampList.elements();
       while (e.hasMoreElements()) {
-        Long stamp = (Long) e.nextElement();
+        Stamp stamp = (Stamp) e.nextElement();
         synchronized (stamp) {
           stamp.notifyAll();
         }
@@ -1264,7 +1264,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Disconnects the application and prevents workers from automatically 
+   * Disconnects the application and prevents workers from automatically
    * establishing any new connections.
    * Clear all account data and the cache -- removes all user objects.
    */
@@ -1280,7 +1280,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Disconnects the application and prevents workers from automatically 
+   * Disconnects the application and prevents workers from automatically
    * establishing any new connections.
    */
   private void disconnect() {
@@ -1484,7 +1484,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
-  /** 
+  /**
    * @return true if the specified worker is registered as the Main Worker.
    */
   public boolean isMainWorker(ServerInterfaceWorker worker) {
@@ -1534,7 +1534,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     return getMaxConnectionCount();
   }
 
-  /** 
+  /**
    * Push-back a request to be placed on the job queue again.
    */
   public void pushbackRequest(MessageAction msgAction) {
@@ -1596,7 +1596,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           if (trace != null) trace.data(11, "synchron on stampList done");
           if (trace != null) trace.data(12, "reply=", nextMsgAction);
 
-          Long stamp = new Long(nextMsgAction.getStamp());
+          Stamp stamp = new Stamp(nextMsgAction.getStamp());
 
           // find the exact object on which a Thread may be waiting.
           int index = stampList.indexOf(stamp);
@@ -1641,7 +1641,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               throw new IllegalStateException("The stamp must be present, but its not!");
             }
 
-            Long exactStampObj = (Long) stampList.elementAt(index);
+            Stamp exactStampObj = (Stamp) stampList.elementAt(index);
             if (trace != null) trace.data(50, "synchron on exactStampObj", exactStampObj);
             // wake up the waiting thread
             synchronized (exactStampObj) {
@@ -1703,7 +1703,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               }
               delay = 5000;
             }
-            // If scanner sleep was interrupted, then check immediately in job queue 
+            // If scanner sleep was interrupted, then check immediately in job queue
             // for waiting jobs and try to create workers to serve them.
             if (triggeredMonitor && jobFifo.size() > 0) {
               checkForImmediateJobsNow = true;
@@ -1711,7 +1711,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               triggeredButAlreadyConsumed = true;
             }
             triggeredMonitor = false;
-          } // end synchronized 
+          } // end synchronized
           if (trace != null) trace.data(20, "checkForImmediateJobsNow", checkForImmediateJobsNow);
           if (trace != null) trace.data(21, "triggeredButAlreadyConsumed", triggeredButAlreadyConsumed);
           // if we were interrupted because of Destroy, then exit now.
@@ -1724,11 +1724,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           } else {
             Object headJob = null;
             try {
-              if (jobFifo.size() > 0) 
+              if (jobFifo.size() > 0)
                 headJob = jobFifo.peek();
 //              // Ignore file transfers as they will create their own heavy connection anyway.
 //              if (headJob != null) {
-//                if (headJob instanceof MessageAction && 
+//                if (headJob instanceof MessageAction &&
 //                    jobFifo.getJobType((MessageAction) headJob) == JobFifo.JOB_TYPE_HEAVY)
 //                {
 //                  headJob = null;
@@ -1777,95 +1777,96 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
   } // end class BusyConnectionScanner
 
-  public String getDebugInfo() {
-    StringBuffer sb = new StringBuffer();
-    sb.append("MAX_CONNECTION_RETRY_COUNT=");
-    sb.append(MAX_CONNECTION_RETRY_COUNT);
-    sb.append("\n");
+//  public String getDebugInfo() {
+//    StringBuffer sb = new StringBuffer();
+//    sb.append("MAX_CONNECTION_RETRY_COUNT=");
+//    sb.append(MAX_CONNECTION_RETRY_COUNT);
+//    sb.append("\n");
+//
+//    sb.append("connectionRetryCount=");
+//    sb.append(connectionRetryCount);
+//    sb.append("\n");
+//
+//    sb.append("maxConnectionCount=");
+//    sb.append(maxConnectionCount);
+//    sb.append("\n");
+//
+//    sb.append("workers=");
+//    sb.append(workers);
+//    sb.append("\n");
+//
+//
+//    sb.append("executionQueue=");
+//    sb.append(executionQueue);
+//    sb.append("\n");
+//
+//    sb.append("jobFifo=");
+//    sb.append(jobFifo);
+//    sb.append("\n");
+//
+//    sb.append("jobScanner=");
+//    sb.append(jobScanner);
+//    sb.append("\n");
+//
+//    sb.append("independentExecutionQueue=");
+//    sb.append(independentExecutionQueue);
+//    sb.append("\n");
+//
+//    sb.append("stampList=");
+//    sb.append(stampList);
+//    sb.append("\n");
+//
+//    sb.append("stampList2=");
+//    sb.append(stampList2);
+//    sb.append("\n");
+//
+//    sb.append("doneList=");
+//    sb.append(doneList);
+//    sb.append("\n");
+//
+//    sb.append("lastLoginMessageAction=");
+//    sb.append(lastLoginMessageAction);
+//    sb.append("\n");
+//
+//    sb.append("remoteSessionID=");
+//    sb.append(remoteSessionID);
+//    sb.append("\n");
+//
+//    sb.append("hostsAndPorts=");
+//    sb.append(hostsAndPorts);
+//    sb.append("\n");
+//
+//    sb.append("currentHostIndex=");
+//    sb.append(currentHostIndex);
+//    sb.append("\n");
+//
+//    sb.append("penalizedSocketType=");
+//    sb.append(penalizedSocketType);
+//    sb.append("\n");
+//
+//    sb.append("mainWorker=");
+//    sb.append(mainWorker);
+//    sb.append("\n");
+//
+//    sb.append("mainWorkerSubmition=");
+//    sb.append(mainWorkerSubmition);
+//    sb.append("\n");
+//
+//    sb.append("isClient=");
+//    sb.append(isClient);
+//    sb.append("\n");
+//
+//    sb.append("lastForcedWorkerStamp=");
+//    sb.append(lastForcedWorkerStamp);
+//    sb.append("\n");
+//    sb.append("lastWorkerActivityStamp=");
+//    sb.append(lastWorkerActivityStamp);
+//    sb.append("\n");
+//    sb.append("lastWorkerActivityResyncPending=");
+//    sb.append(lastWorkerActivityResyncPending);
+//    sb.append("\n");
+//
+//    return sb.toString();
+//  }
 
-    sb.append("connectionRetryCount=");
-    sb.append(connectionRetryCount);
-    sb.append("\n");
-
-    sb.append("maxConnectionCount=");
-    sb.append(maxConnectionCount);
-    sb.append("\n");
-
-    sb.append("workers=");
-    sb.append(workers);
-    sb.append("\n");
-
-
-    sb.append("executionQueue=");
-    sb.append(executionQueue);
-    sb.append("\n");
-
-    sb.append("jobFifo=");
-    sb.append(jobFifo);
-    sb.append("\n");
-
-    sb.append("jobScanner=");
-    sb.append(jobScanner);
-    sb.append("\n");
-
-    sb.append("independentExecutionQueue=");
-    sb.append(independentExecutionQueue);
-    sb.append("\n");
-
-    sb.append("stampList=");
-    sb.append(stampList);
-    sb.append("\n");
-
-    sb.append("stampList2=");
-    sb.append(stampList2);
-    sb.append("\n");
-
-    sb.append("doneList=");
-    sb.append(doneList);
-    sb.append("\n");
-
-    sb.append("lastLoginMessageAction=");
-    sb.append(lastLoginMessageAction);
-    sb.append("\n");
-
-    sb.append("remoteSessionID=");
-    sb.append(remoteSessionID);
-    sb.append("\n");
-
-    sb.append("hostsAndPorts=");
-    sb.append(hostsAndPorts);
-    sb.append("\n");
-
-    sb.append("currentHostIndex=");
-    sb.append(currentHostIndex);
-    sb.append("\n");
-
-    sb.append("penalizedSocketType=");
-    sb.append(penalizedSocketType);
-    sb.append("\n");
-
-    sb.append("mainWorker=");
-    sb.append(mainWorker);
-    sb.append("\n");
-
-    sb.append("mainWorkerSubmition=");
-    sb.append(mainWorkerSubmition);
-    sb.append("\n");
-
-    sb.append("isClient=");
-    sb.append(isClient);
-    sb.append("\n");
-
-    sb.append("lastForcedWorkerStamp=");
-    sb.append(lastForcedWorkerStamp);
-    sb.append("\n");
-    sb.append("lastWorkerActivityStamp=");
-    sb.append(lastWorkerActivityStamp);
-    sb.append("\n");
-    sb.append("lastWorkerActivityResyncPending=");
-    sb.append(lastWorkerActivityResyncPending);
-    sb.append("\n");
-
-    return sb.toString();
-  }
 } // end class ServerInterfaceLayer

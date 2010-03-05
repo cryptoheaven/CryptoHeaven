@@ -199,6 +199,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
           Record rec = (Record) usedRecsHT.get(objId);
           boolean isFile = rec instanceof FileLinkRecord;
           boolean isMsg = rec instanceof MsgLinkRecord;
+          boolean isFolder = rec instanceof FolderRecord;
           String objType = "";
           if (isFile) {
             objType = com.CH_gui.lang.Lang.rb.getString("File");
@@ -209,8 +210,12 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
               objType = com.CH_gui.lang.Lang.rb.getString("Address");
             else 
               objType = com.CH_gui.lang.Lang.rb.getString("Message");
-          } else {
-            objType = com.CH_gui.lang.Lang.rb.getString("Folder");
+          } else if (isFolder) {
+            FolderRecord fldRec = (FolderRecord) rec;
+            if (!fldRec.isGroupType())
+              objType = com.CH_gui.lang.Lang.rb.getString("Folder");
+            else
+              objType = com.CH_gui.lang.Lang.rb.getString("Group");
           }
           subject = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msgSubject_Access_Trace_for_OBJECT-TYPE_-_OBJECT-NAME___(id_OBJECT-ID)"), new Object[] {objType, '"'+ListRenderer.getRenderedText(rec)+'"', objId});
         }

@@ -13,14 +13,11 @@
 package com.CH_gui.sortedTable;
 
 import java.lang.ref.WeakReference;
-import java.util.EventListener;
-import javax.swing.JTable;
 import javax.swing.event.EventListenerList;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
-import javax.swing.SwingUtilities;
 
 import com.CH_co.trace.Trace;
 

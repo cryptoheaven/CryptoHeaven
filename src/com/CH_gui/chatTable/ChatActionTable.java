@@ -54,7 +54,7 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
   private static final int TYPING_NOTIFY_MILLIS = 6000; // 6 sec.
   private MsgTypingListener msgTypingListener;
   private MsgLinkListener msgLinkRecordListener;
-  private TableModelSortListener sortListener;
+  private TableModelSortListener sortListener = null;
 
   // used for auto-scrolling to the new chat message
   private MsgLinkRecord prevKeepRecord;

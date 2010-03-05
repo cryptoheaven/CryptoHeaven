@@ -110,8 +110,6 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
       statusName = "Replied";
     else if ((st & STATUS_FLAG__FORWARDED) != 0)
       statusName = "Forwarded";
-    else if ((st & STATUS_FLAG__READ) != 0)
-      statusName = "Normal";
     else 
       statusName = "Normal";
     return statusName;

@@ -98,19 +98,14 @@ public class FetchedDataCache extends Object {
 
   EventListenerList myListenerList = new EventListenerList();
 
-  private static FetchedDataCache singleInstance;
-  private static final Object singleInstanceMonitor = new Object();
-
   /**
    * @returns a single instance of the cache.
    */
   public static FetchedDataCache getSingleInstance() {
-    synchronized (singleInstanceMonitor) {
-      if (singleInstance == null) {
-        singleInstance = new FetchedDataCache();
-      }
-      return singleInstance;
-    }
+    return SingletonHolder.INSTANCE;
+  }
+  private static class SingletonHolder {
+    private static final FetchedDataCache INSTANCE = new FetchedDataCache();
   }
 
   /** Creates new FetchedDataCache */
@@ -675,18 +670,11 @@ public class FetchedDataCache extends Object {
   }
 
   /**
+   * Not traced for performance.
    * @return a FolderRecord from cache with a given id.
    */
   public synchronized FolderRecord getFolderRecord(Long folderId) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecord(Long folderId)");
-    if (trace != null) trace.args(folderId);
-
-    FolderRecord folderRecord = null;
-    if (folderId != null)
-      folderRecord = (FolderRecord) folderRecordMap.get(folderId);
-
-    if (trace != null) trace.exit(FetchedDataCache.class, folderRecord);
-    return folderRecord;
+    return folderId != null ? (FolderRecord) folderRecordMap.get(folderId) : null;
   }
 
   /**
@@ -2883,19 +2871,12 @@ public class FetchedDataCache extends Object {
   }
 
   /**
+   * Not traced for performance.
    * @return Stat Record for a given Link ID (statId is the linkId for client purposes)
    */
   public synchronized StatRecord getStatRecord(Long statId, int statType) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getStatRecord(Long statId, int statType)");
-    if (trace != null) trace.args(statId);
-    if (trace != null) trace.args(statType);
-
-    StatRecord statRecord = (StatRecord) statRecordMaps[statType].get(statId);
-
-    if (trace != null) trace.exit(FetchedDataCache.class, statRecord);
-    return statRecord;
+    return (StatRecord) statRecordMaps[statType].get(statId);
   }
-
 
   /**
    * @return all StatRecords from cache for a given type

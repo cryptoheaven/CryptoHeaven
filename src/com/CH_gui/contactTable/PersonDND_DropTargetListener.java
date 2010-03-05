@@ -133,7 +133,6 @@ public class PersonDND_DropTargetListener extends Object implements DropTargetLi
   }
   public void drop(DropTargetDropEvent event) {
     //System.out.println("PersonDND_DropTargetListener.drop");
-    Point location = event.getLocation();
     try {
       Transferable tr = event.getTransferable();
 

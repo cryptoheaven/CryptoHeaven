@@ -1369,7 +1369,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     MsgTableModel tableModel = (MsgTableModel) getTableModel();
     Vector linksV = new Vector();
     for (int i=0; i<tableModel.getRowCount(); i++) {
-      linksV.addElement(tableModel.getRowObject(i));
+      linksV.addElement(tableModel.getRowObjectNoTrace(i));
     }
     if (linksV.size() > 0) {
       MsgLinkRecord[] links = new MsgLinkRecord[linksV.size()];
@@ -1451,7 +1451,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (chosenFolderPair != null) {
       Msg_MoveCopy_Rq request = prepareMoveCopyRequest(chosenFolderPair.getFolderShareRecord(), mLinks);
       if (request != null) { // mLinks can not be empty if request was generated
-        ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        final FetchedDataCache cache = SIL.getFetchedDataCache();
         int actionCode = isMove ? CommandCodes.MSG_Q_MOVE : CommandCodes.MSG_Q_COPY;
         // if messages are attachments, switch MOVE request to SAVE ATTACHMENTS request
         if (mLinks[0].ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE)
@@ -1461,7 +1462,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         FolderRecord sourceFolder = null;
         if (isMove) {
           if (mLinks[0].ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-            sourceFolder = FetchedDataCache.getSingleInstance().getFolderRecord(mLinks[0].ownerObjId);
+            sourceFolder = cache.getFolderRecord(mLinks[0].ownerObjId);
           }
         }
 
@@ -1471,14 +1472,21 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         if (sourceFolder != null) {
           newCountUpdate = new Runnable() {
             public void run() {
-              FetchedDataCache.getSingleInstance().statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
+              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
             }
           };
         }
 
-        serverInterfaceLayer.submitAndReturn(new MessageAction(actionCode, request), 30000, newCountUpdate, newCountUpdate);
-      }
+        // if Move then immediatelly remove links so that source GUI table responds FAST, when action comes back from server destination folder will update
+        if (isMove && sourceFolder != null) {
+          FolderShareRecord sourceShare = cache.getFolderShareRecordMy(sourceFolder.folderId, true);
+          FolderShareRecord chosenShare = chosenFolderPair.getFolderShareRecord();
+          if (sourceShare.canDelete.shortValue() == FolderShareRecord.YES && chosenShare.canWrite.shortValue() == FolderShareRecord.YES)
+            cache.removeMsgLinkRecords(mLinks);
+        }
 
+        SIL.submitAndReturn(new MessageAction(actionCode, request), 30000, newCountUpdate, newCountUpdate);
+      }
     }
     if (trace != null) trace.exit(MsgActionTable.class);
   }
@@ -1769,7 +1777,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (!anyUnread) {
       MsgTableModel tableModel = (MsgTableModel) getTableModel();
       for (int i=0; i<tableModel.getRowCount(); i++) {
-        Record rec = tableModel.getRowObject(i);
+        Record rec = tableModel.getRowObjectNoTrace(i);
         if (rec instanceof MsgLinkRecord) {
           MsgLinkRecord msgLink = (MsgLinkRecord) rec;
           StatRecord statRecord = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
@@ -2017,10 +2025,6 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Reply_to_Sender"));
           actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Reply"));
         } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
-          actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Compose_to_Address(es)_..."));
-          actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_address(es)."));
-          actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Compose"));
-        } else {
           actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Compose_to_Address(es)_..."));
           actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_address(es)."));
           actions[REPLY_TO_SENDER__OR__COMPOSE_TO_ADDRESS_ACTION].putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Compose"));

@@ -107,14 +107,13 @@ public class FolderRecord extends Record {
 
   public Icon getIcon(boolean selected, UserRecord uRec) {
     Icon icon = null;
-    short numShares = numOfShares.shortValue();
     switch (folderType.shortValue()) {
       case LOCAL_FILES_FOLDER :
         icon = Images.get(ImageNums.MY_COMPUTER16);
         break;
       case ADDRESS_FOLDER :
       case WHITELIST_FOLDER :
-        if (numShares > 1) {
+        if (numOfShares.shortValue() > 1) {
           if (selected)
             //icon = Images.get(ImageNums.FLD_ADDR_OPEN_SHARED16);
             icon = Images.get(ImageNums.FLD_ADDR_OPEN_SHARED16, true);
@@ -131,7 +130,7 @@ public class FolderRecord extends Record {
       case FILE_FOLDER :
         if (folderId.longValue() == CATEGORY_FILE_ID) {
           icon = Images.get(ImageNums.FLD_FILES16);
-        } else if (numShares > 1) {
+        } else if (numOfShares.shortValue() > 1) {
           if (selected)
             //icon = Images.get(ImageNums.FLD_OPEN_SHARED16);
             icon = Images.get(ImageNums.FLD_OPEN_SHARED16, true);
@@ -148,7 +147,7 @@ public class FolderRecord extends Record {
       case MESSAGE_FOLDER :
         if (folderId.longValue() == CATEGORY_MAIL_ID) {
           icon = Images.get(ImageNums.FLD_MAIL18_12);
-        } else if (numShares > 1) {
+        } else if (numOfShares.shortValue() > 1) {
           if (uRec == null) {
             if (selected) icon = Images.get(ImageNums.FLD_MAIL_OPEN_SHARED16, true);
             else icon = Images.get(ImageNums.FLD_MAIL_CLOSED_SHARED16, true);
@@ -194,7 +193,7 @@ public class FolderRecord extends Record {
       case CHATTING_FOLDER :
         if (folderId.longValue() == CATEGORY_CHAT_ID) {
           icon = Images.get(ImageNums.CHAT16);
-        } else if (numShares > 1) {
+        } else if (numOfShares.shortValue() > 1) {
           if (isChatting()) {
             if (selected)
               icon = Images.get(ImageNums.FLD_CHAT_OPEN16);
@@ -233,7 +232,7 @@ public class FolderRecord extends Record {
         }
         break;
       case RECYCLE_FOLDER :
-        if (numShares > 1) {
+        if (numOfShares.shortValue() > 1) {
           icon = Images.get(ImageNums.FLD_RECYCLE_EMPTY_SHARED16, true);
         } else {
           icon = Images.get(ImageNums.FLD_RECYCLE_EMPTY16);

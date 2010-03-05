@@ -241,7 +241,6 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
     }
 
     FolderShareRecord[] records = (FolderShareRecord[]) getSelectedRecords();
-    Long[] userIDs = FolderShareRecord.getOwnerUserIDs(records);
 
     int count = 0;
     if (records != null) {

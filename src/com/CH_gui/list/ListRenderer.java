@@ -41,7 +41,6 @@ import com.CH_co.util.*;
  */
 public class ListRenderer implements ListCellRenderer, Cloneable {
 
-  private static String STR_FOLDER = com.CH_gui.lang.Lang.rb.getString("Folder");
   private static String STR_UNKNOWN = com.CH_gui.lang.Lang.rb.getString("unknown");
 
   private DefaultListCellRenderer defaultRenderer = new MyDefaultListCellRenderer();
@@ -196,8 +195,10 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
       FolderShareRecord sRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(fRec.folderId, true);
       if (sRec != null) {
         label = sRec.getFolderName();
+      } else if (!fRec.isGroupType()) {
+        label = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Folder_(FOLDER-ID)"), new Object[] {fRec.folderId});
       } else {
-        label = STR_FOLDER + " (" + fRec.folderId + ")";
+        label = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Group_(GROUP-ID)"), new Object[] {fRec.folderId});
       }
     }
     else if (value instanceof FolderShareRecord) {

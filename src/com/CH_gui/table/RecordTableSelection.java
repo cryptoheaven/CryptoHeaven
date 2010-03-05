@@ -105,7 +105,7 @@ public class RecordTableSelection extends Object {
 
         int rowModel = jst.convertMyRowIndexToModel(rowView);
 
-        Long objId = rtm.getRowObject(rowModel).getId();
+        Long objId = rtm.getRowObjectNoTrace(rowModel).getId();
         boolean shouldSelect = selectedRecordIDsV.contains(objId);
 
         boolean add = !selected && shouldSelect;

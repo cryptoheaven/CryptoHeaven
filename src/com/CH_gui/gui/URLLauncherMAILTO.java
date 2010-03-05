@@ -48,7 +48,8 @@ public class URLLauncherMAILTO extends Object implements URLLauncher {
     Component c = invoker;
     while (c != null && !(c instanceof MsgDataProviderI))
       c = c.getParent();
-    if (c != null && c instanceof MsgDataProviderI) {
+    // if we found a MsgDataProviderI
+    if (c != null) {
       msgDataProvider = (MsgDataProviderI) c;
       MsgDataRecord msgData = msgDataProvider.provideMsgData();
       sendFromEmailAccount = MsgPanelUtils.getOurMatchingFromEmlRec(msgData);
