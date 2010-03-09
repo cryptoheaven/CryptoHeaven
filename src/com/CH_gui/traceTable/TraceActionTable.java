@@ -13,29 +13,21 @@
 package com.CH_gui.traceTable;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
 import java.util.*;
 
 import com.CH_gui.action.*;
 import com.CH_gui.dialog.*;
-import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 
 import com.CH_co.service.records.*;
-import com.CH_co.service.msg.dataSets.*;
-import com.CH_co.service.msg.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 
@@ -118,7 +110,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Traces"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Trace_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
     }
@@ -135,7 +127,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   private class InitiateAction extends AbstractActionTraced {
     public InitiateAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
     }
@@ -159,7 +151,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
     }

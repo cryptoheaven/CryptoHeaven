@@ -76,8 +76,8 @@ public class StatsInitAndLabelMouseAdapter extends MouseAdapter {
     JScrollPane textPane = new JScrollPane(textArea);
     StringBuffer sb = new StringBuffer();
     synchronized (Stats.monitor) {
-      Vector moversTraceV = Stats.getGlobeMoversTraceV();
-      if (moversTraceV != null && moversTraceV.size() > 0) {
+      ArrayList moversTraceL = Stats.getGlobeMoversTraceL();
+      if (moversTraceL != null && moversTraceL.size() > 0) {
         sb.append("Spinning Globe\n");
       }
       Iterator iterS = Stats.statusHistoryL.iterator();
@@ -93,10 +93,10 @@ public class StatsInitAndLabelMouseAdapter extends MouseAdapter {
         sb.append("   ");
         sb.append(nextStatus);
       }
-      if (moversTraceV != null && moversTraceV.size() > 0) {
+      if (moversTraceL != null && moversTraceL.size() > 0) {
         sb.append("\n\nSpinning Globe traces:\n");
-        for (int i=0; i<moversTraceV.size(); i++) {
-          sb.append("\nRunning Action: " + moversTraceV.elementAt(i));
+        for (int i=0; i<moversTraceL.size(); i++) {
+          sb.append("\nRunning Action: " + moversTraceL.get(i));
         }
       }
     }

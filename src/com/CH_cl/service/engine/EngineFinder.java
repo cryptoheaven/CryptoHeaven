@@ -227,7 +227,7 @@ public class EngineFinder extends Object {
       t.nextToken();
       String hostname = t.nextToken();
       t.nextToken();
-      Integer port = new Integer(t.nextToken());
+      Integer port = Integer.valueOf(t.nextToken());
 
       if (compareVersion(minVer, minRel, version, release) <= 0) {
         if (httpServers && role.equals("HttpServer")) {

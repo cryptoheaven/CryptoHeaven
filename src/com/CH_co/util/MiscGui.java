@@ -666,10 +666,10 @@ public class MiscGui extends Object {
     }
 
     // If not found and we have invoker, ask invoker about his gc
-    if (gc == null && invoker != null) {
+    if (gc == null) {
       gc = invoker.getGraphicsConfiguration();
     }
-    if (gc == null && invoker != null) {
+    if (gc == null) {
       Container container = invoker.getParent();
       if (container != null)
         gc = container.getGraphicsConfiguration();

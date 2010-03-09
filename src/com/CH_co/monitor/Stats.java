@@ -54,7 +54,7 @@ public class Stats extends Object {
   protected static ImageIcon greenLightOffPic;
 
   private static Vector globeMoversV = new Vector(); // objects that are causing the globe to move
-  private static Hashtable globeMoversTraceHT = new Hashtable(); // for debug, stack traces of our Movers
+  private static HashMap globeMoversTraceHM = new HashMap(); // for debug, stack traces of our Movers
 
   protected static JLabel jPing;
   protected static JLabel jOnlineStatus;
@@ -126,14 +126,14 @@ public class Stats extends Object {
     return jSize;
   }
 
-  public static Vector getGlobeMoversTraceV() {
-    Vector moversTraceV = null;
+  public static ArrayList getGlobeMoversTraceL() {
+    ArrayList moversTraceL = null;
     synchronized (monitor) {
-      if (globeMoversTraceHT.size() > 0) {
-        moversTraceV = new Vector(globeMoversTraceHT.values());
+      if (globeMoversTraceHM.size() > 0) {
+        moversTraceL = new ArrayList(globeMoversTraceHM.values());
       }
     }
-    return moversTraceV;
+    return moversTraceL;
   }
 
   public static void moveGlobe(Object mover) {
@@ -144,7 +144,7 @@ public class Stats extends Object {
       }
       if (!globeMoversV.contains(mover)) {
         globeMoversV.addElement(mover);
-        globeMoversTraceHT.put(mover, Misc.getStack(new Throwable(""+mover+" at " + new Date())));
+        globeMoversTraceHM.put(mover, Misc.getStack(new Throwable(""+mover+" at " + new Date())));
       }
     }
   }
@@ -152,7 +152,7 @@ public class Stats extends Object {
   public static void stopGlobe(Object mover) {
     synchronized (monitor) {
       if (globeMoversV.contains(mover)) {
-        globeMoversTraceHT.remove(mover);
+        globeMoversTraceHM.remove(mover);
         globeMoversV.removeElement(mover);
         if (globeMoversV.size() == 0) {
           if (jLastStatus != null)

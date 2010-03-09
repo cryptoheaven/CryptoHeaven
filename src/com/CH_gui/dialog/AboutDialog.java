@@ -46,7 +46,7 @@ public class AboutDialog extends GeneralDialog implements VisualsSavable {
     super(frame, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_About__SERVICE_SOFTWARE_NAME"), 
       new Object[] {  URLs.get(URLs.SERVICE_SOFTWARE_NAME), 
                       GlobalProperties.PROGRAM_VERSION_STR, 
-                      new Short(GlobalProperties.PROGRAM_BUILD_NUMBER)
+                      Short.valueOf(GlobalProperties.PROGRAM_BUILD_NUMBER)
                    }
           ));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AboutDialog.class, "AboutDialog(Frame frame)");

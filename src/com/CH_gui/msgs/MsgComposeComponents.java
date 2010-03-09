@@ -626,7 +626,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
             public void actionPerformed(ActionEvent e) {
               Usr_AltUsrData_Rq request = new Usr_AltUsrData_Rq();
               request.userRecord = (UserRecord) uRec.clone();
-              request.userRecord.flags = new Long(Misc.setBit(menuItem.isSelected(), request.userRecord.flags, UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES));
+              request.userRecord.flags = Long.valueOf(Misc.setBit(menuItem.isSelected(), request.userRecord.flags, UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES));
               MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_ALTER_DATA, request));
             }
           };

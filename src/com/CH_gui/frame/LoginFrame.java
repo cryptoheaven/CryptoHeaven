@@ -458,8 +458,8 @@ public class LoginFrame extends JFrame {
           if (estimatedTime == null) {
             expectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
             int expecTime = estimateKeyGenerationTimeNow(keyLength, certainty)+1;
-            expectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] {new Integer(expecTime)}));
-            estimatedTime = new Integer(expecTime);
+            expectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] {Integer.valueOf(expecTime)}));
+            estimatedTime = Integer.valueOf(expecTime);
           }
         }
       }
@@ -472,7 +472,7 @@ public class LoginFrame extends JFrame {
   private int estimateKeyGenerationTimeNow(int keyLength, int certainty) {
     synchronized (estimateMonitor) {
       if (estimatedTime == null) {
-        estimatedTime = new Integer(LoginFrame.estimateGenerationTime(keyLength, certainty));
+        estimatedTime = Integer.valueOf(LoginFrame.estimateGenerationTime(keyLength, certainty));
       }
       return estimatedTime.intValue();
     }
@@ -569,11 +569,11 @@ public class LoginFrame extends JFrame {
 
       socksProxyUsed = Boolean.valueOf(GlobalProperties.getProperty("SocksProxyUsed", "false"));
       socksProxyAddress = GlobalProperties.getProperty("SocksProxyAddress", "");
-      socksProxyPort = new Integer(GlobalProperties.getProperty("SocksProxyPort", "1080"));
+      socksProxyPort = Integer.valueOf(GlobalProperties.getProperty("SocksProxyPort", "1080"));
 
       httpProxyUsed = Boolean.valueOf(GlobalProperties.getProperty("HttpProxyUsed", "false"));
       httpProxyAddress = GlobalProperties.getProperty("HttpProxyAddress", "");
-      httpProxyPort = new Integer(GlobalProperties.getProperty("HttpProxyPort", "80"));
+      httpProxyPort = Integer.valueOf(GlobalProperties.getProperty("HttpProxyPort", "80"));
 
       proxyAuthentication = Boolean.valueOf(GlobalProperties.getProperty("ProxyAuthentication", "false"));
       proxyUsername = GlobalProperties.getProperty("ProxyUsername", "");
@@ -768,7 +768,7 @@ public class LoginFrame extends JFrame {
       public void mouseClicked(MouseEvent event) {
         performLogout();
         performConnect();
-        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.SYS_Q_VERSION, new Obj_List_Co(new Object[] { new Float(GlobalProperties.PROGRAM_VERSION), new Short(GlobalProperties.PROGRAM_RELEASE), new Short(GlobalProperties.PROGRAM_BUILD_NUMBER)})));
+        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.SYS_Q_VERSION, new Obj_List_Co(new Object[] { Float.valueOf(GlobalProperties.PROGRAM_VERSION), Short.valueOf(GlobalProperties.PROGRAM_RELEASE), Short.valueOf(GlobalProperties.PROGRAM_BUILD_NUMBER)})));
         new UserSelectPassRecoveryDialog(LoginFrame.this, "Recover Password", userName.getText().trim());
       }
     });
@@ -934,7 +934,7 @@ public class LoginFrame extends JFrame {
               socksProxyAddress = jSocksProxyAddress.getText().trim();
               String socksProxyPortS = jSocksProxyPort.getText().trim();
               if (socksProxyPortS.length() > 0)
-                socksProxyPort = new Integer(socksProxyPortS);
+                socksProxyPort = Integer.valueOf(socksProxyPortS);
               if (jProxyUsed.isSelected()) {
                 //socksProxyUsed = Boolean.valueOf(jSocksProxyUsed.isSelected() && socksProxyAddress.length() > 0 && socksProxyPortS.length() > 0);
                 socksProxyUsed = Boolean.valueOf(socksProxyAddress.length() > 0 && socksProxyPortS.length() > 0);
@@ -945,7 +945,7 @@ public class LoginFrame extends JFrame {
               httpProxyAddress = jHttpProxyAddress.getText().trim();
               String httpProxyPortS = jHttpProxyPort.getText().trim();
               if (httpProxyPortS.length() > 0)
-                httpProxyPort = new Integer(httpProxyPortS);
+                httpProxyPort = Integer.valueOf(httpProxyPortS);
               if (jProxyUsed.isSelected()) {
                 //httpProxyUsed = Boolean.valueOf(jHttpProxyUsed.isSelected() && httpProxyAddress.length() > 0 && httpProxyPortS.length() > 0);
                 httpProxyUsed = Boolean.valueOf(httpProxyAddress.length() > 0 && httpProxyPortS.length() > 0);
@@ -1180,10 +1180,10 @@ public class LoginFrame extends JFrame {
             errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_The_retyped_password_does_not_match_the_entered_password.");
           }
         } else {
-          errorMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
+          errorMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {Integer.valueOf(MIN_PASSWORD_LENGTH)});
         }
       } else {
-        errorMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
+        errorMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {Integer.valueOf(MIN_PASSWORD_LENGTH)});
       }
     } else {
       errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Username_must_have_at_least_1_non_blank_character...");
@@ -1432,7 +1432,7 @@ public class LoginFrame extends JFrame {
               requestedEmailAddress,
               //null,
               currentEmail.getText().trim(),
-              new Short((short) 1), null, null,
+              Short.valueOf((short) 1), null, null,
               null
               );
 

@@ -118,13 +118,13 @@ public class ChatSessionCreator extends ThreadTraced {
       FolderShareRecord newShare = additionalShares[i];
       if (chatWithContacts[i].getMemberType() == Record.RECORD_TYPE_USER) {
         newShare.ownerUserId = ((ContactRecord) chatWithContacts[i]).contactWithId;
-        newShare.ownerType = new Short(Record.RECORD_TYPE_USER);
+        newShare.ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
       } else if (chatWithContacts[i].getMemberType() == Record.RECORD_TYPE_GROUP) {
         newShare.ownerUserId = ((FolderPair) chatWithContacts[i]).getId();
-        newShare.ownerType = new Short(Record.RECORD_TYPE_GROUP);
+        newShare.ownerType = Short.valueOf(Record.RECORD_TYPE_GROUP);
       }
-      newShare.canWrite = new Short(FolderShareRecord.YES);
-      newShare.canDelete = new Short(FolderShareRecord.YES);
+      newShare.canWrite = Short.valueOf(FolderShareRecord.YES);
+      newShare.canDelete = Short.valueOf(FolderShareRecord.YES);
       newShare.setSymmetricKey(baSymmetricKey);
     }
 
@@ -149,8 +149,8 @@ public class ChatSessionCreator extends ThreadTraced {
         null,
         FolderRecord.CHATTING_FOLDER, // Chatting folder since July 2006
         myFolderName, folderDesc, shareFolderName, folderDesc,
-        new Short(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_NUM),
-        new Integer(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_SECONDS),
+        Short.valueOf(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_NUM),
+        Integer.valueOf(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_SECONDS),
         baSymmetricKey,
         false,
         additionalShares,

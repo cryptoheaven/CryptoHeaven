@@ -24,7 +24,7 @@ import com.CH_co.service.records.filters.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -32,14 +32,14 @@ import com.CH_co.service.records.filters.*;
  *
  * <b>$Revision: 1.13 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ShareFilter extends AbstractRecordFilter implements RecordFilter {
 
   // if not null, keep only the records with specified folderId
   private Long keepFolderId;
   private Long keepOwnerUserId;
-  private Hashtable keepOwnerGroupIDsHT;
+  private Set keepOwnerGroupIDsSet;
 
   /** Creates new ShareFilter */
   public ShareFilter(Long keepFolderId) {
@@ -49,14 +49,14 @@ public class ShareFilter extends AbstractRecordFilter implements RecordFilter {
     if (trace != null) trace.exit(ShareFilter.class);
   }
   /** Creates new ShareFilter */
-  public ShareFilter(Long keepFolderId, Long keepOwnerUserId, Hashtable keepOwnerGroupIDsHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ShareFilter.class, "ShareFilter(Long keepFolderId, Long keepOwnerUserId, Hashtable keepOwnerGroupIDsHT)");
+  public ShareFilter(Long keepFolderId, Long keepOwnerUserId, Set keepOwnerGroupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ShareFilter.class, "ShareFilter(Long keepFolderId, Long keepOwnerUserId, Set keepOwnerGroupIDsSet)");
     if (trace != null) trace.args(keepFolderId);
     if (trace != null) trace.args(keepOwnerUserId);
-    if (trace != null) trace.args(keepOwnerGroupIDsHT);
+    if (trace != null) trace.args(keepOwnerGroupIDsSet);
     this.keepFolderId = keepFolderId;
     this.keepOwnerUserId = keepOwnerUserId;
-    this.keepOwnerGroupIDsHT = keepOwnerGroupIDsHT;
+    this.keepOwnerGroupIDsSet = keepOwnerGroupIDsSet;
     if (trace != null) trace.exit(ShareFilter.class);
   }
 
@@ -70,8 +70,8 @@ public class ShareFilter extends AbstractRecordFilter implements RecordFilter {
         if (!share.folderId.equals(keepFolderId))
           keep = false;
       }
-      if (keep && (keepOwnerUserId != null || keepOwnerGroupIDsHT != null)) {
-        keep = share.isOwnedBy(keepOwnerUserId, keepOwnerGroupIDsHT);
+      if (keep && (keepOwnerUserId != null || keepOwnerGroupIDsSet != null)) {
+        keep = share.isOwnedBy(keepOwnerUserId, keepOwnerGroupIDsSet);
       }
     }
     return keep;

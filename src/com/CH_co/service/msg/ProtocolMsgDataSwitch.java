@@ -48,87 +48,87 @@ public class ProtocolMsgDataSwitch extends Object {
 
   private static Object[][] classCodes;
   private static Object[][] classNames = new Object[][] {
-    {Fld_Folders_Rp.class.getName(), new Integer(10)},
+    {Fld_Folders_Rp.class.getName(), Integer.valueOf(10)},
 
-    {File_GetAttr_Rp.class.getName(), new Integer(20)},
-    {File_GetData_Rp.class.getName(), new Integer(21)},
-    {File_GetLinks_Rp.class.getName(), new Integer(22)},
+    {File_GetAttr_Rp.class.getName(), Integer.valueOf(20)},
+    {File_GetData_Rp.class.getName(), Integer.valueOf(21)},
+    {File_GetLinks_Rp.class.getName(), Integer.valueOf(22)},
 
-    {Cnt_GetCnts_Rp.class.getName(), new Integer(30)},
+    {Cnt_GetCnts_Rp.class.getName(), Integer.valueOf(30)},
 
-    {Key_KeyPairs_Rp.class.getName(), new Integer(40)},
-    {Key_PubKeys_Rp.class.getName(), new Integer(41)},
+    {Key_KeyPairs_Rp.class.getName(), Integer.valueOf(40)},
+    {Key_PubKeys_Rp.class.getName(), Integer.valueOf(41)},
 
-    {Msg_GetBody_Rp.class.getName(), new Integer(50)},
-    {Msg_GetLinkAndData_Rp.class.getName(), new Integer(51)},
+    {Msg_GetBody_Rp.class.getName(), Integer.valueOf(50)},
+    {Msg_GetLinkAndData_Rp.class.getName(), Integer.valueOf(51)},
 
-    {Org_GetOrg_Rp.class.getName(), new Integer(60)},
+    {Org_GetOrg_Rp.class.getName(), Integer.valueOf(60)},
 
-    {Str_Rp.class.getName(), new Integer(80)},
+    {Str_Rp.class.getName(), Integer.valueOf(80)},
 
-    {Usr_GetMyInfo_Rp.class.getName(), new Integer(90)},
-    {Usr_LoginSecSess_Rp.class.getName(), new Integer(91)},
-    {Usr_UsrHandles_Rp.class.getName(), new Integer(92)},
+    {Usr_GetMyInfo_Rp.class.getName(), Integer.valueOf(90)},
+    {Usr_LoginSecSess_Rp.class.getName(), Integer.valueOf(91)},
+    {Usr_UsrHandles_Rp.class.getName(), Integer.valueOf(92)},
 
 
 
-    {Obj_IDAndIDList_Rq.class.getName(), new Integer(100)},
-    {Obj_IDList_Co.class.getName(), new Integer(101)},
-    {Obj_IDPair_Co.class.getName(), new Integer(102)},
-    {Obj_ID_Rq.class.getName(), new Integer(103)},
-    {Obj_IDs_Co.class.getName(), new Integer(104)},
-    {Obj_List_Co.class.getName(), new Integer(105)},
-    {Obj_EncSet_Co.class.getName(), new Integer(106)},
+    {Obj_IDAndIDList_Rq.class.getName(), Integer.valueOf(100)},
+    {Obj_IDList_Co.class.getName(), Integer.valueOf(101)},
+    {Obj_IDPair_Co.class.getName(), Integer.valueOf(102)},
+    {Obj_ID_Rq.class.getName(), Integer.valueOf(103)},
+    {Obj_IDs_Co.class.getName(), Integer.valueOf(104)},
+    {Obj_List_Co.class.getName(), Integer.valueOf(105)},
+    {Obj_EncSet_Co.class.getName(), Integer.valueOf(106)},
 
-    {Cnt_AcceptDecline_Rq.class.getName(), new Integer(110)},
-    {Cnt_MovCnts_Rq.class.getName(), new Integer(111)},
-    {Cnt_NewCnt_Rq.class.getName(), new Integer(112)},
-    {Cnt_Remove_Rq.class.getName(), new Integer(113)},
-    {Cnt_Rename_Rq.class.getName(), new Integer(114)},
-    {Cnt_GroupCnt_Rq.class.getName(), new Integer(115)},
+    {Cnt_AcceptDecline_Rq.class.getName(), Integer.valueOf(110)},
+    {Cnt_MovCnts_Rq.class.getName(), Integer.valueOf(111)},
+    {Cnt_NewCnt_Rq.class.getName(), Integer.valueOf(112)},
+    {Cnt_Remove_Rq.class.getName(), Integer.valueOf(113)},
+    {Cnt_Rename_Rq.class.getName(), Integer.valueOf(114)},
+    {Cnt_GroupCnt_Rq.class.getName(), Integer.valueOf(115)},
 
-    {Fld_AddShares_Rq.class.getName(), new Integer(120)},
-    {Fld_AltPerm_Rq.class.getName(), new Integer(121)},
-    {Fld_AltStrs_Rq.class.getName(), new Integer(122)},
-    {Fld_NewFld_Rq.class.getName(), new Integer(123)},
-    {Fld_ToSymEnc_Rq.class.getName(), new Integer(124)},
+    {Fld_AddShares_Rq.class.getName(), Integer.valueOf(120)},
+    {Fld_AltPerm_Rq.class.getName(), Integer.valueOf(121)},
+    {Fld_AltStrs_Rq.class.getName(), Integer.valueOf(122)},
+    {Fld_NewFld_Rq.class.getName(), Integer.valueOf(123)},
+    {Fld_ToSymEnc_Rq.class.getName(), Integer.valueOf(124)},
 
-    {File_MoveCopy_Rq.class.getName(), new Integer(130)},
-    {File_NewFiles_Rq.class.getName(), new Integer(131)},
-    {File_Rename_Rq.class.getName(), new Integer(132)},
-    {File_GetFiles_Rq.class.getName(), new Integer(133)},
+    {File_MoveCopy_Rq.class.getName(), Integer.valueOf(130)},
+    {File_NewFiles_Rq.class.getName(), Integer.valueOf(131)},
+    {File_Rename_Rq.class.getName(), Integer.valueOf(132)},
+    {File_GetFiles_Rq.class.getName(), Integer.valueOf(133)},
 
-    {Key_KeyIDs_Rq.class.getName(), new Integer(140)},
-    {Key_NewPair_Rq.class.getName(), new Integer(141)},
-    {Key_KeyRecov_Co.class.getName(), new Integer(142)},
+    {Key_KeyIDs_Rq.class.getName(), Integer.valueOf(140)},
+    {Key_NewPair_Rq.class.getName(), Integer.valueOf(141)},
+    {Key_KeyRecov_Co.class.getName(), Integer.valueOf(142)},
 
-    {Msg_GetMsgs_Rq.class.getName(), new Integer(150)},
-    {Msg_New_Rq.class.getName(), new Integer(151)},
-    {Msg_ToSymEnc_Rq.class.getName(), new Integer(152)},
-    {Msg_MoveCopy_Rq.class.getName(), new Integer(153)},
+    {Msg_GetMsgs_Rq.class.getName(), Integer.valueOf(150)},
+    {Msg_New_Rq.class.getName(), Integer.valueOf(151)},
+    {Msg_ToSymEnc_Rq.class.getName(), Integer.valueOf(152)},
+    {Msg_MoveCopy_Rq.class.getName(), Integer.valueOf(153)},
 
-    {Usr_AltUsrData_Rq.class.getName(), new Integer(170)},
-    {Usr_AltUsrPass_Rq.class.getName(), new Integer(171)},
-    {Usr_LoginSecSess_Rq.class.getName(), new Integer(172)},
-    {Usr_NewUsr_Rq.class.getName(), new Integer(173)},
-    {Usr_Search_Rq.class.getName(), new Integer(174)},
-    {Usr_GetSubAcc_Rp.class.getName(), new Integer(175)},
-    {Usr_PassRecovery_Co.class.getName(), new Integer(176)},
-    {Usr_PassReset_Rq.class.getName(), new Integer(177)},
+    {Usr_AltUsrData_Rq.class.getName(), Integer.valueOf(170)},
+    {Usr_AltUsrPass_Rq.class.getName(), Integer.valueOf(171)},
+    {Usr_LoginSecSess_Rq.class.getName(), Integer.valueOf(172)},
+    {Usr_NewUsr_Rq.class.getName(), Integer.valueOf(173)},
+    {Usr_Search_Rq.class.getName(), Integer.valueOf(174)},
+    {Usr_GetSubAcc_Rp.class.getName(), Integer.valueOf(175)},
+    {Usr_PassRecovery_Co.class.getName(), Integer.valueOf(176)},
+    {Usr_PassReset_Rq.class.getName(), Integer.valueOf(177)},
 
-    {PingPong_Cm.class.getName(), new Integer(180)},
+    {PingPong_Cm.class.getName(), Integer.valueOf(180)},
 
-    {Stats_Get_Rq.class.getName(), new Integer(190)},
-    {Stats_Get_Rp.class.getName(), new Integer(191)},
-    {Stats_Update_Rq.class.getName(), new Integer(192)},
+    {Stats_Get_Rq.class.getName(), Integer.valueOf(190)},
+    {Stats_Get_Rp.class.getName(), Integer.valueOf(191)},
+    {Stats_Update_Rq.class.getName(), Integer.valueOf(192)},
 
-    {Eml_Get_Rp.class.getName(), new Integer(200)},
+    {Eml_Get_Rp.class.getName(), Integer.valueOf(200)},
 
-    {Addr_GetHash_Rp.class.getName(), new Integer(210)},
+    {Addr_GetHash_Rp.class.getName(), Integer.valueOf(210)},
 
-    {Sys_AutoUpdate_Co.class.getName(), new Integer(300)},
+    {Sys_AutoUpdate_Co.class.getName(), Integer.valueOf(300)},
 
-    {Sys_Check_Co.class.getName(), new Integer('d' << 24 | 'a' << 16 | 't' << 8 | 'a')}
+    {Sys_Check_Co.class.getName(), Integer.valueOf('d' << 24 | 'a' << 16 | 't' << 8 | 'a')}
   };
 
   static {
@@ -186,7 +186,7 @@ public class ProtocolMsgDataSwitch extends Object {
     String rc = null;
 
     if (!isNull(code)) {
-      int index = Arrays.binarySearch(classCodes, new Integer(code), codeComparator);
+      int index = Arrays.binarySearch(classCodes, Integer.valueOf(code), codeComparator);
       if (index >= 0)
         rc = (String) classCodes[index][0];
     }

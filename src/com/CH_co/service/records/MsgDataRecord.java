@@ -102,7 +102,7 @@ public class MsgDataRecord extends Record {
   private byte[] rawRecipients;
   private BASymCipherBulk encSubject;
   private BASymCipherBulk encText;
-  private Short flags = new Short((short) 0); // bits flags to mark compression in recipients/subject/body (1,2,3rd bit respectively)
+  private Short flags = Short.valueOf((short) 0); // bits flags to mark compression in recipients/subject/body (1,2,3rd bit respectively)
   private BASymCipherBulk encSignedDigest;    // digest of plain data, signed, then encrypted with msg's symmetric key
   private BASymCipherBulk encEncDigest;       // digest of encrypted data, encrypted with msg's symmetric key
   private Long sendPrivKeyId;
@@ -418,8 +418,8 @@ public class MsgDataRecord extends Record {
    * Decrypt specified encText using a matching password set from the specified array.
    * @return Object[] { BASymPlainBulk and BASymmetricKey } ie: the decrypted text and symmetric body key
    */
-  private static Object[] decryptBody(BASymCipherBulk encText, SymmetricBulkCipher symCipher, BASymmetricKey symmetricKey, Long bodyPassHash, Vector bodyKeys) throws DigestException, NoSuchAlgorithmException, InvalidKeyException {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "decryptBody(BASymCipherBulk encText, SymmetricBulkCipher symCipher, BASymmetricKey symmetricKey, Long bodyPassHash, Vector bodyKeys)");
+  private static Object[] decryptBody(BASymCipherBulk encText, SymmetricBulkCipher symCipher, BASymmetricKey symmetricKey, Long bodyPassHash, List bodyKeys) throws DigestException, NoSuchAlgorithmException, InvalidKeyException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "decryptBody(BASymCipherBulk encText, SymmetricBulkCipher symCipher, BASymmetricKey symmetricKey, Long bodyPassHash, List bodyKeys)");
     if (trace != null) trace.args(encText, symCipher, symmetricKey, bodyPassHash, bodyKeys);
     BASymPlainBulk plainText = null;
     BASymmetricKey symmetricBodyKey = null;
@@ -429,19 +429,21 @@ public class MsgDataRecord extends Record {
     if (symBodyCipher == null) {
       DigestException de = null;
       if (trace != null) trace.data(10, "decryptBody : trying keys");
-      for (int i=0; bodyKeys!=null && i<bodyKeys.size(); i++) {
-        Hasher.Set bodyKey = (Hasher.Set) bodyKeys.elementAt(i);
-        if (trace != null) trace.data(20, "decryptBody : trying key : ", bodyKey);
-        try {
-          if (bodyKey.passwordHash.equals(bodyPassHash)) {
-            symmetricBodyKey = new BASymmetricKey(symmetricKey);
-            symmetricBodyKey.XOR(bodyKey.encodedPassword);
-            symBodyCipher = new SymmetricBulkCipher(symmetricBodyKey);
-            plainText = symBodyCipher.bulkDecrypt(encText);
-            break;
+      if (bodyKeys != null) {
+        for (int i=0; i<bodyKeys.size(); i++) {
+          Hasher.Set bodyKey = (Hasher.Set) bodyKeys.get(i);
+          if (trace != null) trace.data(20, "decryptBody : trying key : ", bodyKey);
+          try {
+            if (bodyKey.passwordHash.equals(bodyPassHash)) {
+              symmetricBodyKey = new BASymmetricKey(symmetricKey);
+              symmetricBodyKey.XOR(bodyKey.encodedPassword);
+              symBodyCipher = new SymmetricBulkCipher(symmetricBodyKey);
+              plainText = symBodyCipher.bulkDecrypt(encText);
+              break;
+            }
+          } catch (DigestException e) {
+            de = e;
           }
-        } catch (DigestException e) {
-          de = e;
         }
       }
       if (plainText == null && de != null)
@@ -462,8 +464,8 @@ public class MsgDataRecord extends Record {
    * Unseals the <code> encSubject, encText, encSignedDigest, encEncDigest </code> into <code> subject, text, digest, encDigest </code> 
    * using the unSealant object which is the message's symmetric key and signers public key.
    */
-  public void unSeal(BASymmetricKey symmetricKey, Vector bodyKeys, KeyRecord keyRecord) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSeal(BASymmetricKey symmetricKey, Vector bodyKeys, KeyRecord keyRecord)");
+  public void unSeal(BASymmetricKey symmetricKey, List bodyKeys, KeyRecord keyRecord) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSeal(BASymmetricKey symmetricKey, List bodyKeys, KeyRecord keyRecord)");
 
     try {
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(symmetricKey);
@@ -533,8 +535,8 @@ public class MsgDataRecord extends Record {
    * Unseals the <code> encSubject, encText, encEncDigest </code> into <code> subject, text, encDigest </code> 
    * using the unSealant object which is the message's symmetric key -- DOES NOT verify signatures!
    */
-  public void unSealWithoutVerify(BASymmetricKey symmetricKey, Vector bodyKeys) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSealWithoutVerify(BASymmetricKey symmetricKey, Vector bodyKeys)");
+  public void unSealWithoutVerify(BASymmetricKey symmetricKey, List bodyKeys) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSealWithoutVerify(BASymmetricKey symmetricKey, List bodyKeys)");
 
     try {
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(symmetricKey);

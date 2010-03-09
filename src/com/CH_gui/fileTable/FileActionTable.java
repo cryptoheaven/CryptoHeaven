@@ -238,7 +238,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class OpenFileAction extends AbstractActionTraced {
     public OpenFileAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, "Transfer and Open remote file on local system using default file type association.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Open"));
@@ -257,7 +257,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class DownloadAction extends AbstractActionTraced {
     public DownloadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Download_..."), Images.get(ImageNums.IMPORT_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Download"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.IMPORT_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download"));
@@ -274,7 +274,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class CopyAction extends AbstractActionTraced {
     public CopyAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Copy_..."), Images.get(ImageNums.COPY16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_file_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Copy"));
@@ -302,7 +302,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Move_..."), Images.get(ImageNums.FILE_MOVE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_selected_file_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_MOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Move"));
@@ -399,7 +399,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class DeleteAction extends AbstractActionTraced {
     public DeleteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_..."), Images.get(ImageNums.FILE_REMOVE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_selected_file."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_REMOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
@@ -434,7 +434,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_File_Properties"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_General_Properties."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -460,7 +460,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class ForwardToAction extends AbstractActionTraced {
     public ForwardToAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Forward_..."), Images.get(ImageNums.FORWARD16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Forward"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FORWARD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Forward"));
@@ -480,7 +480,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_File_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
@@ -499,7 +499,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class MarkAsSeenAction extends AbstractActionTraced {
     public MarkAsSeenAction (int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Seen"), Images.get(ImageNums.FLAG_BLANK_SMALL));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_files_as_seen."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Seen"));
@@ -516,7 +516,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class MarkAsUnseenAction extends AbstractActionTraced {
     public MarkAsUnseenAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unseen"), Images.get(ImageNums.FLAG_GREEN_SMALL));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_files_as_unseen."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_GREEN24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Unseen"));
@@ -533,7 +533,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class MarkAllSeenAction extends AbstractActionTraced {
     public MarkAllSeenAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Seen"), Images.get(ImageNums.FLAG_BLANK_DOUBLE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_files_in_selected_folder_as_seen."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_All_Seen"));
@@ -550,7 +550,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -570,7 +570,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class TracePrivilegeAndHistoryAction extends AbstractActionTraced {
     public TracePrivilegeAndHistoryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Trace_File_Access"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Trace_File_Access"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -592,7 +592,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
@@ -864,7 +864,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           FileLinkRecord fLink = (FileLinkRecord) records[i];
 
           // count the file towards total selected size
-          totalSize = new Long(fLink.origSize.longValue() + (totalSize != null ? totalSize.longValue() : 0));
+          totalSize = Long.valueOf(fLink.origSize.longValue() + (totalSize != null ? totalSize.longValue() : 0));
 
           if (!(anySeen && anyUnseen)) {
             StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);

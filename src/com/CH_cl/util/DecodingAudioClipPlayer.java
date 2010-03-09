@@ -155,8 +155,8 @@ public class DecodingAudioClipPlayer {
       player.start();
       player.notifyPlay();
     } catch (Throwable e) {
-      try { ais.close(); } catch (Throwable t) { }
-      try { clip.close(); } catch (Throwable t) { }
+      try { if (ais != null) ais.close(); } catch (Throwable t) { }
+      try { if (clip != null) clip.close(); } catch (Throwable t) { }
     }
   }
 
@@ -186,7 +186,7 @@ public class DecodingAudioClipPlayer {
     }
     private void notifyLength() {
       for (int i=0; i<callbacksV.size(); i++)
-        ((CallbackI) callbacksV.elementAt(i)).callback(new Double(clip.getMicrosecondLength()/1000));
+        ((CallbackI) callbacksV.elementAt(i)).callback(Double.valueOf(clip.getMicrosecondLength()/1000.0));
     }
     private void notifyPause() {
       for (int i=0; i<callbacksV.size(); i++)
@@ -198,8 +198,8 @@ public class DecodingAudioClipPlayer {
     }
     private void notifyPosition() {
       for (int i=0; i<callbacksV.size(); i++) {
-        ((CallbackI) callbacksV.elementAt(i)).callback(new Integer((int) (clip.getMicrosecondPosition()/1000000)));
-        ((CallbackI) callbacksV.elementAt(i)).callback(new Long(clip.getMicrosecondPosition()/1000));
+        ((CallbackI) callbacksV.elementAt(i)).callback(Integer.valueOf((int) (clip.getMicrosecondPosition()/1000000)));
+        ((CallbackI) callbacksV.elementAt(i)).callback(Long.valueOf(clip.getMicrosecondPosition()/1000));
       }
     }
     public synchronized void pauseSeek(int millisecondPosition, Object controllingObj) {

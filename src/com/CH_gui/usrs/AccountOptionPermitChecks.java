@@ -112,7 +112,7 @@ public class AccountOptionPermitChecks extends Object {
       else // else if no user, set all NO GRANT bits
         accSpam |= UserRecord.ACC_SPAM_MASK__NO_GRANT;
     }
-    return new Short(accSpam);
+    return Short.valueOf(accSpam);
   }
 
   public Short getNewNotifySetting(UserRecord userRecord) {
@@ -145,7 +145,7 @@ public class AccountOptionPermitChecks extends Object {
       else // else if no user, set all NO GRANT bits
         notify |= UserRecord.EMAIL_MASK__NO_GRANT;
     }
-    return new Short(notify);
+    return Short.valueOf(notify);
   }
 
   public Long getNewFlagSetting(UserRecord userRecord) {
@@ -214,7 +214,7 @@ public class AccountOptionPermitChecks extends Object {
       else // else if no user, set all NO GRANT bits
         flags |= UserRecord.FLAG_MASK__NO_GRANT;
     }
-    return new Long(flags);
+    return Long.valueOf(flags);
   }
 
 
@@ -585,7 +585,7 @@ public class AccountOptionPermitChecks extends Object {
       if (count > uRecs.length/2)
         commonBits = commonBits | bitMask;
     }
-    return new Long(commonBits);
+    return Long.valueOf(commonBits);
   }
 
   public static Long getMostCommonNotifyByEmailBits(UserRecord[] uRecs) {
@@ -600,7 +600,7 @@ public class AccountOptionPermitChecks extends Object {
       if (count > uRecs.length/2)
         commonBits = commonBits | bitMask;
     }
-    return new Long(commonBits);
+    return Long.valueOf(commonBits);
   }
 
   public static Long getMostCommonFlagsBits(UserRecord[] uRecs) {
@@ -615,6 +615,6 @@ public class AccountOptionPermitChecks extends Object {
       if (count > uRecs.length/2)
         commonBits = commonBits | bitMask;
     }
-    return new Long(commonBits);
+    return Long.valueOf(commonBits);
   }
 }

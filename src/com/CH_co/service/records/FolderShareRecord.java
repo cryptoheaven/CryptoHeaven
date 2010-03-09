@@ -365,14 +365,14 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     }
     return rc;
   }
-  public boolean isOwnedBy(Long userId, Hashtable groupIDsHT) {
+  public boolean isOwnedBy(Long userId, Set groupIDsSet) {
     boolean rc = false;
     if (ownerType.shortValue() == Record.RECORD_TYPE_USER) {
       if (userId != null)
         rc = ownerUserId.equals(userId);
     } else if (ownerType.shortValue() == Record.RECORD_TYPE_GROUP) {
-      if (groupIDsHT != null)
-        rc = groupIDsHT.get(ownerUserId) != null;
+      if (groupIDsSet != null)
+        rc = groupIDsSet.contains(ownerUserId);
     }
     return rc;
   }

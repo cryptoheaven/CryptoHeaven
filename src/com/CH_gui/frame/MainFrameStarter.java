@@ -128,7 +128,7 @@ public class MainFrameStarter extends Object {
           } else if (args[i].equalsIgnoreCase("-killAfterMilliseconds")) {
             i ++;
             try {
-              final Long millisToKill = new Long(args[i]);
+              final Long millisToKill = Long.valueOf(args[i]);
               new Thread() {
                 public void run() {
                   try { Thread.sleep(millisToKill.longValue()); } catch (InterruptedException e) { }
@@ -140,7 +140,7 @@ public class MainFrameStarter extends Object {
           } else if (args[i].equalsIgnoreCase("-killAfterRandomMilliseconds")) {
             i ++;
             try {
-              final Long rndMillisToKill = new Long(args[i]);
+              final Long rndMillisToKill = Long.valueOf(args[i]);
               new Thread() {
                 public void run() {
                   Random rnd = new Random();
@@ -173,13 +173,13 @@ public class MainFrameStarter extends Object {
           } else if (args[i].equalsIgnoreCase("-folderId")) {
             i++;
             try {
-              initialFolderId = new Long(args[i]);
+              initialFolderId = Long.valueOf(args[i]);
             } catch (Throwable t) {
             }
           } else if (args[i].equalsIgnoreCase("-msgLinkId")) {
             i++;
             try {
-              initialMsgLinkId = new Long(args[i]);
+              initialMsgLinkId = Long.valueOf(args[i]);
             } catch (Throwable t) {
             }
           } else if (args[0].equals("-menuEditor")) {

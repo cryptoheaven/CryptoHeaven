@@ -20,7 +20,7 @@ import com.CH_cl.service.cache.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.MultiHashtable;
+import com.CH_co.util.*;
 
 import com.CH_gui.sortedTable.TableSorter;
 
@@ -73,9 +73,9 @@ public class MsgTableSorter extends TableSorter {
         if (trace != null) trace.data(5, "msgTableModel", msgTableModel);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        MultiHashtable rootNodes_byReplyMsgId = new MultiHashtable();
-        MultiHashtable nodes_byMsgId = new MultiHashtable();
-        MultiHashtable nodes_byObjIndex = new MultiHashtable();
+        MultiHashMap rootNodes_byReplyMsgId = new MultiHashMap();
+        MultiHashMap nodes_byMsgId = new MultiHashMap();
+        MultiHashMap nodes_byObjIndex = new MultiHashMap();
         // one index at a time build our tree top-to-bottom
         for (int i=0; i<objIndexes.length; i++) {
           Integer objIndexI = (Integer) objIndexes[i];
@@ -87,12 +87,12 @@ public class MsgTableSorter extends TableSorter {
           nodes_byObjIndex.put(objIndexI, mLinkNode);
           MsgDataRecord mData = cache.getMsgDataRecordNoTrace(mLink.msgId);
           // move root nodes to new one if they are replies to it.
-          Vector childrenV = rootNodes_byReplyMsgId.removeAll(mLink.msgId);
+          Collection childrenV = rootNodes_byReplyMsgId.poolAll(mLink.msgId);
           if (childrenV != null) {
-            for (int k=0; k<childrenV.size(); k++) {
-              DefaultMutableTreeNode child = (DefaultMutableTreeNode) childrenV.elementAt(k);
+            Iterator iter = childrenV.iterator();
+            while (iter.hasNext()) {
               //root.remove(child);  // interesting that nodes need not be removed to change their location
-              mLinkNode.add(child);
+              mLinkNode.add((DefaultMutableTreeNode) iter.next());
             }
           }
 
@@ -151,10 +151,6 @@ public class MsgTableSorter extends TableSorter {
             index ++;
           }
         }
-        // help cleanup
-        root.removeAllChildren();
-        rootNodes_byReplyMsgId.clear();
-        nodes_byMsgId.clear();
       }
     }
 

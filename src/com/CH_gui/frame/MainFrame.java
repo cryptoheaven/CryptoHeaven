@@ -681,7 +681,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public ExitAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Exit"), Images.get(ImageNums.DELETE16));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Exit_the_application."));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Exit"));
     }
@@ -697,7 +697,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public AboutAction(int actionId) {
       super(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
             new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) }), Images.get(ImageNums.INFO16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.INFO16));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -714,7 +714,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public ChangePassAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -745,7 +745,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public ChangeUserNameAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -762,7 +762,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 //    public ConnectionOptionsAction(int actionId) {
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Connection_Options"));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Connection_Options"));
-//      putValue(Actions.ACTION_ID, new Integer(actionId));
+//      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
 //      //putValue(Actions.TOOL_ICON, Images.get(ImageNums.COMP_NET32));
 //      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
 //    }
@@ -778,7 +778,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class AccountOptionsAction extends AbstractActionTraced {
     public AccountOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Account_Options"), Images.get(ImageNums.USER_EDIT16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Account_Options"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
     }
@@ -795,7 +795,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public SwitchIdentityAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Switch_Identity"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Log_off_current_identity_and_log_in_as_a_different_user."));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -809,7 +809,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class ManageSubAccountsAction extends AbstractActionTraced {
     public ManageSubAccountsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Manage_User_Accounts"), Images.get(ImageNums.USER_MANAGE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       //putValue(Actions.TOOL_TIP, "Manage User Accounts");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_MANAGE24));
     }
@@ -837,7 +837,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class DeleteMyAccountAction extends AbstractActionTraced {
     public DeleteMyAccountAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Account_..."));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_my_user_account."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -852,7 +852,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class ImportAddressBookAction extends AbstractActionTraced {
     public ImportAddressBookAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Import_Address_Book_..."));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -868,7 +868,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public URLGeneralFAQAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_General_FAQ"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -888,7 +888,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public URLQuickTourAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Quick_Tour"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -908,7 +908,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public URLUsersGuideAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_User's_Guide"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -928,7 +928,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public URLAccountUpgradeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Account_Upgrade"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -947,7 +947,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class ManageWhiteListAction extends AbstractActionTraced {
     public ManageWhiteListAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Manage_WhiteList_..."));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Manage_WhiteList_..."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -972,7 +972,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public SetupPasswordRecovery(int actionId) {
       super("Setup Password Recovery");
       putValue(Actions.TOOL_TIP, "Setup Password Recovery");
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -986,7 +986,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class TraceDiagnosticsAction extends AbstractActionTraced {
     public TraceDiagnosticsAction(int actionId) {
       super("Problem Reporting", Images.get(ImageNums.TOOLS_FIX16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, "Send Diagnostics Information");
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }

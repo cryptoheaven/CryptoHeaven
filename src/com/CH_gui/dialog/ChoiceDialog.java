@@ -73,10 +73,10 @@ public class ChoiceDialog extends GeneralDialog {
     buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
-        resultButton = new Integer(DEFAULT_OK_INDEX);
+        resultButton = Integer.valueOf(DEFAULT_OK_INDEX);
         for (int i=0; i<jChoices.length; i++) {
           if (jChoices[i].isSelected()) {
-            resultChoice = new Integer(i);
+            resultChoice = Integer.valueOf(i);
             break;
           }
         }

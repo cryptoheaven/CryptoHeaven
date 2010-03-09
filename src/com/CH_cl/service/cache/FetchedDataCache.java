@@ -72,25 +72,25 @@ public class FetchedDataCache extends Object {
   private RSAPrivateKey newUserPrivateKey;
 
 
-  SortedMap userRecordMap;
-  SortedMap folderRecordMap;
-  SortedMap folderShareRecordMap;
-  MultiHashtable folderShareRecordMap_byFldId;
-  MultiHashtable folderShareRecordMap_byOwnerId;
-  SortedMap fileLinkRecordMap;
-  SortedMap fileDataRecordMap;
-  SortedMap invEmlRecordMap;
-  SortedMap keyRecordMap;
-  SortedMap contactRecordMap;
-  SortedMap msgLinkRecordMap;
-  MultiHashtable msgLinkRecordMap_byMsgId; // key is the msgId
-  SortedMap msgDataRecordMap;
-  SortedMap emailRecordMap;
-  MultiHashtable addrHashRecordMap_byMsgId; // key is the msgId
-  MultiHashtable addrHashRecordMap_byHash; // key is the hash
-  SortedMap[] statRecordMaps;
-  public Vector bodyKeys;
-  public Hashtable requestedAddrHashHT;
+  private Map userRecordMap;
+  private Map folderRecordMap;
+  private Map folderShareRecordMap;
+  private MultiHashMap folderShareRecordMap_byFldId;
+  private MultiHashMap folderShareRecordMap_byOwnerId;
+  private Map fileLinkRecordMap;
+  private Map fileDataRecordMap;
+  private Map invEmlRecordMap;
+  private Map keyRecordMap;
+  private Map contactRecordMap;
+  private Map msgLinkRecordMap;
+  private MultiHashMap msgLinkRecordMap_byMsgId; // key is the msgId
+  private Map msgDataRecordMap;
+  private Map emailRecordMap;
+  private MultiHashMap addrHashRecordMap_byMsgId; // key is the msgId
+  private MultiHashMap addrHashRecordMap_byHash; // key is the hash
+  private Map[] statRecordMaps;
+  private ArrayList msgBodyKeys;
+  private HashSet requestedAddrHashHS;
 
   public static final int STAT_TYPE_FILE = 0;
   public static final int STAT_TYPE_FOLDER = 1;
@@ -123,27 +123,27 @@ public class FetchedDataCache extends Object {
     myUserId = null;
     myUserSettingsRecord = null;
     myPassRecoveryRecord = null;
-    userRecordMap = new TreeMap();
-    folderRecordMap = new TreeMap();
-    folderShareRecordMap = new TreeMap();
-    folderShareRecordMap_byFldId = new MultiHashtable(true);
-    folderShareRecordMap_byOwnerId = new MultiHashtable(true);
-    fileLinkRecordMap = new TreeMap();
-    fileDataRecordMap = new TreeMap();
-    invEmlRecordMap = new TreeMap();
-    keyRecordMap = new TreeMap();
-    contactRecordMap = new TreeMap();
-    msgLinkRecordMap = new TreeMap();
-    msgLinkRecordMap_byMsgId = new MultiHashtable(true);
-    msgDataRecordMap = new TreeMap();
-    emailRecordMap = new TreeMap();
-    addrHashRecordMap_byMsgId = new MultiHashtable(true);
-    addrHashRecordMap_byHash = new MultiHashtable(true);
-    statRecordMaps = new SortedMap[3];
+    userRecordMap = new HashMap();
+    folderRecordMap = new HashMap();
+    folderShareRecordMap = new HashMap();
+    folderShareRecordMap_byFldId = new MultiHashMap(true);
+    folderShareRecordMap_byOwnerId = new MultiHashMap(true);
+    fileLinkRecordMap = new HashMap();
+    fileDataRecordMap = new HashMap();
+    invEmlRecordMap = new HashMap();
+    keyRecordMap = new HashMap();
+    contactRecordMap = new HashMap();
+    msgLinkRecordMap = new HashMap();
+    msgLinkRecordMap_byMsgId = new MultiHashMap(true);
+    msgDataRecordMap = new HashMap();
+    emailRecordMap = new HashMap();
+    addrHashRecordMap_byMsgId = new MultiHashMap(true);
+    addrHashRecordMap_byHash = new MultiHashMap(true);
+    statRecordMaps = new Map[3];
     for (int i=0; i<3; i++)
-      statRecordMaps[i] = new TreeMap();
-    bodyKeys = new Vector();
-    requestedAddrHashHT = new Hashtable();
+      statRecordMaps[i] = new HashMap();
+    msgBodyKeys = new ArrayList();
+    requestedAddrHashHS = new HashSet();
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
@@ -185,8 +185,8 @@ public class FetchedDataCache extends Object {
       invEmlRecordMap.clear();
       keyRecordMap.clear();
       userRecordMap.clear();
-      bodyKeys.clear();
-      requestedAddrHashHT.clear();
+      msgBodyKeys.clear();
+      requestedAddrHashHS.clear();
       addrHashRecordMap_byMsgId.clear();
       addrHashRecordMap_byHash.clear();
     }
@@ -265,8 +265,7 @@ public class FetchedDataCache extends Object {
    */
   public synchronized void addRequestedAddrHash(byte[] hash) {
     // Store the hash as string so when comparing different instances of the same data will match.
-    String strHash = ArrayUtils.toString(hash);
-    requestedAddrHashHT.put(strHash, strHash);
+    requestedAddrHashHS.add(ArrayUtils.toString(hash));
   }
 
   /**
@@ -281,7 +280,7 @@ public class FetchedDataCache extends Object {
    * @return true if hash exists in the requested cashe.
    */
   public synchronized boolean wasRequestedAddrHash(byte[] hash) {
-    return requestedAddrHashHT.get(ArrayUtils.toString(hash)) != null;
+    return requestedAddrHashHS.contains(ArrayUtils.toString(hash));
   }
 
   /*********************************
@@ -438,9 +437,7 @@ public class FetchedDataCache extends Object {
   public synchronized UserRecord[] getUserRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getUserRecords()");
 
-    Vector usersV = new Vector();
-    usersV.addAll(userRecordMap.values());
-    UserRecord[] users = (UserRecord[]) ArrayUtils.toArray(usersV, UserRecord.class);
+    UserRecord[] users = (UserRecord[]) ArrayUtils.toArray(userRecordMap.values(), UserRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, users);
     return users;
@@ -453,15 +450,15 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getUserRecords(Long[] userIDs)");
     if (trace != null) trace.args(userIDs);
 
-    Vector usersV = new Vector();
+    ArrayList usersL = new ArrayList();
     if (userIDs != null) {
       for (int i=0; i<userIDs.length; i++) {
         UserRecord uRec = (UserRecord) userRecordMap.get(userIDs[i]);
         if (uRec != null)
-          usersV.addElement(uRec);
+          usersL.add(uRec);
       }
     }
-    UserRecord[] users = (UserRecord[]) ArrayUtils.toArray(usersV, UserRecord.class);
+    UserRecord[] users = (UserRecord[]) ArrayUtils.toArray(usersL, UserRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, users);
     return users;
@@ -482,7 +479,7 @@ public class FetchedDataCache extends Object {
       // convert old chatting into new explicit type
       for (int i=0; i<records.length; i++) {
         if (records[i].folderType.shortValue() == FolderRecord.POSTING_FOLDER && records[i].isChatting())
-          records[i].folderType = new Short(FolderRecord.CHATTING_FOLDER);
+          records[i].folderType = Short.valueOf(FolderRecord.CHATTING_FOLDER);
       }
       synchronized (this) {
         records = (FolderRecord[]) RecordUtils.merge(folderRecordMap, records);
@@ -537,17 +534,17 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecords(Long[] folderIDs)");
     if (trace != null) trace.args(folderIDs);
 
-    Vector fRecsV = new Vector();
+    ArrayList fRecsL = new ArrayList();
     if (folderIDs != null) {
       for (int i=0; i<folderIDs.length; i++) {
         if (folderIDs[i] != null) {
           FolderRecord fRec = (FolderRecord) folderRecordMap.get(folderIDs[i]);
           if (fRec != null)
-            fRecsV.addElement(fRec);
+            fRecsL.add(fRec);
         }
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -560,17 +557,17 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecords(RecordFilter filter)");
     if (trace != null) trace.args(filter);
 
-    Vector fRecsV = new Vector();
+    ArrayList fRecsL = new ArrayList();
     Collection col = folderRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
       // if this is someone else's folder
       if (filter.keep(folderRecord)) {
-        fRecsV.addElement(folderRecord);
+        fRecsL.add(folderRecord);
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -582,17 +579,17 @@ public class FetchedDataCache extends Object {
   public synchronized FolderRecord[] getFolderRecordsNotMine() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsNotMine()");
 
-    Vector fRecsV = new Vector();
+    ArrayList fRecsL = new ArrayList();
     Collection col = folderRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
       // if this is someone else's folder
       if (!folderRecord.ownerUserId.equals(myUserId)) {
-        fRecsV.addElement(folderRecord);
+        fRecsL.add(folderRecord);
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -605,16 +602,16 @@ public class FetchedDataCache extends Object {
   public synchronized FolderRecord[] getFolderRecordsForUser(Long userId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsForUser(Long userId)");
 
-    Vector fRecsV = new Vector();
+    ArrayList fRecsL = new ArrayList();
     Collection col = folderRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
       if (folderRecord.ownerUserId.equals(userId)) {
-        fRecsV.addElement(folderRecord);
+        fRecsL.add(folderRecord);
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -626,21 +623,21 @@ public class FetchedDataCache extends Object {
   public synchronized FolderRecord[] getFolderRecordsForUsers(Long[] userIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsForUsers(Long[] userIDs)");
 
-    Vector fRecsV = new Vector();
-    Collection col = folderRecordMap.values();
-    Iterator iter = col.iterator();
+    // user ID lookup table
+    HashSet uIDsHS = new HashSet();
+    uIDsHS.addAll(Arrays.asList(userIDs));
+    // gathered folders
+    HashSet fRecsHS = new HashSet();
+    Iterator iter = folderRecordMap.values().iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
-      for (int i=0; i<userIDs.length; i++) {
-        if (folderRecord.ownerUserId.equals(userIDs[i])) {
-          if (!fRecsV.contains(folderRecord)) {
-            fRecsV.addElement(folderRecord);
-            break;
-          }
+      if (uIDsHS.contains(folderRecord.ownerUserId)) {
+        if (!fRecsHS.contains(folderRecord)) {
+          fRecsHS.add(folderRecord);
         }
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsHS, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -653,17 +650,16 @@ public class FetchedDataCache extends Object {
   public synchronized FolderRecord[] getFolderRecordsChatting() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsChatting()");
 
-    Vector fRecsV = new Vector();
+    ArrayList fRecsL = new ArrayList();
     Collection col = folderRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
-      // if this is someone else's folder
       if (folderRecord.isChatting()) {
-        fRecsV.addElement(folderRecord);
+        fRecsL.add(folderRecord);
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(fRecsL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -685,16 +681,16 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFoldersChildren(Long parentFolderId)");
     if (trace != null) trace.args(parentFolderId);
 
-    Vector childrenV = new Vector();
+    ArrayList childrenL = new ArrayList();
     Collection col = folderRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
       if (folderRecord.isChildToParent(parentFolderId)) {
-        childrenV.addElement(folderRecord);
+        childrenL.add(folderRecord);
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(childrenV, FolderRecord.class);
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(childrenL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -707,25 +703,24 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFoldersChildren(FolderRecord[] parentRecords)");
     if (trace != null) trace.args(parentRecords);
 
-    // load hashtable with specified parents
-    Hashtable ht = new Hashtable(parentRecords.length);
+    // load set with specified parents
+    HashSet parentIDsHS = new HashSet(parentRecords.length);
     for (int i=0; i<parentRecords.length; i++) {
-      ht.put(parentRecords[i].folderId, parentRecords[i]);
+      parentIDsHS.add(parentRecords[i].folderId);
     }
-    Vector childrenV = new Vector();
+    ArrayList childrenL = new ArrayList();
     Collection col = folderRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderRecord folderRecord = (FolderRecord) iter.next();
       // if this is a child at all
       if (!folderRecord.parentFolderId.equals(folderRecord.folderId)) {
-        // if this is one of the wanted children (quick hashtable access)
-        if (ht.get(folderRecord.parentFolderId) != null)
-          childrenV.addElement(folderRecord);
+        // if this is one of the wanted children (quick lookup)
+        if (parentIDsHS.contains(folderRecord.parentFolderId))
+          childrenL.add(folderRecord);
       }
     }
-    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(childrenV, FolderRecord.class);
-    ht.clear();
+    FolderRecord[] folders = (FolderRecord[]) ArrayUtils.toArray(childrenL, FolderRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, folders);
     return folders;
@@ -736,23 +731,23 @@ public class FetchedDataCache extends Object {
    * @return children in the FolderRecord hierarchy, ignores view hierarchy
    */
   public synchronized FolderRecord[] getFoldersAllDescending(FolderRecord[] parentFolders) {
-    Vector allDescendantsV = new Vector();
-    addFoldersAllChildren(allDescendantsV, parentFolders);
-    FolderRecord[] result = (FolderRecord[]) ArrayUtils.toArray(allDescendantsV, FolderRecord.class);
+    HashSet allDescendantsHS = new HashSet();
+    addFoldersAllChildren(allDescendantsHS, parentFolders);
+    FolderRecord[] result = (FolderRecord[]) ArrayUtils.toArray(allDescendantsHS, FolderRecord.class);
     return result;
   }
-  private synchronized void addFoldersAllChildren(Vector allDescendants, FolderRecord[] folders) {
+  private synchronized void addFoldersAllChildren(Collection allDescendants, FolderRecord[] folders) {
     if (folders != null && folders.length >= 0) {
       FolderRecord[] childFolders = getFoldersChildren(folders);
       if (childFolders != null && childFolders.length > 0) {
-        Vector realChildrenV = new Vector();
+        ArrayList realChildrenL = new ArrayList();
         for (int i=0; i<childFolders.length; i++) {
           if (!allDescendants.contains(childFolders[i])) {
-            allDescendants.addElement(childFolders[i]);
-            realChildrenV.addElement(childFolders[i]);
+            allDescendants.add(childFolders[i]);
+            realChildrenL.add(childFolders[i]);
           }
         }
-        FolderRecord[] realChildren = (FolderRecord[]) ArrayUtils.toArray(realChildrenV, FolderRecord.class);
+        FolderRecord[] realChildren = (FolderRecord[]) ArrayUtils.toArray(realChildrenL, FolderRecord.class);
         addFoldersAllChildren(allDescendants, realChildren);
       }
     }
@@ -765,49 +760,49 @@ public class FetchedDataCache extends Object {
     return getFolderGroupIDs(getMyUserId());
   }
   public synchronized Long[] getFolderGroupIDs(Long userId) {
-    Hashtable groupIDsHT = getFolderGroupIDsHT(userId);
-    Set keys = groupIDsHT.keySet();
-    Long[] groupIDs = (Long[]) ArrayUtils.toArray(keys, Long.class);
+    Set groupIDsSet = getFolderGroupIDsSet(userId);
+    Long[] groupIDs = (Long[]) ArrayUtils.toArray(groupIDsSet, Long.class);
     return groupIDs;
   }
-  public synchronized Hashtable getFolderGroupIDsMyHT() {
-    return myUserId != null ? getFolderGroupIDsHT(myUserId) : null;
+  public synchronized Set getFolderGroupIDsMySet() {
+    return myUserId != null ? getFolderGroupIDsSet(myUserId) : null;
   }
-  public synchronized Hashtable getFolderGroupIDsHT(Long userId) {
-    Hashtable groupIDsHT = new Hashtable();
-    Vector sharesForUserV = folderShareRecordMap_byOwnerId.getAll(userId);
+  public synchronized Set getFolderGroupIDsSet(Long userId) {
+    Set groupIDsSet = new HashSet();
+    Collection sharesForUserV = folderShareRecordMap_byOwnerId.getAll(userId);
     if (sharesForUserV != null) {
-      for (int i=0; i<sharesForUserV.size(); i++) {
-        FolderShareRecord sRec = (FolderShareRecord) sharesForUserV.elementAt(i);
+      Iterator iter = sharesForUserV.iterator();
+      while (iter.hasNext()) {
+        FolderShareRecord sRec = (FolderShareRecord) iter.next();
         if (sRec.isOwnedBy(userId, (Long[]) null)) { // check if owner is USER type
           FolderRecord fRec = getFolderRecord(sRec.folderId);
           if (fRec != null && fRec.isGroupType())
-            groupIDsHT.put(fRec.folderId, fRec);
+            groupIDsSet.add(fRec.folderId);
         }
       }
     }
-    if (groupIDsHT.size() > 0)
-      addFolderGroupIDs(groupIDsHT);
-    return groupIDsHT;
+    if (groupIDsSet.size() > 0)
+      addFolderGroupIDs(groupIDsSet);
+    return groupIDsSet;
   }
-  private synchronized void addFolderGroupIDs(Hashtable groupIDsHT) {
+  private synchronized void addFolderGroupIDs(Set groupIDsSet) {
     boolean anyAdded = false;
     Collection col = folderShareRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderShareRecord sRec = (FolderShareRecord) iter.next();
-      if (sRec.isOwnedByGroup() && groupIDsHT.get(sRec.ownerUserId) != null) {
+      if (sRec.isOwnedByGroup() && groupIDsSet.contains(sRec.ownerUserId)) {
         FolderRecord fRec = getFolderRecord(sRec.folderId);
         if (fRec != null && fRec.isGroupType()) {
-          if (groupIDsHT.get(fRec.folderId) == null) {
-            groupIDsHT.put(fRec.folderId, fRec);
+          if (!groupIDsSet.contains(fRec.folderId)) {
+            groupIDsSet.add(fRec.folderId);
             anyAdded = true;
           }
         }
       }
     }
     if (anyAdded)
-      addFolderGroupIDs(groupIDsHT);
+      addFolderGroupIDs(groupIDsSet);
   }
 
   /**
@@ -845,7 +840,7 @@ public class FetchedDataCache extends Object {
       // Merge so that cached valued become updated, this is required for the
       // unsealing process to have complete and upto-date shares in the cache.
       Long myUId = null;
-      Hashtable groupIDsHT = null;
+      Set groupIDsSet = null;
       synchronized (this) {
         // Merge so that cached valued become updated, this is required for the
         // unsealing process to have complete and upto-date shares in the cache.
@@ -854,13 +849,13 @@ public class FetchedDataCache extends Object {
         for (int i=0; i<records.length; i++) folderShareRecordMap_byOwnerId.put(records[i].ownerUserId, records[i]);
         // carry on with unsealing preparations
         myUId = getMyUserId();
-        groupIDsHT = getFolderGroupIDsHT(myUId);
-        Vector toUnsealV = new Vector(Arrays.asList(records));
-        Vector exceptionV = new Vector();
-        while (toUnsealV.size() > 0) {
-          for (int i=0; i<toUnsealV.size(); i++) {
-            FolderShareRecord sRec = (FolderShareRecord) toUnsealV.elementAt(i);
-            if (sRec.isOwnedBy(myUId, groupIDsHT)) { // group changes
+        groupIDsSet = getFolderGroupIDsSet(myUId);
+        ArrayList toUnsealL = new ArrayList(Arrays.asList(records));
+        ArrayList exceptionL = new ArrayList();
+        while (toUnsealL.size() > 0) {
+          for (int i=0; i<toUnsealL.size(); i++) {
+            FolderShareRecord sRec = (FolderShareRecord) toUnsealL.get(i);
+            if (sRec.isOwnedBy(myUId, groupIDsSet)) { // group changes
               // local folder
               if (sRec.shareId.longValue() == FolderShareRecord.SHARE_LOCAL_ID) {
                 sRec.setFolderName(FolderShareRecord.SHARE_LOCAL_NAME);
@@ -879,27 +874,27 @@ public class FetchedDataCache extends Object {
                 sRec.setFolderDesc(FolderShareRecord.CATEGORY_GROUP_DESC);
               }
               try {
-                attemptUnsealShare(sRec, exceptionV, groupIDsHT);
+                attemptUnsealShare(sRec, exceptionL, groupIDsSet);
               } catch (Throwable t) {
                 if (trace != null) trace.data(100, "Exception occured while attempting to unseal FolderShare", sRec);
                 if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
               }
             }
           } // end for
-          int origSize = toUnsealV.size();
-          toUnsealV.clear();
-          if (exceptionV.size() > 0 && exceptionV.size() < origSize) {
+          int origSize = toUnsealL.size();
+          toUnsealL.clear();
+          if (exceptionL.size() > 0 && exceptionL.size() < origSize) {
             // another iteration
-            toUnsealV.addAll(exceptionV);
+            toUnsealL.addAll(exceptionL);
           }
-          exceptionV.clear();
+          exceptionL.clear();
         } // end while
       } // end synchronized - don't want other threads to take records if we are not done unsealing them...
 
       for (int i=0; i<records.length; i++) {
         // Clear folder cached data if applicable.
         FolderShareRecord sRec = records[i];
-        if (sRec.isOwnedBy(myUId, groupIDsHT)) { // group changes
+        if (sRec.isOwnedBy(myUId, groupIDsSet)) { // group changes
           FolderRecord fRec = getFolderRecord(sRec.folderId);
           if (fRec != null) {
             fRec.invalidateCachedValues();
@@ -914,7 +909,7 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
-  private void attemptUnsealShare(FolderShareRecord sRec, Vector exceptionV, Hashtable groupIDsHT) {
+  private void attemptUnsealShare(FolderShareRecord sRec, Collection exceptionList, Set groupIDsSet) {
     // if anything to unseal
     if (sRec.getEncFolderName() != null) {
       // un-seal with user's global-folder symmetric key
@@ -923,12 +918,12 @@ public class FetchedDataCache extends Object {
       }
       // un-seal with symmetric key of the group
       else if (sRec.isOwnedByGroup()) {
-        FolderShareRecord myGroupShare = getFolderShareRecordMy(sRec.ownerUserId, groupIDsHT);
+        FolderShareRecord myGroupShare = getFolderShareRecordMy(sRec.ownerUserId, groupIDsSet);
         BASymmetricKey symmetricKey = myGroupShare != null ? myGroupShare.getSymmetricKey() : null;
         if (symmetricKey != null)
           sRec.unSeal(symmetricKey);
         else
-          exceptionV.addElement(sRec);
+          exceptionList.add(sRec);
       }
       // un-seal new folder share with private key
       else if (sRec.getPubKeyId() != null) {
@@ -936,7 +931,7 @@ public class FetchedDataCache extends Object {
         if (keyRec != null)
           sRec.unSeal(keyRec.getPrivateKey());
         else
-          exceptionV.addElement(sRec);
+          exceptionList.add(sRec);
       }
     } // end if anything to unseal
   }
@@ -969,17 +964,17 @@ public class FetchedDataCache extends Object {
 
       // Convert our removed shares to folder records, so we can remove them from the listeners.
       Long userId = getMyUserId();
-      Vector fRecsToRemoveV = new Vector();
+      ArrayList fRecsToRemoveL = new ArrayList();
       for (int i=0; i<records.length; i++) {
         FolderShareRecord share = (FolderShareRecord) records[i];
         if (share.isOwnedBy(userId, (Long[]) null)) {
           FolderRecord fRec = getFolderRecord(share.folderId);
-          if (fRec != null && !fRecsToRemoveV.contains(fRec))
-            fRecsToRemoveV.addElement(fRec);
+          if (fRec != null && !fRecsToRemoveL.contains(fRec))
+            fRecsToRemoveL.add(fRec);
         }
       }
-      if (fRecsToRemoveV.size() > 0) {
-        FolderRecord[] fRecsToRemove = (FolderRecord[]) ArrayUtils.toArray(fRecsToRemoveV, FolderRecord.class);
+      if (fRecsToRemoveL.size() > 0) {
+        FolderRecord[] fRecsToRemove = (FolderRecord[]) ArrayUtils.toArray(fRecsToRemoveL, FolderRecord.class);
         removeFolderRecords(fRecsToRemove);
       }
     }
@@ -1001,9 +996,7 @@ public class FetchedDataCache extends Object {
   public synchronized FolderShareRecord[] getFolderShareRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecords()");
 
-    Vector sharesV = new Vector();
-    sharesV.addAll(folderShareRecordMap.values());
-    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesV, FolderShareRecord.class);
+    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(folderShareRecordMap.values(), FolderShareRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecords);
     return shareRecords;
@@ -1015,17 +1008,17 @@ public class FetchedDataCache extends Object {
   public synchronized FolderShareRecord[] getFolderShareRecords(Long[] shareIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecords(Long[] shareIDs)");
 
-    Vector sharesV = new Vector();
+    ArrayList sharesL = new ArrayList();
     if (shareIDs != null) {
       for (int i=0; i<shareIDs.length; i++) {
         if (shareIDs[i] != null) {
           FolderShareRecord share = (FolderShareRecord) folderShareRecordMap.get(shareIDs[i]);
           if (share != null)
-            sharesV.addElement(share);
+            sharesL.add(share);
         }
       }
     }
-    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesV, FolderShareRecord.class);
+    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesL, FolderShareRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecords);
     return shareRecords;
@@ -1039,10 +1032,11 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(folderId);
 
     FolderShareRecord shareRec = null;
-    Vector sharesV = folderShareRecordMap_byFldId.getAll(folderId);
+    Collection sharesV = folderShareRecordMap_byFldId.getAll(folderId);
     if (sharesV != null) {
-      for (int i=0; i<sharesV.size(); i++) {
-        FolderShareRecord shareRecord = (FolderShareRecord) sharesV.elementAt(i);
+      Iterator iter = sharesV.iterator();
+      while (iter.hasNext()) {
+        FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
         if (shareRecord.isOwnedBy(myUserId, (Long[]) null)) {
           shareRec = shareRecord;
           break;
@@ -1061,38 +1055,38 @@ public class FetchedDataCache extends Object {
     // first try to find my own share of this folder...
     FolderShareRecord shareRec = getFolderShareRecordMy(folderId);
     if (shareRec == null && includeGroupOwned) {
-      Hashtable groupIDsHT = getFolderGroupIDsHT(myUserId);
-      shareRec = getFolderShareRecordGroupOwnded(folderId, groupIDsHT);
+      Set groupIDsSet = getFolderGroupIDsSet(myUserId);
+      shareRec = getFolderShareRecordGroupOwnded(folderId, groupIDsSet);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRec);
     return shareRec;
   }
-  public synchronized FolderShareRecord getFolderShareRecordMy(Long folderId, Hashtable groupIDsHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId, Hashtable groupIDsHT)");
+  public synchronized FolderShareRecord getFolderShareRecordMy(Long folderId, Set groupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId, Set groupIDsSet)");
     if (trace != null) trace.args(folderId);
-    if (trace != null) trace.args(groupIDsHT);
+    if (trace != null) trace.args(groupIDsSet);
 
     FolderShareRecord shareRec = getFolderShareRecordMy(folderId);
-    if (shareRec == null && groupIDsHT != null) {
-      shareRec = getFolderShareRecordGroupOwnded(folderId, groupIDsHT);
+    if (shareRec == null && groupIDsSet != null) {
+      shareRec = getFolderShareRecordGroupOwnded(folderId, groupIDsSet);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRec);
     return shareRec;
   }
-  private synchronized FolderShareRecord getFolderShareRecordGroupOwnded(Long folderId, Hashtable groupIDsHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordGroupOwnded(Long folderId, Hashtable groupIDsHT)");
+  private synchronized FolderShareRecord getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet)");
     if (trace != null) trace.args(folderId);
-    if (trace != null) trace.args(groupIDsHT); // if present - include folder shares through group memberships
+    if (trace != null) trace.args(groupIDsSet); // if present - include folder shares through group memberships
 
     FolderShareRecord shareRec = null;
-    if (groupIDsHT != null && groupIDsHT.size() > 0) {
+    if (groupIDsSet != null && groupIDsSet.size() > 0) {
       Collection col = folderShareRecordMap.values();
       Iterator iter = col.iterator();
       while (iter.hasNext()) {
         FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
-        if (shareRecord.folderId.equals(folderId) && shareRecord.isOwnedBy(null, groupIDsHT)) {
+        if (shareRecord.folderId.equals(folderId) && shareRecord.isOwnedBy(null, groupIDsSet)) {
           shareRec = shareRecord;
           break;
         }
@@ -1110,28 +1104,27 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordsMy(Long folderId)");
     if (trace != null) trace.args(folderId);
 
-    Hashtable groupIDsHT = getFolderGroupIDsHT(myUserId);
-    FolderShareRecord[] shareRecs = getFolderShareRecordsMy(folderId, groupIDsHT);
+    Set groupIDsSet = getFolderGroupIDsSet(myUserId);
+    FolderShareRecord[] shareRecs = getFolderShareRecordsMy(folderId, groupIDsSet);
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecs);
     return shareRecs;
   }
-  public synchronized FolderShareRecord[] getFolderShareRecordsMy(Long folderId, Hashtable groupIDsHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId, Hashtable groupIDsHT)");
+  public synchronized FolderShareRecord[] getFolderShareRecordsMy(Long folderId, Set groupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId, Set groupIDsSet)");
     if (trace != null) trace.args(folderId);
-    if (trace != null) trace.args(groupIDsHT); // if present - include folder shares through group memberships
+    if (trace != null) trace.args(groupIDsSet); // if present - include folder shares through group memberships
 
-    Vector shareRecsV = new Vector();
+    ArrayList shareRecsL = new ArrayList();
     Collection col = folderShareRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
-      if (shareRecord.folderId.equals(folderId) &&
-          shareRecord.isOwnedBy(myUserId, groupIDsHT)) { // group changes
-        shareRecsV.addElement(shareRecord);
+      if (shareRecord.folderId.equals(folderId) && shareRecord.isOwnedBy(myUserId, groupIDsSet)) { // group changes
+        shareRecsL.add(shareRecord);
       }
     }
-    FolderShareRecord[] shareRecs = (FolderShareRecord[]) ArrayUtils.toArray(shareRecsV, FolderShareRecord.class);
+    FolderShareRecord[] shareRecs = (FolderShareRecord[]) ArrayUtils.toArray(shareRecsL, FolderShareRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecs);
     return shareRecs;
@@ -1144,32 +1137,32 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderSharesMy(boolean includeGroupOwned)");
     if (trace != null) trace.args(includeGroupOwned);
 
-    Hashtable folderIDsHT = new Hashtable();
+    HashMap folderIDsHM = new HashMap();
     if (includeGroupOwned) {
-      Hashtable groupIDsHT = null;
-      groupIDsHT = getFolderGroupIDsHT(myUserId);
+      Set groupIDsSet = getFolderGroupIDsSet(myUserId);
       Collection col = folderShareRecordMap.values();
       Iterator iter = col.iterator();
       while (iter.hasNext()) {
         FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
-        if (shareRecord.isOwnedBy(myUserId, groupIDsHT)) {
+        if (shareRecord.isOwnedBy(myUserId, groupIDsSet)) {
           // if user owned (not by group) then replace already existing group one, if not stored yet - store it
-          if (shareRecord.isOwnedByUser() || folderIDsHT.get(shareRecord.folderId) == null)
-            folderIDsHT.put(shareRecord.folderId, shareRecord);
+          if (shareRecord.isOwnedByUser() || folderIDsHM.get(shareRecord.folderId) == null)
+            folderIDsHM.put(shareRecord.folderId, shareRecord);
         }
       }
     } else {
       // do not include group owned, use different Map for shortcut
-      Vector sharesV = folderShareRecordMap_byOwnerId.getAll(myUserId);
+      Collection sharesV = folderShareRecordMap_byOwnerId.getAll(myUserId);
       if (sharesV != null) {
-        for (int i=0; i<sharesV.size(); i++) {
-          FolderShareRecord shareRecord = (FolderShareRecord) sharesV.elementAt(i);
+        Iterator iter = sharesV.iterator();
+        while (iter.hasNext()) {
+          FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
           if (shareRecord.isOwnedBy(myUserId, (Long[]) null))
-            folderIDsHT.put(shareRecord.folderId, shareRecord);
+            folderIDsHM.put(shareRecord.folderId, shareRecord);
         }
       }
     }
-    FolderShareRecord[] shareRecs = (FolderShareRecord[]) ArrayUtils.toArray(folderIDsHT.values(), FolderShareRecord.class);
+    FolderShareRecord[] shareRecs = (FolderShareRecord[]) ArrayUtils.toArray(folderIDsHM.values(), FolderShareRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecs);
     return shareRecs;
@@ -1186,9 +1179,9 @@ public class FetchedDataCache extends Object {
     FolderShareRecord[] shareRecords = null;
     if (folderIDs != null && folderIDs.length > 0) {
       // load group memberships
-      Hashtable groupIDsHT = null;
-      if (includeGroupOwned) groupIDsHT = getFolderGroupIDsHT(myUserId);
-      shareRecords = getFolderSharesMyForFolders(folderIDs, groupIDsHT);
+      Set groupIDsSet = null;
+      if (includeGroupOwned) groupIDsSet = getFolderGroupIDsSet(myUserId);
+      shareRecords = getFolderSharesMyForFolders(folderIDs, groupIDsSet);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecords);
@@ -1198,32 +1191,29 @@ public class FetchedDataCache extends Object {
   /**
    * @return all of my folder shares that belong to specified folders.
    */
-  public synchronized FolderShareRecord[] getFolderSharesMyForFolders(Long[] folderIDs, Hashtable groupIDsHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderSharesMyForFolders(Long[] folderIDs, Hashtable groupIDsHT)");
+  public synchronized FolderShareRecord[] getFolderSharesMyForFolders(Long[] folderIDs, Set groupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderSharesMyForFolders(Long[] folderIDs, Set groupIDsSet)");
     if (trace != null) trace.args(folderIDs);
-    if (trace != null) trace.args(groupIDsHT);
+    if (trace != null) trace.args(groupIDsSet);
 
     FolderShareRecord[] shareRecords = null;
     if (folderIDs != null && folderIDs.length > 0) {
-      // load a Hashtable with wanted folder IDs
-      Hashtable ht = new Hashtable(folderIDs.length);
-      for (int i=0; i<folderIDs.length; i++)
-        ht.put(folderIDs[i], folderIDs[i]);
+      // load lookup with wanted folder IDs
+      HashSet folderIDsHS = new HashSet(Arrays.asList(folderIDs));
       // go through all shares and see if we want them
-      Hashtable folderIDsHT = new Hashtable();
-      Collection col = folderShareRecordMap.values();
-      Iterator iter = col.iterator();
+      HashMap folderIDsHM = new HashMap();
+      Iterator iter = folderShareRecordMap.values().iterator();
       while (iter.hasNext()) {
         FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
-        if (ht.get(shareRecord.folderId) != null) {
-          if (shareRecord.isOwnedBy(myUserId, groupIDsHT)) { // group changes
-            if (shareRecord.isOwnedByUser() || folderIDsHT.get(shareRecord.folderId) == null) {
-              folderIDsHT.put(shareRecord.folderId, shareRecord);
+        if (folderIDsHS.contains(shareRecord.folderId)) {
+          if (shareRecord.isOwnedBy(myUserId, groupIDsSet)) { // group changes
+            if (shareRecord.isOwnedByUser() || !folderIDsHM.containsKey(shareRecord.folderId)) {
+              folderIDsHM.put(shareRecord.folderId, shareRecord);
             }
           }
         }
       }
-      shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(folderIDsHT.values(), FolderShareRecord.class);
+      shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(folderIDsHM.values(), FolderShareRecord.class);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class, shareRecords);
@@ -1237,7 +1227,7 @@ public class FetchedDataCache extends Object {
 
     MsgLinkRecord[] childMsgs = msgLinks;
     FolderShareRecord[] parentShares = null;
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
     while (true) {
       MsgLinkRecord[] parentLinks = null;
       FolderShareRecord[] parentShareRecs = null;
@@ -1249,8 +1239,8 @@ public class FetchedDataCache extends Object {
       ownerIDs = MsgLinkRecord.getOwnerObjIDs(childMsgs, Record.RECORD_TYPE_FOLDER);
       if (trace != null) trace.data(20, "find share records for folder IDs", ownerIDs);
       if (ownerIDs != null && ownerIDs.length > 0) {
-        if (includeGroupOwned && groupIDsHT == null) groupIDsHT = getFolderGroupIDsHT(myUserId);
-        parentShareRecs = getFolderSharesMyForFolders(ownerIDs, groupIDsHT);
+        if (includeGroupOwned && groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
+        parentShareRecs = getFolderSharesMyForFolders(ownerIDs, groupIDsSet);
         if (parentShareRecs != null && parentShareRecs.length > 0) {
           parentShares = (FolderShareRecord[]) ArrayUtils.concatinate(parentShares, parentShareRecs);
           parentShares = (FolderShareRecord[]) ArrayUtils.removeDuplicates(parentShares);
@@ -1274,7 +1264,7 @@ public class FetchedDataCache extends Object {
    */
   public synchronized FolderShareRecord[] getFolderShareRecordsForFolder(Long folderId) {
 
-    Vector sharesV = folderShareRecordMap_byFldId.getAll(folderId);
+    Collection sharesV = folderShareRecordMap_byFldId.getAll(folderId);
     FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesV, FolderShareRecord.class);
 
     return shareRecords;
@@ -1285,19 +1275,20 @@ public class FetchedDataCache extends Object {
    * @return FolderShareRecords from cache for a given userId EXCLUDING shares accessed through group memberships
    */
   public synchronized FolderShareRecord[] getFolderShareRecordsForUsers(Long[] userIDs) {
-    Vector sharesV = new Vector();
+    ArrayList sharesL = new ArrayList();
     userIDs = (Long[]) ArrayUtils.removeDuplicates(userIDs, Long.class);
     for (int i=0; i<userIDs.length; i++) {
-      Vector sharesForOwnerV = folderShareRecordMap_byOwnerId.getAll(userIDs[i]);
+      Collection sharesForOwnerV = folderShareRecordMap_byOwnerId.getAll(userIDs[i]);
       if (sharesForOwnerV != null) {
-        for (int k=0; k<sharesForOwnerV.size(); k++) {
-          FolderShareRecord shareRecord = (FolderShareRecord) sharesForOwnerV.elementAt(k);
+        Iterator iter = sharesForOwnerV.iterator();
+        while (iter.hasNext()) {
+          FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
           if (shareRecord.isOwnedByUser())
-            sharesV.addElement(shareRecord);
+            sharesL.add(shareRecord);
         }
       }
     }
-    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesV, FolderShareRecord.class);
+    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesL, FolderShareRecord.class);
     return shareRecords;
   }
 
@@ -1306,16 +1297,15 @@ public class FetchedDataCache extends Object {
    * @return all children of the parents specified.
    */
   public synchronized FolderShareRecord[] getFolderShareRecordsForFolders(FolderRecord[] folderRecords) {
-    Vector sharesV = new Vector();
+    ArrayList sharesL = new ArrayList();
     folderRecords = (FolderRecord[]) ArrayUtils.removeDuplicates(folderRecords, FolderRecord.class);
     for (int i=0; i<folderRecords.length; i++) {
-      Vector sharesForFolderV = folderShareRecordMap_byFldId.getAll(folderRecords[i].folderId);
+      Collection sharesForFolderV = folderShareRecordMap_byFldId.getAll(folderRecords[i].folderId);
       if (sharesForFolderV != null) {
-        for (int k=0; k<sharesForFolderV.size(); k++)
-          sharesV.addElement(sharesForFolderV.elementAt(k));
+        sharesL.addAll(sharesForFolderV);
       }
     }
-    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesV, FolderShareRecord.class);
+    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesL, FolderShareRecord.class);
     return shareRecords;
   }
 
@@ -1324,35 +1314,35 @@ public class FetchedDataCache extends Object {
    * @return all descendant children of the view parents specified.
    */
   public synchronized FolderPair[] getFolderPairsViewAllDescending(FolderPair[] parentFolderPairs, boolean includeParents) {
-    Vector allDescendants = new Vector();
-    Hashtable groupIDsHT = getFolderGroupIDsHT(myUserId);
-    addFolderPairsViewAllDescending(allDescendants, parentFolderPairs, groupIDsHT);
+    HashSet allDescendantsHS = new HashSet();
+    Set groupIDsSet = getFolderGroupIDsSet(myUserId);
+    addFolderPairsViewAllDescending(allDescendantsHS, parentFolderPairs, groupIDsSet);
     // include or exclude parents, sometimes a folder is its own parent in the view, so do this anyway
     for (int i=0; i<parentFolderPairs.length; i++) {
-      if (allDescendants.contains(parentFolderPairs[i]) != includeParents) {
+      if (allDescendantsHS.contains(parentFolderPairs[i]) != includeParents) {
         if (includeParents)
-          allDescendants.addElement(parentFolderPairs[i]);
+          allDescendantsHS.add(parentFolderPairs[i]);
         else
-          allDescendants.removeElement(parentFolderPairs[i]);
+          allDescendantsHS.remove(parentFolderPairs[i]);
       }
     }
     // pack the result into an array
-    FolderPair[] result = (FolderPair[]) ArrayUtils.toArray(allDescendants, FolderPair.class);
+    FolderPair[] result = (FolderPair[]) ArrayUtils.toArray(allDescendantsHS, FolderPair.class);
     return result;
   }
-  private synchronized void addFolderPairsViewAllDescending(Vector allDescendants, FolderPair[] folderPairs, Hashtable groupIDsHT) {
+  private synchronized void addFolderPairsViewAllDescending(Collection allDescendants, FolderPair[] folderPairs, Set groupIDsSet) {
     if (folderPairs != null && folderPairs.length >= 0) {
-      FolderPair[] childPairs = getFolderPairsViewChildren(folderPairs, groupIDsHT);
+      FolderPair[] childPairs = getFolderPairsViewChildren(folderPairs, groupIDsSet);
       if (childPairs != null && childPairs.length > 0) {
-        Vector realChildrenV = new Vector();
+        ArrayList realChildrenL = new ArrayList();
         for (int i=0; i<childPairs.length; i++) {
           if (!allDescendants.contains(childPairs[i])) {
-            allDescendants.addElement(childPairs[i]);
-            realChildrenV.addElement(childPairs[i]);
+            allDescendants.add(childPairs[i]);
+            realChildrenL.add(childPairs[i]);
           }
         }
-        FolderPair[] realChildren = (FolderPair[]) ArrayUtils.toArray(realChildrenV, FolderPair.class);
-        addFolderPairsViewAllDescending(allDescendants, realChildren, groupIDsHT);
+        FolderPair[] realChildren = (FolderPair[]) ArrayUtils.toArray(realChildrenL, FolderPair.class);
+        addFolderPairsViewAllDescending(allDescendants, realChildren, groupIDsSet);
       }
     }
   }
@@ -1371,8 +1361,8 @@ public class FetchedDataCache extends Object {
   public synchronized FolderPair[] getFolderPairsViewChildren(FolderPair[] parentFolderPairs, boolean includeGroupOwned) {
     return getFolderPairs(new FolderFilter(RecordUtils.getIDs(parentFolderPairs)), includeGroupOwned);
   }
-  public synchronized FolderPair[] getFolderPairsViewChildren(FolderPair[] parentFolderPairs, Hashtable groupIDsHT) {
-    return getFolderPairs(new FolderFilter(RecordUtils.getIDs(parentFolderPairs)), groupIDsHT);
+  public synchronized FolderPair[] getFolderPairsViewChildren(FolderPair[] parentFolderPairs, Set groupIDsSet) {
+    return getFolderPairs(new FolderFilter(RecordUtils.getIDs(parentFolderPairs)), groupIDsSet);
   }
   /**
    * @return all of My accessible Posting Folder Shares (for ie: message recipients) or other types
@@ -1388,38 +1378,38 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderPairs(RecordFilter filter, boolean includeGroupOwned)");
     if (trace != null) trace.args(filter);
     if (trace != null) trace.args(includeGroupOwned);
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
     if (includeGroupOwned) {
       if (myUserId != null)
-        groupIDsHT = getFolderGroupIDsHT(myUserId);
+        groupIDsSet = getFolderGroupIDsSet(myUserId);
     }
-    FolderPair[] folderPairs = getFolderPairs(filter, groupIDsHT);
+    FolderPair[] folderPairs = getFolderPairs(filter, groupIDsSet);
     if (trace != null) trace.exit(FetchedDataCache.class, folderPairs);
     return folderPairs;
   }
-  public synchronized FolderPair[] getFolderPairs(RecordFilter filter, Hashtable groupIDsHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderPairs(RecordFilter filter, Hashtable groupIDsHT)");
+  public synchronized FolderPair[] getFolderPairs(RecordFilter filter, Set groupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderPairs(RecordFilter filter, Set groupIDsSet)");
     if (trace != null) trace.args(filter);
-    if (trace != null) trace.args(groupIDsHT);
-    Hashtable folderPairsHT = new Hashtable();
+    if (trace != null) trace.args(groupIDsSet);
+    HashMap folderPairsHM = new HashMap();
     Collection col = folderShareRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
       // if this is one of the wanted shares
-      if (shareRecord.isOwnedBy(myUserId, groupIDsHT)) { // group changes required
+      if (shareRecord.isOwnedBy(myUserId, groupIDsSet)) { // group changes required
         FolderRecord folderRecord = getFolderRecord(shareRecord.folderId);
         if (folderRecord != null) {
           FolderPair fPair = new FolderPair(shareRecord, folderRecord);
           if (filter.keep(fPair)) {
-            if (shareRecord.isOwnedByUser() || folderPairsHT.get(shareRecord.folderId) == null) {
-              folderPairsHT.put(shareRecord.folderId, fPair);
+            if (shareRecord.isOwnedByUser() || !folderPairsHM.containsKey(shareRecord.folderId)) {
+              folderPairsHM.put(shareRecord.folderId, fPair);
             }
           }
         }
       }
     }
-    FolderPair[] folderPairs = (FolderPair[]) ArrayUtils.toArray(folderPairsHT.values(), FolderPair.class);
+    FolderPair[] folderPairs = (FolderPair[]) ArrayUtils.toArray(folderPairsHM.values(), FolderPair.class);
     if (trace != null) trace.exit(FetchedDataCache.class, folderPairs);
     return folderPairs;
   }
@@ -1450,7 +1440,7 @@ public class FetchedDataCache extends Object {
 
     if (records != null && records.length > 0) {
       synchronized (this) {
-        Hashtable groupIDsHT = null;
+        Set groupIDsSet = null;
         // un-seal the records
         for (int i=0; i<records.length; i++) {
           FileLinkRecord fLink = records[i];
@@ -1460,8 +1450,8 @@ public class FetchedDataCache extends Object {
           // find the symmetric key from the owner object's record.
           switch (ownerObjType) {
             case Record.RECORD_TYPE_FOLDER:
-              if (groupIDsHT == null) groupIDsHT = getFolderGroupIDsHT(myUserId);
-              FolderShareRecord shareRecord = getFolderShareRecordMy(fLink.ownerObjId, groupIDsHT);
+              if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
+              FolderShareRecord shareRecord = getFolderShareRecordMy(fLink.ownerObjId, groupIDsSet);
               // Share Record may be null if this file was moved from a shared folder to a private on
               // not accessible to us, but some other user.
               if (shareRecord != null) {
@@ -1550,9 +1540,7 @@ public class FetchedDataCache extends Object {
   public synchronized FileLinkRecord[] getFileLinkRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFileLinkRecords()");
 
-    Vector fileLinksV = new Vector();
-    fileLinksV.addAll(fileLinkRecordMap.values());
-    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksV, FileLinkRecord.class);
+    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinkRecordMap.values(), FileLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, fileLinks);
     return fileLinks;
@@ -1567,15 +1555,15 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFileLinkRecords(Long[] fileLinkIDs)");
     if (trace != null) trace.args(fileLinkIDs);
 
-    Vector fileLinksV = new Vector();
+    ArrayList fileLinksL = new ArrayList();
     if (fileLinkIDs != null) {
       for (int i=0; i<fileLinkIDs.length; i++) {
         FileLinkRecord fileLink = (FileLinkRecord) fileLinkRecordMap.get(fileLinkIDs[i]);
         if (fileLink != null)
-          fileLinksV.addElement(fileLink);
+          fileLinksL.add(fileLink);
       }
     }
-    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksV, FileLinkRecord.class);
+    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksL, FileLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, fileLinks);
     return fileLinks;
@@ -1588,7 +1576,7 @@ public class FetchedDataCache extends Object {
   public synchronized FileLinkRecord[] getFileLinkRecords(Long shareId) {
     // find the corresponding folderId
     Long folderId = getFolderShareRecord(shareId).folderId;
-    return getFileLinkRecordsOwnerAndType(folderId, new Short(Record.RECORD_TYPE_FOLDER));
+    return getFileLinkRecordsOwnerAndType(folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
   }
 
   /**
@@ -1596,15 +1584,15 @@ public class FetchedDataCache extends Object {
    * @return a collection of FileLinkRecords for specified ownerId and ownerType.
    */
   public synchronized FileLinkRecord[] getFileLinkRecordsOwnerAndType(Long ownerId, Short ownerType) {
-    Vector fileLinksV = new Vector();
+    ArrayList fileLinksL = new ArrayList();
     // Collect all file links for this folder
     Iterator iter = fileLinkRecordMap.values().iterator();
     while (iter.hasNext()) {
       FileLinkRecord fLink = (FileLinkRecord) iter.next();
       if (fLink.ownerObjId.equals(ownerId) && fLink.ownerObjType.equals(ownerType))
-        fileLinksV.addElement(fLink);
+        fileLinksL.add(fLink);
     }
-    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksV, FileLinkRecord.class);
+    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksL, FileLinkRecord.class);
     return fileLinks;
   }
 
@@ -1614,20 +1602,17 @@ public class FetchedDataCache extends Object {
    * @return a collection of FileLinkRecords for specified ownerId and ownerType.
    */
   public synchronized FileLinkRecord[] getFileLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType) {
-    Vector fileLinksV = new Vector();
-    // load a Hashtable with wanted ownerIDs
-    Hashtable ht = new Hashtable();
-    for (int i=0; i<ownerIDs.length; i++) {
-      ht.put(ownerIDs[i], ownerIDs[i]);
-    }
+    ArrayList fileLinksL = new ArrayList();
+    // load a lookup with wanted ownerIDs
+    HashSet ownerIDsHS = new HashSet(Arrays.asList(ownerIDs));
     // Collect all file links for this folder
     Iterator iter = fileLinkRecordMap.values().iterator();
     while (iter.hasNext()) {
       FileLinkRecord fLink = (FileLinkRecord) iter.next();
-      if (fLink.ownerObjType.equals(ownerType) && ht.get(fLink.ownerObjId) != null)
-        fileLinksV.addElement(fLink);
+      if (fLink.ownerObjType.equals(ownerType) && ownerIDsHS.contains(fLink.ownerObjId))
+        fileLinksL.add(fLink);
     }
-    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksV, FileLinkRecord.class);
+    FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(fileLinksL, FileLinkRecord.class);
     return fileLinks;
   }
 
@@ -1714,9 +1699,7 @@ public class FetchedDataCache extends Object {
   public synchronized InvEmlRecord[] getInvEmlRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getInvEmlRecords()");
 
-    Vector invEmlsV = new Vector();
-    invEmlsV.addAll(invEmlRecordMap.values());
-    InvEmlRecord[] invEmls = (InvEmlRecord[]) ArrayUtils.toArray(invEmlsV, InvEmlRecord.class);
+    InvEmlRecord[] invEmls = (InvEmlRecord[]) ArrayUtils.toArray(invEmlRecordMap.values(), InvEmlRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, invEmls);
     return invEmls;
@@ -1729,15 +1712,15 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getInvEmlRecords(Long[] IDs)");
     if (trace != null) trace.args(IDs);
 
-    Vector recsV = new Vector();
+    ArrayList recsL = new ArrayList();
     if (IDs != null) {
       for (int i=0; i<IDs.length; i++) {
         InvEmlRecord rec = (InvEmlRecord) invEmlRecordMap.get(IDs[i]);
         if (rec != null)
-          recsV.addElement(rec);
+          recsL.add(rec);
       }
     }
-    InvEmlRecord[] recs = (InvEmlRecord[]) ArrayUtils.toArray(recsV, InvEmlRecord.class);
+    InvEmlRecord[] recs = (InvEmlRecord[]) ArrayUtils.toArray(recsL, InvEmlRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, recs);
     return recs;
@@ -1846,10 +1829,7 @@ public class FetchedDataCache extends Object {
   public synchronized KeyRecord[] getKeyRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getKeyRecords()");
 
-    //Iterator iter = keyRecordMap.values().iterator();
-    Vector keysV = new Vector();
-    keysV.addAll(keyRecordMap.values());
-    KeyRecord[] keys = (KeyRecord[]) ArrayUtils.toArray(keysV, KeyRecord.class);
+    KeyRecord[] keys = (KeyRecord[]) ArrayUtils.toArray(keyRecordMap.values(), KeyRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, keys);
     return keys;
@@ -1958,7 +1938,7 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     UserRecord myUserRecord = null;
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
     // Unwrap contact records.
     for (int i=0; i<records.length; i++) {
       ContactRecord cRec = records[i];
@@ -1976,8 +1956,8 @@ public class FetchedDataCache extends Object {
         }
       }
 
-      if (groupIDsHT == null) groupIDsHT = getFolderGroupIDsHT(myUserId);
-      FolderShareRecord shareRecord = getFolderShareRecordMy(cRec.folderId, groupIDsHT);
+      if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
+      FolderShareRecord shareRecord = getFolderShareRecordMy(cRec.folderId, groupIDsSet);
       // unSeal only OWNER part
       if (cRec.ownerUserId != null && cRec.ownerUserId.equals(myUserId)) {
         // OWNER part
@@ -2057,9 +2037,7 @@ public class FetchedDataCache extends Object {
   public synchronized ContactRecord[] getContactRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecords()");
 
-    Vector contactsV = new Vector();
-    contactsV.addAll(contactRecordMap.values());
-    ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactsV, ContactRecord.class);
+    ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactRecordMap.values(), ContactRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, contacts);
     return contacts;
@@ -2072,14 +2050,14 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecordsMyActive()");
 
     Iterator iter = contactRecordMap.values().iterator();
-    Vector contactsV = new Vector();
+    ArrayList contactsL = new ArrayList();
     while (iter.hasNext()) {
       ContactRecord cRec = (ContactRecord) iter.next();
       if (cRec.ownerUserId.equals(myUserId) && cRec.isOfActiveType()) {
-        contactsV.addElement(cRec);
+        contactsL.add(cRec);
       }
     }
-    ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactsV, ContactRecord.class);
+    ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactsL, ContactRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, contacts);
     return contacts;
@@ -2112,21 +2090,18 @@ public class FetchedDataCache extends Object {
   public synchronized ContactRecord[] getContactRecordsForUsers(Long[] userIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecordsForUsers(Long[] userIDs)");
 
-    Vector recordsV = new Vector();
+    HashSet userIDsHS = new HashSet(Arrays.asList(userIDs));
+    HashSet recordsHS = new HashSet();
     Iterator iter = contactRecordMap.values().iterator();
     while (iter.hasNext()) {
       ContactRecord cRec = (ContactRecord) iter.next();
-      for (int i=0; i<userIDs.length; i++) {
-        Long uId = userIDs[i];
-        if (cRec.ownerUserId.equals(uId) || cRec.contactWithId.equals(uId)) {
-          if (!recordsV.contains(cRec)) {
-            recordsV.addElement(cRec);
-            break;
-          }
+      if (userIDsHS.contains(cRec.ownerUserId) || userIDsHS.contains(cRec.contactWithId)) {
+        if (!recordsHS.contains(cRec)) {
+          recordsHS.add(cRec);
         }
       }
     }
-    ContactRecord[] records = (ContactRecord[]) ArrayUtils.toArray(recordsV, ContactRecord.class);
+    ContactRecord[] records = (ContactRecord[]) ArrayUtils.toArray(recordsHS, ContactRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, records);
     return records;
@@ -2165,7 +2140,7 @@ public class FetchedDataCache extends Object {
   private void unWrapMsgLinkRecords(MsgLinkRecord[] linkRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapMsgLinkRecords(MsgLinkRecord[] linkRecords)");
     if (trace != null) trace.args(linkRecords);
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
     for (int i=0; i<linkRecords.length; i++) {
       MsgLinkRecord link = linkRecords[i];
       try {
@@ -2176,8 +2151,8 @@ public class FetchedDataCache extends Object {
         } else if (link.ownerObjType != null && link.ownerObjId != null) {
           // When a message BODY is received, it does not have msg link and brief's fields -- ignore unSealing
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-            if (groupIDsHT == null) groupIDsHT = getFolderGroupIDsHT(myUserId);
-            FolderShareRecord sRec = getFolderShareRecordMy(link.ownerObjId, groupIDsHT);
+            if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
+            FolderShareRecord sRec = getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
             if (sRec != null)
               link.unSeal(sRec.getSymmetricKey());
           } else if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
@@ -2270,12 +2245,12 @@ public class FetchedDataCache extends Object {
             Long[] statIDs = null;
             Record[] links = null;
             if (fRec.isFileType()) {
-              links = getFileLinkRecordsOwnerAndType(fRec.folderId, new Short(Record.RECORD_TYPE_FOLDER));
+              links = getFileLinkRecordsOwnerAndType(fRec.folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
               statType = STAT_TYPE_FILE;
               if (trace != null) trace.data(30, links);
             }
             else if (fRec.isMsgType()) {
-              links = getMsgLinkRecordsOwnerAndType(fRec.folderId, new Short(Record.RECORD_TYPE_FOLDER));
+              links = getMsgLinkRecordsOwnerAndType(fRec.folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
               statType = STAT_TYPE_MESSAGE;
               if (trace != null) trace.data(31, links);
             }
@@ -2428,9 +2403,7 @@ public class FetchedDataCache extends Object {
   public synchronized MsgLinkRecord[] getMsgLinkRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords()");
 
-    Vector msgLinksV = new Vector();
-    msgLinksV.addAll(msgLinkRecordMap.values());
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinkRecordMap.values(), MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2445,15 +2418,15 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords(Long[] msgLinkIDs)");
     if (trace != null) trace.args(msgLinkIDs);
 
-    Vector msgLinksV = new Vector();
+    ArrayList msgLinksL = new ArrayList();
     if (msgLinkIDs != null) {
       for (int i=0; i<msgLinkIDs.length; i++) {
         MsgLinkRecord msgLink = (MsgLinkRecord) msgLinkRecordMap.get(msgLinkIDs[i]);
         if (msgLink != null)
-          msgLinksV.addElement(msgLink);
+          msgLinksL.add(msgLink);
       }
     }
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2467,8 +2440,6 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords(Date dateCreatedFrom, Date dateCreatedTo, Long ownerObjId, Short ownerObjType)");
     if (trace != null) trace.args(dateCreatedFrom, dateCreatedTo, ownerObjId, ownerObjType);
 
-    Vector msgLinksV = new Vector();
-    Iterator iter = msgLinkRecordMap.values().iterator();
     Date dateFrom = null;
     Date dateTo = null;
     if (dateCreatedFrom.before(dateCreatedTo)) {
@@ -2478,15 +2449,17 @@ public class FetchedDataCache extends Object {
       dateFrom = dateCreatedTo;
       dateTo = dateCreatedFrom;
     }
+    ArrayList msgLinksL = new ArrayList();
+    Iterator iter = msgLinkRecordMap.values().iterator();
     while (iter.hasNext()) {
       MsgLinkRecord msgLink = (MsgLinkRecord) iter.next();
       if ((ownerObjId == null || ownerObjId.equals(msgLink.ownerObjId)) && (ownerObjType == null || ownerObjType.equals(msgLink.ownerObjType))) {
         if (msgLink.dateCreated.compareTo(dateFrom) >= 0 && msgLink.dateCreated.compareTo(dateTo) <= 0) {
-          msgLinksV.addElement(msgLink);
+          msgLinksL.add(msgLink);
         }
       }
     }
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2499,8 +2472,8 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForFolder(Long folderId)");
     if (trace != null) trace.args(folderId);
 
+    ArrayList msgLinksL = new ArrayList();
     Iterator iter = msgLinkRecordMap.values().iterator();
-    Vector msgLinksV = new Vector();
     while (iter.hasNext()) {
       MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
       if (linkRecord != null &&
@@ -2508,9 +2481,9 @@ public class FetchedDataCache extends Object {
           linkRecord.ownerObjId != null &&
           linkRecord.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER &&
           linkRecord.ownerObjId.equals(folderId))
-        msgLinksV.addElement(linkRecord);
+        msgLinksL.add(linkRecord);
     }
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2523,10 +2496,10 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForFolder(Long[] folderIDs)");
     if (trace != null) trace.args(folderIDs);
 
-    Vector msgLinksV = new Vector();
-    Hashtable folderIDsHT = new Hashtable();
-    for (int i=0; i<folderIDs.length; i++)
-      folderIDsHT.put(folderIDs[i], folderIDs[i]);
+    // load lookup table
+    HashSet folderIDsHS = new HashSet(Arrays.asList(folderIDs));
+    // list for gathering items
+    ArrayList msgLinksL = new ArrayList();
     Iterator iter = msgLinkRecordMap.values().iterator();
     while (iter.hasNext()) {
       MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
@@ -2534,11 +2507,11 @@ public class FetchedDataCache extends Object {
           linkRecord.ownerObjType != null &&
           linkRecord.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER &&
           linkRecord.ownerObjId != null &&
-          folderIDsHT.get(linkRecord.ownerObjId) != null
+          folderIDsHS.contains(linkRecord.ownerObjId)
         )
-        msgLinksV.addElement(linkRecord);
+        msgLinksL.add(linkRecord);
     }
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2551,7 +2524,7 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForMsg(Long msgId)");
     if (trace != null) trace.args(msgId);
 
-    Vector msgLinksV = msgLinkRecordMap_byMsgId.getAll(msgId);
+    Collection msgLinksV = msgLinkRecordMap_byMsgId.getAll(msgId);
     MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
@@ -2568,12 +2541,12 @@ public class FetchedDataCache extends Object {
 
     MsgLinkRecord[] records = null;
     if (msgIDs != null) {
-      Vector linksV = new Vector();
+      ArrayList linksL = new ArrayList();
       for (int i=0; i<msgIDs.length; i++) {
-        Vector v = msgLinkRecordMap_byMsgId.getAll(msgIDs[i]);
-        if (v != null) linksV.addAll(v);
+        Collection v = msgLinkRecordMap_byMsgId.getAll(msgIDs[i]);
+        if (v != null) linksL.addAll(v);
       }
-      records = (MsgLinkRecord[]) ArrayUtils.toArray(linksV, MsgLinkRecord.class);
+      records = (MsgLinkRecord[]) ArrayUtils.toArray(linksL, MsgLinkRecord.class);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class, records);
@@ -2588,20 +2561,20 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsOwnerAndType(Long ownerId, Short ownerType)");
     if (trace != null) trace.args(ownerId, ownerType);
 
-    Vector msgLinksV = new Vector();
+    ArrayList msgLinksL = new ArrayList();
     if (ownerId != null && ownerType != null) {
-      Collection coll = msgLinkRecordMap.values();
-      if (coll != null && !coll.isEmpty()) {
-        Iterator iter = coll.iterator();
+      Collection col = msgLinkRecordMap.values();
+      if (col != null && !col.isEmpty()) {
+        Iterator iter = col.iterator();
         while (iter.hasNext()) {
           MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
           if (ownerId.equals(linkRecord.ownerObjId) && ownerType.equals(linkRecord.ownerObjType)) {
-            msgLinksV.addElement(linkRecord);
+            msgLinksL.add(linkRecord);
           }
         }
       }
     }
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2615,13 +2588,10 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType)");
     if (trace != null) trace.args(ownerIDs, ownerType);
 
-    Vector msgLinksV = new Vector();
+    ArrayList msgLinksL = new ArrayList();
     if (ownerIDs != null && ownerIDs.length > 0 && ownerType != null) {
-      // load a Hashtable with wanted ownerIDs
-      Hashtable ht = new Hashtable();
-      for (int i=0; i<ownerIDs.length; i++) {
-        ht.put(ownerIDs[i], ownerIDs[i]);
-      }
+      // load lookup with wanted ownerIDs
+      HashSet ownerIDsHS = new HashSet(Arrays.asList(ownerIDs));
       Collection coll = msgLinkRecordMap.values();
       if (coll != null && !coll.isEmpty()) {
         Iterator iter = coll.iterator();
@@ -2629,14 +2599,14 @@ public class FetchedDataCache extends Object {
           MsgLinkRecord linkRecord = (MsgLinkRecord) iter.next();
           if (ownerType.equals(linkRecord.ownerObjType)) {
             Long ownerObjId = linkRecord.ownerObjId;
-            if (ownerObjId != null && ht.get(ownerObjId) != null) {
-              msgLinksV.addElement(linkRecord);
+            if (ownerObjId != null && ownerIDsHS.contains(ownerObjId)) {
+              msgLinksL.add(linkRecord);
             }
           }
         }
       }
     }
-    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgLinks);
     return msgLinks;
@@ -2687,7 +2657,7 @@ public class FetchedDataCache extends Object {
               //              data.unSeal(linkRecords[0].getSymmetricKey(), msgSigningKeyRec);
               //            else
               // signing key no longer exists, maybe the user account was deleted..., just unseal the message.
-              data.unSealWithoutVerify(symmetricKey, bodyKeys);
+              data.unSealWithoutVerify(symmetricKey, msgBodyKeys);
             } else {
               // unSeal the subject only, don't verify signatures as the text is not available yet
               data.unSealSubject(symmetricKey);
@@ -2721,6 +2691,19 @@ public class FetchedDataCache extends Object {
   }
 
   /**
+   *
+   * @return copy of our message body keys collection
+   */
+  public synchronized List getMsgBodyKeys() {
+    ArrayList list = new ArrayList(msgBodyKeys.size());
+    list.addAll(msgBodyKeys);
+    return list;
+  }
+  public synchronized void addMsgBodyKey(Hasher.Set key) {
+    msgBodyKeys.add(key);
+  }
+
+  /**
    * @return Message Data Record for a given message ID.
    */
   public synchronized MsgDataRecord getMsgDataRecord(Long msgId) {
@@ -2741,9 +2724,7 @@ public class FetchedDataCache extends Object {
   public synchronized MsgDataRecord[] getMsgDataRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecords()");
 
-    Vector msgDatasV = new Vector();
-    msgDatasV.addAll(msgDataRecordMap.values());
-    MsgDataRecord[] msgDatas = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasV, MsgDataRecord.class);
+    MsgDataRecord[] msgDatas = (MsgDataRecord[]) ArrayUtils.toArray(msgDataRecordMap.values(), MsgDataRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgDatas);
     return msgDatas;
@@ -2757,15 +2738,15 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecords(Long[] msgIDs)");
     if (trace != null) trace.args(msgIDs);
 
-    Vector msgDatasV = new Vector();
+    ArrayList msgDatasL = new ArrayList();
     if (msgIDs != null) {
       for (int i=0; i<msgIDs.length; i++) {
         MsgDataRecord msgData = (MsgDataRecord) msgDataRecordMap.get(msgIDs[i]);
         if (msgData != null)
-          msgDatasV.addElement(msgData);
+          msgDatasL.add(msgData);
       }
     }
-    MsgDataRecord[] msgDatas = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasV, MsgDataRecord.class);
+    MsgDataRecord[] msgDatas = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasL, MsgDataRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgDatas);
     return msgDatas;
@@ -2778,15 +2759,15 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecords(MsgFilter msgFilter)");
     if (trace != null) trace.args(msgFilter);
 
-    Vector msgDatasV = new Vector();
+    ArrayList msgDatasL = new ArrayList();
     Collection col = msgDataRecordMap.values();
     Iterator iter = col.iterator();
     while (iter.hasNext()) {
       MsgDataRecord mData = (MsgDataRecord) iter.next();
       if (msgFilter.keep(mData))
-        msgDatasV.addElement(mData);
+        msgDatasL.add(mData);
     }
-    MsgDataRecord[] msgDatas = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasV, MsgDataRecord.class);
+    MsgDataRecord[] msgDatas = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasL, MsgDataRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, msgDatas);
     return msgDatas;
@@ -2882,20 +2863,20 @@ public class FetchedDataCache extends Object {
    * @return all StatRecords from cache for a given type
    */
   public synchronized StatRecord[] getStatRecords(int statType) {
-    Vector statsV = new Vector();
-    statsV.addAll(statRecordMaps[statType].values());
-    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsV, StatRecord.class);
-    return stats;
+    return (StatRecord[]) ArrayUtils.toArray(statRecordMaps[statType].values(), StatRecord.class);
   }
 
   /**
    * @return all StatRecords from cache
    */
   public synchronized StatRecord[] getStatRecords() {
-    Vector statsV = new Vector();
+    int statCount = 0;
     for (int i=0; i<3; i++)
-      statsV.addAll(statRecordMaps[i].values());
-    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsV, StatRecord.class);
+      statCount += statRecordMaps[i].size();
+    ArrayList statsL = new ArrayList(statCount);
+    for (int i=0; i<3; i++)
+      statsL.addAll(statRecordMaps[i].values());
+    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsL, StatRecord.class);
     return stats;
   }
 
@@ -2904,15 +2885,15 @@ public class FetchedDataCache extends Object {
    * @return all StatRecords from cache with specified IDs
    */
   public synchronized StatRecord[] getStatRecords(Long[] statIDs, int statType) {
-    Vector statsV = new Vector();
+    ArrayList statsL = new ArrayList();
     if (statIDs != null) {
       for (int i=0; i<statIDs.length; i++) {
         StatRecord rec = (StatRecord) statRecordMaps[statType].get(statIDs[i]);
         if (rec != null)
-          statsV.addElement(rec);
+          statsL.add(rec);
       }
     }
-    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsV, StatRecord.class);
+    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsL, StatRecord.class);
     return stats;
   }
 
@@ -3007,26 +2988,23 @@ public class FetchedDataCache extends Object {
    * @return all EmailRecords from cache
    */
   public synchronized EmailRecord[] getEmailRecords() {
-    Vector emailsV = new Vector();
-    emailsV.addAll(emailRecordMap.values());
-    EmailRecord[] emails = (EmailRecord[]) ArrayUtils.toArray(emailsV, EmailRecord.class);
-    return emails;
+    return (EmailRecord[]) ArrayUtils.toArray(emailRecordMap.values(), EmailRecord.class);
   }
 
   /**
    * @return all EmailRecords from cache with specified IDs
    */
   public synchronized EmailRecord[] getEmailRecords(Long userId) {
-    Vector emailsV = new Vector();
+    ArrayList emailsL = new ArrayList();
     if (userId != null) {
       Iterator iter = emailRecordMap.values().iterator();
       while (iter.hasNext()) {
         EmailRecord rec = (EmailRecord) iter.next();
         if (rec.userId.equals(userId))
-          emailsV.addElement(rec);
+          emailsL.add(rec);
       }
     }
-    EmailRecord[] emails = (EmailRecord[]) ArrayUtils.toArray(emailsV, EmailRecord.class);
+    EmailRecord[] emails = (EmailRecord[]) ArrayUtils.toArray(emailsL, EmailRecord.class);
     return emails;
   }
 
@@ -3034,15 +3012,15 @@ public class FetchedDataCache extends Object {
    * @return all EmailRecords from cache with specified IDs
    */
   public synchronized EmailRecord[] getEmailRecords(Long[] emailIDs) {
-    Vector emailsV = new Vector();
+    ArrayList emailsL = new ArrayList();
     if (emailIDs != null) {
       for (int i=0; i<emailIDs.length; i++) {
         EmailRecord sRec = (EmailRecord) emailRecordMap.get(emailIDs[i]);
         if (sRec != null)
-          emailsV.addElement(sRec);
+          emailsL.add(sRec);
       }
     }
-    EmailRecord[] emails = (EmailRecord[]) ArrayUtils.toArray(emailsV, EmailRecord.class);
+    EmailRecord[] emails = (EmailRecord[]) ArrayUtils.toArray(emailsL, EmailRecord.class);
     return emails;
   }
 
@@ -3102,7 +3080,7 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrHashRecordsForMsgId(Long msgId)");
     if (trace != null) trace.args(msgId);
 
-    Vector addrHashRecordsV = addrHashRecordMap_byMsgId.getAll(msgId);
+    Collection addrHashRecordsV = addrHashRecordMap_byMsgId.getAll(msgId);
     AddrHashRecord[] addrHashRecords = (AddrHashRecord[]) ArrayUtils.toArray(addrHashRecordsV, AddrHashRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, addrHashRecords);
@@ -3132,7 +3110,7 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(hash);
 
     String hashHex = hash.getHexContent();
-    Vector addrHashRecordsV = addrHashRecordMap_byHash.getAll(hashHex);
+    Collection addrHashRecordsV = addrHashRecordMap_byHash.getAll(hashHex);
     AddrHashRecord[] addrHashRecords = (AddrHashRecord[]) ArrayUtils.toArray(addrHashRecordsV, AddrHashRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, addrHashRecords);
@@ -3187,23 +3165,24 @@ public class FetchedDataCache extends Object {
       // if hash exists then look for it between specified msgIDs
       if (getAddrHashRecords(hash) != null) {
         BADigestBlock hashBA = new BADigestBlock(hash);
-        Vector msgIDsV = new Vector();
+        HashSet msgIDsHS = new HashSet();
         for (int i=0; i<fromMsgIDs.length; i++) {
-          Vector addrHashRecordsV = addrHashRecordMap_byMsgId.getAll(fromMsgIDs[i]);
+          Collection addrHashRecordsV = addrHashRecordMap_byMsgId.getAll(fromMsgIDs[i]);
           // all these records must have the same msgId so find only the first match
           if (addrHashRecordsV != null) {
-            for (int k=0; k<addrHashRecordsV.size(); k++) {
-              AddrHashRecord addrHashRecord = (AddrHashRecord) addrHashRecordsV.elementAt(k);
-              if (addrHashRecord.hash.equals(hashBA) && !msgIDsV.contains(addrHashRecord.msgId)) {
-                msgIDsV.addElement(addrHashRecord.msgId);
+            Iterator iter = addrHashRecordsV.iterator();
+            while (iter.hasNext()) {
+              AddrHashRecord addrHashRecord = (AddrHashRecord) iter.next();
+              if (addrHashRecord.hash.equals(hashBA) && !msgIDsHS.contains(addrHashRecord.msgId)) {
+                msgIDsHS.add(addrHashRecord.msgId);
                 // break on first match, because we are finding UNIQUE msgIDs
                 break;
               }
             }
           }
         }
-        if (msgIDsV.size() > 0) {
-          addrRecords = getMsgDataRecords((Long[]) ArrayUtils.toArray(msgIDsV, Long.class));
+        if (msgIDsHS.size() > 0) {
+          addrRecords = getMsgDataRecords((Long[]) ArrayUtils.toArray(msgIDsHS, Long.class));
         }
       }
     }

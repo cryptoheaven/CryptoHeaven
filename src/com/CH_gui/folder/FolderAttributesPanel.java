@@ -207,9 +207,9 @@ public class FolderAttributesPanel extends JPanel {
     try {
       String s = jNumToKeep.getText();
       if (jNumToKeepCheck.isSelected() && s.length() > 0)
-        numToKeep = new Short(s);
+        numToKeep = Short.valueOf(s);
       else
-        numToKeep = new Short((short)0);
+        numToKeep = Short.valueOf((short)0);
       if (numToKeep.shortValue() < 0)
         numToKeep = null;
     } catch (Throwable t) {
@@ -221,11 +221,11 @@ public class FolderAttributesPanel extends JPanel {
     try {
       String s = jKeepAsOldAs.getText();
       if (jKeepAsOldAsCheck.isSelected() && s.length() > 0)
-        keepAsOldAs = new Integer(s);
+        keepAsOldAs = Integer.valueOf(s);
       else
-        keepAsOldAs = new Integer(0);
+        keepAsOldAs = Integer.valueOf(0);
       // apply multipier
-      keepAsOldAs = new Integer(keepAsOldAs.intValue() * keepAsOldAsMultipier[jKeepAsOldAsCombo.getSelectedIndex()]);
+      keepAsOldAs = Integer.valueOf(keepAsOldAs.intValue() * keepAsOldAsMultipier[jKeepAsOldAsCombo.getSelectedIndex()]);
       if (keepAsOldAs.intValue() < 0)
         keepAsOldAs = null;
     } catch (Throwable t) {

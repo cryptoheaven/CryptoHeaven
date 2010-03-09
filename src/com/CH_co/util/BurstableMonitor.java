@@ -154,7 +154,7 @@ public class BurstableMonitor extends Object {
         }
       }
       if (!interrupted) {
-        passStampsList.addLast(new Long(now));
+        passStampsList.addLast(Long.valueOf(now));
       } else {
         rc = -1;
       }

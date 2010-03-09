@@ -12,12 +12,7 @@
 
 package com.CH_co.monitor;
 
-import java.awt.Window;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowEvent;
-
-import java.util.Hashtable;
-import java.util.Enumeration;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -25,7 +20,7 @@ import java.util.Enumeration;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -33,20 +28,24 @@ import java.util.Enumeration;
  *
  * <b>$Revision: 1.10 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ProgMonitorPool extends Object { // no-argument implicit constructor
 
-  private static Hashtable ht;
-  private static ProgMonitorPool singleInstance;
+  private static HashMap hm;
   private static ProgMonitor dummy;
 
   // static initializer
   static {
-    singleInstance = new ProgMonitorPool();
-    ht = new Hashtable();
+    hm = new HashMap();
     //dummy = new ProgMonitorDummy();
     dummy = new ProgMonitorDumping();
+  }
+
+  /**
+   * All static fields and methods -- hide the constructor.
+   */
+  private ProgMonitorPool() {
   }
 
   /**
@@ -57,25 +56,25 @@ public class ProgMonitorPool extends Object { // no-argument implicit constructo
   }
 
   public static synchronized void registerProgMonitor(ProgMonitor progressMonitor, long id) {
-    registerProgMonitor(progressMonitor, new Long(id));
+    registerProgMonitor(progressMonitor, Long.valueOf(id));
   }
 
   public static synchronized void registerProgMonitor(ProgMonitor progressMonitor, Long id) {
-    Object obj = ht.get(id);
+    Object obj = hm.get(id);
     if (obj != null)
       throw new IllegalArgumentException("Specified progress monitor is already registered, cannot register again!");
-    ht.put(id, progressMonitor);
+    hm.put(id, progressMonitor);
   }
 
 
   public static synchronized ProgMonitor getProgMonitor(long id) {
-    return (ProgMonitor) getProgMonitor(new Long(id));
+    return (ProgMonitor) getProgMonitor(Long.valueOf(id));
   }
   public static synchronized ProgMonitor getProgMonitor(Long id) {
     ProgMonitor progressMonitor = null;
 
     if (id != null)
-      progressMonitor = (ProgMonitor) ht.get(id);
+      progressMonitor = (ProgMonitor) hm.get(id);
 
     if (progressMonitor == null)
       progressMonitor = dummy;
@@ -85,18 +84,18 @@ public class ProgMonitorPool extends Object { // no-argument implicit constructo
 
 
   public static synchronized void removeProgMonitor(long id) {
-    removeProgMonitor(new Long(id));
+    removeProgMonitor(Long.valueOf(id));
   }
   public static synchronized void removeProgMonitor(Long id) {
-    ht.remove(id);
+    hm.remove(id);
   }
 
   public static synchronized void removeProgMonitor(ProgMonitor progressMonitor) {
-    Enumeration keys = ht.keys();
-    while (keys.hasMoreElements()) {
-      Object key = keys.nextElement();
-      if (ht.get(key) == progressMonitor) {
-        ht.remove(key);
+    Iterator keys = hm.keySet().iterator();
+    while (keys.hasNext()) {
+      Object key = keys.next();
+      if (hm.get(key) == progressMonitor) {
+        hm.remove(key);
         break;
       }
     }

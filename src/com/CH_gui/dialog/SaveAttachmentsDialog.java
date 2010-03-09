@@ -407,7 +407,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
     FileChooser fileChooser = FileChooser.makeNew(this, true, localFileDestination,
       com.CH_gui.lang.Lang.rb.getString("title_Select_Download_Destination"),
-      com.CH_gui.lang.Lang.rb.getString("button_Select"), new Character('S'),
+      com.CH_gui.lang.Lang.rb.getString("button_Select"), Character.valueOf('S'),
       com.CH_gui.lang.Lang.rb.getString("actionTip_Approve_the_current_directory_selection."));
     File destDir = fileChooser.getSelectedDir();
 

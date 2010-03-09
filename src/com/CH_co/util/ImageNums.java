@@ -1814,11 +1814,11 @@ public class ImageNums extends Object {
 
     for (int k=0; k<NUMBER_OF_IMAGES; k++) {
       unUsedIconNames.addElement(images[k]);
-      imageCodesHT1.put(images[k], new Integer(k));
-      imageCodesHT2.put(images[k]+".png", new Integer(k));
-      imageCodesHT3.put("images/"+images[k]+".png", new Integer(k));
-      imageCodesHT4.put(images[k]+".gif", new Integer(k));
-      imageCodesHT5.put("images/"+images[k]+".gif", new Integer(k));
+      imageCodesHT1.put(images[k], Integer.valueOf(k));
+      imageCodesHT2.put(images[k]+".png", Integer.valueOf(k));
+      imageCodesHT3.put("images/"+images[k]+".png", Integer.valueOf(k));
+      imageCodesHT4.put(images[k]+".gif", Integer.valueOf(k));
+      imageCodesHT5.put("images/"+images[k]+".gif", Integer.valueOf(k));
     }
 
     emotions = new int[]

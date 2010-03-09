@@ -109,13 +109,15 @@ public class DataInputStream2 extends DataInputStream {
   }
 
   public Boolean readBooleanObj() throws IOException {
+    Boolean rc = null;
     byte nullIndicator = readByte();
     if (nullIndicator == -1)
-      return null;
+      rc = null;
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Boolean.valueOf(readBoolean());
+      rc = Boolean.valueOf(readBoolean());
+    return rc;
   }
 
   public Byte readByteObj() throws IOException {
@@ -135,7 +137,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid character value read.");
     else
-      return new Character((char) readByte());
+      return Character.valueOf((char) readByte());
   }
 
   public String readString() throws IOException {
@@ -148,7 +150,6 @@ public class DataInputStream2 extends DataInputStream {
       return null;
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
-
     return new Date(readLong());
   }
 
@@ -158,7 +159,6 @@ public class DataInputStream2 extends DataInputStream {
       return null;
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
-
     Timestamp timestamp = new Timestamp(readLong());
     timestamp.setNanos(readInt());
     return timestamp;
@@ -171,7 +171,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return new Float(readFloat());
+      return Float.valueOf(readFloat());
   }
 
   public Double readDoubleObj() throws IOException {
@@ -181,7 +181,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return new Double(readDouble());
+      return Double.valueOf(readDouble());
   }
 
   public Long readLongObj() throws IOException {
@@ -191,7 +191,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return new Long(readLong());
+      return Long.valueOf(readLong());
   }
 
   public Integer readInteger() throws IOException {
@@ -201,7 +201,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return new Integer(readInt());
+      return Integer.valueOf(readInt());
   }
 
   public Short readSmallint() throws IOException {
@@ -211,7 +211,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return new Short(readShort());
+      return Short.valueOf(readShort());
   }
 
   public File readFile(ProgMonitor progressMonitor) throws IOException {

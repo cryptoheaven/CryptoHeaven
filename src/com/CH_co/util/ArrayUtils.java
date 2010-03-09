@@ -12,12 +12,12 @@
 
 package com.CH_co.util;
 
-import java.util.*; 
+import java.util.*;
 import java.lang.reflect.Array;
 
 import com.CH_co.trace.Trace;
 
-/** 
+/**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
@@ -237,33 +237,36 @@ public class ArrayUtils extends Object {
     if (a1 != null && a2 != null && !a1.getClass().equals(a2.getClass()))
       throw new IllegalArgumentException("Runtime instances of arrays do not match!");
 
-    HashSet hs = new HashSet();
-    Vector objsV = new Vector();
+    HashSet hs = null;
+    ArrayList objsL = null;
 
     if (a1 != null) {
+      int maxCapacity = a1.length + (a2 != null ? a2.length : 0);
+      hs = new HashSet((int) (maxCapacity/0.75), 0.75f);
+      objsL = new ArrayList(maxCapacity);
       for (int i=0; i < a1.length; i++) {
         Object o = a1[i];
         if (!hs.contains(o)) {
           hs.add(o);
-          objsV.addElement(o);
+          objsL.add(o);
         }
       }
     }
     if (a2 != null) {
+      if (hs == null) hs = new HashSet(a2.length);
+      if (objsL == null) objsL = new ArrayList(a2.length);
       for (int i=0; i < a2.length; i++) {
         Object o = a2[i];
         if (!hs.contains(o)) {
           hs.add(o);
-          objsV.addElement(o);
+          objsL.add(o);
         }
       }
     }
 
-    if (objsV.size() == 0) {
-      return null;
-    }
-
-    Object[] array = toArray(objsV, hs.iterator().next().getClass());
+    Object[] array = null;
+    if (objsL != null && objsL.size() > 0)
+      array = toArray(objsL, hs.iterator().next().getClass());
 
     return array;
   }
@@ -284,18 +287,13 @@ public class ArrayUtils extends Object {
    * Concatinates arrays and returns an Object[] and returns a new array for component type specified.
    */
   public static Object[] concatinate(Object[] a1, Object[] a2, Class type) {
-    LinkedList lList = new LinkedList();
-    if (a1 != null && a1.length > 0) {
-      List list1 = Arrays.asList(a1);
-      if (list1.size() > 0)
-        lList.addAll(list1);
-    }
-    if (a2 != null && a2.length > 0) {
-      List list2 = Arrays.asList(a2);
-      if (list2.size() > 0)
-        lList.addAll(list2);
-    }
-    Object[] array = toArray(lList, type);
+    int size1 = a1 != null ? a1.length : 0;
+    int size2 = a2 != null ? a2.length : 0;
+    Object[] array = (Object[]) Array.newInstance(type, size1 + size2);
+    if (size1 > 0)
+      System.arraycopy(a1, 0, array, 0, size1);
+    if (size2 > 0)
+      System.arraycopy(a2, 0, array, size1, size2);
     return array;
   }
 
@@ -386,18 +384,7 @@ public class ArrayUtils extends Object {
 
     Object[] objs = null;
     if (source != null) {
-      if (source.length == 0) {
-        objs = source;
-      } else {
-        // if there is a record that changed parents we should remove it
-        List original = Arrays.asList(source);
-        ArrayList aOriginal = new ArrayList(original);
-        if (subtract != null && subtract.length > 0) {
-          List subtractL = Arrays.asList(subtract);
-          aOriginal.removeAll(subtractL);
-        }
-        objs = toArray(aOriginal, source.getClass().getComponentType());
-      }
+      objs = getDifference(source, subtract, source.getClass().getComponentType());
     }
 
     if (trace != null) trace.exit(ArrayUtils.class, objs);
@@ -414,21 +401,33 @@ public class ArrayUtils extends Object {
 
     Object[] objs = null;
     if (source != null) {
-      if (source.length == 0) {
-        objs = source;
-      } else {
-        // if there is a record that changed parents we should remove it
-        List original = Arrays.asList(source);
-        ArrayList aOriginal = new ArrayList(original);
-        if (subtract != null && subtract.length > 0) {
-          List subtractL = Arrays.asList(subtract);
-          aOriginal.removeAll(subtractL);
-        }
-        objs = toArray(aOriginal, Object.class);
-      }
+      objs = getDifference(source, subtract, Object.class);
     }
 
     if (trace != null) trace.exit(ArrayUtils.class, objs);
+    return objs;
+  }
+
+  private static Object[] getDifference(Object[] source, Object[] subtract, Class type) {
+    Object[] objs = null;
+    if (source.length == 0) {
+      objs = source;
+    } else if (subtract == null || subtract.length == 0) {
+      objs = source;
+    } else {
+      // load subtract lookup
+      HashSet subtractHS = new HashSet();
+      for (int i=0; i<subtract.length; i++)
+        subtractHS.add(subtract[i]);
+      // if there is a record that changed parents we should remove it
+      ArrayList resultL = new ArrayList(source.length);
+      for (int i=0; i<source.length; i++) {
+        Object obj = source[i];
+        if (!subtractHS.contains(obj))
+          resultL.add(obj);
+      }
+      objs = toArray(resultL, type);
+    }
     return objs;
   }
 
@@ -452,18 +451,17 @@ public class ArrayUtils extends Object {
     Object[] objs = source;
     if (source != null && source.length > 0 && anyDuplicates(source)) {
       // remove duplicates from source[]
-      HashSet hs = new HashSet();
+      HashSet hs = new HashSet((int) (source.length/0.75), 0.75f);
       // vector used to preserve the order
-      Vector objsV = new Vector();
+      ArrayList objsL = new ArrayList(source.length);
       for (int i=0; i<source.length; i++) {
         Object o = source[i];
         if (!hs.contains(o)) {
           hs.add(source[i]);
-          objsV.addElement(o);
+          objsL.add(o);
         }
       }
-
-      objs = toArray(objsV, type);
+      objs = toArray(objsL, type);
     }
 
     if (trace != null) trace.exit(ArrayUtils.class, objs);
@@ -488,11 +486,11 @@ public class ArrayUtils extends Object {
     if (!anyEquals) {
       result = source;
     } else {
-      Vector resultV = new Vector();
+      ArrayList resultL = new ArrayList(source.length);
       for (int i=0; i<source.length; i++)
         if (!source[i].equals(toRemove))
-          resultV.addElement(source[i]);
-      result = toArray(resultV, source.getClass().getComponentType());
+          resultL.add(source[i]);
+      result = toArray(resultL, source.getClass().getComponentType());
     }
     return result;
   }
@@ -508,7 +506,7 @@ public class ArrayUtils extends Object {
     if (source.length == 0 || !source[0].equals(toRemove)) {
       result = source;
     } else {
-      Vector resultV = new Vector();
+      ArrayList resultL = new ArrayList(source.length);
       boolean processingLeading = true;
       for (int i=0; i<source.length; i++) {
         Object o = source[i];
@@ -517,10 +515,10 @@ public class ArrayUtils extends Object {
         } else {
           // copy element
           processingLeading = false;
-          resultV.addElement(o);
+          resultL.add(o);
         }
       }
-      result = toArray(resultV, source.getClass().getComponentType());
+      result = toArray(resultL, source.getClass().getComponentType());
     }
     return result;
   }
@@ -530,15 +528,15 @@ public class ArrayUtils extends Object {
    * Object classes are compared, instances subclassing specified type are considered different.
    */
   public static Object[] gatherAllOfType(Object[] source, Class type) {
-    Vector selectedV = new Vector();
+    ArrayList selectedL = null;
     if (source != null) {
+      selectedL = new ArrayList(source.length);
       for (int i=0; i<source.length; i++) {
         if (source[i].getClass().equals(type))
-          selectedV.addElement(source[i]);
+          selectedL.add(source[i]);
       }
     }
-    Object[] objs = toArray(selectedV, type);
-    return objs;
+    return toArray(selectedL, type);
   }
 
   /**
@@ -546,15 +544,15 @@ public class ArrayUtils extends Object {
    * Object class trees are compared, instances subclassing specified type are considered equal.
    */
   public static Object[] gatherAllOfInstance(Object[] source, Class type) {
-    Vector selectedV = new Vector();
+    ArrayList selectedL = null;
     if (source != null) {
+      selectedL = new ArrayList(source.length);
       for (int i=0; i<source.length; i++) {
         if (type.isAssignableFrom(source[i].getClass()))
-          selectedV.addElement(source[i]);
+          selectedL.add(source[i]);
       } // end for
     }
-    Object[] objs = toArray(selectedV, type);
-    return objs;
+    return toArray(selectedL, type);
   }
 
   /**

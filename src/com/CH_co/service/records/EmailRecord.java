@@ -50,8 +50,8 @@ public class EmailRecord extends Record {
   public Timestamp dateCreated;
   public Timestamp dateUpdated;
 
-  public Long getId() { 
-    return emlId; 
+  public Long getId() {
+    return emlId;
   }
 
   public Icon getIcon() {
@@ -134,17 +134,17 @@ public class EmailRecord extends Record {
   public static String[] getUniqueEmailDomains(EmailRecord[] records) {
     String[] domains = null;
     if (records != null) {
-      Vector domainsV = new Vector();
-      Vector domainsLowerV = new Vector();
+      ArrayList domainsL = new ArrayList();
+      HashSet domainsLowerHS = new HashSet();
       for (int i=0; i<records.length; i++) {
         String domain = records[i].getDomain();
         String domainLower = domain != null ? domain.toLowerCase() : null;
-        if (domainLower != null && !domainsLowerV.contains(domainLower)) {
-          domainsV.addElement(domain);
-          domainsLowerV.addElement(domain.toLowerCase());
+        if (domainLower != null && !domainsLowerHS.contains(domainLower)) {
+          domainsL.add(domain);
+          domainsLowerHS.add(domainLower);
         }
       }
-      domains = (String[]) ArrayUtils.toArray(domainsV, String.class);
+      domains = (String[]) ArrayUtils.toArray(domainsL, String.class);
     }
     return domains;
   }
@@ -226,11 +226,11 @@ public class EmailRecord extends Record {
     }
     return index;
   }
-  public static int findEmailAddress(Vector emailAddressesStrsV, String emailAddress) {
+  public static int findEmailAddress(List emailAddressesStrsL, String emailAddress) {
     int index = -1;
-    if (emailAddressesStrsV != null) {
-      for (int i=0; i<emailAddressesStrsV.size(); i++) {
-        if (isAddressEqual((String) emailAddressesStrsV.elementAt(i), emailAddress)) {
+    if (emailAddressesStrsL != null) {
+      for (int i=0; i<emailAddressesStrsL.size(); i++) {
+        if (isAddressEqual((String) emailAddressesStrsL.get(i), emailAddress)) {
           index = i;
           break;
         }
@@ -445,25 +445,25 @@ public class EmailRecord extends Record {
     String[] addresses = null;
 
     if (fullEmailAddresses != null && fullEmailAddresses.length() > 0) {
-      Hashtable uniqueHT = new Hashtable();
-      Vector emlsV = new Vector();
+      HashMap uniqueHM = new HashMap();
+      ArrayList emlsL = new ArrayList();
       StringTokenizer st = new StringTokenizer(fullEmailAddresses, " ,;:[]{}<>\t\r\n'\"\\/");
       while (st.hasMoreTokens()) {
         String eml = st.nextToken();
         eml = eml.trim();
         if (EmailRecord.isEmailFormatValid(eml) || (includeSoloDomains && EmailRecord.isDomainNameValid(eml))) {
           String normalized = eml.toLowerCase();
-          String prevEml = (String) uniqueHT.put(normalized, eml);
+          String prevEml = (String) uniqueHM.put(normalized, eml);
           if (prevEml == null) {
-            emlsV.addElement(eml);
+            emlsL.add(eml);
           } else if (!prevEml.equals(eml)) {
-            // stored before but different case... then replace it with new one... 
+            // stored before but different case... then replace it with new one...
             // important in case email address is of form "Name@Domain.com" <name@domain.com>
             // we would prefer to get the second one as it is meant to be the address instead of the personal name
-            for (int i=0; i<emlsV.size(); i++) {
-              String emlAddr = (String) emlsV.elementAt(i);
+            for (int i=0; i<emlsL.size(); i++) {
+              String emlAddr = (String) emlsL.get(i);
               if (emlAddr.equalsIgnoreCase(eml)) {
-                emlsV.setElementAt(eml, i);
+                emlsL.set(i, eml);
                 break;
               }
             }
@@ -471,9 +471,9 @@ public class EmailRecord extends Record {
         }
       }
       // Emails gathered, send invitations and insert addresses for future reference.
-      if (emlsV.size() > 0) {
-        addresses = new String[emlsV.size()];
-        emlsV.toArray(addresses);
+      if (emlsL.size() > 0) {
+        addresses = new String[emlsL.size()];
+        emlsL.toArray(addresses);
       }
     }
 
@@ -492,7 +492,7 @@ public class EmailRecord extends Record {
       if (record.dateCreated  != null) dateCreated  = record.dateCreated;
       if (record.dateUpdated  != null) dateUpdated  = record.dateUpdated;
     }
-    else 
+    else
       super.mergeError(updated);
   }
 
@@ -525,7 +525,7 @@ public class EmailRecord extends Record {
       }
       else if (o1 == null)
         return -1;
-      else 
+      else
         return 1;
     }
   }

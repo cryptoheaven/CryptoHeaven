@@ -81,7 +81,7 @@ public class InterruptMessageAction extends ClientMessageAction {
                 + "Please verify your computer network and/or modem cables are plugged-in and your computer is currently connected to the Internet.  When you have established and verified your Internet connectivity, please try connecting to "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" again.  "
                 + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
           } 
-          Integer key = new Integer(actionCode);
+          Integer key = Integer.valueOf(actionCode);
           new SingleDialogShower(singleInterruptedDialogArbiter, key, null, MessageDialog.ERROR_MESSAGE, title, msg).start();
         } else {
           if (trace != null) trace.data(100, "suppress interrupt msg");

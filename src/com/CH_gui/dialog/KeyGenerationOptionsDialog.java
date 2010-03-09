@@ -156,24 +156,24 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
     jCertainty.setMajorTickSpacing(32);
 
     Hashtable htKey = new Hashtable();
-    htKey.put(new Integer(1024), new JMyLabel("1024"));
-    htKey.put(new Integer(1536), new JMyLabel("1536"));
-    htKey.put(new Integer(2048), new JMyLabel("2048"));
-    htKey.put(new Integer(2560), new JMyLabel("2560"));
-    htKey.put(new Integer(3072), new JMyLabel("3072"));
-    htKey.put(new Integer(3584), new JMyLabel("3584"));
-    htKey.put(new Integer(4096), new JMyLabel("4096"));
+    htKey.put(Integer.valueOf(1024), new JMyLabel("1024"));
+    htKey.put(Integer.valueOf(1536), new JMyLabel("1536"));
+    htKey.put(Integer.valueOf(2048), new JMyLabel("2048"));
+    htKey.put(Integer.valueOf(2560), new JMyLabel("2560"));
+    htKey.put(Integer.valueOf(3072), new JMyLabel("3072"));
+    htKey.put(Integer.valueOf(3584), new JMyLabel("3584"));
+    htKey.put(Integer.valueOf(4096), new JMyLabel("4096"));
 
     Hashtable htCert = new Hashtable();
-    htCert.put(new Integer(128), new JMyLabel("128"));
-    htCert.put(new Integer(192), new JMyLabel("192"));
-    htCert.put(new Integer(256), new JMyLabel("256"));
-    htCert.put(new Integer(160), new JMyLabel("160"));
-    htCert.put(new Integer(224), new JMyLabel("224"));
+    htCert.put(Integer.valueOf(128), new JMyLabel("128"));
+    htCert.put(Integer.valueOf(192), new JMyLabel("192"));
+    htCert.put(Integer.valueOf(256), new JMyLabel("256"));
+    htCert.put(Integer.valueOf(160), new JMyLabel("160"));
+    htCert.put(Integer.valueOf(224), new JMyLabel("224"));
 
     if (KeyRecord.DEBUG__ALLOW_SHORT_KEYS) {
-      htKey.put(new Integer(KeyRecord.DEBUG__SHORTEST_KEY), new JMyLabel(""+KeyRecord.DEBUG__SHORTEST_KEY));
-      htCert.put(new Integer(KeyRecord.DEBUG__MIN_CERTAINTY), new JMyLabel(""+KeyRecord.DEBUG__MIN_CERTAINTY));
+      htKey.put(Integer.valueOf(KeyRecord.DEBUG__SHORTEST_KEY), new JMyLabel(""+KeyRecord.DEBUG__SHORTEST_KEY));
+      htCert.put(Integer.valueOf(KeyRecord.DEBUG__MIN_CERTAINTY), new JMyLabel(""+KeyRecord.DEBUG__MIN_CERTAINTY));
     }
 
     jKeyLength.setLabelTable(htKey);

@@ -100,7 +100,7 @@ public class Cnt_AcceptDecline_Rq extends ProtocolMsgDataSet {
       if (clientBuild >= 28) 
         contactRecords[i].permits = dataIn.readInteger();
       else
-        contactRecords[i].permits = new Integer(0);
+        contactRecords[i].permits = Integer.valueOf(0);
     }
     if (clientBuild >= 382 && serverBuild >= 382)
       autoCreateReciprocals = dataIn.readBooleanObj();

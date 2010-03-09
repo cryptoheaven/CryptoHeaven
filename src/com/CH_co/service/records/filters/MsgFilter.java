@@ -85,7 +85,7 @@ public class MsgFilter extends AbstractRecordFilter implements RecordFilter {
   public MsgFilter(short objType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgFilter.class, "MsgFilter(short objType)");
     if (trace != null) trace.args(objType);
-    this.objType = new Short(objType);
+    this.objType = Short.valueOf(objType);
     if (trace != null) trace.exit(MsgFilter.class);
   }
 
@@ -94,7 +94,7 @@ public class MsgFilter extends AbstractRecordFilter implements RecordFilter {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgFilter.class, "MsgFilter(short ownerObjType, Long ownerObjId)");
     if (trace != null) trace.args(ownerObjType);
     if (trace != null) trace.args(ownerObjId);
-    this.ownerObjType = new Short(ownerObjType);
+    this.ownerObjType = Short.valueOf(ownerObjType);
     this.ownerObjId = ownerObjId;
     if (trace != null) trace.exit(MsgFilter.class);
   }
@@ -104,7 +104,7 @@ public class MsgFilter extends AbstractRecordFilter implements RecordFilter {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgFilter.class, "MsgFilter(short ownerObjType, Long[] ownerObjIDs)");
     if (trace != null) trace.args(ownerObjType);
     if (trace != null) trace.args(ownerObjIDs);
-    this.ownerObjType = new Short(ownerObjType);
+    this.ownerObjType = Short.valueOf(ownerObjType);
     this.ownerObjIDs = ownerObjIDs;
     if (trace != null) trace.exit(MsgFilter.class);
   }

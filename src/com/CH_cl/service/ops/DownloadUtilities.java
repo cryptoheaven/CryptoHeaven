@@ -33,10 +33,7 @@ import com.CH_co.util.*;
 import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Vector;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -297,7 +294,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       if (trace != null) trace.exit(DownloadCoordinator.class);
     }
 
-    private void downloadRecords(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTreeAtOnce, Collection excludeDirsAlreadyDone, ServerInterfaceLayer SIL) {
+    private void downloadRecords(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTreeAtOnce, Set excludeDirsAlreadyDone, ServerInterfaceLayer SIL) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "downloadRecords(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTree, Collection excludeDirsAlreadyDone, ServerInterfaceLayer SIL)");
       if (trace != null) trace.args(toDownload, fromMsgs, destDir);
       if (trace != null) trace.args(fetchFilesForFolderTreeAtOnce);
@@ -313,20 +310,20 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       }
       else {
 
-        Vector dirsV = new Vector();
-        Vector filesV = new Vector();
-        Vector msgsV = new Vector();
+        ArrayList dirsV = new ArrayList();
+        ArrayList filesV = new ArrayList();
+        ArrayList msgsV = new ArrayList();
         // distinguish between files/messages/directories
         for (int i=0; i<toDownload.length; i++) {
           Record recToDownload  = toDownload[i];
           if (recToDownload instanceof FolderPair) {
             if (excludeDirsAlreadyDone == null || !excludeDirsAlreadyDone.contains(recToDownload))
-              dirsV.addElement(recToDownload);
+              dirsV.add(recToDownload);
           }
           else if (recToDownload instanceof FileLinkRecord)
-            filesV.addElement(recToDownload);
+            filesV.add(recToDownload);
           else if (recToDownload instanceof MsgLinkRecord)
-            msgsV.addElement(recToDownload);
+            msgsV.add(recToDownload);
           else
             throw new IllegalArgumentException("Don't know how to handle download of object type " + recToDownload.getClass());
         }
@@ -352,13 +349,13 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
           dirsV.toArray(f);
 
           // exclude non-data type folders (ie: category folders) from fetching
-          Vector dataFoldersV = new Vector();
+          ArrayList dataFoldersL = new ArrayList();
           for (int i=0; i<f.length; i++) {
             FolderRecord fRec = f[i].getFolderRecord();
             if (!fRec.isCategoryType() && !fRec.isLocalFileType())
-              dataFoldersV.addElement(f[i]);
+              dataFoldersL.add(f[i]);
           }
-          FolderPair[] dataFolders = (FolderPair[]) ArrayUtils.toArray(dataFoldersV, FolderPair.class);
+          FolderPair[] dataFolders = (FolderPair[]) ArrayUtils.toArray(dataFoldersL, FolderPair.class);
 
           // fetch all messgae links to make sure we have them in our cache
           if (dataFolders != null && dataFolders.length > 0) {
@@ -370,14 +367,14 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
             FetchedDataCache cache = SIL.getFetchedDataCache();
             FolderPair[] allDescendantAndParentPairs = cache.getFolderPairsViewAllDescending(f, true);
             // eliminate non-data folders
-            Vector descendantDataPairsV = new Vector();
+            ArrayList descendantDataPairsL = new ArrayList();
             for (int i=0; i<allDescendantAndParentPairs.length; i++) {
               FolderRecord fRec = allDescendantAndParentPairs[i].getFolderRecord();
               if (!fRec.isCategoryType() && !fRec.isLocalFileType())
-                descendantDataPairsV.addElement(allDescendantAndParentPairs[i]);
+                descendantDataPairsL.add(allDescendantAndParentPairs[i]);
             }
-            if (descendantDataPairsV.size() > 0) {
-              fetchFileListings((FolderPair[]) ArrayUtils.toArray(descendantDataPairsV, FolderPair.class), SIL);
+            if (descendantDataPairsL.size() > 0) {
+              fetchFileListings((FolderPair[]) ArrayUtils.toArray(descendantDataPairsL, FolderPair.class), SIL);
             }
           } else if (fetchFilesForSingleFolders) {
             if (dataFolders != null && dataFolders.length > 0) {
@@ -394,7 +391,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
             File newDestDir = new File(destDir, dirName);
 
             // Recursive call should avoid nesting into this folder as we are hendling it here...
-            if (excludeDirsAlreadyDone == null) excludeDirsAlreadyDone = new ArrayList();
+            if (excludeDirsAlreadyDone == null) excludeDirsAlreadyDone = new HashSet();
             excludeDirsAlreadyDone.add(f[i]);
 
             if (!folderRecord.isCategoryType() && !folderRecord.isLocalFileType()) {
@@ -433,7 +430,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     FolderShareRecord[] fldShares = FolderPair.getFolderShareRecords(folders);
     Long[] folderIDs = FolderShareRecord.getFolderIDs(fldShares);
 
-    final Vector _folderIDsBeingFetched = new Vector(Arrays.asList(folderIDs));
+    final ArrayList _folderIDsBeingFetched = new ArrayList(Arrays.asList(folderIDs));
 
     // Register the completion notify listener
     FolderRecordListener folderListener = new FolderRecordListener() {
@@ -443,7 +440,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
           FolderRecord[] fldRecs = e.getFolderRecords();
           synchronized (_folderIDsBeingFetched) {
             for (int i=0; i<fldRecs.length; i++) {
-              _folderIDsBeingFetched.removeElement(fldRecs[i].folderId);
+              _folderIDsBeingFetched.remove(fldRecs[i].folderId);
             }
             _folderIDsBeingFetched.notifyAll();
             if (_folderIDsBeingFetched.size() == 0)
@@ -492,7 +489,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     FolderShareRecord[] fldShares = FolderPair.getFolderShareRecords(folders);
     Long[] folderIDs = FolderShareRecord.getFolderIDs(fldShares);
 
-    final Vector _folderIDsBeingFetched = new Vector(Arrays.asList(folderIDs));
+    final ArrayList _folderIDsBeingFetched = new ArrayList(Arrays.asList(folderIDs));
 
     // Register the completion notify listener
     FolderRecordListener folderListener = new FolderRecordListener() {
@@ -502,7 +499,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
           FolderRecord[] fldRecs = e.getFolderRecords();
           synchronized (_folderIDsBeingFetched) {
             for (int i=0; i<fldRecs.length; i++) {
-              _folderIDsBeingFetched.removeElement(fldRecs[i].folderId);
+              _folderIDsBeingFetched.remove(fldRecs[i].folderId);
             }
             _folderIDsBeingFetched.notifyAll();
             if (_folderIDsBeingFetched.size() == 0)

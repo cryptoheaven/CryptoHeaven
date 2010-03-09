@@ -234,11 +234,11 @@ public class SendMessageRunner extends ThreadTraced {
             for (int i=0; i<emailAddresses.length; i++) {
               addresses[i] = emailAddresses[i].address;
               if (ArrayUtils.find(selectedRecipients[TO], emailAddresses[i]) >= 0) {
-                recipientTypes[i] = new Short(TO);
+                recipientTypes[i] = Short.valueOf(TO);
               } else if (ArrayUtils.find(selectedRecipients[CC], emailAddresses[i]) >= 0) {
-                recipientTypes[i] = new Short(CC);
+                recipientTypes[i] = Short.valueOf(CC);
               } else {
-                recipientTypes[i] = new Short(BCC);
+                recipientTypes[i] = Short.valueOf(BCC);
               }
             }
             emailRequest = new Obj_List_Co();
@@ -258,7 +258,7 @@ public class SendMessageRunner extends ThreadTraced {
               } else {
                 contentType = "text/plain";
               }
-              priority = new Short(msgSendInfoProvider.getPriority());
+              priority = Short.valueOf(msgSendInfoProvider.getPriority());
             }
 
             emailRequest.objs = new Object[] { addresses, subject, contentType, body, recipientTypes, priority };
@@ -424,7 +424,7 @@ public class SendMessageRunner extends ThreadTraced {
           if (pass == SEALING_MSGS_PASS) {
             linkRec = new MsgLinkRecord();
             linkRec.setSymmetricKey(symmetricKey);
-            linkRec.status = new Short((short) recipientType);
+            linkRec.status = Short.valueOf((short) recipientType);
           }
 
           boolean toAdd = false;
@@ -442,7 +442,7 @@ public class SendMessageRunner extends ThreadTraced {
           // prepare Msg Link to reside in a folder
           else if (pass == SEALING_MSGS_PASS && recipients[i] instanceof FolderPair) {
             FolderPair fPair = (FolderPair) recipients[i];
-            linkRec.ownerObjType = new Short(Record.RECORD_TYPE_FOLDER);
+            linkRec.ownerObjType = Short.valueOf(Record.RECORD_TYPE_FOLDER);
             linkRec.ownerObjId = fPair.getId();
             linkRec.seal(fPair.getFolderShareRecord().getSymmetricKey());
             toAdd = true;
@@ -497,7 +497,7 @@ public class SendMessageRunner extends ThreadTraced {
 
 
   public static MsgDataRecord prepareMsgDataRecord(BASymmetricKey symmetricKey, Short importance, String subject, String body, String password) {
-    return prepareMsgDataRecord(symmetricKey, importance, new Short(MsgDataRecord.OBJ_TYPE_MSG), subject, body, password);
+    return prepareMsgDataRecord(symmetricKey, importance, Short.valueOf(MsgDataRecord.OBJ_TYPE_MSG), subject, body, password);
   }
   public static MsgDataRecord prepareMsgDataRecord(BASymmetricKey symmetricKey, Short importance, Short objType, String subject, String body, String password) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgDataRecord(BASymmetricKey symmetricKey, Short importance, String subject, String body, String password)");
@@ -524,7 +524,7 @@ public class SendMessageRunner extends ThreadTraced {
     String[] content = msgSendInfoProvider.getContent();
     String question = msgSendInfoProvider.getQuestion();
     String password = msgSendInfoProvider.getPassword();
-    MsgDataRecord dataRecord = prepareMsgDataRecord(symmetricKey, new Short(msgPriority), objType, content[0], content[1], password);
+    MsgDataRecord dataRecord = prepareMsgDataRecord(symmetricKey, Short.valueOf(msgPriority), objType, content[0], content[1], password);
     dataRecord.bodyPassHint = question == null || question.trim().length() == 0 ? null : question.trim();
     dataRecord.dateExpired = msgSendInfoProvider.getExpiry();
     if (trace != null) trace.exit(SendMessageRunner.class, dataRecord);

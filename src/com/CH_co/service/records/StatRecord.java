@@ -37,8 +37,8 @@ import com.CH_co.util.*;
  */
 public class StatRecord extends Record { // implicit no-argument constructor
 
-  public static final Short FLAG_NEW = new Short((short) 1);
-  public static final Short FLAG_OLD = new Short((short) 2);
+  public static final Short FLAG_NEW = Short.valueOf((short) 1);
+  public static final Short FLAG_OLD = Short.valueOf((short) 2);
   public static final short FLAG_BCC = 4; // server only flag, client never sees it
 
   public static final short STATUS__UNSEEN_UNDELIVERED = 3;
@@ -94,16 +94,16 @@ public class StatRecord extends Record { // implicit no-argument constructor
   public Short getFlag(boolean forceIfSeenThenDelivered) {
     Short value = null;
     if ((mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered == null)
-      value = new Short(STATUS__UNSEEN_UNDELIVERED);
+      value = Short.valueOf(STATUS__UNSEEN_UNDELIVERED);
     else if ((mark.shortValue() & FLAG_OLD.shortValue()) != 0 && firstDelivered != null)
-      value = new Short(STATUS__SEEN_DELIVERED);
+      value = Short.valueOf(STATUS__SEEN_DELIVERED);
     else if ((mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered != null)
-      value = new Short(STATUS__UNSEEN_DELIVERED);
+      value = Short.valueOf(STATUS__UNSEEN_DELIVERED);
     else if ((mark.shortValue() & FLAG_OLD.shortValue()) != 0 && firstDelivered == null) {
       if (!forceIfSeenThenDelivered)
-        value = new Short(STATUS__SEEN_UNDELIVERED);
+        value = Short.valueOf(STATUS__SEEN_UNDELIVERED);
       else
-        value = new Short(STATUS__SEEN_DELIVERED);
+        value = Short.valueOf(STATUS__SEEN_DELIVERED);
     }
     return value;
   }

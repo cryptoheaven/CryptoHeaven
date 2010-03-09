@@ -353,7 +353,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
       Short numToKeep = folderPurgingPanel.folderAttributesPanel.getNumToKeep();
       Integer keepAsOldAs = folderPurgingPanel.folderAttributesPanel.getKeepAsOldAs();
       if (numToKeep != null && keepAsOldAs != null && (!fRec.numToKeep.equals(numToKeep) || !fRec.keepAsOldAs.equals(keepAsOldAs))) {
-        Obj_IDList_Co request = new Obj_IDList_Co(new Long[] { fRec.folderId, new Long(numToKeep.shortValue()), new Long(keepAsOldAs.intValue()) });
+        Obj_IDList_Co request = new Obj_IDList_Co(new Long[] { fRec.folderId, Long.valueOf(numToKeep.shortValue()), Long.valueOf(keepAsOldAs.intValue()) });
         SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_ALTER_FLD_ATTR, request));
       }
     }
@@ -735,7 +735,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
           /*
           String suffix = "";
           long countObjs = data.objId_1.longValue();
-          folderPair.getFolderRecord().objectCount = new Long(countObjs);
+          folderPair.getFolderRecord().objectCount = Long.valueOf(countObjs);
           switch (folderPair.getFolderRecord().folderType.shortValue()) {
             case FolderRecord.FILE_FOLDER:
               suffix = countObjs == 1 ? com.CH_gui.lang.Lang.rb.getString("File") : com.CH_gui.lang.Lang.rb.getString("Files");

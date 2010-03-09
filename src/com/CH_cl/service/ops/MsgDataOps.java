@@ -96,7 +96,7 @@ public class MsgDataOps extends Object {
               break;
           }
           if (symKey != null)
-            dataRecord.unSeal(symKey, cache.bodyKeys, msgSigningKeyRec);
+            dataRecord.unSeal(symKey, cache.getMsgBodyKeys(), msgSigningKeyRec);
         }
       }
     }

@@ -67,7 +67,7 @@ public class StreamTextLexicon extends MemTextLexicon {
     //      char c3 = '\u03E7';
     //      char c4 = '\227';
     //      char c5 = '\u012B';
-    //      int i1 = SpellingSession.getOption(new Integer(32));
+    //      int i1 = SpellingSession.getOption(Integer.valueOf(32));
     //      if ((i1 & 0xff) == 162)
     //      {
     //        int j1 = (i1 & 0x1f00) >> 8;
@@ -76,7 +76,7 @@ public class StreamTextLexicon extends MemTextLexicon {
     //        Date date1 = (new GregorianCalendar(2000, 0, 1)).getTime();
     //        Date date2 = new Date(date1.getTime() + (long)k1 * 0x5265c00L);
     //        long l3 = System.currentTimeMillis();
-    //        long l5 = (long)SpellingSession.getOption(new Integer(16)) * 1000L;
+    //        long l5 = (long)SpellingSession.getOption(Integer.valueOf(16)) * 1000L;
     //        int j3 = i1 & 0x7fffe000;
     //        int k3 = 0;
     //        for (int i4 = 0; i4 < 32; i4++)
@@ -102,7 +102,7 @@ public class StreamTextLexicon extends MemTextLexicon {
     //              System.out.println();
     //            }
     //
-    //            SpellingSession.setOption(new Integer(16), new Integer((int)(l3 / 1000L)));
+    //            SpellingSession.setOption(Integer.valueOf(16), Integer.valueOf((int)(l3 / 1000L)));
     //          }
     //          throw new Exception();
     //        }
@@ -119,7 +119,7 @@ public class StreamTextLexicon extends MemTextLexicon {
     //            System.out.println();
     //          }
     //
-    //          SpellingSession.setOption(new Integer(16), new Integer((int)(l3 / 1000L)));
+    //          SpellingSession.setOption(Integer.valueOf(16), Integer.valueOf((int)(l3 / 1000L)));
     //        }
     //      } else
     //      {

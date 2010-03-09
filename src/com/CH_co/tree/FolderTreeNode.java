@@ -12,14 +12,11 @@
 
 package com.CH_co.tree;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import java.util.Enumeration;
-import java.util.Vector;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -61,7 +58,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode {
    * @return a node with <code> folderId/shareId </code> if found in this sub-tree
    * @return null if not found 
    */
-  public static FolderTreeNode findNode(Long id, boolean isFolderId, FolderTreeNode root) {
+  protected static FolderTreeNode findNode(Long id, boolean isFolderId, FolderTreeNode root) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "findNode(Long id, boolean isFolderId, FolderTreeNode root)");
     if (trace != null) trace.args(id);
     if (trace != null) trace.args(isFolderId);
@@ -100,7 +97,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode {
     * in alphabetical order of their names.  If inserting folder of brand new type
     * the index after the last child will be returned.
     */
-  public int getInsertionIndex(FolderPair folder) {
+  protected int getInsertionIndex(FolderPair folder) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getInsertionIndex(FolderPair)");
     if (trace != null) trace.args(folder);
 
@@ -149,77 +146,77 @@ public class FolderTreeNode extends DefaultMutableTreeNode {
   }
 
 
- /** 
-  * @return FolderPair of parent of <code> this node </code>
-  * @return null if parent is a root or it doesn't exist
-  */
-  public FolderPair getParentFolderPair() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentFolderPair()");
-
-    FolderPair folderPair = null;
-    FolderTreeNode parentNode = (FolderTreeNode) getParent();
-
-    if (parentNode != null)
-      folderPair = parentNode.getFolderObject();
-
-    if (trace != null) trace.exit(FolderTreeNode.class, folderPair);
-    return folderPair;
-  }
-
-
-  /** 
-   * @return folderId of parent of <code> this node </code>
-   * @return -1 if parent is a root or it doesn't exist
-   */
-  public Long getParentFolderID() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentFolderID()");
-
-    Long parentId = new Long(-1);
-    FolderPair parentFolderPair = getParentFolderPair();
-
-    if (parentFolderPair != null) 
-      parentId = parentFolderPair.getFolderRecord().getId();
-
-    if (trace != null) trace.exit(FolderTreeNode.class, parentId);
-    return parentId;
-  }
-
-  /** 
-   * @return shareId of parent share of <code> this node </code>
-   * @return -1 if parent is a root or it doesn't exist
-   */
-  public Long getParentShareID() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentShareID()");
-
-    Long parentShareId = new Long(-1);
-    FolderPair parentFolderPair = getParentFolderPair();
-
-    if (parentFolderPair != null) 
-      parentShareId = parentFolderPair.getFolderShareRecord().getId();
-
-    if (trace != null) trace.exit(FolderTreeNode.class, parentShareId);
-    return parentShareId;
-  }
-
-
-  /**
-   * @return an array of FolderPairs which are children of <code> this parent </code> 
-   */
-  public FolderPair[] getChildrenPairs() {
-    Vector v = new Vector();
-
-    int childCount = getChildCount();
-    for (int i=0; i<childCount; i++) {
-      FolderTreeNode childNode = (FolderTreeNode) getChildAt(i);
-      FolderPair folderPair = childNode.getFolderObject();
-      if (folderPair != null)
-        v.add(folderPair);
-    }
-
-    FolderPair[] folderPairs = (FolderPair[]) ArrayUtils.toArray(v, FolderPair.class);
-
-    return folderPairs;
-  }
+// /**
+//  * @return FolderPair of parent of <code> this node </code>
+//  * @return null if parent is a root or it doesn't exist
+//  */
+//  private FolderPair getParentFolderPair() {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentFolderPair()");
+//
+//    FolderPair folderPair = null;
+//    FolderTreeNode parentNode = (FolderTreeNode) getParent();
+//
+//    if (parentNode != null)
+//      folderPair = parentNode.getFolderObject();
+//
+//    if (trace != null) trace.exit(FolderTreeNode.class, folderPair);
+//    return folderPair;
+//  }
+//
+//
+//  /**
+//   * @return folderId of parent of <code> this node </code>
+//   * @return -1 if parent is a root or it doesn't exist
+//   */
+//  public Long getParentFolderID() {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentFolderID()");
+//
+//    Long parentId = Long.valueOf(-1);
+//    FolderPair parentFolderPair = getParentFolderPair();
+//
+//    if (parentFolderPair != null)
+//      parentId = parentFolderPair.getFolderRecord().getId();
+//
+//    if (trace != null) trace.exit(FolderTreeNode.class, parentId);
+//    return parentId;
+//  }
+//
+//  /**
+//   * @return shareId of parent share of <code> this node </code>
+//   * @return -1 if parent is a root or it doesn't exist
+//   */
+//  public Long getParentShareID() {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentShareID()");
+//
+//    Long parentShareId = Long.valueOf(-1);
+//    FolderPair parentFolderPair = getParentFolderPair();
+//
+//    if (parentFolderPair != null)
+//      parentShareId = parentFolderPair.getFolderShareRecord().getId();
+//
+//    if (trace != null) trace.exit(FolderTreeNode.class, parentShareId);
+//    return parentShareId;
+//  }
+//
+//
+//  /**
+//   * @return an array of FolderPairs which are children of <code> this parent </code>
+//   */
+//  public FolderPair[] getChildrenPairs() {
+//    Vector v = new Vector();
+//
+//    int childCount = getChildCount();
+//    for (int i=0; i<childCount; i++) {
+//      FolderTreeNode childNode = (FolderTreeNode) getChildAt(i);
+//      FolderPair folderPair = childNode.getFolderObject();
+//      if (folderPair != null)
+//        v.add(folderPair);
+//    }
+//
+//    FolderPair[] folderPairs = (FolderPair[]) ArrayUtils.toArray(v, FolderPair.class);
+//
+//    return folderPairs;
+//  }
 
 
   public String toString() {

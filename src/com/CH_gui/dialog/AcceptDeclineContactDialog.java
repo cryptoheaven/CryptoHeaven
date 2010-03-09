@@ -372,7 +372,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
       permits |= ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS;
     if (!jAudibleNotify.isSelected())
       permits |= ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY;
-    contactRecord.permits = new Integer(permits);
+    contactRecord.permits = Integer.valueOf(permits);
 
     Cnt_AcceptDecline_Rq request = new Cnt_AcceptDecline_Rq(contactRecord);
 

@@ -26,10 +26,10 @@ import java.util.zip.*;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Misc extends Object {
 
@@ -123,7 +123,7 @@ public class Misc extends Object {
    */
   public static void objToStr(Object obj, StringBuffer strB) {
     int MAX_ITEMS_TO_LIST = 50;
-    if (obj == null) { 
+    if (obj == null) {
       strB.append("null");
     } else {
       Class c = obj.getClass();
@@ -164,12 +164,26 @@ public class Misc extends Object {
           }
         }
         strB.append(')');
+      } else if (obj instanceof ArrayList) {
+        ArrayList al = (ArrayList) obj;
+        int len = al.size();
+        strB.append("ArrayList[len="); strB.append(len); strB.append("](");
+        if (len > MAX_ITEMS_TO_LIST) {
+          strB.append("too many to list");
+        } else {
+          for (int i=0; i<len; i++) {
+            objToStr(al.get(i), strB);
+            if (i+1 < len)
+              strB.append(", ");
+          }
+        }
+        strB.append(')');
       } else if (obj instanceof Map) {
         Map map = (Map) obj;
         Set keys = map.keySet();
-        strB.append("Map[len="); 
+        strB.append("Map[len=");
         if (keys == null) {
-          strB.append("null]"); 
+          strB.append("null]");
         } else {
           strB.append(keys.size()); strB.append("](");
           int len = map.size();
@@ -196,21 +210,21 @@ public class Misc extends Object {
         strB.append(')');
       } else if (obj instanceof Enumeration) {
         Enumeration enm = (Enumeration) obj;
-        Vector v = new Vector();
+        ArrayList al = new ArrayList();
         while (enm.hasMoreElements()) {
-          v.addElement(enm.nextElement());
+          al.add(enm.nextElement());
         }
         strB.append("Enumeration");
-        objToStr(v, strB);
+        objToStr(al, strB);
         strB.append(')');
       } else if (obj instanceof Iterator) {
         Iterator iter = (Iterator) obj;
-        Vector v = new Vector();
+        ArrayList al = new ArrayList();
         while (iter.hasNext()) {
-          v.addElement(iter.next());
+          al.add(iter.next());
         }
         strB.append("Iterator");
-        objToStr(v, strB);
+        objToStr(al, strB);
         strB.append(')');
 //      } else if (obj instanceof Map) {
 //        Map map = (Map) obj;
@@ -289,7 +303,7 @@ public class Misc extends Object {
   private static String[] sizeUnits = new String[] { " bytes", " KB", " MB", " GB", " TB" };
 
   /** The number is less than 'maxNumOfDigits' long, otherwise
-    * it is divided by 1000 and appropriate units added, 
+    * it is divided by 1000 and appropriate units added,
     * such as: bytes, KB, MB, GB
     */
   public static String getFormattedSize(Long byteSize, int maxNumOfDigits, int minNumOfDigits) {
@@ -578,9 +592,9 @@ public class Misc extends Object {
       StringBuffer sb = new StringBuffer();
       // pre-process string to remove \n\r \r\n combos
       plain = ArrayUtils.replaceKeyWords(plain, new String[][] {
-                  {"\n\r", "\n"}, 
-                  {"\r\n", "\n"}, 
-                  {"\r",   "\n"}, 
+                  {"\n\r", "\n"},
+                  {"\r\n", "\n"},
+                  {"\r",   "\n"},
                 });
       int len = plain.length();
       char prevCH = ' ';
@@ -624,7 +638,7 @@ public class Misc extends Object {
       // change all <br><br> into <p>
       do {
         int doubleBR = encodedStr.indexOf("<br><br>");
-        if (doubleBR >= 0) 
+        if (doubleBR >= 0)
           encodedStr = encodedStr.substring(0, doubleBR) + "<p>" + encodedStr.substring(doubleBR + "<br><br>".length());
         else
           break;
@@ -653,9 +667,9 @@ public class Misc extends Object {
       host = url.getHost();
       int p = url.getPort();
       if (p >= 0)
-        port = new Integer(p);
+        port = Integer.valueOf(p);
       else
-        port = new Integer(80);
+        port = Integer.valueOf(80);
     } catch (Throwable t) {
     }
     Object[] rc = null;
@@ -809,12 +823,12 @@ public class Misc extends Object {
         bytes = new byte[0];
       else {
         synchronized (compressorSCSU) {
-          try { 
+          try {
             compressorSCSU.resetAll();
             bytes = compressorSCSU.compress(doubleByteChars);
           } catch (IllegalInputException e1) {
           } catch (EndOfInputException e2) {
-          } 
+          }
         }
       }
     }
@@ -838,7 +852,7 @@ public class Misc extends Object {
             doubleByteString = expanderSCSU.expand(bytes);
           } catch (IllegalInputException e1) {
           } catch (EndOfInputException e2) {
-          } 
+          }
         }
       }
     }
@@ -861,13 +875,13 @@ public class Misc extends Object {
     String[] strings = null;
     if (str != null && str.length() > 0) {
       StringTokenizer st = new StringTokenizer(str, delim);
-      Vector tokensV = new Vector();
+      ArrayList tokensL = new ArrayList();
       while (st.hasMoreTokens()) {
         String token = st.nextToken().trim();
         if (token.length() > 0)
-          tokensV.addElement(token);
+          tokensL.add(token);
       }
-      strings = (String[]) ArrayUtils.toArray(tokensV, String.class);
+      strings = (String[]) ArrayUtils.toArray(tokensL, String.class);
     }
     return strings;
   }
@@ -890,11 +904,11 @@ public class Misc extends Object {
   public static Number setBitObj(boolean turnOn, Number bits, long theBit) {
     long rc = setBit(turnOn, bits, theBit);
     if (bits instanceof Long)
-      return new Long(rc);
+      return Long.valueOf(rc);
     else if (bits instanceof Integer)
-      return new Integer((int) rc);
+      return Integer.valueOf((int) rc);
     else if (bits instanceof Short)
-      return new Short((short) rc);
+      return Short.valueOf((short) rc);
     else
       throw new IllegalArgumentException("Argument 'bits' of type " + (bits == null ? "null" : bits.getClass().getName() ) + " is not supported.");
   }

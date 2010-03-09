@@ -209,7 +209,7 @@ public class MsgPanelUtils extends Object {
           Icon icon = null;
           Record rec = null;
           if (typeChar == MsgDataRecord.RECIPIENT_USER || typeChar == MsgDataRecord.RECIPIENT_BOARD) {
-            Long lId = new Long(sId);
+            Long lId = Long.valueOf(sId);
             if (typeChar == MsgDataRecord.RECIPIENT_USER) {
               rec = convertUserIdToFamiliarUser(lId, true, false);
               if (rec != null) {
@@ -230,8 +230,8 @@ public class MsgPanelUtils extends Object {
               } else {
                 fRec = new FolderRecord();
                 fRec.folderId = lId;
-                fRec.folderType = new Short(FolderRecord.FILE_FOLDER);
-                fRec.numOfShares = new Short((short)1);
+                fRec.folderType = Short.valueOf(FolderRecord.FILE_FOLDER);
+                fRec.numOfShares = Short.valueOf((short)1);
                 recsV.addElement(fRec);
               }
               countGathered ++;
@@ -283,7 +283,7 @@ public class MsgPanelUtils extends Object {
       recipients = addressBookFilter.filterExclude(recipients);
       // gather address contacts for the address books selected
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), new Short(Record.RECORD_TYPE_FOLDER));
+      MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), Short.valueOf(Record.RECORD_TYPE_FOLDER));
       Record[] addressContactDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(addressContactLinks));
       // filter out messages leaving address contacts objects
       addressContactDatas = new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR).filterInclude(addressContactDatas);
@@ -1061,7 +1061,7 @@ public class MsgPanelUtils extends Object {
       BASymCipherBulk encText = msgDataRecord.getEncText();
       if (encText != null && encText.size() > 0 && msgDataRecord.getTextBody() == null) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        cache.bodyKeys.addElement(matchingSet);
+        cache.addMsgBodyKey(matchingSet);
         CacheUtilities.unlockPassProtectedMsg(msgDataRecord, matchingSet);
       }
     }

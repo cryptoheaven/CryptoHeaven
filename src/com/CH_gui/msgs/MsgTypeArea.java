@@ -393,7 +393,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
   }
 
   public Short getContentType() {
-    return new Short(objType);
+    return Short.valueOf(objType);
   }
 
   public short getContentMode() {

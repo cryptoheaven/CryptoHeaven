@@ -589,7 +589,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
         case FolderRecord.CATEGORY_MAIL_FOLDER:
           if (categoryMailFolder == null) {
             RecordTableComponent table = new MsgTableComponent();
-            table.initData(new Long(FolderRecord.CATEGORY_MAIL_ID));
+            table.initData(Long.valueOf(FolderRecord.CATEGORY_MAIL_ID));
             categoryMailFolder = table;
           }
           c = categoryMailFolder;
@@ -597,7 +597,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
         case FolderRecord.CATEGORY_FILE_FOLDER:
           if (categoryFileFolder == null) {
             RecordTableComponent table = new FileTableComponent();
-            table.initData(new Long(FolderRecord.CATEGORY_FILE_ID));
+            table.initData(Long.valueOf(FolderRecord.CATEGORY_FILE_ID));
             categoryFileFolder = table;
           }
           c = categoryFileFolder;
@@ -605,7 +605,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
         case FolderRecord.CATEGORY_CHAT_FOLDER:
           if (categoryChatFolder == null) {
             RecordTableComponent table = new ChatTableComponent();
-            table.initData(new Long(FolderRecord.CATEGORY_CHAT_ID));
+            table.initData(Long.valueOf(FolderRecord.CATEGORY_CHAT_ID));
             categoryChatFolder = table;
           }
           c = categoryChatFolder;
@@ -613,7 +613,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
         case FolderRecord.CATEGORY_GROUP_FOLDER:
           if (categoryGroupFolder == null) {
             RecordTableComponent table = new GroupTableComponent();
-            table.initData(new Long(FolderRecord.CATEGORY_GROUP_ID));
+            table.initData(Long.valueOf(FolderRecord.CATEGORY_GROUP_ID));
             categoryGroupFolder = table;
           }
           c = categoryGroupFolder;

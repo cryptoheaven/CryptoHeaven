@@ -46,10 +46,10 @@ import javax.swing.table.AbstractTableModel;
  */
 public abstract class RecordTableModel extends AbstractTableModel implements SearchTextProviderI {
 
-  public static final Integer TIMESTAMP_PRL = new Integer(110); // Preferred Long
-  public static final Integer TIMESTAMP_PRS = new Integer(93);  // Preferred Short
-  public static final Integer TIMESTAMP_MAX = new Integer(130); // Mac OSX has wider text
-  public static final Integer TIMESTAMP_MIN = new Integer(60);
+  public static final Integer TIMESTAMP_PRL = Integer.valueOf(110); // Preferred Long
+  public static final Integer TIMESTAMP_PRS = Integer.valueOf(93);  // Preferred Short
+  public static final Integer TIMESTAMP_MAX = Integer.valueOf(130); // Mac OSX has wider text
+  public static final Integer TIMESTAMP_MIN = Integer.valueOf(60);
 
   /** vector of all records stored in this model */
   private Vector recordsV = new Vector();

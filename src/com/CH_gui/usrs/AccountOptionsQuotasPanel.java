@@ -101,7 +101,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
         long moreMillis = userRecord.dateExpired.getTime() - now.getTime();
         long moreDays = moreMillis / 1000 / 60 / 60 / 24;
         moreDays = Math.max(moreDays, 0);
-        expDate += "   " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("(###_days)"), new Object[] {new Long(moreDays)});
+        expDate += "   " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("(###_days)"), new Object[] {Long.valueOf(moreDays)});
       }
       panel.add(new JMyLabel(expDate), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -326,7 +326,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
     value = value != null ? value.trim().toLowerCase() : "";
     Long num = null;
     if (value.length() == 0 || value.equals("unlimited")) {
-      num = new Long(UserRecord.UNLIMITED_AMOUNT);
+      num = Long.valueOf(UserRecord.UNLIMITED_AMOUNT);
     } else {
       StringTokenizer st = new StringTokenizer(value);
       String val = "";
@@ -353,15 +353,15 @@ public class AccountOptionsQuotasPanel extends JPanel {
       nf.setGroupingUsed(true);
       long longVal = nf.parse(val).longValue();
       if (units.length() == 0 || units.startsWith("byte"))
-        num = new Long(longVal);
+        num = Long.valueOf(longVal);
       else if (units.startsWith("kb"))
-        num = new Long(longVal*1024);
+        num = Long.valueOf(longVal*1024);
       else if (units.startsWith("mb"))
-        num = new Long(longVal*1024*1024);
+        num = Long.valueOf(longVal*1024*1024);
       else if (units.startsWith("gb"))
-        num = new Long(longVal*1024*1024*1024);
+        num = Long.valueOf(longVal*1024*1024*1024);
       else if (units.startsWith("tb"))
-        num = new Long(longVal*1024*1024*1024*1024);
+        num = Long.valueOf(longVal*1024*1024*1024*1024);
       else
         throw new IllegalArgumentException("Could not parse!");
     }

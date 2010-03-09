@@ -510,7 +510,7 @@ public class ToolBarModel extends Object {
       int actionId = Integer.parseInt(st.nextToken());
       MenuActionItem action = new MenuActionItem(toolName, actionId, -1, -1, -1);
       newToolBarModel.addElement(action);
-      newToolBarModelHT.put(new Integer(actionId), action);
+      newToolBarModelHT.put(Integer.valueOf(actionId), action);
     }
     return new Object[] { newToolBarModel, newToolBarModelHT };
   }

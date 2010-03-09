@@ -284,7 +284,7 @@ public class SpellingSession implements Serializable, Cloneable {
       //        char c3 = '\u03E7';
       //        char c4 = '\227';
       //        char c5 = '\u012B';
-      //        int k = getOption(new Integer(32));
+      //        int k = getOption(Integer.valueOf(32));
       //        if ((k & 0xff) == 162)
       //        {
       //          int i1 = (k & 0x1f00) >> 8;
@@ -293,7 +293,7 @@ public class SpellingSession implements Serializable, Cloneable {
       //          Date date1 = (new GregorianCalendar(2000, 0, 1)).getTime();
       //          Date date2 = new Date(date1.getTime() + (long)j1 * 0x5265c00L);
       //          long l3 = System.currentTimeMillis();
-      //          long l5 = (long)getOption(new Integer(16)) * 1000L;
+      //          long l5 = (long)getOption(Integer.valueOf(16)) * 1000L;
       //          int k2 = k & 0x7fffe000;
       //          int i3 = 0;
       //          for (int j3 = 0; j3 < 32; j3++)
@@ -319,7 +319,7 @@ public class SpellingSession implements Serializable, Cloneable {
       //                System.out.println();
       //              }
       //
-      //              setOption(new Integer(16), new Integer((int)(l3 / 1000L)));
+      //              setOption(Integer.valueOf(16), Integer.valueOf((int)(l3 / 1000L)));
       //            }
       //            throw new Exception();
       //          }
@@ -336,7 +336,7 @@ public class SpellingSession implements Serializable, Cloneable {
       //              System.out.println();
       //            }
       //
-      //            setOption(new Integer(16), new Integer((int)(l3 / 1000L)));
+      //            setOption(Integer.valueOf(16), Integer.valueOf((int)(l3 / 1000L)));
       //          }
       //        } else
       //        {

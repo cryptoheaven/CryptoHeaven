@@ -424,7 +424,7 @@ public class EmailSendingAttOps extends Object {
         Address rec = null;
         if (typeChar == MsgDataRecord.RECIPIENT_USER) {
           if (includeUsers) {
-            Long userId = new Long(sId);
+            Long userId = Long.valueOf(sId);
             try {
               String[] addressSet = dataAcquisitionHelper.getDefaultEmailAddressSet(userId);
               InternetAddress address = new InternetAddress(addressSet[1], addressSet[0]);

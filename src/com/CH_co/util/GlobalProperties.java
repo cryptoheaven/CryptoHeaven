@@ -50,7 +50,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 508;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 510;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -185,6 +185,7 @@ public class GlobalProperties extends Object {
   // build 502 Content Toolbars
   // build 506 HTML cleanup to exclude <PRE></PRE> tags
   // build 508 Offline chat and participants list with status icon
+  // build 510 Static code cleanups based on FindBugs reports, use of Number.valueOf() to conserve memory.
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
@@ -432,7 +433,7 @@ public class GlobalProperties extends Object {
     return rc;
   }
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     cleanupTempFilesOnFinalize();
     super.finalize();
   }

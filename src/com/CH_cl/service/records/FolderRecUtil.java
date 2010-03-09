@@ -26,7 +26,7 @@ import com.CH_co.util.MultiHashtable;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,7 +34,7 @@ import com.CH_co.util.MultiHashtable;
  *
  * <b>$Revision: 1.6 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderRecUtil extends Object {
 
@@ -43,9 +43,9 @@ public class FolderRecUtil extends Object {
 
   // When folder view is invalidated, lets keep these marks here.
   private static final Hashtable fldViewInvalidatedHT = new Hashtable();
-  
+
   // When update comes to the chatting folder, keep track of open Chat Frames or chat Components
-  private static final MultiHashtable openChatFolders = new MultiHashtable();
+  private static final MultiHashtable openChatFolders = new MultiHashtable(); // use synchronized version of this class
 
 
   public static void markFolderFetchRequestIssued(Long folderId) {
@@ -68,29 +68,17 @@ public class FolderRecUtil extends Object {
     return b != null ? b.booleanValue() : false;
   }
 
-  public static Vector getOpenChatFolders(Long folderId) {
-    Vector v = null;
-    synchronized (openChatFolders) {
-      v = openChatFolders.getAll(folderId);
-    }
-    return v;
+  public static Collection getOpenChatFolders(Long folderId) {
+    return openChatFolders.getAll(folderId);
   }
   public static boolean isOpenChatFolder(Long folderId) {
-    boolean rc = false;
-    synchronized (openChatFolders) {
-      rc = openChatFolders.get(folderId) != null;
-    }
-    return rc;
+    return openChatFolders.get(folderId) != null;
   }
   public static void setOpenChatFolder(Long folderId, Component comp) {
-    synchronized (openChatFolders) {
-      openChatFolders.put(folderId, comp);
-    }
+    openChatFolders.put(folderId, comp);
   }
   public static void clearOpenChatFolder(Long folderId, Component comp) {
-    synchronized (openChatFolders) {
-      openChatFolders.remove(folderId, comp);
-    }
+    openChatFolders.remove(folderId, comp);
   }
 
   public static boolean isMySuperRoot(FolderRecord folderRecord) {

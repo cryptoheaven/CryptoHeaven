@@ -527,7 +527,7 @@ public class MultiProgressMonitor extends Object {
           int value = ((Integer) valuesV.elementAt(i)).intValue();
           if (value < max) {
             mon.setProgress(value + 1);
-            valuesV.setElementAt(new Integer(value + 1), i);
+            valuesV.setElementAt(Integer.valueOf(value + 1), i);
           }
         }
       }
@@ -549,8 +549,8 @@ public class MultiProgressMonitor extends Object {
       int max = new Random().nextInt(20)+6;
       MultiProgressMonitor mon = new MultiProgressMonitor(null, "Test Monitor "+monsV.size(), "total units "+max, 0, max);
       monsV.addElement(mon);
-      maxsV.addElement(new Integer(max));
-      valuesV.addElement(new Integer(0));
+      maxsV.addElement(Integer.valueOf(max));
+      valuesV.addElement(Integer.valueOf(0));
     }
   }
 

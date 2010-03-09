@@ -200,7 +200,7 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
         int updateCount = fRec.getUpdateCount();
         if (!selected && updateCount > 0) {
           String times = updateCount > 1 ? com.CH_gui.lang.Lang.rb.getString("times") : com.CH_gui.lang.Lang.rb.getString("time");
-          toolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("folderTip_This_folder_was_updated_NUMBER-OF_TIMES_while_you_were_not_viewing_its_content..."), new Object[] {new Integer(updateCount), times});
+          toolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("folderTip_This_folder_was_updated_NUMBER-OF_TIMES_while_you_were_not_viewing_its_content..."), new Object[] {Integer.valueOf(updateCount), times});
         } else {
           String[] notes = FolderTree.getOwnerAndChatNote(fRec);
           String ownerNote = notes[0];

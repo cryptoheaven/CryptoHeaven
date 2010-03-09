@@ -104,7 +104,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     if (searchString != null && searchString.length() > 0) {
       Long userId = null;
       try {
-        userId = new Long(searchString);
+        userId = Long.valueOf(searchString);
       } catch (Throwable t) {
       }
       if (userId != null)
@@ -339,7 +339,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     Long uID = null;
     if (id != null && id.length() > 0) {
       try {
-        uID = new Long(id);
+        uID = Long.valueOf(id);
       } catch (NumberFormatException e) {
         inputValid = false;
         String messageText = com.CH_gui.lang.Lang.rb.getString("msg_User_ID_must_have_a_numeric_value.");

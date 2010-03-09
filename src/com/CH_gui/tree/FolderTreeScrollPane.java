@@ -30,8 +30,7 @@ import com.CH_gui.gui.*;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.dnd.*;
-import java.util.EventObject;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
@@ -41,7 +40,7 @@ import javax.swing.border.EmptyBorder;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -49,7 +48,7 @@ import javax.swing.border.EmptyBorder;
  *
  * <b>$Revision: 1.32 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 
 public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
@@ -67,21 +66,21 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   private DropTarget dropTarget2;
 
 
-  /** 
-   * Creates new FolderTreeScrollPane 
+  /**
+   * Creates new FolderTreeScrollPane
    * With Actions, No Filter, Auto Fetch.
    */
   public FolderTreeScrollPane() {
     this(new FolderActionTree(), true);
   }
-  /** 
-   * Creates new FolderTreeScrollPane 
+  /**
+   * Creates new FolderTreeScrollPane
    * With Actions, No Filter, Auto Fetch.
    */
   public FolderTreeScrollPane(RecordFilter filter) {
     this(new FolderActionTree(filter), true);
   }
-  /** 
+  /**
    * Creates new FolderTreeScrollPane
    * No Filter, Auto Fetch.
    * @param withAction If true, action packed tree will be used, false for no action tree.
@@ -89,7 +88,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   public FolderTreeScrollPane(boolean withAction) {
     this(withAction ? new FolderActionTree() : new FolderTree(), true);
   }
-  /** 
+  /**
    * Creates new FolderTreeScrollPane
    * @param withAction If true, action packed tree will be used, false for no action tree.
    * @param filter Sets the tree to be filtered.
@@ -97,7 +96,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   public FolderTreeScrollPane(boolean withAction, RecordFilter filter) {
     this(withAction ? new FolderActionTree(filter) : new FolderTree(filter), true);
   }
-  /** 
+  /**
    * Creates new FolderTreeScrollPane
    * @param withAction If true, action packed tree will be used, false for no action tree.
    * @param filter Sets the tree to be filtered.
@@ -106,7 +105,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   public FolderTreeScrollPane(boolean withAction, RecordFilter filter, FolderPair[] initialFolderPairs) {
     this(withAction ? new FolderActionTree(filter, initialFolderPairs) : new FolderTree(filter, initialFolderPairs), false);
   }
-  /** 
+  /**
    * Creates new FolderTreeScrollPane with a specified FolderTree.
    * @param tree The underlying folder tree in this pane.
    * @param autoFetch If true, request to fetch all folders is sent to the server.
@@ -137,8 +136,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
       fetchFolders();
 
     FolderDND_DropTargetListener dropListener = new FolderDND_DropTargetListener(tree);
-    dropTarget1 = new DropTarget(tree, dropListener); 
-    dropTarget2 = new DropTarget(getViewport(), dropListener); 
+    dropTarget1 = new DropTarget(tree, dropListener);
+    dropTarget2 = new DropTarget(getViewport(), dropListener);
     DragSource dragSource = DragSource.getDefaultDragSource();
     FolderDND_DragGestureListener dragGestureListener = new FolderDND_DragGestureListener(tree);
     dragSource.createDefaultDragGestureRecognizer(tree, DnDConstants.ACTION_MOVE, dragGestureListener);
@@ -165,10 +164,10 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
     MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction);
 
     if (trace != null) trace.exit(FolderTreeScrollPane.class);
-  } 
+  }
 
   /** Set <code> records </code> in the tree.
-    * if records do not exist, add them, 
+    * if records do not exist, add them,
     * else update the existing ones
     */
   private void setFoldersInTree(FolderPair[] records) {
@@ -320,7 +319,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
             FolderShareRecord sRec = cache.getFolderShareRecordMy(folderId, true);
             if (sRec != null) {
               try {
-                Vector chatCompsV = FolderRecUtil.getOpenChatFolders(folderId);
+                Collection chatCompsV = FolderRecUtil.getOpenChatFolders(folderId);
                 Component[] chatComps = null;
                 if (chatCompsV != null && chatCompsV.size() > 0) {
                   chatComps = (Component[]) ArrayUtils.toArray(chatCompsV, Component.class);
@@ -382,7 +381,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   } // end class FolderGUIUpdater
 
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     disposeObj();
     super.finalize();
   }
@@ -414,6 +413,6 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
     msgLinkListener = null;
     if (tree != null)
       tree.disposeObj();
-  }  
+  }
 
 }

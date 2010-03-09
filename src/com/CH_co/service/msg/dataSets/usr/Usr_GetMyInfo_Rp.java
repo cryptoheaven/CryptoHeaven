@@ -69,7 +69,7 @@ public class Usr_GetMyInfo_Rp extends ProtocolMsgDataSet {
   /** Writes out 'this' object to a stream */
   public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
     if (userRecord == null) {
-      dataOut.writeLongObj(new Long(-1));
+      dataOut.writeLongObj(Long.valueOf(-1));
     } else {
       dataOut.writeLongObj(userRecord.userId);
       dataOut.writeString(userRecord.handle);
@@ -83,7 +83,7 @@ public class Usr_GetMyInfo_Rp extends ProtocolMsgDataSet {
         short oldAccSpam = 0;
         oldAccSpam |= (userRecord.acceptingSpam.shortValue() & UserRecord.ACC_SPAM_YES_INTER) != 0 ? 2 : 0;
         oldAccSpam |= (userRecord.acceptingSpam.shortValue() & UserRecord.ACC_SPAM_YES_REG_EMAIL) != 0 ? 4 : 0;
-        dataOut.writeSmallint(new Short(oldAccSpam));
+        dataOut.writeSmallint(Short.valueOf(oldAccSpam));
       } else {
         dataOut.writeSmallint(userRecord.acceptingSpam);
       }
@@ -96,7 +96,7 @@ public class Usr_GetMyInfo_Rp extends ProtocolMsgDataSet {
           short oldNotify = 0;
           oldNotify |= (userRecord.notifyByEmail.shortValue() & UserRecord.EMAIL_NOTIFY_YES) != 0 ? 2 : 1;
           oldNotify |= (userRecord.notifyByEmail.shortValue() & UserRecord.EMAIL_WARN_EXTERNAL) == 0 ? 4 : 0;
-          dataOut.writeSmallint(new Short(oldNotify));
+          dataOut.writeSmallint(Short.valueOf(oldNotify));
         } 
         dataOut.writeTimestamp(userRecord.dateNotified);
       }

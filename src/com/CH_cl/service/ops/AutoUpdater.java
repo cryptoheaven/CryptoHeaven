@@ -275,14 +275,14 @@ public class AutoUpdater extends ThreadTraced {
     // header part
     // boundry byte | boundry type 0=eof, 1=header, 1=data, 2=free space
     if (updateRec.size.intValue() > TINY_FILE_SIZE) {
-      Object[] header = new Object[] { new Integer(0), BOUNDRY_HEADER };
+      Object[] header = new Object[] { Integer.valueOf(0), BOUNDRY_HEADER };
       updateStruct.addLast(header);
-      Object[] freeSpace = new Object[] { new Integer(MAX_HEADER_SIZE), BOUNDRY_FREE};
+      Object[] freeSpace = new Object[] { Integer.valueOf(MAX_HEADER_SIZE), BOUNDRY_FREE};
       updateStruct.addLast(freeSpace);
       Object[] eof = new Object[] { updateRec.size, BOUNDRY_EOF };
       updateStruct.addLast(eof);
     } else {
-      Object[] freeSpace = new Object[] { new Integer(0), BOUNDRY_FREE };
+      Object[] freeSpace = new Object[] { Integer.valueOf(0), BOUNDRY_FREE };
       updateStruct.addLast(freeSpace);
       Object[] eof = new Object[] { updateRec.size, BOUNDRY_EOF };
       updateStruct.addLast(eof);
@@ -332,10 +332,10 @@ public class AutoUpdater extends ThreadTraced {
       int boundry = ((Integer) boundryObjs[0]).intValue();
       Byte type = (Byte) boundryObjs[1];
       if (boundry == startPosition) {
-        boundryObjs[0] = new Integer(startPosition);
+        boundryObjs[0] = Integer.valueOf(startPosition);
         boundryObjs[1] = BOUNDRY_DATA;
         // Create a new boundry at end of chunk
-        Object[] boundryNew = new Object[] { new Integer(startPosition + bytes.length), BOUNDRY_FREE };
+        Object[] boundryNew = new Object[] { Integer.valueOf(startPosition + bytes.length), BOUNDRY_FREE };
         iter.add(boundryNew);
         break;
       }
@@ -423,7 +423,7 @@ public class AutoUpdater extends ThreadTraced {
 
     if (unfetchedBoundry >= 0 && batchSize > 0) {
       Sys_AutoUpdate_Co requestSet = new Sys_AutoUpdate_Co();
-      requestSet.dataSet = new Obj_List_Co(new Object[] { updateRec.id, new Integer(unfetchedBoundry), new Integer(batchSize) });
+      requestSet.dataSet = new Obj_List_Co(new Object[] { updateRec.id, Integer.valueOf(unfetchedBoundry), Integer.valueOf(batchSize) });
       MessageAction msgAction = new MessageAction(CommandCodes.SYS_Q_GET_AUTO_UPDATE, requestSet);
       ClientMessageAction reply = SIL.submitAndFetchReply(msgAction, 15*60000);
       if (reply instanceof SysAGetAutoUpdate) {
@@ -648,7 +648,7 @@ public class AutoUpdater extends ThreadTraced {
   private void writeApplyUpdatesClass() throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "writeApplyUpdatesClass()");
     Sys_AutoUpdate_Co requestSet = new Sys_AutoUpdate_Co();
-    requestSet.dataSet = new Obj_List_Co(new Object[] { new Long(-1), null, null });
+    requestSet.dataSet = new Obj_List_Co(new Object[] { Long.valueOf(-1), null, null });
     MessageAction msgAction = new MessageAction(CommandCodes.SYS_Q_GET_AUTO_UPDATE, requestSet);
     ClientMessageAction reply = SIL.submitAndFetchReply(msgAction, 15*60000);
     if (reply instanceof SysAGetAutoUpdate) {

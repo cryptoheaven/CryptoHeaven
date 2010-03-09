@@ -435,7 +435,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     */
   private Short getFolderType() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Move_NewFld_Dialog.class, "getFolderType()");
-    Short folderType = new Short((short)1);             /* default file type*/
+    Short folderType = Short.valueOf((short)1);             /* default file type*/
     if (selectedFolderPair != null) {
       folderType = selectedFolderPair.getFolderRecord().folderType;
     }
@@ -534,11 +534,11 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
       if (folderPurgingPanel != null) {
         Short numToKeep = folderPurgingPanel.folderAttributesPanel.getNumToKeep();
         if (numToKeep == null || numToKeep.shortValue() == 0) {
-          folderPurgingPanel.folderAttributesPanel.setNumToKeep(new Short(DEFAULT_CHAT_PURGING_RECORD_NUM));
+          folderPurgingPanel.folderAttributesPanel.setNumToKeep(Short.valueOf(DEFAULT_CHAT_PURGING_RECORD_NUM));
         }
         Integer keepAsOldAs = folderPurgingPanel.folderAttributesPanel.getKeepAsOldAs();
         if (keepAsOldAs == null || keepAsOldAs.intValue() == 0) {
-          folderPurgingPanel.folderAttributesPanel.setKeepAsOldAs(new Integer(DEFAULT_CHAT_PURGING_RECORD_SECONDS));
+          folderPurgingPanel.folderAttributesPanel.setKeepAsOldAs(Integer.valueOf(DEFAULT_CHAT_PURGING_RECORD_SECONDS));
         }
       }
     } else {

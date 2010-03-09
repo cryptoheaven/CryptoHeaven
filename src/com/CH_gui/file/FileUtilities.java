@@ -16,11 +16,9 @@ import java.util.*;
 
 import com.CH_gui.frame.MainFrame;
 
-import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.cache.FetchedDataCache;
 
-import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.fld.*;
@@ -36,7 +34,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  * All common methods for folders or/and folder records should be placed here
  *
  * Class Details:
@@ -44,7 +42,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.17 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileUtilities extends Object {
 
@@ -95,7 +93,7 @@ public class FileUtilities extends Object {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "renameFolderAndShares.afterKeyFetchRunner.run()");
 
         try {
-          Hashtable groupIDsHT = null;
+          Set groupIDsSet = null;
           for (int i=0; i<shares.length; i++) {
             FolderShareRecord share = shares[i];
             // Keep the same folder key for all shares, users must have same key to decrypt content successfuly.
@@ -108,8 +106,8 @@ public class FileUtilities extends Object {
               else
                 share.seal(cache.getKeyRecordForUser(ownerUserId));
             } else {
-              if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-              FolderShareRecord groupShare = cache.getFolderShareRecordMy(share.ownerUserId, groupIDsHT);
+              if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+              FolderShareRecord groupShare = cache.getFolderShareRecordMy(share.ownerUserId, groupIDsSet);
               // we should have the key of the group, but check just in case
               if (groupShare != null) {
                 share.seal(groupShare.getSymmetricKey());

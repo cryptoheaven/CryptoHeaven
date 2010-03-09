@@ -264,7 +264,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     if (trace != null) trace.exit(ServerInterfaceWorker.class);
   }
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "finalize()");
     if (trace != null) trace.data(10, this);
     try {
@@ -366,7 +366,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
             // Since the reply has been read, there is no communication error and we can remove the interruptable message.
             synchronized (outgoingInterruptableActionsHT) {
-              outgoingInterruptableActionsHT.remove(new Long(msgActionStamp));
+              outgoingInterruptableActionsHT.remove(Long.valueOf(msgActionStamp));
             }
 
             // we must ignore idle restart here due to possibly incoming notifications which are treated as IDLE messages
@@ -700,7 +700,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
           // Remember every action that is sent, so when worker dies, all actions can be properly interrupted.
           synchronized (outgoingInterruptableActionsHT) {
-            outgoingInterruptableActionsHT.put(new Long(msgActionStamp), msgAction);
+            outgoingInterruptableActionsHT.put(Long.valueOf(msgActionStamp), msgAction);
           }
 
           if (JobFifo.getJobType(msgAction) == JobFifo.JOB_TYPE_HEAVY || 
@@ -766,7 +766,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
                 pm.jobForRetry();
               // Since we will retry this action, it is not yet done and should not be interrupted.
               synchronized (outgoingInterruptableActionsHT) {
-                outgoingInterruptableActionsHT.remove(new Long(msgAction.getStamp()));
+                outgoingInterruptableActionsHT.remove(Long.valueOf(msgAction.getStamp()));
               }
               // Don't allow it to be killed so pretend nothing happend and it will be retried.
               msgAction = null;

@@ -21,7 +21,7 @@ import com.CH_co.trace.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -29,15 +29,15 @@ import com.CH_co.trace.*;
  *
  * <b>$Revision: 1.11 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class SingleTokenArbiter extends Object {
 
-  private Hashtable ht = new Hashtable();
-  private Hashtable htTrace = new Hashtable();
+  private final HashMap hm = new HashMap();
+  private final HashMap hmTrace = new HashMap();
 
   /**
-   * Stores a token for a key, if another token is already stored for the same key, 
+   * Stores a token for a key, if another token is already stored for the same key,
    * it quits without storing the new token.  Max one token per key.
    * @return true if the new token was stored, false when another token was already present.
    */
@@ -45,14 +45,14 @@ public class SingleTokenArbiter extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SingleTokenArbiter.class, "putToken(Object key, Object token)");
     if (trace != null) trace.args(key, token);
     boolean stored = false;
-    synchronized (ht) {
+    synchronized (hm) {
       if (trace != null) trace.data(10, "synchronized block... entered", this);
-      if (ht.get(key) == null) {
-        ht.put(key, token);
+      if (hm.get(key) == null) {
+        hm.put(key, token);
         stored = true;
       }
       if (stored)
-        htTrace.put(key, Thread.currentThread().getName());
+        hmTrace.put(key, Thread.currentThread().getName());
       if (trace != null) trace.data(100, "synchronized block... done", this);
     }
     if (trace != null) trace.exit(SingleTokenArbiter.class, stored);
@@ -64,16 +64,16 @@ public class SingleTokenArbiter extends Object {
   public void removeToken(Object key, Object token) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SingleTokenArbiter.class, "removeToken(Object key, Object token)");
     if (trace != null) trace.args(key, token);
-    synchronized (ht) {
+    synchronized (hm) {
       if (trace != null) trace.data(10, "synchronized block... entered", this);
-      Object obj = ht.get(key);
+      Object obj = hm.get(key);
       if (obj == null) {
         throw new IllegalArgumentException("There is no token stored for a given key.");
       } else if (!token.equals(obj)) {
         throw new IllegalArgumentException("Specified token does not match the one stored.");
       } else {
-        ht.remove(key);
-        htTrace.remove(key);
+        hm.remove(key);
+        hmTrace.remove(key);
       }
       if (trace != null) trace.data(100, "synchronized block... done", this);
     }
@@ -81,9 +81,11 @@ public class SingleTokenArbiter extends Object {
   }
 
   public String toString() {
-    return "[SingleTokenArbiter"
-      + ": ht=" + Misc.objToStr(ht)
-      + ", htTrace=" + Misc.objToStr(htTrace)
-      + "]";
+    synchronized (hm) {
+      return "[SingleTokenArbiter"
+        + ": ht=" + Misc.objToStr(hm)
+        + ", htTrace=" + Misc.objToStr(hmTrace)
+        + "]";
+    }
   }
 }

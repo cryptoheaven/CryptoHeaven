@@ -58,9 +58,9 @@ public class MenuActionItem extends Object implements List_Viewable, Cloneable {
 
   public MenuActionItem(String menuName, int actionId, int mnemonic, int keyCode, int mask) {
     this.menuName = menuName;
-    this.actionId = new Integer(actionId);
+    this.actionId = Integer.valueOf(actionId);
     if (mnemonic != -1)
-      this.mnemonic = new Integer(mnemonic);
+      this.mnemonic = Integer.valueOf(mnemonic);
     if (keyCode != -1)
       this.keyStroke = KeyStroke.getKeyStroke(keyCode, mask);
     this.defaultProperty = true;

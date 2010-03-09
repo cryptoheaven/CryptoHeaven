@@ -564,7 +564,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               TableModel rawModel = sTable.getRawModel();
               if (rawModel instanceof MsgTableModel) {
                 MsgTableModel tableModel = (MsgTableModel) rawModel;
-                if (ArrayUtils.find(tableModel.getColumnHeaderData().data[ColumnHeaderData.I_VIEWABLE_SEQUENCE_DEFAULT_LONG], new Integer(15)) > -1) {
+                if (ArrayUtils.find(tableModel.getColumnHeaderData().data[ColumnHeaderData.I_VIEWABLE_SEQUENCE_DEFAULT_LONG], Integer.valueOf(15)) > -1) {
                   Object[] o = mData.getSecurityTextAndIcon();
                   JLabel icon = new JLabel((Icon) o[1]);
                   jIconSetRenderer.add(icon);

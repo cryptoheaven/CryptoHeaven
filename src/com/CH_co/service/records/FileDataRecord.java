@@ -210,7 +210,7 @@ public class FileDataRecord extends Record {
       if (progressMonitor != null) progressMonitor.setCurrentStatus("Signing Encrypted File ... signed.");
 
       signingKeyId = signingKeyRecord.keyId;
-      encSize = new Long(tempFile.length());
+      encSize = Long.valueOf(tempFile.length());
 
       // Remember the newly created encrypted file.
       encDataFile = tempFile;
@@ -647,7 +647,7 @@ public class FileDataRecord extends Record {
     } catch (Throwable t) { }
   }
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     cleanupEncFile();
     // see if plain file needs to be deleted
     try {

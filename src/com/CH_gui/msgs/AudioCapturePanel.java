@@ -489,7 +489,7 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
     }
   }//end main
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     cleanupTempFiles();
     super.finalize();
   }

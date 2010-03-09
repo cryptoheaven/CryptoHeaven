@@ -300,7 +300,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
       if (startBracket < endBracket) {
         handle = userNameAndNumber.substring(0, startBracket).trim();
         number = userNameAndNumber.substring(startBracket+1, endBracket);
-        numberL = new Long(number);
+        numberL = Long.valueOf(number);
         formatOk = true;
       }
     } catch (Throwable t) {

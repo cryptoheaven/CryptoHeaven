@@ -119,7 +119,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     // Set default PERMITS into a sample user record which we are creating...
     this.userRecord = UserRecord.getDefaultUserSettings(UserRecord.STATUS_BUSINESS_SUB);
     // skip NOTIFY_EMAIL_YES because it needs a contact email address too
-    userRecord.notifyByEmail = new Short((short) Misc.setBit(false, userRecord.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
+    userRecord.notifyByEmail = Short.valueOf((short) Misc.setBit(false, userRecord.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
     UserRecord.trimChildToParent(userRecord, myUser);
 
     super.initialize();
@@ -344,7 +344,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
         RSAKeyPair keyPair = RSAKeyPairGenerator.generateKeyPair(keyLength, certainty, this);
         Usr_NewUsr_Rq request = LoginFrame.createNewUserRequest(keyPair, uAcc.handle, ba.getHashValue(), uAcc.emailAddress, null, spam, notify, flags, ba);
-        request.userRecord.maxSubAccounts = new Short(UserRecord.UNLIMITED_AMOUNT);
+        request.userRecord.maxSubAccounts = Short.valueOf(UserRecord.UNLIMITED_AMOUNT);
         newUsrRequestsV.addElement(request);
       }
 
@@ -704,7 +704,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
   private static void sendMessageToSelf(ServerInterfaceLayer SIL, String subject, String body) {
     BASymmetricKey ba = new BASymmetricKey(32);
     MsgLinkRecord[] linkRecords = SendMessageRunner.prepareMsgLinkRecords(new UserRecord[] { SIL.getFetchedDataCache().getUserRecord() }, ba, null);
-    MsgDataRecord dataRecord = SendMessageRunner.prepareMsgDataRecord(ba, new Short(MsgDataRecord.IMPORTANCE_HIGH_PLAIN), subject, body, null);
+    MsgDataRecord dataRecord = SendMessageRunner.prepareMsgDataRecord(ba, Short.valueOf(MsgDataRecord.IMPORTANCE_HIGH_PLAIN), subject, body, null);
     Msg_New_Rq newMsgRequest = new Msg_New_Rq(null, null, null, linkRecords, dataRecord, null, null, null, null);
     MessageAction requestMessageAction = new MessageAction(CommandCodes.MSG_Q_NEW, newMsgRequest);
     SIL.submitAndReturn(requestMessageAction);
@@ -747,7 +747,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
           if (estimatedTime == null) {
             jExpectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
             validate();
-            estimatedTime = new Integer(estimateKeyGenerationTimeNow(keyLength, certainty)+1);
+            estimatedTime = Integer.valueOf(estimateKeyGenerationTimeNow(keyLength, certainty)+1);
             jExpectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] { estimatedTime }));
             validate();
           }
@@ -763,7 +763,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
   private int estimateKeyGenerationTimeNow(int keyLength, int certainty) {
     synchronized (estimateMonitor) {
       if (estimatedTime == null) {
-        estimatedTime = new Integer(LoginFrame.estimateGenerationTime(keyLength, certainty) * accountsV.size());
+        estimatedTime = Integer.valueOf(LoginFrame.estimateGenerationTime(keyLength, certainty) * accountsV.size());
       }
       return estimatedTime.intValue();
     }

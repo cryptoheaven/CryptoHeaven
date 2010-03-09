@@ -240,7 +240,7 @@ public class BlockCipherInputStream extends InputStream {
     rijndael_CBC = null;
     messageDigest = null;
 
-    if (trace != null) trace.data(100, "Total bytes read=", new Long(totalTransmitedBytes));
+    if (trace != null) trace.data(100, "Total bytes read=", Long.valueOf(totalTransmitedBytes));
     if (trace != null) trace.exit(BlockCipherInputStream.class);
   }
 

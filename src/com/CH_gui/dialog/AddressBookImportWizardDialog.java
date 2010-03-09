@@ -231,7 +231,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
                 XMLElement[] address = makeAddressFromData(mappedLine, destinationFields.length);
                 BASymmetricKey key = new BASymmetricKey(32);
                 MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(recipient, key, AddressBookImportWizardDialog.this);
-                MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), address[0].toString(), address[1].toString(), null);
+                MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, Short.valueOf(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), Short.valueOf(MsgDataRecord.OBJ_TYPE_ADDR), address[0].toString(), address[1].toString(), null);
                 Msg_New_Rq request = new Msg_New_Rq(shareId, null, links[0], data);
                 request.hashes = SendMessageRunner.prepareAddrHashes(data);
                 MessageAction action = new MessageAction(CommandCodes.MSG_Q_NEW, request);

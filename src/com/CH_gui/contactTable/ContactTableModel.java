@@ -52,16 +52,16 @@ public class ContactTableModel extends RecordTableModel {
         { { null, com.CH_gui.lang.Lang.rb.getString("column_Name"), null, com.CH_gui.lang.Lang.rb.getString("column_Contact_ID"), com.CH_gui.lang.Lang.rb.getString("column_User_ID"), com.CH_gui.lang.Lang.rb.getString("column_Encryption"), com.CH_gui.lang.Lang.rb.getString("column_Created"), com.CH_gui.lang.Lang.rb.getString("column_Updated"), null },
           { com.CH_gui.lang.Lang.rb.getString("column_Direction"), com.CH_gui.lang.Lang.rb.getString("column_Name"), com.CH_gui.lang.Lang.rb.getString("column_Status"), com.CH_gui.lang.Lang.rb.getString("column_Contact_ID"), com.CH_gui.lang.Lang.rb.getString("column_User_ID"), com.CH_gui.lang.Lang.rb.getString("column_Encryption"), com.CH_gui.lang.Lang.rb.getString("column_Created"), com.CH_gui.lang.Lang.rb.getString("column_Updated"), com.CH_gui.lang.Lang.rb.getString("column_Permissions") },
           { com.CH_gui.lang.Lang.rb.getString("columnTip_Direction_of_the_contact..."), null, com.CH_gui.lang.Lang.rb.getString("columnTip_Contact_Status"), com.CH_gui.lang.Lang.rb.getString("columnTip_Contact_Permissions") },
-          { new Integer(ImageNums.ARROW_DOUBLE16), null, new Integer(ImageNums.HANDSHAKE16), null, null, null, null, null, new Integer(ImageNums.TOOLS16) },
-          { new Integer(18), new Integer(128), new Integer(18), new Integer( 60), new Integer( 60), new Integer(120), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer(30) },
-          { new Integer(18), new Integer(128), new Integer(18), new Integer( 60), new Integer( 60), new Integer(120), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer(30) },
-          { new Integer(18), new Integer(128), new Integer(18), new Integer( 60), new Integer( 60), new Integer(120), TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer(30) },
-          { new Integer(18), new Integer(  0), new Integer(18), new Integer(120), new Integer(120), new Integer(130), TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(30) },
-          { new Integer(18), new Integer( 70), new Integer(18), new Integer( 50), new Integer( 50), new Integer( 70), TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer(30) },
-          { new Integer(0), new Integer(1) },
-          { new Integer(0), new Integer(1) },
-          { new Integer(0), new Integer(1) },
-          { new Integer(1), new Integer(0) }
+          { Integer.valueOf(ImageNums.ARROW_DOUBLE16), null, Integer.valueOf(ImageNums.HANDSHAKE16), null, null, null, null, null, Integer.valueOf(ImageNums.TOOLS16) },
+          { Integer.valueOf(18), Integer.valueOf(128), Integer.valueOf(18), Integer.valueOf( 60), Integer.valueOf( 60), Integer.valueOf(120), TIMESTAMP_PRL, TIMESTAMP_PRL, Integer.valueOf(30) },
+          { Integer.valueOf(18), Integer.valueOf(128), Integer.valueOf(18), Integer.valueOf( 60), Integer.valueOf( 60), Integer.valueOf(120), TIMESTAMP_PRL, TIMESTAMP_PRL, Integer.valueOf(30) },
+          { Integer.valueOf(18), Integer.valueOf(128), Integer.valueOf(18), Integer.valueOf( 60), Integer.valueOf( 60), Integer.valueOf(120), TIMESTAMP_PRS, TIMESTAMP_PRS, Integer.valueOf(30) },
+          { Integer.valueOf(18), Integer.valueOf(  0), Integer.valueOf(18), Integer.valueOf(120), Integer.valueOf(120), Integer.valueOf(130), TIMESTAMP_MAX, TIMESTAMP_MAX, Integer.valueOf(30) },
+          { Integer.valueOf(18), Integer.valueOf( 70), Integer.valueOf(18), Integer.valueOf( 50), Integer.valueOf( 50), Integer.valueOf( 70), TIMESTAMP_MIN, TIMESTAMP_MIN, Integer.valueOf(30) },
+          { Integer.valueOf(0), Integer.valueOf(1) },
+          { Integer.valueOf(0), Integer.valueOf(1) },
+          { Integer.valueOf(0), Integer.valueOf(1) },
+          { Integer.valueOf(1), Integer.valueOf(0) }
         });
 
   /** Creates new ContactTableModel */
@@ -327,7 +327,7 @@ public class ContactTableModel extends RecordTableModel {
     }
   }
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     setAutoUpdate(false);
     super.finalize();
   }

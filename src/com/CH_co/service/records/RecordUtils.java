@@ -19,7 +19,7 @@ import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
 
-/** 
+/**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
@@ -33,7 +33,7 @@ import com.CH_co.util.ArrayUtils;
  *
  * <b>$Revision: 1.20 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class RecordUtils extends Object {
 
@@ -60,15 +60,25 @@ public class RecordUtils extends Object {
     return ids;
   }
   /** @return records' IDs */
-  public static Long[] getIDs(Vector records) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getIDs(Vector records)");
+  public static Long[] getIDs(Collection records) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getIDs(Collection records)");
     if (trace != null) trace.args(records);
 
     Long[] ids = null;
     if (records != null) {
       ids = new Long[records.size()];
-      for (int i=0; i<records.size(); i++) {
-        ids[i] = ((Record) records.elementAt(i)).getId();
+      if (records instanceof List) {
+        List list = (List) records;
+        for (int i=0; i<records.size(); i++) {
+          ids[i] = ((Record) list.get(i)).getId();
+        }
+      } else {
+        Iterator iter = records.iterator();
+        int i = 0;
+        while (iter.hasNext()) {
+          ids[i] = ((Record) iter.next()).getId();
+          i ++;
+        }
       }
     }
 
@@ -76,24 +86,24 @@ public class RecordUtils extends Object {
     return ids;
   }
   /** @return IDs */
-  public static Long[] getIDs2(Vector IDsV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getIDs(Vector IDsV)");
-    if (trace != null) trace.args(IDsV);
-    Long[] ids = (Long[]) ArrayUtils.toArray(IDsV, Long.class);
+  public static Long[] getIDs2(Collection IDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getIDs(Collection IDs)");
+    if (trace != null) trace.args(IDs);
+    Long[] ids = (Long[]) ArrayUtils.toArray(IDs, Long.class);
     if (trace != null) trace.exit(RecordUtils.class, ids);
     return ids;
   }
 
 
   /** @return String in brackets of record IDs separated by a comma.  Eg: "(1,2,3)" */
-  public static String getIDsStr(Vector recordsV) {
-    Record[] records = (Record[]) ArrayUtils.toArray(recordsV, Record.class);
+  public static String getIDsStr(Collection recordsL) {
+    Record[] records = (Record[]) ArrayUtils.toArray(recordsL, Record.class);
     return getIDsStr(records);
   }
 
   /** @return String in brackets of record IDs separated by a comma.  Eg: "(1,2,3)" */
-  public static String getIDsStr2(Vector IDsV) {
-    Long[] IDs = (Long[]) ArrayUtils.toArray(IDsV, Long.class);
+  public static String getIDsStr2(Collection IDsL) {
+    Long[] IDs = (Long[]) ArrayUtils.toArray(IDsL, Long.class);
     return getIDsStr(IDs);
   }
 
@@ -137,7 +147,7 @@ public class RecordUtils extends Object {
 
 
   /**
-   * @return an array with elements that exist in both arrays comparing using the getId() method.  
+   * @return an array with elements that exist in both arrays comparing using the getId() method.
    * Elements from the sourceMap are returned.
    */
   public static Record[] AND(Map sourceMap, Record[] compareTo) {
@@ -156,21 +166,21 @@ public class RecordUtils extends Object {
    * @return an array with elements that EXIST in the sourceMap when probed from compareTo array.
    * Elements from the sourceMap if it exists there, or from compareTo is it doesn't exist in the sorceMap.
    */
-  private static Record[] pick(Map sourceMap, Record[] compareTo, boolean exist) {
-    Vector resultsV = new Vector();
+  private static Record[] pick(Map sourceMap, Record[] recs, boolean exist) {
+    ArrayList resultsL = new ArrayList(recs.length);
 
-    for (int i=0; i<compareTo.length; i++) {
-      Object o = sourceMap.get(compareTo[i].getId());
+    for (int i=0; i<recs.length; i++) {
+      Record rec = recs[i];
+      Object o = sourceMap.get(rec.getId());
       if ((o != null) == exist) {
         if (o != null)
-          resultsV.addElement(o);
-        else 
-          resultsV.addElement(compareTo[i]);
+          resultsL.add(o);
+        else
+          resultsL.add(rec);
       }
     }
 
-    Record[] results = (Record[]) Array.newInstance(compareTo.getClass().getComponentType(), resultsV.size());
-    resultsV.copyInto(results);
+    Record[] results = (Record[]) ArrayUtils.toArray(resultsL, recs.getClass().getComponentType());
     return results;
   }
 
@@ -180,34 +190,32 @@ public class RecordUtils extends Object {
    * @return an array of records that were touched in the map either by merging or insertion.
    * The returned array has the same runtime type as the sourceRecords array.
    */
-  public static Record[] merge(Map destinationMap, Record[] sourceRecords) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "merge(Map destinationMap, Record[] sourceRecords)");
+  public static Record[] merge(Map destinationMap, Record[] recs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "merge(Map destinationMap, Record[] recs)");
     if (trace != null) trace.args(destinationMap);
-    if (trace != null) trace.args(sourceRecords);
-    Vector resultsV = new Vector();
+    if (trace != null) trace.args(recs);
+    ArrayList resultsL = new ArrayList(recs.length);
 
-    for (int i=0; i<sourceRecords.length; i++) {
-      Record rec = sourceRecords[i];
-        if (rec != null) {
+    for (int i=0; i<recs.length; i++) {
+      Record rec = recs[i];
+      if (rec != null) {
         Long id = rec.getId();
         Record o = (Record) destinationMap.get(id);
         // if not in map, insert
         // else merge with the map element
         if (o == null) {
           destinationMap.put(id, rec);
-          resultsV.addElement(rec); // DON'T clone
+          resultsL.add(rec); // DON'T clone
         } else {
           o.merge(rec);
-          resultsV.addElement(o); // DON'T clone
+          resultsL.add(o); // DON'T clone
         }
 
         if (o != null && !(o.getClass().isInstance(rec)))
           throw new IllegalArgumentException("Runtime instance of the specified destinationMap elements and sourceRecords elements do not match.");
       }
     }
-
-    Record[] results = (Record[]) Array.newInstance(sourceRecords.getClass().getComponentType(), resultsV.size());
-    resultsV.copyInto(results);
+    Record[] results = (Record[]) ArrayUtils.toArray(resultsL, recs.getClass().getComponentType());
 
     if (trace != null) trace.exit(RecordUtils.class, results);
     return results;
@@ -219,23 +227,23 @@ public class RecordUtils extends Object {
    * No records either in the map or from the array are merged during this operation.
    * The returned array has the same runtime type as the toRemoveItems array.
    */
-  public static Record[] remove(Map removeFromMap, Record[] toRemoveItems) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "remove(Map removeFromMap, Record[] toRemoveItems)");
+  public static Record[] remove(Map removeFromMap, Record[] recs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "remove(Map removeFromMap, Record[] recs)");
     if (trace != null) trace.args(removeFromMap);
-    if (trace != null) trace.args(toRemoveItems);
-    Vector resultsV = new Vector();
+    if (trace != null) trace.args(recs);
+    ArrayList resultsL = new ArrayList(recs.length);
 
-    for (int i=0; i<toRemoveItems.length; i++) {
-      Record rec = toRemoveItems[i];
+    for (int i=0; i<recs.length; i++) {
+      Record rec = recs[i];
       if (rec != null) {
         Long id = rec.getId();
         Record o = (Record) removeFromMap.remove(id);
-        // if found in map put to result vector,
-        // else put the queried item from array to result vector.
+        // if found in map then put to results,
+        // else put the queried item from source to results.
         if (o == null) {
-          resultsV.addElement(rec); // DON'T clone
+          resultsL.add(rec); // DON'T clone
         } else {
-          resultsV.addElement(o); // DON'T clone
+          resultsL.add(o); // DON'T clone
         }
 
         if (o != null && !(o.getClass().isInstance(rec)))
@@ -243,8 +251,7 @@ public class RecordUtils extends Object {
       }
     }
 
-    Record[] results = (Record[]) Array.newInstance(toRemoveItems.getClass().getComponentType(), resultsV.size());
-    resultsV.copyInto(results);
+    Record[] results = (Record[]) ArrayUtils.toArray(resultsL, recs.getClass().getComponentType());
 
     if (trace != null) trace.exit(RecordUtils.class, results);
     return results;
@@ -269,12 +276,12 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * @return the Record from the Vector with specified ID
+   * @return the Record from the List with specified ID
    */
-  public static Record find(Vector records, Long id) {
+  public static Record find(List records, Long id) {
     if (records != null && id != null) {
       for (int i=0; i<records.size(); i++) {
-        Record r = (Record) records.elementAt(i);
+        Record r = (Record) records.get(i);
         Long oldId = r.getId();
         if (oldId != null) {
           if (oldId.equals(id)) {
@@ -287,15 +294,15 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * @return true if record with specified ID is found. 
+   * @return true if record with specified ID is found.
    */
   public static boolean contains(Record[] records, Long id) {
     return find(records, id) != null ? true : false;
   }
   /**
-   * @return true if record with specified ID is found. 
+   * @return true if record with specified ID is found.
    */
-  public static boolean contains(Vector records, Long id) {
+  public static boolean contains(List records, Long id) {
     return find(records, id) != null ? true : false;
   }
 
@@ -328,10 +335,13 @@ public class RecordUtils extends Object {
 
     Record[] recs = source;
     if (subtract != null && subtract.length > 0) {
+      HashSet subtractHS = new HashSet();
+      for (int i=0; i<subtract.length; i++)
+        subtractHS.add(subtract[i]);
       if (comparator != null)
-        recs = getDifference(source, Arrays.asList(subtract), comparator);
-      else 
-        recs = getDifference(source, Arrays.asList(subtract));
+        recs = getDifference(source, subtractHS, comparator);
+      else
+        recs = getDifference(source, subtractHS, (Class) null);
     }
 
     if (trace != null) trace.exit(RecordUtils.class, recs);
@@ -341,12 +351,14 @@ public class RecordUtils extends Object {
    * @return the difference between specified arrays.
    * The runtime instance of the array is Record[] !!!
    */
-  public static Record[] getDifference(Record[] source, Collection subtract, Comparator comparator) {
+  public static Record[] getDifference(Record[] source, Set subtract, Comparator comparator) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getDifference(Record[] source, Collection subtract, Comparator comparator)");
     if (trace != null) trace.args(source, subtract, comparator);
 
     Record[] recs = null;
-    if (subtract == null || subtract.size() == 0) {
+    if (source.length == 0) {
+      recs = source;
+    } else if (subtract == null || subtract.size() == 0) {
       recs = source;
     } else {
       LinkedList ll = new LinkedList(Arrays.asList(source));
@@ -368,20 +380,22 @@ public class RecordUtils extends Object {
     if (trace != null) trace.exit(RecordUtils.class, recs);
     return recs;
   }
-  public static Record[] getDifference(Record[] source, Collection subtract) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getDifference(Record[] source, Collection subtract)");
-    if (trace != null) trace.args(source, subtract);
+  public static Record[] getDifference(Record[] source, Set subtract, Class recordType) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getDifference(Record[] source, Set subtract, Class recordType)");
+    if (trace != null) trace.args(source, subtract, recordType);
 
     Record[] recs = null;
     if (subtract == null || subtract.size() == 0) {
       recs = source;
     } else {
-      List original = Arrays.asList(source);
-      ArrayList aOriginal = new ArrayList(original);
-      if (subtract != null && subtract.size() > 0) {
-        aOriginal.removeAll(subtract);
+      ArrayList resultL = new ArrayList(source.length);
+      for (int i=0; i<source.length; i++) {
+        Record rec = source[i];
+        if (!subtract.contains(rec))
+          resultL.add(rec);
       }
-      recs = (Record[]) ArrayUtils.toArray(aOriginal, Record.class);
+      Class type = recordType == null ? Record.class : recordType;
+      recs = (Record[]) ArrayUtils.toArray(resultL, type);
     }
 
     if (trace != null) trace.exit(RecordUtils.class, recs);
@@ -396,26 +410,30 @@ public class RecordUtils extends Object {
     if (trace != null) trace.args(source);
     if (trace != null) trace.args(subtract);
 
-    Record[] recs = difference(source, Arrays.asList(subtract));
+    HashSet subtractHS = null;
+    if (subtract != null && subtract.length > 0) {
+      subtractHS = new HashSet();
+      for (int i=0; i<subtract.length; i++)
+        subtractHS.add(subtract[i]);
+    }
+    Record[] recs = difference(source, subtractHS);
 
     if (trace != null) trace.exit(RecordUtils.class, recs);
     return recs;
   }
   /**
    * @return the difference between specified arrays.
-   * The runtime instance of the returned array has the runtime instance type of the first element
+   * The runtime instance of the returned array has the runtime instance type of the first array
    */
-  public static Record[] difference(Record[] source, Collection subtract) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "difference(Record[] source, Collection subtract)");
+  public static Record[] difference(Record[] source, Set subtract) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "difference(Record[] source, Set subtract)");
     if (trace != null) trace.args(source);
     if (trace != null) trace.args(subtract);
 
-    Record[] recs = getDifference(source, subtract);
-    if (recs != null) {
-      Record[] recs2 = (Record[]) Array.newInstance(source.getClass().getComponentType(), recs.length);
-      Arrays.asList(recs).toArray(recs2);
-      recs = recs2;
-    }
+    Class recordType = null;
+    if (source != null)
+      recordType = source.getClass().getComponentType();
+    Record[] recs = getDifference(source, subtract, recordType);
 
     if (trace != null) trace.exit(RecordUtils.class, recs);
     return recs;
@@ -425,15 +443,16 @@ public class RecordUtils extends Object {
    * Filter specified array.
    * @return new instance of array of which has the runtime instance type of the source array.
    */
-  public static Record[] filter(Record[] records, RecordFilter filter) {
+  public static Record[] filter(Record[] recs, RecordFilter filter) {
     Record[] keptRecords = null;
-    if (records != null) {
-      Vector keepV = new Vector();
-      for (int i=0; i<records.length; i++) {
-        if (filter.keep(records[i]))
-          keepV.addElement(records[i]);
+    if (recs != null) {
+      ArrayList keepL = new ArrayList(recs.length);
+      for (int i=0; i<recs.length; i++) {
+        Record rec = recs[i];
+        if (filter.keep(rec))
+          keepL.add(rec);
       }
-      keptRecords = (Record[]) ArrayUtils.toArray(keepV, records.getClass().getComponentType());
+      keptRecords = (Record[]) ArrayUtils.toArray(keepL, recs.getClass().getComponentType());
     }
     return keptRecords;
   }
@@ -442,19 +461,20 @@ public class RecordUtils extends Object {
    * Concatinates arrays and returns an Record[]
    */
   public static Record[] concatinate(Record[] a1, Record[] a2) {
-    if (a1 == null)
-      return a2;
-    if (a2 == null)
-      return a1;
-
-    List list1 = Arrays.asList(a1);
-    List list2 = Arrays.asList(a2);
-
-    LinkedList lList = new LinkedList(list1);
-    lList.addAll(list2);
-
-    Record[] array = (Record[]) ArrayUtils.toArray(lList, Record.class);
-
+    Record[] array = null;
+    if (a1 != null && a2 != null) {
+      int size1 = a1.length;
+      int size2 = a2.length;
+      array = (Record[]) Array.newInstance(Record.class, size1 + size2);
+      if (size1 > 0)
+        System.arraycopy(a1, 0, array, 0, size1);
+      if (size2 > 0)
+        System.arraycopy(a2, 0, array, size1, size2);
+    } else if (a1 == null) {
+      array = a2;
+    } else if (a2 == null) {
+      array = a1;
+    }
     return array;
   }
 

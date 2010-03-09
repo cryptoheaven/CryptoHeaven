@@ -78,7 +78,7 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
       String actionName = null;
       Integer actionId = null;
       try {
-        actionId = new Integer(path);
+        actionId = Integer.valueOf(path);
       } catch (Throwable t) {
         actionName = path;
       }

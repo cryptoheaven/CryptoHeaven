@@ -79,16 +79,16 @@ public class RecycleTableModel extends RecordTableModel {
         { { null, STR_NAME, STR_FROM, STR_TYPE, STR_SIZE, STR_CREATED, STR_DELETED, STR_LINK_ID, STR_DATA_ID },
           { STR_FLAG, STR_NAME, STR_FROM, STR_TYPE, STR_SIZE, STR_CREATED, STR_DELETED, STR_LINK_ID, STR_DATA_ID },
           { com.CH_gui.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag"), null, null, null, null, null, null },
-          { new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null },
-          { new Integer(16), new Integer(141), new Integer(100), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
-          { new Integer(16), new Integer(141), new Integer(100), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
-          { new Integer(16), new Integer(141), new Integer(100), new Integer(85), new Integer( 74), TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 60), new Integer( 60) },
-          { new Integer(16), new Integer(  0), new Integer(  0), new Integer( 0), new Integer(100), TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120) },
-          { new Integer(16), new Integer( 90), new Integer(100), new Integer(80), new Integer( 70), TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 50), new Integer( 50) },
-          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(6) },
-          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(6) },
-          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(6) },
-          { new Integer(1), new Integer(6) }
+          { Integer.valueOf(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null },
+          { Integer.valueOf(16), Integer.valueOf(141), Integer.valueOf(100), Integer.valueOf(85), Integer.valueOf( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, Integer.valueOf( 60), Integer.valueOf( 60) },
+          { Integer.valueOf(16), Integer.valueOf(141), Integer.valueOf(100), Integer.valueOf(85), Integer.valueOf( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, Integer.valueOf( 60), Integer.valueOf( 60) },
+          { Integer.valueOf(16), Integer.valueOf(141), Integer.valueOf(100), Integer.valueOf(85), Integer.valueOf( 74), TIMESTAMP_PRS, TIMESTAMP_PRS, Integer.valueOf( 60), Integer.valueOf( 60) },
+          { Integer.valueOf(16), Integer.valueOf(  0), Integer.valueOf(  0), Integer.valueOf( 0), Integer.valueOf(100), TIMESTAMP_MAX, TIMESTAMP_MAX, Integer.valueOf(120), Integer.valueOf(120) },
+          { Integer.valueOf(16), Integer.valueOf( 90), Integer.valueOf(100), Integer.valueOf(80), Integer.valueOf( 70), TIMESTAMP_MIN, TIMESTAMP_MIN, Integer.valueOf( 50), Integer.valueOf( 50) },
+          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(6) },
+          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(6) },
+          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(6) },
+          { Integer.valueOf(1), Integer.valueOf(6) }
         });
 
 
@@ -194,13 +194,13 @@ public class RecycleTableModel extends RecordTableModel {
           }
 
           // add all files
-          FileLinkRecord[] fileLinks = cache.getFileLinkRecordsOwnerAndType(folderId, new Short(Record.RECORD_TYPE_FOLDER));
+          FileLinkRecord[] fileLinks = cache.getFileLinkRecordsOwnerAndType(folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
           if (fileLinks != null && fileLinks.length > 0) {
             updateData(fileLinks);
           }
 
           // add all messages
-          MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsOwnerAndType(folderId, new Short(Record.RECORD_TYPE_FOLDER));
+          MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsOwnerAndType(folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
           if (msgLinks != null && msgLinks.length > 0) {
             updateData(msgLinks);
           }
@@ -320,7 +320,7 @@ public class RecycleTableModel extends RecordTableModel {
           break;
         case 3: value = folderPair.getFolderRecord().numOfShares.shortValue() <=1 ? STR_FILE_FOLDER : STR_SHARED_FOLDER;
           break;
-        case 4: value = new Long(-1);
+        case 4: value = Long.valueOf(-1);
           break;
         case 5: value = folderPair.getFolderShareRecord().dateCreated;
           break;
@@ -688,7 +688,7 @@ public class RecycleTableModel extends RecordTableModel {
     if (trace != null) trace.exit(RecycleTableModel.class);
   }
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     setAutoUpdate(false);
     super.finalize();
   }

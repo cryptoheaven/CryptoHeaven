@@ -52,47 +52,47 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // *** System ASCII Checks ***
       // ===========================
 
-      { new Integer(CommandCodes.SYS_A_CHECK), SysACheck.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_CHECK), SysACheck.class.getName() },
 
       // =====================
       // *** User Commands ***
       // =====================
 
       // Login Secure Session
-      { new Integer(CommandCodes.USR_A_LOGIN_SECURE_SESSION), UsrALoginSecureSession.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_LOGIN_SECURE_SESSION), UsrALoginSecureSession.class.getName() },
 
       // Login failed -- 
-      { new Integer(CommandCodes.USR_E_HANDLE_PASSWORD_COMBO_DNE), UsrALoginFailed.class.getName() },
-      { new Integer(CommandCodes.USR_E_USER_LOCKED_OUT), UsrALoginFailed.class.getName() },
-      { new Integer(CommandCodes.USR_E_LOGIN_FAILED), UsrALoginFailed.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_E_HANDLE_PASSWORD_COMBO_DNE), UsrALoginFailed.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_E_USER_LOCKED_OUT), UsrALoginFailed.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_E_LOGIN_FAILED), UsrALoginFailed.class.getName() },
       // Get My Info
-      { new Integer(CommandCodes.USR_A_GET_INFO), UsrAGetInfo.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_GET_INFO), UsrAGetInfo.class.getName() },
       // Get Sub-Account Info
-      { new Integer(CommandCodes.USR_A_GET_SUB_ACCOUNTS), UsrAGetSubAcc.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_GET_SUB_ACCOUNTS), UsrAGetSubAcc.class.getName() },
       // Create New User
-      { new Integer(CommandCodes.USR_A_NEW_USER), UsrANewUser.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_NEW_USER), UsrANewUser.class.getName() },
       // Alter User Password
-      { new Integer(CommandCodes.USR_A_ALTER_PASSWORD), UsrAAlterPassword.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_ALTER_PASSWORD), UsrAAlterPassword.class.getName() },
       // Find Password Recovery challenge questions
-      { new Integer(CommandCodes.USR_A_PASS_RECOVERY_GET_CHALLENGE), UsrAPassRecoveryGetChallenge.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_PASS_RECOVERY_GET_CHALLENGE), UsrAPassRecoveryGetChallenge.class.getName() },
       // Find Password Recovery complete data
-      { new Integer(CommandCodes.USR_A_PASS_RECOVERY_GET_COMPLETE), UsrAPassRecoveryGetComplete.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_PASS_RECOVERY_GET_COMPLETE), UsrAPassRecoveryGetComplete.class.getName() },
       // Delete Account
-      { new Integer(CommandCodes.USR_A_DELETE), UsrADelete.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_DELETE), UsrADelete.class.getName() },
       // Logout
-      { new Integer(CommandCodes.USR_A_LOGOUT), UsrALogout.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_LOGOUT), UsrALogout.class.getName() },
       // System asking for session recycle
-      { new Integer(CommandCodes.USR_A_RECYCLE_SESSION_REQUEST), UsrARecycleSessionRequest.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_RECYCLE_SESSION_REQUEST), UsrARecycleSessionRequest.class.getName() },
       // Client session recycling
-      { new Integer(CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE), UsrARecycleSessionSequence.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE), UsrARecycleSessionSequence.class.getName() },
       // Delete an account
-      { new Integer(CommandCodes.USR_A_REMOVE), UsrARemove.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_REMOVE), UsrARemove.class.getName() },
       // Account Suspended
-      { new Integer(CommandCodes.USR_A_SUSPENDED), UsrASuspended.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_SUSPENDED), UsrASuspended.class.getName() },
       // Get User Handles
-      { new Integer(CommandCodes.USR_A_GET_HANDLES), UsrAGetHandles.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_GET_HANDLES), UsrAGetHandles.class.getName() },
       // Calculate Cummulative Usage
-      { new Integer(CommandCodes.USR_A_CUMULATIVE_USAGE), UsrAGetCumulativeUsage.class.getName() },
+      { Integer.valueOf(CommandCodes.USR_A_CUMULATIVE_USAGE), UsrAGetCumulativeUsage.class.getName() },
 
 
       // ======================
@@ -100,11 +100,11 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // ======================
 
       // Get Emails
-      { new Integer(CommandCodes.EML_A_GET), EmlAGet.class.getName() },
+      { Integer.valueOf(CommandCodes.EML_A_GET), EmlAGet.class.getName() },
       // Get Available Domains
-      { new Integer(CommandCodes.EML_A_GET_DOMAINS), EmlAGetDomains.class.getName() },
+      { Integer.valueOf(CommandCodes.EML_A_GET_DOMAINS), EmlAGetDomains.class.getName() },
       // Remove Emails
-      { new Integer(CommandCodes.EML_A_REMOVE), EmlARemove.class.getName() },
+      { Integer.valueOf(CommandCodes.EML_A_REMOVE), EmlARemove.class.getName() },
 
 
       // =============================
@@ -112,7 +112,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // =============================
 
       // Find if email address exists in Address Book
-      { new Integer(CommandCodes.ADDR_A_FOUND_HASH), AddrAFoundHash.class.getName() },
+      { Integer.valueOf(CommandCodes.ADDR_A_FOUND_HASH), AddrAFoundHash.class.getName() },
 
 
       // =======================
@@ -120,19 +120,19 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // =======================
 
       // Get My Folders
-      { new Integer(CommandCodes.FLD_A_GET_FOLDERS), FldAGetFolders.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_GET_FOLDERS), FldAGetFolders.class.getName() },
       // Get My Folders Children
-      { new Integer(CommandCodes.FLD_A_GET_FOLDERS_CHILDREN), FldAGetChildren.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_GET_FOLDERS_CHILDREN), FldAGetChildren.class.getName() },
       // Get My Folders Roots
-      { new Integer(CommandCodes.FLD_A_GET_FOLDERS_ROOTS), FldAGetRoots.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_GET_FOLDERS_ROOTS), FldAGetRoots.class.getName() },
       // Remove Folder
-      { new Integer(CommandCodes.FLD_A_REMOVE_FOLDER), FldARemoveFolder.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_REMOVE_FOLDER), FldARemoveFolder.class.getName() },
         //actionClassName = OKMessageAction.class.getName() },
-      { new Integer(CommandCodes.FLD_A_GET_FOLDER_SIZE), FldAGetSize.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_GET_FOLDER_SIZE), FldAGetSize.class.getName() },
       // Get Folder Red Flag Count
-      { new Integer(CommandCodes.FLD_A_RED_FLAG_COUNT), FldARedFlagCount.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_RED_FLAG_COUNT), FldARedFlagCount.class.getName() },
       // Ring Ring
-      { new Integer(CommandCodes.FLD_A_RING_RING), FldARingRing.class.getName() },
+      { Integer.valueOf(CommandCodes.FLD_A_RING_RING), FldARingRing.class.getName() },
 
 
       // =====================
@@ -143,13 +143,13 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // Get Files
       // Move Files
       // Copy Files
-      { new Integer(CommandCodes.FILE_A_GET_FILES), FileAGetFiles.class.getName() },
+      { Integer.valueOf(CommandCodes.FILE_A_GET_FILES), FileAGetFiles.class.getName() },
       // Get File Data Attributes
-      { new Integer(CommandCodes.FILE_A_GET_FILES_DATA_ATTRIBUTES), FileAGetFilesDataAttr.class.getName() },
+      { Integer.valueOf(CommandCodes.FILE_A_GET_FILES_DATA_ATTRIBUTES), FileAGetFilesDataAttr.class.getName() },
       // Get File Data 
-      { new Integer(CommandCodes.FILE_A_GET_FILES_DATA), FileAGetFilesData.class.getName() },
+      { Integer.valueOf(CommandCodes.FILE_A_GET_FILES_DATA), FileAGetFilesData.class.getName() },
       // Remove Files
-      { new Integer(CommandCodes.FILE_A_REMOVE_FILES), FileARemoveFiles.class.getName() },
+      { Integer.valueOf(CommandCodes.FILE_A_REMOVE_FILES), FileARemoveFiles.class.getName() },
 
 
       // ========================
@@ -157,9 +157,9 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // ========================
 
       // Get My Contacts
-      { new Integer(CommandCodes.CNT_A_GET_CONTACTS), CntAGetContacts.class.getName() },
+      { Integer.valueOf(CommandCodes.CNT_A_GET_CONTACTS), CntAGetContacts.class.getName() },
       // Remove Contacts
-      { new Integer(CommandCodes.CNT_A_REMOVE_CONTACTS), CntARemoveContacts.class.getName() },
+      { Integer.valueOf(CommandCodes.CNT_A_REMOVE_CONTACTS), CntARemoveContacts.class.getName() },
 
 
       //====================================
@@ -167,13 +167,13 @@ public class ClientActionSwitch extends CommonActionSwitch {
       //====================================
 
       // Get Messages Full or Briefs
-      { new Integer(CommandCodes.MSG_A_GET), MsgAGet.class.getName() },
+      { Integer.valueOf(CommandCodes.MSG_A_GET), MsgAGet.class.getName() },
       // Get Message Body
-      { new Integer(CommandCodes.MSG_A_GET_BODY), MsgAGetBody.class.getName() },
+      { Integer.valueOf(CommandCodes.MSG_A_GET_BODY), MsgAGetBody.class.getName() },
       // Remove Message(s)
-      { new Integer(CommandCodes.MSG_A_REMOVE), MsgARemove.class.getName() },
+      { Integer.valueOf(CommandCodes.MSG_A_REMOVE), MsgARemove.class.getName() },
       // Deliver 'typing' notification
-      { new Integer(CommandCodes.MSG_A_TYPING), MsgATyping.class.getName() },
+      { Integer.valueOf(CommandCodes.MSG_A_TYPING), MsgATyping.class.getName() },
 
 
       // =====================
@@ -181,20 +181,20 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // =====================
 
       // Get My Key Pairs
-      { new Integer(CommandCodes.KEY_A_GET_KEY_PAIRS), KeyAGetKeyPairs.class.getName() },
+      { Integer.valueOf(CommandCodes.KEY_A_GET_KEY_PAIRS), KeyAGetKeyPairs.class.getName() },
       // Get Public Keys For Users
-      { new Integer(CommandCodes.KEY_A_GET_PUBLIC_KEYS), KeyAGetPublicKeys.class.getName() },
+      { Integer.valueOf(CommandCodes.KEY_A_GET_PUBLIC_KEYS), KeyAGetPublicKeys.class.getName() },
       // Remove Key Pairs
-      { new Integer(CommandCodes.KEY_A_REMOVE_KEY_PAIRS), OKMessageAction.class.getName() },
+      { Integer.valueOf(CommandCodes.KEY_A_REMOVE_KEY_PAIRS), OKMessageAction.class.getName() },
       // Get Key Recovery records
-      { new Integer(CommandCodes.KEY_A_GET_KEY_RECOVERY), KeyAGetRecovery.class.getName() },
+      { Integer.valueOf(CommandCodes.KEY_A_GET_KEY_RECOVERY), KeyAGetRecovery.class.getName() },
 
       // =====================
       // *** Stat Commands ***
       // =====================
 
       // Get Stats
-      { new Integer(CommandCodes.STAT_A_GET), StatAGet.class.getName() },
+      { Integer.valueOf(CommandCodes.STAT_A_GET), StatAGet.class.getName() },
 
 
       // =============================
@@ -202,7 +202,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // =============================
 
       // Get My Organization
-      //{ new Integer(CommandCodes.ORG_A_GET_ORG :
+      //{ Integer.valueOf(CommandCodes.ORG_A_GET_ORG :
         //actionClassName = OrgAGetOrg.class.getName() },
 
 
@@ -211,45 +211,45 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // =============================
 
       // Ping-Pong
-      { new Integer(CommandCodes.SYS_A_PONG), SysAPong.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_PONG), SysAPong.class.getName() },
       // No-op
-      { new Integer(CommandCodes.SYS_A_NOOP), SysANoop.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_NOOP), SysANoop.class.getName() },
       // Display a message to user
-      { new Integer(CommandCodes.SYS_A_MSG), SysAMsg.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_MSG), SysAMsg.class.getName() },
       // Server replies with array of reply-sets
-      { new Integer(CommandCodes.SYS_A_REPLY_DATA_SETS), SysAReplyDataSets.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_REPLY_DATA_SETS), SysAReplyDataSets.class.getName() },
       // Server replies with Version information
-      { new Integer(CommandCodes.SYS_A_VERSION), SysAVersion.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_VERSION), SysAVersion.class.getName() },
       // Registration for inter-user notifications
-      { new Integer(CommandCodes.SYS_A_NOTIFY), SysANotify.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_NOTIFY), SysANotify.class.getName() },
 
-      { new Integer(CommandCodes.SYS_A_GET_AUTO_UPDATE), SysAGetAutoUpdate.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_GET_AUTO_UPDATE), SysAGetAutoUpdate.class.getName() },
 
       // Get Temporary Public Key
-      { new Integer(CommandCodes.SYS_A_GET_TEMP_PUB_KEY), SysAGetTempPubKey.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_GET_TEMP_PUB_KEY), SysAGetTempPubKey.class.getName() },
       
       // System Login
-      { new Integer(CommandCodes.SYS_A_LOGIN), SysALogin.class.getName() },
-      { new Integer(CommandCodes.SYS_E_LOGIN), SysELogin.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_LOGIN), SysALogin.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_E_LOGIN), SysELogin.class.getName() },
 
       // System Query
-      { new Integer(CommandCodes.SYS_A_QUERY), SysAQuery.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_QUERY), SysAQuery.class.getName() },
 
       // Connection Timeout
-      { new Integer(CommandCodes.SYS_A_CONNECTION_TIMEOUT), SysATimeout.class.getName() },
-      { new Integer(CommandCodes.SYS_E_BANDWIDTH_EXCEEDED), ErrorBandwidthExceeded.class.getName() },
-      { new Integer(CommandCodes.SYS_E_ACCOUNT_EXPIRED), ErrorAccountExpired.class.getName() },
-      { new Integer(CommandCodes.SYS_E_STORAGE_EXCEEDED), ErrorStorageExceeded.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_A_CONNECTION_TIMEOUT), SysATimeout.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_E_BANDWIDTH_EXCEEDED), ErrorBandwidthExceeded.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_E_ACCOUNT_EXPIRED), ErrorAccountExpired.class.getName() },
+      { Integer.valueOf(CommandCodes.SYS_E_STORAGE_EXCEEDED), ErrorStorageExceeded.class.getName() },
 
       // Engine-network Distribution Messages handled by the server.
-      { new Integer(CommandCodes.SYSNET_Q_DISTRIBUTE), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_LOGIN), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_LOGIN_FAILED), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_SET_USERS), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_ADD_USER), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_REMOVE_USER), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_SERVER_AVAILABLE), SysQServerAction.class.getName() },
-      { new Integer(CommandCodes.SYSNET_A_CONSOLE_COMMAND), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_Q_DISTRIBUTE), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_LOGIN), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_LOGIN_FAILED), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_SET_USERS), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_ADD_USER), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_REMOVE_USER), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_SERVER_AVAILABLE), SysQServerAction.class.getName() },
+      { Integer.valueOf(CommandCodes.SYSNET_A_CONSOLE_COMMAND), SysQServerAction.class.getName() },
     };
 
     Arrays.sort(actionClassNames, codeComparator);
@@ -279,7 +279,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
 
     String actionClassName = null;
 
-    int index = Arrays.binarySearch(actionClassNames, new Integer(msgCode), codeComparator);
+    int index = Arrays.binarySearch(actionClassNames, Integer.valueOf(msgCode), codeComparator);
     if (index >= 0)
       actionClassName = (String) actionClassNames[index][1];
     else if (msgCode >= 0) 

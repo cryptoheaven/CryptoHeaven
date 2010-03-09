@@ -238,7 +238,7 @@ public class CleanupAgent extends Thread {
     long len = file.length();
     if (progMonitor != null) {
       progMonitor.setTransferSize(len);
-      String passS = " " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("[Pass_{0}/2]"), new Object[] {new Integer(pass)});
+      String passS = " " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("[Pass_{0}/2]"), new Object[] {Integer.valueOf(pass)});
       String task = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getName(), passS});
       progMonitor.setCurrentStatus(task);
       progMonitor.nextTask(task);

@@ -74,9 +74,9 @@ public class FolderOps extends Object {
     Long parentFolderId = null;
     Long parentShareId = null;
     Long myUserId = cache.getMyUserId();
-    Short ownerType = new Short(Record.RECORD_TYPE_USER);
+    Short ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
     Long ownerUserId = myUserId;
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
 
     if (parentPair != null) {
       parentFolder = parentPair.getFolderRecord();
@@ -124,15 +124,15 @@ public class FolderOps extends Object {
     request.parentFolderId = parentFolderId;
     request.parentShareId = parentShareId;
 
-    request.folderType = new Short(newFolderType);
+    request.folderType = Short.valueOf(newFolderType);
 
     request.folderShareRecord.setFolderName(newFolderName.trim());
     if (newFolderDesc.trim().length() > 0) {
       request.folderShareRecord.setFolderDesc(newFolderDesc.trim());
     }
 
-    request.numToKeep = numToKeep != null ? numToKeep : new Short((short)0);
-    request.keepAsOldAs = keepAsOldAs != null ? keepAsOldAs : new Integer(0);
+    request.numToKeep = numToKeep != null ? numToKeep : Short.valueOf((short)0);
+    request.keepAsOldAs = keepAsOldAs != null ? keepAsOldAs : Integer.valueOf(0);
 
     request.folderShareRecord.setSymmetricKey(baSymmetricKey);
     request.folderShareRecord.ownerType = ownerType;
@@ -200,8 +200,8 @@ public class FolderOps extends Object {
           throw new RuntimeException("Could not fetch user's Public Key to encrypt folder shares.  Operation terminated.");
         }
       } else {
-        if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-        FolderShareRecord groupShare = cache.getFolderShareRecordMy(additionalShares[i].ownerUserId, groupIDsHT);
+        if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+        FolderShareRecord groupShare = cache.getFolderShareRecordMy(additionalShares[i].ownerUserId, groupIDsSet);
         // we should have the key of the group, but check just in case
         if (groupShare != null) {
           additionalShares[i].seal(groupShare.getSymmetricKey());
@@ -398,7 +398,7 @@ public class FolderOps extends Object {
     Long junkFolderId = userRecord.junkFolderId;
     if (junkFolderId == null || cache.getFolderRecord(junkFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, Integer.valueOf(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
@@ -444,25 +444,25 @@ public class FolderOps extends Object {
    * @return Root folder or null if guess cannot be made or some looping of folders is found.
    */
   public static FolderPair getRootmostFolderInViewHierarchy(Long childFolderId) {
-    Hashtable visitedFolderIDsHT = new Hashtable();
-    Hashtable groupIDsHT = FetchedDataCache.getSingleInstance().getFolderGroupIDsMyHT();
-    return getRootmostFolderInViewHierarchy(childFolderId, visitedFolderIDsHT, groupIDsHT);
+    HashSet visitedFolderIDsHS = new HashSet();
+    Set groupIDsSet = FetchedDataCache.getSingleInstance().getFolderGroupIDsMySet();
+    return getRootmostFolderInViewHierarchy(childFolderId, visitedFolderIDsHS, groupIDsSet);
   }
-  private static FolderPair getRootmostFolderInViewHierarchy(Long childFolderId, Hashtable visitedFolderIDsHT, Hashtable groupIDsHT) {
+  private static FolderPair getRootmostFolderInViewHierarchy(Long childFolderId, Set visitedFolderIDsSet, Set groupIDsSet) {
     // if visited, return null;
-    if (visitedFolderIDsHT.get(childFolderId) == null) {
-      visitedFolderIDsHT.put(childFolderId, childFolderId);
+    if (!visitedFolderIDsSet.contains(childFolderId)) {
+      visitedFolderIDsSet.add(childFolderId);
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       FolderRecord fRec = cache.getFolderRecord(childFolderId);
       if (fRec != null) {
-        FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsHT);
+        FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsSet);
         if (sRec != null) {
           FolderPair fPair = new FolderPair(sRec, fRec);
           if (fPair.isViewRoot())
             return fPair;
           else {
             Long parentFolderId = fPair.getParentId();
-            return getRootmostFolderInViewHierarchy(parentFolderId, visitedFolderIDsHT, groupIDsHT);
+            return getRootmostFolderInViewHierarchy(parentFolderId, visitedFolderIDsSet, groupIDsSet);
           }
         }
       }

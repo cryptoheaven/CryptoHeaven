@@ -74,7 +74,7 @@ public class MsgAGet extends ClientMessageAction {
     StatRecord[] statRecords = reply.stats_rp != null ? reply.stats_rp.stats : null;
 
     FetchedDataCache cache = getFetchedDataCache();
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
 
 
     Vector newDataRecordIDsV = new Vector();
@@ -112,7 +112,7 @@ public class MsgAGet extends ClientMessageAction {
                 (type.charAt(0) == MsgDataRecord.RECIPIENT_COPY && type.charAt(1) == MsgDataRecord.RECIPIENT_USER) ||
                 (type.charAt(0) == MsgDataRecord.RECIPIENT_COPY_BLIND && type.charAt(1) == MsgDataRecord.RECIPIENT_USER)
                 ) {
-              Long id = new Long(sId);
+              Long id = Long.valueOf(sId);
               if (cache.getUserRecord(id) == null) {
                 if (userV == null) userV = new Vector();
                 userV.addElement(id);
@@ -157,8 +157,8 @@ public class MsgAGet extends ClientMessageAction {
     for (int i=0; i<linkRecords.length; i++) {
       MsgLinkRecord link = linkRecords[i];
       if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-        if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-        if (cache.getFolderShareRecordMy(link.ownerObjId, groupIDsHT) == null) {
+        if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+        if (cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet) == null) {
           if (folderIDsV == null) folderIDsV = new Vector();
           folderIDsV.addElement(link.ownerObjId);
         }
@@ -209,8 +209,8 @@ public class MsgAGet extends ClientMessageAction {
               msgData = cache.getMsgDataRecord(msgLink.msgId);
             if (msgData == null || msgData.getEncSignedDigest() == null) {
               // Can't find a body anywhere, just fetch it. -- but we must have a shareID
-              if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-              FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsHT);
+              if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+              FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsSet);
               if (sRec != null) {
                 if (needMsgBody_dataIDsV == null) {
                   needMsgBody_dataIDsV = new Vector();
@@ -230,7 +230,7 @@ public class MsgAGet extends ClientMessageAction {
       // Process all body fetch requests that are needed before the links can be displayed correctly.
       if (needMsgBody_dataIDsV != null) {
         for (int i=0; i<needMsgBody_dataIDsV.size(); i++) {
-          Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.elementAt(i)), (Long)(needMsgBody_linkIDsV.elementAt(i)), null, new Long(1)});
+          Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.elementAt(i)), (Long)(needMsgBody_linkIDsV.elementAt(i)), null, Long.valueOf(1)});
           getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 120000);
         }
       }
@@ -283,8 +283,8 @@ public class MsgAGet extends ClientMessageAction {
         MsgLinkRecord link = linkRecords[i];
         if (cache.getStatRecord(link.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-            if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-            FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsHT);
+            if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+            FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
             if (shareIDsV == null) shareIDsV = new Vector();
             if (objLinkIDsV == null) objLinkIDsV = new Vector();
             if (!shareIDsV.contains(share.shareId))
@@ -300,8 +300,8 @@ public class MsgAGet extends ClientMessageAction {
         Long[] objLinkIDs = (Long[]) ArrayUtils.toArray(objLinkIDsV, Long.class);
 
         Stats_Get_Rq request = new Stats_Get_Rq();
-        request.statsForObjType = new Short(Record.RECORD_TYPE_MSG_LINK);
-        request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
+        request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_MSG_LINK);
+        request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 
@@ -319,8 +319,8 @@ public class MsgAGet extends ClientMessageAction {
         if (link.isUnSealed() && link.getRecPubKeyId() != null) {
           FolderRecord fOwner = cache.getFolderRecord(link.ownerObjId);
           if (fOwner != null) {
-            if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-            FolderShareRecord sOwner = cache.getFolderShareRecordMy(fOwner.folderId, groupIDsHT);
+            if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+            FolderShareRecord sOwner = cache.getFolderShareRecordMy(fOwner.folderId, groupIDsSet);
             if (sOwner != null) {
               if (sOwner.isOwnedByUser() && sOwner.ownerUserId.equals(cache.getMyUserId()) && sOwner.canWrite.shortValue() != FolderShareRecord.YES) {
                 // no-op; don't recrypt, no permission
@@ -404,8 +404,8 @@ public class MsgAGet extends ClientMessageAction {
             cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
         } else {
           Timestamp timeStamp = linkRecords[linkRecords.length-1].dateCreated;
-          if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-          Long fetchingShareId = cache.getFolderShareRecordMy(fetchingFolderId, groupIDsHT).shareId;
+          if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+          Long fetchingShareId = cache.getFolderShareRecordMy(fetchingFolderId, groupIDsSet).shareId;
 
           // are these full messages, or briefs?
           boolean full = dataRecords[0].getEncText() != null;

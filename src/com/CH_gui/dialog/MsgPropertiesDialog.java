@@ -877,8 +877,8 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
     if (sumFiles > 0 || sumMsgs > 0) {
       Runnable afterJob = new Runnable() {
         public void run() {
-          MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsOwnerAndType(msgLink.msgId, new Short(Record.RECORD_TYPE_MESSAGE));
-          FileLinkRecord[] fileLinks = cache.getFileLinkRecordsOwnerAndType(msgLink.msgId, new Short(Record.RECORD_TYPE_MESSAGE));
+          MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsOwnerAndType(msgLink.msgId, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
+          FileLinkRecord[] fileLinks = cache.getFileLinkRecordsOwnerAndType(msgLink.msgId, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
           final Record[] records = RecordUtils.concatinate(msgLinks, fileLinks);
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {

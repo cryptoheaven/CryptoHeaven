@@ -236,7 +236,7 @@ public class ManageContactsDialog extends GeneralDialog {
       permits |= ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS;
     if (!notifyStatus)
       permits |= ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS;
-    Integer permitsI = new Integer(permits);
+    Integer permitsI = Integer.valueOf(permits);
 
     // Gather removed contacts
     removedContactsV.addAll(selectedUserContactsV);

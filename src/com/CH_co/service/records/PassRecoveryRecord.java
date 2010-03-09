@@ -161,17 +161,17 @@ public class PassRecoveryRecord extends Record {
   }
 
   public void setData(boolean enabledRecovery, char[] pass, String hint, boolean enabledQA, int numQuestions, int minAnsweres, String[] theQs, String[] theAs) {
-    this.enabledRecovery = new Character(enabledRecovery ? 'Y' : 'N');
+    this.enabledRecovery = Character.valueOf(enabledRecovery ? 'Y' : 'N');
     if (enabledRecovery) {
       this.hint = hint;
     } else {
       this.hint = "";
     }
 
-    this.numQs = new Short((short) numQuestions);
-    this.minAs = new Short((short) minAnsweres);
+    this.numQs = Short.valueOf((short) numQuestions);
+    this.minAs = Short.valueOf((short) minAnsweres);
 
-    this.enabledQA = new Character(enabledRecovery && enabledQA ? 'Y' : 'N');
+    this.enabledQA = Character.valueOf(enabledRecovery && enabledQA ? 'Y' : 'N');
     if (enabledRecovery && enabledQA) {
       this.questions = new String[numQuestions];
       this.answersHashMD5 = new BADigestBlock[numQuestions];

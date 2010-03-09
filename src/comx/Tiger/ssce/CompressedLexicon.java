@@ -368,7 +368,7 @@ public class CompressedLexicon implements Lexicon {
       //        char c3 = '\u03E7';
       //        char c5 = '\227';
       //        char c6 = '\u012B';
-      //        int j1 = SpellingSession.getOption(new Integer(32));
+      //        int j1 = SpellingSession.getOption(Integer.valueOf(32));
       //        if ((j1 & 0xff) == 162)
       //        {
       //          int k1 = (j1 & 0x1f00) >> 8;
@@ -377,7 +377,7 @@ public class CompressedLexicon implements Lexicon {
       //          Date date1 = (new GregorianCalendar(2000, 0, 1)).getTime();
       //          Date date2 = new Date(date1.getTime() + (long)i2 * 0x5265c00L);
       //          long l3 = System.currentTimeMillis();
-      //          long l5 = (long)SpellingSession.getOption(new Integer(16)) * 1000L;
+      //          long l5 = (long)SpellingSession.getOption(Integer.valueOf(16)) * 1000L;
       //          int j3 = j1 & 0x7fffe000;
       //          int k3 = 0;
       //          for (int i4 = 0; i4 < 32; i4++)
@@ -403,7 +403,7 @@ public class CompressedLexicon implements Lexicon {
       //                System.out.println();
       //              }
       //
-      //              SpellingSession.setOption(new Integer(16), new Integer((int)(l3 / 1000L)));
+      //              SpellingSession.setOption(Integer.valueOf(16), Integer.valueOf((int)(l3 / 1000L)));
       //            }
       //            throw new Exception();
       //          }
@@ -420,7 +420,7 @@ public class CompressedLexicon implements Lexicon {
       //              System.out.println();
       //            }
       //
-      //            SpellingSession.setOption(new Integer(16), new Integer((int)(l3 / 1000L)));
+      //            SpellingSession.setOption(Integer.valueOf(16), Integer.valueOf((int)(l3 / 1000L)));
       //          }
       //        } else
       //        {

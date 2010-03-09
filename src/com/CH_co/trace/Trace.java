@@ -173,10 +173,10 @@ public class Trace extends Object {
     }
     else {
       synchronized (staticMonitor) {
-        Trace threadTrace = (Trace) hashTable.get( new Integer(Thread.currentThread().hashCode()) );
+        Trace threadTrace = (Trace) hashTable.get( Integer.valueOf(Thread.currentThread().hashCode()) );
         if (threadTrace == null) {
           threadTrace = new Trace();
-          hashTable.put( new Integer(Thread.currentThread().hashCode()), threadTrace );
+          hashTable.put( Integer.valueOf(Thread.currentThread().hashCode()), threadTrace );
         }
         String str = className + " " + methodPrototype;
         threadTrace.addLine("|>" + str);
@@ -238,19 +238,19 @@ public class Trace extends Object {
   public void exit(Class c, int rc) {
     if (this == dumpingTrace) return;
     synchronized (staticMonitor) {
-      exit(c, new Integer(rc), true);
+      exit(c, Integer.valueOf(rc), true);
     }
   }
   public void exit(Class c, long rc) {
     if (this == dumpingTrace) return;
     synchronized (staticMonitor) {
-      exit(c, new Long(rc), true);
+      exit(c, Long.valueOf(rc), true);
     }
   }
   public void exit(Class c, double rc) {
     if (this == dumpingTrace) return;
     synchronized (staticMonitor) {
-      exit(c, new Double(rc), true);
+      exit(c, Double.valueOf(rc), true);
     }
   }
   public void exit(Class c, boolean rc) {
@@ -291,7 +291,7 @@ public class Trace extends Object {
   }
 //  public static boolean isPaused() {
 //    synchronized (staticMonitor) {
-//      Integer hashCode = new Integer(Thread.currentThread().hashCode());
+//      Integer hashCode = Integer.valueOf(Thread.currentThread().hashCode());
 //      if (tracePauseCount == null) return false;
 //      Integer pauseCount = (Integer) tracePauseCount.get(hashCode);
 //      return pauseCount != null;
@@ -300,21 +300,21 @@ public class Trace extends Object {
 //  public static Integer pause() {
 //    Integer token = null;
 //    synchronized (staticMonitor) {
-//      Integer hashCode = new Integer(Thread.currentThread().hashCode());
+//      Integer hashCode = Integer.valueOf(Thread.currentThread().hashCode());
 //      if (tracePauseCount == null) tracePauseCount = new Hashtable();
 //      Integer pauseCount = (Integer) tracePauseCount.get(hashCode);
 //      token = pauseCount;
 //      if (pauseCount == null)
-//        tracePauseCount.put(hashCode, new Integer(1));
+//        tracePauseCount.put(hashCode, Integer.valueOf(1));
 //      else
-//        tracePauseCount.put(hashCode, new Integer(pauseCount.intValue()+1));
+//        tracePauseCount.put(hashCode, Integer.valueOf(pauseCount.intValue()+1));
 //    }
 //    return token;
 //  }
 //  public static void resume(Integer token) {
 //    synchronized (staticMonitor) {
 //      if (tracePauseCount != null) {
-//        Integer hashCode = new Integer(Thread.currentThread().hashCode());
+//        Integer hashCode = Integer.valueOf(Thread.currentThread().hashCode());
 //        if (token == null)
 //          tracePauseCount.remove(hashCode);
 //        else
@@ -383,7 +383,7 @@ public class Trace extends Object {
   }
   public void info(int tracePoint, Object obj, long data) {
     if (this == dumpingTrace) return;
-    tracePoint(INFO, tracePoint, obj, new Long(data));
+    tracePoint(INFO, tracePoint, obj, Long.valueOf(data));
   }
   public void info(int tracePoint, Object data) {
     if (this == dumpingTrace) return;
@@ -405,7 +405,7 @@ public class Trace extends Object {
   }
   public void data(int tracePoint, long data) {
     if (this == dumpingTrace) return;
-    tracePoint(DATA, tracePoint, new Long(data));
+    tracePoint(DATA, tracePoint, Long.valueOf(data));
   }
   public void data(int tracePoint, boolean state) {
     if (this == dumpingTrace) return;
@@ -413,7 +413,7 @@ public class Trace extends Object {
   }
   public void data(int tracePoint, String str, long data) {
     if (this == dumpingTrace) return;
-    tracePoint(DATA, tracePoint, str, new Long(data));
+    tracePoint(DATA, tracePoint, str, Long.valueOf(data));
   }
   public void data(int tracePoint, String str, boolean data) {
     if (this == dumpingTrace) return;
@@ -555,7 +555,7 @@ public class Trace extends Object {
         addLine("<-- Trace Cleared for thread " + threadName);
         if (lastThread == thisThread)
           lastThread = null;
-        Trace trace = (Trace) hashTable.remove( new Integer(thisThread.hashCode()) );
+        Trace trace = (Trace) hashTable.remove( Integer.valueOf(thisThread.hashCode()) );
         trace.stack.clear(); trace.stack = null;
         trace.stack2.clear(); trace.stack2 = null;
       }

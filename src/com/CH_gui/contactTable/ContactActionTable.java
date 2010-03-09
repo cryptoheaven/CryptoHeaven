@@ -256,7 +256,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private static class NewContactAction extends AbstractActionTraced {
     public NewContactAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Find_Friends_and_Associates_..."), Images.get(ImageNums.USER_FIND16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Find_Users_on_the_System_and_Invite_them_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_FIND24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Find"));
@@ -272,7 +272,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class NewGroupAction extends AbstractActionTraced {
     public NewGroupAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Create_Group"), Images.get(ImageNums.GROUP_ADD16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Create_Group"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GROUP_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Group"));
@@ -288,7 +288,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class AcceptDeclineAction extends AbstractActionTraced {
     public AcceptDeclineAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Accept_/_Decline_Contact(s)_..."), Images.get(ImageNums.CONTACT_CHECK16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Accept_or_Decline_selected_contact(s)"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_CHECK24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Accept"));
@@ -309,7 +309,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class RemoveAction extends AbstractActionTraced {
     public RemoveAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Contact_..."), Images.get(ImageNums.CONTACT_DELETE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contact."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
@@ -364,7 +364,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class NewMessageAction extends AbstractActionTraced {
     public NewMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
@@ -392,7 +392,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class NewAddressAction extends AbstractActionTraced {
     public NewAddressAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Address_Book"), Images.get(ImageNums.ADDRESS_ADD16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Create_a_New_Address_Book_entry."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_ADD24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -473,7 +473,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Contact_Properties"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_Properties_of_the_selected_Contact."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -498,7 +498,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Contacts"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Contact_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
@@ -520,7 +520,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     private Boolean lastSetShow = null;
     public ToggleIncomingAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Show_Other's_Contacts"), Images.get(ImageNums.ARROW_DOUBLE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_other's_contacts_with_you."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ARROW_DOUBLE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -556,10 +556,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           recordTableModel.updateHeaderDataFrom(getJSortedTable());
           Integer[] viewSeq = data.getRawColumnViewableSequence();
           Vector viewSeqV = new Vector(Arrays.asList(viewSeq));
-          if (viewSeqV.contains(new Integer(0))) {
+          if (viewSeqV.contains(Integer.valueOf(0))) {
             // its already viewable - noop
           } else {
-            viewSeqV.insertElementAt(new Integer(0), 0);
+            viewSeqV.insertElementAt(Integer.valueOf(0), 0);
             Integer[] viewSeqNew = (Integer[]) ArrayUtils.toArray(viewSeqV, Integer.class);
             data.data[ColumnHeaderData.I_VIEWABLE_SEQUENCE] = viewSeqNew;
             getTableModel().updateHeaderDataFromTo(null, getJSortedTable());
@@ -576,8 +576,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           recordTableModel.updateHeaderDataFrom(getJSortedTable());
           Integer[] viewSeq = data.getRawColumnViewableSequence();
           Vector viewSeqV = new Vector(Arrays.asList(viewSeq));
-          if (viewSeqV.contains(new Integer(0))) {
-            viewSeqV.remove(new Integer(0));
+          if (viewSeqV.contains(Integer.valueOf(0))) {
+            viewSeqV.remove(Integer.valueOf(0));
             Integer[] viewSeqNew = (Integer[]) ArrayUtils.toArray(viewSeqV, Integer.class);
             data.data[ColumnHeaderData.I_VIEWABLE_SEQUENCE] = viewSeqNew;
             getTableModel().updateHeaderDataFromTo(null, getJSortedTable());
@@ -612,7 +612,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Contact_List_View"), Images.get(ImageNums.CLONE_CONTACT16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_contact_list_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -627,7 +627,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class ChatAction extends AbstractActionTraced {
     public ChatAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Chat"), Images.get(ImageNums.CHAT16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Enter_chat_mode_with_selected_party."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CHAT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Chat"));
@@ -644,7 +644,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.PEOPLE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Email_Message_to_invite_others_to_join_the_service."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.PEOPLE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite"));
@@ -692,7 +692,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private class CreateSharedSpaceAction extends AbstractActionTraced {
     public CreateSharedSpaceAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Create_Shared_Space_..."), Images.get(ImageNums.FOLDER_NEW_SHARED16, true));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Create_New_Shared_Space"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_NEW_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Shared_Space"));
@@ -1002,7 +1002,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     return visualsClassKeyName;
   }
   public Integer getVisualsVersion() {
-    return new Integer(1);
+    return Integer.valueOf(1);
   }
 
 }

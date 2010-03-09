@@ -117,7 +117,7 @@ public abstract class BA extends Object {
   }
   public int hashCode() {
     if (blockContent != null)
-      return blockContent.hashCode();
+      return Arrays.hashCode(blockContent);
     else
       return super.hashCode();
   }

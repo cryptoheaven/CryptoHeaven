@@ -142,7 +142,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_File_List_from_local_file_system."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -159,7 +159,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -175,7 +175,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   private class WipeAction extends AbstractActionTraced {
     public WipeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Wipe_File"), Images.get(ImageNums.FILE_REMOVE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_file."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_REMOVE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -248,7 +248,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   private class UploadAction extends AbstractActionTraced {
     public UploadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Upload_File_..."), Images.get(ImageNums.EXPORT16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Upload"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.EXPORT24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);

@@ -317,10 +317,10 @@ public class Msg_New_Rq extends ProtocolMsgDataSet {
         long id = dataIn.readLong();
         if (type == 1) {
           fromAccount = new UserRecord();
-          ((UserRecord) fromAccount).userId = new Long(id);
+          ((UserRecord) fromAccount).userId = Long.valueOf(id);
         } else if (type == 2) {
           fromAccount = new EmailRecord();
-          ((EmailRecord) fromAccount).emlId = new Long(id);
+          ((EmailRecord) fromAccount).emlId = Long.valueOf(id);
         }
       }
     }
@@ -382,7 +382,7 @@ public class Msg_New_Rq extends ProtocolMsgDataSet {
       if (clientBuild >= 86)
         dataRecord.objType = dataIn.readSmallint();
       else
-        dataRecord.objType = new Short(MsgDataRecord.OBJ_TYPE_MSG);
+        dataRecord.objType = Short.valueOf(MsgDataRecord.OBJ_TYPE_MSG);
       dataRecord.importance = dataIn.readSmallint();
       if (clientBuild >= 82)
         dataRecord.setRecipients(dataIn.readString());

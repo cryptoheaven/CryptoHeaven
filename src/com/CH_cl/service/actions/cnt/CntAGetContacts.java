@@ -32,10 +32,10 @@ import com.CH_co.util.*;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class CntAGetContacts extends ClientMessageAction {
 
@@ -43,7 +43,7 @@ public class CntAGetContacts extends ClientMessageAction {
   public CntAGetContacts() {
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -57,11 +57,11 @@ public class CntAGetContacts extends ClientMessageAction {
     FetchedDataCache cache = getFetchedDataCache();
     UserRecord myUser = cache.getUserRecord();
     Long userId = cache.getMyUserId();
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
 
     if (trace != null) trace.data(10, "Running contacts reply with contacts ", contactRecords);
 
-    // Since we need folder shares to which the contacts belong (if its our contact, does not apply for other peoples contacts with us) 
+    // Since we need folder shares to which the contacts belong (if its our contact, does not apply for other peoples contacts with us)
     // in order to decrypt the contact notes, lets make sure we have all the shares we need,
     // and if not, fetch them now.  For contacts that are simple notify messages (not specifically requested)
     // and do need any unsealing, do not fetch shares for them.
@@ -70,11 +70,11 @@ public class CntAGetContacts extends ClientMessageAction {
     Vector folderIDsV = null;
     for (int i=0; contactRecords!=null && i<contactRecords.length; i++) {
       ContactRecord cRec = contactRecords[i];
-      if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-      if (cRec.ownerUserId != null && cRec.ownerUserId.equals(userId) && 
-          cRec.folderId != null && 
+      if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+      if (cRec.ownerUserId != null && cRec.ownerUserId.equals(userId) &&
+          cRec.folderId != null &&
           cRec.getEncOwnerNote() != null && // if enc note is null, no point fetching a share to decrypt it.
-          cache.getFolderShareRecordMy(cRec.folderId, groupIDsHT) == null) 
+          cache.getFolderShareRecordMy(cRec.folderId, groupIDsSet) == null)
       {
         if (folderIDsV == null) folderIDsV = new Vector();
         folderIDsV.addElement(cRec.folderId);
@@ -197,7 +197,7 @@ public class CntAGetContacts extends ClientMessageAction {
           if (cRec.getNote(userId) == null && cRec.getEncOwnerNote() == null && cache.getContactRecord(cRec.contactId).getNote(userId) == null) {
             ContactRecord cRecClone = (ContactRecord) cRec.clone();
             cRecClone.setOwnerNote(cache.getUserRecord(cRecClone.contactWithId).handle);
-            cRecClone.seal(cache.getFolderShareRecordMy(cRecClone.folderId, groupIDsHT).getSymmetricKey());
+            cRecClone.seal(cache.getFolderShareRecordMy(cRecClone.folderId, groupIDsSet).getSymmetricKey());
             if (recryptedContactsMineV == null) recryptedContactsMineV = new Vector();
             recryptedContactsMineV.addElement(cRecClone);
           }
@@ -233,23 +233,23 @@ public class CntAGetContacts extends ClientMessageAction {
             Sounds.playAsynchronous(Sounds.YOU_WERE_AUTHORIZED);
             final JCheckBox jEnableAudibleNotify = new JMyCheckBox("Enable audible notification when contact's status changes to Available.");
             jEnableAudibleNotify.setSelected((cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0);
-            
+
             JPanel panel = new JPanel();
             panel.setLayout(new GridBagLayout());
-            
+
             panel.setLayout(new GridBagLayout());
 
             int posY = 0;
-            panel.add(new JMyLabel(msg), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+            panel.add(new JMyLabel(msg), new GridBagConstraints(0, posY, 1, 1, 0, 0,
                   GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
             posY ++;
-            panel.add(jEnableAudibleNotify, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+            panel.add(jEnableAudibleNotify, new GridBagConstraints(0, posY, 1, 1, 10, 0,
                   GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
             posY ++;
 
             ActionListener defaultButtonAction = new ActionListener() {
               public void actionPerformed(ActionEvent event) {
-                Object[] objs = new Object[] { cRec.contactId, new Integer(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
+                Object[] objs = new Object[] { cRec.contactId, Integer.valueOf(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
                 Obj_List_Co dataSet = new Obj_List_Co();
                 dataSet.objs = objs;
                 getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_ALTER_SETTINGS, dataSet));

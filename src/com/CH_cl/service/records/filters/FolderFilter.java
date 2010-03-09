@@ -280,7 +280,7 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
 //            parentId = FolderRecord.CATEGORY_MAIL_ID;
 //          }
 //          if (parentId != 0) {
-//            viewParentOk = keepViewParentIDsHT.get(new Long(parentId)) != null;
+//            viewParentOk = keepViewParentIDsHT.get(Long.valueOf(parentId)) != null;
 //          }
 //        }
 //      }

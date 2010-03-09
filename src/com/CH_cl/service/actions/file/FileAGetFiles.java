@@ -69,7 +69,7 @@ public class FileAGetFiles extends ClientMessageAction {
     StatRecord[] statRecords = reply.stats_rp != null ? reply.stats_rp.stats : null;
 
     FetchedDataCache cache = getFetchedDataCache();
-    Hashtable groupIDsHT = null;
+    Set groupIDsSet = null;
 
     // Since getting file links may be a result of another user creating it,
     // make sure we have the share (and its key) to unSeal the file link.
@@ -81,8 +81,8 @@ public class FileAGetFiles extends ClientMessageAction {
       FileLinkRecord fLink = fileLinks[i];
       switch (fLink.ownerObjType.shortValue()) {
         case Record.RECORD_TYPE_FOLDER:
-          if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-          if (cache.getFolderShareRecordMy(fLink.ownerObjId, groupIDsHT) == null) {
+          if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+          if (cache.getFolderShareRecordMy(fLink.ownerObjId, groupIDsSet) == null) {
             if (folderIDsV == null) folderIDsV = new Vector();
             folderIDsV.addElement(fLink.ownerObjId);
           }
@@ -117,8 +117,8 @@ public class FileAGetFiles extends ClientMessageAction {
         FileLinkRecord link = fileLinks[i];
         if (cache.getStatRecord(link.fileLinkId, FetchedDataCache.STAT_TYPE_FILE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-            if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-            FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsHT);
+            if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+            FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
             if (shareIDsV == null) shareIDsV = new Vector();
             if (objLinkIDsV == null) objLinkIDsV = new Vector();
             if (!shareIDsV.contains(share.shareId))
@@ -135,8 +135,8 @@ public class FileAGetFiles extends ClientMessageAction {
         objLinkIDsV.toArray(objLinkIDs);
 
         Stats_Get_Rq request = new Stats_Get_Rq();
-        request.statsForObjType = new Short(Record.RECORD_TYPE_FILE_LINK);
-        request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
+        request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_FILE_LINK);
+        request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 
@@ -165,8 +165,8 @@ public class FileAGetFiles extends ClientMessageAction {
             cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
         } else {
           Timestamp timeStamp = fileLinks[fileLinks.length-1].recordCreated;
-          if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-          Long fetchingShareId = cache.getFolderShareRecordMy(fetchingFolderId, groupIDsHT).shareId;
+          if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+          Long fetchingShareId = cache.getFolderShareRecordMy(fetchingFolderId, groupIDsSet).shareId;
 
           short numMax = fetchNumMax.shortValue();
 

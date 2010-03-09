@@ -76,10 +76,10 @@ public class CacheUtilities extends Object {
 
     if (recs != null && recs.length > 0) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      Vector v = new Vector();
+      ArrayList list = new ArrayList(recs.length);
       FolderPair folderPair = null;
       Long userId = cache.getMyUserId();
-      Hashtable groupIDsHT = null;
+      Set groupIDsSet = null;
 
       for (int i=0; i<recs.length; i++) {
         Record rec = recs[i];
@@ -94,13 +94,13 @@ public class CacheUtilities extends Object {
             }
             if (folderRecord != null) {
               folderPair = new FolderPair(shareRecord, folderRecord);
-              v.add(folderPair);
+              list.add(folderPair);
             }
           }
         } else if (rec instanceof FolderRecord) {
           FolderRecord folderRecord = (FolderRecord) rec;
-          if (groupIDsHT == null) groupIDsHT = cache.getFolderGroupIDsMyHT();
-          FolderShareRecord shareRecord = cache.getFolderShareRecordMy(folderRecord.getId(), groupIDsHT);
+          if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+          FolderShareRecord shareRecord = cache.getFolderShareRecordMy(folderRecord.getId(), groupIDsSet);
           if (shareRecord == null && makeupPairsIfDoNotExist) {
             shareRecord = new FolderShareRecord();
             shareRecord.folderId = folderRecord.folderId;
@@ -108,14 +108,14 @@ public class CacheUtilities extends Object {
           }
           if (shareRecord != null) {
             folderPair = new FolderPair(shareRecord, folderRecord);
-            v.add(folderPair);
+            list.add(folderPair);
           }
         } else {
           throw new IllegalArgumentException("Instance " + rec.getClass().getName() + " is not supported in this call!");
         }
       }
 
-      folderPairs = (FolderPair[]) ArrayUtils.toArray(v, FolderPair.class);
+      folderPairs = (FolderPair[]) ArrayUtils.toArray(list, FolderPair.class);
     }
 
     if (trace != null) trace.exit(CacheUtilities.class, folderPairs);
@@ -160,13 +160,13 @@ public class CacheUtilities extends Object {
     // add Category Folder
     if (foldersV != null) {
       FolderRecord fldRec = new FolderRecord();
-      fldRec.folderId = new Long(folderId);
+      fldRec.folderId = Long.valueOf(folderId);
       fldRec.parentFolderId = fldRec.folderId;
       fldRec.ownerUserId = userId;
-      fldRec.folderType = new Short(folderType);
+      fldRec.folderType = Short.valueOf(folderType);
       fldRec.numToKeep = null;
       fldRec.keepAsOldAs = null;
-      fldRec.numOfShares = new Short((short)1);
+      fldRec.numOfShares = Short.valueOf((short)1);
       fldRec.dateCreated = null;
       fldRec.dateUpdated = null;
       foldersV.addElement(fldRec);
@@ -174,9 +174,9 @@ public class CacheUtilities extends Object {
     // add related share
     if (sharesV != null) {
       FolderShareRecord shrRec = new FolderShareRecord();
-      shrRec.shareId = new Long(shareId);
-      shrRec.folderId = new Long(folderId);
-      shrRec.ownerType = new Short(Record.RECORD_TYPE_USER);
+      shrRec.shareId = Long.valueOf(shareId);
+      shrRec.folderId = Long.valueOf(folderId);
+      shrRec.ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
       shrRec.ownerUserId = userId;
       shrRec.dateCreated = null;
       shrRec.dateUpdated = null;
@@ -201,15 +201,15 @@ public class CacheUtilities extends Object {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (msgDatas == null)
       msgDatas = cache.getMsgDataRecords(new MsgFilter((Boolean) null, (Boolean) null, Boolean.FALSE));
-    Vector bodyKeys = null;
+    List bodyKeys = null;
     if (bodyKey == null) {
-      bodyKeys = cache.bodyKeys;
+      bodyKeys = cache.getMsgBodyKeys();
     } else {
-      bodyKeys = new Vector(1);
-      bodyKeys.addElement(bodyKey);
+      bodyKeys = new ArrayList();
+      bodyKeys.add(bodyKey);
     }
-    Vector msgDatasV = new Vector();
-    Vector msgLinksV = new Vector();
+    ArrayList msgDatasL = new ArrayList();
+    ArrayList msgLinksL = new ArrayList();
     if (msgDatas != null) {
       for (int i=0; i<msgDatas.length; i++) {
         MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsForMsg(msgDatas[i].msgId);
@@ -230,16 +230,16 @@ public class CacheUtilities extends Object {
             //msgDatas[i].unSealWithoutVerify(symmetricKey, bodyKeys);
             if (msgDatas[i].getTextBody() != null) {
               MsgLinkRecord.clearPostRenderingCache(msgLinks);
-              msgDatasV.addElement(msgDatas[i]);
+              msgDatasL.add(msgDatas[i]);
               for (int k=0; k<msgLinks.length; k++)
-                msgLinksV.addElement(msgLinks[k]);
+                msgLinksL.add(msgLinks[k]);
             }
           }
         }
       }
     }
-    MsgDataRecord[] msgDatasUnsealed = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasV, MsgDataRecord.class);
-    MsgLinkRecord[] msgLinksUnsealed = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksV, MsgLinkRecord.class);
+    MsgDataRecord[] msgDatasUnsealed = (MsgDataRecord[]) ArrayUtils.toArray(msgDatasL, MsgDataRecord.class);
+    MsgLinkRecord[] msgLinksUnsealed = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksL, MsgLinkRecord.class);
     // trigger listeners to update changed messages
     cache.addMsgDataRecords(msgDatasUnsealed);
     cache.addMsgLinkRecords(msgLinksUnsealed);
@@ -248,12 +248,12 @@ public class CacheUtilities extends Object {
       // check if unsealing some messages can unlock any attachments
       Long[] msgDataIDsUnsealed = RecordUtils.getIDs(msgDatasUnsealed);
       // start with file attachments...
-      FileLinkRecord[] fileLinkAttachments = cache.getFileLinkRecordsOwnersAndType(msgDataIDsUnsealed, new Short(Record.RECORD_TYPE_MESSAGE));
+      FileLinkRecord[] fileLinkAttachments = cache.getFileLinkRecordsOwnersAndType(msgDataIDsUnsealed, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
       // adding attachments back to cache will unseal them and allow for unsealing of nested bodies...
       // it will also refresh registered listener viewes with unsealed data...
       cache.addFileLinkRecords(fileLinkAttachments);
       // follow with message attachments...
-      MsgLinkRecord[] msgLinkAttachments = cache.getMsgLinkRecordsOwnersAndType(msgDataIDsUnsealed, new Short(Record.RECORD_TYPE_MESSAGE));
+      MsgLinkRecord[] msgLinkAttachments = cache.getMsgLinkRecordsOwnersAndType(msgDataIDsUnsealed, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
       // adding attachments back to cache will unseal them and allow for unsealing of nested bodies...
       cache.addMsgLinkRecords(msgLinkAttachments);
       // if there are message attachments present, unseal their bodies too
@@ -272,13 +272,13 @@ public class CacheUtilities extends Object {
   public static MsgLinkRecord[] getMsgLinkRecordsWithFetchedDatas(Long folderId) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     MsgLinkRecord[] mLinks = cache.getMsgLinkRecordsForFolder(folderId);
-    Vector mLinksFetchedV = new Vector();
+    ArrayList mLinksFetchedL = new ArrayList();
     for (int i=0; i<mLinks.length; i++) {
       MsgDataRecord mData = cache.getMsgDataRecord(mLinks[i].msgId);
       if (mData != null && mData.getEncText() != null)
-        mLinksFetchedV.addElement(mLinks[i]);
+        mLinksFetchedL.add(mLinks[i]);
     }
-    return (MsgLinkRecord[]) ArrayUtils.toArray(mLinksFetchedV, MsgLinkRecord.class);
+    return (MsgLinkRecord[]) ArrayUtils.toArray(mLinksFetchedL, MsgLinkRecord.class);
   }
 
 }

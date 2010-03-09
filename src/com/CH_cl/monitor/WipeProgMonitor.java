@@ -322,8 +322,8 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
       historyUpdateDates.removeFirst();
     }
 
-    historyTotalBytes.add(new Long(totalBytes));
-    historyUpdateDates.add(new Long(currentDateMillis));
+    historyTotalBytes.add(Long.valueOf(totalBytes));
+    historyUpdateDates.add(Long.valueOf(currentDateMillis));
 
     lastTransferUpdateDateMillis = currentDateMillis;
 

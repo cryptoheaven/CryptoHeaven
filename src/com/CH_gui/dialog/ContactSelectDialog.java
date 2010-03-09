@@ -141,7 +141,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
       folderFilter = new FixedFilter(false);
     RecordFilter filter = new MultiFilter(new RecordFilter[] { 
       new ContactFilterCo(myUserRec != null ? myUserRec.contactFolderId : null, 
-                          new Short[] { new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED) },
+                          new Short[] { Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED) },
                           true, myUserRec != null ? myUserRec.userId : null),
       folderFilter }
     , MultiFilter.OR);
@@ -183,7 +183,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
   }
 
   private void pressedOK() {
-    resultButton = new Integer(DEFAULT_OK_INDEX);
+    resultButton = Integer.valueOf(DEFAULT_OK_INDEX);
     Record[] selected = contactTable.getActionTable().getSelectedRecords();
     int size = selected != null ? selected.length : 0;
     selectedMemberContacts = new MemberContactRecordI[size];
@@ -196,7 +196,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
   }
 
   private void pressedCancel() {
-    resultButton = new Integer(DEFAULT_CANCEL_INDEX);
+    resultButton = Integer.valueOf(DEFAULT_CANCEL_INDEX);
     closeDialog();
   }
 

@@ -70,7 +70,7 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         if (clientBuild >= 35)
           dataOut.writeLongObj(contactRecords[i].creatorId);
         if (clientBuild < 260 || serverBuild < 260) // for old clients and engines, translate the status
-          dataOut.writeSmallint(ContactRecord.isOnlineStatus(contactRecords[i].status) ? new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE) : contactRecords[i].status);
+          dataOut.writeSmallint(ContactRecord.isOnlineStatus(contactRecords[i].status) ? Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE) : contactRecords[i].status);
         else
           dataOut.writeSmallint(contactRecords[i].status);
         if (clientBuild >= 28)
@@ -124,7 +124,7 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         contactRecords[i].status = dataIn.readSmallint();
         if (clientBuild < 260 || serverBuild < 260) // for old clients and engines, translate the status
           if (ContactRecord.isOnlineStatus(contactRecords[i].status))
-            contactRecords[i].status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE);
+            contactRecords[i].status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE);
         contactRecords[i].permits = dataIn.readInteger();
         contactRecords[i].setEncOwnerNote(dataIn.readSymCipherBulk());
         contactRecords[i].setOtherKeyId(dataIn.readLongObj());

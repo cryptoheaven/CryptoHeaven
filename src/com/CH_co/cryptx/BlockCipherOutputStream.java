@@ -191,7 +191,7 @@ public class BlockCipherOutputStream extends OutputStream {
     rijndael_CBC = null;
     messageDigest = null;
 
-    if (trace != null) trace.data(100, "Total bytes written=", new Long(totalTransmitedBytes));
+    if (trace != null) trace.data(100, "Total bytes written=", Long.valueOf(totalTransmitedBytes));
     if (trace != null) trace.exit(BlockCipherOutputStream.class);
   }
 

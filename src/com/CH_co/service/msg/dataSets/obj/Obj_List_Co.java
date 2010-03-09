@@ -38,7 +38,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.14 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Obj_List_Co extends ProtocolMsgDataSet {
 
@@ -46,7 +46,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
   private static final byte TYPE_LONG = 1;
   private static final byte TYPE_INT = 2;
   private static final byte TYPE_STRING = 3;
-  private static final byte TYPE_PROTOCOL_MSG_DATA_SET = 4; 
+  private static final byte TYPE_PROTOCOL_MSG_DATA_SET = 4;
   private static final byte TYPE_SHORT = 5;
   private static final byte TYPE_BOOLEAN = 6;
   private static final byte TYPE_BYTES = 7;
@@ -56,7 +56,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
   private static final byte TYPE_TIMESTAMP = 11;
   private static final byte TYPE_CHARACTER = 12;
 
-  // <numOfElements> { <Object> }+ 
+  // <numOfElements> { <Object> }+
 
   public Object objs[];
 
@@ -80,10 +80,10 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
     if (trace != null) trace.exit(Obj_List_Co.class);
   }
   /** Creates new Obj_List_Co */
-  public Obj_List_Co(Vector objsV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "Obj_List_Co(Vector objsV)");
-    if (trace != null) trace.args(objsV);
-    this.objs = ArrayUtils.toArray(objsV, Object.class);
+  public Obj_List_Co(List objsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "Obj_List_Co(List objsL)");
+    if (trace != null) trace.args(objsL);
+    this.objs = ArrayUtils.toArray(objsL, Object.class);
     if (trace != null) trace.exit(Obj_List_Co.class);
   }
 
@@ -200,10 +200,10 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
             objects[i] = null;
             break;
           case TYPE_LONG:
-            objects[i] = new Long(dataIn.readLong());
+            objects[i] = Long.valueOf(dataIn.readLong());
             break;
           case TYPE_INT:
-            objects[i] = new Integer(dataIn.readInt());
+            objects[i] = Integer.valueOf(dataIn.readInt());
             break;
           case TYPE_STRING:
             objects[i] = dataIn.readString();
@@ -213,7 +213,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
             objects[i] = protocolMsgDataSet;
             break;
           case TYPE_SHORT:
-            objects[i] = new Short(dataIn.readShort());
+            objects[i] = Short.valueOf(dataIn.readShort());
             break;
           case TYPE_BOOLEAN:
             objects[i] = Boolean.valueOf(dataIn.readBoolean());

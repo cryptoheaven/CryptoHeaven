@@ -233,7 +233,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class OpenFileAction extends AbstractActionTraced {
     public OpenFileAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, "Transfer and Open remote file on local system using default file type association.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Open"));
@@ -256,7 +256,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class DownloadAction extends AbstractActionTraced {
     public DownloadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Download_..."), Images.get(ImageNums.IMPORT_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Download"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.IMPORT_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download"));
@@ -278,7 +278,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 //  private class CopyAction extends AbstractActionTraced {
 //    public CopyAction(int actionId) {
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Copy_..."), Images.get(ImageNums.COPY16));
-//      putValue(Actions.ACTION_ID, new Integer(actionId));
+//      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_file_to_another_folder."));
 //      putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
 //      putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -312,7 +312,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Move_..."), Images.get(ImageNums.FILE_MOVE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_selected_file_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_MOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Move"));
@@ -334,7 +334,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class DeleteAction extends AbstractActionTraced {
     public DeleteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_..."), Images.get(ImageNums.FILE_REMOVE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_selected_files."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_REMOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
@@ -352,7 +352,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Properties"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_General_Properties."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -384,7 +384,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class ForwardToAction extends AbstractActionTraced {
     public ForwardToAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Forward_..."), Images.get(ImageNums.FORWARD16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Forward"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FORWARD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Forward"));
@@ -404,7 +404,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
@@ -422,7 +422,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 //  private class MarkAsSeenAction extends AbstractActionTraced {
 //    public MarkAsSeenAction (int actionId) {
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Seen"), Images.get(ImageNums.FLAG_BLANK13_15));
-//      putValue(Actions.ACTION_ID, new Integer(actionId));
+//      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_files_as_seen."));
 //      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK24));
 //      putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -438,7 +438,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 //  private class MarkAsUnseenAction extends AbstractActionTraced {
 //    public MarkAsUnseenAction(int actionId) {
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unseen"), Images.get(ImageNums.FLAG_GREEN13_15));
-//      putValue(Actions.ACTION_ID, new Integer(actionId));
+//      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_files_as_unseen."));
 //      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_GREEN24));
 //      putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -454,7 +454,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 //  private class MarkAllSeenAction extends AbstractActionTraced {
 //    public MarkAllSeenAction(int actionId) {
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Seen"), Images.get(ImageNums.FLAG_BLANK_DOUBLE16));
-//      putValue(Actions.ACTION_ID, new Integer(actionId));
+//      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
 //      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_files_in_selected_folder_as_seen."));
 //      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE24));
 //      putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -470,7 +470,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class OpenFilesInSeperateWindowAction extends AbstractActionTraced {
     public OpenFilesInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -488,7 +488,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class OpenMsgsInSeperateWindowAction extends AbstractActionTraced {
     public OpenMsgsInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Message_View"), Images.get(ImageNums.CLONE_MSG16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_message_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_MSG24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -506,7 +506,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class OpenRecycleBinInSeperateWindowAction extends AbstractActionTraced {
     public OpenRecycleBinInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Recycle_Bin_View"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_Recycle_Bin_in_its_own_window."));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_MENU, Boolean.FALSE);
@@ -526,7 +526,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class EmptyFolderAction extends AbstractActionTraced {
     public EmptyFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Empty_Folder_..."), Images.get(ImageNums.FLD_RECYCLE_CLEAR16));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Empty_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_RECYCLE_CLEAR24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Empty"));
@@ -546,7 +546,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class TracePrivilegeAndHistoryAction extends AbstractActionTraced {
     public TracePrivilegeAndHistoryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Trace_Access"));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Trace_Access"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -568,7 +568,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
@@ -836,7 +836,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
           anyFileLink = true;
           FileLinkRecord fLink = (FileLinkRecord) records[i];
           // count the file towards total selected size
-          totalSize = new Long(fLink.origSize.longValue() + (totalSize != null ? totalSize.longValue() : 0));
+          totalSize = Long.valueOf(fLink.origSize.longValue() + (totalSize != null ? totalSize.longValue() : 0));
 //          if (!(anySeen && anyUnseen)) {
 //            StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
 //            if (statRecord != null) {
@@ -853,7 +853,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
           // count the msg towards total selected size
           MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
           if (mData != null) {
-            totalSize = new Long(mData.recordSize.intValue() + (totalSize != null ? totalSize.longValue() : 0));
+            totalSize = Long.valueOf(mData.recordSize.intValue() + (totalSize != null ? totalSize.longValue() : 0));
 //            if (!(anySeen && anyUnseen)) {
 //              StatRecord statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
 //              if (statRecord != null) {

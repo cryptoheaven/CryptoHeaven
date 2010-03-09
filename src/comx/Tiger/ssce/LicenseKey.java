@@ -25,7 +25,7 @@ public class LicenseKey {
   }
 
   public static void setKey(int i) {
-    SpellingSession.setOption(new Integer(32), new Integer(i));
+    SpellingSession.setOption(Integer.valueOf(32), Integer.valueOf(i));
     key = i;
   }
 }

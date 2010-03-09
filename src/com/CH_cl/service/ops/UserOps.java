@@ -125,7 +125,7 @@ public class UserOps extends Object {
     boolean storeKeyOnLocal = !storeKeyOnServer;
 
     if (actionCode == null) {
-      actionCode = new Integer(CommandCodes.USR_Q_ALTER_PASSWORD);
+      actionCode = Integer.valueOf(CommandCodes.USR_Q_ALTER_PASSWORD);
     }
 
     FetchedDataCache cache = SIL.getFetchedDataCache();
@@ -230,7 +230,7 @@ public class UserOps extends Object {
     boolean success = false;
     Usr_AltUsrPass_Rq altUsrPassSet = createAltUserPassRequest(SIL, null, ba, false);
     Obj_List_Co request = new Obj_List_Co();
-    request.objs = new Object[] { altUsrPassSet, new Obj_IDList_Co(toManageUserIDs), new Short(toStatus), statusMsg };
+    request.objs = new Object[] { altUsrPassSet, new Obj_IDList_Co(toManageUserIDs), Short.valueOf(toStatus), statusMsg };
     ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_CHANGE_STATUS, request), 60000);
     success = msgAction != null && msgAction.getActionCode() >= 0;
     DefaultReplyRunner.nonThreadedRun(SIL, msgAction);

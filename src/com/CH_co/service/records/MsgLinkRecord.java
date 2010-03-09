@@ -324,7 +324,7 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   }
 
   public void setSortThreadLayer(int layer) {
-    setSortThreadLayer(new Integer(layer));
+    setSortThreadLayer(Integer.valueOf(layer));
   }
   public void setSortThreadLayer(Integer layer) {
     sortThreadLayer = layer;

@@ -294,7 +294,7 @@ public abstract class CommonSessionContext extends Object implements Interruptib
   }
 
 
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CommonSessionContext.class, "finalize()");
     try {
       closeCommunications();

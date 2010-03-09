@@ -210,7 +210,7 @@ public class LexCompressor
 //        char c3 = '\u03E7';
 //        char c4 = '\227';
 //        char c5 = '\u012B';
-//        int j1 = SpellingSession.getOption(new Integer(32));
+//        int j1 = SpellingSession.getOption(Integer.valueOf(32));
 //        if ((j1 & 0xff) == 162)
 //        {
 //          int k1 = (j1 & 0x1f00) >> 8;
@@ -219,7 +219,7 @@ public class LexCompressor
 //          Date date1 = (new GregorianCalendar(2000, 0, 1)).getTime();
 //          Date date2 = new Date(date1.getTime() + (long)i2 * 0x5265c00L);
 //          long l4 = System.currentTimeMillis();
-//          long l6 = (long)SpellingSession.getOption(new Integer(16)) * 1000L;
+//          long l6 = (long)SpellingSession.getOption(Integer.valueOf(16)) * 1000L;
 //          int j3 = j1 & 0x7fffe000;
 //          int k3 = 0;
 //          for (int i4 = 0; i4 < 32; i4++)
@@ -245,7 +245,7 @@ public class LexCompressor
 //                System.out.println();
 //              }
 //
-//              SpellingSession.setOption(new Integer(16), new Integer((int)(l4 / 1000L)));
+//              SpellingSession.setOption(Integer.valueOf(16), Integer.valueOf((int)(l4 / 1000L)));
 //            }
 //            throw new Exception();
 //          }
@@ -262,7 +262,7 @@ public class LexCompressor
 //              System.out.println();
 //            }
 //
-//            SpellingSession.setOption(new Integer(16), new Integer((int)(l4 / 1000L)));
+//            SpellingSession.setOption(Integer.valueOf(16), Integer.valueOf((int)(l4 / 1000L)));
 //          }
 //        } else
 //        {
