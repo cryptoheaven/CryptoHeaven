@@ -271,9 +271,9 @@ public class FetchedDataCache extends Object {
   /**
    * Add email address record hashes in batch mode.
    */
-  public synchronized void addRequestedAddrHashes(Vector hashesV) {
-    for (int i=0; i<hashesV.size(); i++)
-      addRequestedAddrHash((byte[]) hashesV.elementAt(i));
+  public synchronized void addRequestedAddrHashes(List hashesL) {
+    for (int i=0; i<hashesL.size(); i++)
+      addRequestedAddrHash((byte[]) hashesL.get(i));
   }
 
   /**
