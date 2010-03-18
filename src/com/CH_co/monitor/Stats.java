@@ -28,7 +28,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -36,7 +36,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.19 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Stats extends Object {
 
@@ -53,7 +53,6 @@ public class Stats extends Object {
   protected static ImageIcon greenLightOnPic;
   protected static ImageIcon greenLightOffPic;
 
-  private static Vector globeMoversV = new Vector(); // objects that are causing the globe to move
   private static HashMap globeMoversTraceHM = new HashMap(); // for debug, stack traces of our Movers
 
   protected static JLabel jPing;
@@ -138,12 +137,11 @@ public class Stats extends Object {
 
   public static void moveGlobe(Object mover) {
     synchronized (monitor) {
-      if (globeMoversV.size() == 0) {
+      if (globeMoversTraceHM.size() == 0) {
         if (jLastStatus != null)
           jLastStatus.setIcon(movingPic);
       }
-      if (!globeMoversV.contains(mover)) {
-        globeMoversV.addElement(mover);
+      if (!globeMoversTraceHM.containsKey(mover)) {
         globeMoversTraceHM.put(mover, Misc.getStack(new Throwable(""+mover+" at " + new Date())));
       }
     }
@@ -151,10 +149,9 @@ public class Stats extends Object {
 
   public static void stopGlobe(Object mover) {
     synchronized (monitor) {
-      if (globeMoversV.contains(mover)) {
+      if (globeMoversTraceHM.containsKey(mover)) {
         globeMoversTraceHM.remove(mover);
-        globeMoversV.removeElement(mover);
-        if (globeMoversV.size() == 0) {
+        if (globeMoversTraceHM.size() == 0) {
           if (jLastStatus != null)
             jLastStatus.setIcon(staticPic);
         }
@@ -194,7 +191,7 @@ public class Stats extends Object {
     synchronized (monitor) {
       if (jConnections != null) {
         jConnections.setText("" + connectionCount);
-        jConnections.setToolTipText("<html>Number of open socket connections: <b>" + connectionTypeCounts[0] + 
+        jConnections.setToolTipText("<html>Number of open socket connections: <b>" + connectionTypeCounts[0] +
                                   "</b><br>Number of open HTTP sockets: <b>" + connectionTypeCounts[1] + "</b>");
       }
       if (connectionCount > 0) {
