@@ -190,7 +190,6 @@ public class MiscGui extends Object {
 
   public static void setPaintPrefs(Graphics g) {
     if (isAntiAliasingCapable && isAntiAliasingEnabled && g instanceof Graphics2D) {
-      //UIManager.getLookAndFeelDefaults().put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
       ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     }
   }
