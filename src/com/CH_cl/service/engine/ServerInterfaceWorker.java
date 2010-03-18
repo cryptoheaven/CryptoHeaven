@@ -84,7 +84,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   // All actions before they are sent, we hash them into a table so we can properly interrupt them
   // and release any waiting processes in an event of a failure in the writer or reader process.
   // The key is message stamp.
-  private final Hashtable outgoingInterruptableActionsHT;
+  private final HashMap outgoingInterruptableActionsHM;
 
   /** Login message action that should be used for login. */
   private MessageAction loginMsgAction;
@@ -103,7 +103,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
   private boolean isPersistantWorker = false;
 
-  /** 
+  /**
    * Monitor completion of HEAVY jobs so that requests for heavy jobs are sent one at a time and replies read
    * before the same worker can send a request for a heavy job.
    */
@@ -119,8 +119,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
    * @param requestPriorityFifoReaderI Where the requests for sending are taken from.
    * @param loginMsgAction Message to be used for login.
    */
-  public ServerInterfaceWorker(Socket connectedSocket, WorkerManagerI workerManager, 
-        RequestSubmitterI requestSubmitter, FifoWriterI replyFifoWriterI, 
+  public ServerInterfaceWorker(Socket connectedSocket, WorkerManagerI workerManager,
+        RequestSubmitterI requestSubmitter, FifoWriterI replyFifoWriterI,
         PriorityFifoReaderI requestPriorityFifoReaderI,
         MessageAction loginMsgAction) throws IOException
   {
@@ -132,7 +132,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     this.requestPriorityFifoReaderI = requestPriorityFifoReaderI;
     this.loginMsgAction = loginMsgAction;
 
-    this.outgoingInterruptableActionsHT = new Hashtable();
+    this.outgoingInterruptableActionsHM = new HashMap();
 
     this.reader = new ReaderThread("Worker Reader " + workerCount);
     reader.start();
@@ -365,8 +365,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             progressMonitor.setCancellable(msgAction);
 
             // Since the reply has been read, there is no communication error and we can remove the interruptable message.
-            synchronized (outgoingInterruptableActionsHT) {
-              outgoingInterruptableActionsHT.remove(Long.valueOf(msgActionStamp));
+            synchronized (outgoingInterruptableActionsHM) {
+              outgoingInterruptableActionsHM.remove(new Stamp(msgActionStamp));
             }
 
             // we must ignore idle restart here due to possibly incoming notifications which are treated as IDLE messages
@@ -434,15 +434,15 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
         // We need to wake-up any submitting threads should this transaction die.
         // All interruptable actions which did not see a reply must be processed as interrupted.
-        synchronized (outgoingInterruptableActionsHT) {
-          Enumeration enm = outgoingInterruptableActionsHT.elements();
-          while (enm.hasMoreElements()) {
-            MessageAction mAction = (MessageAction) enm.nextElement();
+        synchronized (outgoingInterruptableActionsHM) {
+          Iterator iter = outgoingInterruptableActionsHM.values().iterator();
+          while (iter.hasNext()) {
+            MessageAction mAction = (MessageAction) iter.next();
             InterruptMessageAction interruptAction = new InterruptMessageAction(mAction);
             interruptAction.setClientContext(sessionContext);
             replyFifoWriterI.add(interruptAction);
           }
-          outgoingInterruptableActionsHT.clear();
+          outgoingInterruptableActionsHM.clear();
         }
       }
 
@@ -699,11 +699,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           progressMonitor.setCancellable(msgAction);
 
           // Remember every action that is sent, so when worker dies, all actions can be properly interrupted.
-          synchronized (outgoingInterruptableActionsHT) {
-            outgoingInterruptableActionsHT.put(Long.valueOf(msgActionStamp), msgAction);
+          synchronized (outgoingInterruptableActionsHM) {
+            outgoingInterruptableActionsHM.put(new Stamp(msgActionStamp), msgAction);
           }
 
-          if (JobFifo.getJobType(msgAction) == JobFifo.JOB_TYPE_HEAVY || 
+          if (JobFifo.getJobType(msgAction) == JobFifo.JOB_TYPE_HEAVY ||
               JobFifo.isJobComputationallyIntensive(msgActionCode)
               // No need to synchronize on Login since this is done in
               // processOutgoingMsgAction() and would cause a deadlock here.
@@ -714,7 +714,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               // wait for reader to finish processing reply before we can continue to the next request
               try {
                 readerDoneMonitor.wait();
-              } catch (InterruptedException e) { 
+              } catch (InterruptedException e) {
                 if (trace != null) trace.data(80, "Reader thread has woken up the writer...");
               }
             }
@@ -741,7 +741,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         } // end while (!finished)
 
 
-      // If there was a communication problem why the request was not send, try 
+      // If there was a communication problem why the request was not send, try
       // pushing it back to the queue for resend.
       } catch (SocketException e) {
         if (trace != null) trace.exception(WriterThread.class, 100, e);
@@ -765,8 +765,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               if (pm != null)
                 pm.jobForRetry();
               // Since we will retry this action, it is not yet done and should not be interrupted.
-              synchronized (outgoingInterruptableActionsHT) {
-                outgoingInterruptableActionsHT.remove(Long.valueOf(msgAction.getStamp()));
+              synchronized (outgoingInterruptableActionsHM) {
+                outgoingInterruptableActionsHM.remove(new Stamp(msgAction.getStamp()));
               }
               // Don't allow it to be killed so pretend nothing happend and it will be retried.
               msgAction = null;
@@ -796,13 +796,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         // All not completed actions should be entered for reply-processing as interrupted actions.
         // Reader thread completes the actions by taking them out of the hash table by their stamp.
         // Those action cannot be retried because we don't know if they failed or not, we sent them but no replies yet.
-        synchronized (outgoingInterruptableActionsHT) {
-          Enumeration enm = outgoingInterruptableActionsHT.elements();
-          while (enm.hasMoreElements()) {
-            MessageAction mAction = (MessageAction) enm.nextElement();
+        synchronized (outgoingInterruptableActionsHM) {
+          Iterator iter = outgoingInterruptableActionsHM.values().iterator();
+          while (iter.hasNext()) {
+            MessageAction mAction = (MessageAction) iter.next();
             replyFifoWriterI.add(new InterruptMessageAction(mAction));
           }
-          outgoingInterruptableActionsHT.clear();
+          outgoingInterruptableActionsHM.clear();
         }
       }
 
@@ -823,8 +823,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       // If streams are about to change due to securing streams, then wait
       // if Login action then wait till the streams are secured or waiting threads released, else no one will notify us hence wait would be forever!
       // if this is a login action, remember it for the future.
-      if (msgActionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || 
-          msgActionCode == CommandCodes.SYSENG_Q_LOGIN || 
+      if (msgActionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
+          msgActionCode == CommandCodes.SYSENG_Q_LOGIN ||
           msgActionCode == CommandCodes.SYS_Q_LOGIN ||
           msgActionCode == CommandCodes.SYS_Q_VERSION ||
           msgActionCode == CommandCodes.USR_Q_LOGOUT ||
@@ -846,10 +846,10 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             msgActionCode == CommandCodes.SYS_Q_LOGIN) {
           if (trace != null) trace.data(21, "Synchronizing key fetch...");
           synchronized (dataOut) {
-            // This key only used to conceal public key when sent from server to client... 
+            // This key only used to conceal public key when sent from server to client...
             // key is already public so it doesn't matter much but at least login can be anonimized against sniffers
             // which could otherwise examine the public key to see who is logging in... keep in mind that successful request of public key
-            // does not equal successful login (or link the key to any particular user) because user may have bad password 
+            // does not equal successful login (or link the key to any particular user) because user may have bad password
             // which could generate identical partial hash so public key is dispensed but login fails due to incorrect password.
             sessionContext.generateKeyPairIfDoesntExist(512);
             Obj_List_Co dataSet = new Obj_List_Co(new Object[] { sessionContext.getKeyPairToReceiveWith().getPublicKey().objectToBytes() });
@@ -867,8 +867,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           if (trace != null) trace.data(25, "Synchronizing key fetch... done.");
         }
 
-        if (msgActionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || 
-            msgActionCode == CommandCodes.SYSENG_Q_LOGIN || 
+        if (msgActionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
+            msgActionCode == CommandCodes.SYSENG_Q_LOGIN ||
             msgActionCode == CommandCodes.SYS_Q_LOGIN)
         {
           attemptLoginMessageAction = msgAction;
