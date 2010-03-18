@@ -38,6 +38,7 @@ import com.CH_co.tree.*;
 import com.CH_co.util.*;
 
 import java.awt.*;
+import java.util.EventListener;
 import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -50,7 +51,7 @@ import javax.swing.tree.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -58,13 +59,15 @@ import javax.swing.tree.*;
  *
  * <b>$Revision: 1.40 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class TableComponent extends JPanel implements TreeSelectionListener, VisualsSavable, DisposableObj {
 
   public static final boolean DEBUG__DISABLE_LOCAL_FILE_CHOOSER = false;
 
   private RecordTableComponent lastFilterableTableComponent;
+
+  private final Object initTableComponentMonitor = new Object();
 
   private AddressTableComponent addressTableComponent;
   private MsgPreviewPanel addressPreviewPanel;
@@ -75,6 +78,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   private JSplitPane whiteListSplitPane;
 
   private FileTableComponent fileTableComponent;
+  private EventListenerList folderSelectionListeners;
+
   private KeyTableComponent keyTableComponent;
   private GroupTableComponent groupTableComponent;
   private RecycleTableComponent recycleTableComponent;
@@ -132,7 +137,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   /** Creates new TableComponent */
   public TableComponent(String propertyName) {
-    this(propertyName, new JPanel());
+    this(propertyName, null);
   }
   public TableComponent(String propertyName, Component welcomeScreen) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "TableComponent(String propertyName, Component welcomeScreen)");
@@ -295,12 +300,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initAddressTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initAddressTableComponent()");
-    if (addressTableComponent == null) {
-      addressTableComponent = new AddressTableComponent(false);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(addressTableComponent);
-        ((JActionFrame)w).removeComponentActions(addressTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (addressTableComponent == null) {
+        addressTableComponent = new AddressTableComponent(false);
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(addressTableComponent);
+          ((JActionFrame) w).removeComponentActions(addressTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -308,12 +315,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initWhiteListTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initWhiteListTableComponent()");
-    if (whiteListTableComponent == null) {
-      whiteListTableComponent = new WhiteListTableComponent(false);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(whiteListTableComponent);
-        ((JActionFrame)w).removeComponentActions(whiteListTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (whiteListTableComponent == null) {
+        whiteListTableComponent = new WhiteListTableComponent(false);
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(whiteListTableComponent);
+          ((JActionFrame) w).removeComponentActions(whiteListTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -321,12 +330,22 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initFileTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initFileTableComponent()");
-    if (fileTableComponent == null) {
-      fileTableComponent = new FileTableComponent();
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(fileTableComponent);
-        ((JActionFrame)w).removeComponentActions(fileTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (fileTableComponent == null) {
+        fileTableComponent = new FileTableComponent();
+        // add previously registered folder selection listeners
+        if (folderSelectionListeners != null) {
+          EventListener[] listeners = folderSelectionListeners.getListeners(FolderSelectionListener.class);
+          if (listeners != null) {
+            for (int i=0; i<listeners.length; i++)
+              ((FileActionTable) fileTableComponent.getRecordTableScrollPane()).addFolderSelectionListener((FolderSelectionListener) listeners[i]);
+          }
+        }
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(fileTableComponent);
+          ((JActionFrame) w).removeComponentActions(fileTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -334,43 +353,50 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initPostTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initPostTableComponent()");
-    if (postTableComponent == null) {
-      postTableComponent = new PostTableComponent();
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(postTableComponent);
-        ((JActionFrame)w).removeComponentActions(postTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (postTableComponent == null) {
+        postTableComponent = new PostTableComponent();
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(postTableComponent);
+          ((JActionFrame) w).removeComponentActions(postTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
-  } 
+  }
 
   public void initChatTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initChatTableComponent()");
-    if (chatTableComponent == null) {
-      chatTableComponent = new ChatTableComponent();
-      chatComposePanel = new MsgComposePanel(null, MsgDataRecord.OBJ_TYPE_MSG, true);
-      if (chatTableComponent.getToolBarModel() != null)
-        chatTableComponent.getToolBarModel().addComponentActions(chatComposePanel);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(chatTableComponent);
-        ((JActionFrame)w).addComponentActions(chatComposePanel);
-        ((JActionFrame)w).removeComponentActions(chatTableComponent);
-        ((JActionFrame)w).removeComponentActions(chatComposePanel);
+    synchronized (initTableComponentMonitor) {
+      if (chatTableComponent == null) {
+        chatTableComponent = new ChatTableComponent();
+        chatComposePanel = new MsgComposePanel(null, MsgDataRecord.OBJ_TYPE_MSG, true);
+        if (chatTableComponent.getToolBarModel() != null) {
+          chatTableComponent.getToolBarModel().addComponentActions(chatComposePanel);
+        }
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(chatTableComponent);
+          ((JActionFrame) w).addComponentActions(chatComposePanel);
+          ((JActionFrame) w).removeComponentActions(chatTableComponent);
+          ((JActionFrame) w).removeComponentActions(chatComposePanel);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
-  } 
+  }
 
   public void initMsgTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgTableComponent()");
-    if (msgTableComponent == null) {
-      msgTableComponent = new MsgTableComponent();
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(msgTableComponent);
-        ((JActionFrame)w).removeComponentActions(msgTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (msgTableComponent == null) {
+        msgTableComponent = new MsgTableComponent();
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(msgTableComponent);
+          ((JActionFrame) w).removeComponentActions(msgTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -378,12 +404,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initMsgInboxTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgInboxTableComponent()");
-    if (msgInboxTableComponent == null) {
-      msgInboxTableComponent = new MsgInboxTableComponent(false);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(msgInboxTableComponent);
-        ((JActionFrame)w).removeComponentActions(msgInboxTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (msgInboxTableComponent == null) {
+        msgInboxTableComponent = new MsgInboxTableComponent(false);
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(msgInboxTableComponent);
+          ((JActionFrame) w).removeComponentActions(msgInboxTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -391,12 +419,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initMsgSentTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgSentTableComponent()");
-    if (msgSentTableComponent == null) {
-      msgSentTableComponent = new MsgSentTableComponent(false);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(msgSentTableComponent);
-        ((JActionFrame)w).removeComponentActions(msgSentTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (msgSentTableComponent == null) {
+        msgSentTableComponent = new MsgSentTableComponent(false);
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(msgSentTableComponent);
+          ((JActionFrame) w).removeComponentActions(msgSentTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -404,12 +434,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initMsgSpamTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgSpamTableComponent()");
-    if (msgSpamTableComponent == null) {
-      msgSpamTableComponent = new MsgSpamTableComponent(false);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(msgSpamTableComponent);
-        ((JActionFrame)w).removeComponentActions(msgSpamTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (msgSpamTableComponent == null) {
+        msgSpamTableComponent = new MsgSpamTableComponent(false);
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(msgSpamTableComponent);
+          ((JActionFrame) w).removeComponentActions(msgSpamTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -417,12 +449,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initMsgDraftsTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgDraftsTableComponent()");
-    if (msgDraftsTableComponent == null) {
-      msgDraftsTableComponent = new MsgDraftsTableComponent(false);
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(msgDraftsTableComponent);
-        ((JActionFrame)w).removeComponentActions(msgDraftsTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (msgDraftsTableComponent == null) {
+        msgDraftsTableComponent = new MsgDraftsTableComponent(false);
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(msgDraftsTableComponent);
+          ((JActionFrame) w).removeComponentActions(msgDraftsTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -430,12 +464,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initKeyTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initKeyTableComponent()");
-    if (keyTableComponent == null) {
-      keyTableComponent = new KeyTableComponent(FetchedDataCache.getSingleInstance().getKeyRecords());
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(keyTableComponent);
-        ((JActionFrame)w).removeComponentActions(keyTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (keyTableComponent == null) {
+        keyTableComponent = new KeyTableComponent(FetchedDataCache.getSingleInstance().getKeyRecords());
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(keyTableComponent);
+          ((JActionFrame) w).removeComponentActions(keyTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -443,12 +479,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initGroupTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initGroupTableComponent()");
-    if (groupTableComponent == null) {
-      groupTableComponent = new GroupTableComponent();
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(groupTableComponent);
-        ((JActionFrame)w).removeComponentActions(groupTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (groupTableComponent == null) {
+        groupTableComponent = new GroupTableComponent();
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(groupTableComponent);
+          ((JActionFrame) w).removeComponentActions(groupTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -456,12 +494,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
 
   public void initRecycleTableComponent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initRecycleTableComponent()");
-    if (recycleTableComponent == null) {
-      recycleTableComponent = new RecycleTableComponent();
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(recycleTableComponent);
-        ((JActionFrame)w).removeComponentActions(recycleTableComponent);
+    synchronized (initTableComponentMonitor) {
+      if (recycleTableComponent == null) {
+        recycleTableComponent = new RecycleTableComponent();
+        Window w = SwingUtilities.windowForComponent(this);
+        if (w != null && w instanceof JActionFrame) {
+          ((JActionFrame) w).addComponentActions(recycleTableComponent);
+          ((JActionFrame) w).removeComponentActions(recycleTableComponent);
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -471,16 +511,20 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initLocalFileTableComponent()");
     if (DEBUG__DISABLE_LOCAL_FILE_CHOOSER) {
       System.out.println("Warning: Local file chooser is disabled.");
-    } else if (fileChooserComponent == null) {
-      if (propertyName == null)
-        fileChooserComponent = new FileChooserComponent(UploadUtilities.getDefaultSourceDir());
-      else
-        fileChooserComponent = new FileChooserComponent(propertyName);
+    } else {
+      synchronized (initTableComponentMonitor) {
+        if (fileChooserComponent == null) {
+          if (propertyName == null)
+            fileChooserComponent = new FileChooserComponent(UploadUtilities.getDefaultSourceDir());
+          else
+            fileChooserComponent = new FileChooserComponent(propertyName);
 
-      Window w = SwingUtilities.windowForComponent(this);
-      if (w instanceof JActionFrame) {
-        ((JActionFrame)w).addComponentActions(fileChooserComponent);
-        ((JActionFrame)w).removeComponentActions(fileChooserComponent);
+          Window w = SwingUtilities.windowForComponent(this);
+          if (w != null && w instanceof JActionFrame) {
+            ((JActionFrame)w).addComponentActions(fileChooserComponent);
+            ((JActionFrame)w).removeComponentActions(fileChooserComponent);
+          }
+        }
       }
     }
     if (trace != null) trace.exit(TableComponent.class);
@@ -495,8 +539,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     if (trace != null) trace.args(isSpamFolder);
     if (trace != null) trace.args(isDraftsFolder);
     // only setDisplay if the mode has changed (special handling for send msg folder as its different from regular)
-    if (mode != null && 
-        (displayMode != mode.shortValue() || 
+    if (mode != null &&
+        (displayMode != mode.shortValue() ||
           (mode.shortValue() == FolderRecord.MESSAGE_FOLDER && isInboxFolder != displayMode_IsInboxFolder) ||
           (mode.shortValue() == FolderRecord.MESSAGE_FOLDER && isSentFolder != displayMode_IsSentFolder) ||
           (mode.shortValue() == FolderRecord.MESSAGE_FOLDER && isSpamFolder != displayMode_IsSpamFolder) ||
@@ -620,7 +664,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           break;
         case FolderRecord.FILE_FOLDER:
           // make sure we have the file table component;
-          initFileTableComponent();
+          if (fileTableComponent == null)
+            initFileTableComponent();
           c = fileTableComponent;
           break;
         case FolderRecord.ADDRESS_FOLDER:
@@ -694,35 +739,40 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           break;
         case FolderRecord.POSTING_FOLDER:
           // make sure we have the post table component;
-          initPostTableComponent();
+          if (postTableComponent == null)
+            initPostTableComponent();
           c = postTableComponent;
           break;
         case FolderRecord.CHATTING_FOLDER:
-          // make sure we have the chat table component;
-          initChatTableComponent();
           if (chatSplitPane == null) {
+            // make sure we have the chat table component;
+            initChatTableComponent();
             chatSplitPane = createSplitPane(chatTableComponent, chatComposePanel, "_chatComp", JSplitPane.VERTICAL_SPLIT, 0.90d);
           }
           c = chatSplitPane;
           break;
         case FolderRecord.KEY_FOLDER:
           // make sure we have key table component;
-          initKeyTableComponent();
+          if (keyTableComponent == null)
+            initKeyTableComponent();
           c = keyTableComponent;
           break;
         case FolderRecord.GROUP_FOLDER:
           // make sure we have group table component;
-          initGroupTableComponent();
+          if (groupTableComponent == null)
+            initGroupTableComponent();
           c = groupTableComponent;
           break;
         case FolderRecord.RECYCLE_FOLDER:
           // make sure we have recycle table component;
-          initRecycleTableComponent();
+          if (recycleTableComponent == null)
+            initRecycleTableComponent();
           c = recycleTableComponent;
           break;
         case FolderRecord.LOCAL_FILES_FOLDER:
           // make sure we have the file chooser component ready;
-          initLocalFileTableComponent();
+          if (fileChooserComponent == null)
+            initLocalFileTableComponent();
           c = fileChooserComponent;
           break;
       }
@@ -778,14 +828,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       if (displayed != null)
         remove(displayed);
       displayed = c;
-      add(c, new GridBagConstraints(0, 0, 1, 1, 10, 10, 
+      add(c, new GridBagConstraints(0, 0, 1, 1, 10, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
 
     if (displayedChanged) {
       Window w = SwingUtilities.windowForComponent(this);
       JActionFrame aFrame = null;
-      if (w instanceof JActionFrame) {
+      if (w != null && w instanceof JActionFrame) {
         aFrame = (JActionFrame) w;
         aFrame.removeComponentActions(previousDisplayed);
         aFrame.rebuildAllActions(this);
@@ -871,7 +921,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           FolderTreeNode node = (FolderTreeNode) path.getLastPathComponent();
           FolderPair pair = node.getFolderObject();
           // if Root, skip
-          if (pair == null) { 
+          if (pair == null) {
             // skip ROOT
             if (trace != null) trace.data(15, "skip ROOT");
           }
@@ -947,7 +997,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               msgSentTableComponent.initData(selectedFolderID);
             else if (isSpamFolder)
               msgSpamTableComponent.initData(selectedFolderID);
-            else 
+            else
               msgDraftsTableComponent.initData(selectedFolderID);
             break;
           case FolderRecord.POSTING_FOLDER:
@@ -986,13 +1036,20 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   }
 
   public void addFolderSelectionListener(FolderSelectionListener l) {
-    initFileTableComponent();
-    ((FileActionTable) fileTableComponent.getRecordTableScrollPane()).addFolderSelectionListener(l);
+    if (fileTableComponent != null) {
+      ((FileActionTable) fileTableComponent.getRecordTableScrollPane()).addFolderSelectionListener(l);
+    } else {
+      if (folderSelectionListeners == null)
+        folderSelectionListeners = new EventListenerList();
+      folderSelectionListeners.add(FolderSelectionListener.class, l);
+    }
   }
 
   public void removeTreeSelectionListener(FolderSelectionListener l) {
     if (fileTableComponent != null)
       ((FileActionTable) fileTableComponent.getRecordTableScrollPane()).removeFolderSelectionListener(l);
+    if (folderSelectionListeners != null)
+      folderSelectionListeners.remove(FolderSelectionListener.class, l);
   }
 
 
@@ -1019,7 +1076,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     if (trace != null) trace.args(visuals);
 
     try {
-      StringTokenizer st = new StringTokenizer(visuals);  
+      StringTokenizer st = new StringTokenizer(visuals);
       st.nextToken();
       st.nextToken();
       int width = Integer.parseInt(st.nextToken());
@@ -1063,6 +1120,13 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     }
     if (fileTableComponent != null)
       fileTableComponent.disposeObj();
+    if (folderSelectionListeners != null) {
+      EventListener[] listeners = folderSelectionListeners.getListeners(FolderSelectionListener.class);
+      if (listeners != null) {
+        for (int i=0; i<listeners.length; i++)
+          folderSelectionListeners.remove(FolderSelectionListener.class, listeners[i]);
+      }
+    }
     if (postTableComponent != null)
       postTableComponent.disposeObj();
     if (chatTableComponent != null) {
