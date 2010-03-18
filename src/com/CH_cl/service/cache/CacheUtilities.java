@@ -42,8 +42,8 @@ import com.CH_co.util.*;
 public class CacheUtilities extends Object {
 
 
-  /** Creates new CacheUtilities */
-  public CacheUtilities() {
+  /** Hide the constructor, all methods are static. */
+  private CacheUtilities() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUtilities.class, "CacheUtilities()");
     if (trace != null) trace.exit(CacheUtilities.class);
   }
@@ -144,21 +144,21 @@ public class CacheUtilities extends Object {
     return familiar;
   }
 
-  public static void makeFolderCategories(Long userId, Vector foldersBufferV, Vector sharesBufferV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUtilities.class, "makeFolderCategories(Vector folderRecordBufferV, Vector shareRecordBufferV)");
+  public static void makeFolderCategories(Long userId, List foldersBufferL, List sharesBufferL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUtilities.class, "makeFolderCategories(List folderRecordBufferL, List shareRecordBufferL)");
     if (userId != null) {
-      addCategoryFolder(FolderRecord.CATEGORY_MAIL_ID, FolderShareRecord.CATEGORY_MAIL_ID, FolderRecord.CATEGORY_MAIL_FOLDER, userId, foldersBufferV, sharesBufferV);
-      addCategoryFolder(FolderRecord.CATEGORY_FILE_ID, FolderShareRecord.CATEGORY_FILE_ID, FolderRecord.CATEGORY_FILE_FOLDER, userId, foldersBufferV, sharesBufferV);
-      addCategoryFolder(FolderRecord.FOLDER_LOCAL_ID, FolderShareRecord.SHARE_LOCAL_ID, FolderRecord.LOCAL_FILES_FOLDER, userId, foldersBufferV, sharesBufferV);
-      addCategoryFolder(FolderRecord.CATEGORY_CHAT_ID, FolderShareRecord.CATEGORY_CHAT_ID, FolderRecord.CATEGORY_CHAT_FOLDER, userId, foldersBufferV, sharesBufferV);
-      addCategoryFolder(FolderRecord.CATEGORY_GROUP_ID, FolderShareRecord.CATEGORY_GROUP_ID, FolderRecord.CATEGORY_GROUP_FOLDER, userId, foldersBufferV, sharesBufferV);
+      addCategoryFolder(FolderRecord.CATEGORY_MAIL_ID, FolderShareRecord.CATEGORY_MAIL_ID, FolderRecord.CATEGORY_MAIL_FOLDER, userId, foldersBufferL, sharesBufferL);
+      addCategoryFolder(FolderRecord.CATEGORY_FILE_ID, FolderShareRecord.CATEGORY_FILE_ID, FolderRecord.CATEGORY_FILE_FOLDER, userId, foldersBufferL, sharesBufferL);
+      addCategoryFolder(FolderRecord.FOLDER_LOCAL_ID, FolderShareRecord.SHARE_LOCAL_ID, FolderRecord.LOCAL_FILES_FOLDER, userId, foldersBufferL, sharesBufferL);
+      addCategoryFolder(FolderRecord.CATEGORY_CHAT_ID, FolderShareRecord.CATEGORY_CHAT_ID, FolderRecord.CATEGORY_CHAT_FOLDER, userId, foldersBufferL, sharesBufferL);
+      addCategoryFolder(FolderRecord.CATEGORY_GROUP_ID, FolderShareRecord.CATEGORY_GROUP_ID, FolderRecord.CATEGORY_GROUP_FOLDER, userId, foldersBufferL, sharesBufferL);
     }
     if (trace != null) trace.exit(CacheUtilities.class);
   }
 
-  private static void addCategoryFolder(long folderId, long shareId, short folderType, Long userId, Vector foldersV, Vector sharesV) {
+  private static void addCategoryFolder(long folderId, long shareId, short folderType, Long userId, List foldersL, List sharesL) {
     // add Category Folder
-    if (foldersV != null) {
+    if (foldersL != null) {
       FolderRecord fldRec = new FolderRecord();
       fldRec.folderId = Long.valueOf(folderId);
       fldRec.parentFolderId = fldRec.folderId;
@@ -169,10 +169,10 @@ public class CacheUtilities extends Object {
       fldRec.numOfShares = Short.valueOf((short)1);
       fldRec.dateCreated = null;
       fldRec.dateUpdated = null;
-      foldersV.addElement(fldRec);
+      foldersL.add(fldRec);
     }
     // add related share
-    if (sharesV != null) {
+    if (sharesL != null) {
       FolderShareRecord shrRec = new FolderShareRecord();
       shrRec.shareId = Long.valueOf(shareId);
       shrRec.folderId = Long.valueOf(folderId);
@@ -180,7 +180,7 @@ public class CacheUtilities extends Object {
       shrRec.ownerUserId = userId;
       shrRec.dateCreated = null;
       shrRec.dateUpdated = null;
-      sharesV.addElement(shrRec);
+      sharesL.add(shrRec);
     }
   }
 
