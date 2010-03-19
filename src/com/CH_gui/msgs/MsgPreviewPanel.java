@@ -100,6 +100,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private JPanel jRecipients;
   private JLabel jSubjectLabel;
   private JLabel jSubject;
+  private JLabel jLoadingLabel;
   private JMyLinkLikeLabel jNotSpam;
   private JMyLinkLikeLabel jFullView;
   private boolean isFullView = false;
@@ -262,7 +263,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jPriority = new JMyLabel();
     jPriority.setIconTextGap(2);
     jFromName = new JMyLabel();
-    //jFromName.setFont(jFromName.getFont().deriveFont(Font.BOLD));
     jFromName.setIconTextGap(2);
     {
       jFromNameAddContact = new JMyLinkLikeLabel("+Add to Address Book", LINK_RELATIVE_FONT_SIZE);
@@ -285,8 +285,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     });
     //jMsgDate = new JMyLinkLabel("", null);
     jMsgDate = new JMyLabel();
-    Font font = jMsgDate.getFont();
-    jMsgDate.setFont(jMsgDate.getFont().deriveFont((float) (font.getSize()-2)));
+    Font labelFont = jMsgDate.getFont();
+    jMsgDate.setFont(labelFont.deriveFont((float) (labelFont.getSize()-2)));
 
     jReplyTo = new JMyLabel();
     jReplyTo.setIconTextGap(2);
@@ -335,6 +335,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     });
 
     jSubject = new JMyLabel();
+    jLoadingLabel = new JMyLabel("Loading...");
+    jLoadingLabel.setVisible(false);
     jExpiration = new JMyLabel();
     jPasswordField = new JMyTextField(10);
     jPasswordField.addKeyListener(new KeyAdapter() {
@@ -488,7 +490,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jLinePriority.add(jMinHeight1, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jPriorityLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority"));
-    //jPriorityLabel.setFont(jPriorityLabel.getFont().deriveFont(Font.BOLD));
     jLinePriority.add(jPriorityLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLinePriority.add(jPriority, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
@@ -499,7 +500,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jLineFrom.add(jMinHeight2, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jFromLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_From"));
-    //jFromLabel.setFont(jFromLabel.getFont().deriveFont(Font.BOLD));
     jLineFrom.add(jFromLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineFrom.add(jFromName, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
@@ -525,7 +525,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jLineReplyTo.add(jMinHeight3, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jReplyToLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reply_To"));
-    //jReplyToLabel.setFont(jReplyToLabel.getFont().deriveFont(Font.BOLD));
     jLineReplyTo.add(jReplyToLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineReplyTo.add(jReplyTo, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
@@ -546,23 +545,25 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jLineSubject.add(jMinHeight5, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jSubjectLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject"));
-    //jSubjectLabel.setFont(jSubjectLabel.getFont().deriveFont(Font.BOLD));
 //    jLineSubject.add(jSubjectLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
 //          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jSubject.setFont(jSubject.getFont().deriveFont(Font.BOLD));
-    jLineSubject.add(jSubject, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
+    jLineSubject.add(jSubject, new GridBagConstraints(2, 0, 1, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+    // when "Loading" label is visible we want it to fill max space and be left justified
+    jLineSubject.add(jLoadingLabel, new GridBagConstraints(3, 0, 1, 1, 1000000, 0,
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
 //    jLineSubject.add(jMsgDate, new GridBagConstraints(3, 0, 1, 1, 0, 0,
 //          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineSubject.add(jNotSpam, new GridBagConstraints(3, 0, 1, 1, 0, 0,
+    jLineSubject.add(jNotSpam, new GridBagConstraints(5, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineSubject.add(jFullView, new GridBagConstraints(4, 0, 1, 1, 0, 0,
+    jLineSubject.add(jFullView, new GridBagConstraints(6, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineSubject.add(jHTML, new GridBagConstraints(5, 0, 1, 1, 0, 0,
+    jLineSubject.add(jHTML, new GridBagConstraints(7, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineSubject.add(jAttachment, new GridBagConstraints(6, 0, 1, 1, 0, 0,
+    jLineSubject.add(jAttachment, new GridBagConstraints(8, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    jLineSubject.add(jPrint, new GridBagConstraints(7, 0, 1, 1, 0, 0,
+    jLineSubject.add(jPrint, new GridBagConstraints(9, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
 
@@ -1627,6 +1628,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           if ((previewMsgLink.status.shortValue() & MsgLinkRecord.STATUS_FLAG__READ) == 0 || 
               previewMsgData == null || previewMsgData.getEncText() == null)
           {
+            // fetching can take a while so show the "Loading..." sign
+            jLoadingLabel.setVisible(true);
+            // Prepare and send the request
             ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(previewMsgLink);
             serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 60000);
             if (previewMsgData == null)
@@ -1660,6 +1664,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           javax.swing.SwingUtilities.invokeAndWait(new PreviewGUIUpdater(previewMsgLink, previewMsgData, emailNicksV, emailStringRecordsV, emailRecordsOrigV));
         } catch (Throwable t) {
           if (trace != null) trace.exception(getClass(), 300, t);
+        } finally {
+          jLoadingLabel.setVisible(false);
         }
       } // end if still the same message
 
