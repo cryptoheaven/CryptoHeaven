@@ -150,8 +150,6 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       uploadCoordinatorCount ++;
       uploadCoordinatorCount %= Integer.MAX_VALUE-1;
 
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
       setDaemon(true);
 
       if (trace != null) trace.exit(UploadCoordinator.class);
@@ -365,8 +363,6 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       uploadRunnerCount ++;
       uploadRunnerCount %= Integer.MAX_VALUE-1;
 
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
       setDaemon(true);
 
       if (trace != null) trace.exit(UploadRunner.class);

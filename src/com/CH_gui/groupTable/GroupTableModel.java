@@ -321,7 +321,7 @@ public class GroupTableModel extends RecordTableModel {
           Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
           request.IDs = new Obj_IDList_Co();
           request.IDs.IDs = new Long[] {shareId}; 
-          request.Id = Long.valueOf(Record.RECORD_TYPE_SHARE);
+          request.id = Long.valueOf(Record.RECORD_TYPE_SHARE);
 
           MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareId));
           Runnable afterJob = new Runnable() {

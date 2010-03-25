@@ -336,7 +336,7 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
         ais = AudioSystem.getAudioInputStream(targetEncoding, ais);
 
         boolean anySignal = false;
-        Hashtable anySignalHT = new Hashtable();
+        HashSet anySignalHS = new HashSet();
         long cntTotal = 0;
         byteArrayAudioFormat = ais.getFormat();
         //System.out.println("Capturing in format " + byteArrayAudioFormat);
@@ -350,9 +350,9 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
             if (!anySignal) {
               for (int i=0; i<cnt; i++) {
                 Byte b = Byte.valueOf(buff[i]);
-                anySignalHT.put(b, b);
+                anySignalHS.add(b);
               }
-              anySignal = anySignalHT.size() >= 8;
+              anySignal = anySignalHS.size() >= 8;
             }
             if (anySignal) {
               if (!isPausing) {

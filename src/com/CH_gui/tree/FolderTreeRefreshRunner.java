@@ -28,10 +28,10 @@ import com.CH_gui.frame.MainFrame;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderTreeRefreshRunner extends ThreadTraced {
 
@@ -75,12 +75,12 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
 
     if (refreshNow) {
       try {
-        Object AWTTreeLock = fTree.getTreeLock();
+        Object treeLock = fTree.getFolderTreeModel().getMonitor();
 
         FolderTreeSelectionExpansion selectionExpansion = null;
         FolderTreeModelCl model = null;
         FolderTreeNode root = null;
-        synchronized (AWTTreeLock) {
+        synchronized (treeLock) {
           // suppress consideration for selection changes by event processors...
           fTree.suppressSelection(true);
           // dissalow any selection changes while in refresh
@@ -96,8 +96,8 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
 
         boolean gotFolders = replyAction != null && replyAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS;
 
-        if (gotFolders) {
-          synchronized (AWTTreeLock) {
+        synchronized (treeLock) {
+          if (gotFolders) {
             // We kept the visuals as long as possible, time to get rid of it as update just came in.
             root.removeAllChildren();
             model.nodeStructureChanged(root);
@@ -112,7 +112,7 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
         // don't start a new thread here, just execute the action synchronously
         DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyAction);
 
-        synchronized (AWTTreeLock) {
+        synchronized (treeLock) {
           // restore visuals once we are done
           selectionExpansion.restoreData(fTree);
           fTree.setEnabled(true);
@@ -121,7 +121,7 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
 
         refreshInProgress = false;
 
-      } catch (Throwable t) { 
+      } catch (Throwable t) {
         if (trace != null) trace.exception(FolderTreeRefreshRunner.class, 100, t);
       }
       // catch everything so we can decrement the counter properly

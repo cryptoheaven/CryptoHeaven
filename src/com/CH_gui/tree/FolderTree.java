@@ -25,7 +25,7 @@ import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
 
 import java.awt.Rectangle;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeNode;
@@ -444,7 +444,7 @@ public class FolderTree extends JTree implements DisposableObj {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "getLastPathComponentFolderPairs(TreePath[])");
     if (trace != null) trace.args(treePaths);
 
-    Vector folderPairsV = new Vector();
+    ArrayList folderPairsL = new ArrayList();
     if (treePaths != null && treePaths.length > 0) {
       FolderTreeNode[] lastNodes = getLastPathComponentNodes(treePaths);
 
@@ -452,14 +452,14 @@ public class FolderTree extends JTree implements DisposableObj {
         for (int i=0; i<lastNodes.length; i++) {
           FolderPair folderPair = lastNodes[i].getFolderObject();
           if (folderPair != null)
-            folderPairsV.addElement(folderPair);
+            folderPairsL.add(folderPair);
         }
       }
     }
 
-    FolderPair[] folderPairs = new FolderPair[folderPairsV.size()];
-    if (folderPairsV.size() > 0)
-      folderPairsV.toArray(folderPairs);
+    FolderPair[] folderPairs = new FolderPair[folderPairsL.size()];
+    if (folderPairsL.size() > 0)
+      folderPairsL.toArray(folderPairs);
 
     if (trace != null) trace.exit(FolderTree.class, folderPairs);
     return folderPairs;

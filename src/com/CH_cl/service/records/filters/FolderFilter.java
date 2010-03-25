@@ -12,11 +12,12 @@
 
 package com.CH_cl.service.records.filters;
 
-import java.util.Hashtable;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -24,7 +25,7 @@ import com.CH_co.service.records.filters.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -32,7 +33,7 @@ import com.CH_co.service.records.filters.*;
  *
  * <b>$Revision: 1.18 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
 
@@ -60,7 +61,7 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
             FolderRecord.CATEGORY_FILE_FOLDER,
             FolderRecord.CATEGORY_CHAT_FOLDER,
             FolderRecord.LOCAL_FILES_FOLDER,
-            FolderRecord.FILE_FOLDER, 
+            FolderRecord.FILE_FOLDER,
             FolderRecord.MESSAGE_FOLDER,
             FolderRecord.POSTING_FOLDER,
             FolderRecord.CHATTING_FOLDER,
@@ -73,8 +74,8 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
             FolderRecord.CATEGORY_FILE_FOLDER,
             FolderRecord.CATEGORY_CHAT_FOLDER,
             FolderRecord.CATEGORY_GROUP_FOLDER,
-            FolderRecord.FILE_FOLDER, 
-            //FolderRecord.KEY_FOLDER, 
+            FolderRecord.FILE_FOLDER,
+            //FolderRecord.KEY_FOLDER,
             FolderRecord.MESSAGE_FOLDER,
             FolderRecord.POSTING_FOLDER,
             FolderRecord.CHATTING_FOLDER,
@@ -100,7 +101,7 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
             FolderRecord.CATEGORY_MAIL_FOLDER,
             FolderRecord.CATEGORY_CHAT_FOLDER,
             FolderRecord.CATEGORY_GROUP_FOLDER,
-            FolderRecord.KEY_FOLDER, 
+            FolderRecord.KEY_FOLDER,
             FolderRecord.MESSAGE_FOLDER,
             FolderRecord.POSTING_FOLDER,
             FolderRecord.CHATTING_FOLDER,
@@ -114,9 +115,9 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
             FolderRecord.CATEGORY_FILE_FOLDER,
             FolderRecord.CATEGORY_GROUP_FOLDER,
             FolderRecord.LOCAL_FILES_FOLDER,
-            FolderRecord.FILE_FOLDER, 
-            FolderRecord.KEY_FOLDER, 
-            FolderRecord.CONTACT_FOLDER, 
+            FolderRecord.FILE_FOLDER,
+            FolderRecord.KEY_FOLDER,
+            FolderRecord.CONTACT_FOLDER,
             FolderRecord.GROUP_FOLDER,
             }
           );
@@ -126,8 +127,8 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
             FolderRecord.CATEGORY_FILE_FOLDER,
             FolderRecord.CATEGORY_CHAT_FOLDER,
             FolderRecord.CATEGORY_GROUP_FOLDER,
-            FolderRecord.FILE_FOLDER, 
-            FolderRecord.KEY_FOLDER, 
+            FolderRecord.FILE_FOLDER,
+            FolderRecord.KEY_FOLDER,
             FolderRecord.MESSAGE_FOLDER,
             FolderRecord.POSTING_FOLDER,
             FolderRecord.CHATTING_FOLDER,
@@ -141,10 +142,10 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
 
 
   private short[] keepFolderTypes;
-  private Hashtable keepFolderIDsHT;
+  private HashSet keepFolderIDsHS;
   private Long keepOwnerId;
   private Long keepParentId;
-  private Hashtable keepViewParentIDsHT;     // This is actual view parent id from FolderPair, not necessairly FolderShareRecord.viewParentId.
+  private HashSet keepViewParentIDsHS;     // This is actual view parent id from FolderPair, not necessairly FolderShareRecord.viewParentId.
   private Boolean keepViewRootFolders;  // Roots in the view are not necessairly the same as root folders in data tree.
   private Boolean mustBeChatting;
   private Boolean mustBePosting;
@@ -184,9 +185,8 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
     if (trace != null) trace.args(keepFolderIDs);
     this.keepFolderTypes = new short[] { keepFolderType };
     if (keepFolderIDs != null) {
-      this.keepFolderIDsHT = new Hashtable();
-      for (int i=0; i<keepFolderIDs.length; i++)
-        this.keepFolderIDsHT.put(keepFolderIDs[i], keepFolderIDs[i]);
+      this.keepFolderIDsHS = new HashSet(keepFolderIDs.length);
+      this.keepFolderIDsHS.addAll(Arrays.asList(keepFolderIDs));
     }
     if (trace != null) trace.exit(FolderFilter.class);
   }
@@ -206,8 +206,8 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
     this.keepOwnerId = keepOwnerId;
     this.keepParentId = keepParentId;
     if (keepViewParentId != null) {
-      this.keepViewParentIDsHT = new Hashtable();
-      this.keepViewParentIDsHT.put(keepViewParentId, keepViewParentId);
+      this.keepViewParentIDsHS = new HashSet(1);
+      this.keepViewParentIDsHS.add(keepViewParentId);
     }
     this.keepViewRootFolders = keepViewRootFolders;
     if (trace != null) trace.exit(FolderFilter.class);
@@ -218,9 +218,8 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderFilter.class, "FolderFilter(Long[] keepViewParentIDs)");
     if (trace != null) trace.args(keepViewParentIDs);
     if (keepViewParentIDs != null) {
-      this.keepViewParentIDsHT = new Hashtable();
-      for (int i=0; i<keepViewParentIDs.length; i++)
-        this.keepViewParentIDsHT.put(keepViewParentIDs[i], keepViewParentIDs[i]);
+      this.keepViewParentIDsHS = new HashSet();
+      this.keepViewParentIDsHS.addAll(Arrays.asList(keepViewParentIDs));
     }
     if (trace != null) trace.exit(FolderFilter.class);
   }
@@ -236,10 +235,10 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
 
   public boolean keep(Record record) {
     boolean typeOk = keepFolderTypes == null;
-    boolean folderIdOk = keepFolderIDsHT == null;
+    boolean folderIdOk = keepFolderIDsHS == null;
     boolean ownerOk = keepOwnerId == null;
     boolean parentOk = keepParentId == null;
-    boolean viewParentOk = keepViewParentIDsHT == null;
+    boolean viewParentOk = keepViewParentIDsHS == null;
     boolean rootViewOk = keepViewRootFolders == null;
     boolean chattingOk = mustBeChatting == null;
     boolean postingOk = mustBePosting == null;
@@ -255,18 +254,18 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
 
     if (fRec != null) {
       if (!typeOk) typeOk = keep(fRec.folderType.shortValue(), fRec.numOfShares.shortValue());
-      if (!folderIdOk) folderIdOk = keepFolderIDsHT.get(fRec.folderId) != null;
+      if (!folderIdOk) folderIdOk = keepFolderIDsHS.contains(fRec.folderId);
       if (!ownerOk) ownerOk = keepOwnerId.equals(fRec.ownerUserId);
       if (!parentOk) parentOk = keepParentId.equals(fRec.parentFolderId);
       if (!chattingOk) chattingOk = mustBeChatting.booleanValue() == fRec.isChatting();
       if (!postingOk) postingOk = mustBePosting.booleanValue() == (fRec.folderType.shortValue() == FolderRecord.POSTING_FOLDER && !fRec.isChatting());
     }
     if (fPair != null) {
-      if (!viewParentOk) viewParentOk = keepViewParentIDsHT.get(fPair.getFileViewParentId()) != null;
+      if (!viewParentOk) viewParentOk = keepViewParentIDsHS.contains(fPair.getFileViewParentId());
       if (!viewParentOk) {
         Long guiViewParentId = fPair.getFolderShareRecord().guiViewParentId;
         if (guiViewParentId != null)
-          viewParentOk = keepViewParentIDsHT.get(guiViewParentId) != null;
+          viewParentOk = keepViewParentIDsHS.contains(guiViewParentId);
       }
 //      // analize view parents as Category folders
 //      if (!viewParentOk) {
@@ -287,7 +286,7 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
       if (!rootViewOk) rootViewOk = keepViewRootFolders.booleanValue() == fPair.isViewRoot();
     }
 
-    return typeOk && ownerOk && parentOk && viewParentOk && rootViewOk && chattingOk && postingOk;
+    return typeOk && folderIdOk && ownerOk && parentOk && viewParentOk && rootViewOk && chattingOk && postingOk;
   }
 
   public boolean keep(short folderType, short numOfShares) {

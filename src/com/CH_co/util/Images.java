@@ -19,6 +19,8 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 import com.CH_co.trace.Trace;
+import java.util.Collection;
+import java.util.Iterator;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -26,7 +28,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,20 +36,26 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.42 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Images extends Object {
 
-  public static ImageIcon[] imageIcons;
+  private static final ImageIcon[] imageIcons;
 
   static {
-    imageIcons = new ImageIcon[ImageNums.images.length];
+    imageIcons = new ImageIcon[ImageNums.NUMBER_OF_IMAGES];
   }
 
   public static void printUnusedIconNames() {
-    for (int i=0; i<ImageNums.unUsedIconNames.size(); i++) {
-      System.out.println(ImageNums.unUsedIconNames.elementAt(i));
+    Collection unUsedIconNames = ImageNums.getUnusedImageNames();
+    Iterator iter = unUsedIconNames.iterator();
+    while (iter.hasNext()) {
+      System.out.println(iter.next());
     }
+  }
+
+  public static void clearImageCache(int imageCode) {
+    imageIcons[imageCode] = null;
   }
 
   public static ImageIcon get(String name) {
@@ -65,11 +73,8 @@ public class Images extends Object {
       String fileName = null;
       URL location = null;
       try {
-        if (ImageNums.unUsedIconNames.contains(ImageNums.images[imageCode])) {
-          ImageNums.unUsedIconNames.removeElement(ImageNums.images[imageCode]);
-          ImageNums.usedIconNames.addElement(ImageNums.images[imageCode]);
-        }
-        String name = ImageNums.images[imageCode];
+        ImageNums.setUsedIcon(imageCode);
+        String name = ImageNums.getImageName(imageCode);
         // If customized version and logo image is our own, not from URL then null it
         // First 3 (index 0, 1, 2) images MUST be customized
         if (URLs.hasPrivateLabelCustomizationClass() && imageCode <= 2 && name.indexOf("://") < 0 && name.indexOf("jar:file:") < 0) {
@@ -137,12 +142,12 @@ public class Images extends Object {
         ImageIcon icon = get(i);
         if (icon != null) {
           if ((icon.getIconHeight() > 32 || icon.getIconWidth() > 32) && icon.getIconWidth() < 200) {
-            javax.swing.JLabel item = new javax.swing.JLabel(ImageNums.images[i], icon, javax.swing.JLabel.LEFT);
+            javax.swing.JLabel item = new javax.swing.JLabel(ImageNums.getImageName(i), icon, javax.swing.JLabel.LEFT);
             item.setVerticalTextPosition(javax.swing.JLabel.CENTER);
             panelL.add(item);
           }
         } else {
-          System.out.println("Null icon " + i + " " + ImageNums.images[i]);
+          System.out.println("Null icon " + i + " " + ImageNums.getImageName(i));
         }
       }
       cL.add(new javax.swing.JScrollPane(panelL));
@@ -158,12 +163,12 @@ public class Images extends Object {
         ImageIcon icon = get(i);
         if (icon != null) {
           if (icon.getIconHeight() <= 32 || icon.getIconWidth() <= 32) {
-            javax.swing.JLabel item = new javax.swing.JLabel(ImageNums.images[i], icon, javax.swing.JLabel.LEFT);
+            javax.swing.JLabel item = new javax.swing.JLabel(ImageNums.getImageName(i), icon, javax.swing.JLabel.LEFT);
             item.setVerticalTextPosition(javax.swing.JLabel.CENTER);
             panel.add(item);
           }
         } else {
-          System.out.println("Null icon " + i + " " + ImageNums.images[i]);
+          System.out.println("Null icon " + i + " " + ImageNums.getImageName(i));
         }
       }
       c.add(new javax.swing.JScrollPane(panel));

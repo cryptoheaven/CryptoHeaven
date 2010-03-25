@@ -48,7 +48,6 @@ public class WipingThread extends ThreadTraced {
     super("Wiping Thread");
     this.filesToWipe = filesToWipe;
     this.jFileChooser = jFileChooser;
-    setPriority(Thread.MIN_PRIORITY);
     setDaemon(true);
   }
 

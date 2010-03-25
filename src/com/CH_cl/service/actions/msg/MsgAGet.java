@@ -77,23 +77,23 @@ public class MsgAGet extends ClientMessageAction {
     Set groupIDsSet = null;
 
 
-    Vector newDataRecordIDsV = new Vector();
+    HashSet newDataRecordIDsHS = new HashSet();
     if (dataRecords != null) {
       for (int i=0; i<dataRecords.length; i++) {
         if (cache.getMsgDataRecord(dataRecords[i].msgId) == null)
-          newDataRecordIDsV.addElement(dataRecords[i].msgId);
+          newDataRecordIDsHS.add(dataRecords[i].msgId);
       }
     }
 
 
     // Decompress all recipients and gather all unknown user recipients/senders to later on fetch the user handles.
-    Vector userV = null;
+    ArrayList userIDsL = null;
     for (int i=0; i<dataRecords.length; i++) {
       MsgDataRecord data = dataRecords[i];
 
       if (cache.getUserRecord(data.senderUserId) == null) {
-        if (userV == null) userV = new Vector();
-        userV.addElement(data.senderUserId);
+        if (userIDsL == null) userIDsL = new ArrayList();
+        userIDsL.add(data.senderUserId);
       }
 
       if (trace != null) trace.data(10, "Decompressing recipients for msgId", data.msgId);
@@ -114,8 +114,8 @@ public class MsgAGet extends ClientMessageAction {
                 ) {
               Long id = Long.valueOf(sId);
               if (cache.getUserRecord(id) == null) {
-                if (userV == null) userV = new Vector();
-                userV.addElement(id);
+                if (userIDsL == null) userIDsL = new ArrayList();
+                userIDsL.add(id);
               }
             }
           }
@@ -126,8 +126,8 @@ public class MsgAGet extends ClientMessageAction {
       }
     }
     // if found unknown users, get handles
-    if (userV != null && userV.size() > 0) {
-      Long[] userIDs = (Long[]) ArrayUtils.toArray(userV, Long.class);
+    if (userIDsL != null && userIDsL.size() > 0) {
+      Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
       userIDs = (Long[]) ArrayUtils.removeDuplicates(userIDs);
       getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000);
     }
@@ -153,19 +153,19 @@ public class MsgAGet extends ClientMessageAction {
 
 
     // gather all Folder Records that we don't have fetched yet
-    Vector folderIDsV = null;
+    ArrayList folderIDsL = null;
     for (int i=0; i<linkRecords.length; i++) {
       MsgLinkRecord link = linkRecords[i];
       if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
         if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
         if (cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet) == null) {
-          if (folderIDsV == null) folderIDsV = new Vector();
-          folderIDsV.addElement(link.ownerObjId);
+          if (folderIDsL == null) folderIDsL = new ArrayList();
+          folderIDsL.add(link.ownerObjId);
         }
       }
     }
-    if (folderIDsV != null && folderIDsV.size() > 0) {
-      Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsV, Long.class);
+    if (folderIDsL != null && folderIDsL.size() > 0) {
+      Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
       getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
@@ -186,12 +186,12 @@ public class MsgAGet extends ClientMessageAction {
     // If the message is a notification, it might be a BRIEF, and may need to be placed in a posting folder,
     // in which case we need the body.  Such notifications always come in singles, with all links pointing to single MsgDataRecord.
     if (linkRecords != null && linkRecords.length > 0) {
-      // These 3 vectors will go hand-in-hand to create sets of IDs for msgBody requests.
+      // These 3 lists will go hand-in-hand to create sets of IDs for msgBody requests.
       // So far, there is no such case that will require to send more than 1 msg body request,
       // but to accomodate for the remote possibility of introducing such thing in the futury, handle any number of bodies one-by-one.
-      Vector needMsgBody_dataIDsV = null;
-      Vector needMsgBody_shareIDsV = null;
-      Vector needMsgBody_linkIDsV = null;
+      ArrayList needMsgBody_dataIDsV = null;
+      ArrayList needMsgBody_shareIDsV = null;
+      ArrayList needMsgBody_linkIDsV = null;
       for (int i=0; i<linkRecords.length; i++) {
         MsgLinkRecord msgLink = linkRecords[i];
         if (msgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
@@ -213,14 +213,14 @@ public class MsgAGet extends ClientMessageAction {
               FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsSet);
               if (sRec != null) {
                 if (needMsgBody_dataIDsV == null) {
-                  needMsgBody_dataIDsV = new Vector();
-                  needMsgBody_shareIDsV = new Vector();
-                  needMsgBody_linkIDsV = new Vector();
+                  needMsgBody_dataIDsV = new ArrayList();
+                  needMsgBody_shareIDsV = new ArrayList();
+                  needMsgBody_linkIDsV = new ArrayList();
                 }
                 if (!needMsgBody_dataIDsV.contains(msgLink.msgId)) {
-                  needMsgBody_dataIDsV.addElement(msgLink.msgId);
-                  needMsgBody_shareIDsV.addElement(sRec.shareId);
-                  needMsgBody_linkIDsV.addElement(msgLink.msgLinkId);
+                  needMsgBody_dataIDsV.add(msgLink.msgId);
+                  needMsgBody_shareIDsV.add(sRec.shareId);
+                  needMsgBody_linkIDsV.add(msgLink.msgLinkId);
                 }
               }
             }
@@ -230,7 +230,7 @@ public class MsgAGet extends ClientMessageAction {
       // Process all body fetch requests that are needed before the links can be displayed correctly.
       if (needMsgBody_dataIDsV != null) {
         for (int i=0; i<needMsgBody_dataIDsV.size(); i++) {
-          Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.elementAt(i)), (Long)(needMsgBody_linkIDsV.elementAt(i)), null, Long.valueOf(1)});
+          Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.get(i)), (Long)(needMsgBody_linkIDsV.get(i)), null, Long.valueOf(1)});
           getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 120000);
         }
       }
@@ -258,14 +258,14 @@ public class MsgAGet extends ClientMessageAction {
     if (toRemoveMsgLinks != null && toRemoveMsgLinks.length > 0) {
       MsgDataRecord[] toRemoveDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(toRemoveMsgLinks));
       cache.removeMsgLinkRecords(toRemoveMsgLinks);
-      Vector toRemoveDatasV = new Vector();
+      ArrayList toRemoveDatasL = new ArrayList();
       for (int i=0; i<toRemoveDatas.length; i++) {
         MsgLinkRecord[] otherMsgLinks = cache.getMsgLinkRecordsForMsg(toRemoveDatas[i].msgId);
         if (otherMsgLinks == null || otherMsgLinks.length == 0) {
-          toRemoveDatasV.addElement(toRemoveDatas[i]);
+          toRemoveDatasL.add(toRemoveDatas[i]);
         }
       }
-      toRemoveDatas = (MsgDataRecord[]) ArrayUtils.toArray(toRemoveDatasV, MsgDataRecord.class);
+      toRemoveDatas = (MsgDataRecord[]) ArrayUtils.toArray(toRemoveDatasL, MsgDataRecord.class);
       if (toRemoveDatas != null && toRemoveDatas.length > 0) {
         cache.removeMsgDataRecords(toRemoveDatas);
       }
@@ -277,27 +277,27 @@ public class MsgAGet extends ClientMessageAction {
 
     // Gather all Message Links that we don't have stat records for, and fetch the stats
     {
-      Vector shareIDsV = null;
-      Vector objLinkIDsV = null;
+      HashSet shareIDsHS = null;
+      HashSet objLinkIDsHS = null;
       for (int i=0; i<linkRecords.length; i++) {
         MsgLinkRecord link = linkRecords[i];
         if (cache.getStatRecord(link.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
             FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
-            if (shareIDsV == null) shareIDsV = new Vector();
-            if (objLinkIDsV == null) objLinkIDsV = new Vector();
-            if (!shareIDsV.contains(share.shareId))
-              shareIDsV.addElement(share.shareId);
+            if (shareIDsHS == null) shareIDsHS = new HashSet();
+            if (objLinkIDsHS == null) objLinkIDsHS = new HashSet();
+            if (!shareIDsHS.contains(share.shareId))
+              shareIDsHS.add(share.shareId);
             Long msgLinkId = link.msgLinkId;
-            if (!objLinkIDsV.contains(msgLinkId))
-              objLinkIDsV.addElement(msgLinkId);
+            if (!objLinkIDsHS.contains(msgLinkId))
+              objLinkIDsHS.add(msgLinkId);
           }
         }
       }
-      if (shareIDsV != null && shareIDsV.size() > 0 && objLinkIDsV != null && objLinkIDsV.size() > 0) {
-        Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsV, Long.class);
-        Long[] objLinkIDs = (Long[]) ArrayUtils.toArray(objLinkIDsV, Long.class);
+      if (shareIDsHS != null && shareIDsHS.size() > 0 && objLinkIDsHS != null && objLinkIDsHS.size() > 0) {
+        Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsHS, Long.class);
+        Long[] objLinkIDs = (Long[]) ArrayUtils.toArray(objLinkIDsHS, Long.class);
 
         Stats_Get_Rq request = new Stats_Get_Rq();
         request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_MSG_LINK);
@@ -312,8 +312,8 @@ public class MsgAGet extends ClientMessageAction {
 
     {
       // see if any message links need to be recrypted to symmetric encryption
-      Vector linksV = null;
-      Vector shareV = null;
+      ArrayList linksL = null;
+      ArrayList shareL = null;
       for (int i=0; i<linkRecords.length; i++) {
         MsgLinkRecord link = linkRecords[i];
         if (link.isUnSealed() && link.getRecPubKeyId() != null) {
@@ -330,19 +330,19 @@ public class MsgAGet extends ClientMessageAction {
                 // would result in removal of recipient key id keeping the encryption assymetric...
                 link = (MsgLinkRecord) link.clone();
                 link.seal(sOwner.getSymmetricKey());
-                if (linksV == null) linksV = new Vector();
-                linksV.addElement(link);
-                if (shareV == null) shareV = new Vector();
-                shareV.addElement(sOwner.shareId);
+                if (linksL == null) linksL = new ArrayList();
+                linksL.add(link);
+                if (shareL == null) shareL = new ArrayList();
+                shareL.add(sOwner.shareId);
               }
             }
           }
         }
       }
       // if message links for re-cryption to symmetric encryption, send request
-      if (linksV != null && linksV.size() > 0) {
-        MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(linksV, MsgLinkRecord.class);
-        Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareV, Long.class);
+      if (linksL != null && linksL.size() > 0) {
+        MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(linksL, MsgLinkRecord.class);
+        Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareL, Long.class);
         shareIDs = (Long[]) ArrayUtils.removeDuplicates(shareIDs);
         Msg_ToSymEnc_Rq request = new Msg_ToSymEnc_Rq(shareIDs, msgLinks);
         getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TO_SYM_ENC, request));
@@ -352,7 +352,7 @@ public class MsgAGet extends ClientMessageAction {
 
     // see if any email message has unknown from address, or any Address Record has unknown hash, if so, request it from the server
     {
-      Vector hashesV = null;
+      ArrayList hashesL = null;
       for (int i=0; i<dataRecords.length; i++) {
         MsgDataRecord dataRecord = dataRecords[i];
         String fromEmailAddress = dataRecord.getFromEmailAddress();
@@ -368,18 +368,18 @@ public class MsgAGet extends ClientMessageAction {
           // if hash not already in the cache, add it to be fetched
           // always fetch hashes for new Address Records in case Address Record was deleted and recreated
           // (there could be wanted duplicates of hashes when address exists in Address Book and Allowed Senders book)
-          if ((dataRecord.isTypeAddress() && newDataRecordIDsV.contains(dataRecord.msgId)) ||
+          if ((dataRecord.isTypeAddress() && newDataRecordIDsHS.contains(dataRecord.msgId)) ||
               (cache.getAddrHashRecords(hash) == null && !cache.wasRequestedAddrHash(hash)))
           {
-            if (hashesV == null) hashesV = new Vector();
-            hashesV.addElement(hash);
+            if (hashesL == null) hashesL = new ArrayList();
+            hashesL.add(hash);
           }
         }
       }
-      if (hashesV != null) {
-        Obj_List_Co requestSet = new Obj_List_Co(hashesV);
+      if (hashesL != null) {
+        Obj_List_Co requestSet = new Obj_List_Co(hashesL);
         getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet));
-        cache.addRequestedAddrHashes(hashesV);
+        cache.addRequestedAddrHashes(hashesL);
       }
     }
 

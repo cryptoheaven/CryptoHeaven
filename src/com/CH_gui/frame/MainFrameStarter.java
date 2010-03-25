@@ -18,7 +18,6 @@ import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.util.PopupWindow;
 
-import com.CH_co.cryptx.Rnd;
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
@@ -97,7 +96,7 @@ public class MainFrameStarter extends Object {
     CleanupAgent.startSingleInstance(CleanupAgent.MODE_FINALIZATION | CleanupAgent.MODE_GC | CleanupAgent.MODE_TEMP_FILE_CLEANER,
                      new String[][] { { FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null },
                                       { FileDataRecord.TEMP_PLAIN_FILE_PREFIX, null } },
-                     1, 29, 29, 37, 37, 1, 1440);
+                     29, 29, 37, 37, 1, 1440);
     // File cleaner will start early, but wipe/delete left over temp files after they are at least 24h old.
     // All temp files should be wiped/deleted in other ways, this is a last resort cleanup in case of exceptions, etc.
 
@@ -223,9 +222,6 @@ public class MainFrameStarter extends Object {
         }
       }
 
-      // start initializing Secure Random we will need it either for key generation or encryption
-      Rnd.getSecureRandom();
-
       new MainFrameStarter(splashWindow, skipLogin, swingMemoryFootprintTestExitWhenMainScreenLoaded, initialFolderId, initialMsgLinkId);
 
     } catch (Throwable t) {
@@ -254,28 +250,23 @@ public class MainFrameStarter extends Object {
     UIDefaults table = UIManager.getLookAndFeelDefaults();
 
     Set keys = table.keySet();
-    Vector keysV = new Vector(keys);
-//    // make sure we have only strings as keys because jre v6 seems to return StringBuffer as well
-//    for (int i=0; i<keysV.size(); i++) {
-//      Object key = keysV.elementAt(i);
-//      keysV.setElementAt(""+key, i);
-//    }
+    Object[] keysO = new Object[keys.size()];
+    keys.toArray(keysO);
     // odd menu bar border and tool bar border colors
     Color colorToChange1 = new Color(204, 204, 204);
     Color colorSubstitute1 = new Color(223, 221, 214);
     Color colorToChange2 = new Color(180, 195, 212);
     Color colorSubstitute2 = new Color(206, 219, 230);
-    Object[] keysO = new Object[keysV.size()];
-    keysV.toArray(keysO);
-    Arrays.sort(keysO, new Comparator() { // use custom comparator because keys are of different class types...
-      public int compare(Object o1, Object o2) {
-        String s1 = "";
-        String s2 = "";
-        if (o1 != null) s1 = o1.toString();
-        if (o2 != null) s2 = o2.toString();
-        return s1.compareTo(s2);
-      }
-    });
+    boolean withConsolePrintout = false;
+    if (withConsolePrintout) {
+      Arrays.sort(keysO, new Comparator() { // use custom comparator because keys are of different class types...
+        public int compare(Object o1, Object o2) {
+          String s1 = o1 != null ? o1.toString() : "";
+          String s2 = o2 != null ? o2.toString() : "";
+          return s1.compareTo(s2);
+        }
+      });
+    }
     for (int i=0; i<keysO.length; i++) {
       Object key = keysO[i];
       Object o = table.get(key);
@@ -292,10 +283,12 @@ public class MainFrameStarter extends Object {
       }
     }
 
-    if (Toolkit.getDefaultToolkit().getScreenSize().width <= 800)
+    if (Toolkit.getDefaultToolkit().getScreenSize().width <= 800) {
       MiscGui.setSmallScreen(true);
+    }
 
     AffineTransform at = null;
+    HashMap fontCache = null;
 
     // Change default labels and menu items to normal font attribute and black color, also make the default fonts little smaller
     Enumeration keyEnum = table.keys();
@@ -304,100 +297,37 @@ public class MainFrameStarter extends Object {
       Object value = table.get(key);
       if (value instanceof FontUIResource) {
         FontUIResource fontUI = (FontUIResource) value;
-        fontUI = new FontUIResource(fontUI.deriveFont(Font.PLAIN));
-        if (at == null) {
-          at = new AffineTransform();
-          if (MiscGui.isSmallScreen()) {
-            at.setToScale(0.9, 0.9); // any smaller than 0.9 and BOLD becomes NORMAL
-          } else {
-            at.setToScale(1.0, 1.0);
+        if (fontCache == null) fontCache = new HashMap();
+        String fontKey = fontUI.getName()+"."+fontUI.getSize()+"."+fontUI.getStyle();
+        FontUIResource fontUIderived = (FontUIResource) fontCache.get(fontKey);
+        if (fontUIderived == null) {
+          fontUIderived = fontUI;
+          if (!fontUIderived.isPlain()) {
+            fontUIderived = new FontUIResource(fontUIderived.deriveFont(Font.PLAIN));
           }
+          if (at == null && MiscGui.isSmallScreen()) {
+            at = new AffineTransform();
+            at.setToScale(0.9, 0.9); // any smaller than 0.9 and BOLD becomes NORMAL
+          }
+          if (at != null) {
+            fontUIderived = new FontUIResource(fontUIderived.deriveFont(at));
+          }
+          fontCache.put(fontKey, fontUIderived);
         }
-        fontUI = new FontUIResource(fontUI.deriveFont(at));
-        table.put(key, fontUI);
+        table.put(key, fontUIderived);
       }
     }
 
     // Fix the static labels in the Stats bar
-    Stats.adjustFontSize(at);
+    if (at != null) {
+      Stats.adjustFontSize(at);
+    }
 
     // Change default label color to black
     try {
-      /*
-      String key = "Label.font";
-      Font labelFont = (Font) table.get(key);
-      labelFont = labelFont.deriveFont(Font.PLAIN);
-      table.put(key, labelFont);
-       */
       table.put("Label.foreground", Color.black);
     } catch (Throwable t) {
     }
-//    Font sansSerif = new Font("SansSerif", Font.PLAIN, 12);
-//    for (Enumeration enm = table.keys(); enm.hasMoreElements() ; ) {
-//      Object key = enm.nextElement();
-//      Object value = table.get(key);
-//      /*
-//      if (value instanceof Icon) {
-//        System.out.println(key + "=" + value);
-//      }
-//       */
-//      if (value instanceof Font) {
-//        /*
-//        Font font = (Font) value;
-//        if (!font.isPlain()) {
-//          font = font.deriveFont(Font.PLAIN);
-//          table.put(key, font);
-//        }
-//         */
-//        table.put(key, sansSerif);
-//      }
-//    }
-
-    /*
-    String fontName = System.getProperty("CryptoHeaven.font.name", "Arial");
-    String fontSize = System.getProperty("CryptoHeaven.font.normal.size", "12");
-    Font arialPlain = new Font(fontName, Font.PLAIN, Integer.parseInt(fontSize));
-    ColorUIResource black = new ColorUIResource(Color.black);
-    Object[] defaults = {      //fonts
-      "Button.font", arialPlain,
-      "MenuBar.font", arialPlain,
-      "Menu.font", arialPlain,
-      "MenuItem.font", arialPlain,
-      "CheckBox.font", arialPlain,
-      "CheckBoxMenuItem.font", arialPlain,
-      "ToggleButton.font", arialPlain,
-      "RadioButton.font", arialPlain,
-      "ToolTip.font", arialPlain,
-      "ProgressBar.font", arialPlain,
-      "Panel.font", arialPlain,
-      "MenuItem.acceleratorFont", arialPlain,
-      "CheckBoxMenuItem.acceleratorFont", arialPlain,
-      "PopupMenu.font", arialPlain,
-      "Label.font", arialPlain,
-      "List.font", arialPlain,
-      "ComboBox.font", arialPlain,
-      "TextField.font", arialPlain,
-      "PasswordField.font", arialPlain,
-      "TextArea.font", arialPlain,
-      "TextPane.font", arialPlain,
-      "EditorPane.font", arialPlain,
-      "ScrollPane.font", arialPlain,
-      "TabbedPane.font", arialPlain,
-      "Table.font", arialPlain,
-      "TableHeader.font", arialPlain,
-      "TitledBorder.font", arialPlain,
-      "ToolBar.font", arialPlain,
-      "ProgressBar.font", arialPlain,
-      "OptionPane.font", arialPlain,
-      "ColorChooser.font", arialPlain,
-      "InternalFrame.titleFont", arialPlain,
-      //Colours
-      "ComboBox.disabledForeground",  black,
-      "TextField.inactiveForeground", black,
-      "TextArea.inactiveForeground",  black
-    };
-    table.putDefaults(defaults);
-     */
   }
 
   private static class StarterLoginCoordinator implements LoginCoordinatorI {
@@ -516,6 +446,10 @@ public class MainFrameStarter extends Object {
 //      }
 
       if (trace != null) trace.exit(StarterLoginCoordinator.class);
+    }
+
+    public void startPreloadingComponents_Threaded() {
+      // no-op
     }
 
     public void readyForMainData() {

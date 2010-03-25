@@ -225,9 +225,14 @@ public class FileTextLexicon extends StreamTextLexicon {
 //        }
 //        throw new UnsupportedException();
 //      }
-      FileOutputStream fileoutputstream = new FileOutputStream(fileName);
-      super.save(fileoutputstream);
-      fileoutputstream.close();
+      FileOutputStream fileoutputstream = null;
+      try {
+        fileoutputstream = new FileOutputStream(fileName);
+        super.save(fileoutputstream);
+      } finally {
+        if (fileoutputstream != null)
+          fileoutputstream.close();
+      }
       File file = new File(fileName);
       lastModified = file.lastModified();
     } catch (UnsupportedException unsupportedexception) {
@@ -236,9 +241,14 @@ public class FileTextLexicon extends StreamTextLexicon {
 
   protected void open(String s) throws IOException, FileFormatException, LexiconUpdateException {
     fileName = s;
-    FileInputStream fileinputstream = new FileInputStream(s);
-    load(fileinputstream);
-    fileinputstream.close();
+    FileInputStream fileinputstream = null;
+    try {
+      fileinputstream = new FileInputStream(s);
+      load(fileinputstream);
+    } finally {
+      if (fileinputstream != null)
+        fileinputstream.close();
+    }
   }
 
   public String toString() {
@@ -249,10 +259,15 @@ public class FileTextLexicon extends StreamTextLexicon {
     File file = new File(fileName);
     long l = file.lastModified();
     if (l > lastModified) {
-      FileInputStream fileinputstream = new FileInputStream(fileName);
-      load(fileinputstream);
-      lastModified = l;
-      fileinputstream.close();
+      FileInputStream fileinputstream = null;
+      try {
+        fileinputstream = new FileInputStream(fileName);
+        load(fileinputstream);
+        lastModified = l;
+      } finally {
+        if (fileinputstream != null)
+          fileinputstream.close();
+      }
     }
   }
 }

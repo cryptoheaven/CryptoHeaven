@@ -16,8 +16,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.beans.*;
-import java.lang.ref.WeakReference;
-import java.util.*;
 
 import com.CH_gui.action.Actions;
 

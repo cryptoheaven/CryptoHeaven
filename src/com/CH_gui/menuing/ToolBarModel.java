@@ -15,10 +15,7 @@ package com.CH_gui.menuing;
 import javax.swing.*;
 
 import java.awt.Component;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -56,10 +53,10 @@ public class ToolBarModel extends Object {
   /** Force addition of all tools even if they were ommited in the properties. */
   private boolean forceAddAllTools;
 
-  /** Vector stores sequence of MenuActionItem objects **/
-  private Vector toolBarModel;
-  /** Hashtable stores a map of MenuActionItem objects for fast access by ID **/
-  private Hashtable toolBarModelHT;
+  /** Stores sequence of MenuActionItem objects **/
+  private ArrayList toolBarModel;
+  /** lookup stores a map of MenuActionItem objects for fast access by ID **/
+  private HashMap toolBarModelHM;
 
   /** Creates new ToolBarModel */
   public ToolBarModel(String name) {
@@ -84,8 +81,8 @@ public class ToolBarModel extends Object {
     if (trace != null) trace.data(5, toolSequence);
 
     Object[] _toolBarModel = buildToolBarModel(new StringTokenizer(toolSequence, "|"));
-    toolBarModel = (Vector) _toolBarModel[0];
-    toolBarModelHT = (Hashtable) _toolBarModel[1];
+    toolBarModel = (ArrayList) _toolBarModel[0];
+    toolBarModelHM = (HashMap) _toolBarModel[1];
     //printTools();
 
     // GUI placeholder for this model.
@@ -112,13 +109,13 @@ public class ToolBarModel extends Object {
   public synchronized void clear() {
     if (toolBarModel != null) {
       for (int i=0; i<toolBarModel.size(); i++) {
-        MenuActionItem menuActionItem = (MenuActionItem) toolBarModel.elementAt(i);
+        MenuActionItem menuActionItem = (MenuActionItem) toolBarModel.get(i);
         menuActionItem.setAction(null);
       }
-      toolBarModel.removeAllElements();
+      toolBarModel.clear();
       toolBarModel = null;
-      toolBarModelHT.clear();
-      toolBarModelHT = null;
+      toolBarModelHM.clear();
+      toolBarModelHM = null;
       MiscGui.removeAllComponentsAndListeners(jToolBar);
       jToolBar = null;
     }
@@ -154,9 +151,9 @@ public class ToolBarModel extends Object {
 
     if (actionArray != null && actionArray.length > 0) {
 
-      // Go through the array and store all unique groups in a hashtable
+      // Go through the array and store all unique groups in a lookup table
       // where a key is the old group and value is the new replacement group.
-      Hashtable ht = null;
+      HashMap groupsHM = null;
       boolean isAnyMadeVisible = false;
 
       for (int i=0; i<actionArray.length; i++) {
@@ -171,22 +168,20 @@ public class ToolBarModel extends Object {
             toolItem.setAction(action);
           } else {
             toolItem = new MenuActionItem(action);
-            toolBarModel.addElement(toolItem);
-            toolBarModelHT.put(actionId, toolItem);
+            toolBarModel.add(toolItem);
+            toolBarModelHM.put(actionId, toolItem);
           }
 
           ButtonGroup buttonGroup = (ButtonGroup) action.getValue(Actions.BUTTON_GROUP);
           if (buttonGroup != null) {
-            // laizly create a hashtable
-            if (ht == null)
-              ht = new Hashtable();
-
-            ButtonGroup newButtonGroup = (ButtonGroup) ht.get(buttonGroup);
+            // laizly create lookup
+            if (groupsHM == null) groupsHM = new HashMap();
+            ButtonGroup newButtonGroup = (ButtonGroup) groupsHM.get(buttonGroup);
 
             // if the first item with that group, create a replacement group
             if (newButtonGroup == null) {
               newButtonGroup = new ButtonGroup();
-              ht.put(buttonGroup, newButtonGroup);
+              groupsHM.put(buttonGroup, newButtonGroup);
             }
 
             // replace the old group with a new one
@@ -203,8 +198,8 @@ public class ToolBarModel extends Object {
           }
         } // end include
       } // end for
-      if (ht != null)
-        ht.clear();
+      if (groupsHM != null)
+        groupsHM.clear();
 
       if (isAnyMadeVisible && !jToolBar.isVisible())
         jToolBar.setVisible(true);
@@ -221,7 +216,7 @@ public class ToolBarModel extends Object {
   private MenuActionItem findTool(Integer actionId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "findTool(Integer actionId)");
     if (trace != null) trace.args(actionId);
-    MenuActionItem returnMenuItem = (MenuActionItem) toolBarModelHT.get(actionId);
+    MenuActionItem returnMenuItem = (MenuActionItem) toolBarModelHM.get(actionId);
     if (trace != null) trace.exit(ToolBarModel.class, returnMenuItem);
     return returnMenuItem;
   }
@@ -279,7 +274,7 @@ public class ToolBarModel extends Object {
 
     int count = 0;
     for (int i=0; i<toolBarModel.size(); i++) {
-      MenuActionItem menuItem = (MenuActionItem) toolBarModel.elementAt(i);
+      MenuActionItem menuItem = (MenuActionItem) toolBarModel.get(i);
       if (menuItem == menuTool)
         break;
       else if (menuItem.isShowing())
@@ -296,10 +291,10 @@ public class ToolBarModel extends Object {
 
     MenuActionItem lastHidenSeparatorAfterShownItem = null;
 
-    Enumeration tools = toolBarModel.elements();
+    Iterator tools = toolBarModel.iterator();
     int state = 0; // 0 - looking for shown menu node, 1 - looking for hiden seperator, 2 - looking for another shown menu node
-    while (tools.hasMoreElements()) {
-      MenuActionItem item = (MenuActionItem) tools.nextElement();
+    while (tools.hasNext()) {
+      MenuActionItem item = (MenuActionItem) tools.next();
 
       if (state == 0) {
         if (item.isShowing()) {
@@ -339,28 +334,28 @@ public class ToolBarModel extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "getAvailableTools(boolean isShowing, boolean includeGenericTableActions)");
     if (trace != null) trace.args(isShowing);
 
-    Vector v = new Vector();
+    ArrayList tools = new ArrayList();
     for (int i=0; i<toolBarModel.size(); i++) {
-      MenuActionItem toolItem = (MenuActionItem) toolBarModel.elementAt(i);
+      MenuActionItem toolItem = (MenuActionItem) toolBarModel.get(i);
       // if isShowing has specified value
       if (toolItem.isShowing() == isShowing) {
         // if item is not showing and its the Separator or expected tool, don't return it.
         if (! (isShowing == false && toolItem.getAction() == null) ) {
           if (includeGenericTableActions) {
-            v.addElement(toolItem);
+            tools.add(toolItem);
           } else {
             Action action = toolItem.getAction();
             if (!(action instanceof RecordActionTable.SortByColumnAction ||
                   action instanceof RecordActionTable.SortAscDescAction ||
                   action instanceof RecordActionTable.CustomizeColumnsAction)) {
-              v.addElement(toolItem);
+              tools.add(toolItem);
             }
           }
         }
       }
     }
-    List_Viewable[] list_viewable = new List_Viewable[v.size()];
-    v.toArray(list_viewable);
+    List_Viewable[] list_viewable = new List_Viewable[tools.size()];
+    tools.toArray(list_viewable);
 
     if (trace != null) trace.exit(ToolBarModel.class, list_viewable);
     return list_viewable;
@@ -379,7 +374,7 @@ public class ToolBarModel extends Object {
 
     // hide all current tools
     for (int i=0; i<toolBarModel.size(); i++) {
-      MenuActionItem toolItem = (MenuActionItem) toolBarModel.elementAt(i);
+      MenuActionItem toolItem = (MenuActionItem) toolBarModel.get(i);
       toolItem.setDefaultProperty(false);
     }
 
@@ -389,11 +384,11 @@ public class ToolBarModel extends Object {
       toolItem.setDefaultProperty(true);
       if (!toolItem.isSeparator()) {
         toolBarModel.remove(toolItem);
-        toolBarModel.insertElementAt(toolItem, i);
+        toolBarModel.add(i, toolItem);
       } else {
         // need to create brand new separator for each spot so that they have different object references...
         // important when looking for object index or counting visible elements before this...
-        toolBarModel.insertElementAt(makeSeparator(), i);
+        toolBarModel.add(i,makeSeparator());
       }
     }
     rebuildToolBar();
@@ -440,7 +435,7 @@ public class ToolBarModel extends Object {
     boolean isAnyMadeVisible = false;
 
     for (int i=0; i<toolBarModel.size(); i++) {
-      MenuActionItem toolItem = (MenuActionItem) toolBarModel.elementAt(i);
+      MenuActionItem toolItem = (MenuActionItem) toolBarModel.get(i);
       // since we removed all items, we must reset isShowing
       toolItem.setShowing(false);
       if (toolItem.isDefaultProperty() && toolItem.getAction() != null) {
@@ -503,21 +498,21 @@ public class ToolBarModel extends Object {
   /***************************************/
 
   private static Object[] buildToolBarModel(StringTokenizer st) {
-    Vector newToolBarModel = new Vector();
-    Hashtable newToolBarModelHT = new Hashtable();
+    ArrayList newToolBarModel = new ArrayList();
+    HashMap newToolBarModelHM = new HashMap();
     while (st.hasMoreTokens()) {
       String toolName = st.nextToken();
       int actionId = Integer.parseInt(st.nextToken());
       MenuActionItem action = new MenuActionItem(toolName, actionId, -1, -1, -1);
-      newToolBarModel.addElement(action);
-      newToolBarModelHT.put(Integer.valueOf(actionId), action);
+      newToolBarModel.add(action);
+      newToolBarModelHM.put(Integer.valueOf(actionId), action);
     }
-    return new Object[] { newToolBarModel, newToolBarModelHT };
+    return new Object[] { newToolBarModel, newToolBarModelHM };
   }
 
-  private static void dissasambleToolBarModel(Vector toolBarModel, StringBuffer sb) {
+  private static void dissasambleToolBarModel(List toolBarModel, StringBuffer sb) {
     for (int i=0; i<toolBarModel.size(); i++) {
-      MenuActionItem toolItem = (MenuActionItem) toolBarModel.elementAt(i);
+      MenuActionItem toolItem = (MenuActionItem) toolBarModel.get(i);
       if (toolItem.isDefaultProperty()) {
         sb.append(toolItem.getName().replace('|', '_'));
         sb.append("|");

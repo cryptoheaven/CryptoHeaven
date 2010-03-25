@@ -15,7 +15,6 @@ package com.CH_gui.list;
 import java.util.*;
 import javax.swing.*;
 
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /**

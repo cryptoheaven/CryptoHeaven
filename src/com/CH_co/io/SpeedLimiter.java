@@ -92,7 +92,6 @@ public class SpeedLimiter extends Object {
       }
     };
     globalStatReseter.setDaemon(true);
-    globalStatReseter.setPriority(Thread.MIN_PRIORITY);
     globalStatReseter.start();
   }
 

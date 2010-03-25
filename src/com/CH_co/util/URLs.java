@@ -83,7 +83,7 @@ public class URLs extends Object {
   private static String[] customizationKeys;
   private static String[] customizationStrings;
 
-  public static Hashtable replacementTemplatesHT;
+  public static HashMap replacementTemplatesHM;
 
 
   static {
@@ -275,15 +275,15 @@ public class URLs extends Object {
       } catch (Throwable t) { }
       try {
         if (privateLabel.getImage_LogoBanner() != null)
-          ImageNums.images[ImageNums.LOGO_BANNER_MAIN] = privateLabel.getImage_LogoBanner();
+          ImageNums.setImageName(ImageNums.LOGO_BANNER_MAIN, privateLabel.getImage_LogoBanner());
       } catch (Throwable t) { }
       try {
         if (privateLabel.getImage_LogoKeyMain() != null)
-          ImageNums.images[ImageNums.LOGO_KEY_MAIN] = privateLabel.getImage_LogoKeyMain();
+          ImageNums.setImageName(ImageNums.LOGO_KEY_MAIN, privateLabel.getImage_LogoKeyMain());
       } catch (Throwable t) { }
       try {
         if (privateLabel.getImage_WindowPopup() != null)
-          ImageNums.images[ImageNums.WINDOW_POPUP] = privateLabel.getImage_WindowPopup();
+          ImageNums.setImageName(ImageNums.WINDOW_POPUP, privateLabel.getImage_WindowPopup());
       } catch (Throwable t) { }
       try {
         if (privateLabel.getActivationCodeDefault() != null)
@@ -407,12 +407,13 @@ public class URLs extends Object {
                   }
 
                   if (replacementHT.size() > 0) {
-                    String[] images = ImageNums.images;
-                    for (int i=0; i<images.length; i++) {
-                      String replacement = (String) replacementHT.get(images[i]);
+                    ArrayList images = ImageNums.getImageNames();
+                    for (int i=0; i<images.size(); i++) {
+                      String replacement = (String) replacementHT.get(images.get(i));
                       if (replacement != null) {
-                        images[i] = replacement;
-                        Images.imageIcons[i] = null; // clear cache of this image if already loaded
+                        ImageNums.setImageName(i, replacement);
+                        // clear cache of this image if already loaded
+                        Images.clearImageCache(i);
                       }
                     }
                     // First 3 Customization images
@@ -420,8 +421,9 @@ public class URLs extends Object {
                     for (int i=0; i<3; i++) {
                       String replacement = (String) replacementHT.get(customizationImageName+"-"+i);
                       if (replacement != null) {
-                        images[i] = replacement;
-                        Images.imageIcons[i] = null; // clear cache of this image if already loaded
+                        ImageNums.setImageName(i, replacement);
+                        // clear cache of this image if already loaded
+                        Images.clearImageCache(i);
                       }
                     }
                   }
@@ -429,8 +431,8 @@ public class URLs extends Object {
 
                 if (xml3.getName().equals("Templates")) {
 
-                  replacementTemplatesHT = new Hashtable();
-                  java.util.Enumeration e3 = xml3.enumerateChildren();
+                  replacementTemplatesHM = new HashMap();
+                  Enumeration e3 = xml3.enumerateChildren();
 
                   while (e3.hasMoreElements()) {
                     XMLElement xml4 = (XMLElement) e3.nextElement();
@@ -448,7 +450,7 @@ public class URLs extends Object {
                         }
                       }
                       if (name != null && source != null) {
-                        replacementTemplatesHT.put(name, source);
+                        replacementTemplatesHM.put(name, source);
                       }
                     }
                   }
@@ -456,8 +458,8 @@ public class URLs extends Object {
 
                 if (xml3.getName().equals("Strings") || xml3.getName().equals("Settings")) {
 
-                  java.util.Hashtable replacementHT = new java.util.Hashtable();
-                  java.util.Enumeration e3 = xml3.enumerateChildren();
+                  HashMap replacementHM = new HashMap();
+                  Enumeration e3 = xml3.enumerateChildren();
 
                   while (e3.hasMoreElements()) {
                     XMLElement xml4 = (XMLElement) e3.nextElement();
@@ -473,16 +475,16 @@ public class URLs extends Object {
                           str = xml5.getContent();
                       }
                       if (key != null && str != null) {
-                        replacementHT.put(key, str);
+                        replacementHM.put(key, str);
                       }
                     }
                   }
 
-                  if (replacementHT.size() > 0) {
+                  if (replacementHM.size() > 0) {
                     String[] keys = com.CH_co.util.URLs.customizationKeys;
                     String[] strings = com.CH_co.util.URLs.customizationStrings;
                     for (int i=0; i<keys.length; i++) {
-                      String replacement = (String) replacementHT.get(keys[i]);
+                      String replacement = (String) replacementHM.get(keys[i]);
                       if (replacement != null)
                         strings[i] = replacement;
                     }

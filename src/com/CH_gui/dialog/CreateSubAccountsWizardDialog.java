@@ -754,8 +754,6 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
         }
       }
     };
-    // change the priority of that thread to minimum
-    th.setPriority(Thread.MIN_PRIORITY);
     th.setDaemon(true);
     th.start();
   }

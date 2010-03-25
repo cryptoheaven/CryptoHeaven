@@ -16,9 +16,11 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -51,10 +53,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   public static final Integer TIMESTAMP_MAX = Integer.valueOf(130); // Mac OSX has wider text
   public static final Integer TIMESTAMP_MIN = Integer.valueOf(60);
 
-  /** vector of all records stored in this model */
-  private Vector recordsV = new Vector();
-  /** hashtable of all records stored in this model, always holds identical data as recordsV, its purpose is to speed up queries */
-  private Hashtable recordsHT = new Hashtable();
+  /** list of all records stored in this model */
+  private ArrayList recordsL = new ArrayList();
+  /** table of all records stored in this model, always holds identical data as recordsL, its purpose is to speed up queries */
+  private HashMap recordsHM = new HashMap();
 
   private ColumnHeaderData columnHeaderData;
   public ButtonGroup sortButtonGroup;
@@ -194,7 +196,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   public synchronized int getRowCount() {
-    return recordsV.size();
+    return recordsL.size();
   }
 
 
@@ -206,8 +208,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     return getValueAt(row, column, false);
   }
   public synchronized Object getValueAt(int row, int column, boolean forSortOnly) {
-    if (row >= 0 && row < recordsV.size())
-      return getValueAtRawColumn((Record) recordsV.elementAt(row), columnHeaderData.convertColumnToRawModel(column), forSortOnly);
+    if (row >= 0 && row < recordsL.size())
+      return getValueAtRawColumn((Record) recordsL.get(row), columnHeaderData.convertColumnToRawModel(column), forSortOnly);
     else
       return null;
   }
@@ -240,8 +242,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
   public synchronized Record getRowObjectNoTrace(int modelRow) {
     Record record = null;
-    if (modelRow >= 0 && modelRow < recordsV.size()) {
-      record = (Record) recordsV.elementAt(modelRow);
+    if (modelRow >= 0 && modelRow < recordsL.size()) {
+      record = (Record) recordsL.get(modelRow);
     }
     return record;
   }
@@ -253,8 +255,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "getRowForObject(Long id)");
     if (trace != null) trace.args(id);
     int row = -1;
-    for (int i=0; i<recordsV.size(); i++) {
-      Record record = (Record) recordsV.elementAt(i);
+    for (int i=0; i<recordsL.size(); i++) {
+      Record record = (Record) recordsL.get(i);
       if (record.getId().equals(id)) {
         row = i;
         break;
@@ -267,7 +269,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   public synchronized boolean contains(Record rec) {
     boolean rc = false;
     if (rec != null) {
-      if (recordsHT.containsKey(rec.getId())) {
+      if (recordsHM.containsKey(rec.getId())) {
         rc = true;
       }
     }
@@ -278,7 +280,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     boolean rc = false;
     if (recs != null) {
       for (int i=0; i<recs.length; i++) {
-        if (recordsHT.containsKey(recs[i].getId())) {
+        if (recordsHM.containsKey(recs[i].getId())) {
           rc = true;
           break;
         }
@@ -302,8 +304,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       RecordFilter filter = getFilterCombined();
       if (filter == null) {
         List recs = Arrays.asList(records);
-        recordsV.addAll(recs);
-        for (int i=0; i<records.length; i++) recordsHT.put(records[i].getId(), records[i]);
+        recordsL.addAll(recs);
+        for (int i=0; i<records.length; i++) recordsHM.put(records[i].getId(), records[i]);
         if (recordInsertionCallback != null) {
           if (insertedRecsV == null) insertedRecsV = new Vector();
           insertedRecsV.addAll(recs);
@@ -311,18 +313,18 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       } else {
         for (int i=0; i<records.length; i++ ) {
           if (filter.keep(records[i])) {
-            recordsV.addElement(records[i]);
-            recordsHT.put(records[i].getId(), records[i]);
+            recordsL.add(records[i]);
+            recordsHM.put(records[i].getId(), records[i]);
             if (recordInsertionCallback != null) {
               if (insertedRecsV == null) insertedRecsV = new Vector();
-              insertedRecsV.addElement(records[i]);
+              insertedRecsV.add(records[i]);
             }
           }
         }
       }
-      if (recordsV.size() > 0) {
-        if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsInserted(0, "+(recordsV.size()-1)+");");
-        fireTableRowsInserted(0, recordsV.size()-1);
+      if (recordsL.size() > 0) {
+        if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsInserted(0, "+(recordsL.size()-1)+");");
+        fireTableRowsInserted(0, recordsL.size()-1);
       }
     }
     // Notify callback of inserted records
@@ -351,14 +353,14 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       for (int i=0; i<records.length; i++) {
         Record newRec = records[i];
         boolean keep = keep(newRec);
-        Record rec = (Record) recordsHT.get(newRec.getId());
+        Record rec = (Record) recordsHM.get(newRec.getId());
         if (keep) {
           if (rec != null) {
             rec.merge(newRec);
             countUpdated ++;
           } else {
-            recordsV.addElement(newRec);
-            recordsHT.put(newRec.getId(), newRec);
+            recordsL.add(newRec);
+            recordsHM.put(newRec.getId(), newRec);
             countInserted ++;
             if (recordInsertionCallback != null) {
               if (insertedRecsV == null) insertedRecsV = new Vector();
@@ -378,7 +380,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       if (countInserted > 0 || countUpdated > 0) {
         // Can not fire event for specific row since sorter could shuffle it to another row -- fire entire data change.
         // We don't want the sorter to translate event rows and split row ranges.
-        int size = recordsV.size();
+        int size = recordsL.size();
         if (countInserted > 0) {
           // Always inserts are at the end
           if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsInserted("+(size - countInserted) + ", " + (size - 1) + ");");
@@ -414,7 +416,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     int removeCount = 0;
     // records are compared with equals() by their ID.. so we can use generic Vector methods
     for (int i=0; i<records.length; i++ ) {
-      boolean contains = recordsHT.containsKey(records[i].getId());
+      boolean contains = recordsHM.containsKey(records[i].getId());
       if (contains) {
 
         if (removeCount == 0) {
@@ -424,21 +426,21 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
           fireTableRowsDeleted(-10,-10);
         }
 
-        recordsV.removeElement(records[i]);
-        recordsHT.remove(records[i].getId());
+        recordsL.remove(records[i]);
+        recordsHM.remove(records[i].getId());
         removeCount ++;
       }
     }
     if (removeCount > 0) {
       // simulate reletions from the end.... to minimally confuse the selection list as
       // the rows are remapped by the sorter anyway
-      int originalSize = recordsV.size() + removeCount;
+      int originalSize = recordsL.size() + removeCount;
       if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsDeleted("+(originalSize - removeCount) + ", " +(originalSize - 1)+");");
       fireTableRowsDeleted(originalSize - removeCount, originalSize - 1); // to fix number of elements in SizeSequence
 
       // don't need to call updated, because when a row is deleted, the table sorter will call update for all rows
       //-//System.out.println("RecordTableModel.fireTableRowsUpdated(0, "+(size-1)+");");
-      //-//fireTableRowsUpdated(0, recordsV.size() -1); // don't fire structure changed -- it would screw up the header renderer
+      //-//fireTableRowsUpdated(0, recordsL.size() -1); // don't fire structure changed -- it would screw up the header renderer
     }
 
     if (trace != null) trace.exit(RecordTableModel.class);
@@ -450,10 +452,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   public synchronized void removeData() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "removeData()");
 
-    int size = recordsV.size();
+    int size = recordsL.size();
     if (size > 0) {
-      recordsV.removeAllElements();
-      recordsHT.clear();
+      recordsL.clear();
+      recordsHM.clear();
       if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsDeleted(0, "+(size-1)+");");
       fireTableRowsDeleted(0, size-1);
       //fireTableDataChanged();
@@ -471,8 +473,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     return keep;
   }
 
-  public final Vector getRowVectorForViewOnly() {
-    return recordsV;
+  public final ArrayList getRowListForViewOnly() {
+    return recordsL;
   }
 
   public final ColumnHeaderData getColumnHeaderData() {

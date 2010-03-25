@@ -747,9 +747,12 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           if (chatSplitPane == null) {
             // make sure we have the chat table component;
             initChatTableComponent();
-            chatSplitPane = createSplitPane(chatTableComponent, chatComposePanel, "_chatComp", JSplitPane.VERTICAL_SPLIT, 0.90d);
+            chatSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + chatTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.90d);
+            //chatSplitPane = createSplitPane(chatTableComponent, chatComposePanel, "_chatComp", JSplitPane.VERTICAL_SPLIT, 0.90d);
+            chatTableComponent.addEntryComponent(chatSplitPane, chatComposePanel);
           }
-          c = chatSplitPane;
+          //c = chatSplitPane;
+          c = chatTableComponent;
           break;
         case FolderRecord.KEY_FOLDER:
           // make sure we have key table component;
@@ -878,9 +881,6 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     if (splitPane.getDividerSize() > 5) splitPane.setDividerSize(5);
     return splitPane;
   }
-  private JSplitPane createSplitPane(RecordTableComponent recordTableComp, JComponent viewer, String propertyNamePrefix, int orientation, double resizeWeight) {
-    return createSplitPane(getVisualsClassKeyName() + propertyNamePrefix, recordTableComp, viewer, orientation, resizeWeight);
-  }
   public static JSplitPane createSplitPane(String propertyName, RecordTableComponent recordTableComp, JComponent viewer, int orientation, double resizeWeight) {
     viewer.setBorder(new EmptyBorder(0,0,0,0));
 
@@ -892,10 +892,6 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     JSplitPane splitPane = new JSplitPaneVS(propertyName, orientation, recordTableComp, viewer, resizeWeight);
     splitPane.setOneTouchExpandable(false);
     if (splitPane.getDividerSize() > 5) splitPane.setDividerSize(5);
-
-//    if (viewer instanceof RecordSelectionListener) {
-//      recordTableComp.addPreviewComponent(splitPane, viewer);
-//    }
 
     return splitPane;
   }

@@ -17,11 +17,9 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-import javax.swing.text.*;
 import java.util.*;
 
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.records.*;
 
 import com.CH_co.gui.*;
 import com.CH_co.cryptx.*;
@@ -33,7 +31,6 @@ import com.CH_co.util.*;
 
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.shareTable.*;
 import com.CH_gui.table.*;
@@ -624,18 +621,18 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
   }
 
   public Vector gatherWantedShares() {
-    Vector sharesV = shareTableModel.getRowVectorForViewOnly();
+    ArrayList sharesL = shareTableModel.getRowListForViewOnly();
     Vector wantedSharesV = new Vector();
     // clear wanted shares if Radio DO NOT SHARE is selected
     if (jRadioDoNotShare.isSelected()) {
-      for (int i=0; i<sharesV.size(); i++) {
-        FolderShareRecord share = (FolderShareRecord) sharesV.elementAt(i);
+      for (int i=0; i<sharesL.size(); i++) {
+        FolderShareRecord share = (FolderShareRecord) sharesL.get(i);
         if (share.isOwnedBy(folderPair.getFolderRecord().ownerUserId, (Long[]) null)) {
           wantedSharesV.addElement(share);
         }
       }
     } else {
-      wantedSharesV.addAll(sharesV);
+      wantedSharesV.addAll(sharesL);
     }
     return wantedSharesV;
   }

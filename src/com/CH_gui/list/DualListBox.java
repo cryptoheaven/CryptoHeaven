@@ -12,22 +12,20 @@
 
 package com.CH_gui.list;
 
+import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
 import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -35,7 +33,7 @@ import java.awt.image.BufferedImage;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *  This is a general panel where there are two lists.
  *  The functionalities include: moving elements back and forth between the lists
  *  moving elements up and down in the destination list, and reseting lists
@@ -48,7 +46,7 @@ import java.awt.image.BufferedImage;
  *
  * <b>$Revision: 1.27 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 
 public class DualListBox extends JPanel implements StringHighlighterI, ListUpdatableI {
@@ -90,7 +88,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
   private ListDataListener destListener;
 
   private String sourceSearchString;
-  private static int sourceSearchMatchBITS = 
+  private static int sourceSearchMatchBITS =
       StringHighlighter.MATCH_STRING__EXACT |
       StringHighlighter.MATCH_STRING__TRIMMED |
       StringHighlighter.MATCH_STRING__NO_CASE |
@@ -338,7 +336,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
 
   public synchronized void addDefaultDestinationElements(Object[] newValue) {
     fillListModel(defaultDestLModel, newValue);
-    addDestinationElements(newValue);  
+    addDestinationElements(newValue);
   }
 
   public synchronized void addDestinationElements(Object[] newValue) {
@@ -413,8 +411,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     updateButtons();
   }
   /**
-   * Moves specified elements to destination list and removes them from 
-   * source list.  If the requested elements do not exist in the source list 
+   * Moves specified elements to destination list and removes them from
+   * source list.  If the requested elements do not exist in the source list
    * they are still added to the destination list.
    */
   public synchronized void moveToDestinationElements(Object[] newValue) {
@@ -428,8 +426,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     updateButtons();
   }
   /**
-   * Moves specified elements to source list and removes them from 
-   * destination list.  If the requested elements do not exist in the destination list 
+   * Moves specified elements to source list and removes them from
+   * destination list.  If the requested elements do not exist in the destination list
    * they are still added to the source list.
    */
   public synchronized void moveToSourceElements(Object[] newValue) {
@@ -444,8 +442,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     updateButtons();
   }
   /**
-   * Moves specified elements to destination list and removes them from 
-   * source list.  If the requested elements do not exist in the source list 
+   * Moves specified elements to destination list and removes them from
+   * source list.  If the requested elements do not exist in the source list
    * they are NOT added to the destination list.
    * String matching is performed.  When more than one element matches the
    * search, nothing is selected.
@@ -606,8 +604,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     return true;
   }
 
-  /** 
-   * Move all selected elements from destination to source list 
+  /**
+   * Move all selected elements from destination to source list
    * @return true is anthing was highlighted (and moved)
    **/
   public synchronized boolean moveHighlightedToSource() {
@@ -623,8 +621,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     return rc;
   }
 
-  /** 
-   * Move all selected elements from source to destination list 
+  /**
+   * Move all selected elements from source to destination list
    * @return true is anthing was highlighted (and moved)
    **/
   public synchronized boolean moveHighlightedToDestination() {
@@ -651,7 +649,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
 
     int index = selected[0];
 
-    if ((dir == -1 && index == 0 ) || (dir == 1 && index == destListModel.size()-1)) 
+    if ((dir == -1 && index == 0 ) || (dir == 1 && index == destListModel.size()-1))
       return;
 
     Object obj = destListModel.getElementAt(index);
@@ -681,7 +679,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     int[] sourceSelected = sourceList.getSelectedIndices();
 
     addButton.setEnabled( (sourceSelected == null || sourceSelected.length == 0)  ? false : true );
-    removeButton.setEnabled( (destSelected == null || destSelected.length == 0) ? false : true );  
+    removeButton.setEnabled( (destSelected == null || destSelected.length == 0) ? false : true );
 
     if (addAllButton != null)
       addAllButton.setEnabled(sourceListModel.getSize() > 0);
@@ -781,7 +779,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
       resetButton.addActionListener(new ResetListener());
     }
     if (includeOrderControls) {
-      moveUpButton = new JMyButton(UP_BUTTON_LABEL); 
+      moveUpButton = new JMyButton(UP_BUTTON_LABEL);
       moveDownButton = new JMyButton(DOWN_BUTTON_LABEL);
       moveUpButton.addActionListener(new MoveUpListener());
       moveDownButton.addActionListener(new MoveDownListener());
@@ -802,39 +800,39 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
 
     /* now, add all the components to the pane from left to right */
 
-    add(sourceLabel, new GridBagConstraints(0, 0, 2, 1, 10, 0, 
+    add(sourceLabel, new GridBagConstraints(0, 0, 2, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     JScrollPane sPane = new JScrollPane(sourceList);
     sPane.setPreferredSize(new Dimension(150, 200));
-    add(sPane, new GridBagConstraints(0, 1, 1, 10, 10, 10, 
+    add(sPane, new GridBagConstraints(0, 1, 1, 10, 10, 10,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
 
     if (buttonLocationsOnSides) {
-      add(addButton, new GridBagConstraints(1, 1, 1, 1, 0, 0, 
+      add(addButton, new GridBagConstraints(1, 1, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-      add(removeButton, new GridBagConstraints(1, 2, 1, 1, 0, 0, 
+      add(removeButton, new GridBagConstraints(1, 2, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
       if (addAllButton != null) {
-        add(addAllButton, new GridBagConstraints(1, 4, 1, 1, 0, 0, 
+        add(addAllButton, new GridBagConstraints(1, 4, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       }
 
       if (removeAllButton != null) {
-        add(removeAllButton, new GridBagConstraints(1, 5, 1, 1, 0, 0, 
+        add(removeAllButton, new GridBagConstraints(1, 5, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       }
     } else {
-      add(addButton, new GridBagConstraints(0, 11, 1, 1, 0, 0, 
+      add(addButton, new GridBagConstraints(0, 11, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
-      add(removeButton, new GridBagConstraints(3, 11, 1, 1, 0, 0, 
+      add(removeButton, new GridBagConstraints(3, 11, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     }
 
-    add(destLabel, new GridBagConstraints(3, 0, 3, 1, 10, 0, 
+    add(destLabel, new GridBagConstraints(3, 0, 3, 1, 10, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     JScrollPane dPane = new JScrollPane(destList);
@@ -844,29 +842,29 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
 
     if (resetButton != null) {
       if (buttonLocationsOnSides)
-        add(resetButton, new GridBagConstraints(5, 1, 1, 1, 0, 0, 
+        add(resetButton, new GridBagConstraints(5, 1, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       else
-        add(resetButton, new GridBagConstraints(4, 11, 1, 1, 0, 0, 
+        add(resetButton, new GridBagConstraints(4, 11, 1, 1, 0, 0,
             GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     }
 
     if (moveUpButton != null) {
-      add(moveUpButton, new GridBagConstraints(5, 3, 1, 1, 0, 0, 
+      add(moveUpButton, new GridBagConstraints(5, 3, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     }
 
     if (moveDownButton != null) {
-      add(moveDownButton, new GridBagConstraints(5, 4, 1, 1, 0, 0, 
+      add(moveDownButton, new GridBagConstraints(5, 4, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     }
   }
 
   // =====================================================================
-  // LISTENERS FOR THE INNER COMPONENTS OF THIS PANEL        
+  // LISTENERS FOR THE INNER COMPONENTS OF THIS PANEL
   // =====================================================================
 
-  /** Adds element to the destination list, 
+  /** Adds element to the destination list,
     * i.e. moves it from source list to destination list
     */
   private class AddListener implements ActionListener {
@@ -877,7 +875,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     }
   }
 
-  /** Adds element to the destination list, 
+  /** Adds element to the destination list,
     * i.e. moves it from source list to destination list
     */
   private class AddAllListener implements ActionListener {
@@ -918,7 +916,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
   private class ResetListener implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
       synchronized (DualListBox.this) {
-        clearSourceListModel(); 
+        clearSourceListModel();
         clearDestinationListModel();
         addSourceElements(defaultSourceLModel);
         addDestinationElements(defaultDestLModel);
@@ -956,7 +954,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     }
   }
 
-  /** 
+  /**
     * Listens on the selection of the source list
     * and updates the appropriate buttons
     */
@@ -974,10 +972,10 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     */
   private class SourceListMouseListener implements MouseListener {
 
-    public void mouseClicked(MouseEvent mouseEvent) { 
+    public void mouseClicked(MouseEvent mouseEvent) {
       synchronized (DualListBox.this) {
-        if (mouseEvent.getClickCount() == 2) 
-          moveHighlightedToDestination(); 
+        if (mouseEvent.getClickCount() == 2)
+          moveHighlightedToDestination();
       }
     }
     public void mouseEntered(MouseEvent p1) {}
@@ -1217,7 +1215,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
           event.startDrag(null, _imgGhost, ptDragOrigin, objs, new ListDragSourceListener());
         }
       } else {
-        //System.out.println( "nothing was selected");   
+        //System.out.println( "nothing was selected");
       }
     }
 
@@ -1227,42 +1225,42 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
      */
     private class ListDragSourceListener implements DragSourceListener {
       /**
-       * this message goes to DragSourceListener, informing it that the dragging 
+       * this message goes to DragSourceListener, informing it that the dragging
        * has ended
-       * 
+       *
        */
-      public void dragDropEnd (DragSourceDropEvent event) {   
+      public void dragDropEnd (DragSourceDropEvent event) {
         dndDraggedObjects = null;
         dndSourceModel = null;
       }
 
       /**
-       * this message goes to DragSourceListener, informing it that the dragging 
+       * this message goes to DragSourceListener, informing it that the dragging
        * has entered the DropSite
-       * 
+       *
        */
       public void dragEnter (DragSourceDragEvent event) {
       }
 
       /**
-       * this message goes to DragSourceListener, informing it that the dragging 
+       * this message goes to DragSourceListener, informing it that the dragging
        * has exited the DropSite
-       * 
+       *
        */
       public void dragExit (DragSourceEvent event) {
       }
 
       /**
-       * this message goes to DragSourceListener, informing it that the dragging is currently 
+       * this message goes to DragSourceListener, informing it that the dragging is currently
        * ocurring over the DropSite
-       * 
+       *
        */
       public void dragOver (DragSourceDragEvent event) {
       }
 
       /**
        * is invoked when the user changes the dropAction
-       * 
+       *
        */
       public void dropActionChanged ( DragSourceDragEvent event) {
       }

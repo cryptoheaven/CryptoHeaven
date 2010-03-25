@@ -13,12 +13,10 @@
 package com.CH_gui.actionGui;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.beans.*;
-import java.lang.ref.WeakReference;
 
 import com.CH_gui.action.Actions;
 

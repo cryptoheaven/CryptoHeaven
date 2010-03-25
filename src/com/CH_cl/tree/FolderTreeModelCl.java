@@ -19,8 +19,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.tree.*;
 import com.CH_co.util.*;
 
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -89,7 +88,7 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
 
       // Remember the children nodes which still exist in the cache, 
       // if the 'keepCacheResidantChildren' flag is specified.
-      Vector keepChildrenV = null;
+      ArrayList keepChildrenL = null;
       if (keepCacheResidantChildren) {
         Enumeration enm = nodeToRemove.postorderEnumeration(); // all descending children
         if (enm != null && enm.hasMoreElements()) {
@@ -98,10 +97,8 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
             FolderTreeNode childNode = (FolderTreeNode) enm.nextElement();
             FolderPair fPair = childNode.getFolderObject();
             if (cache.getFolderRecord(fPair.getId()) != null) {
-              if (keepChildrenV == null) {
-                keepChildrenV = new Vector();
-              }
-              keepChildrenV.addElement(fPair);
+              if (keepChildrenL == null) keepChildrenL = new ArrayList();
+              keepChildrenL.add(fPair);
             }
           }
         }
@@ -111,7 +108,7 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
 
       // if we have kept some children, add them back to the tree...
       if (keepCacheResidantChildren) {
-        FolderPair[] keepChildren = (FolderPair[]) ArrayUtils.toArray(keepChildrenV, FolderPair.class);
+        FolderPair[] keepChildren = (FolderPair[]) ArrayUtils.toArray(keepChildrenL, FolderPair.class);
         addNodes(keepChildren);
       }
     }

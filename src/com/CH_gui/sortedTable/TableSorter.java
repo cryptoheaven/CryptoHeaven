@@ -12,17 +12,11 @@
 
 package com.CH_gui.sortedTable;
 
+import java.util.*;
+import javax.swing.event.*;
 import javax.swing.table.TableModel;
 
-import javax.swing.event.TableModelListener;
-import javax.swing.event.TableModelEvent;
-
-import java.util.Arrays;
-import java.util.Vector;
-import java.util.Comparator;
-
 import com.CH_co.trace.Trace;
-
 import com.CH_gui.table.*;
 
 /**
@@ -249,7 +243,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
       TableSorter.super.tableChanged(tableModelEvent);
     }
     if (!suppressSort) {
-      synchronized (TableSorter.this) {
+      synchronized (this) {
         reallocateIndexes();
         sort();
       }
@@ -344,7 +338,11 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
     Object rc = null;
     TableModel model = getRawModel();
     if (model != null) {
-      if (indexes.length != 0 && model.getRowCount() > row && row >= 0 && model.getColumnCount() > column)
+      int indexLength = 0;
+      synchronized (this) {
+        indexLength = indexes.length;
+      }
+      if (indexLength != 0 && model.getRowCount() > row && row >= 0 && model.getColumnCount() > column)
         rc = model.getValueAt(convertMyRowIndexToModel(row), column);
     }
     return rc;
@@ -429,7 +427,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
    * Return the index of the row in the model whose data is being displayed in
    * the row viewRowIndex in the display or -1 if invalid view row is specified.
    */
-  int convertMyRowIndexToModel(int viewRowIndex) {
+  synchronized int convertMyRowIndexToModel(int viewRowIndex) {
     int rc = -1;
     if (viewRowIndex >= 0 && viewRowIndex <= (indexes.length-1)) {
       rc = indexes[viewRowIndex];
@@ -440,7 +438,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
   /**
    * Return the index of the row in the view which is displaying the data from the column modelRowIndex in the model.
    */
-  int convertMyRowIndexToView(int modelRowIndex) {
+  synchronized int convertMyRowIndexToView(int modelRowIndex) {
     int rc = -1;
     for (int i=0; i<indexes.length; i++) {
       if (indexes[i] == modelRowIndex) {

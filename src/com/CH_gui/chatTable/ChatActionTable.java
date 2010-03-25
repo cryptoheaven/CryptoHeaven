@@ -88,12 +88,12 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
     getTableModel().recordInsertionCallback = new CallbackI() {
       public void callback(final Object value) {
         try {
-          if (value != null && value instanceof Vector) {
-            Vector v = (Vector) value;
+          if (value != null && value instanceof java.util.List) {
+            java.util.List valueList = (java.util.List) value;
             // pick the most recent element out of the vector
             MsgLinkRecord mostRecentInVector = null;
-            for (int i=0; i<v.size(); i++) {
-              Record rec = (Record) v.elementAt(i);
+            for (int i=0; i<valueList.size(); i++) {
+              Record rec = (Record) valueList.get(i);
               if (rec instanceof MsgLinkRecord) {
                 MsgLinkRecord link = (MsgLinkRecord) rec;
                 if (mostRecentInVector == null || mostRecentInVector.dateCreated.before(link.dateCreated))
@@ -136,6 +136,7 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
             }
           }
         } catch (Throwable t) {
+          t.printStackTrace();
         }
 
       } // end callback()

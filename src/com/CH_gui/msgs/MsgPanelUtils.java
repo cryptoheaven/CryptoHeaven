@@ -372,13 +372,13 @@ public class MsgPanelUtils extends Object {
       EmailRecord[] emlRecs = cache.getEmailRecords(cache.getMyUserId());
       if (emlRecs.length > 0) {
         Record[][] recipients = gatherAllMsgRecipients(originalMsg);
-        for (int recipientType=0; ourMatchingEmlRec==null && recipientType<recipients.length; recipientType++) {
+        for (int recipientType=0; recipientType<recipients.length; recipientType++) {
           if (recipients[recipientType] != null) {
-            for (int i=0; ourMatchingEmlRec==null && i<recipients[recipientType].length; i++) {
+            for (int i=0; i<recipients[recipientType].length; i++) {
               Record recipient = recipients[recipientType][i];
               if (recipient instanceof EmailAddressRecord) {
                 String emlAddr = ((EmailAddressRecord) recipient).address;
-                for (int k=0; ourMatchingEmlRec==null && k<emlRecs.length; k++) {
+                for (int k=0; k<emlRecs.length; k++) {
                   if (EmailRecord.isAddressEqual(emlRecs[k].emailAddr, emlAddr)) {
                     ourMatchingEmlRec = emlRecs[k];
                     break;
@@ -948,7 +948,7 @@ public class MsgPanelUtils extends Object {
 //  }
 
 
-  private static final Hashtable previewContentHT = new Hashtable();
+  private static final HashMap previewContentHM = new HashMap();
   private static Thread previewContentSetter = null;
   private static final Object previewContentSetterMonitor = new Object(); // synchronizes lazy initialization
   public static void setPreviewContent_Threaded(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, JComponent messageViewer) {
@@ -959,31 +959,33 @@ public class MsgPanelUtils extends Object {
     if (trace != null) trace.args(skipHeaderClearing);
 
     Object[] data = new Object[] { content, Boolean.valueOf(isHTMLview), Boolean.valueOf(convertHTMLtoPLAIN), Boolean.valueOf(skipHeaderClearing), messageViewer };
-    synchronized (previewContentHT) {
-      previewContentHT.put(messageViewer, data);
-      previewContentHT.notifyAll();
+    synchronized (previewContentHM) {
+      previewContentHM.put(messageViewer, data);
+      previewContentHM.notifyAll();
     }
     synchronized (previewContentSetterMonitor) {
       if (previewContentSetter == null) {
         previewContentSetter = new ThreadTraced("Preview Content Setter") {
           public void runTraced() {
-            while (true) {
+            while (!isInterrupted()) {
               try {
                 // pick the data to work with
                 Object[] data = null;
-                synchronized (previewContentHT) {
+                synchronized (previewContentHM) {
                   // in case there is no data, wait for it
-                  if (previewContentHT.size() == 0) {
+                  if (previewContentHM.size() == 0) {
                     try {
-                      previewContentHT.wait();
+                      // wake-up periodically so it has a chance to quit if applet is destroyed without JVM exit
+                      previewContentHM.wait(1000);
                     } catch (InterruptedException x) {
+                      break;
                     }
                   } else {
                     // pick first data for servicing...
-                    Enumeration enm = previewContentHT.keys();
-                    if (enm.hasMoreElements()) {
-                      Object key = enm.nextElement();
-                      data = (Object[]) previewContentHT.remove(key);
+                    Iterator iter = previewContentHM.keySet().iterator();
+                    if (iter.hasNext()) {
+                      Object key = iter.next();
+                      data = (Object[]) previewContentHM.remove(key);
                     }
                   }
                 }
@@ -998,6 +1000,7 @@ public class MsgPanelUtils extends Object {
                   if (convertHTMLtoPLAIN) {
                     content[0] = MsgPanelUtils.extractPlainFromHtml(content[0]);
                   }
+//                  MsgPanelUtils.setMessageContent(content[0], isHTMLview, messageViewer, skipHeaderClearing, false);
                   try {
                     SwingUtilities.invokeAndWait(new Runnable() {
                       public void run() {
@@ -1014,6 +1017,13 @@ public class MsgPanelUtils extends Object {
                 // just incase so the while loop goes forever
               }
             } // end while
+            // when thread exits, cleanup static data so it can be reinitialized
+            synchronized (previewContentSetterMonitor) {
+              previewContentSetter = null;
+            }
+            synchronized (previewContentHM) {
+              previewContentHM.clear();
+            }
           } // end run
         };
         previewContentSetter.setDaemon(true);

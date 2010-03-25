@@ -193,7 +193,6 @@ public class CacheUtilities extends Object {
         unlockPassProtectedMsgs(null, null);
       }
     };
-    th.setPriority(Thread.MIN_PRIORITY);
     th.setDaemon(true);
     th.start();
   }

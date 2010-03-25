@@ -40,7 +40,7 @@ import com.CH_co.service.msg.ProtocolMsgDataSet;
 public class Obj_IDAndIDList_Rq extends ProtocolMsgDataSet {
 
   // <id> <numberOfIDs> { <id> }+
-  public Long Id;
+  public Long id;
   public Obj_IDList_Co IDs = new Obj_IDList_Co();
   
   
@@ -53,7 +53,7 @@ public class Obj_IDAndIDList_Rq extends ProtocolMsgDataSet {
   /** Writes out 'this' object to a stream */
   public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDAndIDList_Rq.class, "writeToStream(DataOutputStream2)");
-    dataOut.writeLongObj(Id);
+    dataOut.writeLongObj(id);
     // write the ID list
     IDs.writeToStream(dataOut, progressMonitor, clientBuild, serverBuild);
     
@@ -63,7 +63,7 @@ public class Obj_IDAndIDList_Rq extends ProtocolMsgDataSet {
   /** Initializes 'this' object from a stream. */
   public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDAndIDList_Rq.class, "initFromStream(DataInputStream2)");
-    Id = dataIn.readLongObj();
+    id = dataIn.readLongObj();
     // read the ID list
     IDs.initFromStream(dataIn, progressMonitor, clientBuild, serverBuild);
     
@@ -73,7 +73,7 @@ public class Obj_IDAndIDList_Rq extends ProtocolMsgDataSet {
 
   public String toString() {
     return "[Obj_IDAndIDList_Rq"
-      + ": Id=" + Id
+      + ": Id=" + id
       + ", IDs=" + IDs
       + "]";
   }

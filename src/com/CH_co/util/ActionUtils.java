@@ -74,10 +74,10 @@ public class ActionUtils extends Object {
 
     Action[] actionArray = null;
 
-    LinkedList targetList = new LinkedList();
+    ArrayList targetList = new ArrayList();
     fillActionProducersRecursively(c, targetList);
 
-    LinkedList actionList = new LinkedList();
+    ArrayList actionList = new ArrayList();
     Iterator iter = targetList.iterator();
     while (iter.hasNext()) {
       ActionProducerI actionProducer = (ActionProducerI) iter.next();
@@ -85,13 +85,14 @@ public class ActionUtils extends Object {
       // laizly create the list
       if (actions != null && actions.length > 0) {
         for (int k=0; k<actions.length; k++) {
-          actionList.add(actions[k]);
+          Action action = actions[k];
+          if (action != null)
+            actionList.add(action);
         }
       }
     }
 
     if (actionList.size() > 0) {
-      while (actionList.remove((Object) null));
       actionArray = (Action[]) ArrayUtils.toArray(actionList, Action.class);
     }
 
@@ -107,7 +108,7 @@ public class ActionUtils extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ActionUtils.class, "getActionProducersRecursively(Component c)");
     if (trace != null) trace.args(c);
 
-    LinkedList targetList = new LinkedList();
+    ArrayList targetList = new ArrayList();
     fillActionProducersRecursively(c, targetList);
 
     ActionProducerI[] producerArray = (ActionProducerI[]) ArrayUtils.toArray(targetList, ActionProducerI.class);

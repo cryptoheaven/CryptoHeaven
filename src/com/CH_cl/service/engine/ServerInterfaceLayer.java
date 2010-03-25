@@ -90,8 +90,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private int maxConnectionCount = DEFAULT_MAX_CONNECTION_COUNT;
   public static final String PROPERTY_NAME_MAX_CONNECTION_COUNT = "ServerInterfaceLayer" + "_maxConnCount";
 
-  /** Vector of connection workers. */
-  private final Vector workers = new Vector();
+  /** ArrayList of connection workers. */
+  private final ArrayList workers = new ArrayList();
   /** All the ready messages go through this queue.
       No jobs are being run by that queue, they are handled to the submitting threads to be run. */
   private QueueMM1 executionQueue;
@@ -106,11 +106,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private QueueMM1 independentExecutionQueue;
 
   /** List to put the waiting stamps. */
-  private final Vector stampList = new Vector();
+  private final ArrayList stampList = new ArrayList();
   /** Secondary list to put the waiting stamps as a signal for execution thread to start its work. */
-  private final Vector stampList2 = new Vector();
+  private final ArrayList stampList2 = new ArrayList();
   /** List to put the fetched Client Message Actions for the waiting stamps. */
-  private final Vector doneList = new Vector();
+  private final ArrayList doneList = new ArrayList();
 
   /** Last successful login message. */
   private MessageAction lastLoginMessageAction;
@@ -185,23 +185,23 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
       // Divide list into 3 parts, last-host-port, socket-hosts, protocoled-hosts
       Object[] lastHostAndPort = null;
-      Vector hostsAndPortsSocketV = new Vector();
-      Vector hostsAndPortsProtocolV = new Vector();
+      ArrayList hostsAndPortsSocketL = new ArrayList();
+      ArrayList hostsAndPortsProtocolL = new ArrayList();
       for (int i=0; i<hostsAndPorts.length; i++) {
         Object[] hostAndPort = (Object[]) hostsAndPorts[i];
         if (hostAndPort[0].toString().equalsIgnoreCase(lastEngineHost) && hostAndPort[1].toString().equalsIgnoreCase(lastEnginePort))
           lastHostAndPort = hostAndPort;
         else if (hostAndPort[0].toString().indexOf("://") >= 0)
-          hostsAndPortsProtocolV.addElement(hostAndPort);
+          hostsAndPortsProtocolL.add(hostAndPort);
         else
-          hostsAndPortsSocketV.addElement(hostAndPort);
+          hostsAndPortsSocketL.add(hostAndPort);
       }
 
       // randomize lists
 
       Random rnd = new Random();
-      randomizeList(hostsAndPortsSocketV, rnd);
-      randomizeList(hostsAndPortsProtocolV, rnd);
+      randomizeList(hostsAndPortsSocketL, rnd);
+      randomizeList(hostsAndPortsProtocolL, rnd);
 
       // put lists back together with leading last-host-port
       int index = 0;
@@ -209,12 +209,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         hostsAndPorts[index] = lastHostAndPort;
         index ++;
       }
-      for (int i=0; i<hostsAndPortsSocketV.size(); i++) {
-        hostsAndPorts[index] = (Object[]) hostsAndPortsSocketV.elementAt(i);
+      for (int i=0; i<hostsAndPortsSocketL.size(); i++) {
+        hostsAndPorts[index] = (Object[]) hostsAndPortsSocketL.get(i);
         index ++;
       }
-      for (int i=0; i<hostsAndPortsProtocolV.size(); i++) {
-        hostsAndPorts[index] = (Object[]) hostsAndPortsProtocolV.elementAt(i);
+      for (int i=0; i<hostsAndPortsProtocolL.size(); i++) {
+        hostsAndPorts[index] = (Object[]) hostsAndPortsProtocolL.get(i);
         index ++;
       }
     }
@@ -256,16 +256,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class, this);
   }
 
-  private void randomizeList(Vector list, Random rnd) {
+  private void randomizeList(List list, Random rnd) {
     int length = list.size();
     for (int i=0; i<length-1; i++) {
       int swap1 = i;
       int swap2 = rnd.nextInt(length-i)+i;
       if (swap1 != swap2) {
-        Object o1 = list.elementAt(swap1);
-        Object o2 = list.elementAt(swap2);
-        list.setElementAt(o1, swap2);
-        list.setElementAt(o2, swap1);
+        Object o1 = list.get(swap1);
+        Object o2 = list.get(swap2);
+        list.set(swap2, o1);
+        list.set(swap1, o2);
       }
     }
   }
@@ -290,9 +290,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private int[] getWorkerCounts() {
     int[] counts = new int[2];
     synchronized (workers) {
-      Enumeration enm = workers.elements();
-      while (enm.hasMoreElements()) {
-        ServerInterfaceWorker worker = (ServerInterfaceWorker) enm.nextElement();
+      for (int i=0; i<workers.size(); i++) {
+        ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
         Class socketType = worker.getSocketType();
         if (Socket.class.equals(socketType))
           counts[0] ++;
@@ -458,7 +457,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                   }
                 }
               } catch (Throwable t) {
-                if (trace != null) trace.exception(getClass(), 100, t);
+                if (trace != null) trace.exception(getClass(), 200, t);
               }
               if (trace != null) trace.data(300, Thread.currentThread().getName() + " done.");
               if (trace != null) trace.exit(getClass());
@@ -515,7 +514,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     synchronized (stampList) {
       // register a stamp so that executor returns the reply message to the done list
-      stampList.addElement(lStamp);
+      stampList.add(lStamp);
       stampList.notifyAll();
     }
 
@@ -537,7 +536,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         synchronized (stampList2) {
           if (stampList2.contains(lStamp))
             throw new IllegalStateException("We are trying to add a stamp to list 2, but it is already there!");
-          stampList2.addElement(lStamp);
+          stampList2.add(lStamp);
         } // end synchronized (stampList2)
         // This notify can unlock the execution thread waiting for the submitter to get ready...
         stampList.notifyAll();
@@ -561,9 +560,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         synchronized (stampList2) {
           stampList2.remove(lStamp);
         }
-        if (replyMsg == null) {
-          replyMsg = findAndRemoveMsgForStamp(doneList, lStamp);
-        }
+        replyMsg = findAndRemoveMsgForStamp(lStamp);
 
         if (replyMsg == null) {
           if (trace != null) trace.data(70, "TIMEOUT");
@@ -587,28 +584,32 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /**
    * Removes and returns the reply message from the done list.
    */
-  private ClientMessageAction findAndRemoveMsgForStamp(Vector v, Stamp l) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "findAndRemoveMsgForStamp(Vector, Stamp)");
-    if (trace != null) trace.args(v);
-    if (trace != null) trace.args(l);
+  private ClientMessageAction findAndRemoveMsgForStamp(Stamp stamp) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "findAndRemoveMsgForStamp(Stamp)");
+    if (trace != null) trace.args(stamp);
 
-    Enumeration e = v.elements();
-    while (e.hasMoreElements()) {
-      ClientMessageAction replyMsg = (ClientMessageAction) e.nextElement();
-      long stamp = l.longValue();
-      if (stamp == replyMsg.getStamp()) {
-        if (trace != null) trace.data(10, "reply found");
-        if (trace != null) trace.data(15, replyMsg);
-        synchronized (doneList) {
-          doneList.remove(replyMsg);
+    ClientMessageAction replyMsg = null;
+
+    synchronized (doneList) {
+      for (int i=0; i<doneList.size(); i++) {
+        ClientMessageAction reply = (ClientMessageAction) doneList.get(i);
+        long stampValue = stamp.longValue();
+        if (stampValue == reply.getStamp()) {
+          replyMsg = reply;
+          if (trace != null) trace.data(10, "reply found");
+          doneList.remove(reply);
+          break;
         }
-        if (trace != null) trace.exit(ServerInterfaceLayer.class);
-        return replyMsg;
-      }
-    } // end while
-    if (trace != null) trace.data(20, "reply NOT found");
-    if (trace != null) trace.exit(ServerInterfaceLayer.class, null);
-    return null;
+      } // end loop
+    } // end synchronized
+
+    if (replyMsg != null) {
+      if (trace != null) trace.data(20, "reply IS found");
+    } else {
+      if (trace != null) trace.data(20, "reply NOT found");
+    }
+    if (trace != null) trace.exit(ServerInterfaceLayer.class, replyMsg);
+    return replyMsg;
   } // end findAndRemoveMsgForStamp()
 
   /**
@@ -707,9 +708,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       int countAllWorkers = workers.size();
 
       if (trace != null) trace.data(10, "for all workers, size=", countAllWorkers);
-      Enumeration enm = workers.elements();
-      while (enm.hasMoreElements()) {
-        ServerInterfaceWorker worker = (ServerInterfaceWorker) enm.nextElement();
+      for (int i=0; i<countAllWorkers; i++) {
+        ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
         if (!worker.isBusy())
           countFreeAllWorkers ++;
         if (!isMainWorker(worker)) {
@@ -996,7 +996,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
           // store the worker in a collection
           if (worker != null) {// null when createWorker() failed!
-            workers.addElement(worker);
+            workers.add(worker);
             // destroyed worker could be replaced by new one which should now be updating connection counts
             if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
 //            // seperate GUI in another thread, don't use swing here because Engine doesn't like activating GUI timers/classes
@@ -1238,9 +1238,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     // release all threads waiting on the stamps
     if (trace != null) trace.data(51, "releasing all threads waiting on stamps");
     synchronized (stampList) {
-      Enumeration e = stampList.elements();
-      while (e.hasMoreElements()) {
-        Stamp stamp = (Stamp) e.nextElement();
+      for (int i=0; i<stampList.size(); i++) {
+        Stamp stamp = (Stamp) stampList.get(i);
         synchronized (stamp) {
           stamp.notifyAll();
         }
@@ -1314,9 +1313,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.data(10, "killing all workers");
 
     synchronized (workers) {
-      Enumeration enm = workers.elements();
-      while (enm.hasMoreElements()) {
-        ServerInterfaceWorker worker = (ServerInterfaceWorker) enm.nextElement();
+      int size = workers.size();
+      for (int i=0; i<size; i++) {
+        ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
         try {
           worker.destroyWorker();
         } catch (Throwable t) {
@@ -1385,7 +1384,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     boolean workerRemoved = false;
 
     synchronized (workers) {
-      workerRemoved = workers.removeElement(worker);
+      workerRemoved = workers.remove(worker);
       // destroyed worker could be replaced by new one which should now be updating connection counts
       if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
     }
@@ -1629,7 +1628,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
             if (trace != null) trace.data(40, "adding reply to done list");
             synchronized (doneList) {
-              doneList.addElement(nextMsgAction);
+              doneList.add(nextMsgAction);
               if (trace != null) trace.data(41, "adding done");
             }
 
@@ -1641,7 +1640,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               throw new IllegalStateException("The stamp must be present, but its not!");
             }
 
-            Stamp exactStampObj = (Stamp) stampList.elementAt(index);
+            Stamp exactStampObj = (Stamp) stampList.get(index);
             if (trace != null) trace.data(50, "synchron on exactStampObj", exactStampObj);
             // wake up the waiting thread
             synchronized (exactStampObj) {

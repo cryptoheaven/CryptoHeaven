@@ -316,6 +316,16 @@ public class ContactTableModel extends RecordTableModel {
           if (pairPicks != null && pairPicks.length > 0) {
             removeData(pairPicks);
           }
+          if (halfPairPicks != null && halfPairPicks.length > 0) {
+            // If Share is already gone, use the Folder only to construct a Pair for removal
+            for (int i=0; i<halfPairPicks.length; i++) {
+              if (halfPairPicks[i] instanceof FolderRecord) {
+                FolderRecord fRec = (FolderRecord) halfPairPicks[i];
+                FolderPair halfPair = new FolderPair(null, fRec);
+                removeData(new Record[] { halfPair });
+              }
+            }
+          }
           if (contactPicks != null && contactPicks.length > 0) {
             removeData(contactPicks);
           }

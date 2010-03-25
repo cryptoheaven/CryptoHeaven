@@ -690,11 +690,11 @@ public class MsgTableModel extends RecordTableModel {
               if (flagS != null) {
                 short flag = flagS.shortValue();
                 if (flag == StatRecord.STATUS__UNSEEN_UNDELIVERED)
-                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.FLAG_RED_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_RED_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
                 else if (flag == StatRecord.STATUS__UNSEEN_DELIVERED)
-                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.FLAG_GREEN_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_GREEN_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
                 else if (flag == StatRecord.STATUS__SEEN_UNDELIVERED)
-                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.FLAG_YELLOW_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_YELLOW_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
               }
             }
           }
@@ -712,11 +712,11 @@ public class MsgTableModel extends RecordTableModel {
 
           if (toAddPriority) {
             if (msgData.isImpHigh(msgData.importance.shortValue()))
-              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.PRIORITY_HIGH_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_HIGH_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
             else if (msgData.isImpFYI(msgData.importance.shortValue()))
-              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.PRIORITY_LOW_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_LOW_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
             else if (msgData.isImpSystem(msgData.importance.shortValue()))
-              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.LIGHT_ON_12] + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.LIGHT_ON_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
           }
 
           if (toAddAttachment) {
@@ -729,7 +729,7 @@ public class MsgTableModel extends RecordTableModel {
               }
             }
             if (numOfAttachments > 0) {
-              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.images[ImageNums.ATTACH_14x12] + ".png\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"12\"/></a>");
+              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.ATTACH_14x12) + ".png\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"12\"/></a>");
             }
           }
 

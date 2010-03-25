@@ -52,7 +52,7 @@ public class JMyComboBox extends JComboBox {
     super(aModel);
     setRenderer(new MyBasicComboBoxRenderer());
   }
-  
+
   public void paint(Graphics g) {
     MiscGui.setPaintPrefs(g);
     super.paint(g);

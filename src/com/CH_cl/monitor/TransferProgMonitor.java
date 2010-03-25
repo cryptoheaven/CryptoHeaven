@@ -44,7 +44,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class TransferProgMonitor extends JFrame implements ProgMonitor {
+public final class TransferProgMonitor extends JFrame implements ProgMonitor {
 
   private String title;
 

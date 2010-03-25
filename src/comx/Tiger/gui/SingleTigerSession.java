@@ -43,7 +43,7 @@ import comx.Tiger.ssce.*;
 public class SingleTigerSession extends Object {
 
   private static TigerPropSession singleInstance;
-  private static Object monitorObj = new Object();
+  private static final Object monitorObj = new Object();
 
   private static Properties defaultProperties = new Properties();
   private static String[][] DEFAULT_PROPERTIES;

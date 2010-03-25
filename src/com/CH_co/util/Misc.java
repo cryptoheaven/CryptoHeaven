@@ -43,10 +43,13 @@ public class Misc extends Object {
     GlobalProperties.cleanupTempFiles();
     GlobalProperties.cleanupTempFilesOnFinalize();
     // exit
-    if (systemExitObj != null)
+    if (systemExitObj != null) {
       systemExitObj.disposeObj();
-    else
+      // interrupt running deamon threads
+      CleanupAgent.stopSingleInstance();
+    } else {
       System.exit(code);
+    }
   }
   public static boolean isRunningFromApplet() {
     return systemExitObj != null && systemExitObj instanceof javax.swing.JApplet;

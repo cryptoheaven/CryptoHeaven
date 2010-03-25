@@ -18,11 +18,7 @@ import java.awt.event.*;
 
 import java.awt.Component;
 
-import com.CH_co.trace.Trace;
-import com.CH_co.util.Images;
-
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

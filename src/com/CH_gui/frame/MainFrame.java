@@ -34,7 +34,6 @@ import com.CH_gui.actionGui.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
-import com.CH_gui.table.RecordTableComponent;
 import com.CH_gui.table.TableComponent;
 import com.CH_gui.tree.FolderTreeComponent;
 
@@ -64,7 +63,7 @@ import javax.swing.border.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoordinatorI {
+public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoordinatorI, ComponentContainerI {
 
   private Action[] actions;
   private static final int EXIT_ACTION = 0;
@@ -90,16 +89,21 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private static MainFrame singleInstance;
 
   private LoginProgMonitor loginProgMonitor;
-  private JPanel welcomeScreenPanel;
 
   private static final String PROPERTY_NAME_PREFIX__PERSONALIZE_EMAIL_ADDRESS_COUNT = "PersonalizeEmailAddressCount";
 
   private Long initialFolderId;
   private Long initialMsgLinkId;
+
+  private JPanel mainPanel;
+  private JPanel welcomeScreenPanel;
+  private ContactTableComponent welcomeContactTableComponent;
+  private FolderTreeComponent treeComp;
   private TableComponent tableComp;
   private ContactTableComponent contactComp;
-  private boolean isInitializationsStarted = false;
 
+  private boolean isInitializationsStarted = false;
+  private boolean isInitializationsFinished = false;
 
   static {
     Toolkit.getDefaultToolkit().getSystemEventQueue().push(InactivityEventQueue.getInstance());
@@ -120,10 +124,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
     this.initialFolderId = initialFolderId;
     this.initialMsgLinkId = initialMsgLinkId;
-    if (singleInstance != null)
-      throw new IllegalStateException("Main Frame already instantiated.");
-    else
-      singleInstance = this;
+    // don't check if already instantiated as applets can re-initialize in a single JVM
+    singleInstance = this;
 
     if (splashWindow != null && splashWindow.isShowing()) {
       splashWindow.setVisible(false);
@@ -161,9 +163,10 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     if (trace != null) trace.args(success);
     if (trace != null) trace.args(loginCoordinator);
 
-    if (!isInitializationsStarted) startPreloadingComponents_Threaded();
-
     if (success) {
+
+      if (!isInitializationsStarted) startPreloadingComponents_Threaded();
+
       if (trace != null) trace.data(10, "advance progress monitor, login is complete");
       if (loginCoordinator != null) {
         if (!loginCoordinator.getLoginProgMonitor().isAllDone()) {
@@ -273,8 +276,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       if (isSet != null && !isSet.booleanValue())
         new ChangePasswordDialog(MainFrame.this, true);
     } else {
-      if (!MainFrame.isLoggedIn())
+      if (!MainFrame.isLoggedIn()) {
+        // cleanup gui and running Threads before applet exits, application exit would kipp deamon threads anyway
+        MainFrame mainFrame = MainFrame.getSingleInstance();
+        if (mainFrame != null) {
+          mainFrame.exitAction();
+        }
         Misc.systemExit(0);
+      }
     }
     ActionUtils.setEnabledActionsRecur(this);
 
@@ -285,57 +294,77 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     if (!isInitializationsStarted) {
       isInitializationsStarted = true;
       // init main table components after initial frame is shown so actions are added to the frame menus
-      Runnable tableCompInitializer = new Runnable() {
-        public void run() {
-          try {
-            // Make the main table and its components.
-            TableComponent tComp = new TableComponent("Browse");
-            tComp.initAddressTableComponent();
-            tComp.initPostTableComponent(); // fastest msg type component to change any prior address related menu changes
-            tComp.initChatTableComponent(); // chat menu loads here for the first time
-            tComp.initMsgTableComponent();
-            tComp.initGroupTableComponent();
-            tComp.initKeyTableComponent();
-            tComp.initRecycleTableComponent();
-            tComp.initFileTableComponent();
+      Thread tableCompInitializerThread = new ThreadTraced("Main-Table-Comp-initializer") {
+        public void runTraced() {
+          // Adding actions will instantiate menu and toolbar components...
+          MainFrame.this.addComponentActions(MainFrame.this);
 
-            // Adding actions will instantiate menu and toolbar components...
-            MainFrame.this.addComponentActions(MainFrame.this);
+          // Make the main table
+          tableComp = new TableComponent("Browse");
+          tableComp.initAddressTableComponent();
+          tableComp.initPostTableComponent(); // fastest msg type component to change any prior address related menu changes
+          tableComp.initChatTableComponent(); // chat menu loads here for the first time
+          tableComp.initMsgTableComponent();
+          tableComp.initGroupTableComponent();
+          tableComp.initKeyTableComponent();
+          tableComp.initRecycleTableComponent();
+          tableComp.initFileTableComponent();
+          tableComp.initLocalFileTableComponent();
 
-            MainFrame.this.addComponentActions(tComp.getAddressTableComponent());
-            MainFrame.this.addComponentActions(tComp.getPostTableComponent());
-            MainFrame.this.addComponentActions(tComp.getChatTableComponent());
-            MainFrame.this.addComponentActions(tComp.getMsgTableComponent());
-            MainFrame.this.addComponentActions(tComp.getGroupTableComponent());
-            MainFrame.this.addComponentActions(tComp.getKeyTableComponent());
-            MainFrame.this.addComponentActions(tComp.getRecycleTableComponent());
-            MainFrame.this.addComponentActions(tComp.getFileTableComponent());
+          // Make the main tree
+          treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true), false);
 
+          // Make the main contact table
+          String propertyName = ContactActionTable.getTogglePropertyName(MainFrame.this);
+          String oldShowS = GlobalProperties.getProperty(propertyName);
+          boolean oldShow = oldShowS != null ? Boolean.valueOf(oldShowS).booleanValue() : false;
+          RecordFilter contactFilter = new MultiFilter(new RecordFilter[] {
+            //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
+            new ContactFilterCl(oldShow),
+            new FolderFilter(FolderRecord.GROUP_FOLDER),
+            new InvEmlFilter(true, false) }
+          , MultiFilter.OR);
 
-//            // removing actions will temporarily disable actions which are not yet linked in the frame.
-//            MainFrame.this.removeComponentActions(tComp.getAddressTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getPostTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getChatTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getMsgTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getGroupTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getKeyTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getRecycleTableComponent());
-//            MainFrame.this.removeComponentActions(tComp.getFileTableComponent());
+          // Make the ContactTableComponent
+          contactComp = new ContactTableComponent(contactFilter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
+          contactComp.addTopContactBuildingPanel();
 
-            // do slowest one last
-            tComp.initLocalFileTableComponent();
-            MainFrame.this.addComponentActions(tComp.getLocalFileTableComponent());
-            MainFrame.this.removeComponentActions(tComp.getLocalFileTableComponent());
+          // Make the welcome ContactTableComponent used for toolbar actions
+          welcomeContactTableComponent = new ContactTableComponent4Frame(null, new FixedFilter(false), null, null, false, false, true);
 
-            // assign to global
-            tableComp = tComp;
-          } catch (Throwable t) {
-            t.printStackTrace();
-          }
+          // Make the main panel
+          JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d);
+          vSplit.setOneTouchExpandable(false);
+          if (vSplit.getDividerSize() > 5) vSplit.setDividerSize(5);
+          JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.20d);
+          hSplit.setOneTouchExpandable(false);
+          if (hSplit.getDividerSize() > 5) hSplit.setDividerSize(5);
+
+          // status bar
+          JPanel jStatusBar = createStatusBar();
+
+          mainPanel = new JPanel();
+          mainPanel.setLayout(new BorderLayout());
+          mainPanel.add(hSplit, BorderLayout.CENTER);
+          mainPanel.add(jStatusBar, BorderLayout.SOUTH);
+
+          // getting actions will instantiate Action objects
+          ActionUtils.getActionsRecursively(treeComp);
+          ActionUtils.getActionsRecursively(contactComp);
+          ActionUtils.getActionsRecursively(welcomeContactTableComponent);
+          ActionUtils.getActionsRecursively(tableComp.getAddressTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getPostTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getChatTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getMsgTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getGroupTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getKeyTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getRecycleTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getFileTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getLocalFileTableComponent());
+
+          isInitializationsFinished = true;
         }
       };
-      Thread tableCompInitializerThread = new Thread(tableCompInitializer, "Main-Table-Comp-initializer");
-      tableCompInitializerThread.setPriority(Thread.MIN_PRIORITY);
       tableCompInitializerThread.setDaemon(true);
       tableCompInitializerThread.start();
     }
@@ -359,23 +388,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     return SIL;
   }
 
-
-  /**
-   * Remove all components from the frame leaving the menu and toolbar intact.
-   */
-  private void removeComponents() {
-    Container contentPane = getContentPane();
-    // clear all content in case we are re-initializing the main window
-    Component[] comps = contentPane.getComponents();
-    for (int i=0; comps != null && i < comps.length; i++) {
-      if (!(comps[i] instanceof JToolBar)) {
-        contentPane.remove(comps[i]);
-        if (comps[i] instanceof DisposableObj)
-          ((DisposableObj) comps[i]).disposeObj();
-      }
-    }
-  }
-
   /**
    * Initialize the main window and layout the main components.
    */
@@ -383,85 +395,39 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "initScreen()");
 
     // wait for initializer thread to complete
-    while (tableComp == null)
-      Thread.yield();
+    while (!isInitializationsFinished) {
+      try { Thread.sleep(10); } catch (Throwable t) { }
+    }
 
-    // Remember old FolderTreeComponent for cleanup -- incase we are re-initializing screen
-    FolderTreeComponent oldTreeComp = getMainTreeComponent();
-    // Remove the Contact Folders from display
-    // FolderTreeComponent treeComp = new FolderTreeComponent(true);
-    FolderTreeComponent treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true), false);
-    setMainTreeComponent(treeComp);
+    // use a component initialized below to check if run for the first time
+    boolean isFirstTimeInitialization = welcomeScreenPanel == null;
 
-    // Get displayable welcome screen in the empty table component.
-    UserRecord myUserRec = SIL.getFetchedDataCache().getUserRecord();
-    Long userId = null;
-    if (myUserRec != null)
-      userId = myUserRec.userId;
-    welcomeScreenPanel = new JPanel();
-    welcomeScreenPanel.setBorder(new EmptyBorder(0,0,0,0));
+    // Make new Folder Tree
+    if (isFirstTimeInitialization) {
+      setMainTreeComponent(treeComp);
+
+      // set window welcome panel
+      welcomeScreenPanel = new JPanel();
+      tableComp.setWelcomeScreenComponent(welcomeScreenPanel);
+
+      // adding a listener will initialize the FileTableComponent so do that after we add it into the frame so actions can be generated and displayed
+      treeComp.addTreeSelectionListener(tableComp);
+      tableComp.addFolderSelectionListener(treeComp);
+    }
+
+    // set welcome content customized for current user
     setDefaultWelcomeScreenPanel();
 
-    // Remember old TableComponent for cleanup -- incase we are re-initializing screen
-    TableComponent oldTableComp = null;//tableComp;
-    // Make new main TableComponent
-    tableComp.setWelcomeScreenComponent(welcomeScreenPanel);
+    // After all of the mainPanel is constructed (including user customized welcome panel) then
+    // add it to the frame which will trigger component added event and menus/toolbars will be populated
+    if (isFirstTimeInitialization) {
+      // put everything on to the center...
+      getContentPane().add(mainPanel, BorderLayout.CENTER);
+    }
 
-    String propertyName = ContactActionTable.getTogglePropertyName(this);
-    String oldShowS = GlobalProperties.getProperty(propertyName);
-    boolean oldShow = oldShowS != null ? Boolean.valueOf(oldShowS).booleanValue() : false;
-    RecordFilter contactFilter = new MultiFilter(new RecordFilter[] {
-      new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
-      new FolderFilter(FolderRecord.GROUP_FOLDER),
-      new InvEmlFilter(true, false) }
-    , MultiFilter.OR);
-
-    // Remember old ContactTableComponent for cleanup -- incase we are re-initializing screen
-    ContactTableComponent oldContactComp = contactComp;
-    // Make new main TableComponent
-    contactComp = new ContactTableComponent(contactFilter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
-    contactComp.addTopContactBuildingPanel();
-
-    JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d);
-    vSplit.setOneTouchExpandable(false);
-    if (vSplit.getDividerSize() > 5) vSplit.setDividerSize(5);
-    JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.20d);
-    hSplit.setOneTouchExpandable(false);
-    if (hSplit.getDividerSize() > 5) hSplit.setDividerSize(5);
-
-    // status bar
-    JPanel jStatusBar = createStatusBar();
-
-    JPanel mainPanel = new JPanel();
-    mainPanel.setLayout(new BorderLayout());
-    mainPanel.add(hSplit, BorderLayout.CENTER);
-    mainPanel.add(jStatusBar, BorderLayout.SOUTH);
-
-    Container contentPane = getContentPane();
-    removeComponents();
-    // put everything on to the center...  leave N/S/E/W sides for droppable toolbar
-    contentPane.add(mainPanel, BorderLayout.CENTER);
-
+    // set window title
     UserRecord uRec = SIL.getFetchedDataCache().getUserRecord();
     setUserTitle(uRec);
-
-    // adding a listener will initialize the FileTableComponent so do that after we add it into the frame so actions can be generated and displayed
-    treeComp.addTreeSelectionListener(tableComp);
-    tableComp.addFolderSelectionListener(treeComp);
-
-    // Cleanup old components from previous login...
-    if (oldContactComp != null) {
-      oldContactComp.disposeObj();
-      //MiscGui.removeAllComponentsAndListeners(oldContactComp);
-    }
-    if (oldTableComp != null) {
-      oldTableComp.disposeObj();
-      //MiscGui.removeAllComponentsAndListeners(oldTableComp);
-    }
-    if (oldTreeComp != null) {
-      oldTreeComp.disposeObj();
-      //MiscGui.removeAllComponentsAndListeners(oldTreeComp);
-    }
 
     // Check or display the 'upgrade' popup window.
     {
@@ -469,6 +435,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       UserOps.checkExpiry();
       UserOps.checkQuotas();
 
+      UserRecord myUserRec = SIL.getFetchedDataCache().getUserRecord();
+      Long userId = SIL.getFetchedDataCache().getMyUserId();
       // Display popup window to suggest upgrading
       if (myUserRec != null && myUserRec.isFreePromoAccount()) {
         String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
@@ -610,16 +578,26 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
   /** Sets the default welcome screen component */
   public void setDefaultWelcomeScreenPanel() {
-    Long userId = SIL.getFetchedDataCache().getMyUserId();
-    Component welcomeComp = getWelcomeScreenComponent(URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId, false);
+    // clear prior panel content
     welcomeScreenPanel.removeAll();
+
+    welcomeScreenPanel.setBorder(new EmptyBorder(0,0,0,0));
     welcomeScreenPanel.setLayout(new BorderLayout());
-    RecordTableComponent recTableComp = new ContactTableComponent4Frame(null, new FixedFilter(false), null, null, false, false, true);
+
+    // Create welcome Top panel with toolbar
     UserRecord userRec = SIL.getFetchedDataCache().getUserRecord();
     String username = userRec != null ? userRec.handle : "";
-    recTableComp.setTitle("Welcome " + username);
-    recTableComp.setTitleIcon(null); // remove the 16x16 transparent default icon
-    welcomeScreenPanel.add(recTableComp.getTopPanel(), BorderLayout.NORTH);
+    welcomeContactTableComponent.setTitle("Welcome " + username);
+    welcomeContactTableComponent.setTitleIcon(null); // remove the 16x16 transparent default icon
+    welcomeScreenPanel.add(welcomeContactTableComponent.getTopPanel(), BorderLayout.NORTH);
+    ActionProducerI[] actionProducers = ActionUtils.getActionProducersRecursively(welcomeContactTableComponent);
+    for (int i=0; i<actionProducers.length; i++) {
+      actionProducers[i].setEnabledActions();
+    }
+
+    // Create welcome content
+    Long userId = SIL.getFetchedDataCache().getMyUserId();
+    Component welcomeComp = getWelcomeScreenComponent(URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId, false);
     welcomeScreenPanel.add(new JScrollPane(welcomeComp), BorderLayout.CENTER);
   }
 
@@ -1089,6 +1067,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           } catch (Throwable t) {
             if (trace != null) trace.exception(MainFrame.class, 200, t);
           }
+          // If this is applet quitting, reset the gui flag in case it will re-initialize
+          MiscGui.suppressAllGUI(false);
           Misc.systemExit(0);
           if (trace != null) trace.exit(getClass());
         } // end run()
@@ -1232,9 +1212,16 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         }
       };
       passRecoveryEnforcer.setDaemon(true);
-      passRecoveryEnforcer.setPriority(Thread.MIN_PRIORITY);
       passRecoveryEnforcer.start();
     }
+  }
+
+  /*****************************************************************
+  *** C o m p o n e n t C o n t a i n e r I    interface methods ***
+  *****************************************************************/
+  public Component[] getPotentiallyHiddenComponents() {
+    // useful for cleanup of hidden gui or instantiated gui but not yet sticked inside this frame
+    return new Component[] { welcomeContactTableComponent, treeComp, tableComp, contactComp };
   }
 
   /*******************************************************

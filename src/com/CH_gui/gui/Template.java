@@ -20,7 +20,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
-import java.util.Hashtable;
+import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -155,14 +155,15 @@ public class Template extends Object {
 
   public static String get(int templateIndex) {
     // see if we have any replacement templates from PrivateLabel
-    Hashtable replacementTemplatesHT = URLs.replacementTemplatesHT;
-    if (replacementTemplatesHT != null && replacementTemplatesHT.size() > 0) {
+    HashMap replacementTemplatesHM = URLs.replacementTemplatesHM;
+    if (replacementTemplatesHM != null && replacementTemplatesHM.size() > 0) {
       for (int i=0; i<templates.length; i++) {
-        String replacement = (String) replacementTemplatesHT.get(templates[i]);
+        String replacement = (String) replacementTemplatesHM.get(templates[i]);
         if (replacement != null)
           templates[i] = replacement;
       }
-      replacementTemplatesHT = null;
+      // after applying the replacements, nullify them...
+      URLs.replacementTemplatesHM = null;
     }
     return templates[templateIndex];
   }

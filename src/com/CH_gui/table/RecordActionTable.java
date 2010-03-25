@@ -75,9 +75,9 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   // NON-STATIC!! because we want one dialog per each chat table inside a frame.
   private SingleTokenArbiter offlineDialogArbiter;
 
-  private Vector dropTargetV = new Vector();
-  private Vector componentsForDNDV = new Vector();
-  private Vector componentsForPopupV = new Vector();
+  private HashSet dropTargetHS = new HashSet();
+  private HashSet componentsForDNDHS = new HashSet();
+  private HashSet componentsForPopupHS = new HashSet();
 
 
   /** Creates new RecordActionTable */
@@ -182,9 +182,9 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   private void addPopup(Component c) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordActionTable.class, "addPopup(Component c)");
     if (trace != null) trace.args(c);
-    if (!componentsForPopupV.contains(c)) {
+    if (!componentsForPopupHS.contains(c)) {
       c.addMouseListener(new PopupMouseAdapter(c, this));
-      componentsForPopupV.addElement(c);
+      componentsForPopupHS.add(c);
     }
     if (trace != null) trace.exit(RecordActionTable.class);
   }
@@ -192,11 +192,11 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
     addDND(c, true);
   }
   private void addDND(Component c, boolean includeDrag) {
-    if (!componentsForDNDV.contains(c)) {
-      componentsForDNDV.addElement(c);
+    if (!componentsForDNDHS.contains(c)) {
+      componentsForDNDHS.add(c);
       DropTargetListener dropTargetListener = createDropTargetListener();
       if (dropTargetListener != null) {
-        dropTargetV.addElement(new DropTarget(c, dropTargetListener));
+        dropTargetHS.add(new DropTarget(c, dropTargetListener));
       }
       if (includeDrag) {
         DragGestureListener dragGestureListener = createDragGestureListener();
@@ -232,14 +232,14 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   }
 
 
-  public Vector getDropTargetV() {
-    return dropTargetV;
+  public HashSet getDropTargetHS() {
+    return dropTargetHS;
   }
-  public Vector getComponentsForDNDV() {
-    return componentsForDNDV;
+  public HashSet getComponentsForDNDHS() {
+    return componentsForDNDHS;
   }
-  public Vector getComponentsForPopupV() {
-    return componentsForPopupV;
+  public HashSet getComponentsForPopupHS() {
+    return componentsForPopupHS;
   }
 
 
@@ -762,9 +762,10 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       getTableModel().removeTableModelListener(tableModelListener);
       tableModelListener = null;
     }
-    for (int i=0; i<dropTargetV.size(); i++) {
+    Iterator iter = dropTargetHS.iterator();
+    while (iter.hasNext()) {
       try {
-        DropTarget target = (DropTarget) dropTargetV.elementAt(i);
+        DropTarget target = (DropTarget) iter.next();
         if (target != null) {
           Component c = target.getComponent();
           if (c != null)
@@ -774,9 +775,9 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       } catch (Throwable t) {
       }
     }
-    dropTargetV.clear();
-    componentsForDNDV.clear();
-    componentsForPopupV.clear();
+    dropTargetHS.clear();
+    componentsForDNDHS.clear();
+    componentsForPopupHS.clear();
     super.disposeObj();
   }
 }

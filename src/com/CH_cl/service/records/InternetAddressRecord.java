@@ -23,7 +23,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -31,13 +31,13 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.11 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 abstract public class InternetAddressRecord extends Record {
 
   // Uniqueness of addresses is kept by this hashtable.
   // Email records of the same address will automatically get assigned the same id.
-  private static Hashtable IDs = new Hashtable();
+  private static final HashMap ids = new HashMap();
   private static long lastId = 0;
 
   public Long id;
@@ -55,12 +55,12 @@ abstract public class InternetAddressRecord extends Record {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InternetAddressRecord.class, "InternetAddressRecord(String addr)");
     if (trace != null) trace.args(addr);
     this.address = addr != null ? addr : "";
-    synchronized (IDs) {
-      Long oldId = (Long) IDs.get(address);
+    synchronized (ids) {
+      Long oldId = (Long) ids.get(address);
       if (oldId == null) {
         lastId ++;
         oldId = Long.valueOf(lastId);
-        IDs.put(address, oldId);
+        ids.put(address, oldId);
       }
       this.id = oldId;
     }

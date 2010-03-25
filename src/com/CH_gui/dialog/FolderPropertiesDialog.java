@@ -555,7 +555,6 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
         }
       }
     };
-    th.setPriority(Thread.MIN_PRIORITY);
     th.setDaemon(true);
     th.start();
   }

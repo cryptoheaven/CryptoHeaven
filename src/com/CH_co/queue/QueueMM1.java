@@ -25,7 +25,7 @@ import com.CH_co.trace.*;
  */
 public class QueueMM1 extends Object {
 
-  private FifoWriterI fifo = null;
+  private final FifoWriterI fifo;
   private final Object processingMonitor = new Object();
 
   private PrivateQueueServer server;
@@ -129,7 +129,6 @@ public class QueueMM1 extends Object {
     wakeUpProcessingThread();
     processingFunction = null;
     fifo.clear();
-    fifo = null;
     if (trace != null) trace.exit(QueueMM1.class);
   }
 
@@ -183,7 +182,8 @@ public class QueueMM1 extends Object {
             if (fifo.size() == 0) {
               if (trace != null) trace.data(10, "About to wait for new objects in fifo.");
               try {
-                fifo.wait();
+                // wake-up periodically to give a chance for the thread to exit when queue was killed
+                fifo.wait(1000);
               } catch (InterruptedException e) {
               }
               if (trace != null) trace.data(20, "Woke up from waiting for new objects in fifo.");

@@ -34,10 +34,10 @@ import com.CH_co.util.Misc;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ClientActionSwitch extends CommonActionSwitch {
 
@@ -61,7 +61,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // Login Secure Session
       { Integer.valueOf(CommandCodes.USR_A_LOGIN_SECURE_SESSION), UsrALoginSecureSession.class.getName() },
 
-      // Login failed -- 
+      // Login failed --
       { Integer.valueOf(CommandCodes.USR_E_HANDLE_PASSWORD_COMBO_DNE), UsrALoginFailed.class.getName() },
       { Integer.valueOf(CommandCodes.USR_E_USER_LOCKED_OUT), UsrALoginFailed.class.getName() },
       { Integer.valueOf(CommandCodes.USR_E_LOGIN_FAILED), UsrALoginFailed.class.getName() },
@@ -146,7 +146,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
       { Integer.valueOf(CommandCodes.FILE_A_GET_FILES), FileAGetFiles.class.getName() },
       // Get File Data Attributes
       { Integer.valueOf(CommandCodes.FILE_A_GET_FILES_DATA_ATTRIBUTES), FileAGetFilesDataAttr.class.getName() },
-      // Get File Data 
+      // Get File Data
       { Integer.valueOf(CommandCodes.FILE_A_GET_FILES_DATA), FileAGetFilesData.class.getName() },
       // Remove Files
       { Integer.valueOf(CommandCodes.FILE_A_REMOVE_FILES), FileARemoveFiles.class.getName() },
@@ -227,7 +227,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
 
       // Get Temporary Public Key
       { Integer.valueOf(CommandCodes.SYS_A_GET_TEMP_PUB_KEY), SysAGetTempPubKey.class.getName() },
-      
+
       // System Login
       { Integer.valueOf(CommandCodes.SYS_A_LOGIN), SysALogin.class.getName() },
       { Integer.valueOf(CommandCodes.SYS_E_LOGIN), SysELogin.class.getName() },
@@ -269,7 +269,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
   }
 
 
-  /** 
+  /**
    * Translates an Command Code into corresponding Client Action Class Name (classes located in this package only)
    * @return name of the action class, (not fully qualified) String
    */
@@ -282,7 +282,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
     int index = Arrays.binarySearch(actionClassNames, Integer.valueOf(msgCode), codeComparator);
     if (index >= 0)
       actionClassName = (String) actionClassNames[index][1];
-    else if (msgCode >= 0) 
+    else if (msgCode >= 0)
       actionClassName = nullActionClassName;
     // errors should be negative
     else {

@@ -56,8 +56,8 @@ public class MultiProgressMonitor extends Object {
 
   private static JFrame progressFrame;
   private static JPanel mainPanel;
-  private static Object synchro = new Object();
-  private static Vector monitorsV = new Vector();
+  private static final Object synchro = new Object();
+  private static final ArrayList monitorsL = new ArrayList();
   private static int yPos = 0;
 
   private static int MAX_GUI_MONITORS = 500;
@@ -192,7 +192,7 @@ public class MultiProgressMonitor extends Object {
           contentPane.add(scrollPane, BorderLayout.CENTER);
         }
 
-        monitorsV.addElement(MultiProgressMonitor.this);
+        monitorsL.add(MultiProgressMonitor.this);
         updateTitle();
         mainPanel.add(this, new GridBagConstraints(0, yPos ++, 1, 1, 10, 0, 
           GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -217,8 +217,8 @@ public class MultiProgressMonitor extends Object {
         inFrame.addWindowListener(new WindowAdapter() {
           public void windowClosing(WindowEvent we) {
             synchronized (synchro) {
-              for (int i=monitorsV.size()-1; i>=0; i--) {
-                MultiProgressMonitor monitor = (MultiProgressMonitor) monitorsV.elementAt(i);
+              for (int i=monitorsL.size()-1; i>=0; i--) {
+                MultiProgressMonitor monitor = (MultiProgressMonitor) monitorsL.get(i);
                 monitor.cancel();
               }
             }
@@ -338,8 +338,8 @@ public class MultiProgressMonitor extends Object {
       timer.stop();
     }
     synchronized (synchro) {
-      if (removed = monitorsV.remove(this)) {
-        if (monitorsV.size() == 0) {
+      if (removed = monitorsL.remove(this)) {
+        if (monitorsL.size() == 0) {
           if (progressFrame != null) {
             toDispose = progressFrame;
             progressFrame = null;
@@ -378,7 +378,7 @@ public class MultiProgressMonitor extends Object {
   private void updateTitle() {
     JFrame frame = progressFrame;
     if (frame != null) {
-      int size = monitorsV.size();
+      int size = monitorsL.size();
       String titleStr = UIManager.getString("ProgressMonitor.progressText");
       if (size > 1) {
         frame.setTitle(size + ": " + titleStr);

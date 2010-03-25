@@ -66,6 +66,7 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
     if (trace != null) trace.exit(JActionFrameClosable.class);
   }
   public Action getCloseAction() {
+    if (actions == null) initActions();
     return actions[CLOSE_ACTION];
   }
 
@@ -159,13 +160,13 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
     // remove this frame from closable collection
     try {
       allClosableFrames.remove(this);
-    } catch (Throwable t) { }
+    } catch (Exception t) { }
 
     try {
       setVisible(false);
       // dispose window native resources
       dispose();
-    } catch (Throwable t) { }
+    } catch (Exception t) { }
     // if last Closable Frame closed and no MainFrame, exit
     if (allClosableFrames.size() == 0 && MainFrame.getSingleInstance() == null) {
       MainFrame.exitAction(null);
@@ -211,9 +212,8 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
    */
   public Action[] getActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrameClosable.class, "getActions()");
-    if (actions == null) {
+    if (actions == null)
       initActions();
-    }
     Action[] a = ActionUtilities.concatinate(super.getActions(), actions);
     if (trace != null) trace.exit(JActionFrameClosable.class, a);
     return a;

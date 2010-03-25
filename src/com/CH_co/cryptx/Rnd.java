@@ -13,6 +13,7 @@
 package com.CH_co.cryptx;
 
 import java.security.SecureRandom;
+import java.util.Random;
 
 import com.CH_co.trace.*;
 
@@ -34,37 +35,44 @@ import com.CH_co.trace.*;
  */
 public class Rnd extends Object {
 
-  static {
-    // initialize a secure random generator
-    Thread th = new ThreadTraced("Rnd Seeder") {
-      public void runTraced() {
-        getSecureRandom().nextInt();  // call for next will seed the generator (this can take a while)
-      }
-    };
-    th.setPriority(Thread.MIN_PRIORITY);
-    th.setDaemon(true);
-    th.start();
+  private static class SingletonHolder {
+    private static Random random;
+    static {
+      // initialize a secure random generator
+      Thread th = new ThreadTraced("Rnd Seeder") {
+        public void runTraced() {
+          random = new SecureRandom();
+        }
+      };
+      th.setDaemon(true);
+      th.start();
+    }
   }
 
-  /** Creates new Rnd */
-  public Rnd() {
+  /**
+   * Hide constructor, all methods are static.
+   */
+  private Rnd() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Rnd.class, "Rnd()");
     if (trace != null) trace.exit(Rnd.class);
   }
 
-
+  /**
+   * @return true if secure random finished initializing
+   */
+  public static boolean initSecureRandom() {
+    return SingletonHolder.random != null;
+  }
   /**
    * @return a Random generator.
    */
-  private static java.util.Random random;
-  public static java.util.Random getSecureRandom() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Rnd.class, "getSecureRandom()");
-    // Lazily create a random generator
-    if (random == null) {
-      random = new SecureRandom();
+  public static Random getSecureRandom() {
+    Random rnd = SingletonHolder.random;
+    if (rnd == null) {
+      while ((rnd = SingletonHolder.random) == null) {
+        try { Thread.sleep(10); } catch (Throwable t) { }
+      }
     }
-
-    if (trace != null) trace.exit(Rnd.class);
-    return random;
+    return rnd;
   }
 }

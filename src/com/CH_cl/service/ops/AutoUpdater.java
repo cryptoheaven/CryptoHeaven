@@ -12,10 +12,7 @@
 
 package com.CH_cl.service.ops;
 
-import java.io.*;
-import java.net.*;
-import java.sql.Timestamp;
-import java.util.*;
+import ch.cl.CryptoHeaven;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.sys.*;
@@ -27,6 +24,11 @@ import com.CH_co.service.msg.dataSets.sys.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+
+import java.io.*;
+import java.net.*;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -54,12 +56,11 @@ public class AutoUpdater extends ThreadTraced {
 
   private static String FILENAME__LICENSE_TXT = "License.txt";
   private static String FILENAME__ONEJAR_VERSION = ".version";
-  private static String[] originalStartupArgs;
 
-  private static Byte BOUNDRY_EOF = new Byte((byte) 0);
-  private static Byte BOUNDRY_HEADER = new Byte((byte) 1);
-  private static Byte BOUNDRY_DATA = new Byte((byte) 2);
-  private static Byte BOUNDRY_FREE = new Byte((byte) 3);
+  private static Byte BOUNDRY_EOF = Byte.valueOf((byte) 0);
+  private static Byte BOUNDRY_HEADER = Byte.valueOf((byte) 1);
+  private static Byte BOUNDRY_DATA = Byte.valueOf((byte) 2);
+  private static Byte BOUNDRY_FREE = Byte.valueOf((byte) 3);
 
   private ServerInterfaceLayer SIL;
   private AutoUpdateRecord[] updateRecs;
@@ -239,9 +240,11 @@ public class AutoUpdater extends ThreadTraced {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "readUpdateStruct(File updateFile)");
     if (trace != null) trace.args(updateFile);
     LinkedList updateStruct = null;
+    FileInputStream fIn = null;
+    DataInputStream dIn = null;
     try {
-      FileInputStream fIn = new FileInputStream(updateFile);
-      DataInputStream dIn = new DataInputStream(fIn);
+      fIn = new FileInputStream(updateFile);
+      dIn = new DataInputStream(fIn);
       int fileSize = dIn.readInt();
       if (updateFile.length() == fileSize) {
         int updateStructSize = dIn.readInt();
@@ -257,9 +260,11 @@ public class AutoUpdater extends ThreadTraced {
           updateStruct = (LinkedList) oIn.readObject();
         }
       }
-      fIn.close();
-    } catch (Throwable t) {
+    } catch (Exception t) {
       if (trace != null) trace.exception(AutoUpdater.class, 100, t);
+    } finally {
+      try { if (dIn != null) dIn.close(); } catch (Throwable t) { }
+      try { if (fIn != null) fIn.close(); } catch (Throwable t) { }
     }
     if (trace != null) trace.exit(AutoUpdater.class, updateStruct);
     return updateStruct;
@@ -577,10 +582,15 @@ public class AutoUpdater extends ThreadTraced {
     updateProps.createNewFile();
     Properties props = new Properties();
     props.put("updates", objToStr(map(updateRecs)));
-    FileOutputStream updatePropsOut = new FileOutputStream(updateProps);
-    props.store(updatePropsOut, "Update Properties");
-    updatePropsOut.flush();
-    updatePropsOut.close();
+    FileOutputStream updatePropsOut = null;
+    try {
+      updatePropsOut = new FileOutputStream(updateProps);
+      props.store(updatePropsOut, "Update Properties");
+      updatePropsOut.flush();
+    } finally {
+      if (updatePropsOut != null)
+        updatePropsOut.close();
+    }
     if (trace != null) trace.exit(AutoUpdater.class);
   }
 
@@ -659,12 +669,17 @@ public class AutoUpdater extends ThreadTraced {
       if (id.longValue() == -1) {
         File applyUpdates = new File(getMainDir(), "CryptoHeavenApplyUpdates.class");
         applyUpdates.createNewFile();
-        FileOutputStream fOut = new FileOutputStream(applyUpdates);
-        byte[] dataBytes = (byte[]) set[3];
-        dataBytes = Misc.decompressBytes(dataBytes);
-        fOut.write(dataBytes);
-        fOut.flush();
-        fOut.close();
+        FileOutputStream fOut = null;
+        try {
+          fOut = new FileOutputStream(applyUpdates);
+          byte[] dataBytes = (byte[]) set[3];
+          dataBytes = Misc.decompressBytes(dataBytes);
+          fOut.write(dataBytes);
+          fOut.flush();
+        } finally {
+          if (fOut != null)
+            fOut.close();
+        }
       }
     }
     if (trace != null) trace.exit(AutoUpdater.class);
@@ -733,14 +748,20 @@ public class AutoUpdater extends ThreadTraced {
     if (trace != null) trace.args(toFill);
     if (trace != null) trace.args(size);
     // make a blank file of specified size
-    FileOutputStream fout = new FileOutputStream(toFill);
-    BufferedOutputStream bout = new BufferedOutputStream(fout, 4*1024);
-    for (int i=0; i<size; i++) {
-      bout.write(0);
+    FileOutputStream fout = null;
+    BufferedOutputStream bout = null;
+    try {
+      fout = new FileOutputStream(toFill);
+      bout = new BufferedOutputStream(fout, 4*1024);
+      for (int i=0; i<size; i++) {
+        bout.write(0);
+      }
+      bout.flush();
+      fout.flush();
+    } finally {
+      if (bout != null) bout.close();
+      if (fout != null) fout.close();
     }
-    bout.flush();
-    fout.flush();
-    fout.close();
     if (trace != null) trace.exit(AutoUpdater.class);
   }
 
@@ -784,17 +805,9 @@ public class AutoUpdater extends ThreadTraced {
     return file;
   }
 
-  private static String[] getOriginalArgs() {
-    return originalStartupArgs;
-  }
-
-  public static void setOriginalArgs(String[] args) {
-    originalStartupArgs = args;
-  }
-
   private void setUpdateHook() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "setUpdateHook()");
-    String[] originalArgs = getOriginalArgs();
+    String[] originalArgs = CryptoHeaven.getOriginalArgs();
     if (originalArgs == null)
       originalArgs = new String[0];
 

@@ -212,7 +212,14 @@ public class MultiPartFormOutputStream {
     if(file.isDirectory()) {
       throw new IllegalArgumentException("File cannot be a directory.");
     }
-    writeFile(name, mimeType, file.getCanonicalPath(), new FileInputStream(file));
+    String path = file.getCanonicalPath();
+    InputStream is = null;
+    try {
+      is = new FileInputStream(file);
+      writeFile(name, mimeType, path, is);
+    } finally {
+      try { if (is != null) is.close(); } catch (IOException e) { }
+    }
   }
 
   /**
@@ -225,7 +232,7 @@ public class MultiPartFormOutputStream {
    * @param  is        the input stream
    * @throws  java.io.IOException  on input/output errors
    */
-  public void writeFile(String name, String mimeType, String fileName, InputStream is) throws java.io.IOException {
+  private void writeFile(String name, String mimeType, String fileName, InputStream is) throws java.io.IOException {
     if(is == null) {
       throw new IllegalArgumentException("Input stream cannot be null.");
     }
@@ -259,7 +266,6 @@ public class MultiPartFormOutputStream {
     }
     out.writeBytes(NEWLINE);
     out.flush();
-    is.close();
   }
 
   /**

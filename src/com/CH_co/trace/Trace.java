@@ -15,7 +15,8 @@ package com.CH_co.trace;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.io.*;
 
 import com.CH_co.io.*;
@@ -52,7 +53,7 @@ public class Trace extends Object {
   public static final int VERBOSE = 12;
 
   // Storage for Trace objects
-  private static Hashtable hashTable;
+  private static HashMap hashMap;
   private static boolean initialized;
   private static Trace dumpingTrace = new Trace();
   private static Thread lastThread;
@@ -124,7 +125,7 @@ public class Trace extends Object {
         System.out.println("Trace is Disabled");
     }
     if (initialized) {
-      hashTable = new Hashtable();
+      hashMap = new HashMap();
       if (outputFileSequenceNumber == 0) {
         outputFileSequenceNumber = Integer.parseInt(TraceProperties.getProperty("OutputFileInitialSeqNum", "1"));
         if (withConsoleDebugInfo)
@@ -173,10 +174,10 @@ public class Trace extends Object {
     }
     else {
       synchronized (staticMonitor) {
-        Trace threadTrace = (Trace) hashTable.get( Integer.valueOf(Thread.currentThread().hashCode()) );
+        Trace threadTrace = (Trace) hashMap.get( Integer.valueOf(Thread.currentThread().hashCode()) );
         if (threadTrace == null) {
           threadTrace = new Trace();
-          hashTable.put( Integer.valueOf(Thread.currentThread().hashCode()), threadTrace );
+          hashMap.put( Integer.valueOf(Thread.currentThread().hashCode()), threadTrace );
         }
         String str = className + " " + methodPrototype;
         threadTrace.addLine("|>" + str);
@@ -555,7 +556,7 @@ public class Trace extends Object {
         addLine("<-- Trace Cleared for thread " + threadName);
         if (lastThread == thisThread)
           lastThread = null;
-        Trace trace = (Trace) hashTable.remove( Integer.valueOf(thisThread.hashCode()) );
+        Trace trace = (Trace) hashMap.remove( Integer.valueOf(thisThread.hashCode()) );
         trace.stack.clear(); trace.stack = null;
         trace.stack2.clear(); trace.stack2 = null;
       }
@@ -642,14 +643,16 @@ public class Trace extends Object {
     return false;
   }
 
-  private static Hashtable nonDeamonThreadsHT = new Hashtable();
+  private static final HashSet nonDeamonThreadsHS = new HashSet();
   private static void printOutNonDeamonThreads() {
     try {
       String name = Thread.currentThread().getName();
       if (!name.startsWith("main") && !name.startsWith("AWT")) {
-        if (!Thread.currentThread().isDaemon() && !nonDeamonThreadsHT.contains(name)) {
-          System.out.println(name);
-          nonDeamonThreadsHT.put(name, name);
+        synchronized (nonDeamonThreadsHS) {
+          if (!Thread.currentThread().isDaemon() && !nonDeamonThreadsHS.contains(name)) {
+            System.out.println(name);
+            nonDeamonThreadsHS.add(name);
+          }
         }
       }
     } catch (Throwable t) {

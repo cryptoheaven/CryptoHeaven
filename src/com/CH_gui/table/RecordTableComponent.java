@@ -45,11 +45,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -76,7 +76,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private JLabel jDescriptionLabel;
   private JTextField jFilterField;
   private JButton jFilterGoButton;
-  private JButton jFilterClearButton;
   private JCheckBox jFilterMsgBodyCheck;
   private JButton jFilterCloseButton;
 
@@ -99,12 +98,14 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private Long lastFolderId;
 
   private CardLayout cardLayout;
+  private JPanel cardsPanel;
   private JComponent cards;
   private String emptyTemplateName;
   private String backTemplateName;
   private String categoryTemplateName;
 
   private JComponent mainTableComp;
+  private JComponent mainEntryComp;
   private JComponent mainPreviewComp;
   private JPanel mainCardPanel;
 
@@ -165,15 +166,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         jFilterField.requestFocus();
       }
     });
-    jFilterClearButton = null;
-//    jFilterClearButton = new JMyButton("Clear");
-//    jFilterClearButton.addActionListener(new ActionListener() {
-//      public void actionPerformed(ActionEvent event) {
-//        setFilterNarrowing(null, jFilterMsgBodyCheck.isSelected());
-//        jFilterField.setText("");
-//        jFilterField.requestFocus();
-//      }
-//    });
     jFilterMsgBodyCheck = new JMyCheckBox();
     jFilterMsgBodyCheck.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
     jFilterMsgBodyCheck.setOpaque(true);
@@ -216,10 +208,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 3), 0, 0));
     jFilterPanel.add(jFilterGoButton, new GridBagConstraints(2, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
-    if (jFilterClearButton != null) {
-      jFilterPanel.add(jFilterClearButton, new GridBagConstraints(3, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
-    }
     jFilterPanel.add(jFilterMsgBodyCheck, new GridBagConstraints(4, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jFilterPanel.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0,
@@ -343,6 +331,20 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 //    this.jDescriptionPanel.revalidate();
 //  }
   //public void setDescriptionParticipants(String prefix, String postfix, Folder)
+  public void addEntryComponent(JSplitPane splitPane, JComponent entryComponent) {
+    mainEntryComp = entryComponent;
+
+    cards.setBorder(new EmptyBorder(0,0,0,0));
+    mainEntryComp.setBorder(new EmptyBorder(0,0,0,0));
+
+    // clear old content with no split pane to make room for new
+    cardsPanel.removeAll();
+
+    splitPane.setTopComponent(cards);
+    splitPane.setBottomComponent(mainEntryComp);
+
+    cardsPanel.add(BorderLayout.CENTER, splitPane);
+  }
   public void addPreviewComponent(JSplitPane splitPane, JComponent previewComponent) {
     mainPreviewComp = previewComponent;
 
@@ -495,11 +497,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       recordTableScrollPane.setOpaqueTable(false);
       mainTableComp = pane;
     }
-    //mainCardPanel.setLayout(new GridBagLayout());
     mainCardPanel = new JPanel();
     mainCardPanel.setLayout(new BorderLayout(0,0));
     mainCardPanel.add(BorderLayout.CENTER, mainTableComp);
-    //cards.add(mainTableComp, "table");
     cards.add(mainCardPanel, "table");
     JComponent emptyTemplate = Template.getTemplate(emptyTemplateName);
     if (emptyTemplate != null) {
@@ -534,7 +534,10 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 //      cards.add(pane, "template");
 //    }
     // add main table as 10'th element leaving room for addon components
-    add(cards, new GridBagConstraints(0, 10, 1, 1, 20, 20,
+    cardsPanel = new JPanel();
+    cardsPanel.setLayout(new BorderLayout(0,0));
+    cardsPanel.add(BorderLayout.CENTER, cards);
+    add(cardsPanel, new GridBagConstraints(0, 10, 1, 1, 20, 20,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     // Since we want initially to show the table, wait SHOW_DELAY seconds and if it doesn't fill,
     // show the template.
@@ -968,8 +971,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public Record[] getFolderParticipants(FolderRecord fRec) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long ownerUserId = fRec.ownerUserId;
-    Vector participantsV = new Vector();
-    participantsV.addElement(MsgPanelUtils.convertUserIdToFamiliarUser(ownerUserId, true, true));
+    ArrayList participantsL = new ArrayList();
+    participantsL.add(MsgPanelUtils.convertUserIdToFamiliarUser(ownerUserId, true, true));
     FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
     for (int i=0; i<allShares.length; i++) {
       FolderShareRecord share = allShares[i];
@@ -981,22 +984,22 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         else
           recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
         if (recipient != null)
-          participantsV.addElement(recipient);
+          participantsL.add(recipient);
         else {
           if (share.isOwnedByUser()) {
             UserRecord usrRec = new UserRecord();
             usrRec.userId = share.ownerUserId;
-            participantsV.addElement(usrRec);
+            participantsL.add(usrRec);
           } else {
             FolderRecord fldRec = new FolderRecord();
             fldRec.folderId = share.ownerUserId;
             fldRec.folderType = Short.valueOf(FolderRecord.GROUP_FOLDER);
-            participantsV.addElement(fldRec);
+            participantsL.add(fldRec);
           }
         }
       }
     }
-    Record[] participants = (Record[]) ArrayUtils.toArray(participantsV, Record.class);
+    Record[] participants = (Record[]) ArrayUtils.toArray(participantsL, Record.class);
     return participants;
   }
 

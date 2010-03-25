@@ -14,7 +14,6 @@ package com.CH_gui.table;
 
 import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;

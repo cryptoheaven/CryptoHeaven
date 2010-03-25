@@ -37,9 +37,9 @@ import com.CH_co.util.*;
  */
 public class PriorityComboBoxModel extends AbstractListModel implements ComboBoxModel {
 
-  Object currentValue;
-  ImageIcon images[];
-  Hashtable cache[];
+  private Object currentValue;
+  private ImageIcon images[];
+  private Hashtable cache[];
 
   public PriorityComboBoxModel() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityComboBoxModel.class, "PriorityComboBoxModel()");

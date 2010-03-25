@@ -17,11 +17,7 @@ import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -181,8 +177,8 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     if (trace != null) trace.args(folders);
     if (trace != null) trace.args(inOrder);
 
-    Vector toAddFolderPairsV = null;
-    Vector toRemoveFolderPairsV = null;
+    ArrayList toAddFolderPairsL = null;
+    ArrayList toRemoveFolderPairsL = null;
 
     // First remove the folders that are not wanted anymore from the ones for addition...
     // and gather the nodes that will be added.
@@ -192,8 +188,8 @@ public class FolderTreeModelCo extends DefaultTreeModel {
         if (fPair != null) {
           if (filter == null || (filter != null && filter.keep(fPair))) {
             if (inOrder) {
-              if (toAddFolderPairsV == null) toAddFolderPairsV = new Vector();
-              toAddFolderPairsV.addElement(fPair);
+              if (toAddFolderPairsL == null) toAddFolderPairsL = new ArrayList();
+              toAddFolderPairsL.add(fPair);
             } else {
               addNode(fPair, inOrder);
             }
@@ -201,8 +197,8 @@ public class FolderTreeModelCo extends DefaultTreeModel {
             // If folder is not to be kept, remove it, maybe it was changed it a way that its
             // no longer acceptable.
             if (inOrder) {
-              if (toRemoveFolderPairsV == null) toRemoveFolderPairsV = new Vector();
-              toRemoveFolderPairsV.addElement(fPair);
+              if (toRemoveFolderPairsL == null) toRemoveFolderPairsL = new ArrayList();
+              toRemoveFolderPairsL.add(fPair);
             } else {
               removeRecord(fPair.getFolderRecord(), true);
             }
@@ -213,16 +209,16 @@ public class FolderTreeModelCo extends DefaultTreeModel {
       // Order the list of additions and removals and do those operation in order to minimize
       // the GUI tree chaos (expansions and structural changes and jumping nodes)
       if (inOrder) {
-        orderedProcess_AddOrRemove(true, toAddFolderPairsV);
-        orderedProcess_AddOrRemove(false, toRemoveFolderPairsV);
+        orderedProcess_AddOrRemove(true, toAddFolderPairsL);
+        orderedProcess_AddOrRemove(false, toRemoveFolderPairsL);
       }
     }
 
     if (trace != null) trace.exit(FolderTreeModelCo.class);
   }
 
-  private void orderedProcess_AddOrRemove(boolean toAdd, Collection folderPairs) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCo.class, "orderedProcess_AddOrRemove(boolean toAdd, Collection folderPairs)");
+  private void orderedProcess_AddOrRemove(boolean toAdd, List folderPairs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCo.class, "orderedProcess_AddOrRemove(boolean toAdd, List folderPairs)");
     if (trace != null) trace.args(toAdd);
     if (trace != null) trace.args(folderPairs);
 
@@ -388,7 +384,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     FolderRecord newParentFolder = newParent.getFolderObject().getFolderRecord();
     Long newParentId = newParentFolder.getId();
 
-    Vector nodesToMove = new Vector();
+    ArrayList nodesToMove = new ArrayList();
 
     // gather nodes to be moved... (so we don't invalidate the Enumerateion
     int childCount = moveFromParent.getChildCount();
@@ -415,7 +411,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
               move = true;
           }
           if (move) {
-            nodesToMove.addElement(nextChild);
+            nodesToMove.add(nextChild);
           }
         }
       }
@@ -424,7 +420,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     // move the nodes
     int moveSize = nodesToMove.size();
     for (int i=0; i<moveSize; i++) {
-      FolderTreeNode node = (FolderTreeNode) nodesToMove.elementAt(i);
+      FolderTreeNode node = (FolderTreeNode) nodesToMove.get(i);
       if (!node.isNodeDescendant(newParent)) {
         removeNodeFromParent(node, false);
         int insertionIndex = newParent.getInsertionIndex(node.getFolderObject());
@@ -481,13 +477,13 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCo.class, "createFilteredModel(RecordFilter filter, FolderTreeModelCo newModel)");
     if (trace != null) trace.args(filter, newModel);
 
-    FolderTreeNode root = (FolderTreeNode) getRootNode();
+    FolderTreeNode rootNode = (FolderTreeNode) getRootNode();
 
     /* add chosen folderPairs */
-    FolderTreeNode newRoot = new FolderTreeNode(root.getFolderObject()); // <-- expect NULL FolderPair
+    FolderTreeNode newRoot = new FolderTreeNode(rootNode.getFolderObject()); // <-- expect NULL FolderPair
     newModel.setRoot(newRoot);
 
-    createFilteredModel_copyStructure(root, newRoot, newModel.folderNodesHM, filter != null, filter);
+    createFilteredModel_copyStructure(rootNode, newRoot, newModel.folderNodesHM, filter != null, filter);
 
     if (trace != null) trace.exit(FolderTreeModelCo.class, newModel);
     return newModel;
@@ -512,14 +508,13 @@ public class FolderTreeModelCo extends DefaultTreeModel {
   /**
    * @return a node that has the specified folderId/shareId.
    */
-  public FolderTreeNode findNode(Long id, boolean isFolderId) {
-    // TODO synchronize access to folderNodesHM
+  public synchronized FolderTreeNode findNode(Long id, boolean isFolderId) {
     FolderTreeNode node = (FolderTreeNode) folderNodesHM.get(id);
     // if node found, see if it is the up-to-date node of this tree
     if (node != null) {
-      TreeNode root = node.getRoot();
+      TreeNode rootNode = node.getRoot();
       TreeNode modelRoot = getRootNode();
-      if (root != modelRoot) {
+      if (rootNode != modelRoot) {
         // remove old node
         folderNodesHM.remove(id);
         // find it using the tree traversal method
@@ -537,13 +532,12 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     // Cache the new parent Id in child's view hierarchy so cache queries can find
     //children by view (case of parent not being availble when only child folder
     //is available through granted share)
-    if (parent != null && parent.getFolderObject() != null)
+    if (parent.getFolderObject() != null)
       newChild.getFolderObject().getFolderShareRecord().guiViewParentId = parent.getFolderObject().getId();
     super.insertNodeInto(newChild, parent, index);
   }
 
-  public void removeNodeFromParent(FolderTreeNode node, boolean removeChildrenFromHT) {
-    // TODO synchronize access to folderNodesHM
+  public synchronized void removeNodeFromParent(FolderTreeNode node, boolean removeChildrenFromHT) {
     folderNodesHM.remove(node.getFolderObject().getId());
     if (removeChildrenFromHT) {
       Enumeration enm = node.depthFirstEnumeration();
@@ -555,4 +549,10 @@ public class FolderTreeModelCo extends DefaultTreeModel {
     super.removeNodeFromParent(node);
   }
 
+  /**
+   * @return synchronization object for compound tree manipulations.
+   */
+  public Object getMonitor() {
+    return this;
+  }
 }

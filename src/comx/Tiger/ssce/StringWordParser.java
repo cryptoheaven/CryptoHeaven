@@ -225,7 +225,8 @@ public class StringWordParser implements WordParser {
     } else {
       String s = getWord();
       cursor += s.length();
-      cursor = findWordStart();
+      int nextWord = findWordStart();
+      cursor = nextWord;
       is1stWord = false;
       nWords++;
       subWordLength = -1;

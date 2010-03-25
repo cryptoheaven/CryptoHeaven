@@ -13,7 +13,7 @@
 package com.CH_co.service.msg.dataSets.obj;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.List;
 
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
@@ -59,10 +59,10 @@ public class Obj_IDList_Co extends ProtocolMsgDataSet {
     if (trace != null) trace.exit(Obj_IDList_Co.class);
   }
   /** Creates new Obj_IDList_Co */
-  public Obj_IDList_Co(Vector IDsV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "Obj_IDList_Co(Vector IDsV)");
-    if (trace != null) trace.args(IDsV);
-    this.IDs = (Long[]) ArrayUtils.toArray(IDsV, Long.class);
+  public Obj_IDList_Co(List IDsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "Obj_IDList_Co(List IDsL)");
+    if (trace != null) trace.args(IDsL);
+    this.IDs = (Long[]) ArrayUtils.toArray(IDsL, Long.class);
     if (trace != null) trace.exit(Obj_IDList_Co.class);
   }
 

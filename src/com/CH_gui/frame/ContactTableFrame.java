@@ -54,9 +54,10 @@ public class ContactTableFrame extends JActionFrameClosable {
     String oldShowS = GlobalProperties.getProperty(propertyName);
     boolean oldShow = oldShowS != null ? Boolean.valueOf(oldShowS).booleanValue() : false;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    UserRecord myUserRec = cache.getUserRecord();
+    //UserRecord myUserRec = cache.getUserRecord();
     RecordFilter filter = new MultiFilter(new RecordFilter[] { 
-      new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
+      //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
+      new ContactFilterCl(oldShow),
       new FolderFilter(FolderRecord.GROUP_FOLDER),
       new InvEmlFilter(true, false) }
     , MultiFilter.OR);

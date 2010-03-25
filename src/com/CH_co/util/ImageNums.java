@@ -545,20 +545,19 @@ public class ImageNums extends Object {
   public static final int EM_FLAG_RED;
   public static final int EM_FLAG_GREEN;
 
-
   public static final int NUMBER_OF_IMAGES;
 
-  public static String[] images;
-  public static final int[] emotions;
+  private static final String[] images;
+  private static final int[] emotions;
 
-  public static Vector unUsedIconNames = new Vector();
-  public static Vector usedIconNames = new Vector();
+  private static final HashSet unUsedIconNames = new HashSet();
+  private static final HashSet usedIconNames = new HashSet();
 
-  private static Hashtable imageCodesHT1 = new Hashtable();
-  private static Hashtable imageCodesHT2 = new Hashtable();
-  private static Hashtable imageCodesHT3 = new Hashtable();
-  private static Hashtable imageCodesHT4 = new Hashtable();
-  private static Hashtable imageCodesHT5 = new Hashtable();
+  private static final HashMap imageCodesHM1 = new HashMap();
+  private static final HashMap imageCodesHM2 = new HashMap();
+  private static final HashMap imageCodesHM3 = new HashMap();
+  private static final HashMap imageCodesHM4 = new HashMap();
+  private static final HashMap imageCodesHM5 = new HashMap();
 
   static {
     int i = 0;
@@ -1813,12 +1812,12 @@ public class ImageNums extends Object {
     NUMBER_OF_IMAGES = i;
 
     for (int k=0; k<NUMBER_OF_IMAGES; k++) {
-      unUsedIconNames.addElement(images[k]);
-      imageCodesHT1.put(images[k], Integer.valueOf(k));
-      imageCodesHT2.put(images[k]+".png", Integer.valueOf(k));
-      imageCodesHT3.put("images/"+images[k]+".png", Integer.valueOf(k));
-      imageCodesHT4.put(images[k]+".gif", Integer.valueOf(k));
-      imageCodesHT5.put("images/"+images[k]+".gif", Integer.valueOf(k));
+      unUsedIconNames.add(images[k]);
+      imageCodesHM1.put(images[k], Integer.valueOf(k));
+      imageCodesHM2.put(images[k]+".png", Integer.valueOf(k));
+      imageCodesHM3.put("images/"+images[k]+".png", Integer.valueOf(k));
+      imageCodesHM4.put(images[k]+".gif", Integer.valueOf(k));
+      imageCodesHM5.put("images/"+images[k]+".gif", Integer.valueOf(k));
     }
 
     emotions = new int[]
@@ -1834,15 +1833,44 @@ public class ImageNums extends Object {
   public static Integer getImageCode(String imageName) {
     Integer imageCode = null;
     if (imageCode == null)
-      imageCode = (Integer) ImageNums.imageCodesHT1.get(imageName);
+      imageCode = (Integer) ImageNums.imageCodesHM1.get(imageName);
     if (imageCode == null)
-      imageCode = (Integer) ImageNums.imageCodesHT2.get(imageName);
+      imageCode = (Integer) ImageNums.imageCodesHM2.get(imageName);
     if (imageCode == null)
-      imageCode = (Integer) ImageNums.imageCodesHT3.get(imageName);
+      imageCode = (Integer) ImageNums.imageCodesHM3.get(imageName);
     if (imageCode == null)
-      imageCode = (Integer) ImageNums.imageCodesHT4.get(imageName);
+      imageCode = (Integer) ImageNums.imageCodesHM4.get(imageName);
     if (imageCode == null)
-      imageCode = (Integer) ImageNums.imageCodesHT5.get(imageName);
+      imageCode = (Integer) ImageNums.imageCodesHM5.get(imageName);
     return imageCode;
   }
+
+  public static String getImageName(int imageCode) {
+    return images[imageCode];
+  }
+  public static ArrayList getImageNames() {
+    return new ArrayList(Arrays.asList(images));
+  }
+  public static int[] getEmoticonCodes() {
+    return emotions;
+  }
+
+  public static void setImageName(int imageCode, String name) {
+    images[imageCode] = name;
+  }
+
+  public static ArrayList getUnusedImageNames() {
+    synchronized (unUsedIconNames) {
+      return new ArrayList(unUsedIconNames);
+    }
+  }
+
+  public static void setUsedIcon(int imageCode) {
+    synchronized (unUsedIconNames) {
+      String imageName = images[imageCode];
+      if (unUsedIconNames.remove(imageName))
+        usedIconNames.add(imageName);
+    }
+  }
+
 }

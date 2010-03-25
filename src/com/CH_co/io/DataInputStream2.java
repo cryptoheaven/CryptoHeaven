@@ -127,7 +127,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return new Byte(readByte());
+      return Byte.valueOf(readByte());
   }
 
   public Character readCharByte() throws IOException {

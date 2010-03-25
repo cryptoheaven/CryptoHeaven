@@ -14,8 +14,6 @@ package com.CH_co.service.msg;
 
 import java.util.*;
 
-import com.CH_co.trace.Trace;
-
 /** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
@@ -59,9 +57,6 @@ public class Switch_StrInt_Comparator implements Comparator {
   }
 
   public int compare(Object o1, Object o2) {
-    //Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Switch_StrInt_Comparator.class, "compare(Object o1, Object o2)");
-    //if (trace != null) trace.args(o1, o2);
-
     int rc = 0;
     if (o2 instanceof String) {
       Object[] obj1 = (Object[]) o1;
@@ -87,8 +82,6 @@ public class Switch_StrInt_Comparator implements Comparator {
       else
         rc = ((Integer)obj1[intIndex]).compareTo((Integer) obj2[intIndex]);
     }
-
-    //if (trace != null) trace.exit(Switch_StrInt_Comparator.class, rc);
     return rc;
   }
 

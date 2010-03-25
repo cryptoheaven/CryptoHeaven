@@ -47,10 +47,10 @@ public class GlobalProperties extends Object {
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.1f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 2;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 510;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 512;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -186,6 +186,7 @@ public class GlobalProperties extends Object {
   // build 506 HTML cleanup to exclude <PRE></PRE> tags
   // build 508 Offline chat and participants list with status icon
   // build 510 Static code cleanups based on FindBugs reports, use of Number.valueOf() to conserve memory.
+  // build 512 Loading speed optimizations
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
@@ -210,18 +211,17 @@ public class GlobalProperties extends Object {
     // now load the saved properties possibly overwriting the default ones.
     String it = getPropertiesFullFileName();
     InputStream is = null;
+    boolean ok = false;
     try {
       is = new FileInputStream(it);
-    } catch (Exception e) {
-    }
-    //InputStream is = GlobalProperties.class.getResourceAsStream(it);
-    boolean ok = is != null;
-    if (ok) {
+      ok = is != null;
+      properties.load(is);
+    } catch (Exception x1) {
+      ok = false;
+    } finally {
       try {
-        properties.load(is);
-        is.close();
-      } catch (Exception x) {
-        ok = false;
+        if (is != null) is.close();
+      } catch (Exception x2) {
       }
     }
 

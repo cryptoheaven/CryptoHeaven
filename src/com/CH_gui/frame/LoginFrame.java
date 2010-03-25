@@ -235,6 +235,12 @@ public class LoginFrame extends JFrame {
       setVisible(true);
       toFront();
     }
+
+    // start initializing the GUIs
+    loginCoordinator.startPreloadingComponents_Threaded();
+
+    // Start initializing secure random, we'll need it for login
+    Rnd.initSecureRandom();
   }
 
 
@@ -272,21 +278,28 @@ public class LoginFrame extends JFrame {
     //password.setEditable(b);
     password.setEnabled(b);
     //retypePassword.setEditable(b);
-    retypePassword.setEnabled(b);
+    if (retypePassword != null)
+      retypePassword.setEnabled(b);
     //currentEmail.setEditable(b);
-    currentEmail.setEnabled(b);
+    if (currentEmail != null)
+      currentEmail.setEnabled(b);
     //accountCode.setEditable(b);
-    accountCode.setEnabled(b);
+    if (accountCode != null)
+      accountCode.setEnabled(b);
     //serverCombo.setEditable(b);
-    serverCombo.setEnabled(b);
+    if (serverCombo != null)
+      serverCombo.setEnabled(b);
     //proxyButton.setEnabled(b);
     okButton.setEnabled(b);
     cancelButton.setEnabled(b);
-    advancedButton.setEnabled(b);
+    if (advancedButton != null)
+      advancedButton.setEnabled(b);
     rememberUserName.setEnabled(b);
     switchModeButton.setEnabled(isNewAccountOptionEnabled && b);
-    licenseButton.setEnabled(b);
-    licenseCheck.setEnabled(b);
+    if (licenseButton != null)
+      licenseButton.setEnabled(b);
+    if (licenseCheck != null)
+      licenseCheck.setEnabled(b);
     invalidate();
     validate();
   }
@@ -363,6 +376,63 @@ public class LoginFrame extends JFrame {
     * Add "Retype password" amd "Enter email" fields plus labels
     */
   private void changeModeToNewAccount() {
+    if (passwordConditionLabel == null)
+      passwordConditionLabel = getPasswordHint();
+    if (reTypeLabel == null)
+      reTypeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password"));
+    if (retypePassword == null)
+      retypePassword = new JMyPasswordKeyboardField(com.CH_gui.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."));
+    if (currentEmailLabel == null)
+      currentEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Email_Address"));
+    if (currentEmail == null)
+      currentEmail = new JMyTextField(defaultSignupEmail);
+    if (advancedLabel == null)
+      advancedLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Advanced_Options"));
+    if (advancedButton == null) {
+      advancedButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Customize..."));
+      advancedButton.addActionListener(new AdvancedListener());
+    }
+    if (accountCodeLabel == null) {
+      try {
+        accountCodeLabel = new JMyLinkLikeLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code"), 0);
+        accountCodeLabel.addMouseListener(new MouseAdapter() {
+          public void mouseClicked(MouseEvent event) {
+            try {
+              BrowserLauncher.openURL(URLs.get(URLs.ACTIVATION_CODE_PAGE));
+            } catch (Throwable t) {
+            }
+          }
+        });
+      } catch (Throwable t) {
+        accountCodeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code"));
+      }
+    }
+    if (accountCode == null) {
+      accountCode = new JMyTextField();
+      accountCode.setText(URLs.get(URLs.ACTIVATION_CODE_DEFAULT));
+    }
+    if (expectedTime == null)
+      expectedTime = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately"));
+
+    if (licenseConditionLabel == null)
+      licenseConditionLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Please_read_and_indicate_your_acceptance_of_the_License_Agreement..."));
+    if (licenseButton == null) {
+      licenseButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Read_License_Agreement"));
+      licenseButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+          new LicenseDialog(LoginFrame.this);
+        }
+      });
+    }
+    if (licenseCheck == null) {
+      licenseCheck = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_I_Accept"), false);
+      licenseCheck.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+          // Always enable the ok Button, check for validity of input alter its pressed.
+          //okButton.setEnabled(isInputValid());
+        }
+      });
+    }
 
     isNewAccountDialog = true;
     setTitle(com.CH_gui.lang.Lang.rb.getString("title_Create_New_Account"));
@@ -464,9 +534,7 @@ public class LoginFrame extends JFrame {
         }
       }
     };
-    // change the priority of that thread to minimum
     t.setDaemon(true);
-    t.setPriority(Thread.MIN_PRIORITY);
     t.start();
   }
   private int estimateKeyGenerationTimeNow(int keyLength, int certainty) {
@@ -491,22 +559,25 @@ public class LoginFrame extends JFrame {
   /**
    * Private helper to fetch the server list as Vector of Strings.
    */
-  private Vector getServerList() {
+  private static ArrayList getServerList() {
     String serversStr = GlobalProperties.getProperty(PROPERTY_SERVER_LIST);
-    Vector v = new Vector();
+    ArrayList al = new ArrayList();
     StringTokenizer st = new StringTokenizer(serversStr);
     while (st.hasMoreTokens()) {
       String serverS = st.nextToken();
       Object[] server = Misc.parseHostAndPort(serverS);
       if (server != null) {
-        String str = server[0].toString();
-        // ommit port if regular (80)
-        if (((Integer) server[1]).intValue() != 80)
-          str += ":" + server[1].toString();
-        v.addElement(str);
+        al.add(getServerStr(server));
       }
     }
-    return v;
+    return al;
+  }
+  private static String getServerStr(Object[] server) {
+    String str = server[0].toString();
+    // ommit port if regular (80)
+    if (((Integer) server[1]).intValue() != 80)
+      str += ":" + server[1].toString();
+    return str;
   }
 
   private static String[] getUserList() {
@@ -648,38 +719,47 @@ public class LoginFrame extends JFrame {
    * @return currently selected server - the array that includes Server name as String and port number as Integer.
    */
   private Object[] getServer() {
-    return Misc.parseHostAndPort((String) serverCombo.getSelectedItem());
+    return Misc.parseHostAndPort(getServerStr());
   }
+  private String getServerStr() {
+    String serverStr = null;
+    if (serverCombo != null)
+      serverStr = (String) serverCombo.getSelectedItem();
+    else
+      serverStr = (String) getServerList().get(0);
+    return serverStr;
+  }
+
 
   /**
    * Put the new server list and proxy servers to Global Properties.
    */
   private void putServerListAndProxySettings() {
-    String selectedItem = (String) serverCombo.getSelectedItem();
-
-    Object[] server = Misc.parseHostAndPort((String) selectedItem);
+    Object[] server = getServer();
     if (server != null) {
-      StringBuffer serverList = new StringBuffer();
-      serverList.append(server[0].toString());
-      serverList.append(':');
-      serverList.append(server[1]);
-      serverList.append(' ');
+      String serverStr = getServerStr(server);
+      StringBuffer serverListSB = new StringBuffer();
+      serverListSB.append(server[0].toString());
+      serverListSB.append(':');
+      serverListSB.append(server[1]);
+      serverListSB.append(' ');
 
-      for (int i=0; i<serverCombo.getItemCount(); i++) {
+      ArrayList serverList = getServerList();
+      for (int i=0; i<serverList.size(); i++) {
         if (i>10)
           break;
-        String item = (String) serverCombo.getItemAt(i);
-        if (!item.equals(selectedItem)) {
+        String item = (String) serverList.get(i);
+        if (!item.equals(serverStr)) {
           server = Misc.parseHostAndPort(item);
           if (server != null) {
-            serverList.append(server[0].toString());
-            serverList.append(':');
-            serverList.append(server[1]);
-            serverList.append(' ');
+            serverListSB.append(server[0].toString());
+            serverListSB.append(':');
+            serverListSB.append(server[1]);
+            serverListSB.append(' ');
           }
         }
       }
-      GlobalProperties.setProperty(PROPERTY_SERVER_LIST, serverList.toString());
+      GlobalProperties.setProperty(PROPERTY_SERVER_LIST, serverListSB.toString());
 
       // Put the proxy config there too together with the server list.
       GlobalProperties.setProperty("ProxyUsed", proxyUsed.toString());
@@ -759,10 +839,7 @@ public class LoginFrame extends JFrame {
 //    });
 
     // new account stuff
-    passwordConditionLabel = getPasswordHint();
-    retypePassword = new JMyPasswordKeyboardField(com.CH_gui.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."));
     passwordLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password"));
-    reTypeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password"));
     recoveryLabel = new JMyLinkLikeLabel("Forgot your password?", -1);
     recoveryLabel.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent event) {
@@ -965,34 +1042,15 @@ public class LoginFrame extends JFrame {
       }
     });
 
-    licenseConditionLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Please_read_and_indicate_your_acceptance_of_the_License_Agreement..."));
-    licenseButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Read_License_Agreement"));
-    licenseButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-        new LicenseDialog(LoginFrame.this);
-      }
-    });
-    licenseCheck = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_I_Accept"), false);
-    licenseCheck.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-        // Always enable the ok Button, check for validity of input alter its pressed.
-        //okButton.setEnabled(isInputValid());
-      }
-    });
-
-
-    Vector serverList = getServerList();
+    ArrayList serverList = getServerList();
     for (int i=0; i<serverList.size(); i++) {
-      serverCombo.addItem(serverList.elementAt(i));
+      serverCombo.addItem(serverList.get(i));
     }
     initiateProxySettings();
 
 //    newEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
 //    newEmail = new JMyTextComboBox("", new String[] { "@"+URLs.get(URLs.DOMAIN_MAIL) });
 //    newEmail.setEditable(true);
-
-    currentEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Email_Address"));
-    currentEmail = new JMyTextField(defaultSignupEmail);
 
     String rememberStr = com.CH_gui.lang.Lang.rb.getString("check_Remember_my_Username_on_this_computer.");
     rememberUserName = new JMyCheckBox(rememberStr, defaultRememberUserName);
@@ -1012,27 +1070,6 @@ public class LoginFrame extends JFrame {
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 5), 0, 0));
     rememberUserNamePanel.add(versionLabel, new GridBagConstraints(2, 1, 1, 1, 0, 0,
         GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 0), 0, 0));
-
-    advancedLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Advanced_Options"));
-    advancedButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Customize..."));
-    advancedButton.addActionListener(new AdvancedListener());
-    try {
-      accountCodeLabel = new JMyLinkLikeLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code"), 0);
-      accountCodeLabel.addMouseListener(new MouseAdapter() {
-        public void mouseClicked(MouseEvent event) {
-          try {
-            BrowserLauncher.openURL(URLs.get(URLs.ACTIVATION_CODE_PAGE));
-          } catch (Throwable t) {
-          }
-        }
-      });
-    } catch (Throwable t) {
-      accountCodeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code"));
-    }
-    accountCode = new JMyTextField();
-    accountCode.setText(URLs.get(URLs.ACTIVATION_CODE_DEFAULT));
-    expectedTime = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately"));
-
 
     userName.selectAll();
 
@@ -1163,7 +1200,7 @@ public class LoginFrame extends JFrame {
         if (isNewAccountDialog && isPasswordValid(pass1) || !isNewAccountDialog) {
           if (!isNewAccountDialog || isPasswordValid(pass2 = retypePassword.getPassword())) {
             if (!isNewAccountDialog || currentEmail.getText().trim().length() == 0 || EmailRecord.isEmailFormatValid(currentEmail.getText().trim())) {
-              String serverS = serverCombo.getSelectedItem().toString();
+              String serverS = getServerStr();
               if (Misc.parseHostAndPort(serverS) != null) {
                 if (!isNewAccountDialog || licenseCheck.isSelected()) {
                   errorMsg = null;
@@ -1600,7 +1637,7 @@ public class LoginFrame extends JFrame {
    */
   public static int estimateGenerationTime(int keyLength, int certainty) {
     // make sure the secure random is initialized
-    Rnd.getSecureRandom().nextInt();
+    Rnd.initSecureRandom();
     try {
       // rest for 1 second so that things have a change to seattle down
       Thread.sleep(1000);

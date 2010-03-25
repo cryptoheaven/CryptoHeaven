@@ -61,12 +61,13 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   private EventListenerList recordSelectionListenerList = new EventListenerList();
   private SortListener sortListener;
   private RecordListSelectionListener recordListSelectionListener;
-  private SelectionUpdater selectionUpdater;
+  private Thread selectionUpdater;
 
   // larger component of which this scroll pane in an integral part of
   private JComponent areaComponent;
 
   private Thread silentValidator;
+  private boolean isDisposed = false;
 
   /** Creates new RecordTableScrollPane */
   public RecordTableScrollPane(RecordTableModel recordTableModel) {
@@ -82,7 +83,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     TableSorter tableSorter = null;
     try {
       tableSorter = (TableSorter) tableSorterClass.newInstance();
-    } catch (Throwable t) {
+    } catch (Exception t) {
       if (trace != null) trace.exception(RecordTableScrollPane.class, 100, t);
       throw new IllegalArgumentException(t.getMessage());
     }
@@ -115,7 +116,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
     // Create a silent view updater that will try to re-fetch data after connection re-establishment or other
     // synchronizing events
-    this.silentValidator = new SilentValidator(this);
+    this.silentValidator = new SilentValidator();
     this.silentValidator.setDaemon(true);
     this.silentValidator.start();
 
@@ -161,7 +162,6 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
     selectionUpdater = new SelectionUpdater();
     selectionUpdater.setDaemon(true);
-    selectionUpdater.setPriority(Thread.MIN_PRIORITY);
     selectionUpdater.start();
 
     setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -406,7 +406,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
 
 
-  public class SelectionUpdater extends ThreadTraced {
+  private class SelectionUpdater extends ThreadTraced {
     private Record lastNotifyRecord;
     public SelectionUpdater() {
       super("Selection Updater");
@@ -415,13 +415,10 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       while (true) {
         try {
           Thread.sleep(1000);
+          if (isDisposed || isInterrupted()) break;
+          doWork();
         } catch (InterruptedException e) {
           break;
-        }
-        if (isInterrupted())
-          break;
-        try {
-          doWork();
         } catch (Throwable t) {
         }
       }
@@ -449,29 +446,23 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   /**
    * Worker that checks in the background for possible invalidated GUI that require refresh
    */
-  private static class SilentValidator extends ThreadTraced {
-    RecordTableScrollPane recordTableToValidate = null;
-    private SilentValidator(RecordTableScrollPane recordTable) {
+  private class SilentValidator extends ThreadTraced {
+    private SilentValidator() {
       super("Silent Validator");
-      recordTableToValidate = recordTable;
     }
     public void runTraced() {
       while (true) {
         try {
           Thread.sleep(1000 + new java.util.Random().nextInt(1000)); // 1 + 1 seconds random delay
+          if (isDisposed || isInterrupted()) break;
+          doWork();
         } catch (InterruptedException e) {
           break;
         } catch (Throwable t) {
         }
-        if (Thread.currentThread().isInterrupted())
-          break;
-        try {
-          doWork();
-        } catch (Throwable t) {
-        }
       }
     }
-    private static RecordTableComponent getParentRecordTableComponent(Component c) {
+    private RecordTableComponent getParentRecordTableComponent(Component c) {
       RecordTableComponent recordTableComponent = null;
       Container cont = c.getParent();
       if (cont != null) {
@@ -490,14 +481,14 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     private void doWork() {
       // only do this if GUI is actually showing
       boolean isShowing = false;
-      if (recordTableToValidate.isShowing()) {
+      if (isShowing()) {
         isShowing = true;
       } else {
-        RecordTableComponent recordTableComponent = getParentRecordTableComponent(recordTableToValidate);
+        RecordTableComponent recordTableComponent = getParentRecordTableComponent(RecordTableScrollPane.this);
         isShowing = recordTableComponent != null && recordTableComponent.isShowing();
       }
       if (isShowing) {
-        FolderPair folderPair = recordTableToValidate.recordTableModel.getParentFolderPair();
+        FolderPair folderPair = recordTableModel.getParentFolderPair();
         FolderRecord folder = folderPair != null ? folderPair.getFolderRecord() : null;
         Long folderId = folder != null ? folder.folderId : null;
         boolean viewInvalidated = FolderRecUtil.wasFolderViewInvalidated(folderId);
@@ -514,8 +505,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
               Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
               int messageMode = MsgTableModel.MODE_MSG; // default value in case this is a Recycle table
-              if (recordTableToValidate.recordTableModel instanceof MsgTableModel) {
-                messageMode = ((MsgTableModel) recordTableToValidate.recordTableModel).getMode();
+              if (recordTableModel instanceof MsgTableModel) {
+                messageMode = ((MsgTableModel) recordTableModel).getMode();
               }
               int action = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
               SIL.submitAndReturn(new MessageAction(action, request));
@@ -548,7 +539,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     try {
       // Restore headers.
       recordTableModel.updateHeaderDataFromTo(visuals, jSTable);
-    } catch (Throwable t) {
+    } catch (Exception t) {
       if (trace != null) trace.exception(RecordTableScrollPane.class, 100, t);
     }
 
@@ -590,6 +581,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
    * Dispose the object and release resources to help in garbage collection.
    */
   public void disposeObj() {
+    isDisposed = true;
     if (silentValidator != null) {
       try { silentValidator.interrupt(); } catch (Throwable t) { }
       silentValidator = null;

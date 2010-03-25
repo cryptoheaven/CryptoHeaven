@@ -18,6 +18,7 @@ import javax.swing.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
@@ -48,6 +49,10 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
   private static int interval = UserSettingsRecord.DEFAULT__AWAY_MINUTES*60*1000;
   private Timer timer;
   private long lastActiveTime;
+  private Boolean isEligibleToSendInactiveState;
+
+  private boolean isTimeToCheck;
+  private Timer timeToCheckHeartbeat;
 
   private static UserSettingsListener userSettingsListener;
 
@@ -66,29 +71,6 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
     return (instance);
   }
 
-  public void sendActiveFlagIfInactive() {
-    UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
-    if (uRec != null) {
-      if (ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE) {
-        Character onlineFlag = ContactRecord.onlineFlagToChar(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE);
-        // mark our local user record online so that we don't try sending another request if we are disconnected and interval passes
-        uRec.online = onlineFlag;
-        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_CHANGE_ONLINE_STATUS, new Obj_List_Co(onlineFlag)));
-      }
-    }
-  }
-
-  public void setActive(boolean flag) {
-    if (!isActive && flag) {
-      // Change state from inactive to active...
-      sendActiveFlagIfInactive();
-    }
-    isActive = flag;
-    if (isActive) {
-      lastActiveTime = System.currentTimeMillis();
-    }
-  }
-
   private InactivityEventQueue() {
     initialize();
   }
@@ -96,54 +78,115 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
   private void initialize() {
     if (interval != 0) {
       if (timer == null) {
-        isActive = false;
+        isActive = true;
         lastActiveTime = System.currentTimeMillis();
-        // Initialize it with 15 sec initial interval... Due to a bug in the timer which prevents
-        // proper action fireing if the interval is decreased and timer restarted... 
+        // Initialize it with 13 sec initial interval... Due to a bug in the timer which prevents
+        // proper action fireing if the interval is decreased and timer restarted...
         // The delay will be corrected after this initial interval expires and action event is fired.
-        //timer = new Timer(interval, this);
-        timer = new Timer(15*1000, this);
+        timer = new Timer(13*1000, this);
         timer.start();
       } else if (!timer.isRunning()) {
         timer.restart();
+      }
+      if (timeToCheckHeartbeat == null) {
+        // beats every 7 seconds and flips the flag for marking activity timestamp
+        timeToCheckHeartbeat = new Timer(7*1000, new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            isTimeToCheck = true;
+          }
+        });
+        timeToCheckHeartbeat.start();
+      } else if (!timeToCheckHeartbeat.isRunning()) {
+        timeToCheckHeartbeat.restart();
       }
     } else {
       if (timer != null) {
         timer.stop();
       }
+      if (timeToCheckHeartbeat != null) {
+        timeToCheckHeartbeat.stop();
+      }
     }
+  }
+
+
+  public void sendActiveFlagIfInactive() {
+    UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
+    if (uRec != null) {
+      ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+      if (SIL.hasPersistantMainWorker()) {
+        if (ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE) {
+          Character onlineFlag = ContactRecord.onlineFlagToChar(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE);
+          // mark our local user record online so that we don't try sending another request if we are disconnected and interval passes
+          uRec.online = onlineFlag;
+          SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_CHANGE_ONLINE_STATUS, new Obj_List_Co(onlineFlag)));
+        }
+      }
+    }
+  }
+
+  public void setActive(boolean flag) {
+    isEligibleToSendInactiveState = Boolean.TRUE;
+    isActive = flag;
+    if (isActive) {
+      // change to active contact if needed
+      sendActiveFlagIfInactive();
+      // mark last active time
+      lastActiveTime = System.currentTimeMillis();
+    } else {
+      // if disabled the flag then give chance to flip it back right away without waiting for secondary timer
+      isTimeToCheck = true;
+    }
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    if (isActive) {
+      // Set the flag and start the countdown
+      setActive(false);
+      // after setting the flag delay the remainder
+      setDelayToRemainder();
+    } else {
+      // set the delay to the full interval...
+      timer.setDelay(interval);
+      // skip turning off active state by other multiple client sessions that are sitting dormant.
+      if (isEligibleToSendInactiveState == null || isEligibleToSendInactiveState.equals(Boolean.TRUE)) {
+        // No new event made the application inActive after countdown expired...
+        // Change state from Active to Inactive
+        UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
+        if (uRec != null) {
+          if (ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE ||
+              ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE)
+          {
+            Character inactiveFlag = ContactRecord.onlineFlagToChar(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE);
+            // mark our local user record inactive so that we don't try sending another request if we are dicsonnected and interval passes
+            uRec.online = inactiveFlag;
+            MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_CHANGE_ONLINE_STATUS, new Obj_List_Co(inactiveFlag)));
+            isEligibleToSendInactiveState = Boolean.FALSE;
+          }
+        }
+      }
+    }
+  }
+
+  private void setDelayToRemainder() {
+    // Check the elapsed time since the last event
+    long currentTime = System.currentTimeMillis();
+    int elapsedTime = (int) (currentTime - lastActiveTime);
+    int delay = interval - elapsedTime;
+    // set additional delay to complete the interval
+    if (delay < 1)
+      delay = 1;
+    timer.setDelay(delay);
   }
 
   protected void dispatchEvent(AWTEvent event) {
     try {
       super.dispatchEvent(event);
-      switch (event.getID()) {
-        case MouseEvent.MOUSE_PRESSED :
-        case MouseEvent.MOUSE_RELEASED :
-        case MouseEvent.MOUSE_MOVED :
-        case MouseEvent.MOUSE_ENTERED :
-        case KeyEvent.KEY_PRESSED :
-        case KeyEvent.KEY_RELEASED :
-          setActive(true);
-          break;
-        case WindowEvent.WINDOW_DEICONIFIED :
-          setActive(true);
-          break;
-        case WindowEvent.WINDOW_ACTIVATED :
-          setActive(true);
-          break;
-        case WindowEvent.WINDOW_DEACTIVATED :
-          setActive(true);
-          break;
-  //      case WindowEvent.WINDOW_ICONIFIED : // chat popup window opens iconified window...
-  //        setActive(true);
-  //        break;
-        case FocusEvent.FOCUS_GAINED :
-          setActive(true);
-          break;
-        case FocusEvent.FOCUS_LOST :
-          setActive(true);
-          break;
+      if (isTimeToCheck) {
+        // turn off flag only if new activity was marked and timestamp updated
+        if (checkActivity(event)) {
+          isTimeToCheck = false;
+        }
       }
     } catch (OutOfMemoryError e) {
       e.printStackTrace();
@@ -159,39 +202,31 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
     }
   }
 
-  private void setDelayToRemainder() {
-    // Check the elapsed time since the last event
-    long currentTime = System.currentTimeMillis();
-    int elapsedTime = (int) (currentTime - lastActiveTime);
-    int delay = interval - elapsedTime;
-    // set additional delay to complete the interval
-    if (delay < 1)
-      delay = 1;
-    timer.setDelay(delay);
-  }
-  public void actionPerformed(ActionEvent e) {
-    if (isActive) {
-      setDelayToRemainder();
-      // Set the flag and start the countdown
-      isActive = false;
-    } else {
-      // set the delay to the full interval...
-      timer.setDelay(interval);
-      // No new event made the application inActive after countdown expired...
-      // Change state from Active to Inactive
-      UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
-      if (uRec != null) {
-        if (ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE ||
-            ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE
-            )
-        {
-          Character inactiveFlag = ContactRecord.onlineFlagToChar(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE);
-          // mark our local user record inactive so that we don't try sending another request if we are dicsonnected and interval passes
-          uRec.online = inactiveFlag;
-          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_CHANGE_ONLINE_STATUS, new Obj_List_Co(inactiveFlag)));
-        }
-      }
+  /**
+   * @param event
+   * @return true if activity was marked in this call
+   */
+  private boolean checkActivity(AWTEvent event) {
+    boolean isActivity = false;
+    switch (event.getID()) {
+      case MouseEvent.MOUSE_PRESSED :
+      case MouseEvent.MOUSE_RELEASED :
+      case MouseEvent.MOUSE_MOVED :
+      case MouseEvent.MOUSE_ENTERED :
+      case KeyEvent.KEY_PRESSED :
+      case KeyEvent.KEY_RELEASED :
+      case WindowEvent.WINDOW_DEICONIFIED :
+      case WindowEvent.WINDOW_ACTIVATED :
+      case WindowEvent.WINDOW_DEACTIVATED :
+      case FocusEvent.FOCUS_GAINED :
+      case FocusEvent.FOCUS_LOST :
+        setActive(true);
+        isActivity = true;
+        break;
+      // skip:
+      // case WindowEvent.WINDOW_ICONIFIED : // chat popup window opens iconified window without user intervention...
     }
+    return isActivity;
   }
 
   private static class UserSettingsListener extends Object implements UserSettingsRecordListener {

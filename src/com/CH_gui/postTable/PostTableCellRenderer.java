@@ -32,7 +32,7 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 
-/** 
+/**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
@@ -49,20 +49,19 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   //private static Color postingAltColorSelected = new Color(184, 194, 204);
   //private static Color[] altBkColors = new Color[] { postingAltColor, postingAltColorSelected };
 
-  // User is is the key, value is the Color object
-  private static Hashtable altBkUserAssignedColors;
-  private static Vector altBkUserColors;
+  // User is the key, value is the Color object
+  private static final HashMap altBkUserAssignedColors;
+  private static final ArrayList altBkUserColors;
   private static Color altMyBkColor;
-  private static FetchedDataCache cache;
   private static MessageDigest sha256;
   static {
-    altBkUserColors = new Vector();
-    altBkUserColors.addElement(new Color(230, 242, 255)); // old chat color
-    altBkUserColors.addElement(new Color(236, 251, 232));
-    altBkUserColors.addElement(new Color(253, 242, 230));
-    altBkUserColors.addElement(new Color(245, 243, 233));
+    altBkUserColors = new ArrayList();
+    altBkUserColors.add(new Color(230, 242, 255)); // old chat color
+    altBkUserColors.add(new Color(236, 251, 232));
+    altBkUserColors.add(new Color(253, 242, 230));
+    altBkUserColors.add(new Color(245, 243, 233));
 
-    altBkUserAssignedColors = new Hashtable();
+    altBkUserAssignedColors = new HashMap();
     altMyBkColor = new Color(247, 247, 247);
     sha256 = new SHA256();
 
@@ -114,15 +113,18 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   }
 
   private static Color getUserColor(Object colorKey) {
-    Color color = (Color) altBkUserAssignedColors.get(colorKey);
-    if (color == null) {
-      if (altBkUserAssignedColors.size() == altBkUserColors.size()) {
-        color = makeBkColor(colorKey);
-        altBkUserColors.addElement(color);
-      } else {
-        color = (Color) altBkUserColors.elementAt(altBkUserAssignedColors.size());
+    Color color = null;
+    synchronized (altBkUserAssignedColors) {
+      color = (Color) altBkUserAssignedColors.get(colorKey);
+      if (color == null) {
+        if (altBkUserAssignedColors.size() == altBkUserColors.size()) {
+          color = makeBkColor(colorKey);
+          altBkUserColors.add(color);
+        } else {
+          color = (Color) altBkUserColors.get(altBkUserAssignedColors.size());
+        }
+        altBkUserAssignedColors.put(colorKey, color);
       }
-      altBkUserAssignedColors.put(colorKey, color);
     }
     return color;
   }
@@ -145,8 +147,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
             Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
             if (rec instanceof MsgLinkRecord) {
               MsgLinkRecord msgLink = (MsgLinkRecord) rec;
-              if (cache == null)
-                cache = FetchedDataCache.getSingleInstance();
+              FetchedDataCache cache = FetchedDataCache.getSingleInstance();
               MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
               if (msgData != null) {
                 if (cache.getMyUserId().equals(msgData.senderUserId)) {

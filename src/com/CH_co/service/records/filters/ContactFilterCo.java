@@ -35,7 +35,7 @@ import com.CH_co.util.ArrayUtils;
 public class ContactFilterCo extends AbstractRecordFilter implements RecordFilter {
 
   // if not null, keeps only if folderId matches specified
-  protected Long keepFolderId;
+  private Long keepFolderId;
   // if not null, keeps only the status specified.
   private Short[] keepStatus;
   private Boolean keepOnlineStatuses;

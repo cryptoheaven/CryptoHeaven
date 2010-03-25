@@ -56,13 +56,13 @@ public class CleanupAgent extends Thread {
   private long delayMillisFileCleanerAccumulator;
 
 
-  public static void startSingleInstance(int mode, String[][] fileSpecs, int delayMinutesHeartbeat, 
+  public static void startSingleInstance(int mode, String[][] fileSpecs,
           int delayMinutesFinalizationFirst, int delayMinutesFinalizationNext,
           int delayMinutesGCFirst, int delayMinutesGCNext,
           int delayMinutesFileCleanerFirst, int delayMinutesFileCleanerNext) {
     synchronized (singleInstanceMonitor) {
       if (singleInstance == null) {
-        singleInstance = new CleanupAgent(mode, fileSpecs, delayMinutesHeartbeat, 
+        singleInstance = new CleanupAgent(mode, fileSpecs,
                 delayMinutesFinalizationFirst, delayMinutesFinalizationNext,
                 delayMinutesGCFirst, delayMinutesGCNext,
                 delayMinutesFileCleanerFirst, delayMinutesFileCleanerNext);
@@ -71,16 +71,24 @@ public class CleanupAgent extends Thread {
     }
   }
 
+  public static void stopSingleInstance() {
+    synchronized (singleInstanceMonitor) {
+      if (singleInstance != null) {
+        singleInstance.interrupt();
+      }
+    }
+  }
+
 
   /** Creates new CleanupAgent */
-  private CleanupAgent(int mode, String[][] fileSpecs, int delayMinutesHeartbeat, 
+  private CleanupAgent(int mode, String[][] fileSpecs,
           int delayMinutesFinalizationFirst, int delayMinutesFinalizationNext,
           int delayMinutesGCFirst, int delayMinutesGCNext,
           int delayMinutesFileCleanerFirst, int delayMinutesFileCleanerNext) {
     super("CleanupAgent");
     this.mode = mode;
     this.fileSpecs = fileSpecs;
-    this.delayMillisHeartbeat = delayMinutesHeartbeat * 60L * 1000L;
+    this.delayMillisHeartbeat = 3L * 1000L; // heartbeat every 3 seconds and check timers/conditions
     this.delayMillisFinalizationFirst = delayMinutesFinalizationFirst * 60L * 1000L;
     this.delayMillisFinalizationNext = delayMinutesFinalizationNext * 60L * 1000L;
     this.delayMillisGCFirst = delayMinutesGCFirst * 60L * 1000L;
@@ -97,7 +105,7 @@ public class CleanupAgent extends Thread {
 
 
   public void run() {
-    while (true) {
+    while (!isInterrupted()) {
       try {
         Thread.sleep(delayMillisHeartbeat);
         if ((mode & MODE_FINALIZATION) != 0)
@@ -106,7 +114,10 @@ public class CleanupAgent extends Thread {
           delayMillisGCAccumulator += delayMillisHeartbeat;
         if ((mode & MODE_TEMP_FILE_CLEANER) != 0)
           delayMillisFileCleanerAccumulator += delayMillisHeartbeat;
-      } catch (Throwable t) { }
+      } catch (InterruptedException e) {
+        break;
+      } catch (Throwable t) {
+      }
       if (delayMillisFinalizationAccumulator >= delayMillisFinalization && (mode & MODE_FINALIZATION) != 0) {
         delayMillisFinalizationAccumulator -= delayMillisFinalization;
         try {
@@ -162,6 +173,10 @@ public class CleanupAgent extends Thread {
         // next cycle will use NEXT delay
         delayMillisFileCleaner = delayMillisFileCleanerNext;
       }
+    }
+    // when thread exits, clean up the single instance so next one can be restarted
+    synchronized (singleInstanceMonitor) {
+      singleInstance = null;
     }
   } // end run()
 

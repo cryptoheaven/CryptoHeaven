@@ -44,11 +44,12 @@ import javax.sound.sampled.*;
 
 public class DecodingAudioClipPlayer {
 
-  private static Hashtable filesPlayingHT;
+  private static final class SingletonHolder {
+    private static final Hashtable filesPlayingHT = new Hashtable();
+  }
 
   public static void pauseSeek(Object fileOrURL, int millisecondPosition, Object controllingObj) {
-    if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
-    ClipControl player = (ClipControl) filesPlayingHT.get(fileOrURL);
+    ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(fileOrURL);
     if (player != null) {
       player.pauseSeek(millisecondPosition, controllingObj);
     }
@@ -61,8 +62,7 @@ public class DecodingAudioClipPlayer {
     play(fileOrURL, callback, 0);
   }
   public static synchronized void play(Object fileOrURL, CallbackI callback, int millisecondPosition) {
-    if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
-    ClipControl player = (ClipControl) filesPlayingHT.get(fileOrURL);
+    ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(fileOrURL);
     if (player == null) {
       playFile(fileOrURL, callback, millisecondPosition);
     } else {
@@ -71,32 +71,28 @@ public class DecodingAudioClipPlayer {
   }
 
   public static void pause(File file, CallbackI callback) {
-    if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
-    ClipControl player = (ClipControl) filesPlayingHT.get(file);
+    ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(file);
     if (player != null) {
       player.pause(callback);
     }
   }
 
   public static void seek(File file, double fractionalPosition) {
-    if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
-    ClipControl player = (ClipControl) filesPlayingHT.get(file);
+    ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(file);
     if (player != null) {
       player.seek(fractionalPosition);
     }
   }
 
   public static void seekPlayIfPaused(File file, int millisecondPosition, Object controllingObj) {
-    if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
-    ClipControl player = (ClipControl) filesPlayingHT.get(file);
+    ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(file);
     if (player != null) {
       player.seekPlayIfPaused(millisecondPosition, controllingObj);
     }
   }
 
   public static void close(File file) {
-    if (filesPlayingHT == null) filesPlayingHT = new Hashtable();
-    ClipControl player = (ClipControl) filesPlayingHT.get(file);
+    ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(file);
     if (player != null) {
       player.close();
     }
@@ -125,17 +121,17 @@ public class DecodingAudioClipPlayer {
           if (_clip.isOpen()) {
             if (!_clip.isRunning() && _clip.getMicrosecondPosition() == _clip.getMicrosecondLength()) {
               //_clip.close();
-              ClipControl player = (ClipControl) filesPlayingHT.get(fileOrURL);
+              ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(fileOrURL);
               player.close();
 //              if (player != null)
 //                player.notifyClose();
-//              filesPlayingHT.remove(fileOrURL);
+//              SingletonHolder.filesPlayingHT.remove(fileOrURL);
             } else if (!_clip.isRunning()) {
-              ClipControl player = (ClipControl) filesPlayingHT.get(fileOrURL);
+              ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(fileOrURL);
               if (player != null)
                 player.notifyPause();
             } else {
-              ClipControl player = (ClipControl) filesPlayingHT.get(fileOrURL);
+              ClipControl player = (ClipControl) SingletonHolder.filesPlayingHT.get(fileOrURL);
               if (player != null)
                 player.notifyPlay();
             }
@@ -151,7 +147,7 @@ public class DecodingAudioClipPlayer {
       // Create a thread to play back the data and start it running.  It will run
       // until all the data has been played back or stopPlayer() is called.
       ClipControl player = new ClipControl(fileOrURL, clip, callback);
-      filesPlayingHT.put(fileOrURL, player);
+      SingletonHolder.filesPlayingHT.put(fileOrURL, player);
       player.start();
       player.notifyPlay();
     } catch (Throwable e) {
@@ -175,7 +171,7 @@ public class DecodingAudioClipPlayer {
     }
     public synchronized void close() {
       notifyClose();
-      filesPlayingHT.remove(fileOrURL);
+      SingletonHolder.filesPlayingHT.remove(fileOrURL);
       clip.stop();
       clip.flush();
       clip.close();

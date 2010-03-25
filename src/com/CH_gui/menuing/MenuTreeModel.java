@@ -34,7 +34,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -42,7 +42,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.47 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MenuTreeModel extends Object {
 
@@ -55,20 +55,20 @@ public class MenuTreeModel extends Object {
    * Format of menu items:
    *    for all JMenuItem(s) where action id is +ve
    *      <menu item name>|<actionId>|<mnemonic>|<key code>|<modifiers>|
-   *    for Separator(s) where action id = 0 
+   *    for Separator(s) where action id = 0
    *      <menu item name>|<actionId>|
    *    for JMenu(s) where action id is -ve
    *      <menu item name>|<actionId>|<mnemonic>|
    *
    * Submenus are groupped with "(|" ... ")|"
    */
-  private static String EMPTY_MENU_SEQUENCE = 
+  private static String EMPTY_MENU_SEQUENCE =
     "Program Menus|-1|0|"+
       "(|"+
         // Main Frame
         "File|-10|"+KeyEvent.VK_F+"|"+
           "(|"+
-            // Message Table Starter Frame 
+            // Message Table Starter Frame
             "Switch to Full Application|1400|-1|-1|-1|"+
             // File Table
             "Open|716|"+KeyEvent.VK_O+"|"+KeyEvent.VK_O+"|"+Event.CTRL_MASK+"|"+
@@ -114,7 +114,7 @@ public class MenuTreeModel extends Object {
             "Exit|200|"+KeyEvent.VK_X+"|"+KeyEvent.VK_X+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
           ")|"+
         // Message Frame
-        "Message|-20|"+KeyEvent.VK_M+"|"+  
+        "Message|-20|"+KeyEvent.VK_M+"|"+
           "(|"+
             "New Message to Folder|700|"+KeyEvent.VK_M+"|"+KeyEvent.VK_M+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
             "New Message from Draft|718|-1|-1|-1|"+
@@ -132,7 +132,7 @@ public class MenuTreeModel extends Object {
             "Message Properties|704|-1|-1|-1|"+
           ")|"+
         // Compose Message Frame
-        "Chat|-22|"+KeyEvent.VK_C+"|"+  
+        "Chat|-22|"+KeyEvent.VK_C+"|"+
           "(|"+
             "Chat|508|"+KeyEvent.VK_H+"|"+KeyEvent.VK_H+"|"+Event.CTRL_MASK+"|"+
             "Send|750|"+KeyEvent.VK_S+"|"+KeyEvent.VK_S+"|"+Event.CTRL_MASK+"|"+
@@ -166,7 +166,7 @@ public class MenuTreeModel extends Object {
             "Show Other's Contacts|506|-1|-1|-1|"+
             "Contact Properties|504|-1|-1|-1|"+
           ")|"+
-        "Edit|-40|"+KeyEvent.VK_E+"|"+  
+        "Edit|-40|"+KeyEvent.VK_E+"|"+
           "(|"+
             "Mark as Seen|709|"+KeyEvent.VK_R+"|"+KeyEvent.VK_R+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
             "Mark as Unseen|710|"+KeyEvent.VK_U+"|"+KeyEvent.VK_U+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
@@ -273,7 +273,7 @@ public class MenuTreeModel extends Object {
         "Plugins|"+PLUGINS_ID+"|"+KeyEvent.VK_P+"|"+
       ")|";
 
-  private static String EMPTY_MENU_POPUP_SEQUENCE = 
+  private static String EMPTY_MENU_POPUP_SEQUENCE =
     "Program Menus|-1|0|"+
       "(|"+
         // Main Frame
@@ -328,12 +328,12 @@ public class MenuTreeModel extends Object {
             // >>> Message Menu - part a
           ")|"+
         // Message Frame
-        "Message|-20|-1|"+  
+        "Message|-20|-1|"+
           "(|"+
             //"Forward Message To ...|705|-1|-1|-1|"+
           ")|"+
         // Compose Message Frame
-        "Message|-22|-1|"+  
+        "Message|-22|-1|"+
           "(|"+
             "Send|750|-1|-1|-1|"+
             "Save as Draft|764|-1|-1|-1|"+
@@ -364,7 +364,7 @@ public class MenuTreeModel extends Object {
             "Accept / Decline Contact ...|501|-1|-1|-1|"+
             "Delete Contact ...|502|-1|-1|-1|"+
           ")|"+
-        "Edit|-40|-1|"+  
+        "Edit|-40|-1|"+
           "(|"+
             "Mark as Seen|709|-1|-1|-1|"+
             "Mark as Unseen|710|-1|-1|-1|"+
@@ -491,8 +491,10 @@ public class MenuTreeModel extends Object {
 
   private DefaultTreeModel treeModel;
   private DefaultTreeModel treeModelPopup;
-  private Hashtable treeModelHT;
-  private Hashtable treeModelPopupHT;
+  private HashMap treeModelHM;
+  private HashMap treeModelPopupHM;
+
+  private boolean isInitialized = false;
 
   /** Creates new MenuTreeModel */
   public MenuTreeModel() {
@@ -505,46 +507,54 @@ public class MenuTreeModel extends Object {
 
     this.menuPropertyName = menuPropertyName;
 
-    // First build the popup menu model, then overwrite hot keys with real menu tree model.
-    String menuSequencePopup = GlobalProperties.getProperty("PopupTreeModel."+menuPropertyName);
-    if (trace != null) trace.data(10, menuSequencePopup);
-    if (menuSequencePopup == null || menuSequencePopup.length() == 0)
-      menuSequencePopup = EMPTY_MENU_POPUP_SEQUENCE;
-    Object[] _treeModelPopup = buildMenuTreeModel(null, null, Arrays.asList(menuSequencePopup.split("[\\|]+")).iterator());
-    treeModelPopup = (DefaultTreeModel) _treeModelPopup[0];
-    treeModelPopupHT = (Hashtable) _treeModelPopup[1];
-
-    String menuSequence = GlobalProperties.getProperty("MenuTreeModel."+menuPropertyName);
-    if (trace != null) trace.data(20, menuSequence);
-    if (menuSequence == null || menuSequence.length() == 0)
-      menuSequence = EMPTY_MENU_SEQUENCE;
-    Object[] _treeModel = buildMenuTreeModel(null, null, Arrays.asList(menuSequence.split("[\\|]+")).iterator());
-    treeModel = (DefaultTreeModel) _treeModel[0];
-    treeModelHT = (Hashtable) _treeModel[1];
-
     /** GUI placeholder for this model. */
     jMenuBar = new JMenuBar();
 
     if (trace != null) trace.exit(MenuTreeModel.class);
   }
 
+  private void initialize() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "initialize()");
+    if (trace != null) trace.args(menuPropertyName);
+
+    if (!isInitialized) {
+      isInitialized = true;
+
+      // First build the popup menu model, then overwrite hot keys with real menu tree model.
+      String menuSequencePopup = GlobalProperties.getProperty("PopupTreeModel."+menuPropertyName);
+      if (trace != null) trace.data(10, menuSequencePopup);
+      if (menuSequencePopup == null || menuSequencePopup.length() == 0)
+        menuSequencePopup = EMPTY_MENU_POPUP_SEQUENCE;
+      Object[] _treeModelPopup = buildMenuTreeModel(null, null, Arrays.asList(menuSequencePopup.split("[\\|]+")).iterator());
+      treeModelPopup = (DefaultTreeModel) _treeModelPopup[0];
+      treeModelPopupHM = (HashMap) _treeModelPopup[1];
+
+      String menuSequence = GlobalProperties.getProperty("MenuTreeModel."+menuPropertyName);
+      if (trace != null) trace.data(20, menuSequence);
+      if (menuSequence == null || menuSequence.length() == 0)
+        menuSequence = EMPTY_MENU_SEQUENCE;
+      Object[] _treeModel = buildMenuTreeModel(null, null, Arrays.asList(menuSequence.split("[\\|]+")).iterator());
+      treeModel = (DefaultTreeModel) _treeModel[0];
+      treeModelHM = (HashMap) _treeModel[1];
+    }
+
+    if (trace != null) trace.exit(MenuTreeModel.class);
+  }
 
   /**
    * Wipes out entire model.
    */
   public synchronized void clear() {
-    clear(treeModel, treeModelHT);
-    clear(treeModelPopup, treeModelPopupHT);
-    treeModel = null;
-    treeModelPopup = null;
-    treeModelHT = null;
-    treeModelPopupHT = null;
+    if (isInitialized) {
+      clear(treeModel, treeModelHM);
+      clear(treeModelPopup, treeModelPopupHM);
+    }
     if (jMenuBar!= null) {
       MiscGui.removeAllComponentsAndListeners(jMenuBar);
       jMenuBar = null;
     }
   }
-  private static void clear(DefaultTreeModel treeModel, Hashtable treeModelHT) {
+  private static void clear(DefaultTreeModel treeModel, Map treeModelHM) {
     if (treeModel != null) {
       DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
       Enumeration e = root.depthFirstEnumeration();
@@ -559,12 +569,13 @@ public class MenuTreeModel extends Object {
         node.removeAllChildren();
       }
       root = null;
-      treeModelHT.clear();
+      treeModelHM.clear();
     }
   }
 
 
   public synchronized DefaultTreeModel getTreeModel() {
+    if (!isInitialized) initialize();
     return treeModel;
   }
 
@@ -576,25 +587,27 @@ public class MenuTreeModel extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "rebuildMenuBar(DefaultTreeModel treeModel)");
     if (trace != null) trace.args(treeModel);
 
+    if (!isInitialized) initialize();
+
     this.treeModel = treeModel;
-    treeModelHT.clear();
+    treeModelHM.clear();
     jMenuBar.removeAll();
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
     Enumeration e = root.depthFirstEnumeration();
 
-    Vector actionsV = new Vector();
-    // rebuild the Hashtable of nodes and hide the nodes so we can re-ad them...
+    ArrayList actionsL = new ArrayList();
+    // rebuild the HashMap of nodes and hide the nodes so we can re-ad them...
     while (e.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
       MenuActionItem menuActionItem = (MenuActionItem) node.getUserObject();
-      treeModelHT.put(menuActionItem.getActionId(), node);
+      treeModelHM.put(menuActionItem.getActionId(), node);
       menuActionItem.setShowing(false);
       if (menuActionItem.getAction() != null)
-        actionsV.addElement(menuActionItem.getAction());
+        actionsL.add(menuActionItem.getAction());
     }
-    if (actionsV.size() > 0) {
-      Action[] actions = new Action[actionsV.size()];
-      actionsV.toArray(actions);
+    if (actionsL.size() > 0) {
+      Action[] actions = new Action[actionsL.size()];
+      actionsL.toArray(actions);
       addActions(actions);
     }
 
@@ -611,6 +624,8 @@ public class MenuTreeModel extends Object {
     if (trace != null) trace.args(actionArray);
 
     if (actionArray != null && actionArray.length > 0) {
+      if (!isInitialized) initialize();
+
       boolean anyAdded = false;
       // Insert new actions into the tree -- and based on the position, to the menu too.
       for (int i=0; i<actionArray.length; i++) {
@@ -618,13 +633,13 @@ public class MenuTreeModel extends Object {
         // see if the action is to be included in the menu
         Boolean include = (Boolean) action.getValue(Actions.IN_MENU);
         if (include == null || include.equals(Boolean.TRUE)) {
-          addAction(action, treeModel, treeModelHT, true);
+          addAction(action, treeModel, treeModelHM, true);
           anyAdded = true;
         }
         // see if the action is to be included in the popups or regulated by IN_POPUP_SHOW_DEACTIVATED variable flag
         include = (Boolean) action.getValue(Actions.IN_POPUP);
         if (include == null || include.equals(Boolean.TRUE) || action.getValue(Actions.IN_POPUP_SHOW_DEACTIVATED) != null) {
-          addAction(action, treeModelPopup, treeModelPopupHT, false);
+          addAction(action, treeModelPopup, treeModelPopupHM, false);
           anyAdded = true;
         }
       }
@@ -636,11 +651,11 @@ public class MenuTreeModel extends Object {
     }
     if (trace != null) trace.exit(MenuTreeModel.class);
   }
-  private void addAction(Action action, DefaultTreeModel treeModel, Hashtable treeModelHT, boolean ensureVisibility) {
+  private void addAction(Action action, DefaultTreeModel treeModel, Map treeModelHM, boolean ensureVisibility) {
     Integer actionId = (Integer) action.getValue(Actions.ACTION_ID);
     // Attempt to find the node starting from the root.
     //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) treeModel.getRoot());
-    DefaultMutableTreeNode node = findNode(actionId, treeModelHT);
+    DefaultMutableTreeNode node = findNode(actionId, treeModelHM);
     MenuActionItem menuNode = null;
     if (node != null) {
       menuNode = (MenuActionItem) node.getUserObject();
@@ -658,7 +673,7 @@ public class MenuTreeModel extends Object {
             Integer parentMnemonic = (Integer) action.getValue(Actions.PARENT_MNEMONIC);
             if (parentMnemonic != null)
               parentItem.setMnemonic(parentMnemonic);
-            parentItem.updateGUIButtonName(true); 
+            parentItem.updateGUIButtonName(true);
             //jMenuBar.revalidate();
             //rebuildMenuBar(); // this is too much!
           }
@@ -667,12 +682,16 @@ public class MenuTreeModel extends Object {
     } else {
       // if no assigned node, throw it into 'Not Assigned' (-100,000)
       //node = findNode(Integer.valueOf(-100000), (DefaultMutableTreeNode) treeModel.getRoot());
-      node = findNode(Integer.valueOf(-100000), treeModelHT);
-      menuNode = new MenuActionItem(action);
-      DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(menuNode);
-      node.add(newNode);
-      treeModelHT.put(menuNode.getActionId(), newNode);
-      node = newNode;
+      node = findNode(Integer.valueOf(-100000), treeModelHM);
+      if (node != null) {
+        menuNode = new MenuActionItem(action);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(menuNode);
+        node.add(newNode);
+        treeModelHM.put(menuNode.getActionId(), newNode);
+        node = newNode;
+      } else {
+        System.out.println("Adding action but no parent node!  Action is "+action);
+      }
     }
     if (ensureVisibility) {
       ensureNodeIsVisible(node);
@@ -682,15 +701,15 @@ public class MenuTreeModel extends Object {
   /**
    * @return node from the tree carrying the specified actionId
    */
-  private static MenuActionItem findMenuActionItem(Integer actionId, Hashtable treeModelHT) {
+  private static MenuActionItem findMenuActionItem(Integer actionId, Map treeModelHM) {
     MenuActionItem item = null;
-    DefaultMutableTreeNode node = (DefaultMutableTreeNode) treeModelHT.get(actionId);
+    DefaultMutableTreeNode node = (DefaultMutableTreeNode) treeModelHM.get(actionId);
     if (node != null)
       item = (MenuActionItem) node.getUserObject();
     return item;
   }
-  private static DefaultMutableTreeNode findNode(Integer actionId, Hashtable treeModelHT) {
-    return (DefaultMutableTreeNode) treeModelHT.get(actionId);
+  private static DefaultMutableTreeNode findNode(Integer actionId, Map treeModelHM) {
+    return (DefaultMutableTreeNode) treeModelHM.get(actionId);
   }
 
 //  /**
@@ -716,7 +735,7 @@ public class MenuTreeModel extends Object {
 //    return foundNode;
 //  }
 
-  /** 
+  /**
    * Ensures that specified node is showing in the menu (because the action is available)
    * @return true if some node was made visible.
    */
@@ -790,7 +809,7 @@ public class MenuTreeModel extends Object {
         jMenuItem = (JMenuItem) insertionMenuItem.getGUIButton();
       currentMenu.insert(jMenuItem, visibleBefore);
     }
-    else 
+    else
       currentMenu.insertSeparator(visibleBefore);
 
     insertionMenuItem.setShowing(true);
@@ -899,13 +918,15 @@ public class MenuTreeModel extends Object {
     if (trace != null) trace.args(actionArray);
 
     if (actionArray != null && actionArray.length > 0) {
+      if (!isInitialized) initialize();
+
       // Remove existing action from the tree -- and based on their visible position(s), from the menu(s) too.
       for (int i=0; i<actionArray.length; i++) {
         Action action = actionArray[i];
         Integer actionId = (Integer) action.getValue(Actions.ACTION_ID);
         // Attempt to find the node starting from the root.
         //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) treeModel.getRoot());
-        DefaultMutableTreeNode node = findNode(actionId, treeModelHT);
+        DefaultMutableTreeNode node = findNode(actionId, treeModelHM);
         if (node != null) {
           ensureNodeIsInvisible(node);
         }
@@ -1001,7 +1022,7 @@ public class MenuTreeModel extends Object {
       int componentCount = 0;
       if (menuComponent instanceof JMenu)
         componentCount = ((JMenu) menuComponent).getItemCount();
-      else if (menuComponent instanceof JMenuBar) 
+      else if (menuComponent instanceof JMenuBar)
         componentCount = ((JMenuBar) menuComponent).getMenuCount();
       if (componentCount == 0) {
         // remove gui component from parent menu
@@ -1038,50 +1059,50 @@ public class MenuTreeModel extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "removeExtraSeparatorsFromMenu(DefaultMutableTreeNode node)");
     if (trace != null) trace.args(node);
 
-    Vector visibleNodesV = new Vector();
+    ArrayList visibleNodesL = new ArrayList();
     int childCount = node.getChildCount();
     for (int j=0; j<childCount; j++) {
       DefaultMutableTreeNode n = (DefaultMutableTreeNode) node.getChildAt(j);
       MenuActionItem menuNode = (MenuActionItem) n.getUserObject();
       if (menuNode.isShowing()) {
-        visibleNodesV.addElement(n);
+        visibleNodesL.add(n);
       }
     }
 
     // recursive bottom-up, because removing the deapest child can cause removing of parent path
-    for (int k=0; k<visibleNodesV.size(); k++) {
-      DefaultMutableTreeNode n = (DefaultMutableTreeNode) visibleNodesV.elementAt(k);
-      // make this recursive 
+    for (int k=0; k<visibleNodesL.size(); k++) {
+      DefaultMutableTreeNode n = (DefaultMutableTreeNode) visibleNodesL.get(k);
+      // make this recursive
       if (n.getChildCount() > 1) {
         removeExtraSeparatorsFromMenu(n);
       }
     }
 
-    // Reconstruct visibleNodesV because some objects might have become invisible in the above recursive call.
-    visibleNodesV = new Vector();
+    // Reconstruct visibleNodesL because some objects might have become invisible in the above recursive call.
+    visibleNodesL = new ArrayList();
     childCount = node.getChildCount();
     for (int x=0; x<childCount; x++) {
       DefaultMutableTreeNode n = (DefaultMutableTreeNode) node.getChildAt(x);
       MenuActionItem menuNode = (MenuActionItem) n.getUserObject();
       if (menuNode.isShowing()) {
-        visibleNodesV.addElement(n);
+        visibleNodesL.add(n);
       }
     }
 
     int i = 0;
-    while (i<visibleNodesV.size()) {
-      if (i >= 0 && i < visibleNodesV.size()) {
-        DefaultMutableTreeNode n = (DefaultMutableTreeNode) visibleNodesV.elementAt(i);
+    while (i<visibleNodesL.size()) {
+      if (i >= 0 && i < visibleNodesL.size()) {
+        DefaultMutableTreeNode n = (DefaultMutableTreeNode) visibleNodesL.get(i);
         MenuActionItem menuNode = (MenuActionItem) n.getUserObject();
         if (menuNode.isSeparator()) {
           if ((i == 0) || // leading seperator
-              (i == visibleNodesV.size()-1) || // trailing seperator
-              (i < visibleNodesV.size()-1 && ((MenuActionItem) ((DefaultMutableTreeNode) visibleNodesV.elementAt(i+1)).getUserObject()).isSeparator())) // if next is also a seperator (two seperators in a row)
+              (i == visibleNodesL.size()-1) || // trailing seperator
+              (i < visibleNodesL.size()-1 && ((MenuActionItem) ((DefaultMutableTreeNode) visibleNodesL.get(i+1)).getUserObject()).isSeparator())) // if next is also a seperator (two seperators in a row)
           {
             ensureNodeIsInvisible(n);
-            visibleNodesV.removeElementAt(i);
+            visibleNodesL.remove(i);
             continue;
-          } 
+          }
         }
       }
       i++;
@@ -1114,13 +1135,13 @@ public class MenuTreeModel extends Object {
     if (trace != null) trace.args(popupActions);
 
     JPopupMenu jPopup = null;
-
     if (popupActions != null && popupActions.length > 0) {
+      if (!isInitialized) initialize();
 
       // Create an identical tree model only with the specified leafs.
       Object[] _treeModelPopupCopy = copyTreeModel(treeModelPopup, popupActions, true);
       DefaultTreeModel treeModelPopupCopy = (DefaultTreeModel) _treeModelPopupCopy[0];
-      Hashtable treeModelPopupCopyHT = (Hashtable) _treeModelPopupCopy[1];
+      HashMap treeModelPopupCopyHM = (HashMap) _treeModelPopupCopy[1];
 
       // Cut down the branch levels that don't have any concrete Actions, just bunch of JMenu(s)
       slashAwayMenuLevels(treeModelPopupCopy);
@@ -1130,8 +1151,8 @@ public class MenuTreeModel extends Object {
 
       // create a gui reflection of the popup tree model
       jPopup = createPopupMenuFromModel(treeModelPopupCopy);
-      
-      // dissasemble the tree copy and hashtable
+
+      // dissasemble the tree copy and hashmap
       DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModelPopupCopy.getRoot();
       Enumeration enm = root.depthFirstEnumeration();
       while (enm.hasMoreElements()) {
@@ -1141,7 +1162,7 @@ public class MenuTreeModel extends Object {
         if (parent != null)
           parent.remove(node);
       }
-      treeModelPopupCopyHT.clear();
+      treeModelPopupCopyHM.clear();
     }
 
     if (trace != null) trace.exit(MenuTreeModel.class, jPopup);
@@ -1163,18 +1184,18 @@ public class MenuTreeModel extends Object {
     DefaultMutableTreeNode treeRoot = (DefaultMutableTreeNode) treeModel.getRoot();
     DefaultMutableTreeNode copiedRoot = copyNode(treeRoot);
     List keepActionList = Arrays.asList(keepActions);
-    Hashtable copiedTreeModelHT = new Hashtable();
-    copyTreeNodes(copiedRoot, copiedTreeModelHT, treeRoot, keepActionList, forPopup);
+    HashMap copiedTreeModelHM = new HashMap();
+    copyTreeNodes(copiedRoot, copiedTreeModelHM, treeRoot, keepActionList, forPopup);
     DefaultTreeModel copiedTreeModel = new DefaultTreeModel(copiedRoot);
 
-    Object[] rc = new Object[] { copiedTreeModel, copiedTreeModelHT };
+    Object[] rc = new Object[] { copiedTreeModel, copiedTreeModelHM };
     if (trace != null) trace.exit(MenuTreeModel.class, rc);
     return rc;
   }
-  private static void copyTreeNodes(DefaultMutableTreeNode newRoot, Hashtable newTreeModelHT, DefaultMutableTreeNode treeNode, List keepActionList, boolean forPopup) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "copyTreeNodes(DefaultMutableTreeNode newRoot, Hashtable newTreeModelHT, DefaultMutableTreeNode treeNode, List keepActionList, boolean forPopup)");
+  private static void copyTreeNodes(DefaultMutableTreeNode newRoot, Map newTreeModelHM, DefaultMutableTreeNode treeNode, List keepActionList, boolean forPopup) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "copyTreeNodes(DefaultMutableTreeNode newRoot, HashMap newTreeModelHM, DefaultMutableTreeNode treeNode, List keepActionList, boolean forPopup)");
     if (trace != null) trace.args(newRoot);
-    if (trace != null) trace.args(newTreeModelHT);
+    if (trace != null) trace.args(newTreeModelHM);
     if (trace != null) trace.args(treeNode);
     if (trace != null) trace.args(keepActionList);
     if (trace != null) trace.args(forPopup);
@@ -1211,19 +1232,19 @@ public class MenuTreeModel extends Object {
         if (!suppressAction) {
           if (separatorPending) {
             TreeNode[] nodePath = separatorNode.getPath();
-            addPathToRoot(nodePath, newRoot, newTreeModelHT);
+            addPathToRoot(nodePath, newRoot, newTreeModelHM);
             separatorPending = false;
             separatorNode = null;
           }
           TreeNode[] nodePath = node.getPath();
-          addPathToRoot(nodePath, newRoot, newTreeModelHT);
+          addPathToRoot(nodePath, newRoot, newTreeModelHM);
           separatorOk = true;
         }
       }
 
       // go next level down to copy next layer
       if (node.getChildCount() > 0) {
-        copyTreeNodes(newRoot, newTreeModelHT, node, keepActionList, forPopup);
+        copyTreeNodes(newRoot, newTreeModelHM, node, keepActionList, forPopup);
       }
     } // end while
 
@@ -1236,11 +1257,11 @@ public class MenuTreeModel extends Object {
     }
     return new DefaultMutableTreeNode(item);
   }
-  private static void addPathToRoot(TreeNode[] nodePath, DefaultMutableTreeNode rootNode, Hashtable treeModelHT) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "addPathToRoot(TreeNode[] nodePath, DefaultMutableTreeNode rootNode, Hashtable treeModelHT)");
+  private static void addPathToRoot(TreeNode[] nodePath, DefaultMutableTreeNode rootNode, Map treeModelHM) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "addPathToRoot(TreeNode[] nodePath, DefaultMutableTreeNode rootNode, Map treeModelHM)");
     if (trace != null) trace.args(nodePath);
     if (trace != null) trace.args(rootNode);
-    if (trace != null) trace.args(treeModelHT);
+    if (trace != null) trace.args(treeModelHM);
 
     DefaultMutableTreeNode currentNode = rootNode;
     for (int i=0; i<nodePath.length; i++) {
@@ -1251,13 +1272,13 @@ public class MenuTreeModel extends Object {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) nodePath[i];
         MenuActionItem menuActionItem = (MenuActionItem) node.getUserObject();
         Integer actionId = menuActionItem.getActionId();
-        DefaultMutableTreeNode n = findNode(actionId, treeModelHT);
+        DefaultMutableTreeNode n = findNode(actionId, treeModelHM);
         if (n != null && !menuActionItem.isSeparator())
           currentNode = n;
         else {
           DefaultMutableTreeNode newNode = copyNode(node);
           currentNode.add(newNode);
-          treeModelHT.put(actionId, newNode);
+          treeModelHM.put(actionId, newNode);
           currentNode = newNode;
         }
       }
@@ -1291,7 +1312,7 @@ public class MenuTreeModel extends Object {
           // For every child of mergedParentCandidate take its children and store them in a list.
           // Separate items when jumping accross to another branch.
           Enumeration firstLevelChildren = mergedParentCandidate.children();
-          LinkedList mergedChildren = new LinkedList();
+          ArrayList mergedChildren = new ArrayList();
           while (firstLevelChildren.hasMoreElements()) {
             DefaultMutableTreeNode firstLevelChild = (DefaultMutableTreeNode) firstLevelChildren.nextElement();
 
@@ -1308,7 +1329,7 @@ public class MenuTreeModel extends Object {
                 if (separatorOk) {
                   separatorPending = true;
                   separatorNode = secondLevelChildNode;
-                } 
+                }
               } else {
                 if (separatorPending) {
                   separatorPending = false;
@@ -1365,9 +1386,9 @@ public class MenuTreeModel extends Object {
     return allJMenusOrJSeparators;
   }
   private static void replaceButtonGroups(DefaultTreeModel treeModel) {
-    // Go through the tree and store all unique groups in a hashtable
+    // Go through the tree and store all unique groups in a hashmap
     // where a key is the old group and value is the new replacement group.
-    Hashtable ht = null;
+    HashMap groupsHM = null;
     Enumeration allNodes = ((DefaultMutableTreeNode) treeModel.getRoot()).depthFirstEnumeration();
     while (allNodes.hasMoreElements()) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) allNodes.nextElement();
@@ -1376,16 +1397,15 @@ public class MenuTreeModel extends Object {
       if (action != null) {
         ButtonGroup buttonGroup = (ButtonGroup) action.getValue(Actions.BUTTON_GROUP);
         if (buttonGroup != null) {
-          // laizly create a hashtable
-          if (ht == null)
-            ht = new Hashtable();
+          // laizly create lookup
+          if (groupsHM == null) groupsHM = new HashMap();
 
-          ButtonGroup newButtonGroup = (ButtonGroup) ht.get(buttonGroup);
+          ButtonGroup newButtonGroup = (ButtonGroup) groupsHM.get(buttonGroup);
 
           // if the first item with that group, create a replacement group
           if (newButtonGroup == null) {
             newButtonGroup = new ButtonGroup();
-            ht.put(buttonGroup, newButtonGroup);
+            groupsHM.put(buttonGroup, newButtonGroup);
           }
 
           // replace the old group with a new one
@@ -1394,8 +1414,8 @@ public class MenuTreeModel extends Object {
       }
     }
     // help garbage collector
-    if (ht != null)
-      ht.clear();
+    if (groupsHM != null)
+      groupsHM.clear();
   }
   private static JPopupMenu createPopupMenuFromModel(DefaultTreeModel copiedTreeModel) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "createPopupMenuFromModel(DefaultTreeModel copiedTreeModel)");
@@ -1500,15 +1520,15 @@ public class MenuTreeModel extends Object {
    * Creates a tree node structure from a string source.
    * @return newly created tree model.
    */
-  private static Object[] buildMenuTreeModel(DefaultMutableTreeNode parentNode, Hashtable parentHT, Iterator strs) {
+  private static Object[] buildMenuTreeModel(DefaultMutableTreeNode parentNode, Map parentHM, Iterator strs) {
     DefaultTreeModel newTreeModel = null;
-    Hashtable newTreeModelHT = null;
+    Map newTreeModelHT = null;
     DefaultMutableTreeNode prevNode = null;
 
-    if (parentHT != null)
-      newTreeModelHT = parentHT;
+    if (parentHM != null)
+      newTreeModelHT = parentHM;
     else
-      newTreeModelHT = new Hashtable();
+      newTreeModelHT = new HashMap();
 
     while (strs.hasNext()) {
       String nodeName = (String) strs.next();
@@ -1598,15 +1618,19 @@ public class MenuTreeModel extends Object {
 
 
   public synchronized void putMenuProperties() {
-    StringBuffer sb = new StringBuffer();
-    dissasambleMenuTreeModel((DefaultMutableTreeNode) treeModel.getRoot(), sb);
-    GlobalProperties.setProperty("MenuTreeModel."+menuPropertyName, sb.toString());
+    if (isInitialized) {
+      StringBuffer sb = new StringBuffer();
+      dissasambleMenuTreeModel((DefaultMutableTreeNode) treeModel.getRoot(), sb);
+      GlobalProperties.setProperty("MenuTreeModel."+menuPropertyName, sb.toString());
+    }
   }
 
   public synchronized void printMenus() {
-    StringBuffer strBuf = new StringBuffer();
-    dissasambleMenuTreeModel((DefaultMutableTreeNode) treeModel.getRoot(), strBuf);
-    System.out.println(strBuf.toString());
+    if (isInitialized) {
+      StringBuffer strBuf = new StringBuffer();
+      dissasambleMenuTreeModel((DefaultMutableTreeNode) treeModel.getRoot(), strBuf);
+      System.out.println(strBuf.toString());
+    }
   }
 
 }

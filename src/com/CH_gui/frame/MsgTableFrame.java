@@ -131,10 +131,8 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       if (msgPreviewMode) {
         if (initialData.length > 1) {
           if (objType == MsgDataRecord.OBJ_TYPE_MSG) {
-            //mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_msg", JSplitPane.VERTICAL_SPLIT, 0.33d);
             mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.4d);
           } else {
-            //mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_addr", JSplitPane.HORIZONTAL_SPLIT, 0.5d);
             mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
           }
           mainTableComponent.addPreviewComponent(mainSplitPane, msgPreviewPanel);
@@ -155,10 +153,8 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         }
       } else {
         if (objType == MsgDataRecord.OBJ_TYPE_MSG) {
-          //mainSplitPane = createSplitPane(getVisualsClassKeyName() + "_msg", JSplitPane.VERTICAL_SPLIT, 0.33d);
           mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.4d);
         } else {
-          //mainSplitPane = createSplitPane(getVisualsClassKeyName() + "_addr", JSplitPane.HORIZONTAL_SPLIT, 0.5d);
           mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
         }
         mainTableComponent.addPreviewComponent(mainSplitPane, msgPreviewPanel);
@@ -174,8 +170,9 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         MsgComposePanel msgComposePanel = new MsgComposePanel(folderPair, MsgDataRecord.OBJ_TYPE_MSG, true);
         if (mainTableComponent.getToolBarModel() != null)
           mainTableComponent.getToolBarModel().addComponentActions(msgComposePanel);
-        mainSplitPane = createSplitPane(mainTableComponent, msgComposePanel, "_chat", JSplitPane.VERTICAL_SPLIT, 0.90d);
-        mainComponent = mainSplitPane;
+        mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.90d);
+        mainTableComponent.addEntryComponent(mainSplitPane, msgComposePanel);
+        mainComponent = mainTableComponent;
       }
       // posting folder
       else {

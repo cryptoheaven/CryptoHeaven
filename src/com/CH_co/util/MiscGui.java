@@ -171,6 +171,9 @@ public class MiscGui extends Object {
   public static void suppressAllGUI() {
     guiSuppressed = true;
   }
+  public static void suppressAllGUI(boolean flag) {
+    guiSuppressed = flag;
+  }
   public static void suppressMsgDialogsGUI(boolean suppressMsgDialogs) {
     guiSuppressedMsgDialogs = suppressMsgDialogs;
   }

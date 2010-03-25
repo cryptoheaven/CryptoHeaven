@@ -282,8 +282,6 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       downloadCoordinatorCount ++;
       downloadCoordinatorCount %= Integer.MAX_VALUE-1;
 
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
       setDaemon(true);
 
       if (trace != null) trace.exit(DownloadCoordinator.class);
@@ -470,8 +468,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
           break;
         } else {
           try {
-            _folderIDsBeingFetched.wait();
+            _folderIDsBeingFetched.wait(1000);
           } catch (InterruptedException e) {
+            break;
           }
         }
       }
@@ -529,8 +528,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
           break;
         } else {
           try {
-            _folderIDsBeingFetched.wait();
+            _folderIDsBeingFetched.wait(1000);
           } catch (InterruptedException e) {
+            break;
           }
         }
       }
@@ -651,8 +651,6 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       downloadRunnerCount ++;
       downloadRunnerCount %= Integer.MAX_VALUE-1;
 
-      // change the priority of this thread to minimum
-      setPriority(MIN_PRIORITY);
       setDaemon(true);
 
       if (trace != null) trace.exit(DownloadFileRunner.class);

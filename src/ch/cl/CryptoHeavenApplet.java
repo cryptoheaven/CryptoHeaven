@@ -39,8 +39,7 @@ import javax.swing.border.EmptyBorder;
  */
 public class CryptoHeavenApplet extends JApplet implements DisposableObj {
 
-  private static CryptoHeavenApplet applet;
-  private CryptoHeaven ch;
+  private CryptoHeavenApplet applet;
   private JLabel jTitle;
 
   private String strLoaded = "CryptoHeaven Web Edition loaded";
@@ -68,22 +67,15 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj {
     jTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
     getContentPane().add(jTitle);
     setApplet(this);
-  }
-
-  public void start() {
-    setApplet(this);
-    if (ch == null) {
-      ch = new CryptoHeaven();
-      // pass on the program arguments
-      String[] args = null;
-      String argsParam = getParameter("args");
-      if (argsParam != null && argsParam.length() > 0) {
-        args = argsParam.split("[ ]+");
-        // make sure there is no leading delimited blanks
-        args = (String[]) ArrayUtils.removeLeadingElements(args, "");
-      }
-      CryptoHeaven.main(args);
+    // pass on the program arguments
+    String[] args = null;
+    String argsParam = getParameter("args");
+    if (argsParam != null && argsParam.length() > 0) {
+      args = argsParam.split("[ ]+");
+      // make sure there is no leading delimited blanks
+      args = (String[]) ArrayUtils.removeLeadingElements(args, "");
     }
+    CryptoHeaven.main(args);
   }
 
   public void destroy() {
@@ -92,13 +84,13 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj {
   }
 
   private void setApplet(CryptoHeavenApplet app) {
-    CryptoHeavenApplet.applet = app;
+    applet = app;
     Misc.setSystemExitObj(app);
     BrowserLauncher.setAppletContext(app != null ? app.getAppletContext() : null);
   }
 
   /**
-   * Method of DisposableObj interface used to exit the applet and release resourced.
+   * Method of DisposableObj interface used to exit the applet and release resources.
    */
   public void disposeObj() {
     if (applet != null) {
@@ -113,7 +105,6 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj {
         applet.destroy();
       } catch (Throwable t) {
       }
-      applet = null;
     }
   }
 

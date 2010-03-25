@@ -67,7 +67,7 @@ public class SysAGetAutoUpdate extends ClientMessageAction {
           if (myUser != null && myUser.flags != null &&
               !Misc.isBitSet(myUser.flags, UserRecord.FLAG_DISABLE_AUTO_UPDATES) &&
               AutoUpdater.isRunningFromJar()) {
-            new AutoUpdater(getServerInterfaceLayer(), set != null ? set.updateRecords : null).start();
+            new AutoUpdater(getServerInterfaceLayer(), set.updateRecords).start();
           } else {
             String lastStamp = GlobalProperties.getProperty(PROPERTY_SOFTWARE_UPDATE_MSG_STAMP_MILLIS, "0");
             long now = new Date().getTime();

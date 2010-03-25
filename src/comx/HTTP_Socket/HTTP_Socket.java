@@ -421,7 +421,7 @@ public class HTTP_Socket extends Socket {
           // slow down streams if there is a backlog
           synchronized (recvFifo) {
             while (!closed && !closing && recvFifo.isAvailable(3))
-              try { recvFifo.wait(); } catch (InterruptedException e) { }
+              try { recvFifo.wait(1000); } catch (InterruptedException e) { }
           } // end synchronized slow down
           DataSet sendDS = null;
           synchronized (sendFifo) {
@@ -537,7 +537,7 @@ public class HTTP_Socket extends Socket {
           // slow down streams if there is a backlog
           synchronized (recvFifo) {
             while (!closed && !closing && recvFifo.isAvailable(3))
-              try { recvFifo.wait(); } catch (InterruptedException e) { }
+              try { recvFifo.wait(1000); } catch (InterruptedException e) { }
           } // end synchronized slow down
           try {
             if (socket != null) {
@@ -604,7 +604,7 @@ public class HTTP_Socket extends Socket {
           synchronized (recvFifo) {
             while (!closed && !closing && recvFifo.isAvailable(3)) {
               if (trace != null) trace.data(10, "slow down streams due to backlog");
-              try { recvFifo.wait(); } catch (InterruptedException e) { }
+              try { recvFifo.wait(1000); } catch (InterruptedException e) { }
             }
           } // end synchronized slow down
           //System.out.println("SendingAndReciving:run():while()");
@@ -875,7 +875,7 @@ public class HTTP_Socket extends Socket {
                 synchronized (sendFifo) {
                   // slow down if too many in the send queue
                   while (sendFifo.size() > 1 && !closed && !closing) {
-                    try { sendFifo.wait(); } catch (InterruptedException e) { }
+                    try { sendFifo.wait(1000); } catch (InterruptedException e) { }
                   }
                   if (!closed) {
                     sendSequenceId ++;

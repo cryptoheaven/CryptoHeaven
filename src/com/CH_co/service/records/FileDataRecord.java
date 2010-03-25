@@ -135,7 +135,6 @@ public class FileDataRecord extends Record {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "seal()");
 
     int oldPriority = Thread.currentThread().getPriority();
-    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
     super.seal();
 
@@ -272,7 +271,6 @@ public class FileDataRecord extends Record {
 
 
     int oldPriority = Thread.currentThread().getPriority();
-    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
     super.unSeal();
 

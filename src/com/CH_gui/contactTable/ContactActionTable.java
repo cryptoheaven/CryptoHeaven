@@ -589,10 +589,11 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
     private void setShowModel(boolean isShow) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      UserRecord myUserRec = cache.getUserRecord();
+      //UserRecord myUserRec = cache.getUserRecord();
       ContactTableModel tableModel = (ContactTableModel) ContactActionTable.this.getTableModel();
       RecordFilter filter = new MultiFilter(new RecordFilter[] {
-        new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, isShow),
+        //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, isShow),
+        new ContactFilterCl(isShow),
         new FolderFilter(FolderRecord.GROUP_FOLDER),
         new InvEmlFilter(true, false) }
       , MultiFilter.OR);
@@ -769,12 +770,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       if (contacts != null && contacts.length > 0) {
         Window w = SwingUtilities.windowForComponent(parent);
         if (w == null) w = MainFrame.getSingleInstance();
-        ContactSelectDialog d = null;
         if (w instanceof Dialog)
-          d = new ContactSelectDialog((Dialog) w, true);
+          selectedRecords = new ContactSelectDialog((Dialog) w, true).getSelectedMemberContacts();
         else if (w instanceof Frame)
-          d = new ContactSelectDialog((Frame) w, true);
-        selectedRecords = d.getSelectedMemberContacts();
+          selectedRecords = new ContactSelectDialog((Frame) w, true).getSelectedMemberContacts();
       } else {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
         String messageText = null;
@@ -790,30 +789,18 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       }
     }
     if (selectedRecords != null && selectedRecords.length > 0) {
-      boolean anyUserOnline = false;
       boolean createSharedSpaceOk = true;
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       Long userId = cache.getMyUserId();
       for (int i=0; i<selectedRecords.length; i++) {
-        if (selectedRecords[i].getMemberType() == Record.RECORD_TYPE_GROUP) {
-          FolderPair fPair = (FolderPair) selectedRecords[i];
-          anyUserOnline = true;
-        } else {
+        if (selectedRecords[i].getMemberType() == Record.RECORD_TYPE_CONTACT) {
           ContactRecord cRec = (ContactRecord) selectedRecords[i];
-          short status = cRec.status.shortValue();
-          if (cRec.ownerUserId.equals(userId) && ContactRecord.isOnlineStatus(status)) {
-            anyUserOnline = true;
-          }
           if (!cRec.ownerUserId.equals(userId) || !cRec.isOfActiveType() || (cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) != 0) {
             createSharedSpaceOk = false;
           }
         }
       }
       if (isChat) {
-//        if (!anyUserOnline) {
-//          // show offline warning
-//          MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Must_select_at_least_one_online_user"), com.CH_gui.lang.Lang.rb.getString("msgTitle_User_Offline"), false);
-//        }
         doChat(selectedRecords);
       } else if (createSharedSpaceOk) {
         doSharedSpace(parent, selectedRecords, folderType);
@@ -871,6 +858,12 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     if (!MainFrame.isLoggedIn()) {
       ActionUtils.setEnabledActions(actions, false);
     } else {
+      // Some actions are always enabled
+      actions[CHAT_ACTION].setEnabled(true);
+      actions[CREATE_SHARED_SPACE_ACTION].setEnabled(true);
+      actions[NEW_GROUP].setEnabled(true);
+      actions[NEW_CONTACT].setEnabled(true);
+      actions[SEND_EMAIL_INVITAION_ACTION].setEnabled(true);
       // Always enable sort actions
       actions[SORT_ASC_ACTION].setEnabled(true);
       actions[SORT_DESC_ACTION].setEnabled(true);
@@ -928,24 +921,18 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         actions[MESSAGE_ACTION].setEnabled(true);  // when nothing is selected, set null initial recipients
         actions[ADDRESS_ACTION].setEnabled(true);  // when nothing is selected, set null initial data
         actions[PROPERTIES_ACTION].setEnabled(false);
-        actions[CHAT_ACTION].setEnabled(true);
-        actions[CREATE_SHARED_SPACE_ACTION].setEnabled(true);
       } else if (count == 1) {
         actions[ACCEPT_DECLINE_ACTION].setEnabled(acceptDeclineOk);
         actions[REMOVE_ACTION].setEnabled(true);
         actions[MESSAGE_ACTION].setEnabled(messageOk);
         actions[ADDRESS_ACTION].setEnabled(addressOk);
         actions[PROPERTIES_ACTION].setEnabled(propsOk);
-        actions[CHAT_ACTION].setEnabled(true);
-        actions[CREATE_SHARED_SPACE_ACTION].setEnabled(true);
       } else {
         actions[ACCEPT_DECLINE_ACTION].setEnabled(false);
         actions[REMOVE_ACTION].setEnabled(true);
         actions[MESSAGE_ACTION].setEnabled(messageOk);
         actions[ADDRESS_ACTION].setEnabled(addressOk);
         actions[PROPERTIES_ACTION].setEnabled(false);
-        actions[CHAT_ACTION].setEnabled(true);
-        actions[CREATE_SHARED_SPACE_ACTION].setEnabled(true);
       }
 
       Window w = SwingUtilities.windowForComponent(this);

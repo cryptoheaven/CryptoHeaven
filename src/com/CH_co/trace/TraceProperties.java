@@ -90,26 +90,25 @@ public class TraceProperties extends Object {
     // now load the saved properties possibly overwriting the default ones.
     String it = getPropertiesFullFileName();
     FileInputStream is = null;
+    boolean ok = true;
     try {
       is = new FileInputStream(it);
+      properties.load(is);
     } catch (Exception e) {
-      if (withConsoleDebugInfo) {
-        System.out.println("Could not open " + it + " file for reading.");
-        e.printStackTrace();
-      }
-    }
-    boolean ok = is != null;
-    if (ok) {
-      try {
-        properties.load(is);
-        is.close();
-      } catch (Exception x) {
-        ok = false;
+      ok = false;
+      if (e instanceof FileNotFoundException) {
+        if (withConsoleDebugInfo) {
+          System.out.println("Could not open " + it + " file for reading.");
+          e.printStackTrace();
+        }
+      } else if (e instanceof IOException) {
         if (withConsoleDebugInfo) {
           System.out.println("Error loading properties from " + it);
-          x.printStackTrace();
+          e.printStackTrace();
         }
       }
+    } finally {
+      try { if (is != null) is.close(); } catch (Exception e) { }
     }
 
     if (!ok) {

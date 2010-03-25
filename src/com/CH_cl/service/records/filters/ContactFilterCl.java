@@ -34,24 +34,25 @@ import com.CH_co.trace.Trace;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class ContactFilterCl extends ContactFilterCo {
+public class ContactFilterCl extends AbstractRecordFilter implements RecordFilter {
 
   private Boolean keepIncoming;
   
-  /** 
-   * Creates new ContactFilterCl for incoming contacts (other's contacts with you) 
-   * Outgoing Contacts are kept too.
-   */
-  public ContactFilterCl(Long keepFolderId, boolean keepIncoming) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactFilterCl.class, "ContactFilter(Long keepFolderId, boolean keepIncoming)");
-    if (trace != null) trace.args(keepFolderId);
-    if (trace != null) trace.args(keepIncoming);
-
-    super.keepFolderId = keepFolderId;
-    this.keepIncoming = Boolean.valueOf(keepIncoming);
-
-    if (trace != null) trace.exit(ContactFilterCl.class);
-  }
+//  /**
+//   * Creates new ContactFilterCl for incoming contacts (other's contacts with you)
+//   * Outgoing Contacts are kept too.
+//   */
+//  public ContactFilterCl(Long keepFolderId, Long keepOwner, boolean keepIncoming) {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactFilterCl.class, "ContactFilter(Long keepFolderId, Long keepOwner, boolean keepIncoming)");
+//    if (trace != null) trace.args(keepFolderId);
+//    if (trace != null) trace.args(keepIncoming);
+//
+//    super.keepFolderId = keepFolderId;
+//    super.keepOwners = new Long[] { keepOwner };
+//    this.keepIncoming = Boolean.valueOf(keepIncoming);
+//
+//    if (trace != null) trace.exit(ContactFilterCl.class);
+//  }
   
   /** 
    * Creates new ContactFilterCl for incoming contacts (other's contacts with you) 
@@ -70,13 +71,14 @@ public class ContactFilterCl extends ContactFilterCo {
   public boolean keep(Record record) {
     boolean keep = false;
     if (record instanceof ContactRecord) {
-      keep = super.keep(record);
+//      keep = super.keep(record);
       
       ContactRecord contact = (ContactRecord) record;
 
+      Long myUserId = FetchedDataCache.getSingleInstance().getMyUserId();
+      keep = contact.ownerUserId.equals(myUserId) || contact.contactWithId.equals(myUserId);
       if (keep == true && keepIncoming != null && keepIncoming.booleanValue() == false) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        if (!contact.ownerUserId.equals(cache.getMyUserId())) {
+        if (!contact.ownerUserId.equals(myUserId)) {
           if (contact.status == null || contact.status.shortValue() != ContactRecord.STATUS_INITIATED)
             keep = false;
         }
