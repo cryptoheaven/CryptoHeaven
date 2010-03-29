@@ -759,7 +759,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         autoRespRec.dateEnd = jPanelResponder.getDateEnd();
         autoRespRec.setXmlText(jPanelResponder.getData());
         autoRespRec.seal();
-        request.userRecord.autoResp = jPanelResponder.getEnabled().equals(Boolean.TRUE) ? Character.valueOf('Y') : Character.valueOf('N');
+        request.userRecord.autoResp = jPanelResponder.getEnabled().equals(Boolean.TRUE) ? new Character('Y') : new Character('N');
         request.autoResponderRecord = autoRespRec;
       }
 
@@ -979,7 +979,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         autoRespRec.dateEnd = jPanelResponder.getDateEnd();
         autoRespRec.setXmlText(jPanelResponder.getData());
         autoRespRec.seal();
-        request.userRecord.autoResp = jPanelResponder.getEnabled().equals(Boolean.TRUE) ? Character.valueOf('Y') : Character.valueOf('N');
+        request.userRecord.autoResp = jPanelResponder.getEnabled().equals(Boolean.TRUE) ? new Character('Y') : new Character('N');
         request.autoResponderRecord = autoRespRec;
       }
       SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_ALTER_DATA, request));

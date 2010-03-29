@@ -490,14 +490,14 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
             }
           }
 
-          newShare.ownerType = Short.valueOf(contacts[i].getMemberType());
+          newShare.ownerType = new Short(contacts[i].getMemberType());
           newShare.ownerUserId = contacts[i].getMemberId();
-          newShare.canWrite = Short.valueOf(FolderShareRecord.YES);
-          newShare.canDelete = Short.valueOf(FolderShareRecord.YES);
+          newShare.canWrite = new Short(FolderShareRecord.YES);
+          newShare.canDelete = new Short(FolderShareRecord.YES);
 
           // Set fake shareId for "Remove" purpose only, server will generate shareIDs later.
           fakeShareIdIndex --;
-          newShare.shareId = Long.valueOf(fakeShareIdIndex);
+          newShare.shareId = new Long(fakeShareIdIndex);
 
           // unwrapped data
           if (!isFolderCreationMode)

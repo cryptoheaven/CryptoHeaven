@@ -683,7 +683,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                   replyRecived = true;
                   Obj_IDPair_Co data = (Obj_IDPair_Co) msgAction.getMsgDataSet();
                   countObjs = data.objId_1.longValue();
-                  evaluatedFolder.getFolderRecord().objectCount = Long.valueOf(countObjs);
+                  evaluatedFolder.getFolderRecord().objectCount = new Long(countObjs);
                 }
               }
             }
@@ -701,7 +701,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               refresh = true;
 //        } else if (model instanceof FileTableModel) {
 //          // in file folder there may be sub-directories but no files, so refresh if count of files is different - this is possible because all files are fetched at once (no batches)
-//          FileLinkRecord[] links = cache.getFileLinkRecordsOwnerAndType(evaluatedFolder.getFolderRecord().folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
+//          FileLinkRecord[] links = cache.getFileLinkRecordsOwnerAndType(evaluatedFolder.getFolderRecord().folderId, new Short(Record.RECORD_TYPE_FOLDER));
 //          if (links != null && links.length != countObjs) {
 //            if (replyRecived)
 //              if (recordTableScrollPane.getTableModel().getFilterNarrowing() == null)
@@ -878,7 +878,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
             Arrays.sort(participants, new Comparator() {
               public int compare(Object o1, Object o2) {
                 int rc = 0;
-                rc = Integer.valueOf(getSortInstanceValue(o1)).compareTo(Integer.valueOf(getSortInstanceValue(o2)));
+                rc = new Integer(getSortInstanceValue(o1)).compareTo(new Integer(getSortInstanceValue(o2)));
                 if (rc == 0 && o1 instanceof ContactRecord && o2 instanceof ContactRecord) {
                   rc = -((ContactRecord) o1).status.compareTo(((ContactRecord) o2).status);
                 }
@@ -993,7 +993,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           } else {
             FolderRecord fldRec = new FolderRecord();
             fldRec.folderId = share.ownerUserId;
-            fldRec.folderType = Short.valueOf(FolderRecord.GROUP_FOLDER);
+            fldRec.folderType = new Short(FolderRecord.GROUP_FOLDER);
             participantsL.add(fldRec);
           }
         }

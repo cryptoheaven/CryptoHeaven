@@ -281,7 +281,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     File_NewFiles_Rq request = new File_NewFiles_Rq();
     MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_NEW_FILES, request);
     replyClass = runUploadFileBunch(files, msgAction, request, shareRecord.getSymmetricKey(),
-                                    shareRecord.shareId, Short.valueOf(Record.RECORD_TYPE_SHARE), isThreadedRun, SIL);
+                                    shareRecord.shareId, new Short(Record.RECORD_TYPE_SHARE), isThreadedRun, SIL);
 
     lastReplyClass = replyClass;
     if (trace != null) trace.exit(UploadUtilities.class, replyClass);

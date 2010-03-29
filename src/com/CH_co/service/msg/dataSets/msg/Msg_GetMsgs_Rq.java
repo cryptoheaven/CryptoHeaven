@@ -59,7 +59,7 @@ public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
   }
 
   public Msg_GetMsgs_Rq(Long shareId, short ownerObjType, Long ownerObjId, short fetchNumMax, short fetchNumNew, Timestamp timestamp) {
-    this(shareId, ownerObjType, ownerObjId, Short.valueOf(fetchNumMax), fetchNumNew, timestamp);
+    this(shareId, ownerObjType, ownerObjId, new Short(fetchNumMax), fetchNumNew, timestamp);
   }
   public Msg_GetMsgs_Rq(Long shareId, short ownerObjType, Long ownerObjId, Short fetchNumMax, short fetchNumNew, Timestamp timestamp) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Msg_GetMsgs_Rq.class, "Msg_GetMsgs_Rq(Long shareId, short ownerObjType, Long ownerObjId, Short fetchNumMax, short fetchNumNew, Timestamp timestamp)");
@@ -71,10 +71,10 @@ public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
     if (trace != null) trace.args(timestamp);
 
     this.shareId = shareId;
-    this.ownerObjType = Short.valueOf(ownerObjType);
+    this.ownerObjType = new Short(ownerObjType);
     this.ownerObjId = ownerObjId;
     this.fetchNumMax = fetchNumMax;
-    this.fetchNumNew = Short.valueOf(fetchNumNew);
+    this.fetchNumNew = new Short(fetchNumNew);
     this.timestamp = timestamp;
 
     if (trace != null) trace.exit(Msg_GetMsgs_Rq.class);
@@ -90,7 +90,7 @@ public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
     dataOut.writeLongObj(ownerObjId);
     dataOut.writeSmallint(fetchNumMax);
     if (serverBuild <= 330)
-      fetchNumNew = Short.valueOf(FETCH_NUM_NEW__INITIAL_SIZE);
+      fetchNumNew = new Short(FETCH_NUM_NEW__INITIAL_SIZE);
     dataOut.writeSmallint(fetchNumNew);
     dataOut.writeTimestamp(timestamp);
     if (clientBuild >= 364 && serverBuild >= 364) {

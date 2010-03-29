@@ -97,7 +97,7 @@ public class ColumnHeaderData extends Object implements Serializable {
     return ((Integer) data[I_VIEWABLE_SEQUENCE][column]).intValue();
   }
   public int convertRawColumnToModel(int rawColumn) {
-    return ArrayUtils.find(data[I_VIEWABLE_SEQUENCE], Integer.valueOf(rawColumn));
+    return ArrayUtils.find(data[I_VIEWABLE_SEQUENCE], new Integer(rawColumn));
   }
   public String getRawColumnName(int rawColumn) {
     if (data[I_HEADER_NAMES] != null && data[I_HEADER_NAMES].length > rawColumn)
@@ -233,7 +233,7 @@ public class ColumnHeaderData extends Object implements Serializable {
             try { prefMin = ((Integer) data[I_SIZE_MIN][i]).intValue(); } catch (Throwable tx) { }
             if (prefMax > 0) prefSize = Math.min(prefMax, prefSize);
             if (prefMin > 0) prefSize = Math.max(prefMin, prefSize);
-            data[I_SIZE_PREF][i] = Integer.valueOf(prefSize);
+            data[I_SIZE_PREF][i] = new Integer(prefSize);
           }
         }
       }
@@ -285,8 +285,8 @@ public class ColumnHeaderData extends Object implements Serializable {
       for (int j=sizePrefV.size(); j<=rawColumn; j++)
         sizePrefV.addElement(null);
 
-      sizePrefV.setElementAt(Integer.valueOf(tc.getWidth()), rawColumn);
-      newViewableSeq[i] = Integer.valueOf(rawColumn);
+      sizePrefV.setElementAt(new Integer(tc.getWidth()), rawColumn);
+      newViewableSeq[i] = new Integer(rawColumn);
     }
     if (data[I_SIZE_PREF] == null || data[I_SIZE_PREF].length < sizePrefV.size())
       data[I_SIZE_PREF] = new Integer[sizePrefV.size()];

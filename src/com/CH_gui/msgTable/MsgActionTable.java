@@ -267,12 +267,12 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class NewAction extends AbstractActionTraced {
     public NewAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_to_Folder"), Images.get(ImageNums.MAIL_COMPOSE_TO_FOLDER16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_Folder"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_FOLDER24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Post"));
       putValue(Actions.PARENT_NAME, com.CH_gui.lang.Lang.rb.getString("Message"));
-      putValue(Actions.PARENT_MNEMONIC, Integer.valueOf(77));
+      putValue(Actions.PARENT_MNEMONIC, new Integer(77));
       RecordTableModel tableModel = getTableModel();
       if (tableModel instanceof MsgTableModel) {
         if (((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_ADDRESS ||
@@ -284,7 +284,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_ADD24));
           putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Address"));
           putValue(Actions.PARENT_NAME, com.CH_gui.lang.Lang.rb.getString("Address"));
-          putValue(Actions.PARENT_MNEMONIC, Integer.valueOf(65));
+          putValue(Actions.PARENT_MNEMONIC, new Integer(65));
         }
       }
     }
@@ -314,7 +314,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class MsgComposeAction extends AbstractActionTraced {
     public MsgComposeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
@@ -332,7 +332,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class CopyAction extends AbstractActionTraced {
     public CopyAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Copy_..."), Images.get(ImageNums.MAIL_COPY16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_message(s)_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COPY24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Copy"));
@@ -349,7 +349,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class MoveAction extends AbstractActionTraced {
     public MoveAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Move_..."), Images.get(ImageNums.MAIL_MOVE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_selected_message(s)_to_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_MOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Move"));
@@ -366,7 +366,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class DeleteAction extends AbstractActionTraced {
     public DeleteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_..."), Images.get(ImageNums.MAIL_DELETE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_selected_message(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
@@ -441,7 +441,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class RevokeAction extends AbstractActionTraced {
     public RevokeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Revoke_..."), Images.get(ImageNums.STOPWATCH_ALERT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_Expiry_or_Revoke."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.STOPWATCH_ALERT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Revoke"));
@@ -463,7 +463,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class DownloadAction extends AbstractActionTraced {
     public DownloadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Download_..."), Images.get(ImageNums.IMPORT_FILE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Download"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.IMPORT_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download"));
@@ -483,7 +483,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
@@ -538,7 +538,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Message_Properties"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_properties_of_selected_message."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -558,7 +558,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class ForwardToAction extends AbstractActionTraced {
     public ForwardToAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Forward_..."), Images.get(ImageNums.FORWARD16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Forward"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FORWARD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Forward"));
@@ -578,7 +578,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class SaveAttachmentsAction extends AbstractActionTraced {
     public SaveAttachmentsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Save_Attachment(s)_..."), Images.get(ImageNums.DETACH16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Save_Attachments_into_another_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.DETACH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Save_Attachments"));
@@ -607,7 +607,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class ReplyToSenderOrComposeAction extends AbstractActionTraced {
     public ReplyToSenderOrComposeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Reply_to_Sender_..."), Images.get(ImageNums.REPLY16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Reply_to_Sender"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REPLY24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Reply"));
@@ -674,7 +674,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class ReplyToAllAction extends AbstractActionTraced {
     public ReplyToAllAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Reply_to_All_..."), Images.get(ImageNums.REPLY_TO_ALL16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Reply_All"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REPLY_TO_ALL24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Reply_All"));
@@ -758,7 +758,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class PrintAction extends AbstractActionTraced {
     public PrintAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Print_..."), Images.get(ImageNums.PRINT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       //putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Print_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.PRINT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Print"));
@@ -937,7 +937,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class UseAsDraftAction extends AbstractActionTraced {
     public UseAsDraftAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_from_Draft_..."), Images.get(ImageNums.MAIL_COMPOSE_FROM_DRAFT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_from_selected_Draft_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_FROM_DRAFT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_from_Draft"));
@@ -963,7 +963,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Messages"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Message_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
@@ -990,7 +990,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class MarkAsReadAction extends AbstractActionTraced {
     public MarkAsReadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Read"), Images.get(ImageNums.FLAG_BLANK_SMALL));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_messages_as_read."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Read"));
@@ -1007,7 +1007,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class MarkAsUnreadAction extends AbstractActionTraced {
     public MarkAsUnreadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unread"), Images.get(ImageNums.FLAG_GREEN_SMALL));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_messages_as_unread."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_GREEN24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Unread"));
@@ -1024,7 +1024,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class MarkAllReadAction extends AbstractActionTraced {
     public MarkAllReadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Read"), Images.get(ImageNums.FLAG_BLANK_DOUBLE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_messages_in_selected_folder_as_read."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_All_Read"));
@@ -1041,7 +1041,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Message_View"), Images.get(ImageNums.CLONE_MSG16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_message_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_MSG24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -1081,7 +1081,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class TracePrivilegeAndHistoryAction extends AbstractActionTraced {
     public TracePrivilegeAndHistoryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Trace_Message_Access"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Trace_Message_Access"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -1102,7 +1102,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class InviteSenderAction extends AbstractActionTraced {
     public InviteSenderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Sender"), Images.get(ImageNums.HANDSHAKE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Invite_Message_Sender_to_Contact_List"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.HANDSHAKE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite"));
@@ -1173,7 +1173,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class AddSenderToAddressBook extends AbstractActionTraced {
     public AddSenderToAddressBook(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_Sender_to_Address_Book"), Images.get(ImageNums.ADDRESS_ADD16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Add_Sender_to_Address_Book"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_Sender"));
@@ -1241,7 +1241,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class PostReplyOrEditAction extends AbstractActionTraced {
     public PostReplyOrEditAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Post_Reply_to_Folder_..."), Images.get(ImageNums.REPLY_TO_MSG16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Post_a_reply_for_the_selected_message_into_the_folder."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REPLY_TO_MSG24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Post_Reply"));
@@ -1302,7 +1302,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       else
         putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Group_Mail_by_Conversation"));
 
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       //putValue(Actions.REMOVABLE_MENU, Boolean.TRUE);
       MsgTableSorter mts = (MsgTableSorter) getJSortedTable().getModel();
@@ -1333,7 +1333,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   private class OpenInSeperateViewAction extends AbstractActionTraced {
     public OpenInSeperateViewAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Open_the_selected_object_in_its_own_view."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Open"));
@@ -1759,7 +1759,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           anyUnknownSizes = true;
         } else {
           long len = dataRecord.recordSize.intValue();
-          totalSize = Long.valueOf(len + (totalSize != null ? totalSize.longValue() : 0L));
+          totalSize = new Long(len + (totalSize != null ? totalSize.longValue() : 0L));
         }
         if (!(anyRead && anyUnread)) {
           StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);

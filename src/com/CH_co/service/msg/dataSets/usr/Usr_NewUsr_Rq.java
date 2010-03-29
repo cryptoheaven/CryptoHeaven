@@ -72,7 +72,7 @@ public class Usr_NewUsr_Rq extends ProtocolMsgDataSet {
   /** Writes out 'this' object to a stream */
   public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
     if (clientBuildObj == null)
-      clientBuildObj = Long.valueOf(clientBuild);
+      clientBuildObj = new Long(clientBuild);
     dataOut.writeLongObj(clientBuildObj);
     dataOut.writeLongObj(sponsorId);
     dataOut.writeString(requestedEmailAddress);
@@ -158,7 +158,7 @@ public class Usr_NewUsr_Rq extends ProtocolMsgDataSet {
     clientBuildObj = dataIn.readLongObj();
 
     if (clientBuildObj == null)
-      clientBuildObj = Long.valueOf(clientBuild);
+      clientBuildObj = new Long(clientBuild);
     else
       clientBuild = clientBuildObj.shortValue();
 

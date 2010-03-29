@@ -73,46 +73,46 @@ public class TraceTableModel extends RecordTableModel {
         { { STR_NAME, null, null, STR_USER, STR_FIRST_SEEN, STR_RETRIEVED },
           { STR_NAME, STR_PRIVILEGE, STR_HISTORY, STR_USER, STR_FIRST_SEEN, STR_RETRIEVED },
           { null, STR_TIP__READ_ACCESS_PRIVILEGE, STR_TIP__READ_ACCESS_HISTORY, null, null, null },
-          { null, Integer.valueOf(ImageNums.TRACE_PRIVILEGE12_13), Integer.valueOf(ImageNums.TRACE_HISTORY12_13), null, null, null },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(  0), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(  0), Integer.valueOf(240), Integer.valueOf(240) },
-          { Integer.valueOf( 90), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf( 90), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(4), Integer.valueOf(3) }
+          { null, new Integer(ImageNums.TRACE_PRIVILEGE12_13), new Integer(ImageNums.TRACE_HISTORY12_13), null, null, null },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(  0), new Integer(16), new Integer(16), new Integer(  0), new Integer(240), new Integer(240) },
+          { new Integer( 90), new Integer(16), new Integer(16), new Integer( 90), new Integer(160), new Integer(160) },
+          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(4), new Integer(3) }
         }),
       new ColumnHeaderData(new Object[][]
         { { STR_NAME, null, null, STR_USER, STR_RECEIVED, STR_READ },
           { STR_NAME, STR_PRIVILEGE, STR_HISTORY, STR_USER, STR_RECEIVED, STR_READ },
           { null, STR_TIP__READ_ACCESS_PRIVILEGE, STR_TIP__READ_ACCESS_HISTORY, null, null, null },
-          { null, Integer.valueOf(ImageNums.TRACE_PRIVILEGE12_13), Integer.valueOf(ImageNums.TRACE_HISTORY12_13), null, null, null },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(  0), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(  0), Integer.valueOf(240), Integer.valueOf(240) },
-          { Integer.valueOf( 90), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf( 90), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(4), Integer.valueOf(3) }
+          { null, new Integer(ImageNums.TRACE_PRIVILEGE12_13), new Integer(ImageNums.TRACE_HISTORY12_13), null, null, null },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(  0), new Integer(16), new Integer(16), new Integer(  0), new Integer(240), new Integer(240) },
+          { new Integer( 90), new Integer(16), new Integer(16), new Integer( 90), new Integer(160), new Integer(160) },
+          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(4), new Integer(3) }
         }),
       new ColumnHeaderData(new Object[][]
         { { STR_NAME, null, null, STR_USER, STR_FIRST_SEEN, STR_RETRIEVED },
           { STR_NAME, STR_PRIVILEGE, STR_HISTORY, STR_USER, STR_FIRST_SEEN, STR_RETRIEVED },
           { null, STR_TIP__READ_ACCESS_PRIVILEGE, STR_TIP__READ_ACCESS_HISTORY, null, null, null },
-          { null, Integer.valueOf(ImageNums.TRACE_PRIVILEGE12_13), Integer.valueOf(ImageNums.TRACE_HISTORY12_13), null, null, null },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(160), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(160), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(  0), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf(  0), Integer.valueOf(240), Integer.valueOf(240) },
-          { Integer.valueOf( 90), Integer.valueOf(16), Integer.valueOf(16), Integer.valueOf( 90), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4), Integer.valueOf(5) },
-          { Integer.valueOf(0), Integer.valueOf(4), Integer.valueOf(3) }
+          { null, new Integer(ImageNums.TRACE_PRIVILEGE12_13), new Integer(ImageNums.TRACE_HISTORY12_13), null, null, null },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(160), new Integer(16), new Integer(16), new Integer(160), new Integer(160), new Integer(160) },
+          { new Integer(  0), new Integer(16), new Integer(16), new Integer(  0), new Integer(240), new Integer(240) },
+          { new Integer( 90), new Integer(16), new Integer(16), new Integer( 90), new Integer(160), new Integer(160) },
+          { new Integer(0), new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(0), new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(0), new Integer(1), new Integer(2), new Integer(3), new Integer(4), new Integer(5) },
+          { new Integer(0), new Integer(4), new Integer(3) }
         })
   };
 
@@ -217,7 +217,7 @@ public class TraceTableModel extends RecordTableModel {
         }
         if (folderPairs != null && folderPairs.length > 0) {
           Stats_Get_Rq request = new Stats_Get_Rq();
-          request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
+          request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
           request.ownerObjIDs = FolderPair.getShareIDs(folderPairs);
           request.statsForObjType = request.ownerObjType;
           request.objLinkIDs = new Long[0];
@@ -227,14 +227,14 @@ public class TraceTableModel extends RecordTableModel {
 
       private void doStatRequestMsgOrFile(LinkRecordI[] links) {
         Stats_Get_Rq request = new Stats_Get_Rq();
-        request.statsForObjType = Short.valueOf(links[0] instanceof MsgLinkRecord ? Record.RECORD_TYPE_MSG_LINK : Record.RECORD_TYPE_FILE_LINK);
+        request.statsForObjType = new Short(links[0] instanceof MsgLinkRecord ? Record.RECORD_TYPE_MSG_LINK : Record.RECORD_TYPE_FILE_LINK);
         request.objLinkIDs = RecordUtils.getIDs((Record[]) links);
         if (links[0] instanceof MsgLinkRecord && ((MsgLinkRecord) links[0]).ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
-          request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_MESSAGE);
+          request.ownerObjType = new Short(Record.RECORD_TYPE_MESSAGE);
           Long[] msgIDs = links[0].getOwnerObjIDs(links, Record.RECORD_TYPE_MESSAGE);
           request.ownerObjIDs = msgIDs;
         } else {
-          request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
+          request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
           Long[] folderIDs = links[0].getOwnerObjIDs(links, Record.RECORD_TYPE_FOLDER);
           Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderSharesMyForFolders(folderIDs, true));
           request.ownerObjIDs = shareIDs;

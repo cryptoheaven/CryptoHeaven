@@ -46,7 +46,7 @@ public class MsgLinkOps {
     if (ownerType == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord mData = cache.getMsgDataRecord(ownerObjId);
       if (mData.attachedMsgs.shortValue() > 0) {
-        mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, Short.valueOf(ownerType));
+        mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
         if (mLinks != null && mLinks.length == mData.attachedMsgs.shortValue()) {
           // we have all msg link attachments
         } else {
@@ -68,7 +68,7 @@ public class MsgLinkOps {
           SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request));
 
           // re-query the cache after the request has completed
-          mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, Short.valueOf(ownerType));
+          mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
         }
       }
     } else {

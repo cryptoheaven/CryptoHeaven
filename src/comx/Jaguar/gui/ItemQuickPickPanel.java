@@ -95,7 +95,7 @@ public class ItemQuickPickPanel extends JPanel {
     for (int i=0; i<emotions.length; i++) {
       Icon icon = com.CH_co.util.Images.get(emotions[i]);
       JLabel jIcon = new JMyLabel(icon);
-      SingleComponentPane pn = new SingleComponentPane(Color.white, jIcon, Integer.valueOf(i), singleComponentSize);
+      SingleComponentPane pn = new SingleComponentPane(Color.white, jIcon, new Integer(i), singleComponentSize);
       p.add(pn);
       m_panes.put(jIcon, pn);
     }

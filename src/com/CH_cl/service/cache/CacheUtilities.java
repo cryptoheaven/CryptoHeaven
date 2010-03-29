@@ -160,13 +160,13 @@ public class CacheUtilities extends Object {
     // add Category Folder
     if (foldersL != null) {
       FolderRecord fldRec = new FolderRecord();
-      fldRec.folderId = Long.valueOf(folderId);
+      fldRec.folderId = new Long(folderId);
       fldRec.parentFolderId = fldRec.folderId;
       fldRec.ownerUserId = userId;
-      fldRec.folderType = Short.valueOf(folderType);
+      fldRec.folderType = new Short(folderType);
       fldRec.numToKeep = null;
       fldRec.keepAsOldAs = null;
-      fldRec.numOfShares = Short.valueOf((short)1);
+      fldRec.numOfShares = new Short((short)1);
       fldRec.dateCreated = null;
       fldRec.dateUpdated = null;
       foldersL.add(fldRec);
@@ -174,9 +174,9 @@ public class CacheUtilities extends Object {
     // add related share
     if (sharesL != null) {
       FolderShareRecord shrRec = new FolderShareRecord();
-      shrRec.shareId = Long.valueOf(shareId);
-      shrRec.folderId = Long.valueOf(folderId);
-      shrRec.ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
+      shrRec.shareId = new Long(shareId);
+      shrRec.folderId = new Long(folderId);
+      shrRec.ownerType = new Short(Record.RECORD_TYPE_USER);
       shrRec.ownerUserId = userId;
       shrRec.dateCreated = null;
       shrRec.dateUpdated = null;
@@ -247,12 +247,12 @@ public class CacheUtilities extends Object {
       // check if unsealing some messages can unlock any attachments
       Long[] msgDataIDsUnsealed = RecordUtils.getIDs(msgDatasUnsealed);
       // start with file attachments...
-      FileLinkRecord[] fileLinkAttachments = cache.getFileLinkRecordsOwnersAndType(msgDataIDsUnsealed, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
+      FileLinkRecord[] fileLinkAttachments = cache.getFileLinkRecordsOwnersAndType(msgDataIDsUnsealed, new Short(Record.RECORD_TYPE_MESSAGE));
       // adding attachments back to cache will unseal them and allow for unsealing of nested bodies...
       // it will also refresh registered listener viewes with unsealed data...
       cache.addFileLinkRecords(fileLinkAttachments);
       // follow with message attachments...
-      MsgLinkRecord[] msgLinkAttachments = cache.getMsgLinkRecordsOwnersAndType(msgDataIDsUnsealed, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
+      MsgLinkRecord[] msgLinkAttachments = cache.getMsgLinkRecordsOwnersAndType(msgDataIDsUnsealed, new Short(Record.RECORD_TYPE_MESSAGE));
       // adding attachments back to cache will unseal them and allow for unsealing of nested bodies...
       cache.addMsgLinkRecords(msgLinkAttachments);
       // if there are message attachments present, unseal their bodies too

@@ -147,7 +147,7 @@ public class CustomizeColumnsDialog extends GeneralDialog implements VisualsSava
       Integer[] newViewableColumns = new Integer[chosenColumns.length];
       for (int i=0; i<chosenColumns.length; i++) {
         String columnName = ((JLabel) chosenColumns[i]).getText();
-        newViewableColumns[i] = Integer.valueOf(ArrayUtils.find(headerData.data[ColumnHeaderData.I_SHORT_DISPLAY_NAMES], columnName));
+        newViewableColumns[i] = new Integer(ArrayUtils.find(headerData.data[ColumnHeaderData.I_SHORT_DISPLAY_NAMES], columnName));
       }
       headerData.data[ColumnHeaderData.I_VIEWABLE_SEQUENCE] = newViewableColumns;
     }

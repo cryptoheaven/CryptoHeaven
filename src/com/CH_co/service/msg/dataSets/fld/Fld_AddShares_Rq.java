@@ -122,7 +122,7 @@ public class Fld_AddShares_Rq extends ProtocolMsgDataSet {
         if (clientBuild >= 296 && serverBuild >= 296)
           shareRecords[i].ownerType = dataIn.readSmallint();
         else
-          shareRecords[i].ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
+          shareRecords[i].ownerType = new Short(Record.RECORD_TYPE_USER);
         shareRecords[i].ownerUserId = dataIn.readLongObj();
         if (clientBuild >= 13) 
           shareRecords[i].setViewParentId(dataIn.readLongObj());

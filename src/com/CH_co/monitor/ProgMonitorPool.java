@@ -56,7 +56,7 @@ public class ProgMonitorPool extends Object { // no-argument implicit constructo
   }
 
   public static synchronized void registerProgMonitor(ProgMonitor progressMonitor, long id) {
-    registerProgMonitor(progressMonitor, Long.valueOf(id));
+    registerProgMonitor(progressMonitor, new Long(id));
   }
 
   public static synchronized void registerProgMonitor(ProgMonitor progressMonitor, Long id) {
@@ -68,7 +68,7 @@ public class ProgMonitorPool extends Object { // no-argument implicit constructo
 
 
   public static synchronized ProgMonitor getProgMonitor(long id) {
-    return (ProgMonitor) getProgMonitor(Long.valueOf(id));
+    return (ProgMonitor) getProgMonitor(new Long(id));
   }
   public static synchronized ProgMonitor getProgMonitor(Long id) {
     ProgMonitor progressMonitor = null;
@@ -84,7 +84,7 @@ public class ProgMonitorPool extends Object { // no-argument implicit constructo
 
 
   public static synchronized void removeProgMonitor(long id) {
-    removeProgMonitor(Long.valueOf(id));
+    removeProgMonitor(new Long(id));
   }
   public static synchronized void removeProgMonitor(Long id) {
     hm.remove(id);

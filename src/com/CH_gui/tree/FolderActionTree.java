@@ -246,7 +246,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class NewFolderAction extends AbstractActionTraced {
     public NewFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Folder_..."), Images.get(ImageNums.FOLDER_NEW16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Create_New_Folder"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_NEW24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Folder"));
@@ -316,7 +316,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class MsgComposeAction extends AbstractActionTraced {
     public MsgComposeAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
@@ -334,7 +334,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class MoveFolderAction extends AbstractActionTraced {
     public MoveFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Move_Folder_..."), Images.get(ImageNums.FOLDER_MOVE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Move_folder_to_a_different_parent_folder"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_MOVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Move"));
@@ -354,7 +354,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class DeleteFolderAction extends AbstractActionTraced {
     public DeleteFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Folder_..."), Images.get(ImageNums.FOLDER_DELETE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_Delete_Folder_and_all_of_its_children_folders_and_contents."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
@@ -392,7 +392,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class UploadAction extends AbstractActionTraced {
     public UploadAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Upload_..."), Images.get(ImageNums.EXPORT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Upload"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.EXPORT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Upload"));
@@ -424,7 +424,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class DownloadFolderAction extends AbstractActionTraced {
     public DownloadFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Download_Folder_..."), Images.get(ImageNums.IMPORT_FOLDER16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Download_Folder"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.IMPORT_FOLDER24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Download"));
@@ -476,7 +476,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class RenameFolderAction extends AbstractActionTraced {
     public RenameFolderAction(int actionId) {
       super("Rename Folder...");
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Rename Folder");
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_UPLOAD));
     }
@@ -507,7 +507,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Folder_Properties_and_Sharing"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_Folder_Properties_and_Manage_Folder_Sharing"));
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_UPLOAD));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -549,7 +549,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Folders"), Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Folder_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
@@ -566,7 +566,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Folder_View"), Images.get(ImageNums.CLONE_FOLDER16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_folder_tree_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FOLDER24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -583,7 +583,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class ExploreFolderAction extends AbstractActionTraced {
     public ExploreFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Explore_Folder"), Images.get(ImageNums.CLONE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_folder_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Explore"));
@@ -675,7 +675,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class NewMsgAction extends AbstractActionTraced {
     public NewMsgAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_to_Folder"), Images.get(ImageNums.MAIL_COMPOSE_TO_FOLDER16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_Folder"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_FOLDER24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Post"));
@@ -720,7 +720,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class TracePrivilegeAndHistoryAction extends AbstractActionTraced {
     public TracePrivilegeAndHistoryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Trace_Folder_Access"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Trace_Folder_Access"));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -754,7 +754,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class TransferOwnershipAction extends AbstractActionTraced {
     public TransferOwnershipAction(int actionId) {
       super("Transfer Folder Ownership");
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Transfer Folder Ownership");
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -923,7 +923,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                     FolderShareRecord newShare = (FolderShareRecord) sRec.clone();
                     newShare.setViewParentId(fPair.getFileViewParentId());
                     newShare.ownerUserId = toUserId;
-                    newShare.ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
+                    newShare.ownerType = new Short(Record.RECORD_TYPE_USER);
                     // Fetch public key for 'toUserId' if not already fetched
                     KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
                     if (kRec == null || kRec.plainPublicKey == null) {
@@ -969,7 +969,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
@@ -991,7 +991,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class InvitePopupAction extends AbstractActionTraced {
     public InvitePopupAction (int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Share_Folder_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Share"));
@@ -1067,7 +1067,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   private class EmptyFolderAction extends AbstractActionTraced {
     public EmptyFolderAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Empty_Folder_..."), Images.get(ImageNums.FLD_RECYCLE_CLEAR16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Empty_Folder_..."));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -1419,7 +1419,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
    */
   private void setFolderUpdateMark(Long folderId, int mark) {
     if (folderUpdateHistoryHT == null) folderUpdateHistoryHT = new Hashtable();
-    folderUpdateHistoryHT.put(folderId, Integer.valueOf(mark));
+    folderUpdateHistoryHT.put(folderId, new Integer(mark));
   }
   /**
    * @return last stored mark for given folder, or zero '0' is not stored at all.

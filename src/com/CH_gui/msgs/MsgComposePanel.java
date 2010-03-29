@@ -116,7 +116,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   public static final short CONTENT_MODE_MAIL_HTML = 2;
   public static final short CONTENT_MODE_ADDRESS_BOOK_ENTRY = 3;
 
-  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
 
   private short objType;
@@ -252,7 +251,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private void init() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "init()");
 
-    SIL = MainFrame.getServerInterfaceLayer();
     cache = FetchedDataCache.getSingleInstance();
     undoMngr = new UndoManager();
 
@@ -447,7 +445,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(draftMsgLink);
-      SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -534,7 +532,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(forwardMsg);
-      SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -578,7 +576,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(replyToMsg);
-      SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -747,7 +745,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       final Component _this = this;
       Thread th = new ThreadTraced("Ring Pressed") {
         public void runTraced() {
-          ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())));
+          ClientMessageAction msgAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())));
           DefaultReplyRunner.runAction(msgAction);
           if (msgAction.getActionCode() == CommandCodes.FLD_A_RING_RING) {
             Obj_List_Co reply = (Obj_List_Co) msgAction.getMsgDataSet();
@@ -762,7 +760,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                   return new String[] { ">< ring >< ring ><", "" };
                 }
                 public Short getContentType() {
-                  return Short.valueOf(MsgDataRecord.OBJ_TYPE_MSG);
+                  return new Short(MsgDataRecord.OBJ_TYPE_MSG);
                 }
                 public short getContentMode() {
                   return MsgComposePanel.CONTENT_MODE_MAIL_PLAIN;
@@ -831,7 +829,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SendAction extends AbstractActionTraced {
     public SendAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send"), Images.get(ImageNums.MAIL_SEND16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Send_composed_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_SEND24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Send"));
@@ -1140,8 +1138,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           // Change user preference about warning dialog
           Usr_AltUsrData_Rq request = new Usr_AltUsrData_Rq();
           request.userRecord = (UserRecord) cache.getUserRecord().clone();
-          request.userRecord.notifyByEmail = Short.valueOf((short) Misc.setBit(false, request.userRecord.notifyByEmail, UserRecord.EMAIL_WARN_EXTERNAL));
-          SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_ALTER_DATA, request));
+          request.userRecord.notifyByEmail = new Short((short) Misc.setBit(false, request.userRecord.notifyByEmail, UserRecord.EMAIL_WARN_EXTERNAL));
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_ALTER_DATA, request));
           // send message triggered
           new SendMessageRunner(MsgComposePanel.this).start();
         }
@@ -1169,7 +1167,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SaveAsDraftAction extends AbstractActionTraced {
     public SaveAsDraftAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Save_as_Draft"), Images.get(ImageNums.SAVE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Save_composition_in_the_Drafts_folder_for_future_editing."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.SAVE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Save_Draft"));
@@ -1189,7 +1187,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SelectRecipientsAction extends AbstractActionTraced {
     public SelectRecipientsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.MAIL_RECIPIENTS16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_Recipients,_this_can_be_users,_folders_or_posting_boards."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_RECIPIENTS24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Address_Book"));
@@ -1206,7 +1204,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SelectAttachmentsAction extends AbstractActionTraced {
     public SelectAttachmentsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_Attachments,_this_could_be_a_file_or_a_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ATTACH24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Attach"));
@@ -1224,7 +1222,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     public CutAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Cut"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.CUT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Cut_selected_text."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CUT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Cut"));
@@ -1243,7 +1241,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     public CopyAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Copy"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.COPY16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_text."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Copy"));
@@ -1262,7 +1260,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     public PasteAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.PASTE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.PASTE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
@@ -1299,7 +1297,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           break;
       }
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Sets_the_priority."));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -1316,7 +1314,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class UndoAction extends AbstractActionTraced {
     public UndoAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Undo"), Images.get(ImageNums.UNDO16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Undo_the_last_document_change."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.UNDO24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Undo"));
@@ -1350,7 +1348,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class RedoAction extends AbstractActionTraced {
     public RedoAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Redo"), Images.get(ImageNums.REDO16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Redo_the_last_document_change."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REDO24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Redo"));
@@ -1388,7 +1386,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Show_BCC"));
 //      if (objType == MsgDataRecord.OBJ_TYPE_ADDR)
 //        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Show_CC_and_BCC"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_All_Headers"));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       // Initialize the state of showing headers
@@ -1410,7 +1408,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SpellCheckAction extends AbstractActionTraced {
     public SpellCheckAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_..."), Images.get(ImageNums.SPELL16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       //putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Redo_the_last_document_change."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.SPELL24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Spelling"));
@@ -1443,7 +1441,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SpellCheckEditDictionaryAction extends AbstractActionTraced {
     public SpellCheckEditDictionaryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Edit_user_dictionary_..."));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.REMOVABLE_MENU, Boolean.FALSE);
       putValue(Actions.DISABABLE, Boolean.FALSE);
@@ -1473,7 +1471,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class SpellCheckOptionsAction extends AbstractActionTraced {
     public SpellCheckOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_preferences_..."));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.REMOVABLE_MENU, Boolean.FALSE);
       putValue(Actions.DISABABLE, Boolean.FALSE);
@@ -1486,7 +1484,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         Frame parent = (Frame) w;
         // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
         TigerPropSession speller = SingleTigerSession.getSingleInstance();
-        new JTigerOptionsDialog(parent, speller, SIL);
+        new JTigerOptionsDialog(parent, speller, MainFrame.getServerInterfaceLayer());
       }
     }
   }
@@ -1497,7 +1495,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class RecordPanelAction extends AbstractActionTraced {
     public RecordPanelAction(int actionId) {
       super("Voice Recording Panel", Images.get(ImageNums.RECORD16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Show Voice Recording Panel");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.RECORD24));
       putValue(Actions.TOOL_NAME, "Record");
@@ -1513,7 +1511,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class RingBellAction extends AbstractActionTraced {
     public RingBellAction(int actionId) {
       super("Ring the bell", Images.get(ImageNums.RING_BELL));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -1715,12 +1713,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       Object[] emls = new Object[unknownEmailsV.size()];
       unknownEmailsV.toArray(emls);
       Object[] set = new Object[] { emls, Boolean.valueOf(convertNotHostedEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
-      SIL.submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
+      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
     }
     // fetch unknown users
     if (unknownUserIDsV.size() > 0) {
       if (trace != null) trace.data(50, unknownUserIDsV);
-      SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000);
+      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000);
     }
 
     if (trace != null) trace.data(60, "convert all EmailAddressRecords to UserRecords or ContactRecords");
@@ -2009,7 +2007,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 //      if (addrBooks != null && addrBooks.length > 0) {
 //        // look for addresses in those address books
 //        Long[] folderIDs = RecordUtils.getIDs(addrBooks);
-//        MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsOwnersAndType(folderIDs, Short.valueOf(Record.RECORD_TYPE_FOLDER));
+//        MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsOwnersAndType(folderIDs, new Short(Record.RECORD_TYPE_FOLDER));
 //        if (msgLinks != null && msgLinks.length > 0) {
 //          // gather Address Objects for the links
 //          Long[] msgIDs = MsgLinkRecord.getMsgIDs(msgLinks);
@@ -2222,7 +2220,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
           BASymmetricKey key = new BASymmetricKey(32);
           MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(recipients, key, parentComp);
-          MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, Short.valueOf(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), Short.valueOf(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
+          MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
           Msg_New_Rq request = new Msg_New_Rq(addrBook.getFolderShareRecord().shareId, null, links[0], data);
           request.hashes = SendMessageRunner.prepareAddrHashes(data);
           MessageAction action = new MessageAction(CommandCodes.MSG_Q_NEW, request);
@@ -2689,7 +2687,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
               Long shareId = cache.getFolderShareRecordMy(fromDraftMsgLink.ownerObjId, true).shareId;
               request.IDs[0] = new Long[] { fromDraftMsgLink.msgLinkId };
               request.IDs[1] = new Long[] { shareId };
-              SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_REMOVE, request));
+              MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_REMOVE, request));
             }
           }
           Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);

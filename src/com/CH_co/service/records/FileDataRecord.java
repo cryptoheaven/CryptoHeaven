@@ -209,7 +209,7 @@ public class FileDataRecord extends Record {
       if (progressMonitor != null) progressMonitor.setCurrentStatus("Signing Encrypted File ... signed.");
 
       signingKeyId = signingKeyRecord.keyId;
-      encSize = Long.valueOf(tempFile.length());
+      encSize = new Long(tempFile.length());
 
       // Remember the newly created encrypted file.
       encDataFile = tempFile;

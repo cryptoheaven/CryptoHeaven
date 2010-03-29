@@ -444,8 +444,8 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
       historyUpdateDates.removeFirst();
     }
 
-    historyTotalBytes.add(Long.valueOf(totalBytes));
-    historyUpdateDates.add(Long.valueOf(currentDateMillis));
+    historyTotalBytes.add(new Long(totalBytes));
+    historyUpdateDates.add(new Long(currentDateMillis));
 
     lastTransferUpdateDateMillis = currentDateMillis;
 

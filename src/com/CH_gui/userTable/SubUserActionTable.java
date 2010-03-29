@@ -49,7 +49,7 @@ import com.CH_co.trace.Trace;
  */
 public class SubUserActionTable extends RecordActionTable implements ActionProducerI {
 
-  private static Integer versionedVisualsSavable = Integer.valueOf(1);
+  private static Integer versionedVisualsSavable = new Integer(1);
 
   private Action[] actions;
 
@@ -145,7 +145,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class AddAccountAction extends AbstractActionTraced {
     public AddAccountAction(int actionId) {
       super("Create New", Images.get(ImageNums.USER_NEW16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Create New Account");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_NEW24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create"));
@@ -163,7 +163,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class EditAccountAction extends AbstractActionTraced {
     public EditAccountAction(int actionId) {
       super("Edit Account", Images.get(ImageNums.USER_EDIT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Edit User Account");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Edit"));
@@ -184,7 +184,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class RemoveAccountAction extends AbstractActionTraced {
     public RemoveAccountAction(int actionId) {
       super("Delete Account", Images.get(ImageNums.USER_DELETE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Delete User Account");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_DELETE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
@@ -214,7 +214,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
@@ -230,7 +230,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super("Refresh Accounts", Images.get(ImageNums.REFRESH16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Refresh Account List from the server.");
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       //putValue(Actions.TOOL_NAME, "Refresh");
@@ -247,7 +247,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super("Clone Account List View", Images.get(ImageNums.CLONE_CONTACT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Display account list table in its own window.");
       //putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
     }
@@ -270,7 +270,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class AddRemoveContactsAction extends AbstractActionTraced {
     public AddRemoveContactsAction(int actionId) {
       super("Manage Contacts", Images.get(ImageNums.CONTACT_ADD16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Manage user contacts.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Manage_Contacts"));
@@ -293,7 +293,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class ActivateSuspendAction extends AbstractActionTraced {
     public ActivateSuspendAction(int actionId) {
       super("Activate or Suspend ...", Images.get(ImageNums.USER_ACTIVATE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Activate or Suspend user accounts.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_ACTIVATE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Activate_or_Suspend"));
@@ -314,7 +314,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   private class PasswordResetAction extends AbstractActionTraced {
     public PasswordResetAction(int actionId) {
       super("Password Reset ...", Images.get(ImageNums.USER_PASS_RESET16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Password Reset for user accounts.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_PASS_RESET24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Password_Reset"));

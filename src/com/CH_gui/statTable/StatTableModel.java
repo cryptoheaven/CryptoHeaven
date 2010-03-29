@@ -60,15 +60,15 @@ public class StatTableModel extends RecordTableModel {
           { STR_USER, STR_FIRST_SEEN, STR_CONTENT_RETRIEVED },
           { null, null, null },
           { null, null, null },
-          { Integer.valueOf(249), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(249), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(249), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(  0), Integer.valueOf(  0), Integer.valueOf(  0) },
-          { Integer.valueOf( 90), Integer.valueOf(160), Integer.valueOf(160) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0) }
+          { new Integer(249), new Integer(160), new Integer(160) },
+          { new Integer(249), new Integer(160), new Integer(160) },
+          { new Integer(249), new Integer(160), new Integer(160) },
+          { new Integer(  0), new Integer(  0), new Integer(  0) },
+          { new Integer( 90), new Integer(160), new Integer(160) },
+          { new Integer(0), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(1), new Integer(2) },
+          { new Integer(0) }
         });
 
   /** Creates new StatTableModel */
@@ -149,10 +149,10 @@ public class StatTableModel extends RecordTableModel {
         removeData();
         Stats_Get_Rq request = new Stats_Get_Rq();
         if (parentObjLink instanceof MsgLinkRecord)
-          request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_MSG_LINK);
+          request.statsForObjType = new Short(Record.RECORD_TYPE_MSG_LINK);
         else if (parentObjLink instanceof FileLinkRecord)
-          request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_FILE_LINK);
-        request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
+          request.statsForObjType = new Short(Record.RECORD_TYPE_FILE_LINK);
+        request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
         request.objLinkIDs = new Long[] { parentObjLink.getId() };
 
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();

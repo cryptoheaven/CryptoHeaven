@@ -171,7 +171,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode {
 //  public Long getParentFolderID() {
 //    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentFolderID()");
 //
-//    Long parentId = Long.valueOf(-1);
+//    Long parentId = new Long(-1);
 //    FolderPair parentFolderPair = getParentFolderPair();
 //
 //    if (parentFolderPair != null)
@@ -188,7 +188,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode {
 //  public Long getParentShareID() {
 //    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "getParentShareID()");
 //
-//    Long parentShareId = Long.valueOf(-1);
+//    Long parentShareId = new Long(-1);
 //    FolderPair parentFolderPair = getParentFolderPair();
 //
 //    if (parentFolderPair != null)

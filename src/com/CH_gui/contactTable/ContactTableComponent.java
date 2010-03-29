@@ -230,7 +230,7 @@ public class ContactTableComponent extends RecordTableComponent {
         panel.add(new JMyLabel("Away status", Images.get(ImageNums.STATUS_AWAY16), JLabel.LEADING), new GridBagConstraints(0, 2, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 5, 5), 0, 0));
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        Integer awayMinutes = Integer.valueOf(UserSettingsRecord.DEFAULT__AWAY_MINUTES);
+        Integer awayMinutes = new Integer(UserSettingsRecord.DEFAULT__AWAY_MINUTES);
         UserSettingsRecord usrSettingsRec = cache.getMyUserSettingsRecord();
         if (usrSettingsRec != null) awayMinutes = usrSettingsRec.awayMinutes;
         final JRadioButton jMinutesLabel = new JMyRadioButton("Set inactivity period in minutes:", awayMinutes.intValue() != 0);
@@ -270,7 +270,7 @@ public class ContactTableComponent extends RecordTableComponent {
             boolean success = false;
             try {
               if (jNever.isSelected())
-                usrSettingsRec.awayMinutes = Integer.valueOf(0);
+                usrSettingsRec.awayMinutes = new Integer(0);
               else
                 usrSettingsRec.awayMinutes = Integer.valueOf(jMinutes.getText().trim());
               success = true;
@@ -329,7 +329,7 @@ public class ContactTableComponent extends RecordTableComponent {
       if (event.getEventType() == RecordEvent.SET && combo != null) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         UserRecord userRecord = cache.getUserRecord();
-        int myStatusIndex = getStatusIndexFromChar(userRecord != null ? userRecord.online : Character.valueOf(UserRecord.ONLINE_INVISIBLE));
+        int myStatusIndex = getStatusIndexFromChar(userRecord != null ? userRecord.online : new Character(UserRecord.ONLINE_INVISIBLE));
         combo.setSelectedIndex(myStatusIndex);
       }
 
@@ -348,7 +348,7 @@ public class ContactTableComponent extends RecordTableComponent {
   }
 
   public Integer getVisualsVersion() {
-    return Integer.valueOf(1);
+    return new Integer(1);
   }
 
   /**

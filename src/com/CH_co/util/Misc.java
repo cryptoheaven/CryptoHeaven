@@ -670,9 +670,9 @@ public class Misc extends Object {
       host = url.getHost();
       int p = url.getPort();
       if (p >= 0)
-        port = Integer.valueOf(p);
+        port = new Integer(p);
       else
-        port = Integer.valueOf(80);
+        port = new Integer(80);
     } catch (Throwable t) {
     }
     Object[] rc = null;
@@ -907,11 +907,11 @@ public class Misc extends Object {
   public static Number setBitObj(boolean turnOn, Number bits, long theBit) {
     long rc = setBit(turnOn, bits, theBit);
     if (bits instanceof Long)
-      return Long.valueOf(rc);
+      return new Long(rc);
     else if (bits instanceof Integer)
-      return Integer.valueOf((int) rc);
+      return new Integer((int) rc);
     else if (bits instanceof Short)
-      return Short.valueOf((short) rc);
+      return new Short((short) rc);
     else
       throw new IllegalArgumentException("Argument 'bits' of type " + (bits == null ? "null" : bits.getClass().getName() ) + " is not supported.");
   }

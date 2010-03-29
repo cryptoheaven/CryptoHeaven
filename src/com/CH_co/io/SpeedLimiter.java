@@ -130,14 +130,14 @@ public class SpeedLimiter extends Object {
             // leave the old--previous timestamp and add the bytes to the last entry already in the list
             long lastBytes = ((Long) byteList.getLast()).longValue();
             byteList.removeLast();
-            byteList.addLast(Long.valueOf(lastBytes + additionalBytes));
+            byteList.addLast(new Long(lastBytes + additionalBytes));
             added = true;
           }
         }
 
         if (!added) {
-          timeList.addLast(Long.valueOf(currentDateMillis));
-          byteList.addLast(Long.valueOf(additionalBytes));
+          timeList.addLast(new Long(currentDateMillis));
+          byteList.addLast(new Long(additionalBytes));
         }
 
         // consume expired history

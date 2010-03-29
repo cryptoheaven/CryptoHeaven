@@ -48,7 +48,7 @@ public class FileLinkOps {
     if (ownerType == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord mData = cache.getMsgDataRecord(ownerObjId);
       if (mData.attachedFiles.shortValue() > 0) {
-        fLinks = cache.getFileLinkRecordsOwnerAndType(ownerObjId, Short.valueOf(ownerType));
+        fLinks = cache.getFileLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
         if (fLinks != null && fLinks.length == mData.attachedFiles.shortValue()) {
           // we have all file link attachments
         } else {
@@ -70,7 +70,7 @@ public class FileLinkOps {
           SIL.submitAndWait(new MessageAction(CommandCodes.FILE_Q_GET_MSG_FILE_ATTACHMENTS, request));
 
           // re-query the cache after the request has completed
-          fLinks = cache.getFileLinkRecordsOwnerAndType(ownerObjId, Short.valueOf(ownerType));
+          fLinks = cache.getFileLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
         }
       }
     } else {

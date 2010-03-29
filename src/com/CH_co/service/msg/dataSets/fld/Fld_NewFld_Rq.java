@@ -88,7 +88,7 @@ public class Fld_NewFld_Rq extends ProtocolMsgDataSet {
     if (clientBuild >= 296 && serverBuild >= 296)
       folderShareRecord.ownerType = dataIn.readSmallint();
     else
-      folderShareRecord.ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
+      folderShareRecord.ownerType = new Short(Record.RECORD_TYPE_USER);
     if (clientBuild >= 148 && serverBuild >= 148)
       folderShareRecord.ownerUserId = dataIn.readLongObj();
     if (clientBuild >= 13)

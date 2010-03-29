@@ -145,8 +145,8 @@ public class AttachmentFetcherPopup extends ThreadTraced {
       }
     }
 
-    Record[] attachmentsMsgs = cache.getMsgLinkRecordsOwnersAndType(parentMsgIDs, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
-    Record[] attachmentsFiles = cache.getFileLinkRecordsOwnersAndType(parentMsgIDs, Short.valueOf(Record.RECORD_TYPE_MESSAGE));
+    Record[] attachmentsMsgs = cache.getMsgLinkRecordsOwnersAndType(parentMsgIDs, new Short(Record.RECORD_TYPE_MESSAGE));
+    Record[] attachmentsFiles = cache.getFileLinkRecordsOwnersAndType(parentMsgIDs, new Short(Record.RECORD_TYPE_MESSAGE));
 
     // sort the attachment records for display
     if (attachmentsMsgs != null && attachmentsMsgs.length > 1)

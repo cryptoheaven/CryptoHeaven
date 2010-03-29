@@ -125,7 +125,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Invite_to_the_Group_..."), Images.get(ImageNums.MEMBER_ADD16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Invite_to_the_Group_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MEMBER_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_Member"));
@@ -151,7 +151,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   private class NewMessageToGroupAction extends AbstractActionTraced {
     public NewMessageToGroupAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_To_Group"), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Message_Group"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_selected_Group."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
@@ -180,7 +180,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
   private class NewMessageToMemberAction extends AbstractActionTraced {
     public NewMessageToMemberAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_To_Member"), Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Message_Member"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER24));

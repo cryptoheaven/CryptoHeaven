@@ -52,7 +52,7 @@ public class File_GetFiles_Rq extends ProtocolMsgDataSet {
   }
 
   public File_GetFiles_Rq(Long shareId, short ownerObjType, Long ownerObjId, short fetchNumMax, Timestamp timestamp) {
-    this(shareId, ownerObjType, ownerObjId, Short.valueOf(fetchNumMax), timestamp);
+    this(shareId, ownerObjType, ownerObjId, new Short(fetchNumMax), timestamp);
   }
   public File_GetFiles_Rq(Long shareId, short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetFiles_Rq.class, "File_GetFiles_Rq(Long shareId, short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp)");
@@ -63,7 +63,7 @@ public class File_GetFiles_Rq extends ProtocolMsgDataSet {
     if (trace != null) trace.args(timestamp);
 
     this.shareId = shareId;
-    this.ownerObjType = Short.valueOf(ownerObjType);
+    this.ownerObjType = new Short(ownerObjType);
     this.ownerObjId = ownerObjId;
     this.fetchNumMax = fetchNumMax;
     this.timestamp = timestamp;

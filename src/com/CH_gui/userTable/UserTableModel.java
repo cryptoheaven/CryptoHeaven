@@ -70,15 +70,15 @@ public class UserTableModel extends RecordTableModel {
           { STR_USER_NAME, STR_USER_ID, STR_MESSAGING, STR_EMAIL_ADDRESS },
           { null, null, null },
           { null, null, null },
-          { Integer.valueOf(135), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250) },
-          { Integer.valueOf(135), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250) },
-          { Integer.valueOf(135), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250) },
-          { Integer.valueOf(  0), Integer.valueOf(100), Integer.valueOf(200), Integer.valueOf(  0) },
-          { Integer.valueOf( 90), Integer.valueOf( 70), Integer.valueOf( 70), Integer.valueOf(150) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(1) }
+          { new Integer(135), new Integer( 70), new Integer( 90), new Integer(250) },
+          { new Integer(135), new Integer( 70), new Integer( 90), new Integer(250) },
+          { new Integer(135), new Integer( 70), new Integer( 90), new Integer(250) },
+          { new Integer(  0), new Integer(100), new Integer(200), new Integer(  0) },
+          { new Integer( 90), new Integer( 70), new Integer( 70), new Integer(150) },
+          { new Integer(0), new Integer(3), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(3), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(3), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(1) }
         });
   static final ColumnHeaderData columnHeaderData_subAccounts = 
       new ColumnHeaderData(new Object[][]
@@ -86,15 +86,15 @@ public class UserTableModel extends RecordTableModel {
           { STR_USER_NAME, STR_USER_ID, STR_MESSAGING, STR_EMAIL_ADDRESS, STR_OTHER_CONTACT_ADDRESS, STR_STORAGE_LIMIT, STR_STORAGE_USED, STR_LAST_LOGIN, STR_DATE_CREATED, STR_STATUS },
           { null, null, null },
           { null, null, null },
-          { Integer.valueOf(130), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250), Integer.valueOf(250), Integer.valueOf( 90), Integer.valueOf( 90), Integer.valueOf(100), Integer.valueOf(100), Integer.valueOf(90) },
-          { Integer.valueOf(130), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250), Integer.valueOf(250), Integer.valueOf( 90), Integer.valueOf( 90), Integer.valueOf(100), Integer.valueOf(100), Integer.valueOf(90) },
-          { Integer.valueOf(130), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250), Integer.valueOf(250), Integer.valueOf( 90), Integer.valueOf( 90), Integer.valueOf(100), Integer.valueOf(100), Integer.valueOf(90) },
-          { Integer.valueOf(  0), Integer.valueOf(100), Integer.valueOf(200), Integer.valueOf(  0), Integer.valueOf(  0), Integer.valueOf(100), Integer.valueOf(100), Integer.valueOf(110), Integer.valueOf(110), Integer.valueOf(90) },
-          { Integer.valueOf( 90), Integer.valueOf( 70), Integer.valueOf( 70), Integer.valueOf(150), Integer.valueOf(150), Integer.valueOf( 90), Integer.valueOf( 90), Integer.valueOf( 90), Integer.valueOf( 90), Integer.valueOf(50) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(9), Integer.valueOf(5), Integer.valueOf(6), Integer.valueOf(7), Integer.valueOf(8) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(9), Integer.valueOf(5), Integer.valueOf(6), Integer.valueOf(7), Integer.valueOf(8) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(9), Integer.valueOf(5), Integer.valueOf(6), Integer.valueOf(7), Integer.valueOf(8) },
-          { Integer.valueOf(0), Integer.valueOf(3) }
+          { new Integer(130), new Integer( 70), new Integer( 90), new Integer(250), new Integer(250), new Integer( 90), new Integer( 90), new Integer(100), new Integer(100), new Integer(90) },
+          { new Integer(130), new Integer( 70), new Integer( 90), new Integer(250), new Integer(250), new Integer( 90), new Integer( 90), new Integer(100), new Integer(100), new Integer(90) },
+          { new Integer(130), new Integer( 70), new Integer( 90), new Integer(250), new Integer(250), new Integer( 90), new Integer( 90), new Integer(100), new Integer(100), new Integer(90) },
+          { new Integer(  0), new Integer(100), new Integer(200), new Integer(  0), new Integer(  0), new Integer(100), new Integer(100), new Integer(110), new Integer(110), new Integer(90) },
+          { new Integer( 90), new Integer( 70), new Integer( 70), new Integer(150), new Integer(150), new Integer( 90), new Integer( 90), new Integer( 90), new Integer( 90), new Integer(50) },
+          { new Integer(0), new Integer(3), new Integer(9), new Integer(5), new Integer(6), new Integer(7), new Integer(8) },
+          { new Integer(0), new Integer(3), new Integer(9), new Integer(5), new Integer(6), new Integer(7), new Integer(8) },
+          { new Integer(0), new Integer(3), new Integer(9), new Integer(5), new Integer(6), new Integer(7), new Integer(8) },
+          { new Integer(0), new Integer(3) }
         });
   static final ColumnHeaderData columnHeaderData_passRecovery = 
       new ColumnHeaderData(new Object[][]
@@ -102,15 +102,15 @@ public class UserTableModel extends RecordTableModel {
           { STR_USER_NAME, STR_USER_ID, STR_MESSAGING, STR_EMAIL_ADDRESS },
           { null, null, null },
           { null, null, null },
-          { Integer.valueOf(100), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250) },
-          { Integer.valueOf(100), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250) },
-          { Integer.valueOf(100), Integer.valueOf( 70), Integer.valueOf( 90), Integer.valueOf(250) },
-          { Integer.valueOf(  0), Integer.valueOf(100), Integer.valueOf(200), Integer.valueOf(  0) },
-          { Integer.valueOf( 90), Integer.valueOf( 70), Integer.valueOf( 70), Integer.valueOf(150) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(1) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(1) },
-          { Integer.valueOf(0), Integer.valueOf(3), Integer.valueOf(1) },
-          { Integer.valueOf(0), Integer.valueOf(1) }
+          { new Integer(100), new Integer( 70), new Integer( 90), new Integer(250) },
+          { new Integer(100), new Integer( 70), new Integer( 90), new Integer(250) },
+          { new Integer(100), new Integer( 70), new Integer( 90), new Integer(250) },
+          { new Integer(  0), new Integer(100), new Integer(200), new Integer(  0) },
+          { new Integer( 90), new Integer( 70), new Integer( 70), new Integer(150) },
+          { new Integer(0), new Integer(3), new Integer(1) },
+          { new Integer(0), new Integer(3), new Integer(1) },
+          { new Integer(0), new Integer(3), new Integer(1) },
+          { new Integer(0), new Integer(1) }
         });
 
   /** Creates new UserTableModel */

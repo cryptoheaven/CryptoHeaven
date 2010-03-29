@@ -123,9 +123,9 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
    * @return The index of specified column in the sorting columns vector. 0=primary, -1=not found
    */
   public int getSortingColumnIndex(int column) {
-    int index = getSortingColumns().indexOf(Integer.valueOf(column));
+    int index = getSortingColumns().indexOf(new Integer(column));
     if (index == -1)
-      index = getSortingColumns().indexOf(Integer.valueOf(-(column+ColumnHeaderData.DESCENDING_OFFSET)));
+      index = getSortingColumns().indexOf(new Integer(-(column+ColumnHeaderData.DESCENDING_OFFSET)));
     return index;
   }
 
@@ -274,7 +274,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
         int length = indexes.length;
         Object[] objs = new Object[length];
         for (int i=0; i<length; i++) {
-          objs[i] = Integer.valueOf(indexes[i]);
+          objs[i] = new Integer(indexes[i]);
         }
 
 //        if (model instanceof RecordTableModel) {
@@ -354,7 +354,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
    * If the column is a primary sort column, than invert the sorting direction.
    */
   public void sortByColumn(int column) {
-    sortByColumns(new Integer[] { Integer.valueOf(column) });
+    sortByColumns(new Integer[] { new Integer(column) });
   }
   /**
    * Make direction for all columns uniform, based on first specified column.
@@ -369,7 +369,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
   }
 
   public void sortByColumn(int column, boolean ascending) {
-    sortByColumns(new Integer[] { Integer.valueOf(column) }, new Boolean[] { Boolean.valueOf(ascending) });
+    sortByColumns(new Integer[] { new Integer(column) }, new Boolean[] { Boolean.valueOf(ascending) });
   }
 
   /**
@@ -411,7 +411,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
     }
 
     // insert to the front of ordering sequence;
-    sortingColumns.insertElementAt(Integer.valueOf(ascending ? column : (-(column+ColumnHeaderData.DESCENDING_OFFSET))), 0);
+    sortingColumns.insertElementAt(new Integer(ascending ? column : (-(column+ColumnHeaderData.DESCENDING_OFFSET))), 0);
 
     /*
     // fire before we adjust indexes because selection saving involves using valid indexes!

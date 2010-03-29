@@ -536,29 +536,29 @@ public class ContactRecord extends Record implements MemberContactRecordI {
     if (onlineStatus != null) {
       switch (onlineStatus.charValue()) {
         case UserRecord.ONLINE_INVISIBLE :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED);
           break;
         case UserRecord.ONLINE_DND :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_DND);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_DND);
           break;
         case UserRecord.ONLINE_NA :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_NA);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_NA);
           break;
         case UserRecord.ONLINE_AWAY :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AWAY);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AWAY);
           break;
         case UserRecord.ONLINE_INACTIVE :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE);
           break;
         case UserRecord.ONLINE_AVAILABLE :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE);
           break;
         default :
-          status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE);
+          status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE);
           break;
       }
     } else {
-      status = Short.valueOf(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE);
+      status = new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE);
     }
     return status;
   }
@@ -567,26 +567,26 @@ public class ContactRecord extends Record implements MemberContactRecordI {
     Character online = null;
     switch (flag) {
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED :
-        online = Character.valueOf(UserRecord.ONLINE_INVISIBLE);
+        online = new Character(UserRecord.ONLINE_INVISIBLE);
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_DND :
-        online = Character.valueOf(UserRecord.ONLINE_DND);
+        online = new Character(UserRecord.ONLINE_DND);
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_NA :
-        online = Character.valueOf(UserRecord.ONLINE_NA);
+        online = new Character(UserRecord.ONLINE_NA);
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AWAY :
-        online = Character.valueOf(UserRecord.ONLINE_AWAY);
+        online = new Character(UserRecord.ONLINE_AWAY);
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE :
-        online = Character.valueOf(UserRecord.ONLINE_INACTIVE);
+        online = new Character(UserRecord.ONLINE_INACTIVE);
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE :
-        online = Character.valueOf(UserRecord.ONLINE_AVAILABLE);
+        online = new Character(UserRecord.ONLINE_AVAILABLE);
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE :
       default :
-        online = Character.valueOf(UserRecord.ONLINE_AVAILABLE);
+        online = new Character(UserRecord.ONLINE_AVAILABLE);
         break;
     }
     return online;

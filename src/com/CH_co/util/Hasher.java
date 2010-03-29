@@ -64,7 +64,7 @@ public class Hasher extends Object { // implicit no-argument constructor
       // return only 6 bytes of the resulting hash
       byte[] h = new byte[6];
       System.arraycopy(hash, 0, h, 0, h.length);
-      hashValue = Long.valueOf(new BigInteger(h).longValue());
+      hashValue = new Long(new BigInteger(h).longValue());
       
     } catch (Throwable t) {
       throw new SecurityException("Could not produce an encoded password hash.");

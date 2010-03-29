@@ -135,8 +135,8 @@ public class FileAGetFiles extends ClientMessageAction {
         objLinkIDsV.toArray(objLinkIDs);
 
         Stats_Get_Rq request = new Stats_Get_Rq();
-        request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_FILE_LINK);
-        request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
+        request.statsForObjType = new Short(Record.RECORD_TYPE_FILE_LINK);
+        request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 

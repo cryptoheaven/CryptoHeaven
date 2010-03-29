@@ -53,7 +53,7 @@ public class UserSettingsRecord extends Record {
   public Integer sigDefault;
   public Boolean sigAddToNew;
   public Boolean sigAddToReFwd;
-  public Integer awayMinutes = Integer.valueOf(DEFAULT__AWAY_MINUTES);
+  public Integer awayMinutes = new Integer(DEFAULT__AWAY_MINUTES);
 
   public Properties spellingProps;
 
@@ -181,10 +181,10 @@ public class UserSettingsRecord extends Record {
   private void resetSettings() {
     // reset old settings
     sigListV = new Vector();
-    sigDefault = Integer.valueOf(-1);
+    sigDefault = new Integer(-1);
     sigAddToNew = Boolean.FALSE;
     sigAddToReFwd = Boolean.FALSE;
-    awayMinutes = Integer.valueOf(DEFAULT__AWAY_MINUTES);
+    awayMinutes = new Integer(DEFAULT__AWAY_MINUTES);
   }
 
   private void parseSettings(XMLElement xmlText) {
@@ -209,7 +209,7 @@ public class UserSettingsRecord extends Record {
               if (sig.getNameSafe().equalsIgnoreCase("sig")) {
                 String isDefaultSig = "" + sig.getAttribute("default");
                 if (isDefaultSig.equalsIgnoreCase("true"))
-                  sigDefault = Integer.valueOf(i);
+                  sigDefault = new Integer(i);
                 String[] data = new String[3];
                 Vector sigElementsV = sig.getChildren();
                 for (int k=0; k<sigElementsV.size(); k++) {

@@ -60,15 +60,15 @@ public class KeyTableModel extends RecordTableModel {
           { STR_KEY, STR_OWNER, STR_CREATED, STR_UPDATED, STR_KEY_ID},
           { null, null, null, null },
           { null, null, null, null },
-          { Integer.valueOf(140), Integer.valueOf(122), TIMESTAMP_PRL, TIMESTAMP_PRL, Integer.valueOf( 60) },
-          { Integer.valueOf(140), Integer.valueOf(122), TIMESTAMP_PRL, TIMESTAMP_PRL, Integer.valueOf( 60) },
-          { Integer.valueOf(140), Integer.valueOf(122), TIMESTAMP_PRS, TIMESTAMP_PRS, Integer.valueOf( 60) },
-          { Integer.valueOf(  0), Integer.valueOf(  0), TIMESTAMP_MAX, TIMESTAMP_MAX, Integer.valueOf(120) },
-          { Integer.valueOf( 90), Integer.valueOf( 90), TIMESTAMP_MIN, TIMESTAMP_MIN, Integer.valueOf( 50) },
-          { Integer.valueOf(1), Integer.valueOf(0), Integer.valueOf(2) },
-          { Integer.valueOf(1), Integer.valueOf(0), Integer.valueOf(2) },
-          { Integer.valueOf(1), Integer.valueOf(0), Integer.valueOf(2) },
-          { Integer.valueOf(1), Integer.valueOf(4) }
+          { new Integer(140), new Integer(122), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60) },
+          { new Integer(140), new Integer(122), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60) },
+          { new Integer(140), new Integer(122), TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 60) },
+          { new Integer(  0), new Integer(  0), TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120) },
+          { new Integer( 90), new Integer( 90), TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 50) },
+          { new Integer(1), new Integer(0), new Integer(2) },
+          { new Integer(1), new Integer(0), new Integer(2) },
+          { new Integer(1), new Integer(0), new Integer(2) },
+          { new Integer(1), new Integer(4) }
         });
 
   /** Creates new KeyTableModel */

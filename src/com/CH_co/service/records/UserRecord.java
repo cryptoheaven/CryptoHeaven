@@ -471,9 +471,9 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
 
 
   public static void trimChildToParent(UserRecord userToTrim, UserRecord trimToUser) {
-    userToTrim.notifyByEmail = Short.valueOf((short) trimChildBitsToParentGrants(userToTrim.notifyByEmail, trimToUser.notifyByEmail, UserRecord.EMAIL_MASK__NO_GRANT));
-    userToTrim.acceptingSpam = Short.valueOf((short) trimChildBitsToParentGrants(userToTrim.acceptingSpam, trimToUser.acceptingSpam, UserRecord.ACC_SPAM_MASK__NO_GRANT));
-    userToTrim.flags = Long.valueOf((long) trimChildBitsToParentGrants(userToTrim.flags, trimToUser.flags, UserRecord.FLAG_MASK__NO_GRANT));
+    userToTrim.notifyByEmail = new Short((short) trimChildBitsToParentGrants(userToTrim.notifyByEmail, trimToUser.notifyByEmail, UserRecord.EMAIL_MASK__NO_GRANT));
+    userToTrim.acceptingSpam = new Short((short) trimChildBitsToParentGrants(userToTrim.acceptingSpam, trimToUser.acceptingSpam, UserRecord.ACC_SPAM_MASK__NO_GRANT));
+    userToTrim.flags = new Long((long) trimChildBitsToParentGrants(userToTrim.flags, trimToUser.flags, UserRecord.FLAG_MASK__NO_GRANT));
   }
   private static long trimChildBitsToParentGrants(Number childBits, Number parentBits, long grantMask) {
     long child = childBits.longValue();
@@ -494,13 +494,13 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
    */
   public static void upgradeUserSettingsAndStatus(UserRecord toUpgrade, short newStatus, Long newParentUserId, boolean keepOldPermits) {
     UserRecord defUsr = getDefaultUserSettings(newStatus);
-    toUpgrade.notifyByEmail = Short.valueOf((short) upgradeUserSettingBits(toUpgrade.notifyByEmail, defUsr.notifyByEmail, keepOldPermits, EMAIL_MASK__NO_GRANT));
-    toUpgrade.acceptingSpam = Short.valueOf((short) upgradeUserSettingBits(toUpgrade.acceptingSpam, defUsr.acceptingSpam, keepOldPermits, ACC_SPAM_MASK__NO_GRANT));
-    toUpgrade.flags = Long.valueOf(upgradeUserSettingBits(toUpgrade.flags, defUsr.flags, keepOldPermits, FLAG_MASK__NO_GRANT));
+    toUpgrade.notifyByEmail = new Short((short) upgradeUserSettingBits(toUpgrade.notifyByEmail, defUsr.notifyByEmail, keepOldPermits, EMAIL_MASK__NO_GRANT));
+    toUpgrade.acceptingSpam = new Short((short) upgradeUserSettingBits(toUpgrade.acceptingSpam, defUsr.acceptingSpam, keepOldPermits, ACC_SPAM_MASK__NO_GRANT));
+    toUpgrade.flags = new Long(upgradeUserSettingBits(toUpgrade.flags, defUsr.flags, keepOldPermits, FLAG_MASK__NO_GRANT));
     // make sure that "Send notifications by email" are off when there is no email address set.
     boolean validEmailFormat = EmailRecord.gatherAddresses(toUpgrade.emailAddress) != null;
-    toUpgrade.notifyByEmail = Short.valueOf((short) Misc.setBit(validEmailFormat, toUpgrade.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES)); 
-    toUpgrade.status = Short.valueOf(newStatus);
+    toUpgrade.notifyByEmail = new Short((short) Misc.setBit(validEmailFormat, toUpgrade.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
+    toUpgrade.status = new Short(newStatus);
     toUpgrade.parentId = newParentUserId;
     toUpgrade.masterId = newParentUserId;
   }
@@ -622,10 +622,10 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
       default:
         throw new IllegalArgumentException("Invalid status.");
     }
-    uRec.notifyByEmail = Short.valueOf((short) notify);
-    uRec.acceptingSpam = Short.valueOf((short) accSpam);
-    uRec.flags = Long.valueOf(flags);
-    uRec.status = Short.valueOf(status);
+    uRec.notifyByEmail = new Short((short) notify);
+    uRec.acceptingSpam = new Short((short) accSpam);
+    uRec.flags = new Long(flags);
+    uRec.status = new Short(status);
     return uRec;
   }
 

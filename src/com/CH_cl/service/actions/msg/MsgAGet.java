@@ -230,7 +230,7 @@ public class MsgAGet extends ClientMessageAction {
       // Process all body fetch requests that are needed before the links can be displayed correctly.
       if (needMsgBody_dataIDsV != null) {
         for (int i=0; i<needMsgBody_dataIDsV.size(); i++) {
-          Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.get(i)), (Long)(needMsgBody_linkIDsV.get(i)), null, Long.valueOf(1)});
+          Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.get(i)), (Long)(needMsgBody_linkIDsV.get(i)), null, new Long(1)});
           getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 120000);
         }
       }
@@ -300,8 +300,8 @@ public class MsgAGet extends ClientMessageAction {
         Long[] objLinkIDs = (Long[]) ArrayUtils.toArray(objLinkIDsHS, Long.class);
 
         Stats_Get_Rq request = new Stats_Get_Rq();
-        request.statsForObjType = Short.valueOf(Record.RECORD_TYPE_MSG_LINK);
-        request.ownerObjType = Short.valueOf(Record.RECORD_TYPE_SHARE);
+        request.statsForObjType = new Short(Record.RECORD_TYPE_MSG_LINK);
+        request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 

@@ -47,7 +47,7 @@ import java.awt.event.*;
  */
 public class UserActionTable extends RecordActionTable implements ActionProducerI {
 
-  private static Integer versionedVisualsSavable = Integer.valueOf(1);
+  private static Integer versionedVisualsSavable = new Integer(1);
 
   private Action[] actions;
 
@@ -99,7 +99,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   private class InitiateAction extends AbstractActionTraced {
     public InitiateAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_to_Contacts"));
@@ -120,7 +120,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Send_Message"));

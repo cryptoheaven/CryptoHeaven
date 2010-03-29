@@ -60,15 +60,15 @@ public class GroupTableModel extends RecordTableModel {
           { STR_NAME, STR_ADD, STR_REMOVE },
           { null, null, null },
           { null, null, null },
-          { Integer.valueOf(120), Integer.valueOf(55), Integer.valueOf(55) },
-          { Integer.valueOf(120), Integer.valueOf(55), Integer.valueOf(55) },
-          { Integer.valueOf(120), Integer.valueOf(55), Integer.valueOf(55) },
-          { Integer.valueOf(  0), Integer.valueOf( 0), Integer.valueOf( 0) },
-          { Integer.valueOf( 90), Integer.valueOf(55), Integer.valueOf(55) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) },
-          { Integer.valueOf(0) }
+          { new Integer(120), new Integer(55), new Integer(55) },
+          { new Integer(120), new Integer(55), new Integer(55) },
+          { new Integer(120), new Integer(55), new Integer(55) },
+          { new Integer(  0), new Integer( 0), new Integer( 0) },
+          { new Integer( 90), new Integer(55), new Integer(55) },
+          { new Integer(0), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(1), new Integer(2) },
+          { new Integer(0), new Integer(1), new Integer(2) },
+          { new Integer(0) }
         });
 
   /** 
@@ -262,7 +262,7 @@ public class GroupTableModel extends RecordTableModel {
     if (column > 0 && aValue instanceof Boolean) {
       FolderShareRecord shareRecord = (FolderShareRecord) getRowObject(row);
       Boolean b = (Boolean) aValue;
-      Short newShort = b.booleanValue() ? Short.valueOf(FolderShareRecord.YES) : Short.valueOf(FolderShareRecord.NO);
+      Short newShort = b.booleanValue() ? new Short(FolderShareRecord.YES) : new Short(FolderShareRecord.NO);
       if (column == 1)
         shareRecord.canWrite = newShort;
       else if (column == 2)
@@ -321,7 +321,7 @@ public class GroupTableModel extends RecordTableModel {
           Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
           request.IDs = new Obj_IDList_Co();
           request.IDs.IDs = new Long[] {shareId}; 
-          request.id = Long.valueOf(Record.RECORD_TYPE_SHARE);
+          request.id = new Long(Record.RECORD_TYPE_SHARE);
 
           MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareId));
           Runnable afterJob = new Runnable() {

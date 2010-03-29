@@ -291,7 +291,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   public class IterateNextAction extends AbstractActionTraced {
     public IterateNextAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Next"), Images.get(ImageNums.GO_NEXT16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Next"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GO_NEXT24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Next"));
@@ -312,7 +312,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   public class IteratePrevAction extends AbstractActionTraced {
     public IteratePrevAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Previous"), Images.get(ImageNums.GO_PREV16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Previous"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GO_PREV24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Previous"));
@@ -341,7 +341,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       super("Split Left-Right", Images.get(ImageNums.SPLIT_LEFT_RIGHT16));
       this.switchPercentageMin = switchPercentageMin;
       this.switchPercentageMax = switchPercentageMax;
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.TOOL_TIP, "Split Left-Right");
       putValue(Actions.IN_POPUP, Boolean.FALSE);
@@ -433,7 +433,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   public static class FilterAction extends AbstractActionTraced {
     public FilterAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Search"), Images.get(ImageNums.FIND16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Find Messages and Files ...");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FIND24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Search"));
@@ -453,7 +453,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
     public SortAscDescAction(boolean isAscending, int actionId, ButtonGroup group) {
       super(isAscending ? com.CH_gui.lang.Lang.rb.getString("sort_Ascending") : com.CH_gui.lang.Lang.rb.getString("sort_Descending"));
       this.isAscending = isAscending;
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       // Set "selected" only if the primary sort column direction matches 'isAscending'
       int dir = getTableModel().getColumnHeaderData().getPrimarySortingDirection();
       boolean set = dir != 0 && isAscending == (1 == dir);
@@ -488,7 +488,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       if (getTableModel().getColumnHeaderData().getRawColumnShortName(columnIndex) == null)
         throw new IllegalArgumentException("Action does not exist, ignore it!");
       this.columnIndex = columnIndex;
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       // Set "selected" only if the primary sort column direction matches the 'columnIndex'
       int col = getTableModel().getColumnHeaderData().getPrimarySortingColumn();
       boolean set = col == columnIndex;
@@ -517,7 +517,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
     }
     public CustomizeColumnsAction(int actionId, String actionName) {
       super(actionName);
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_columns_to_render_in_the_table."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
@@ -554,7 +554,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
    */
   private void setFolderUpdateMark(Long folderId, int mark) {
     if (folderUpdateHistoryHT == null) folderUpdateHistoryHT = new Hashtable();
-    folderUpdateHistoryHT.put(folderId, Integer.valueOf(mark));
+    folderUpdateHistoryHT.put(folderId, new Integer(mark));
   }
   /**
    * @return last stored mark for given folder, or zero '0' is not stored at all.

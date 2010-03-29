@@ -188,7 +188,7 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     originalSettingsClone.sigAddToNew = Boolean.valueOf(jAddSigToNew.isSelected());
     originalSettingsClone.sigAddToReFwd = Boolean.valueOf(jAddSigToRepFwd.isSelected());
     originalSettingsClone.sigListV = listDatasV;
-    originalSettingsClone.sigDefault = Integer.valueOf(defaultSig);
+    originalSettingsClone.sigDefault = new Integer(defaultSig);
     return originalSettingsClone;
   }
 

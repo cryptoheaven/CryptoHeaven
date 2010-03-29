@@ -221,7 +221,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     public CopyAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Copy"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.COPY16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -237,7 +237,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     public SelectAllAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Select_All"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.SELECT_ALL16));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }

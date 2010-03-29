@@ -349,7 +349,7 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
             cntTotal += cnt;
             if (!anySignal) {
               for (int i=0; i<cnt; i++) {
-                Byte b = Byte.valueOf(buff[i]);
+                Byte b = new Byte(buff[i]);
                 anySignalHS.add(b);
               }
               anySignal = anySignalHS.size() >= 8;

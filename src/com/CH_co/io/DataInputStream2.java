@@ -127,7 +127,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Byte.valueOf(readByte());
+      return new Byte(readByte());
   }
 
   public Character readCharByte() throws IOException {
@@ -137,7 +137,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid character value read.");
     else
-      return Character.valueOf((char) readByte());
+      return new Character((char) readByte());
   }
 
   public String readString() throws IOException {
@@ -171,7 +171,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Float.valueOf(readFloat());
+      return new Float(readFloat());
   }
 
   public Double readDoubleObj() throws IOException {
@@ -181,7 +181,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Double.valueOf(readDouble());
+      return new Double(readDouble());
   }
 
   public Long readLongObj() throws IOException {
@@ -191,7 +191,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Long.valueOf(readLong());
+      return new Long(readLong());
   }
 
   public Integer readInteger() throws IOException {
@@ -201,7 +201,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Integer.valueOf(readInt());
+      return new Integer(readInt());
   }
 
   public Short readSmallint() throws IOException {
@@ -211,7 +211,7 @@ public class DataInputStream2 extends DataInputStream {
     else if (nullIndicator != 0)
       throw new IllegalStateException("Invalid byte value read.");
     else
-      return Short.valueOf(readShort());
+      return new Short(readShort());
   }
 
   public File readFile(ProgMonitor progressMonitor) throws IOException {

@@ -205,8 +205,6 @@ public class MsgPanelUtils extends Object {
           recsV = isCopyBlind ? recsVbcc : recsV;
 
           String sId = st.nextToken();
-          String text = com.CH_gui.lang.Lang.rb.getString("unknown");
-          Icon icon = null;
           Record rec = null;
           if (typeChar == MsgDataRecord.RECIPIENT_USER || typeChar == MsgDataRecord.RECIPIENT_BOARD) {
             Long lId = Long.valueOf(sId);
@@ -230,8 +228,8 @@ public class MsgPanelUtils extends Object {
               } else {
                 fRec = new FolderRecord();
                 fRec.folderId = lId;
-                fRec.folderType = Short.valueOf(FolderRecord.FILE_FOLDER);
-                fRec.numOfShares = Short.valueOf((short)1);
+                fRec.folderType = new Short(FolderRecord.FILE_FOLDER);
+                fRec.numOfShares = new Short((short)1);
                 recsV.addElement(fRec);
               }
               countGathered ++;
@@ -283,7 +281,7 @@ public class MsgPanelUtils extends Object {
       recipients = addressBookFilter.filterExclude(recipients);
       // gather address contacts for the address books selected
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), Short.valueOf(Record.RECORD_TYPE_FOLDER));
+      MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), new Short(Record.RECORD_TYPE_FOLDER));
       Record[] addressContactDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(addressContactLinks));
       // filter out messages leaving address contacts objects
       addressContactDatas = new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR).filterInclude(addressContactDatas);

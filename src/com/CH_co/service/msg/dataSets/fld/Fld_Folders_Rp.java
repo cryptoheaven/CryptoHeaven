@@ -74,7 +74,7 @@ public class Fld_Folders_Rp extends ProtocolMsgDataSet {
         dataOut.writeLongObj(folderRecords[i].parentFolderId);
         dataOut.writeLongObj(folderRecords[i].ownerUserId);
         if (clientBuild < 324 && folderRecords[i].folderType.shortValue() == FolderRecord.CHATTING_FOLDER) {
-          dataOut.writeSmallint(Short.valueOf(FolderRecord.POSTING_FOLDER));
+          dataOut.writeSmallint(new Short(FolderRecord.POSTING_FOLDER));
         } else {
           dataOut.writeSmallint(folderRecords[i].folderType);
         }
@@ -153,7 +153,7 @@ public class Fld_Folders_Rp extends ProtocolMsgDataSet {
         if (clientBuild >= 296 && serverBuild >= 296)
           shareRecords[i].ownerType = dataIn.readSmallint();
         else
-          shareRecords[i].ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
+          shareRecords[i].ownerType = new Short(Record.RECORD_TYPE_USER);
         shareRecords[i].ownerUserId = dataIn.readLongObj();
         shareRecords[i].setViewParentId(dataIn.readLongObj());
         shareRecords[i].setEncFolderName(dataIn.readSymCipherBulk());

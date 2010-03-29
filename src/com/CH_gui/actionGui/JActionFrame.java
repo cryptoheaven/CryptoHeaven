@@ -58,7 +58,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   public static boolean ENABLE_FRAME_TOOLBARS = false;
   private boolean isWithToolBars = false;
 
-  private static Integer versionedVisualsSavable = Integer.valueOf(4);
+  private static Integer versionedVisualsSavable = new Integer(4);
 
   private static final boolean ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS = false;
   public static boolean ENABLE_MENU_CUSTOMIZATION_ACTION = true;
@@ -252,7 +252,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       try {
         setExtendedState = Frame.class.getMethod("setExtendedState", new Class[] { Integer.TYPE });
         if (setExtendedState != null) {
-          setExtendedState.invoke(JActionFrame.this, new Object[] { Integer.valueOf(xState) });
+          setExtendedState.invoke(JActionFrame.this, new Object[] { new Integer(xState) });
         }
       } catch (Exception t) {
       }
@@ -380,7 +380,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     public CustomizeToolsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Toolbar_..."), Images.get(ImageNums.TOOLS16));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Customize_Toolbar"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -466,7 +466,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     public CustomizeMenuAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Menus_..."), Images.get(ImageNums.TOOLS16));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Customize_Menu_Bar"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -479,7 +479,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     public ToolTipsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Display_Tool_Tips"));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Enable/Disable_Tool_Tip_help"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.STATE_CHECK, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -495,7 +495,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       super(look.getName());
       this.lafClassName = look.getClassName();
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_the_application_Look_And_Feel"));
-      putValue(Actions.ACTION_ID, Integer.valueOf(actionId));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
       // set "selected" only if the current L&F is the one specified
       putValue(Actions.SELECTED_RADIO, Boolean.valueOf(UIManager.getLookAndFeel().getName().equals(look.getName())));
       putValue(Actions.BUTTON_GROUP, group);

@@ -200,10 +200,10 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
             objects[i] = null;
             break;
           case TYPE_LONG:
-            objects[i] = Long.valueOf(dataIn.readLong());
+            objects[i] = new Long(dataIn.readLong());
             break;
           case TYPE_INT:
-            objects[i] = Integer.valueOf(dataIn.readInt());
+            objects[i] = new Integer(dataIn.readInt());
             break;
           case TYPE_STRING:
             objects[i] = dataIn.readString();
@@ -213,7 +213,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
             objects[i] = protocolMsgDataSet;
             break;
           case TYPE_SHORT:
-            objects[i] = Short.valueOf(dataIn.readShort());
+            objects[i] = new Short(dataIn.readShort());
             break;
           case TYPE_BOOLEAN:
             objects[i] = Boolean.valueOf(dataIn.readBoolean());

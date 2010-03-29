@@ -59,7 +59,7 @@ abstract public class InternetAddressRecord extends Record {
       Long oldId = (Long) ids.get(address);
       if (oldId == null) {
         lastId ++;
-        oldId = Long.valueOf(lastId);
+        oldId = new Long(lastId);
         ids.put(address, oldId);
       }
       this.id = oldId;

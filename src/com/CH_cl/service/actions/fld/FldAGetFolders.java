@@ -94,7 +94,7 @@ public class FldAGetFolders extends ClientMessageAction {
     // remove old-style local file folder
     if (folderRecords != null && folderRecords.length > 0) {
       FolderRecord oldLocalFolder = new FolderRecord();
-      oldLocalFolder.folderId = Long.valueOf(0);
+      oldLocalFolder.folderId = new Long(0);
       folderRecords = (FolderRecord[]) ArrayUtils.getDifference(folderRecords, new FolderRecord[] { oldLocalFolder });
     }
 

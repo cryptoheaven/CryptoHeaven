@@ -562,7 +562,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
         if (isPermitsChanged()) {
           int newPermits = getNewPermits();
           int code = amIOwner ? CommandCodes.CNT_Q_ALTER_SETTINGS : CommandCodes.CNT_Q_ALTER_PERMITS;
-          Object[] objs = new Object[] { contactRecord.contactId, Integer.valueOf(newPermits) };
+          Object[] objs = new Object[] { contactRecord.contactId, new Integer(newPermits) };
           Obj_List_Co dataSet = new Obj_List_Co();
           dataSet.objs = objs;
           SIL.submitAndReturn(new MessageAction(code, dataSet));

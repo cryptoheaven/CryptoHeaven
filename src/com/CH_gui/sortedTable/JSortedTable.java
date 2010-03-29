@@ -461,10 +461,10 @@ public class JSortedTable extends JTable implements DisposableObj {
               int viewColumnIndex_Sent = JSortedTable.this.convertColumnIndexToView(modelColumnIndex_Sent);
               // in order columns appear when combined: 1) From, 2) Sent, 3) Posting
               if (viewColumnIndex_From < 0)
-                columnsV.addElement(Integer.valueOf(MsgTableModel.COLUMN_INDEX__FROM));
+                columnsV.addElement(new Integer(MsgTableModel.COLUMN_INDEX__FROM));
               if (viewColumnIndex_Sent < 0)
-                columnsV.addElement(Integer.valueOf(MsgTableModel.COLUMN_INDEX__SENT));
-              columnsV.addElement(Integer.valueOf(MsgTableModel.COLUMN_INDEX__POSTING));
+                columnsV.addElement(new Integer(MsgTableModel.COLUMN_INDEX__SENT));
+              columnsV.addElement(new Integer(MsgTableModel.COLUMN_INDEX__POSTING));
             }
           }
           Integer[] columns = null;
@@ -472,7 +472,7 @@ public class JSortedTable extends JTable implements DisposableObj {
           if (columnsV.size() > 0) {
             columns = (Integer[]) ArrayUtils.toArray(columnsV, Integer.class);
           } else {
-            columns = new Integer[] { Integer.valueOf(column) };
+            columns = new Integer[] { new Integer(column) };
           }
           // Shift and click
           if ( (shiftPressed && !controlPressed) || (!shiftPressed && controlPressed) ) {

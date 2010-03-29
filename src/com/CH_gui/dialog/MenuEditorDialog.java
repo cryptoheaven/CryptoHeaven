@@ -386,7 +386,7 @@ public class MenuEditorDialog extends GeneralDialog {
     int keyCode = e.getKeyCode();
     if (modifiers == 0) {
       jMnemonic.setText(KeyEvent.getKeyText(keyCode));
-      mnemonic = Integer.valueOf(keyCode);
+      mnemonic = new Integer(keyCode);
       currentMenuActionItem.setMnemonic(mnemonic);
     }
   }

@@ -325,10 +325,10 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
   }
   private void searchAction(boolean broaderSearchIfNoResults) {
     boolean inputValid = true;
-    String id = jUserID.getText().trim();
+    String sId = jUserID.getText().trim();
     String nick = jNickname.getText().trim();
 
-    StringTokenizer st = new StringTokenizer(nick + "," + id, ",;");
+    StringTokenizer st = new StringTokenizer(nick + "," + sId, ",;");
     lastSearchStrings = new String[st.countTokens()];
     int tokenIndex = 0;
     while (st.hasMoreTokens()) {
@@ -337,9 +337,9 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     }
 
     Long uID = null;
-    if (id != null && id.length() > 0) {
+    if (sId != null && sId.length() > 0) {
       try {
-        uID = Long.valueOf(id);
+        uID = Long.valueOf(sId);
       } catch (NumberFormatException e) {
         inputValid = false;
         String messageText = com.CH_gui.lang.Lang.rb.getString("msg_User_ID_must_have_a_numeric_value.");

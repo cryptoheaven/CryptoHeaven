@@ -102,7 +102,7 @@ public class MsgDataRecord extends Record {
   private byte[] rawRecipients;
   private BASymCipherBulk encSubject;
   private BASymCipherBulk encText;
-  private Short flags = Short.valueOf((short) 0); // bits flags to mark compression in recipients/subject/body (1,2,3rd bit respectively)
+  private Short flags = new Short((short) 0); // bits flags to mark compression in recipients/subject/body (1,2,3rd bit respectively)
   private BASymCipherBulk encSignedDigest;    // digest of plain data, signed, then encrypted with msg's symmetric key
   private BASymCipherBulk encEncDigest;       // digest of encrypted data, encrypted with msg's symmetric key
   private Long sendPrivKeyId;

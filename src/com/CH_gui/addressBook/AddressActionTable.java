@@ -37,7 +37,7 @@ import com.CH_gui.table.RecordTableModel;
  */
 public class AddressActionTable extends MsgActionTable {
 
-  private static Integer versionedVisualsSavable = Integer.valueOf(1);
+  private static Integer versionedVisualsSavable = new Integer(1);
 
   /** Creates new AddressActionTable */
   public AddressActionTable(RecordTableModel model, boolean previewMode) {

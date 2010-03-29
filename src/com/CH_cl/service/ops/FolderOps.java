@@ -74,7 +74,7 @@ public class FolderOps extends Object {
     Long parentFolderId = null;
     Long parentShareId = null;
     Long myUserId = cache.getMyUserId();
-    Short ownerType = Short.valueOf(Record.RECORD_TYPE_USER);
+    Short ownerType = new Short(Record.RECORD_TYPE_USER);
     Long ownerUserId = myUserId;
     Set groupIDsSet = null;
 
@@ -124,15 +124,15 @@ public class FolderOps extends Object {
     request.parentFolderId = parentFolderId;
     request.parentShareId = parentShareId;
 
-    request.folderType = Short.valueOf(newFolderType);
+    request.folderType = new Short(newFolderType);
 
     request.folderShareRecord.setFolderName(newFolderName.trim());
     if (newFolderDesc.trim().length() > 0) {
       request.folderShareRecord.setFolderDesc(newFolderDesc.trim());
     }
 
-    request.numToKeep = numToKeep != null ? numToKeep : Short.valueOf((short)0);
-    request.keepAsOldAs = keepAsOldAs != null ? keepAsOldAs : Integer.valueOf(0);
+    request.numToKeep = numToKeep != null ? numToKeep : new Short((short)0);
+    request.keepAsOldAs = keepAsOldAs != null ? keepAsOldAs : new Integer(0);
 
     request.folderShareRecord.setSymmetricKey(baSymmetricKey);
     request.folderShareRecord.ownerType = ownerType;
@@ -398,7 +398,7 @@ public class FolderOps extends Object {
     Long junkFolderId = userRecord.junkFolderId;
     if (junkFolderId == null || cache.getFolderRecord(junkFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, Integer.valueOf(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {

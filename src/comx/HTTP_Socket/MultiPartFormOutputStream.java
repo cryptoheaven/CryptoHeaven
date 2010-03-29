@@ -154,7 +154,7 @@ public class MultiPartFormOutputStream {
    * @throws  java.io.IOException  on input/output errors
    */
   public void writeField(String name, char value) throws java.io.IOException {
-    writeField(name, Character.valueOf(value).toString());
+    writeField(name, new Character(value).toString());
   }
 
   /**

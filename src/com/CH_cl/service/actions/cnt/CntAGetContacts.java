@@ -249,7 +249,7 @@ public class CntAGetContacts extends ClientMessageAction {
 
             ActionListener defaultButtonAction = new ActionListener() {
               public void actionPerformed(ActionEvent event) {
-                Object[] objs = new Object[] { cRec.contactId, Integer.valueOf(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
+                Object[] objs = new Object[] { cRec.contactId, new Integer(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
                 Obj_List_Co dataSet = new Obj_List_Co();
                 dataSet.objs = objs;
                 getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_ALTER_SETTINGS, dataSet));

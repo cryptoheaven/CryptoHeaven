@@ -479,7 +479,7 @@ public class FetchedDataCache extends Object {
       // convert old chatting into new explicit type
       for (int i=0; i<records.length; i++) {
         if (records[i].folderType.shortValue() == FolderRecord.POSTING_FOLDER && records[i].isChatting())
-          records[i].folderType = Short.valueOf(FolderRecord.CHATTING_FOLDER);
+          records[i].folderType = new Short(FolderRecord.CHATTING_FOLDER);
       }
       synchronized (this) {
         records = (FolderRecord[]) RecordUtils.merge(folderRecordMap, records);
@@ -1576,7 +1576,7 @@ public class FetchedDataCache extends Object {
   public synchronized FileLinkRecord[] getFileLinkRecords(Long shareId) {
     // find the corresponding folderId
     Long folderId = getFolderShareRecord(shareId).folderId;
-    return getFileLinkRecordsOwnerAndType(folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
+    return getFileLinkRecordsOwnerAndType(folderId, new Short(Record.RECORD_TYPE_FOLDER));
   }
 
   /**
@@ -2245,12 +2245,12 @@ public class FetchedDataCache extends Object {
             Long[] statIDs = null;
             Record[] links = null;
             if (fRec.isFileType()) {
-              links = getFileLinkRecordsOwnerAndType(fRec.folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
+              links = getFileLinkRecordsOwnerAndType(fRec.folderId, new Short(Record.RECORD_TYPE_FOLDER));
               statType = STAT_TYPE_FILE;
               if (trace != null) trace.data(30, links);
             }
             else if (fRec.isMsgType()) {
-              links = getMsgLinkRecordsOwnerAndType(fRec.folderId, Short.valueOf(Record.RECORD_TYPE_FOLDER));
+              links = getMsgLinkRecordsOwnerAndType(fRec.folderId, new Short(Record.RECORD_TYPE_FOLDER));
               statType = STAT_TYPE_MESSAGE;
               if (trace != null) trace.data(31, links);
             }

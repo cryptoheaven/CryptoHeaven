@@ -505,7 +505,7 @@ public class ToolBarModel extends Object {
       int actionId = Integer.parseInt(st.nextToken());
       MenuActionItem action = new MenuActionItem(toolName, actionId, -1, -1, -1);
       newToolBarModel.add(action);
-      newToolBarModelHM.put(Integer.valueOf(actionId), action);
+      newToolBarModelHM.put(new Integer(actionId), action);
     }
     return new Object[] { newToolBarModel, newToolBarModelHM };
   }

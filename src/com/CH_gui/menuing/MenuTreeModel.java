@@ -681,8 +681,8 @@ public class MenuTreeModel extends Object {
       }
     } else {
       // if no assigned node, throw it into 'Not Assigned' (-100,000)
-      //node = findNode(Integer.valueOf(-100000), (DefaultMutableTreeNode) treeModel.getRoot());
-      node = findNode(Integer.valueOf(-100000), treeModelHM);
+      //node = findNode(new Integer(-100000), (DefaultMutableTreeNode) treeModel.getRoot());
+      node = findNode(new Integer(-100000), treeModelHM);
       if (node != null) {
         menuNode = new MenuActionItem(action);
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(menuNode);
@@ -1560,7 +1560,7 @@ public class MenuTreeModel extends Object {
           newTreeModel = new DefaultTreeModel(prevNode);
         else {
           parentNode.add(prevNode);
-          newTreeModelHT.put(Integer.valueOf(actionId), prevNode);
+          newTreeModelHT.put(new Integer(actionId), prevNode);
         }
       }
     }
