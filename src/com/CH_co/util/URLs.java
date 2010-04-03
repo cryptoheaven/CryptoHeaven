@@ -497,6 +497,7 @@ public class URLs extends Object {
         }
         // if no exception then set the new private label URL as default
         PRIVATE_LABEL_SETTINGS_URL = url;
+        // load the default server list
       } catch (Throwable t) {
         System.out.println("Private Label NOT loaded, stack trace:");
         t.printStackTrace();

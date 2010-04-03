@@ -25,7 +25,6 @@ import com.CH_co.service.records.filters.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 import com.CH_cl.tree.*;
@@ -90,7 +89,6 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
 
   private int leadingActionId = Actions.LEADING_ACTION_ID_FOLDER_ACTION_TREE;
   private int leadingMsgActionId = Actions.LEADING_ACTION_ID_MSG_ACTION_TABLE;
-  private ServerInterfaceLayer SIL;
 
   // For listening on folder updates so we can act when new stuff comes.
   private FolderListener folderListener;
@@ -113,8 +111,6 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   public FolderActionTree(FolderTreeModelCl treeModel) {
     super(treeModel);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderActionTree.class, "FolderActionTree()");
-
-    SIL = MainFrame.getServerInterfaceLayer();
 
     initActions();
     //this.setEditable(true);  // disable editing in the tree
@@ -280,8 +276,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       }
       if (!isChatAction) {
         Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
-        if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
-        else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, SIL.getFetchedDataCache(), null);
+        if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, MainFrame.getServerInterfaceLayer().getFetchedDataCache(), null);
+        else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, getFolderTreeModel(), getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Create_New_Folder"), true, newFolderType, MainFrame.getServerInterfaceLayer().getFetchedDataCache(), null);
       }
     }
     private void updateIconAndText(FolderPair[] selectedFolderPairs) {
@@ -342,8 +338,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
       FolderTreeModelCl treeModel = (FolderTreeModelCl) FolderActionTree.this.getFolderTreeModel().createFilteredModel(FolderFilter.MOVE_FOLDER, new FolderTreeModelCl());
-      if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, SIL.getFetchedDataCache(), null);
-      else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, SIL.getFetchedDataCache(), null);
+      if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, MainFrame.getServerInterfaceLayer().getFetchedDataCache(), null);
+      else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, MainFrame.getServerInterfaceLayer().getFetchedDataCache(), null);
     }
   }
 
@@ -412,7 +408,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           selected = new FolderPair[] { selectFolder(w, title, new FolderFilter(new short[] { FolderRecord.CATEGORY_FILE_FOLDER, FolderRecord.FILE_FOLDER })) };
         }
         if (selected != null && selected[0] != null) {
-          UploadUtilities.uploadFileChoice(selected[0].getFolderShareRecord(), FolderActionTree.this, SIL);
+          UploadUtilities.uploadFileChoice(selected[0].getFolderShareRecord(), FolderActionTree.this, MainFrame.getServerInterfaceLayer());
         }
       }
     }
@@ -456,7 +452,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         FolderPair[] folderPairs = new FolderPair[selectedFolderPairs.size()];
         selectedFolderPairs.toArray(folderPairs);
         if (folderPairs != null && folderPairs.length > 0)
-          DownloadUtilities.downloadFilesChoice(folderPairs, null, FolderActionTree.this, SIL);
+          DownloadUtilities.downloadFilesChoice(folderPairs, null, FolderActionTree.this, MainFrame.getServerInterfaceLayer());
       }
     }
     private void updateText(int countSelectedFolderPairs) {
@@ -828,7 +824,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
             d.pack();
             d.setVisible(true);
 
-            FetchedDataCache cache = SIL.getFetchedDataCache();
+            FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
             Long toUserId = null;
             if (d.getResultButton() != null && d.getResultButton().intValue() == ContactSelectDialog.DEFAULT_OK_INDEX) {
               if (jYourself.isSelected()) {
@@ -899,7 +895,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                 // Fetch any shares that are not in cache yet
                 if (shareIDsV.size() > 0) {
                   Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsV, Long.class);
-                  SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000);
+                  MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000);
                 }
                 // See if we need to create any additional shares
                 Vector addSharesV = new Vector();
@@ -927,7 +923,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                     // Fetch public key for 'toUserId' if not already fetched
                     KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
                     if (kRec == null || kRec.plainPublicKey == null) {
-                      SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000);
+                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000);
                       kRec = cache.getKeyRecordForUser(toUserId);
                     }
                     newShare.seal(kRec);
@@ -941,7 +937,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                 }
                 addSharesRequest.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
                 MessageAction requestAction = new MessageAction(CommandCodes.FLD_Q_TRANSFER_OWNERSHIP, new Obj_List_Co(new Object[] { toUserId, folderIDs, addSharesRequest }));
-                SIL.submitAndReturn(requestAction);
+                MainFrame.getServerInterfaceLayer().submitAndReturn(requestAction);
               }
             }
           }
@@ -1283,7 +1279,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       int count = getSelectionCount();
       int countPairs = 0;
 
-      UserRecord userRecord = SIL.getFetchedDataCache().getUserRecord();
+      UserRecord userRecord = MainFrame.getServerInterfaceLayer().getFetchedDataCache().getUserRecord();
 
       boolean moveOk = true;
       boolean deleteOk = true;

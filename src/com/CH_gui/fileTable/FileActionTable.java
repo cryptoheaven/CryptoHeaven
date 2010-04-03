@@ -96,7 +96,6 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private int leadingActionId = Actions.LEADING_ACTION_ID_FILE_ACTION_TABLE;
   private int leadingFolderActionId = Actions.LEADING_ACTION_ID_FOLDER_ACTION_TREE;
   private int leadingMsgActionId = Actions.LEADING_ACTION_ID_MSG_ACTION_TABLE;
-  private ServerInterfaceLayer SIL;
 
   private final EventListenerList folderSelectionListenerList = new EventListenerList();
 
@@ -106,7 +105,6 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "FileActionTable()");
 
     initActions();
-    this.SIL = MainFrame.getServerInterfaceLayer();
     ((FileTableModel) getTableModel()).setAutoUpdate(true);
 
     addDND(getJSortedTable());
@@ -286,7 +284,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       if (chosenFolderPair != null) {
         File_MoveCopy_Rq request = prepareMoveCopyRequest(chosenFolderPair.getFolderShareRecord(), fLinks);
         if (request != null) {
-          SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_COPY_FILES, request));
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.FILE_Q_COPY_FILES, request));
         }
       }
     }
@@ -694,7 +692,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           statsClones[i].mark = newMark;
 
         Stats_Update_Rq request = new Stats_Update_Rq(statsClones);
-        SIL.submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
+        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
       }
     }
     if (trace != null) trace.exit(FileActionTable.class);

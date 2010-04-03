@@ -98,7 +98,6 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private int leadingFileActionId = Actions.LEADING_ACTION_ID_FILE_ACTION_TABLE; // most actions are duplicates of file table actions
   private int leadingFolderActionId = Actions.LEADING_ACTION_ID_FOLDER_ACTION_TREE;
   private int leadingMsgActionId = Actions.LEADING_ACTION_ID_MSG_ACTION_TABLE;
-  private ServerInterfaceLayer serverInterfaceLayer;
 
   private final EventListenerList folderSelectionListenerList = new EventListenerList();
 
@@ -108,7 +107,6 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleActionTable.class, "RecycleActionTable()");
 
     initActions();
-    this.serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
     ((RecycleTableModel) getTableModel()).setAutoUpdate(true);
 
     addDND(getJSortedTable());

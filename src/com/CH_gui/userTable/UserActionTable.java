@@ -63,7 +63,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   private static final int NUM_ACTIONS = CUSTOMIZE_COLUMNS_ACTION + 1;
 
   private int leadingActionId = Actions.LEADING_ACTION_ID_USER_ACTION_TABLE;
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
 
 
   /** Creates new UserActionTable */
@@ -73,7 +73,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   public UserActionTable(RecordTableModel model) {
     super(model);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserActionTable.class, "UserActionTable()");
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
+    SIL = MainFrame.getServerInterfaceLayer();
     initActions();
     addDND(getJSortedTable());
     addDND(getViewport());
@@ -186,7 +186,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
     if (selectedRecords != null) {
       count = selectedRecords.length;
 
-      FetchedDataCache cache = serverInterfaceLayer.getFetchedDataCache();
+      FetchedDataCache cache = SIL.getFetchedDataCache();
       Long userId = cache.getMyUserId();
 
       for (int i=0; i<selectedRecords.length; i++) {

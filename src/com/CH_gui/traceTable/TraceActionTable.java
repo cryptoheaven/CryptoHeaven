@@ -57,7 +57,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
 
 
   private int leadingActionId = Actions.LEADING_ACTION_ID_STAT_ACTION_TABLE;
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
 
 
   /** Creates new TraceActionTable
@@ -68,7 +68,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   }
   private void initialize() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceActionTable.class, "initialize()");
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
+    SIL = MainFrame.getServerInterfaceLayer();
     initActions();
     if (trace != null) trace.exit(TraceActionTable.class);
   }
@@ -262,7 +262,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
 
       count = selectedUserRecords.length;
 
-      FetchedDataCache cache = serverInterfaceLayer.getFetchedDataCache();
+      FetchedDataCache cache = SIL.getFetchedDataCache();
       Long userId = cache.getMyUserId();
 
       for (int i=0; i<selectedUserRecords.length; i++) {

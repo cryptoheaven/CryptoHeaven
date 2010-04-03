@@ -1042,10 +1042,27 @@ public class LoginFrame extends JFrame {
       }
     });
 
+    // add other stored in properties servers
     ArrayList serverList = getServerList();
     for (int i=0; i<serverList.size(); i++) {
+      String srvStr = (String) serverList.get(i);
       serverCombo.addItem(serverList.get(i));
+
+
+      boolean isPresent = false;
+      for (int k=0; k<serverCombo.getItemCount(); k++) {
+        if (serverCombo.getItemAt(k).equals(srvStr)) {
+          isPresent = true;
+          break;
+        }
+      }
+      if (!isPresent) {
+        serverCombo.addItem(srvStr);
+      }
     }
+    // insert any default or PrivateLabel servers under the current selected item
+    insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_1), 0, false);
+    insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_2), 1, false);
     initiateProxySettings();
 
 //    newEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
@@ -1145,6 +1162,31 @@ public class LoginFrame extends JFrame {
     return panel;
   }
 
+  private void insertServerChoice(String addSrv, int index, boolean isReplaceExisting) {
+    if (addSrv != null && addSrv.length() > 0) {
+      boolean shouldInsert = true;
+      for (int i=0; i<serverCombo.getItemCount(); i++) {
+        String srv = (String) serverCombo.getItemAt(i);
+        if (srv.equalsIgnoreCase(addSrv)) {
+          if (isReplaceExisting) {
+            shouldInsert = true;
+            serverCombo.removeItemAt(i);
+          } else {
+            shouldInsert = false;
+          }
+          break;
+        }
+      }
+      if (shouldInsert) {
+        int itemCount = serverCombo.getItemCount();
+        if (itemCount <= index) {
+          serverCombo.addItem(addSrv);
+        } else {
+          serverCombo.insertItemAt(addSrv, index);
+        }
+      }
+    }
+  }
 
   /* Create three buttons: "Login", "Cancel" and "Create New Account */
   private JButton[] createButtons() {
