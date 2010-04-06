@@ -12,6 +12,8 @@
 
 package com.CH_gui.recycleTable;
 
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.Record;
 import javax.swing.table.TableModel;
 
 import com.CH_co.trace.Trace;
@@ -56,24 +58,25 @@ public class Fld_First_TableSorter extends TableSorter {
     // Return Code
     int rc = 0;
 
+    boolean isFolder1;
+    boolean isFolder2;
+
     int typeColumn = JSortedTable.getColumnIndex(getRawModel(), RecycleTableModel.STR_TYPE);
     String fileType1 = null;
     String fileType2 = null;
     TableModel model = getRawModel();
     if (model instanceof RecordTableModel) {
       RecordTableModel rtModel = (RecordTableModel) model;
-      fileType1 = (String) rtModel.getValueAtRawColumn(rtModel.getRowObjectNoTrace(row1), typeColumn, true);
-      fileType2 = (String) rtModel.getValueAtRawColumn(rtModel.getRowObjectNoTrace(row2), typeColumn, true);
+      Record rec1 = rtModel.getRowObjectNoTrace(row1);
+      Record rec2 = rtModel.getRowObjectNoTrace(row2);
+      isFolder1 = rec1 != null && rec1 instanceof FolderPair;
+      isFolder2 = rec2 != null && rec2 instanceof FolderPair;
     } else {
       fileType1 = (String) model.getValueAt(row1, typeColumn);
       fileType2 = (String) model.getValueAt(row2, typeColumn);
+      isFolder1 = fileType1 != null && (fileType1.equals(RecycleTableModel.STR_FILE_FOLDER) || fileType1.equals(RecycleTableModel.STR_SHARED_FOLDER));
+      isFolder2 = fileType2 != null && (fileType2.equals(RecycleTableModel.STR_FILE_FOLDER) || fileType2.equals(RecycleTableModel.STR_SHARED_FOLDER));
     }
-
-    boolean isFolder1;
-    boolean isFolder2;
-
-    isFolder1 = fileType1 != null && (fileType1.equals(RecycleTableModel.STR_FILE_FOLDER) || fileType1.equals(RecycleTableModel.STR_SHARED_FOLDER));
-    isFolder2 = fileType2 != null && (fileType2.equals(RecycleTableModel.STR_FILE_FOLDER) || fileType2.equals(RecycleTableModel.STR_SHARED_FOLDER));
 
     if (isFolder1 && !isFolder2)
       rc = -1;

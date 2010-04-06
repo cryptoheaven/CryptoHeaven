@@ -47,10 +47,10 @@ public class GlobalProperties extends Object {
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.1f;
-  public static final short PROGRAM_VERSION_MINOR = 4;
+  public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 518;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 520;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -190,6 +190,7 @@ public class GlobalProperties extends Object {
   // build 514 '.valueOf' replaced by constructor call to revert from Java 1.5 to 1.4
   // build 516 login server list inserts the private-label servers
   // build 518 Folder tree upload bug fixed
+  // build 520 File table "Type" column sort bug fix
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
