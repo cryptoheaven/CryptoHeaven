@@ -35,6 +35,7 @@ public class ImageNums extends Object {
   public static final int LOGO_KEY_MAIN;
   public static final int LOGO_BANNER_MAIN;
   public static final int WINDOW_POPUP;
+  public static final int FRAME_LOCK32;
 
   public static final int KEYBOARD;
   public static final int KEY_LENGTH32;
@@ -288,7 +289,6 @@ public class ImageNums extends Object {
   public static final int KEY16;
   public static final int SEAL8_15;
   //public static final int KEY_TOOL;
-  public static final int FRAME_LOCK32;
   //public static final int LOCK_CLOSED16;
   //public static final int LOCK_CLOSED_SMALL;
   //public static final int LOCK_OPEN_SMALL;
@@ -565,7 +565,7 @@ public class ImageNums extends Object {
 
 
     /******************************************************************
-     * First 3 indexed images are permanent and used in customizations.
+     * First 4 indexed images are permanent and used in customizations.
      ******************************************************************/
     LOGO_KEY_MAIN = i;
     images[i] = "LogoKey435_260"; i++;
@@ -573,8 +573,10 @@ public class ImageNums extends Object {
     images[i] = "LogoBanner435_80"; i++;
     WINDOW_POPUP = i;
     images[i] = "WindowPopup"; i++;
+    FRAME_LOCK32 = i;
+    images[i] = "FrameLock32"; i++;
     /******************************************************************
-     * First 3 indexed images are permanent and used in customizations.
+     * First 4 indexed images are permanent and used in customizations.
      ******************************************************************/
 
 
@@ -1217,9 +1219,6 @@ public class ImageNums extends Object {
 
     //KEY_TOOL = i;
     //images[i] = "key_tool"; i++;
-
-    FRAME_LOCK32 = i;
-    images[i] = "FrameLock32"; i++;
 
     //LOCK_CLOSED16 = i;
     //images[i] = "lock_closed16"; i++;

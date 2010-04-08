@@ -286,6 +286,10 @@ public class URLs extends Object {
           ImageNums.setImageName(ImageNums.WINDOW_POPUP, privateLabel.getImage_WindowPopup());
       } catch (Throwable t) { }
       try {
+        if (privateLabel.getImage_FrameIcon() != null)
+          ImageNums.setImageName(ImageNums.FRAME_LOCK32, privateLabel.getImage_FrameIcon());
+      } catch (Throwable t) { }
+      try {
         if (privateLabel.getActivationCodeDefault() != null)
           customizationStrings[ACTIVATION_CODE_DEFAULT] = privateLabel.getActivationCodeDefault();
       } catch (Throwable t) { }
@@ -416,9 +420,9 @@ public class URLs extends Object {
                         Images.clearImageCache(i);
                       }
                     }
-                    // First 3 Customization images
+                    // First 4 Customization images
                     String customizationImageName = "customization-image";
-                    for (int i=0; i<3; i++) {
+                    for (int i=0; i<4; i++) {
                       String replacement = (String) replacementHT.get(customizationImageName+"-"+i);
                       if (replacement != null) {
                         ImageNums.setImageName(i, replacement);

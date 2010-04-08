@@ -64,6 +64,7 @@ public interface PrivateLabelI {
   public String getImage_LogoKeyMain();
   public String getImage_LogoBanner();
   public String getImage_WindowPopup();
+  public String getImage_FrameIcon();
 
   // Below this line are items loaded after login and not required for proper look of login dialog
 
