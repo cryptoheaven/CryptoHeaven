@@ -50,7 +50,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 522;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 524;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -192,6 +192,7 @@ public class GlobalProperties extends Object {
   // build 518 Folder tree upload bug fixed
   // build 520 File table "Type" column sort bug fix
   // build 522 Add Frame Icon to private label customizations
+  // build 524 Chat and Post table print view row fix, also include "From" value on each printed line
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;

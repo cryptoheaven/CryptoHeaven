@@ -814,13 +814,19 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
             MsgLinkRecord msgLink = msgLinks[i];
             sb.append("<tr>");
             for (int c=0; c<columns; c++) {
+              // table or selection view row index are not always equal, but for purpose of the renderer use current selection indexes
+              int viewRow = i;
               int viewCol = c;
               int modelCol = table.convertColumnIndexToModel(viewCol);
               int rawCol = chd.convertColumnToRawModel(modelCol);
               Object value = model.getValueAtRawColumn(msgLink, rawCol, false);
               Class cc = table.getColumnClass(c);
               TableCellRenderer tcr = table.getDefaultRenderer(cc);
-              Component comp = tcr.getTableCellRendererComponent(table, value, false, false, model.getRowForObject(msgLink.msgLinkId), viewCol);
+              Component comp = null;
+              if (tcr instanceof PostTableCellRenderer)
+                comp = ((PostTableCellRenderer) tcr).getTableCellRendererComponent(table, value, false, false, viewRow, viewCol, true);
+              else
+                comp = tcr.getTableCellRendererComponent(table, value, false, false, viewRow, viewCol);
               String s = "";
               boolean isHTMLformatted = false;
               boolean isNOwrap = false;

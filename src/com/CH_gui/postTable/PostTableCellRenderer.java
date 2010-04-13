@@ -130,6 +130,9 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   }
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    return getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column, false);
+  }
+  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column, boolean forPrint) {
     Object v = value instanceof StringBuffer ? "" : value;
     Component renderer = super.getTableCellRendererComponent(table, v, isSelected, hasFocus, row, column);
 
@@ -244,7 +247,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       }
     } // end if String Buffer
     // From
-    else if (rawColumn == 3) {
+    else if (rawColumn == 3 && !forPrint) {
       if (row > 0) {
         JSortedTable sTable = (JSortedTable) table;
         TableModel tableModel = sTable.getRawModel();
