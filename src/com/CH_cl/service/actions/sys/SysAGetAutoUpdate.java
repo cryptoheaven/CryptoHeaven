@@ -69,16 +69,27 @@ public class SysAGetAutoUpdate extends ClientMessageAction {
               AutoUpdater.isRunningFromJar()) {
             new AutoUpdater(getServerInterfaceLayer(), set.updateRecords).start();
           } else {
-            String lastStamp = GlobalProperties.getProperty(PROPERTY_SOFTWARE_UPDATE_MSG_STAMP_MILLIS, "0");
-            long now = new Date().getTime();
-            long lastStampL = 0;
-            try { lastStampL = Long.parseLong(lastStamp); } catch (Throwable t) { }
-            if (lastStampL > now || lastStampL < now-1000L*60L*60L*24L*3L) {// - 3 days;
-              String hrefStart = "<a href=\""+URLs.get(URLs.HOME_PAGE)+"\">";
-              String hrefEnd = "</a>";
-              String msg = "<html><small>Software update is available for download free of charge at " + hrefStart + URLs.get(URLs.HOME_PAGE) + hrefEnd + " on the products download page.</small></html>";
-              PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(msg));
-              GlobalProperties.setProperty(PROPERTY_SOFTWARE_UPDATE_MSG_STAMP_MILLIS, ""+now);
+            // check if any of the updates have higher build number before we popup a message, ignore different file size updates as this maybe too minor of a change
+            AutoUpdateRecord[] updateRecords = set.updateRecords;
+            boolean isSignificant = false;
+            for (int i=0; i < updateRecords.length; i++) {
+              if (updateRecords[i].build != null && updateRecords[i].build.shortValue() > GlobalProperties.PROGRAM_BUILD_NUMBER) {
+                isSignificant = true;
+                break;
+              }
+            }
+            if (isSignificant) {
+              String lastStamp = GlobalProperties.getProperty(PROPERTY_SOFTWARE_UPDATE_MSG_STAMP_MILLIS, "0");
+              long now = new Date().getTime();
+              long lastStampL = 0;
+              try { lastStampL = Long.parseLong(lastStamp); } catch (Throwable t) { }
+              if (lastStampL > now || lastStampL < now-1000L*60L*60L*24L*3L) {// - 3 days;
+                String hrefStart = "<a href=\""+URLs.get(URLs.HOME_PAGE)+"\">";
+                String hrefEnd = "</a>";
+                String msg = "<html><small>Software update is available for download free of charge at " + hrefStart + URLs.get(URLs.HOME_PAGE) + hrefEnd + " on the products download page.</small></html>";
+                PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(msg));
+                GlobalProperties.setProperty(PROPERTY_SOFTWARE_UPDATE_MSG_STAMP_MILLIS, ""+now);
+              }
             }
           }
         }
