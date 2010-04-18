@@ -1414,14 +1414,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setGUIComponentsForObj(MsgDataRecord dataRecord)");
     if (trace != null) trace.args(dataRecord);
     short objType = 0;
-    Object[] priority = null;
+    ImageText priority = null;
     boolean isExpiry = false;
     boolean isPassword = false;
     boolean hasAttachments = false;
     if (dataRecord != null) {
       objType = dataRecord.objType.shortValue();
       priority = dataRecord.getPriorityTextAndIcon();
-      String expiryText = (String) dataRecord.getExpirationIconAndText(FetchedDataCache.getSingleInstance().getMyUserId(), true)[1];
+      String expiryText = dataRecord.getExpirationIconAndText(FetchedDataCache.getSingleInstance().getMyUserId(), true).getText();
       isExpiry = expiryText != null && expiryText.trim().length() > 0;
       isPassword = dataRecord.bodyPassHash != null && dataRecord.getTextBody() == null && dataRecord.getEncText() != null && dataRecord.getEncText().size() > 0;
       hasAttachments = dataRecord.attachedFiles.shortValue() + dataRecord.attachedMsgs.shortValue() > 0;
@@ -1431,16 +1431,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
 
-  private synchronized void setGUIComponentsForObj(short objType, Object[] priority, boolean isExpiry, boolean isPassword, boolean hasAttachments) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setGUIComponentsForObj(short objType, Object[] priority, boolean isExpiry, boolean isPassword, boolean hasAttachments)");
+  private synchronized void setGUIComponentsForObj(short objType, ImageText priority, boolean isExpiry, boolean isPassword, boolean hasAttachments) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setGUIComponentsForObj(short objType, ImageText priority, boolean isExpiry, boolean isPassword, boolean hasAttachments)");
     if (trace != null) trace.args(objType);
     if (trace != null) trace.args(priority);
     if (trace != null) trace.args(isExpiry);
     if (trace != null) trace.args(isPassword);
     if (trace != null) trace.args(hasAttachments);
 
-    String priorityLabel = (String) (priority != null ? priority[0] : "");
-    Icon priorityIcon = (Icon) (priority != null ? priority[1] : null);
+    String priorityLabel = priority != null ? priority.getText() : "";
+    Icon priorityIcon = priority != null ? Images.get(priority) : null;
     if (lastGUIcomponentsMode != objType
         || !priorityLabel.equals(lastGUIpriorityMode)
         || lastGUIexpiryMode != isExpiry
@@ -1822,9 +1822,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             setAttachmentsPanel(msgLink, dataRecord, jAttachments, jLineAttachments);
           }
 
-          Object[] expObjs = dataRecord.getExpirationIconAndText(cache.getMyUserId());
-          jExpiration.setIcon((Icon) expObjs[0]);
-          jExpiration.setText((String) expObjs[1]);
+          ImageText exp = dataRecord.getExpirationIconAndText(cache.getMyUserId());
+          jExpiration.setIcon(Images.get(exp));
+          jExpiration.setText(exp.getText());
 
           boolean displayHtmlMode = !isDefaultToPLAINpreferred(msgLink, dataRecord);
 

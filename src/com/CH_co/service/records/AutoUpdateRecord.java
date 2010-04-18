@@ -13,10 +13,7 @@
 package com.CH_co.service.records;
 
 import java.sql.Timestamp;
-import javax.swing.Icon;
 
-import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /**
@@ -49,8 +46,8 @@ public class AutoUpdateRecord extends Record {
   public Integer size;
   public Timestamp dateExpired;
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public Long getId() {

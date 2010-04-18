@@ -13,20 +13,15 @@
 package com.CH_gui.keyTable;
 
 import java.awt.*;
-import java.sql.Timestamp;
 import javax.swing.JTable;
-import javax.swing.table.*;
 
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.table.*;
 import com.CH_gui.sortedTable.JSortedTable;
 
-import com.CH_cl.service.cache.FetchedDataCache;
-
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -58,7 +53,7 @@ public class KeyTableCellRenderer extends RecordTableCellRenderer {
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         JSortedTable jSortedTable = (JSortedTable) table;
         KeyRecord kRec = (KeyRecord) (((KeyTableModel) jSortedTable.getRawModel()).getRowObject(jSortedTable.convertMyRowIndexToModel(row)));
-        setIcon(kRec.getIcon());
+        setIcon(RecordGuiUtils.getIcon(kRec));
       }
     }
 

@@ -14,7 +14,6 @@ package com.CH_co.service.records;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.Icon;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.nanoxml.*;
@@ -65,8 +64,8 @@ public class UserSettingsRecord extends Record {
     if (trace != null) trace.exit(UserSettingsRecord.class);
   }
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public Long getId() {
@@ -102,7 +101,7 @@ public class UserSettingsRecord extends Record {
   }
 
   /**
-   * Seals the <code> symKey </code> to <code> encSymKey </code> 
+   * Seals the <code> symKey </code> to <code> encSymKey </code>
    * using the sealant object which is the user's public key.
    */
   public void seal(KeyRecord publicKey) {
@@ -135,7 +134,7 @@ public class UserSettingsRecord extends Record {
 
 
   /**
-   * Unseals the <code> encSymKey </code> into <code> symKey </code> 
+   * Unseals the <code> encSymKey </code> into <code> symKey </code>
    * using the unSealant object which is the user's private key.
    */
   public void unSeal(KeyRecord privateKey, StringBuffer errorBuffer) {
@@ -273,7 +272,7 @@ public class UserSettingsRecord extends Record {
   public XMLElement makeXMLData() {
     XMLElement xmlData = new XMLElement();
     xmlData.setNameSafe("settings");
-    {  
+    {
       XMLElement xml = new XMLElement();
       xml.setNameSafe("signatures");
       xml.setAttribute("sign_new", sigAddToNew != null ? ""+sigAddToNew : "false");

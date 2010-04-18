@@ -12,7 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 import java.util.Vector;
 
@@ -67,8 +66,8 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     return fileLinkId;  
   }
 
-  public Icon getIcon() {
-    return fileName != null ? (Icon) MiscGui.getFileIconAndType(fileName)[0] : null;
+  public int getIcon() {
+    return ImageNums.IMAGE_SPECIAL_HANDLING;
   }
 
   public Long getParentId() {

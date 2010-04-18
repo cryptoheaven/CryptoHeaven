@@ -40,6 +40,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -178,10 +179,10 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     localFileDestination = DownloadUtilities.getDefaultDestDir();
 
     jMsgDestination = new JMyLabel(msgDestination.getMyName());
-    jMsgDestination.setIcon(msgDestination.getIcon());
+    jMsgDestination.setIcon(RecordGuiUtils.getIcon(msgDestination));
 
     jFileDestination = new JMyLabel(fileDestination.getMyName());
-    jFileDestination.setIcon(fileDestination.getIcon());
+    jFileDestination.setIcon(RecordGuiUtils.getIcon(fileDestination));
 
     jLocalFileDestination = new JMyLabel(localFileDestination.getAbsolutePath());
     jLocalFileDestination.setIcon(Images.get(ImageNums.FLD_CLOSED16));
@@ -383,7 +384,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       msgDestination = fPair;
       GlobalProperties.setProperty(PROPERTY_NAME__MSG_DEST_FOLDER, msgDestination.getId().toString());
       jMsgDestination.setText(msgDestination.getMyName());
-      jMsgDestination.setIcon(msgDestination.getIcon());
+      jMsgDestination.setIcon(RecordGuiUtils.getIcon(msgDestination));
     }
   }
 
@@ -393,7 +394,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       fileDestination = fPair;
       GlobalProperties.setProperty(PROPERTY_NAME__FILE_DEST_FOLDER, fileDestination.getId().toString());
       jFileDestination.setText(fileDestination.getMyName());
-      jFileDestination.setIcon(fileDestination.getIcon());
+      jFileDestination.setIcon(RecordGuiUtils.getIcon(fileDestination));
     }
   }
 

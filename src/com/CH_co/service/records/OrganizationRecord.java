@@ -12,10 +12,10 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 
 import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -44,8 +44,8 @@ public class OrganizationRecord extends Record {
     return userId;
   }
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   /**

@@ -36,6 +36,7 @@ import com.CH_gui.list.ListRenderer;
 import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.msgs.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -841,13 +842,13 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       jSize.setText(com.CH_gui.lang.Lang.rb.getString("unknown"));
     }
 
-    Object[] o1 = dataRecord.getPriorityTextAndIcon();
-    jPriority.setText(o1[0].toString());
-    jPriority.setIcon((Icon)o1[1]);
+    ImageText pri = dataRecord.getPriorityTextAndIcon();
+    jPriority.setText(pri.getText());
+    jPriority.setIcon(Images.get(pri));
 
-    Object[] o2 = dataRecord.getSecurityTextAndIcon();
-    jSecureLock.setText(o2[0].toString());
-    jSecureLock.setIcon((Icon)o2[1]);
+    ImageText sec = dataRecord.getSecurityTextAndIcon();
+    jSecureLock.setText(sec.getText());
+    jSecureLock.setIcon(Images.get(sec));
 
     if (dataRecord.bodyPassHash != null && dataRecord.getEncText() != null && dataRecord.getEncText().size() > 0 && dataRecord.getTextBody() != null) {
       jPasswordPane.removeAll();
@@ -856,9 +857,9 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
     jDelivered.setText(Misc.getFormattedTimestamp(msgLink.dateDelivered));
 
-    Object[] objs = dataRecord.getExpirationIconAndText(cache.getMyUserId());
-    jExpiration.setIcon((Icon) objs[0]);
-    jExpiration.setText((String) objs[1]);
+    ImageText exp = dataRecord.getExpirationIconAndText(cache.getMyUserId());
+    jExpiration.setIcon(Images.get(exp));
+    jExpiration.setText(exp.getText());
 
     // list attachments
     // prepare requests
@@ -900,7 +901,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       jKeyID.setText(dataRecord.getSendPrivKeyId().toString());
     if (kRec != null) {
       jKeyInfo.setText(kRec.plainPublicKey.shortInfo());
-      jKeyInfo.setIcon(kRec.getIcon());
+      jKeyInfo.setIcon(RecordGuiUtils.getIcon(kRec));
     } else {
       jKeyInfo.setText(com.CH_gui.lang.Lang.rb.getString("label_Key_is_not_available."));
       jKeyInfo.setIcon(Images.get(ImageNums.KEY16));

@@ -23,7 +23,6 @@ import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 
@@ -32,7 +31,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -40,7 +39,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.21 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class UserTableCellRenderer extends RecordTableCellRenderer {
 
@@ -68,12 +67,12 @@ public class UserTableCellRenderer extends RecordTableCellRenderer {
             // do nothing, username is already there
           } else {
             //ok.. maybe a familiar name is better
-            setText(ListRenderer.getRenderedText(rec)); 
+            setText(ListRenderer.getRenderedText(rec));
           }
 
           setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         }
-      } 
+      }
     }
     // email address, other email address
     else if (rawColumn == 3 || rawColumn == 4) {
@@ -81,7 +80,7 @@ public class UserTableCellRenderer extends RecordTableCellRenderer {
       if (value instanceof String) {
         String email = (String) value;
         if (email.length() > 0) {
-          setIcon(new EmailRecord().getIcon());
+          setIcon(Images.get(new EmailRecord().getIcon()));
           setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         }
       }

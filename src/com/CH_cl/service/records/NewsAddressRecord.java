@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.records;
 
-import javax.swing.Icon;
-
 import com.CH_co.util.*;
 
 /** 
@@ -47,8 +45,8 @@ public class NewsAddressRecord extends InternetAddressRecord {
   /**
    * @return the default icon to represent this Record type.
    */
-  public Icon getIcon() {
-    return Images.get(ImageNums.POSTING16);
+  public int getIcon() {
+    return ImageNums.POSTING16;
   }
 
 }

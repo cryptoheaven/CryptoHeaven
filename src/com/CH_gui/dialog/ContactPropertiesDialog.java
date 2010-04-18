@@ -12,6 +12,7 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.service.records.ContactRecUtil;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -35,6 +36,7 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
+import com.CH_gui.service.records.RecordGuiUtils;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -154,7 +156,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
                   UserRecord uRec = cache.getUserRecord(contactRecord.creatorId);
                   if (uRec != null) {
                     jContactCreator.setText(uRec.shortInfo());
-                    jContactCreator.setIcon(uRec.getIcon());
+                    jContactCreator.setIcon(RecordGuiUtils.getIcon(uRec));
                   } else {
                     jContactCreator.setText("Unknown User ("+contactRecord.creatorId+")");
                   }
@@ -164,7 +166,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
                   if (uRec != null) {
                     handleFor = "'" + uRec.handle + "'";
                     jContactOwner.setText(uRec.shortInfo());
-                    jContactOwner.setIcon(uRec.getIcon());
+                    jContactOwner.setIcon(RecordGuiUtils.getIcon(uRec));
                   } else {
                     handleFor = "'Unknown User ("+contactRecord.ownerUserId+")'";
                     jContactOwner.setText("Unknown User ("+contactRecord.ownerUserId+")");
@@ -173,7 +175,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
                   if (uRec != null) {
                     handleBy = "'" + uRec.handle + "'";
                     jContactWith.setText(uRec.shortInfo());
-                    jContactWith.setIcon(uRec.getIcon());
+                    jContactWith.setIcon(RecordGuiUtils.getIcon(uRec));
                   } else {
                     handleBy = "'Unknown User ("+contactRecord.contactWithId+")'";
                     jContactWith.setText("Unknown User ("+contactRecord.contactWithId+")");
@@ -220,9 +222,9 @@ public class ContactPropertiesDialog extends GeneralDialog {
                       otherKey = kRecs[0];
                     }
                     jOwnerEncryption.setText(ownerKey.plainPublicKey.shortInfo() + "/" + "AES(256)");
-                    jOwnerEncryption.setIcon(ownerKey.getIcon());
+                    jOwnerEncryption.setIcon(RecordGuiUtils.getIcon(ownerKey));
                     jOtherEncryption.setText(otherKey.plainPublicKey.shortInfo() + "/" + "AES(256)");
-                    jOtherEncryption.setIcon(otherKey.getIcon());
+                    jOtherEncryption.setIcon(RecordGuiUtils.getIcon(otherKey));
                     setEnabledButtons();
                   }
                 }

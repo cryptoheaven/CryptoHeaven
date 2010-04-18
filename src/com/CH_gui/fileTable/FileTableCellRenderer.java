@@ -23,6 +23,7 @@ import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -70,7 +71,9 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
           if (rawModel instanceof FileTableModel) {
             FileTableModel tableModel = (FileTableModel) rawModel;
             Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
-            if (rec != null) icon = rec.getIcon();
+            if (rec != null) {
+              icon = RecordGuiUtils.getIcon(rec);
+            }
           }
         }
         if (icon == null) {
@@ -114,7 +117,7 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
 
                 StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
                 if (statRecord != null) {
-                  setIcon(StatRecord.getIconForFlag((Short) value));
+                  setIcon(Images.get(StatRecord.getIconForFlag((Short) value)));
                   setText("");
                   setToolTipText(StatRecord.getInfo((Short) value));
                 }

@@ -121,7 +121,7 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
                 statRecord = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
               }
               if (statRecord != null) {
-                setIcon(StatRecord.getIconForFlag((Short) value));
+                setIcon(Images.get(StatRecord.getIconForFlag((Short) value)));
                 setText("");
                 setToolTipText(StatRecord.getInfo((Short) value));
               }

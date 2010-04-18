@@ -12,7 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -82,9 +81,8 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
     return msgLinkId;
   }
 
-  public Icon getIcon() {
-    int image = -1;
-    Icon icon = null;
+  public int getIcon() {
+    int image = ImageNums.IMAGE_NONE;
     short st = status.shortValue();
     if ((st & STATUS_FLAG__FORWARDED) != 0 && (st & STATUS_FLAG__REPLIED) != 0)
       image = ImageNums.MAIL_RPYFWD16;
@@ -96,9 +94,7 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
       image = ImageNums.MAIL_READ16;
     else 
       image = ImageNums.MAIL_UNREAD16;
-    if (image >= 0)
-      icon = Images.get(image);
-    return icon;
+    return image;
   }
 
   public String getStatusName() {

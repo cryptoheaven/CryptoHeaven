@@ -263,9 +263,9 @@ public class ExpiryRevocationDialog extends GeneralDialog {
           panelToChange.add(label, new GridBagConstraints(0, i*2, 2, 1, 10, 0,
               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
           JLabel expiry = new JMyLabel();
-          Object[] objs = data.getExpirationIconAndText(myUserId, false);
-          expiry.setIcon((Icon) objs[0]);
-          expiry.setText((String) objs[1]);
+          ImageText exp = data.getExpirationIconAndText(myUserId, false);
+          expiry.setIcon(Images.get(exp));
+          expiry.setText(exp.getText());
           JLabel expiryLabel = new JMyLabel("Currently Expires:");
           expiryLabel.setIcon(Images.get(ImageNums.TRANSPARENT16));
           panelToChange.add(expiryLabel, new GridBagConstraints(0, i*2+1, 1, 1, 0, 0,
@@ -305,9 +305,9 @@ public class ExpiryRevocationDialog extends GeneralDialog {
           panelOther.add(label, new GridBagConstraints(0, i*2, 2, 1, 10, 0,
               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
           JLabel expiry = new JMyLabel();
-          Object[] objs = data.getExpirationIconAndText(myUserId, false);
-          expiry.setIcon((Icon) objs[0]);
-          expiry.setText((String) objs[1]);
+          ImageText exp = data.getExpirationIconAndText(myUserId, false);
+          expiry.setIcon(Images.get(exp));
+          expiry.setText(exp.getText());
           panelOther.add(new JMyLabel("Currently Expires:"), new GridBagConstraints(0, i*2+1, 1, 1, 0, 0,
               GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 25, 5, 2), 0, 0));
           panelOther.add(expiry, new GridBagConstraints(1, i*2+1, 1, 1, 10, 0,

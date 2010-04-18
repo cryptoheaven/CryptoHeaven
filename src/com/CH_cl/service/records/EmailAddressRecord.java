@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.records;
 
-import javax.swing.*;
-
 import com.CH_co.util.*;
 
 /** 
@@ -47,8 +45,8 @@ public class EmailAddressRecord extends InternetAddressRecord {
   /**
    * @return the default icon to represent this Record type.
    */
-  public Icon getIcon() {
-    return Images.get(ImageNums.EMAIL_SYMBOL_SMALL);
+  public int getIcon() {
+    return ImageNums.EMAIL_SYMBOL_SMALL;
   }
 
 }

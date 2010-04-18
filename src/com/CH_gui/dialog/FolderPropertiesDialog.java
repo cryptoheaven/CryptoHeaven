@@ -40,6 +40,7 @@ import com.CH_gui.folder.*;
 import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -221,7 +222,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
     panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    JLabel jType = new JMyLabel(folderPair.getFolderRecord().getFolderType(), folderPair.getIcon(), JLabel.LEFT);
+    JLabel jType = new JMyLabel(folderPair.getFolderRecord().getFolderType(), RecordGuiUtils.getIcon(folderPair), JLabel.LEFT);
     panel.add(jType, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
@@ -651,7 +652,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
           uRec.userId = userId;
         }
         jFolderOwner.setText(ListRenderer.getRenderedText(uRec));
-        jFolderOwner.setIcon(uRec.getIcon());
+        jFolderOwner.setIcon(RecordGuiUtils.getIcon(uRec));
 
         // fetch folder size
 

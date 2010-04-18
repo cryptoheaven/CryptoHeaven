@@ -32,6 +32,7 @@ import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -134,7 +135,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
 
     UserRecord uRec = cache.getUserRecord();
     JLabel currentUserName = new JMyLabel(uRec.handle);
-    currentUserName.setIcon(uRec.getIcon());
+    currentUserName.setIcon(RecordGuiUtils.getIcon(uRec));
     panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(currentUserName, new GridBagConstraints(1, posY, 2, 1, 10, 0,

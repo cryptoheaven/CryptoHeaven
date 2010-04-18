@@ -12,8 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -40,8 +38,8 @@ public class AddrHashRecord extends Record {
   public Long msgId;
   public BADigestBlock hash;
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public Long getId() {

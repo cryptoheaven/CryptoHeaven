@@ -12,7 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 
 import com.CH_co.cryptx.*;
@@ -236,8 +235,8 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     return userId; 
   }
 
-  public Icon getIcon() {
-    return Images.get(ImageNums.PERSON_SMALL);
+  public int getIcon() {
+    return ImageNums.PERSON_SMALL;
   }
 
   public void setEncSymKeys       (BAAsyCipherBlock encSymKeys)     { this.encSymKeys       = encSymKeys;       }

@@ -40,6 +40,7 @@ import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 import com.CH_guiLib.gui.*;
 import com.CH_guiLib.util.*;
@@ -472,8 +473,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jExpiryLine = new JPanel();
       jExpiryLine.setLayout(new GridBagLayout());
       jExpiryLabel = new JMyLabel("Expiration:");
-      jExpiry = new JMyCalendarDropdownField(DateFormat.MEDIUM, 3, 1, true, null, 
-          new String[] { "Never", "Tomorrow", "One Week", "Two Weeks", "One Month", "Custom..." }, 
+      jExpiry = new JMyCalendarDropdownField(DateFormat.MEDIUM, 3, 1, true, null,
+          new String[] { "Never", "Tomorrow", "One Week", "Two Weeks", "One Month", "Custom..." },
           new int[][] { { 0, -1 },
                         { Calendar.DAY_OF_MONTH, 1 },
                         { Calendar.WEEK_OF_YEAR, 1 },
@@ -562,7 +563,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         jRecipients[recipientType].add(jRecipientsInput[recipientType], BorderLayout.CENTER);
       }
 
-      // Set initial focus to the subject and the "TO" field 
+      // Set initial focus to the subject and the "TO" field
       if (isInitialRecipientPresent)
         jSubject.addHierarchyListener(new InitialFocusRequestor());
       else
@@ -584,7 +585,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       if (isChatComposePanel || emlRecs == null || emlRecs.length <= 1) {
         JLabel jFromStaticLabel = null;
         if (myUserRec != null)
-          jFromStaticLabel = new JMyLabel(myUserRec.shortInfo(), myUserRec.getIcon(), JLabel.LEFT);
+          jFromStaticLabel = new JMyLabel(myUserRec.shortInfo(), RecordGuiUtils.getIcon(myUserRec), JLabel.LEFT);
         else
           jFromStaticLabel = new JMyLabel("Not logged In!");
         jFromComponent = jFromStaticLabel;
@@ -686,7 +687,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     jPriorityLabelStretch = new JLabel();
     jPriorityLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority"));
-    jPriority = new JMyListCombo(0, new JLabel[] { 
+    jPriority = new JMyListCombo(0, new JLabel[] {
       new JMyLabel("FYI", Images.get(ImageNums.PRIORITY_LOW_SMALL), JLabel.LEFT),
       new JMyLabel("Normal", Images.get(ImageNums.TRANSPARENT16), JLabel.LEFT),
       new JMyLabel("High", Images.get(ImageNums.PRIORITY_HIGH_SMALL), JLabel.LEFT)
@@ -705,7 +706,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (myUser != null) {
       sentFolder = cache.getFolderRecord(cache.getUserRecord().sentFolderId);
     }
-    Icon sentFolderIcon = sentFolder != null ? sentFolder.getIcon(false, myUser) : Images.get(ImageNums.FLD_MAIL_SENT_CLOSED16);
+    Icon sentFolderIcon = sentFolder != null ? Images.get(sentFolder.getIcon(false, myUser)) : Images.get(ImageNums.FLD_MAIL_SENT_CLOSED16);
 
     if (sentFolder != null)
       sentShare = cache.getFolderShareRecordMy(sentFolder.folderId, false);
@@ -739,7 +740,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (!isChatComposePanel && objType == MsgDataRecord.OBJ_TYPE_MSG) {
       UserSettingsRecord userSettingsRecord = cache.getMyUserSettingsRecord();
       if (userSettingsRecord != null) {
-        if ((!isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToNew)) || 
+        if ((!isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToNew)) ||
             (isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToReFwd))
             ) {
           String signatureText = MsgPanelUtils.getSigText(userSettingsRecord, isHTML());
@@ -786,7 +787,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private void initMainPanelForMail(JPanel panel) {
     int posY = 0;
 
-    panel.add(jReplyToLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jReplyToLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 2, 5), 0, 0));
     panel.add(jReplyTo, new GridBagConstraints(1, posY, 1, 1, 10, 0, // for super long reply subjects, keep the layout aligned to west
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 2, 5), 0, 0));
@@ -794,111 +795,111 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     isFromLineVisible = true;
 
-    panel.add(jFromLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jFromLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 2, 5), 0, 0));
 
-    panel.add(jFromLine, new GridBagConstraints(1, posY, 6, 1, 0, 0, 
+    panel.add(jFromLine, new GridBagConstraints(1, posY, 6, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
 
-    jFromLine.add(jFromComponent, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    jFromLine.add(jFromComponent, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 2, 5), 0, 0));
 
     // here posY is 0
-    jFromLine.add(jPriorityLabelStretch, new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    jFromLine.add(jPriorityLabelStretch, new GridBagConstraints(2, posY, 1, 1, 10, 0,
         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 3), 0, 0));
-    jFromLine.add(jPriorityLabel, new GridBagConstraints(3, posY, 1, 1, 10, 0, 
+    jFromLine.add(jPriorityLabel, new GridBagConstraints(3, posY, 1, 1, 10, 0,
         GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 5, 2, 3), 0, 0));
-    jFromLine.add(jPriority, new GridBagConstraints(4, posY, 1, 1, 0, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(5, 3, 2, 15), 0, 0));  
+    jFromLine.add(jPriority, new GridBagConstraints(4, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(5, 3, 2, 15), 0, 0));
 
     // "Copy to Sent"
-    jFromLine.add(jCopyToOutgoing, new GridBagConstraints(5, posY, 1, 1, 0, 0, 
+    jFromLine.add(jCopyToOutgoing, new GridBagConstraints(5, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 15, 2, 0), 0, 0));
-    jFromLine.add(jOutgoing, new GridBagConstraints(6, posY, 1, 1, 0, 0, 
+    jFromLine.add(jOutgoing, new GridBagConstraints(6, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 0, 2, 5), 0, 0));
     posY ++;
 
     for (int i=0; i<jSelectRecipients.length; i++) {
-      panel.add(jSelectRecipients[i], new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+      panel.add(jSelectRecipients[i], new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
       boolean addShowBccLink = i == 0 && !msgTypeArea.isSubjectGenerated();
       int gridWidth = 6;
       if (addShowBccLink)
         gridWidth = 5;
-      panel.add(jRecipients[i], new GridBagConstraints(1, posY, gridWidth, 1, 10, 0, 
+      panel.add(jRecipients[i], new GridBagConstraints(1, posY, gridWidth, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 5, 2, 5), 0, 0));
       if (addShowBccLink)
-        panel.add(jShowBcc, new GridBagConstraints(6, posY, 1, 1, 0, 0, 
+        panel.add(jShowBcc, new GridBagConstraints(6, posY, 1, 1, 0, 0,
               GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 5), 0, 0));
       posY ++;
     }
 
     // subject label, space and button
     if (!msgTypeArea.isSubjectGenerated()) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-      panel.add(jSubject, new GridBagConstraints(1, posY, 5, 1, 10, 0, 
+      panel.add(jSubject, new GridBagConstraints(1, posY, 5, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-      //add(jAttach, new GridBagConstraints(4, posY, 1, 1, 0, 0, 
+      //add(jAttach, new GridBagConstraints(4, posY, 1, 1, 0, 0,
             //GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 2, 0, 2), 0, 0));
-      panel.add(jHTML, new GridBagConstraints(6, posY, 1, 1, 0, 0, 
+      panel.add(jHTML, new GridBagConstraints(6, posY, 1, 1, 0, 0,
             GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 5), 0, 0));
       posY ++;
     }
 
     isExpiryLineVisible = true;
-    panel.add(jExpiryLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jExpiryLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
 
-    panel.add(jExpiryLine, new GridBagConstraints(1, posY, 6, 1, 0, 0, 
+    panel.add(jExpiryLine, new GridBagConstraints(1, posY, 6, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
-    jExpiryLine.add(jExpiry, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    jExpiryLine.add(jExpiry, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
 
-    jExpiryLine.add(jRequestRecipt, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    jExpiryLine.add(jRequestRecipt, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 15, 2, 5), 0, 0));
 
-    jExpiryLine.add(jStagedSecureCheck, new GridBagConstraints(2, posY, 2, 1, 0, 0, 
+    jExpiryLine.add(jStagedSecureCheck, new GridBagConstraints(2, posY, 2, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 15, 2, 5), 0, 0));
 
-    jExpiryLine.add(new JLabel(), new GridBagConstraints(4, posY, 1, 1, 10, 0, 
+    jExpiryLine.add(new JLabel(), new GridBagConstraints(4, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
     isQuestionPasswordLinesVisible = true;
-    panel.add(jQuestionLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jQuestionLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-    panel.add(jQuestionPasswordLine, new GridBagConstraints(1, posY, 6, 1, 0, 0, 
+    panel.add(jQuestionPasswordLine, new GridBagConstraints(1, posY, 6, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
-    jQuestionPasswordLine.add(jQuestionField, new GridBagConstraints(0, posY, 1, 1, 20, 0, 
+    jQuestionPasswordLine.add(jQuestionField, new GridBagConstraints(0, posY, 1, 1, 20, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 15), 0, 0));
-    jQuestionPasswordLine.add(jPasswordLabel, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    jQuestionPasswordLine.add(jPasswordLabel, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-    jQuestionPasswordLine.add(jPasswordField, new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    jQuestionPasswordLine.add(jPasswordField, new GridBagConstraints(2, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-    jQuestionPasswordLine.add(new JLabel(), new GridBagConstraints(3, posY, 1, 1, 5, 0, 
+    jQuestionPasswordLine.add(new JLabel(), new GridBagConstraints(3, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
-    panel.add(jVoicemailLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jVoicemailLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-    panel.add(jVoicemailPanel, new GridBagConstraints(1, posY, 6, 1, 10, 0, 
+    panel.add(jVoicemailPanel, new GridBagConstraints(1, posY, 6, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 5), 0, 0));
     posY ++;
 
     // space for attachments panel;
     if (!msgTypeArea.isAttachmentPanelEmbeded()) {
-      panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+      panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-      panel.add(jAttachments, new GridBagConstraints(1, posY, 6, 1, 100, 0, 
+      panel.add(jAttachments, new GridBagConstraints(1, posY, 6, 1, 100, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 5, 2, 5), 0, 0));
       posY ++;
     }
 
-    panel.add(msgTypeArea, new GridBagConstraints(0, posY, 7, 1, 10, 10, 
+    panel.add(msgTypeArea, new GridBagConstraints(0, posY, 7, 1, 10, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(3, 5, 5, 5), 0, 0));
   }
 
@@ -914,19 +915,19 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     posY = 0;
 
     // Send Button on the top left
-    panel.add(jSendCombo, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(jSendCombo, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 2, 2, 2), 0, 0));
 
     jPriority.setSelectedIndex(MsgComposePanel.PRIORITY_INDEX_NORMAL);
     composeMngrI.priorityPressed();
-    panel.add(jPriorityLabel, new GridBagConstraints(1, posY, 1, 1, 20, 0, 
+    panel.add(jPriorityLabel, new GridBagConstraints(1, posY, 1, 1, 20, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 2), 0, 0));
-    panel.add(jPriority, new GridBagConstraints(2, posY, 1, 1, 8, 0, 
+    panel.add(jPriority, new GridBagConstraints(2, posY, 1, 1, 8, 0,
           GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(2, 2, 2, 2), 0, 0));
     // "Copy to Sent"
-    panel.add(jCopyToOutgoing, new GridBagConstraints(3, posY, 1, 1, 8, 0, 
+    panel.add(jCopyToOutgoing, new GridBagConstraints(3, posY, 1, 1, 8, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 0), 0, 0));
-    panel.add(jOutgoing, new GridBagConstraints(4, posY, 1, 1, 8, 0, 
+    panel.add(jOutgoing, new GridBagConstraints(4, posY, 1, 1, 8, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 2), 0, 0));
     // ring
     panel.add(jRing, new GridBagConstraints(5, posY, 1, 1, 6, 0,
@@ -951,7 +952,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     if (!msgTypeArea.isAttachmentPanelEmbeded()) {
       // this row was for Attachments in mail mode
-      panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+      panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 2, 2, 2), 0, 0));
       panel.add(jAttachments, new GridBagConstraints(1, posY, 7, 1, 100, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 2, 2, 2), 0, 0));
@@ -1068,7 +1069,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, true) : "";
       if (signatureText.trim().length() > 0) {
         signatureText += "<p></p>";
-        signatureText = ArrayUtils.replaceKeyWords(signatureText, 
+        signatureText = ArrayUtils.replaceKeyWords(signatureText,
             new String[][] {
               {"<BODY>", " "},
               {"<body>", " "},
@@ -1080,9 +1081,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
               {"</html>", " "},
           });
       }
-      text = 
+      text =
           "<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+"> " +
-          "<p> <br> </p> " + 
+          "<p> <br> </p> " +
           (addSignature ? signatureText : "") +
           "<table cellpadding='1' cellspacing='5' border='0'> " +
             "<tr>" +
@@ -1090,8 +1091,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
               "</td>" +
               "<td align='left' valign='top'> " +
               com.CH_gui.lang.Lang.rb.getString("-----_Original_Message_-----") +
-              " <br>" + 
-              content[1] + content[3] + 
+              " <br>" +
+              content[1] + content[3] +
               "</td> " +
             "</tr> " +
           "</table> " +
@@ -1104,7 +1105,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       if (signatureText.trim().length() > 0) {
         signatureText += "\n\n";
       }
-      text = 
+      text =
           "\n\n" +
           (addSignature ? signatureText : "") +
           com.CH_gui.lang.Lang.rb.getString("-----_Original_Message_-----") +
@@ -1156,7 +1157,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
                 }
               } else {
                 sb[recipientType].append("<A href='mailto:" + emailAddr[1] + "'>" + Misc.encodePlainIntoHtml(displayName) + "</A>");
-              } 
+              }
             } else {
               if (emailAddr != null) {
                 if (isForceOutputInHTMLPrintHeader) {
@@ -1220,24 +1221,24 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
       if (isForceOutputInHTMLPrintHeader || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         content[0] = "text/html";
-        content[1] = 
+        content[1] =
             (isForceOutputInHTMLPrintHeader ? "<font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
-            (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") + 
-            (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") + 
+            (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") +
+            (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") +
 
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_From"), 
-                (isForceOutputInHTMLPrintHeader ? Misc.encodePlainIntoHtml(senderEmailFull) : "<A href='mailto:" + senderEmailShort + "'>" + Misc.encodePlainIntoHtml(senderEmailFull) + "</A>"), 
-                isForceOutputInHTMLPrintHeader) + 
+            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_From"),
+                (isForceOutputInHTMLPrintHeader ? Misc.encodePlainIntoHtml(senderEmailFull) : "<A href='mailto:" + senderEmailShort + "'>" + Misc.encodePlainIntoHtml(senderEmailFull) + "</A>"),
+                isForceOutputInHTMLPrintHeader) +
             //(sbReplyTo != null ? ("<b>" + com.CH_gui.lang.Lang.rb.getString("column_Reply_To") + ":</b>  " + Misc.encodePlainIntoHtml(sbReplyTo.toString()) + " <br>") : "") +
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_To"), sb[MsgComposePanel.TO].toString(), isForceOutputInHTMLPrintHeader) + 
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Cc"), sb[MsgComposePanel.CC].toString(), isForceOutputInHTMLPrintHeader) + 
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) + 
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) + 
+            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_To"), sb[MsgComposePanel.TO].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Cc"), sb[MsgComposePanel.CC].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
             (isForceOutputInHTMLPrintHeader ? "</table>" : "");
 
         if (content[2].equalsIgnoreCase("text/html")) {
           // condition formatting
-          quotedMsgBody = ArrayUtils.replaceKeyWords(quotedMsgBody, 
+          quotedMsgBody = ArrayUtils.replaceKeyWords(quotedMsgBody,
               new String[][] {
                 {"<P>", "<p>"},
                 {"</P>", "</p>"},
@@ -1275,7 +1276,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         content[3] = quotedMsgBody;
       } else {
         content[0] = "text/plain";
-        content[1] = 
+        content[1] =
             com.CH_gui.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
             (sb[MsgComposePanel.TO].length() > 0 ? (com.CH_gui.lang.Lang.rb.getString("column_To") + ": " + sb[MsgComposePanel.TO].toString() + "\n") : "") +
             (sb[MsgComposePanel.CC].length() > 0 ? (com.CH_gui.lang.Lang.rb.getString("column_Cc") + ": " + sb[MsgComposePanel.CC].toString() + "\n") : "") +
@@ -1290,13 +1291,13 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
 
-  
+
   private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
     if (htmlText != null && htmlText.length() > 0) {
       return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" : "") +
-              "<b>" + name + ": </b>" + 
+              "<b>" + name + ": </b>" +
               (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" : "") +
-              htmlText + 
+              htmlText +
               (isPrintHeader ? "</font></td></tr>" : "<br>");
     } else {
       return "";
@@ -1393,13 +1394,13 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     setSubject(getSubjectForward(selectedAttachments, 250));
     if (trace != null) trace.exit(MsgComposeComponents.class);
   }
-  
+
 //  public void setForwardBody(MsgLinkRecord forwardMsg, MsgDataRecord dataRecord) {
 //    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "setForwardBody(MsgLinkRecord forwardMsg, MsgDataRecord dataRecord)");
 //    if (trace != null) trace.args(forwardMsg, dataRecord);
 //    if (trace != null) trace.exit(MsgComposeComponents.class);
 //  }
-  
+
 
   public static String eliminatePrefixes(String str) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "eliminatePrefixes(String str)");

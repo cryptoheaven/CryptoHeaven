@@ -10,14 +10,13 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.service.records;
+package com.CH_gui.service.records;
 
 import javax.swing.*;
 
 import com.CH_cl.service.cache.*;
 
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /** 

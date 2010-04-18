@@ -12,7 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 import java.util.Vector;
 
@@ -65,24 +64,24 @@ public class StatRecord extends Record { // implicit no-argument constructor
     return statId; 
   }
 
-  public Icon getIcon() {
+  public int getIcon() {
     return getIconForFlag(getFlag());
   }
 
-  public static Icon getIconForFlag(Short flag) {
-    Icon icon = null;
+  public static int getIconForFlag(Short flag) {
+    int icon = ImageNums.IMAGE_NONE;
     switch (flag.intValue()) {
       case STATUS__UNSEEN_UNDELIVERED:
-        icon = Images.get(ImageNums.FLAG_RED_SMALL);
+        icon = ImageNums.FLAG_RED_SMALL;
         break;
       case STATUS__SEEN_DELIVERED:
-        icon = null;
+        icon = ImageNums.IMAGE_NONE;
         break;
       case STATUS__UNSEEN_DELIVERED:
-        icon = Images.get(ImageNums.FLAG_GREEN_SMALL);
+        icon = ImageNums.FLAG_GREEN_SMALL;
         break;
       case STATUS__SEEN_UNDELIVERED:
-        icon = Images.get(ImageNums.FLAG_YELLOW_SMALL);
+        icon = ImageNums.FLAG_YELLOW_SMALL;
         break;
     }
     return icon;

@@ -12,6 +12,7 @@
 
 package com.CH_gui.table;
 
+import com.CH_gui.util.ActionUtils;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.chatTable.*;

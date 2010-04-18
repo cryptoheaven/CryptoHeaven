@@ -16,7 +16,6 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.security.*;
 import java.util.*;
-import javax.swing.Icon;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.*;
@@ -147,13 +146,13 @@ public class MsgDataRecord extends Record {
     return msgId;
   }
 
-  public Icon getIcon() {
+  public int getIcon() {
     if (objType.shortValue() == OBJ_TYPE_MSG)
-      return Images.get(ImageNums.MAIL_READ16);
+      return ImageNums.MAIL_READ16;
     else if (objType.shortValue() == OBJ_TYPE_ADDR)
-      return Images.get(ImageNums.ADDRESS16);
+      return ImageNums.ADDRESS16;
     else
-      return null;
+      return ImageNums.IMAGE_NONE;
   }
 
   public void setRawRecipients    (byte[] rawRecipients)            { this.rawRecipients    = rawRecipients;    }
@@ -193,47 +192,22 @@ public class MsgDataRecord extends Record {
       return textErr;
   }
 
-
-  public Icon getExpirationIcon(Long forUserId) {
-    Icon icon = null;
-    if (dateExpired != null) {
-      if (dateExpired.getTime() > System.currentTimeMillis())
-        icon = Images.get(ImageNums.STOPWATCH16);
-      else {
-        if (senderUserId.equals(forUserId))
-          icon = Images.get(ImageNums.STOPWATCH_WARN16);
-        else
-          icon = Images.get(ImageNums.STOPWATCH_ALERT16);
-      }
-    }
-    if (Misc.isBitSet(getFlags(), MsgDataRecord.FLAG__REVOKED)) {
-      if (dateExpired == null || dateExpired.getTime() < System.currentTimeMillis()) {
-        if (senderUserId.equals(forUserId))
-          icon = Images.get(ImageNums.STOPWATCH_WARN16);
-        else
-          icon = Images.get(ImageNums.STOPWATCH_ALERT16);
-      } else {
-      }
-    }
-    return icon;
-  }
-
-  public Object[] getExpirationIconAndText(Long forUserId) {
+  public ImageText getExpirationIconAndText(Long forUserId) {
     return getExpirationIconAndText(forUserId, false);
   }
-  public Object[] getExpirationIconAndText(Long forUserId, boolean isShortForm) {
-    Icon icon = null;
+  public ImageText getExpirationIconAndText(Long forUserId, boolean isShortForm) {
+    int icon = ImageNums.IMAGE_NONE;
     String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired, false) : Misc.getFormattedTimestamp(dateExpired));
     String note = "";
     if (dateExpired != null) {
       if (dateExpired.getTime() > System.currentTimeMillis())
-        icon = Images.get(ImageNums.STOPWATCH16);
+        icon = ImageNums.STOPWATCH16;
       else {
         note = " (Expired)";
         if (senderUserId.equals(forUserId))
-          icon = Images.get(ImageNums.STOPWATCH_WARN16);
+          icon = ImageNums.STOPWATCH_WARN16;
         else
-          icon = Images.get(ImageNums.STOPWATCH_ALERT16);
+          icon = ImageNums.STOPWATCH_ALERT16;
       }
     }
     if (Misc.isBitSet(getFlags(), MsgDataRecord.FLAG__REVOKED)) {
@@ -245,16 +219,16 @@ public class MsgDataRecord extends Record {
           expiration = "Revoked";
         }
         if (senderUserId.equals(forUserId))
-          icon = Images.get(ImageNums.STOPWATCH_WARN16);
+          icon = ImageNums.STOPWATCH_WARN16;
         else
-          icon = Images.get(ImageNums.STOPWATCH_ALERT16);
+          icon = ImageNums.STOPWATCH_ALERT16;
       } else if (dateExpired != null) {
         note = " (Revocation Scheduled)";
       }
     }
     if (!isShortForm)
       expiration += note;
-    return new Object[] { icon, expiration };
+    return new ImageText(icon, expiration);
   }
 
   public Boolean isDigestOk() {
@@ -1019,49 +993,49 @@ public class MsgDataRecord extends Record {
   }
 
 
-  public Object[] getPriorityTextAndIcon() {
+  public ImageText getPriorityTextAndIcon() {
     return getPriorityTextAndIcon(importance.shortValue());
   }
-  public static Object[] getPriorityTextAndIcon(short imp) {
+  public static ImageText getPriorityTextAndIcon(short imp) {
     String text = "unknown";
-    Icon icon = null;
+    int icon = ImageNums.IMAGE_NONE;
     if (isImpHigh(imp)) {
       text = "High Priority";
-      icon = Images.get(ImageNums.PRIORITY_HIGH_SMALL);
+      icon = ImageNums.PRIORITY_HIGH_SMALL;
     } else if (isImpFYI(imp)) {
       text = "Low Priority";
-      icon = Images.get(ImageNums.PRIORITY_LOW_SMALL);
+      icon = ImageNums.PRIORITY_LOW_SMALL;
     } else if (isImpSystem(imp)) {
       text = "System Notification";
-      icon = Images.get(ImageNums.LIGHT_ON_SMALL);
+      icon = ImageNums.LIGHT_ON_SMALL;
     } else if (isImpNormal(imp)) {
       text = "Normal Priority";
-      icon = null;
+      icon = ImageNums.IMAGE_NONE;
     } else if (isRegularEmail(imp)) {
       text = "Normal Priority Regular Email";
     } else if (isSecureEmail(imp)) {
       text = "Normal Priority Secure Email";
     }
-    return new Object[] { text, icon };
+    return new ImageText(icon, text);
   }
   
-  public Object[] getSecurityTextAndIcon() {
+  public ImageText getSecurityTextAndIcon() {
     return getSecurityTextAndIcon(importance.shortValue());
   }
-  public static Object[] getSecurityTextAndIcon(short imp) {
+  public static ImageText getSecurityTextAndIcon(short imp) {
     String text = "unknown";
-    Icon icon = null;
+    int icon = ImageNums.IMAGE_NONE;
     if (isRegularEmail(imp)) {
       text = "Regular Email / Stored Encrypted with AES(256)";
-      icon = Images.get(ImageNums.LOCK_OPEN_SMALL);
+      icon = ImageNums.LOCK_OPEN_SMALL;
     } else if (isSecureEmail(imp)) {
       text = "Secure and Encrypted with AES(256) / Web Delivered";
-      icon = Images.get(ImageNums.LOCK_CLOSED_WEB_SMALL);
+      icon = ImageNums.LOCK_CLOSED_WEB_SMALL;
     } else {
       text = "Secure and Encrypted with AES(256)";
-      icon = Images.get(ImageNums.LOCK_CLOSED_SMALL);
+      icon = ImageNums.LOCK_CLOSED_SMALL;
     }
-    return new Object[] { text, icon };
+    return new ImageText(icon, text);
   }
 
   /**

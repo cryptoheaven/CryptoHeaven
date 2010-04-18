@@ -33,6 +33,7 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.service.records.RecordGuiUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -171,7 +172,7 @@ public class DeleteAccountDialog extends GeneralDialog {
 
 
     JLabel userName = new JMyLabel(userRecord.handle);
-    userName.setIcon(userRecord.getIcon());
+    userName.setIcon(RecordGuiUtils.getIcon(userRecord));
     panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(userName, new GridBagConstraints(1, posY, 2, 1, 10, 0,

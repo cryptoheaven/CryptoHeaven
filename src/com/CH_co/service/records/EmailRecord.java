@@ -12,7 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -54,8 +53,8 @@ public class EmailRecord extends Record {
     return emlId;
   }
 
-  public Icon getIcon() {
-    return Images.get(ImageNums.EMAIL_SYMBOL_SMALL);
+  public int getIcon() {
+    return ImageNums.EMAIL_SYMBOL_SMALL;
   }
 
   public String getEmailAddressFull() {

@@ -13,8 +13,6 @@
 package com.CH_co.service.records;
 
 import com.CH_co.util.ImageNums;
-import com.CH_co.util.Images;
-import javax.swing.Icon;
 import java.sql.Timestamp;
 
 /** 
@@ -55,8 +53,8 @@ public class InvEmlRecord extends Record {
   /**
    * @return the default icon to represent this Record type.
    */
-  public Icon getIcon() {
-    return Images.get(ImageNums.EMAIL_SYMBOL_SMALL);
+  public int getIcon() {
+    return ImageNums.EMAIL_SYMBOL_SMALL;
   }
 
   public void merge(Record updated) {

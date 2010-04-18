@@ -96,103 +96,10 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
 
       if (fRec.folderType.shortValue() == FolderRecord.MESSAGE_FOLDER) {
         UserRecord myUserRec = FetchedDataCache.getSingleInstance().getUserRecord();
-        icon = fRec.getIcon(selected, myUserRec);
+        icon = Images.get(fRec.getIcon(selected, myUserRec));
       } else {
-        icon = fRec.getIcon(selected, null);
+        icon = Images.get(fRec.getIcon(selected, null));
       }
-//      // local folder
-//      if (folderType == FolderRecord.LOCAL_FILES_FOLDER) {
-//        icon = Images.get(ImageNums.MY_COMPUTER16);
-//      }
-//
-//      // address folder
-//      else if (folderType == FolderRecord.ADDRESS_FOLDER || folderType == FolderRecord.WHITELIST_FOLDER) {
-//        if (numShares > 1) {
-//          if (selected)
-//            icon = Images.get(ImageNums.FLD_ADDR_OPEN_SHARED16, true);
-//          else
-//            icon = Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED16, true);
-//        } else {
-//          if (selected)
-//            icon = Images.get(ImageNums.FLD_ADDR_OPEN16);
-//          else
-//            icon = Images.get(ImageNums.FLD_ADDR_CLOSED16);
-//        }
-//      }
-//
-//      // file folder
-//      else if (folderType == FolderRecord.FILE_FOLDER) {
-//        if (numShares > 1) {
-//          if (selected)
-//            icon = Images.get(ImageNums.FLD_SHARE_OPEN16);
-//          else
-//            icon = Images.get(ImageNums.FLD_SHARE_CLOSED16);
-//        } else {
-//          if (selected)
-//            icon = Images.get(ImageNums.FOLDER_OPEN16);
-//          else
-//            icon = Images.get(ImageNums.FOLDER16);
-//        }
-//      }
-//
-//      // posting folder
-//      else if (folderType == FolderRecord.POSTING_FOLDER) {
-//        if (numShares > 1) {
-//          if (fRec.isChatting()) {
-//            if (selected)
-//              icon = Images.get(ImageNums.FLD_CHAT_OPEN16);
-//            else
-//              icon = Images.get(ImageNums.FLD_CHAT_CLOSED16);
-//          }
-//          else {
-//            if (selected)
-//              icon = Images.get(ImageNums.FLD_POST_OPEN_SHARED16, true);
-//            else
-//              icon = Images.get(ImageNums.FLD_POST_CLOSED_SHARED16, true);
-//          }
-//        } else {
-//          if (selected)
-//            icon = Images.get(ImageNums.FLD_POST_OPEN16);
-//          else
-//            icon = Images.get(ImageNums.FLD_POST_CLOSED16);
-//        }
-//      }
-//
-//      // message folder
-//      else if (folderType == FolderRecord.MESSAGE_FOLDER) {
-//        if (numShares > 1) {
-//          if (selected)
-//            icon = Images.get(ImageNums.FLD_MAIL_OPEN_SHARED16, true);
-//          else
-//            icon = Images.get(ImageNums.FLD_MAIL_CLOSED_SHARED16, true);
-//        } else {
-//          if (selected)
-//            icon = Images.get(ImageNums.FLD_MAIL_OPEN16);
-//          else
-//            icon = Images.get(ImageNums.FLD_MAIL_CLOSED16);
-//        }
-//      }
-//
-//      // contact folder
-//      else if (folderType == FolderRecord.CONTACT_FOLDER) {
-//        if (selected)
-//          icon = Images.get(ImageNums.FLD_CNT_OPEN16);
-//        else
-//          icon = Images.get(ImageNums.FLD_CNT_CLOSED16);
-//      }
-//
-//      // key folder
-//      else if (folderType == FolderRecord.KEY_FOLDER) {
-//        if (selected)
-//          icon = Images.get(ImageNums.FLD_KEY_OPEN16);
-//        else
-//          icon = Images.get(ImageNums.FLD_KEY_CLOSED16);
-//      }
-//
-//      // group folder
-//      else if (folderType == FolderRecord.GROUP_FOLDER) {
-//        icon = Images.get(ImageNums.PEOPLE16);
-//      }
 
       // Render update count so the user is notified that folder content changed while he wasn't looking at it.
       String toolTip = fRec.getCachedToolTip();

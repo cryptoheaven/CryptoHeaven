@@ -12,18 +12,11 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 
 import com.CH_co.trace.Trace;
+import com.CH_co.cryptx.*;
 import com.CH_co.util.*;
-
-import com.CH_co.cryptx.RSAPrivateKey;
-import com.CH_co.cryptx.RSAPublicKey;
-import com.CH_co.cryptx.SymmetricSmallBlockCipher;
-import com.CH_co.cryptx.BAEncodedPassword;
-import com.CH_co.cryptx.BASymPlainBlock;
-import com.CH_co.cryptx.BASymCipherBlock;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -68,8 +61,8 @@ public class KeyRecord extends Record { // implicit no-argument constructor
     return keyId;
   }
 
-  public Icon getIcon() {
-    return Images.get(ImageNums.KEY16);
+  public int getIcon() {
+    return ImageNums.KEY16;
   }
 
   public void setEncPrivateKey  (BASymCipherBlock encPrivateKey)  { this.encPrivateKey = encPrivateKey; }

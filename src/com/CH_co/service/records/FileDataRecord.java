@@ -20,7 +20,6 @@ import java.util.zip.GZIPOutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.sql.Timestamp;
-import javax.swing.*;
 
 import com.CH_cl.service.ops.DownloadUtilities;
 import com.CH_co.cryptx.*;
@@ -90,8 +89,8 @@ public class FileDataRecord extends Record {
     return fileId;
   }
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public void setEncOrigDataDigest  (BASymCipherBulk  encOrigDataDigest   ) { this.encOrigDataDigest    = encOrigDataDigest;  }

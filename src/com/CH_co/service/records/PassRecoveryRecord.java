@@ -14,7 +14,6 @@ package com.CH_co.service.records;
 
 import java.security.*;
 import java.sql.Timestamp;
-import javax.swing.Icon;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.util.*;
@@ -312,8 +311,8 @@ public class PassRecoveryRecord extends Record {
     return password;
   }
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public Long getId() {

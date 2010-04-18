@@ -65,61 +65,76 @@ public class Images extends Object {
     else
       return null;
   }
+  public static ImageIcon get(ImageText imageText) {
+    return get(imageText.getIcon());
+  }
   public static ImageIcon get(int imageCode) {
-    return get(imageCode, false);
+    boolean isShared = imageCode >= ImageNums.SHARED_OFFSET;
+    if (isShared) {
+      imageCode -= ImageNums.SHARED_OFFSET;
+    }
+    return get(imageCode, isShared);
   }
   public static ImageIcon get(int imageCode, boolean isShared) {
-    if (imageIcons[imageCode] == null) {
-      String fileName = null;
-      URL location = null;
-      try {
-        ImageNums.setUsedIcon(imageCode);
-        String name = ImageNums.getImageName(imageCode);
-        // If customized version and logo image is our own, not from URL then null it
-        // First 3 (index 0, 1, 2) images MUST be customized
-        if (URLs.hasPrivateLabelCustomizationClass() && imageCode <= 2 && name.indexOf("://") < 0 && name.indexOf("jar:file:") < 0) {
-          name = "";
-        }
-        if (name.length() > 0) {
-          // If customized version and image is in a URL format, then load directly from URL
-          if (URLs.hasPrivateLabelCustomization() && (name.indexOf("://") >= 0 || name.indexOf("jar:file:") >= 0)) {
-            location = new URL(name);
-          } else {
-            fileName = "images/" + name;
-            location = URLs.getResourceURL(fileName);
-            if (location == null)
-              location = URLs.getResourceURL(fileName + ".png");
-            if (location == null)
-              location = URLs.getResourceURL(fileName + ".gif");
+    ImageIcon icon = null;
+    if (imageCode == ImageNums.IMAGE_NONE) {
+      icon = null;
+    } else if (imageCode == ImageNums.IMAGE_SPECIAL_HANDLING) {
+      throw new IllegalArgumentException("Image code needs special handling.");
+    } else {
+      if (imageIcons[imageCode] == null) {
+        String fileName = null;
+        URL location = null;
+        try {
+          ImageNums.setUsedIcon(imageCode);
+          String name = ImageNums.getImageName(imageCode);
+          // If customized version and logo image is our own, not from URL then null it
+          // First 3 (index 0, 1, 2) images MUST be customized
+          if (URLs.hasPrivateLabelCustomizationClass() && imageCode <= 2 && name.indexOf("://") < 0 && name.indexOf("jar:file:") < 0) {
+            name = "";
           }
+          if (name.length() > 0) {
+            // If customized version and image is in a URL format, then load directly from URL
+            if (URLs.hasPrivateLabelCustomization() && (name.indexOf("://") >= 0 || name.indexOf("jar:file:") >= 0)) {
+              location = new URL(name);
+            } else {
+              fileName = "images/" + name;
+              location = URLs.getResourceURL(fileName);
+              if (location == null)
+                location = URLs.getResourceURL(fileName + ".png");
+              if (location == null)
+                location = URLs.getResourceURL(fileName + ".gif");
+            }
+          }
+          if (location == null) {
+            // we will include this ERROR call in the trace
+            traceGetError(imageCode, fileName, null);
+          }
+          if (location != null) {
+            imageIcons[imageCode] = new ImageIcon(location);
+          }
+          if (isShared) {
+            // add a small share hand to the icon
+            ImageIcon shareHandSmallImage = get(ImageNums.SHARE_HAND_L, false);
+            int newHeight = imageIcons[imageCode].getIconHeight() + 2;
+            BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+            Graphics2D g = total.createGraphics();
+            g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
+            double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
+            double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
+            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
+            xform.translate(0.0, moveDownBy);
+            g.drawImage(shareHandSmallImage.getImage(), xform, null);
+            imageIcons[imageCode] = new ImageIcon(total);
+          }
+        } catch (Throwable t) {
+          t.printStackTrace();
+          traceGetError(imageCode, fileName, location);
         }
-        if (location == null) {
-          // we will include this ERROR call in the trace
-          traceGetError(imageCode, fileName, null);
-        }
-        if (location != null) {
-          imageIcons[imageCode] = new ImageIcon(location);
-        }
-        if (isShared) {
-          // add a small share hand to the icon
-          ImageIcon shareHandSmallImage = get(ImageNums.SHARE_HAND_L, false);
-          int newHeight = imageIcons[imageCode].getIconHeight() + 2;
-          BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-          Graphics2D g = total.createGraphics();
-          g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
-          double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
-          double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
-          AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
-          xform.translate(0.0, moveDownBy);
-          g.drawImage(shareHandSmallImage.getImage(), xform, null);
-          imageIcons[imageCode] = new ImageIcon(total);
-        }
-      } catch (Throwable t) {
-        t.printStackTrace();
-        traceGetError(imageCode, fileName, location);
       }
+      icon = imageIcons[imageCode];
     }
-    return imageIcons[imageCode];
+    return icon;
   }
 
   private static void traceGetError(int imageCode, String fileName, URL location) {

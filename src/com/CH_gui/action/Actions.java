@@ -13,7 +13,7 @@
 package com.CH_gui.action;
 
 import javax.swing.Action;
-import com.CH_co.util.ActionUtils;
+import com.CH_gui.util.ActionUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

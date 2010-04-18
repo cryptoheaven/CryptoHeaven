@@ -27,7 +27,7 @@ import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.ContactRecUtil;
+import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.gui.*;

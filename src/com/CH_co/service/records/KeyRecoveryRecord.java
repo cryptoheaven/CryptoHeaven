@@ -14,8 +14,8 @@ package com.CH_co.service.records;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
 import java.sql.Timestamp;
-import javax.swing.Icon;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -43,8 +43,8 @@ public class KeyRecoveryRecord extends Record {
   public Long getId() {
     return keyRecovId;
   }
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public void setEncSymKey(BAAsyCipherBlock encSymKey)  { this.encSymKey = encSymKey; }

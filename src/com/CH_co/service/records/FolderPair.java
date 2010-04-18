@@ -12,8 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
-
 import com.CH_co.trace.Trace;
 
 /** 
@@ -60,7 +58,7 @@ public class FolderPair extends FileRecord implements MemberContactRecordI {
     return folderRecord.getId();
   }
 
-  public Icon getIcon() {
+  public int getIcon() {
     return folderRecord.getIcon();
   }
 

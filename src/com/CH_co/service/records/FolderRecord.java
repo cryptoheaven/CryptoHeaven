@@ -14,7 +14,6 @@ package com.CH_co.service.records;
 
 import java.sql.Timestamp;
 import java.util.*;
-import javax.swing.Icon;
 
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
@@ -101,154 +100,150 @@ public class FolderRecord extends Record {
     return folderId;
   }
 
-  public Icon getIcon() {
+  public int getIcon() {
     return getIcon(false, null);
   }
 
-  public Icon getIcon(boolean selected, UserRecord uRec) {
-    Icon icon = null;
+  public int getIcon(boolean selected, UserRecord uRec) {
+    int icon = ImageNums.IMAGE_NONE;
     switch (folderType.shortValue()) {
       case LOCAL_FILES_FOLDER :
-        icon = Images.get(ImageNums.MY_COMPUTER16);
+        icon = ImageNums.MY_COMPUTER16;
         break;
       case ADDRESS_FOLDER :
       case WHITELIST_FOLDER :
         if (numOfShares.shortValue() > 1) {
           if (selected)
-            //icon = Images.get(ImageNums.FLD_ADDR_OPEN_SHARED16);
-            icon = Images.get(ImageNums.FLD_ADDR_OPEN_SHARED16, true);
+            icon = ImageNums.FLD_ADDR_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
           else
-            //icon = Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED16);
-            icon = Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED16, true);
+            icon = ImageNums.FLD_ADDR_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
         } else {
           if (selected)
-            icon = Images.get(ImageNums.FLD_ADDR_OPEN16);
+            icon = ImageNums.FLD_ADDR_OPEN16;
           else
-            icon = Images.get(ImageNums.FLD_ADDR_CLOSED16);
+            icon = ImageNums.FLD_ADDR_CLOSED16;
         }
         break;
       case FILE_FOLDER :
         if (folderId.longValue() == CATEGORY_FILE_ID) {
-          icon = Images.get(ImageNums.FLD_FILES16);
+          icon = ImageNums.FLD_FILES16;
         } else if (numOfShares.shortValue() > 1) {
           if (selected)
-            //icon = Images.get(ImageNums.FLD_OPEN_SHARED16);
-            icon = Images.get(ImageNums.FLD_OPEN_SHARED16, true);
+            icon = ImageNums.FLD_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
           else
-            //icon = Images.get(ImageNums.FLD_CLOSED_SHARED16);
-            icon = Images.get(ImageNums.FLD_CLOSED_SHARED16, true);
+            icon = ImageNums.FLD_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
         } else {
           if (selected)
-            icon = Images.get(ImageNums.FLD_OPEN16);
+            icon = ImageNums.FLD_OPEN16;
           else
-            icon = Images.get(ImageNums.FLD_CLOSED16);
+            icon = ImageNums.FLD_CLOSED16;
         }
         break;
       case MESSAGE_FOLDER :
         if (folderId.longValue() == CATEGORY_MAIL_ID) {
-          icon = Images.get(ImageNums.FLD_MAIL18_12);
+          icon = ImageNums.FLD_MAIL18_12;
         } else if (numOfShares.shortValue() > 1) {
           if (uRec == null) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_OPEN_SHARED16, true);
-            else icon = Images.get(ImageNums.FLD_MAIL_CLOSED_SHARED16, true);
+            if (selected) icon = ImageNums.FLD_MAIL_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            else icon = ImageNums.FLD_MAIL_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.draftFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_DRAFT_OPEN_SHARED16, true);
-            else icon = Images.get(ImageNums.FLD_MAIL_DRAFT_CLOSED_SHARED16, true);
+            if (selected) icon = ImageNums.FLD_MAIL_DRAFT_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            else icon = ImageNums.FLD_MAIL_DRAFT_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.msgFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_INBOX_OPEN_SHARED16, true);
-            else icon = Images.get(ImageNums.FLD_MAIL_INBOX_CLOSED_SHARED16, true);
+            if (selected) icon = ImageNums.FLD_MAIL_INBOX_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            else icon = ImageNums.FLD_MAIL_INBOX_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.junkFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_JUNK_OPEN_SHARED16, true);
-            else icon = Images.get(ImageNums.FLD_MAIL_JUNK_CLOSED_SHARED16, true);
+            if (selected) icon = ImageNums.FLD_MAIL_JUNK_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            else icon = ImageNums.FLD_MAIL_JUNK_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.sentFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_SENT_OPEN_SHARED16, true);
-            else icon = Images.get(ImageNums.FLD_MAIL_SENT_CLOSED_SHARED16, true);
+            if (selected) icon = ImageNums.FLD_MAIL_SENT_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            else icon = ImageNums.FLD_MAIL_SENT_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           } else { // catch all
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_OPEN_SHARED16, true);
-            else icon = Images.get(ImageNums.FLD_MAIL_CLOSED_SHARED16, true);
+            if (selected) icon = ImageNums.FLD_MAIL_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            else icon = ImageNums.FLD_MAIL_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           }
         } else {
           if (uRec == null) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_OPEN16);
-            else icon = Images.get(ImageNums.FLD_MAIL_CLOSED16);
+            if (selected) icon = ImageNums.FLD_MAIL_OPEN16;
+            else icon = ImageNums.FLD_MAIL_CLOSED16;
           } else if (folderId.equals(uRec.draftFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_DRAFT_OPEN16);
-            else icon = Images.get(ImageNums.FLD_MAIL_DRAFT_CLOSED16);
+            if (selected) icon = ImageNums.FLD_MAIL_DRAFT_OPEN16;
+            else icon = ImageNums.FLD_MAIL_DRAFT_CLOSED16;
           } else if (folderId.equals(uRec.msgFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_INBOX_OPEN16);
-            else icon = Images.get(ImageNums.FLD_MAIL_INBOX_CLOSED16);
+            if (selected) icon = ImageNums.FLD_MAIL_INBOX_OPEN16;
+            else icon = ImageNums.FLD_MAIL_INBOX_CLOSED16;
           } else if (folderId.equals(uRec.junkFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_JUNK_OPEN16);
-            else icon = Images.get(ImageNums.FLD_MAIL_JUNK_CLOSED16);
+            if (selected) icon = ImageNums.FLD_MAIL_JUNK_OPEN16;
+            else icon = ImageNums.FLD_MAIL_JUNK_CLOSED16;
           } else if (folderId.equals(uRec.sentFolderId)) {
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_SENT_OPEN16);
-            else icon = Images.get(ImageNums.FLD_MAIL_SENT_CLOSED16);
+            if (selected) icon = ImageNums.FLD_MAIL_SENT_OPEN16;
+            else icon = ImageNums.FLD_MAIL_SENT_CLOSED16;
           } else { // catch all
-            if (selected) icon = Images.get(ImageNums.FLD_MAIL_OPEN16);
-            else icon = Images.get(ImageNums.FLD_MAIL_CLOSED16);
+            if (selected) icon = ImageNums.FLD_MAIL_OPEN16;
+            else icon = ImageNums.FLD_MAIL_CLOSED16;
           }
         }
         break;
       case POSTING_FOLDER :
       case CHATTING_FOLDER :
         if (folderId.longValue() == CATEGORY_CHAT_ID) {
-          icon = Images.get(ImageNums.CHAT16);
+          icon = ImageNums.CHAT16;
         } else if (numOfShares.shortValue() > 1) {
           if (isChatting()) {
             if (selected)
-              icon = Images.get(ImageNums.FLD_CHAT_OPEN16);
+              icon = ImageNums.FLD_CHAT_OPEN16;
             else
-              icon = Images.get(ImageNums.FLD_CHAT_CLOSED16);
+              icon = ImageNums.FLD_CHAT_CLOSED16;
           } else {
             if (selected)
-              icon = Images.get(ImageNums.FLD_MAIL_POST_OPEN_SHARED16, true);
+              icon = ImageNums.FLD_MAIL_POST_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
             else
-              icon = Images.get(ImageNums.FLD_MAIL_POST_CLOSED_SHARED16, true);
+              icon = ImageNums.FLD_MAIL_POST_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
           }
         } else { // includes chatting archives too which are no longer shared...
           if (selected)
-            icon = Images.get(ImageNums.FLD_MAIL_POST_OPEN16);
+            icon = ImageNums.FLD_MAIL_POST_OPEN16;
           else
-            icon = Images.get(ImageNums.FLD_MAIL_POST_CLOSED16);
+            icon = ImageNums.FLD_MAIL_POST_CLOSED16;
         }
         break;
       case CONTACT_FOLDER :
         if (selected)
-          icon = Images.get(ImageNums.FLD_CNT_OPEN16);
+          icon = ImageNums.FLD_CNT_OPEN16;
         else
-          icon = Images.get(ImageNums.FLD_CNT_CLOSED16);
+          icon = ImageNums.FLD_CNT_CLOSED16;
         break;
       case KEY_FOLDER :
         if (selected)
-          icon = Images.get(ImageNums.FLD_KEY_OPEN16);
+          icon = ImageNums.FLD_KEY_OPEN16;
         else
-          icon = Images.get(ImageNums.FLD_KEY_CLOSED16);
+          icon = ImageNums.FLD_KEY_CLOSED16;
         break;
       case GROUP_FOLDER :
         if (folderId.longValue() == CATEGORY_GROUP_ID) {
-          icon = Images.get(ImageNums.FLD_GROUPS16);
+          icon = ImageNums.FLD_GROUPS16;
         } else {
-          icon = Images.get(ImageNums.PEOPLE16);
+          icon = ImageNums.PEOPLE16;
         }
         break;
       case RECYCLE_FOLDER :
         if (numOfShares.shortValue() > 1) {
-          icon = Images.get(ImageNums.FLD_RECYCLE_EMPTY_SHARED16, true);
+          icon = ImageNums.FLD_RECYCLE_EMPTY_SHARED16 + ImageNums.SHARED_OFFSET;
         } else {
-          icon = Images.get(ImageNums.FLD_RECYCLE_EMPTY16);
+          icon = ImageNums.FLD_RECYCLE_EMPTY16;
         }
         break;
       case CATEGORY_MAIL_FOLDER :
-        icon = Images.get(ImageNums.FLD_MAIL18_12);
+        icon = ImageNums.FLD_MAIL18_12;
         break;
       case CATEGORY_FILE_FOLDER :
-        icon = Images.get(ImageNums.FLD_FILES16);
+        icon = ImageNums.FLD_FILES16;
         break;
       case CATEGORY_CHAT_FOLDER :
-        icon = Images.get(ImageNums.FLD_CHAT16);
+        icon = ImageNums.FLD_CHAT16;
         break;
       case CATEGORY_GROUP_FOLDER :
-        icon = Images.get(ImageNums.FLD_GROUPS16);
+        icon = ImageNums.FLD_GROUPS16;
         break;
     }
     return icon;

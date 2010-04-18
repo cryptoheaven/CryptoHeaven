@@ -35,7 +35,7 @@ import com.CH_gui.sortedTable.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -43,7 +43,7 @@ import com.CH_gui.sortedTable.*;
  *
  * <b>$Revision: 1.33 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgTableCellRenderer extends RecordTableCellRenderer {
 
@@ -123,9 +123,9 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         if (value instanceof Short) {
           Icon icon = null;
           short imp = ((Short) value).shortValue();
-          Object[] o = MsgDataRecord.getPriorityTextAndIcon(imp);
-          String toolTip = o[0].toString();
-          icon = (Icon) o[1];
+          ImageText pri = MsgDataRecord.getPriorityTextAndIcon(imp);
+          String toolTip = pri.getText();
+          icon = Images.get(pri);
           if (!isDoubleLineView) {
             FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
@@ -141,10 +141,10 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 }
               }
               if (!col_19) {
-                Object[] exp = mData.getExpirationIconAndText(cache.getMyUserId());
-                if (exp[0] != null) {
-                  icon = (Icon) exp[0];
-                  toolTip = "Expiration: " + exp[1];
+                ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId());
+                if (exp.getIcon() != ImageNums.IMAGE_NONE) {
+                  icon = Images.get(exp);
+                  toolTip = "Expiration: " + exp.getText();
                 }
               }
             }
@@ -203,10 +203,10 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
                 boolean isSet = false;
                 if (!col_19) {
-                  Object[] exp = mData.getExpirationIconAndText(cache.getMyUserId());
-                  if (exp[0] != null) {
-                    icon = (Icon) exp[0];
-                    toolTip = "Expiration: " + exp[1];
+                  ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId());
+                  if (exp.getIcon() != ImageNums.IMAGE_NONE) {
+                    icon = Images.get(exp);
+                    toolTip = "Expiration: " + exp.getText();
                     isSet = true;
                   }
                 }
@@ -219,9 +219,9 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 }
                 // default to Importance column
                 if (!isSet) {
-                  Object[] o = MsgDataRecord.getPriorityTextAndIcon(mData.importance.shortValue());
-                  toolTip = o[0].toString();
-                  icon = (Icon) o[1];
+                  ImageText pri = MsgDataRecord.getPriorityTextAndIcon(mData.importance.shortValue());
+                  toolTip = pri.getText();
+                  icon = Images.get(pri);
                 }
               }
             }
@@ -244,7 +244,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 MsgLinkRecord mLink = (MsgLinkRecord) rec;
                 StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
                 if (statRecord != null) {
-                  setIcon(StatRecord.getIconForFlag((Short) value));
+                  setIcon(Images.get(StatRecord.getIconForFlag((Short) value)));
                   setToolTipText(StatRecord.getInfo((Short) value));
                 }
               }
@@ -317,8 +317,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         }
         // get icon from source object
         Icon icon = null;
-        if (mData != null && mData.isTypeAddress()) icon = mData.getIcon();
-        if (icon == null) icon = mLink.getIcon();
+        if (mData != null && mData.isTypeAddress()) icon = Images.get(mData.getIcon());
+        if (icon == null) icon = Images.get(mLink.getIcon());
         thisCloned.setIcon(icon);
         jTwoLinesRendererFrom.removeAll();
         jTwoLinesRendererFrom.setLayout(new GridBagLayout());
@@ -385,9 +385,9 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             // get icon from source object
             Icon icon = null;
             if (mData != null && mData.isTypeAddress())
-              icon = mData.getIcon();
+              icon = Images.get(mData.getIcon());
             if (icon == null)
-              icon = mLink.getIcon();
+              icon = Images.get(mLink.getIcon());
             jAddrRenderer.setIcon(icon);
             setDefaultBackground(jAddrRenderer, row, isSelected);
             jFlowPanel.removeAll();
@@ -443,10 +443,10 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             if (column > -1) {
               Icon icon = null;
               if (mData != null && mData.isTypeAddress()) {
-                icon = mData.getIcon();
+                icon = Images.get(mData.getIcon());
               }
               if (icon == null) {
-                icon = mLink.getIcon();
+                icon = Images.get(mLink.getIcon());
               }
               setIcon(icon);
               // check if need to use BOLD
@@ -538,7 +538,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         if (!isColumnVisible(table, 2)) {
           StatRecord statRecord = null;
           if (mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null) {
-            JLabel icon = new JLabel(statRecord.getIcon());
+            JLabel icon = new JLabel(Images.get(statRecord.getIcon()));
             jIconSetRenderer.add(icon);
           } else {
             jIconSetRenderer.add(jNoIcon1);
@@ -547,8 +547,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         // Priority
         if (!isColumnVisible(table, 0)) {
           if (mData != null) {
-            Object[] o = mData.getPriorityTextAndIcon();
-            JLabel icon = new JLabel((Icon) o[1]);
+            ImageText pri = mData.getPriorityTextAndIcon();
+            JLabel icon = new JLabel(Images.get(pri));
             jIconSetRenderer.add(icon);
           } else {
             jIconSetRenderer.add(jNoIcon2);
@@ -565,8 +565,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               if (rawModel instanceof MsgTableModel) {
                 MsgTableModel tableModel = (MsgTableModel) rawModel;
                 if (ArrayUtils.find(tableModel.getColumnHeaderData().data[ColumnHeaderData.I_VIEWABLE_SEQUENCE_DEFAULT_LONG], new Integer(15)) > -1) {
-                  Object[] o = mData.getSecurityTextAndIcon();
-                  JLabel icon = new JLabel((Icon) o[1]);
+                  ImageText security = mData.getSecurityTextAndIcon();
+                  JLabel icon = new JLabel(Images.get(security));
                   jIconSetRenderer.add(icon);
                 }
               }
@@ -592,8 +592,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         // Expiration Date
         if (!isColumnVisible(table, 19)) {
           if (mData != null) {
-            Object[] objs = mData.getExpirationIconAndText(cache.getMyUserId(), true);
-            JLabel icon = new JLabel((Icon) objs[0]);
+            ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId(), true);
+            JLabel icon = new JLabel(Images.get(exp));
             jIconSetRenderer.add(icon);
           } else {
             jIconSetRenderer.add(jNoIcon4);
@@ -637,10 +637,10 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
         MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-        Object[] exp = mData.getExpirationIconAndText(cache.getMyUserId());
-        if (exp[0] != null) {
-          setIcon((Icon) exp[0]);
-          setToolTipText("Expiration: " + exp[1]);
+        ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId());
+        if (exp.getIcon() != ImageNums.IMAGE_NONE) {
+          setIcon(Images.get(exp));
+          setToolTipText("Expiration: " + exp.getText());
         }
       }
 
@@ -669,9 +669,9 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         setBorder(RecordTableCellRenderer.BORDER_ICON);
         setText("");
         short imp = ((Short) value).shortValue();
-        Object[] o = MsgDataRecord.getSecurityTextAndIcon(imp);
-        setToolTipText(o[0].toString());
-        setIcon((Icon)o[1]);
+        ImageText security = MsgDataRecord.getSecurityTextAndIcon(imp);
+        setToolTipText(security.getText());
+        setIcon(Images.get(security));
       }
     }
 
@@ -681,9 +681,9 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
       MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-      Object[] objs = mData.getExpirationIconAndText(cache.getMyUserId(), true);
-      setText((String) objs[1]);
-      setIcon((Icon) objs[0]);
+      ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId(), true);
+      setText(exp.getText());
+      setIcon(Images.get(exp));
       if (isDoubleLineView) {
         renderer = intoTwoLines(this, row, isSelected);
       }

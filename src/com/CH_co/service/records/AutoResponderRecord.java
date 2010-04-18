@@ -15,7 +15,6 @@ package com.CH_co.service.records;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Vector;
-import javax.swing.Icon;
 
 import com.CH_co.nanoxml.*;
 import com.CH_co.trace.Trace;
@@ -64,8 +63,8 @@ public class AutoResponderRecord extends Record {
     if (trace != null) trace.exit(AutoResponderRecord.class);
   }
 
-  public Icon getIcon() {
-    return null;
+  public int getIcon() {
+    return ImageNums.IMAGE_NONE;
   }
 
   public Long getId() {

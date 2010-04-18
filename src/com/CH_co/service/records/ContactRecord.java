@@ -14,7 +14,6 @@ package com.CH_co.service.records;
 
 import java.util.*;
 import java.sql.Timestamp;
-import javax.swing.Icon;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
@@ -107,8 +106,8 @@ public class ContactRecord extends Record implements MemberContactRecordI {
     return contactId;
   }
 
-  public Icon getIcon() {
-    return Images.get(ImageNums.CONTACT16);
+  public int getIcon() {
+    return ImageNums.CONTACT16;
   }
 
   public boolean isOfActiveType() {

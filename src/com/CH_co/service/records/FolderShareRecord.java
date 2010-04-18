@@ -12,7 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -87,10 +86,10 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     return shareId;
   }
 
-  public Icon getIcon() {
-    Icon icon = null;
+  public int getIcon() {
+    int icon = ImageNums.IMAGE_NONE;
     if (ownerType.shortValue() == Record.RECORD_TYPE_GROUP)
-      icon = Images.get(ImageNums.PEOPLE16);
+      icon = ImageNums.PEOPLE16;
     return icon;
   }
 

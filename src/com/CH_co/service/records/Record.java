@@ -12,8 +12,6 @@
 
 package com.CH_co.service.records;
 
-import javax.swing.Icon;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
@@ -67,7 +65,7 @@ abstract public class Record extends Object implements Cloneable, Comparable {
   /**
    * @return the default icon to represent this Record type.
    */
-  public abstract Icon getIcon();
+  public abstract int getIcon();
 
   public String toStringLongFormat() {
     return toString();
