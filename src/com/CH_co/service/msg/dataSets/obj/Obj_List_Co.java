@@ -18,7 +18,7 @@ import java.sql.*;
 import java.util.*;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
 import com.CH_co.service.msg.*;
@@ -89,7 +89,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
 
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "writeToStream(DataOutputStream2, ProgMonitor)");
 
     writeToStream2(objs, dataOut, progressMonitor, clientBuild, serverBuild);
@@ -97,7 +97,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
     if (trace != null) trace.exit(Obj_List_Co.class);
   } // end writeToStream()
 
-  private void writeToStream2(Object[] objects, DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  private void writeToStream2(Object[] objects, DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "writeToStream2(Object[] objects, DataOutputStream2, ProgMonitor)");
     // write indicator
     if (objects == null)
@@ -171,7 +171,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
   }
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "initFromStream(DataInputStream2, ProgMonitor)");
 
     try {
@@ -183,7 +183,7 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
     if (trace != null) trace.exit(Obj_List_Co.class);
   } // end initFromStream()
 
-  private Object[] initFromStream2(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException, DataSetException {
+  private Object[] initFromStream2(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException, DataSetException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "initFromStream2(DataInputStream2, ProgMonitor)");
 
     Object[] objects = null;

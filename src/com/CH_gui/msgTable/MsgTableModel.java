@@ -36,7 +36,7 @@ import com.CH_gui.recycleTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.postTable.PostTableCellRenderer;
 
-import com.CH_guiLib.util.HTML_utils;
+import com.CH_guiLib.util.HTML_Ops;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -776,7 +776,7 @@ public class MsgTableModel extends RecordTableModel {
                 messageText = msgData.getEncodedHTMLData();
             } else {
               // move the BODY tag right after the HTML tag...
-              messageText = HTML_utils.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true);
+              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true);
               int iBody1 = messageText.indexOf("<body");
               if (iBody1 < 0)
                 iBody1 = messageText.indexOf("<BODY");

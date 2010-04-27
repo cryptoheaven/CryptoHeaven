@@ -14,7 +14,6 @@ package com.CH_gui.contactTable;
 
 import com.CH_gui.util.ActionUtils;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.awt.dnd.*;
 import java.lang.reflect.Array;
@@ -45,6 +44,12 @@ import com.CH_co.service.msg.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 import com.CH_gui.list.ListRenderer;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -197,14 +202,14 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
    */
   public MemberContactRecordI[] getSelectedMemberContacts() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedMemberContacts()");
-    Vector selectedRecsV = getSelectedRecordsV();
-    Vector selectedMembersV = new Vector();
-    for (int i=0; i<selectedRecsV.size(); i++) {
-      Record rec = (Record) selectedRecsV.elementAt(i);
+    List selectedRecsL = getSelectedRecordsL();
+    List selectedMembersL = new ArrayList();
+    for (int i=0; i<selectedRecsL.size(); i++) {
+      Record rec = (Record) selectedRecsL.get(i);
       if (rec instanceof MemberContactRecordI)
-        selectedMembersV.addElement(rec);
+        selectedMembersL.add(rec);
     }
-    MemberContactRecordI[] records = (MemberContactRecordI[]) ArrayUtils.toArray(selectedMembersV, MemberContactRecordI.class);
+    MemberContactRecordI[] records = (MemberContactRecordI[]) ArrayUtils.toArray(selectedMembersL, MemberContactRecordI.class);
     if (trace != null) trace.exit(ContactActionTable.class, records);
     return records;
   }
@@ -215,7 +220,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
    */
   public Record[] getSelectedRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedRecords()");
-    Record[] records = (Record[]) ArrayUtils.toArray(getSelectedRecordsV(), Record.class);
+    Record[] records = (Record[]) ArrayUtils.toArray(getSelectedRecordsL(), Record.class);
     if (trace != null) trace.exit(ContactActionTable.class, records);
     return records;
   }
@@ -228,12 +233,12 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     if (trace != null) trace.args(classType);
 
     Record[] records = null;
-    Vector recordsV = getSelectedRecordsV();
-    if (recordsV != null && recordsV.size() > 0) {
+    List recordsL = getSelectedRecordsL();
+    if (recordsL != null && recordsL.size() > 0) {
       Vector selectedV = new Vector();
-      for (int i=0; i<recordsV.size(); i++) {
-        if (recordsV.elementAt(i).getClass().equals(classType)) {
-          selectedV.addElement(recordsV.elementAt(i));
+      for (int i=0; i<recordsL.size(); i++) {
+        if (recordsL.get(i).getClass().equals(classType)) {
+          selectedV.addElement(recordsL.get(i));
         }
       }
       if (selectedV.size() > 0) {

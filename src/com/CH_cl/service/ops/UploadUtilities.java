@@ -16,7 +16,7 @@ import java.awt.Component;
 import java.io.File;
 import java.util.Vector;
 
-import com.CH_cl.monitor.TransferProgMonitor;
+import com.CH_gui.monitor.TransferProgMonitor;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.fld.*;
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -405,7 +405,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
         }
 
         if (!MiscGui.isAllGUIsuppressed()) {
-          ProgMonitor progressMonitor = new TransferProgMonitor(fileNames);
+          ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferUp(fileNames);
           ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionToSend.getStamp());
         }
 

@@ -16,7 +16,7 @@ import java.io.*;
 import java.util.Date;
 import java.sql.Timestamp;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.cryptx.BA;
 import com.CH_co.util.Misc;
 
@@ -151,7 +151,7 @@ public class DataOutputStream2 extends DataOutputStream {
       writeShort(shortObj.shortValue());
   }
 
-  public void writeFile(File file, ProgMonitor progressMonitor) throws IOException {
+  public void writeFile(File file, ProgMonitorI progressMonitor) throws IOException {
     byte nullIndicator = (byte) ((file != null) ? 0 : -1);
     writeByte(nullIndicator);
 

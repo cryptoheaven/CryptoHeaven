@@ -341,11 +341,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           synchronized (readerDoneMonitor) {
             msgActionStamp = ClientMessageAction.readActionStampFromStream(dataIn);
             // Set interruptable executor of this action
-            ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
+            ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
             // Don't want dumping monitor here on the client side, server side would be ok.
             if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
-              progressMonitor = new DefaultProgMonitor(false);
-              ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
+              if (!workerManager.isDestroyed()) {
+                progressMonitor = new DefaultProgMonitor(false);
+                ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
+              }
             }
             progressMonitor.setInterrupt(ServerInterfaceWorker.this);
 
@@ -422,7 +424,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       }
 
       if (msgActionCode != 0) {
-        ProgMonitor pm = ProgMonitorPool.getProgMonitor(msgActionStamp);
+        ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgActionStamp);
         if (pm != null)
           pm.jobKilled();
       }
@@ -575,10 +577,12 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       if (msgAction != null) {
         long msgActionStamp = msgAction.getStamp();
         int msgActionCode = msgAction.getActionCode();
-        ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
+        ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
         if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
-          progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
-          ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
+          if (!workerManager.isDestroyed()) {
+            progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
+            ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
+          }
         }
         progressMonitor.dequeue(msgActionCode, msgActionStamp);
       }
@@ -622,7 +626,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
                 if (loginMsgAction == null && msgAction.getActionCode() == CommandCodes.SYS_Q_NOTIFY) {
                   if (trace != null) trace.data(11, "Dumping NOTIFY message, no prior login!");
                   // can't do NOTIFY without login, just dump it, another one will come soon.
-                  ProgMonitor pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+                  ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
                   if (pm != null)
                     pm.jobKilled();
                   workerManager.claimMainWorker(null);
@@ -684,11 +688,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             setBusy(true);
           }
 
-          ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
+          ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
           // if no progress monitor, assign a default one... this case could be useful for just created PING request
           if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
-            progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
-            ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
+            if (!workerManager.isDestroyed()) {
+              progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
+              ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
+            }
           }
 
           // Set interruptable executor of this action
@@ -753,7 +759,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         if (!msgAction.isCancelled()) {
           if (JobFifo.isJobForRetry(msgAction)) {
             // Get job's progress monitor
-            ProgMonitor pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+            ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
             // If PM was not cancelled (ie: got reply of storage exceeded)
             // PM may be null if it was already destroyed.
             if (pm == null || (!pm.isCancelled() && !pm.isJobKilled())) {
@@ -775,7 +781,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
       // If not pushedback, then kill it, pushing back would set it to null...
       if (msgAction != null) {
-        ProgMonitor pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+        ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
         if (pm != null)
           pm.jobKilled();
       }

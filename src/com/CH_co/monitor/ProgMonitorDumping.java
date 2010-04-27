@@ -28,7 +28,7 @@ package com.CH_co.monitor;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class ProgMonitorDumping extends Object implements ProgMonitor {
+public class ProgMonitorDumping extends Object implements ProgMonitorI {
 
   /** Creates new ProgMonitorDumping */
   public ProgMonitorDumping() {

@@ -16,7 +16,7 @@ import java.io.*;
 import java.util.Date;
 import java.sql.Timestamp;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.cryptx.*;
 import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.util.Misc;
@@ -214,7 +214,7 @@ public class DataInputStream2 extends DataInputStream {
       return new Short(readShort());
   }
 
-  public File readFile(ProgMonitor progressMonitor) throws IOException {
+  public File readFile(ProgMonitorI progressMonitor) throws IOException {
     byte nullIndicator = readByte();
     if (nullIndicator == -1)
       return null;

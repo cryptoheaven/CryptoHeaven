@@ -15,7 +15,6 @@ package com.CH_gui.fileTable;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 
@@ -45,6 +44,9 @@ import com.CH_gui.frame.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Window;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -194,7 +196,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
    */
   public Record[] getSelectedRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "getSelectedRecords()");
-    FileRecord[] records = (FileRecord[]) ArrayUtils.toArray(getSelectedRecordsV(), FileRecord.class);
+    FileRecord[] records = (FileRecord[]) ArrayUtils.toArray(getSelectedRecordsL(), FileRecord.class);
     if (trace != null) trace.exit(FileActionTable.class, records);
     return records;
   }
@@ -207,12 +209,12 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     if (trace != null) trace.args(classType);
 
     FileRecord[] fileRecords = null;
-    Vector recordsV = getSelectedRecordsV();
-    if (recordsV != null && recordsV.size() > 0) {
+    List recordsL = getSelectedRecordsL();
+    if (recordsL != null && recordsL.size() > 0) {
       Vector selectedV = new Vector();
-      for (int i=0; i<recordsV.size(); i++) {
-        if (recordsV.elementAt(i).getClass().equals(classType)) {
-          selectedV.addElement(recordsV.elementAt(i));
+      for (int i=0; i<recordsL.size(); i++) {
+        if (recordsL.get(i).getClass().equals(classType)) {
+          selectedV.addElement(recordsL.get(i));
         }
       }
       if (selectedV.size() > 0) {

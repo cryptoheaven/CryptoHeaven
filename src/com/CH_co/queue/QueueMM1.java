@@ -139,15 +139,9 @@ public class QueueMM1 extends Object {
   private void wakeUpProcessingThread() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(QueueMM1.class, "wakeUpProcessingThread()");
     FifoWriterI f = fifo;
-    Object o = processingMonitor;
     if (f != null) {
       synchronized (f) {
         f.notifyAll();
-      }
-    }
-    if (o != null) {
-      synchronized (o) {
-        o.notifyAll();
       }
     }
     if (trace != null) trace.exit(QueueMM1.class);

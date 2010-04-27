@@ -95,7 +95,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
       public void actionPerformed(ActionEvent event) {
         File traceFile = TraceProperties.getLastTraceFile();
         traceStop();
-        new MessageFrame(new Record[] { new EmailAddressRecord("support@cryptoheaven.com") }, new File[] { traceFile });
+        new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, new File[] { traceFile });
         closeDialog();
       }
     });

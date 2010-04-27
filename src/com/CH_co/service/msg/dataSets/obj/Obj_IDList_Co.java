@@ -17,7 +17,7 @@ import java.util.List;
 
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -67,7 +67,7 @@ public class Obj_IDList_Co extends ProtocolMsgDataSet {
   }
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "writeToStream(DataOutputStream2)");
     // write indicator
     if (IDs == null)
@@ -84,7 +84,7 @@ public class Obj_IDList_Co extends ProtocolMsgDataSet {
   } // end writeToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDList_Co.class, "initFromStream(DataInputStream2)");
     // read indicator
     int indicator = dataIn.read();

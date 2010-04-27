@@ -10,16 +10,20 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.util;
+package com.CH_gui.util;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.MsgPopupListener;
 
 import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.EventObject;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -37,7 +41,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class PopupWindow extends JWindow {
+public class PopupWindow extends JWindow implements MsgPopupListener {
 
   private Scroller scroller;
 
@@ -72,6 +76,9 @@ public class PopupWindow extends JWindow {
   }
   private static class SingletonHolder {
     private static final PopupWindow INSTANCE = new PopupWindow();
+    static {
+      FetchedDataCache.getSingleInstance().addMsgPopupListener(INSTANCE);
+    }
   }
 
 
@@ -117,6 +124,12 @@ public class PopupWindow extends JWindow {
     setLocation(location.x, location.y + windowShiftPosition);
 
     if (trace != null) trace.exit(PopupWindow.class);
+  }
+
+  public void addForScrolling(String htmlText) {
+    if (htmlText != null && htmlText.length() > 0) {
+      addForScrolling(new HTML_ClickablePane(htmlText));
+    }
   }
 
   public void addForScrolling(JComponent componentToScroll) {
@@ -241,6 +254,14 @@ public class PopupWindow extends JWindow {
     }
   }
 
+  /******************************************
+   ***   MsgPopup Listener handling       ***
+   ******************************************/
+
+  public void msgPopupUpdate(EventObject e) {
+    System.out.println("update popup with " +e.toString());
+    getSingleInstance().addForScrolling(e.getSource().toString());
+  }
 
   /**
    * main for testing

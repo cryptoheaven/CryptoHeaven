@@ -86,7 +86,7 @@ public class JMyTextPaneWordPastable extends JMyTextPane {
           if (transferData instanceof String) {
             String data = (String) transferData;
             // extract body
-            transferData = HTML_utils.clearHTMLheaderAndConditionForDisplay(data, true, true, true);
+            transferData = HTML_Ops.clearHTMLheaderAndConditionForDisplay(data, true, true, true);
           }
         }
         return transferData;

@@ -12,6 +12,7 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_gui.util.ToolBarProducerI;
 import com.CH_gui.menuing.ToolBarModel;
 import javax.swing.*;
 import javax.swing.border.*;

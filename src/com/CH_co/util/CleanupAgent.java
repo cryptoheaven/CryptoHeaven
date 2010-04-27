@@ -15,7 +15,7 @@ package com.CH_co.util;
 import com.CH_co.cryptx.Rnd;
 import com.CH_co.io.FileUtils;
 import com.CH_co.io.RandomInputStream;
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import java.awt.Component;
 import java.io.*;
 
@@ -193,7 +193,7 @@ public class CleanupAgent extends Thread {
     return wipe(file, new RandomInputStream(Rnd.getSecureRandom()), null, null);
   }
 
-  public static boolean wipe(File file, InputStream randomIn, Component parent, ProgMonitor progMonitor) {
+  public static boolean wipe(File file, InputStream randomIn, Component parent, ProgMonitorI progMonitor) {
     boolean rc = false;
     try {
       if (file.isFile()) {
@@ -249,7 +249,7 @@ public class CleanupAgent extends Thread {
     return rc;
   }
 
-  private static void overwriteFile(InputStream randomIn, File file, ProgMonitor progMonitor, int pass) throws FileNotFoundException, IOException {
+  private static void overwriteFile(InputStream randomIn, File file, ProgMonitorI progMonitor, int pass) throws FileNotFoundException, IOException {
     long len = file.length();
     if (progMonitor != null) {
       progMonitor.setTransferSize(len);

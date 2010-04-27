@@ -33,6 +33,7 @@ import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_cl.service.ops.SysOps;
 import com.CH_gui.usrs.*;
 import com.CH_gui.service.records.RecordGuiUtils;
 
@@ -289,8 +290,8 @@ public class AccountOptionsDialog extends GeneralDialog {
               jPanelResponder.initializeData(userRecords.length == 1 ? userRecords[0].autoResp : null, autoResponderRecord);
             }
 
-            UserOps.checkExpiry();
-            UserOps.checkQuotas();
+            SysOps.checkExpiry();
+            SysOps.checkQuotas();
 
             // buttons enablement after fetch is done
             setEnabledButtons();

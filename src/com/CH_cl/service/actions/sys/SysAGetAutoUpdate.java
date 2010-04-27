@@ -16,7 +16,6 @@ import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
 
-import com.CH_cl.util.PopupWindow;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.sys.*;
@@ -87,7 +86,7 @@ public class SysAGetAutoUpdate extends ClientMessageAction {
                 String hrefStart = "<a href=\""+URLs.get(URLs.HOME_PAGE)+"\">";
                 String hrefEnd = "</a>";
                 String msg = "<html><small>Software update is available for download free of charge at " + hrefStart + URLs.get(URLs.HOME_PAGE) + hrefEnd + " on the products download page.</small></html>";
-                PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(msg));
+                cache.fireMsgPopupEvent(msg);
                 GlobalProperties.setProperty(PROPERTY_SOFTWARE_UPDATE_MSG_STAMP_MILLIS, ""+now);
               }
             }

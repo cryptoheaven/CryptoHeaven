@@ -63,7 +63,12 @@ public interface WorkerManagerI extends RequestSubmitterI {
    */
   public boolean hasMainWorker();
 
-  /** 
+  /**
+   * @return true if Manager is destroyed
+   */
+  public boolean isDestroyed();
+
+  /**
    * @return true if the specified worker is registered as the Main Worker.
    */
   public boolean isMainWorker(ServerInterfaceWorker worker);

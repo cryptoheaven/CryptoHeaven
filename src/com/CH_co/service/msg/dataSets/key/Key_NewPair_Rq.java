@@ -14,7 +14,7 @@ package com.CH_co.service.msg.dataSets.key;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.cryptx.RSAPublicKey;
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
@@ -40,14 +40,14 @@ public class Key_NewPair_Rq extends ProtocolMsgDataSet {
   }
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     dataOut.writeLongObj(keyRecord.folderId);
     dataOut.writeBytes(keyRecord.getEncPrivateKey());
     dataOut.writeBytes(keyRecord.plainPublicKey.objectToBytes());
   } // end writeToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     keyRecord = new KeyRecord();
     keyRecord.folderId = dataIn.readLongObj();
     keyRecord.setEncPrivateKey(dataIn.readSymCipherBlock());

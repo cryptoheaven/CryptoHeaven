@@ -12,7 +12,6 @@
 
 package com.CH_gui.frame;
 
-import com.CH_cl.monitor.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
@@ -158,7 +157,7 @@ public class LoginFrame extends JFrame {
   private TypeAheadPopupList typeAheadPopupList;
 
   private JWindow keyGenSplash = null;
-  private LoginProgMonitor loginProgMonitor;
+  private ProgMonitorI loginProgMonitor;
 
   public static String defaultPassword;
   public static String defaultMode;
@@ -1612,7 +1611,7 @@ public class LoginFrame extends JFrame {
         // HTTP fetch server list and create ServerInterfaceLayer
         performConnect();
         // try to login...
-        loginProgMonitor = new LoginProgMonitor(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"),
+        loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"),
                 new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_a_Secure_Channel_and_Login"),
                                 com.CH_gui.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
                                 //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"),
@@ -1719,8 +1718,8 @@ public class LoginFrame extends JFrame {
    * Submit and fetch request to login
    * @return true on success, false on failure
    */
-  private boolean login(Usr_LoginSecSess_Rq request, LoginProgMonitor loginProgMonitor) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "login(Usr_LoginSecSess_Rq request, LoginProgMonitor loginProgMonitor)");
+  private boolean login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor)");
     MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_LOGIN_SECURE_SESSION, request, false);
 
     boolean success = false;
@@ -1799,8 +1798,8 @@ public class LoginFrame extends JFrame {
   }
 
   /* Submit and fetch request to fetch user info, keys, contacts, folders to the cache */
-  private boolean fetchLoginInfoToCache(LoginProgMonitor loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "fetchLoginInfoToCache(LoginProgMonitor loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag)");
+  private boolean fetchLoginInfoToCache(ProgMonitorI loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "fetchLoginInfoToCache(ProgMonitorI loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag)");
     if (trace != null) trace.args(loginProgMonitor);
     if (trace != null) trace.args(newAccountCreated);
     if (trace != null) trace.args(storeRemoteFlag);

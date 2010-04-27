@@ -12,6 +12,7 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.util.ImageViewer;
 import com.CH_cl.util.DecodingAudioClipPlayer;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;

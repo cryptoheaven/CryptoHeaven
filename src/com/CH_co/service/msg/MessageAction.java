@@ -182,7 +182,7 @@ public class MessageAction extends Message implements Cancellable {
 
       if (trace != null) trace.data(30, "this", this);
 
-      ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(uniqueStamp);
+      ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(uniqueStamp);
       progressMonitor.startSend(actionCode, uniqueStamp);
       String actionInfoName = MessageActionNameSwitch.getActionInfoName(actionCode);
       progressMonitor.startSendAction(actionInfoName);
@@ -255,7 +255,7 @@ public class MessageAction extends Message implements Cancellable {
       this.actionCode = actionCode;
       this.uniqueStamp = stamp;
 
-      ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(stamp);
+      ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(stamp);
       progressMonitor.startReceive(actionCode, stamp);
       String actionInfoName = MessageActionNameSwitch.getActionInfoName(actionCode);
       progressMonitor.startReceiveAction(actionInfoName);

@@ -13,6 +13,7 @@
 
 package com.CH_gui.table;
 
+import com.CH_gui.util.ToolBarProducerI;
 import com.CH_gui.action.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.frame.*;
@@ -41,13 +42,24 @@ import com.CH_co.util.*;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_guiLib.gui.*;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Rectangle;
+
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.swing.*;
@@ -1117,10 +1129,32 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       ((RecordActionTable) RecordTableComponent.this.recordTableScrollPane).getFilterAction().putValue(Actions.STATE_CHECK, enableFilter);
   }
   public void setFilterNarrowing(String filterStr, boolean includeMsgBodies) {
+    // Memorize current selection so we can attempt to restore it after filter is changed.
+    List selectionL = recordTableScrollPane.getSelectedRecordsL();
     if (filterStr != null && filterStr.trim().length() > 0)
       recordTableScrollPane.getTableModel().setFilterNarrowing(new TextSearchFilter(filterStr, includeMsgBodies, recordTableScrollPane.getTableModel()));
     else
       recordTableScrollPane.getTableModel().setFilterNarrowing(null);
+    // Try restoring selection
+    boolean anySelected = false;
+    if (selectionL != null) {
+      for (int i=0; i<selectionL.size(); i++) {
+        int row = recordTableScrollPane.getTableModel().getRowForObject(((Record) selectionL.get(i)).getId());
+        if (row >= 0) {
+          int viewRow = recordTableScrollPane.getJSortedTable().convertMyRowIndexToView(row);
+          if (viewRow >= 0) {
+            if (!anySelected) {
+              recordTableScrollPane.getJSortedTable().getSelectionModel().setSelectionInterval(viewRow, viewRow);
+              Rectangle rect = recordTableScrollPane.getJSortedTable().getCellRect(viewRow, 0, true);
+              recordTableScrollPane.getJSortedTable().scrollRectToVisible(rect);
+              anySelected = true;
+            } else {
+              recordTableScrollPane.getJSortedTable().getSelectionModel().addSelectionInterval(viewRow, viewRow);
+            }
+          }
+        }
+      }
+    }
   }
 
   /***********************************************************

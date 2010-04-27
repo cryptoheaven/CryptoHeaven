@@ -51,7 +51,7 @@ public class ErrorAccountExpired extends ClientMessageAction {
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ErrorAccountExpired.class, "runAction(Connection)");
 
-    ProgMonitor pm = ProgMonitorPool.getProgMonitor(getStamp());
+    ProgMonitorI pm = ProgMonitorPool.getProgMonitor(getStamp());
     if (pm != null)
       pm.jobKilled();
 

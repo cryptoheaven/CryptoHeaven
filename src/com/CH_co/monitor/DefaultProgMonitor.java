@@ -22,7 +22,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -30,9 +30,9 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.25 $</b>
  * @@author  marcin
- * @@version 
+ * @@version
  */
-public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonitor {
+public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonitorI {
 
   private static int DELAY_DECIDE = 10000;
   private static int DELAY_POPUP = 5000;
@@ -40,13 +40,13 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   private static int MIN_VALUE = 0;
   private static int MAX_VALUE = 7;
 
-  private MultiProgressMonitor pm;
+  private ProgMonitorMultiI pm;
   private int value;
   private String actionName;
   private String name;
   private boolean withProgressDialog;
 
-  private static Object counterMonitor = new Object();
+  private static final Object counterMonitor = new Object();
   private static int counter = 0;
 
   public DefaultProgMonitor() {
@@ -71,9 +71,9 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
    * Create the progress bar GUI instance that will display progress.
    */
   private void createProgMonitorGUIifNeeded(int actionCode) {
-    if (withProgressDialog && pm == null) {
+    if (withProgressDialog && pm == null && !allDone && !killed) {
       actionName = MessageActionNameSwitch.getActionInfoName(actionCode) ;
-      pm = new MultiProgressMonitor(null, actionName+ " in progress...", "Waiting in queue...", MIN_VALUE, MAX_VALUE);
+      pm = ProgMonitorFactory.newInstanceMulti(null, actionName+ " in progress...", "Waiting in queue...", MIN_VALUE, MAX_VALUE);
       pm.setMillisToDecideToPopup(DefaultProgMonitor.DELAY_DECIDE);
       pm.setMillisToPopup(DefaultProgMonitor.DELAY_POPUP);
     }
@@ -111,7 +111,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         // reset progress value in case action was returned back to the queue for retry
         createProgMonitorGUIifNeeded(actionCode);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Preparing to send...");
         }
@@ -129,11 +129,11 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (!allDone) {
       if (!MiscGui.isAllGUIsuppressed()) {
         super.startSend(actionCode, stamp);
-        // in case enqueue was not called while creating some special job, the communication layer will start with the "send" call 
+        // in case enqueue was not called while creating some special job, the communication layer will start with the "send" call
         // so make sure we have the default prog monitor
         createProgMonitorGUIifNeeded(actionCode);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Sending request...");
         }
@@ -168,7 +168,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
       if (!MiscGui.isAllGUIsuppressed()) {
         super.doneSend(actionCode, stamp);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Waiting for reply...");
         }
@@ -200,7 +200,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
       if (!MiscGui.isAllGUIsuppressed()) {
         super.startReceive(actionCode, stamp);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Receiving reply... ");
         }
@@ -231,7 +231,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
       if (!MiscGui.isAllGUIsuppressed()) {
         super.doneReceive(actionCode, stamp);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Receiving reply... done.");
         }
@@ -262,7 +262,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
       if (!MiscGui.isAllGUIsuppressed()) {
         super.startExecution(actionCode);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Start executing reply... ");
         }
@@ -278,7 +278,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
       if (!MiscGui.isAllGUIsuppressed()) {
         super.doneExecution(actionCode);
         value++;
-        if (withProgressDialog) {
+        if (withProgressDialog && pm != null) {
           pm.setProgress(value);
           pm.setNote("Start executing reply... done.");
         }
@@ -295,7 +295,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.data(10, name);
     if (!allDone) {
       value++;
-      if (!MiscGui.isAllGUIsuppressed() && withProgressDialog) {
+      if (!MiscGui.isAllGUIsuppressed() && withProgressDialog && pm != null) {
         pm.setProgress(value);
         pm.setNote(currentStatus);
       }
@@ -343,12 +343,12 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (!allDone) {
       allDone = true;
       ProgMonitorPool.removeProgMonitor(this);
-      if (!MiscGui.isAllGUIsuppressed()) {
-        if (withProgressDialog) {
-          if (pm != null) pm.close();
-        }
-        super.allDone();
+      // Don't check for isAllGUIsuppressed() because it might have been suppressed during LOGOUT or EXIT,
+      // just close the ProgMonitor if any exists.
+      if (withProgressDialog && pm != null) {
+        pm.close();
       }
+      super.allDone();
     }
     if (trace != null) trace.exit(DefaultProgMonitor.class);
   }
@@ -366,8 +366,16 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.exit(DefaultProgMonitor.class);
   }
 
+  public void jobKilled() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "jobKilled()");
+    if (trace != null) trace.data(10, name);
+    if (pm != null) pm.cancel();
+    super.jobKilled();
+    if (trace != null) trace.exit(DefaultProgMonitor.class);
+  }
+
   public static boolean isSuppressProgressDialog(int msgActionCode) {
-    return  
+    return
             msgActionCode == CommandCodes.SYS_Q_GET_AUTO_UPDATE ||
             msgActionCode == CommandCodes.SYS_A_GET_AUTO_UPDATE ||
             msgActionCode == CommandCodes.SYS_Q_NOTIFY ||

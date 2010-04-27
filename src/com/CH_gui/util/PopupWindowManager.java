@@ -10,14 +10,13 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_gui.gui;
+package com.CH_gui.util;
 
+import com.CH_gui.util.PopupWindow;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.html.*;
-
-import com.CH_cl.util.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
@@ -27,7 +26,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 
 import com.CH_guiLib.gui.*;
-import com.CH_guiLib.util.*;
+import com.CH_guiLib.util.HTML_Ops;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -55,7 +54,7 @@ public class PopupWindowManager extends Object {
 
       String body = null;
       if (msgData.isHtml()) {
-        body = msgData.isTypeAddress() ? msgData.addressBody : HTML_utils.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
+        body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
       } else {
         body = msgData.getEncodedHTMLData();
       }

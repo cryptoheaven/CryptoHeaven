@@ -23,7 +23,6 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 
 import com.CH_co.trace.*;
-import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

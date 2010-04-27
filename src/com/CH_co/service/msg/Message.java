@@ -15,7 +15,7 @@ package com.CH_co.service.msg;
 import java.io.*;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.*;
 import com.CH_co.io.*;
 
@@ -103,7 +103,7 @@ public class Message extends Object {
    * Output this Message to a specified stream. 
    * @args progressMonitor is nullable if the data set does not require it.
    */
-  protected void writeToStream(DataOutputStream2 out, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  protected void writeToStream(DataOutputStream2 out, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Message.class, "writeToStream(DataOutputStream2 out, ProgMonitor progressMonitor, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(out, progressMonitor);
     if (trace != null) trace.args(clientBuild);
@@ -115,7 +115,7 @@ public class Message extends Object {
    * Output this Message to a specified stream. 
    * @args progressMonitor is nullable if the data set does not require it.
    */
-  public static void writeToStream(DataOutputStream2 out, ProgMonitor progressMonitor, ProtocolMsgDataSet msgDataSet, short clientBuild, short serverBuild) throws IOException {
+  public static void writeToStream(DataOutputStream2 out, ProgMonitorI progressMonitor, ProtocolMsgDataSet msgDataSet, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Message.class, "writeToStream(DataOutputStream2 out, ProgMonitor progressMonitor, ProtocolMsgDataSet msgDataSet, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(out, progressMonitor, msgDataSet);
     if (trace != null) trace.args(clientBuild);
@@ -163,7 +163,7 @@ public class Message extends Object {
    * Initializes 'this' Message from an Input Stream. 
    * @args progressMonitor is nullable if the data set does not require it.
    */
-  protected void initFromStream(DataInputStream2 in, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException, DataSetException {
+  protected void initFromStream(DataInputStream2 in, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException, DataSetException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Message.class, "initFromStream(DataInputStream2 in, ProgMonitor progressMonitor, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(in, progressMonitor);
     if (trace != null) trace.args(clientBuild);
@@ -176,7 +176,7 @@ public class Message extends Object {
    * @args progressMonitor is nullable if the data set does not require it.
    * @return reconstructed ProtocolMsgDataSet from the stream which was written by corresponding writeToStream() call.
    */
-  public static ProtocolMsgDataSet readFromStream(DataInputStream2 in, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException, DataSetException {
+  public static ProtocolMsgDataSet readFromStream(DataInputStream2 in, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException, DataSetException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Message.class, "readFromStream(DataInputStream2 in, ProgMonitor, progressMonitor, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(in, progressMonitor);
     if (trace != null) trace.args(clientBuild);

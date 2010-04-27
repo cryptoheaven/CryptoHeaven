@@ -15,7 +15,7 @@ package com.CH_co.service.msg.dataSets.usr;
 import java.io.*;
 import java.util.Locale;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 
 import com.CH_co.io.*; 
 import com.CH_co.service.records.UserRecord;
@@ -79,7 +79,7 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
 
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Usr_LoginSecSess_Rq.class, "writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(dataOut, progressMonitor);
     if (trace != null) trace.args(clientBuild);
@@ -110,7 +110,7 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
 
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Usr_LoginSecSess_Rq.class, "initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(dataIn, progressMonitor);
     if (trace != null) trace.args(clientBuild);

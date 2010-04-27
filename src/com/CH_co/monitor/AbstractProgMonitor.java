@@ -35,7 +35,7 @@ abstract public class AbstractProgMonitor extends Object {
 
   private String name;
 
-  private static Object counterMonitor = new Object();
+  private static final Object counterMonitor = new Object();
   private static int counter = 0;
 
   protected boolean allDone;

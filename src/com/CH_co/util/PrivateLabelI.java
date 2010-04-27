@@ -77,6 +77,8 @@ public interface PrivateLabelI {
   public String getServiceNetworkName();
   public String getServiceProviderName();
 
+  public String getSupportEmail();
+
   public String getWelcomeEmailFrom();
   public String getWelcomeEmailSubject();
   public String getWelcomeEmailBody();

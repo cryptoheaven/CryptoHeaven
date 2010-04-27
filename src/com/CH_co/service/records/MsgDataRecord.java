@@ -22,7 +22,6 @@ import com.CH_co.monitor.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-import com.CH_guiLib.util.HTML_utils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -30,7 +29,7 @@ import com.CH_guiLib.util.HTML_utils;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -38,7 +37,7 @@ import com.CH_guiLib.util.HTML_utils;
  *
  * <b>$Revision: 1.40 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgDataRecord extends Record {
 
@@ -185,7 +184,7 @@ public class MsgDataRecord extends Record {
   public String          getTextBody()        { return textBody;        }
   public String          getTextError()       { return textErr;         }
 
-  public String getText() { 
+  public String getText() {
     if (textBody != null)
       return textBody;
     else
@@ -240,7 +239,7 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Seals the <code> subject and text </code> to <code> encSubject and encText </code> 
+   * Seals the <code> subject and text </code> to <code> encSubject and encText </code>
    * using the sealant object which is the message's symmetric key from corresponding message link.
    * Sealing also sets the signed digests and sender's private key id.
    */
@@ -266,7 +265,7 @@ public class MsgDataRecord extends Record {
 
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(symmetricKey);
       SymmetricBulkCipher symBodyCipher = null;
-      if (bodyKey == null || bodyKey.encodedPassword == null) 
+      if (bodyKey == null || bodyKey.encodedPassword == null)
         symBodyCipher = symCipher;
       else {
         symmetricBodyKey = new BASymmetricKey(symmetricKey);
@@ -435,7 +434,7 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Unseals the <code> encSubject, encText, encSignedDigest, encEncDigest </code> into <code> subject, text, digest, encDigest </code> 
+   * Unseals the <code> encSubject, encText, encSignedDigest, encEncDigest </code> into <code> subject, text, digest, encDigest </code>
    * using the unSealant object which is the message's symmetric key and signers public key.
    */
   public void unSeal(BASymmetricKey symmetricKey, List bodyKeys, KeyRecord keyRecord) {
@@ -506,7 +505,7 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Unseals the <code> encSubject, encText, encEncDigest </code> into <code> subject, text, encDigest </code> 
+   * Unseals the <code> encSubject, encText, encEncDigest </code> into <code> subject, text, encDigest </code>
    * using the unSealant object which is the message's symmetric key -- DOES NOT verify signatures!
    */
   public void unSealWithoutVerify(BASymmetricKey symmetricKey, List bodyKeys) {
@@ -568,7 +567,7 @@ public class MsgDataRecord extends Record {
 
 
   /**
-   * Unseals the <code> encSubject </code> into <code> subject</code> 
+   * Unseals the <code> encSubject </code> into <code> subject</code>
    * using the unSealant object which is the message's symmetric key.
    */
   public void unSealSubject(BASymmetricKey symmetricKey) {
@@ -620,11 +619,11 @@ public class MsgDataRecord extends Record {
 
     String space = isPlain ? " " : "&nbsp;";
     String str = space + imgStr + space + " Content " + accessStr + dateStr + space;
-    String tablePre = isPlain ? "" : 
+    String tablePre = isPlain ? "" :
             "<table border='0' cellspacing='0' cellpadding='0'>"
               +"<tr>"
                 +"<td width='100%' bgcolor='#"+WARNING_BACKGROUND_COLOR+"'>";
-    String tablePost = isPlain ? "" : 
+    String tablePost = isPlain ? "" :
                 "</td>"
               +"</tr>"
             +"</table>";
@@ -1018,7 +1017,7 @@ public class MsgDataRecord extends Record {
     }
     return new ImageText(icon, text);
   }
-  
+
   public ImageText getSecurityTextAndIcon() {
     return getSecurityTextAndIcon(importance.shortValue());
   }
@@ -1039,7 +1038,7 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Encodes and caches the message text for display in HTML renderers 
+   * Encodes and caches the message text for display in HTML renderers
    * where it should look like PLAIN.
    */
   public String getEncodedHTMLData() {
@@ -1055,7 +1054,7 @@ public class MsgDataRecord extends Record {
     setEncEncDigest(null);
     setSendPrivKeyId(null);
     signedDigest = null;
-    // recipients should stay because they are used in 'Sent' folder 
+    // recipients should stay because they are used in 'Sent' folder
   }
   public static void makeBriefs(MsgDataRecord[] dataRecords) {
     if (dataRecords != null)

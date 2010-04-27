@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ButtonGroup;
@@ -44,7 +43,7 @@ import javax.swing.table.AbstractTableModel;
  *                and not raw columns (unless atherwise specified).
  * <b>$Revision: 1.27 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public abstract class RecordTableModel extends AbstractTableModel implements SearchTextProviderI {
 
@@ -75,8 +74,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   /** Used by Chat table to scroll to the inserted Record */
   public CallbackI recordInsertionCallback;
 
-  /** 
-   * Creates new RecordTableModel 
+  /**
+   * Creates new RecordTableModel
    * Default filter is no-filter = accept all; for objects managed in folders this is usually not desirable.
    */
   public RecordTableModel(ColumnHeaderData columnHeaderData) {
@@ -289,14 +288,14 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     return rc;
   }
 
-  /** 
+  /**
    * Sets the data for the model.
    */
   public synchronized void setData(Record[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "setData(Record[] records)");
     if (trace != null) trace.args(records);
 
-    Vector insertedRecsV = null;
+    ArrayList insertedRecsL = null;
 
     // clear up the table first
     removeData();
@@ -307,8 +306,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
         recordsL.addAll(recs);
         for (int i=0; i<records.length; i++) recordsHM.put(records[i].getId(), records[i]);
         if (recordInsertionCallback != null) {
-          if (insertedRecsV == null) insertedRecsV = new Vector();
-          insertedRecsV.addAll(recs);
+          if (insertedRecsL == null) insertedRecsL = new ArrayList();
+          insertedRecsL.addAll(recs);
         }
       } else {
         for (int i=0; i<records.length; i++ ) {
@@ -316,8 +315,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
             recordsL.add(records[i]);
             recordsHM.put(records[i].getId(), records[i]);
             if (recordInsertionCallback != null) {
-              if (insertedRecsV == null) insertedRecsV = new Vector();
-              insertedRecsV.add(records[i]);
+              if (insertedRecsL == null) insertedRecsL = new ArrayList();
+              insertedRecsL.add(records[i]);
             }
           }
         }
@@ -328,8 +327,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       }
     }
     // Notify callback of inserted records
-    if (recordInsertionCallback != null && insertedRecsV != null && insertedRecsV.size() > 0) {
-      recordInsertionCallback.callback(insertedRecsV);
+    if (recordInsertionCallback != null && insertedRecsL != null && insertedRecsL.size() > 0) {
+      recordInsertionCallback.callback(insertedRecsL);
     }
     if (trace != null) trace.exit(RecordTableModel.class);
   }
@@ -343,13 +342,13 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "updateData(Record[] records)");
     if (trace != null) trace.args(records);
 
-    Vector insertedRecsV = null;
+    ArrayList insertedRecsL = null;
 
     if (records != null) {
       int countInserted = 0;
       int countUpdated = 0;
       int countToDelete = 0;
-      Vector removeRecordsV = null;
+      ArrayList removeRecordsL = null;
       for (int i=0; i<records.length; i++) {
         Record newRec = records[i];
         boolean keep = keep(newRec);
@@ -363,16 +362,16 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
             recordsHM.put(newRec.getId(), newRec);
             countInserted ++;
             if (recordInsertionCallback != null) {
-              if (insertedRecsV == null) insertedRecsV = new Vector();
-              insertedRecsV.addElement(newRec);
+              if (insertedRecsL == null) insertedRecsL = new ArrayList();
+              insertedRecsL.add(newRec);
             }
           }
-        } 
+        }
         // if we don't want to keep it, see if we should remove it...
         else {
           if (rec != null) {
-            if (removeRecordsV == null) removeRecordsV = new Vector();
-            removeRecordsV.addElement(rec);
+            if (removeRecordsL == null) removeRecordsL = new ArrayList();
+            removeRecordsL.add(rec);
             countToDelete ++;
           }
         }
@@ -394,14 +393,14 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       }
       // if somethind is to be removed/deleted, use another call to removeData()
       if (countToDelete > 0) {
-        Record[] recs = new Record[removeRecordsV.size()];
-        removeRecordsV.toArray(recs);
+        Record[] recs = new Record[removeRecordsL.size()];
+        removeRecordsL.toArray(recs);
         removeData(recs);
       }
     }
     // Notify callback of inserted records
-    if (recordInsertionCallback != null && insertedRecsV != null && insertedRecsV.size() > 0) {
-      recordInsertionCallback.callback(insertedRecsV);
+    if (recordInsertionCallback != null && insertedRecsL != null && insertedRecsL.size() > 0) {
+      recordInsertionCallback.callback(insertedRecsL);
     }
     if (trace != null) trace.exit(RecordTableModel.class);
   }

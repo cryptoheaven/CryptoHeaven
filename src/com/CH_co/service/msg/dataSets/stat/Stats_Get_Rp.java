@@ -14,7 +14,7 @@ package com.CH_co.service.msg.dataSets.stat;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.Misc;
 
 import com.CH_co.trace.Trace;
@@ -81,7 +81,7 @@ public void setIsTraceRecord(boolean isTrace) {
   }
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Stats_Get_Rp.class, "writeToStream(DataOutputStream2, ProgMonitor, clientBuild)");
     if (trace != null) trace.args(clientBuild);
     // write indicator
@@ -123,7 +123,7 @@ public void setIsTraceRecord(boolean isTrace) {
   } // end writeToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Stats_Get_Rp.class, "initFromStream(DataInputStream2, ProgMonitor, clientBuild)");
     if (trace != null) trace.args(clientBuild);
     // read indicator

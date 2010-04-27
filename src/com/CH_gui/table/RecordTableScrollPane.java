@@ -26,10 +26,13 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
+import java.awt.Component;
+import java.awt.Container;
 
-import java.awt.*;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -202,23 +205,23 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   /**
    * @return all selected records, if there are none selected, return null
    */
-  public Vector getSelectedRecordsV() {
+  public List getSelectedRecordsL() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecords()");
 
-    Vector recordsV = null;
+    ArrayList recordsL = null;
     if (jSTable != null && jSTable.getSelectedRowCount() > 0) {
       int[] selectedRows = jSTable.getSelectedRows();
-      recordsV = new Vector();
+      recordsL = new ArrayList();
       for (int i=0; selectedRows!=null && i<selectedRows.length; i++) {
         Record rec = recordTableModel.getRowObject(jSTable.convertMyRowIndexToModel(selectedRows[i]));
         if (rec != null) {
-          recordsV.addElement(rec);
+          recordsL.add(rec);
         }
       }
     }
 
-    if (trace != null) trace.exit(RecordTableScrollPane.class, recordsV);
-    return recordsV;
+    if (trace != null) trace.exit(RecordTableScrollPane.class, recordsL);
+    return recordsL;
   }
 
   /**
@@ -229,14 +232,14 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecords()");
 
     Record[] records = null;
-    Vector recordsV = getSelectedRecordsV();
-    if (recordsV != null && recordsV.size() > 0) {
+    List recordsL = getSelectedRecordsL();
+    if (recordsL != null && recordsL.size() > 0) {
       try {
-        records = (Record[]) Array.newInstance(recordsV.elementAt(0).getClass(), recordsV.size());
-        recordsV.toArray(records);
+        records = (Record[]) Array.newInstance(recordsL.get(0).getClass(), recordsL.size());
+        recordsL.toArray(records);
       } catch (ArrayStoreException x) {
-        records = new Record[recordsV.size()];
-        recordsV.toArray(records);
+        records = new Record[recordsL.size()];
+        recordsL.toArray(records);
       }
     }
 

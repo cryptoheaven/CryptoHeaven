@@ -51,7 +51,7 @@ public class FileUtils extends Object {
    * Does not close the input stream.
    * If the originally written file had 0 bytes, a new File will be created with 0 bytes.
    */
-  public static File unserializeFile(String newFilePrefix, DataInputStream2 in, ProgMonitor progressMonitor) throws IOException {
+  public static File unserializeFile(String newFilePrefix, DataInputStream2 in, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "unserializeFile(String, DataInputStream)");
     if (trace != null) trace.args(newFilePrefix);
 
@@ -117,7 +117,7 @@ public class FileUtils extends Object {
    * Serializes the contents of specified file into an output stream 
    * without closing the output stream.
    */
-  public static void serializeFile(File file, DataOutputStream2 out, ProgMonitor progressMonitor) throws IOException {
+  public static void serializeFile(File file, DataOutputStream2 out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "serializeFile(File, DataOutputStream)");
 
     // check file argument for null
@@ -148,7 +148,7 @@ public class FileUtils extends Object {
       // Wait a little for the pipes to clear and if storage or bandwidth exceeded,
       // we should get a message about interruption.  If we read interrupt, skip this message,
       // as it could only confuse the user.
-      final ProgMonitor progMon = progressMonitor;
+      final ProgMonitorI progMon = progressMonitor;
       final String fileName = file.getAbsolutePath();
       final String exceptionStr = ioEx.getMessage();
 
@@ -196,7 +196,7 @@ public class FileUtils extends Object {
    * Reads bytes from input stream until EOF and writes them to a newly created file.
    * If the originally written file had 0 bytes, a new File will be created with 0 bytes.
    */
-  public static File streamToFile(String newFilePrefix, InputStream in, ProgMonitor progressMonitor) throws IOException {
+  public static File streamToFile(String newFilePrefix, InputStream in, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "streamToFile(String, DataInputStream)");
     if (trace != null) trace.args(newFilePrefix);
 
@@ -235,7 +235,7 @@ public class FileUtils extends Object {
    * Moves specified number of bytes from an InputStream to an OutputStream.
    * Flushes the output stream and does not close any of the streams.
    */
-  public static void moveData(DataInputStream in, OutputStream out, long dataLength, ProgMonitor progressMonitor) throws IOException {
+  public static void moveData(DataInputStream in, OutputStream out, long dataLength, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, OutputStream, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
@@ -269,7 +269,7 @@ public class FileUtils extends Object {
     out.flush();
     if (trace != null) trace.exit(FileUtils.class);
   }
-  public static void moveData(DataInputStream in, DataOutput out, long dataLength, ProgMonitor progressMonitor) throws IOException {
+  public static void moveData(DataInputStream in, DataOutput out, long dataLength, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, DataOutput, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
@@ -307,7 +307,7 @@ public class FileUtils extends Object {
    * Moves bytes from an InputStream to an OutputStream until EOF is reached.
    * Flushes the output stream and does not close any of the streams.
    */
-  public static void moveDataEOF(InputStream in, OutputStream out, ProgMonitor progressMonitor) throws IOException {
+  public static void moveDataEOF(InputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(InputStream, OutputStream, ProgMonitor progressMonitor)");
 
      // 32 Kb at a time
@@ -337,7 +337,7 @@ public class FileUtils extends Object {
    * Moves characters from a Reader to a Writer until EOF is reached.
    * Flushes the output writer and does not close any of the streams.
    */
-  public static void moveDataEOF(Reader in, Writer out, ProgMonitor progressMonitor) throws IOException {
+  public static void moveDataEOF(Reader in, Writer out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(Reader, Writer, ProgMonitor progressMonitor)");
 
      // 32 Kb at a time

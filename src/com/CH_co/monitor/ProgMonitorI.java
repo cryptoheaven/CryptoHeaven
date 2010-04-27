@@ -28,7 +28,7 @@ package com.CH_co.monitor;
  * @author  Marcin Kurzawa
  * @version 
  */
-public interface ProgMonitor {
+public interface ProgMonitorI {
 
   public void enqueue(int actionCode, long stamp);
   public void dequeue(int actionCode, long stamp);

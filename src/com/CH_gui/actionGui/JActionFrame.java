@@ -12,6 +12,7 @@
 
 package com.CH_gui.actionGui;
 
+import com.CH_gui.util.ToolBarProducerI;
 import com.CH_gui.util.ActionUtils;
 import java.awt.*;
 import java.awt.event.*;
@@ -59,7 +60,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   public static boolean ENABLE_FRAME_TOOLBARS = false;
   private boolean isWithToolBars = false;
 
-  private static Integer versionedVisualsSavable = new Integer(4);
+  private static Integer versionedVisualsSavable = new Integer(5);
 
   private static final boolean ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS = false;
   public static boolean ENABLE_MENU_CUSTOMIZATION_ACTION = true;

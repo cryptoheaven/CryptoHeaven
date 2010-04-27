@@ -15,7 +15,6 @@ package com.CH_gui.recycleTable;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 
@@ -23,7 +22,6 @@ import java.util.*;
 import java.lang.reflect.Array;
 
 import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
@@ -43,6 +41,10 @@ import com.CH_gui.frame.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Window;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -201,13 +203,13 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     if (trace != null) trace.args(classType);
 
     Object[] records = null;
-    Vector recordsV = getSelectedRecordsV();
-    if (recordsV != null && recordsV.size() > 0) {
+    List recordsL = getSelectedRecordsL();
+    if (recordsL != null && recordsL.size() > 0) {
       Vector selectedV = new Vector();
-      for (int i=0; i<recordsV.size(); i++) {
-        if (classType.isInstance(recordsV.elementAt(i))) { // check if classType specified is equivalent or superclass (or super interface) of record element
+      for (int i=0; i<recordsL.size(); i++) {
+        if (classType.isInstance(recordsL.get(0))) { // check if classType specified is equivalent or superclass (or super interface) of record element
         //if (recordsV.elementAt(i).getClass().equals(classType)) {
-          selectedV.addElement(recordsV.elementAt(i));
+          selectedV.addElement(recordsL.get(i));
         }
       }
       if (selectedV.size() > 0) {

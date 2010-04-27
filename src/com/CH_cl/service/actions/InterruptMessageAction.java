@@ -54,7 +54,7 @@ public class InterruptMessageAction extends ClientMessageAction {
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InterruptMessageAction.class, "runAction()");
 
-    ProgMonitor pm = ProgMonitorPool.getProgMonitor(getStamp());
+    ProgMonitorI pm = ProgMonitorPool.getProgMonitor(getStamp());
     if (pm != null)
       pm.jobKilled();
 

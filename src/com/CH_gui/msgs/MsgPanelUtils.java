@@ -38,7 +38,7 @@ import com.CH_co.util.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
 
-import com.CH_guiLib.util.*;
+import com.CH_guiLib.util.HTML_Ops;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -604,7 +604,7 @@ public class MsgPanelUtils extends Object {
         if (trace != null) trace.exception(MsgPanelUtils.class, -10, t);
       }
       if (isHTML && !skipHeaderClearing) {
-        content = HTML_utils.clearHTMLheaderAndConditionForDisplay(content, true, true, true);
+        content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(content, true, true, true);
       }
 //    } else if (jMessage instanceof HtmlPanel) {
 //      ((HtmlPanel) jMessage).clearDocument();
@@ -822,7 +822,7 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (isHtmlMode) {
-      text = HTML_utils.clearHTMLheaderAndConditionForDisplay(text, true, false, false);
+      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, true, false, false);
     }
     boolean addSpaces = text.trim().length() > 0;
     if (inHtmlMode != isHtmlMode) {

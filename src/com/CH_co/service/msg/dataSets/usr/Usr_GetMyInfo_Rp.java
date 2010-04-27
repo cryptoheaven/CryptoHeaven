@@ -15,7 +15,7 @@ package com.CH_co.service.msg.dataSets.usr;
 import java.io.IOException;
 import java.sql.Timestamp;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
@@ -67,7 +67,7 @@ public class Usr_GetMyInfo_Rp extends ProtocolMsgDataSet {
 
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     if (userRecord == null) {
       dataOut.writeLongObj(new Long(-1));
     } else {
@@ -146,7 +146,7 @@ public class Usr_GetMyInfo_Rp extends ProtocolMsgDataSet {
   } // end writeToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Long userId = dataIn.readLongObj();
     if (userId.longValue() != -1) {
       userRecord                  = new UserRecord();

@@ -15,8 +15,8 @@ package com.CH_gui.frame;
 import java.awt.event.*;
 import javax.swing.*;
 
-import com.CH_cl.monitor.*;
 import com.CH_cl.service.cache.*;
+import com.CH_co.monitor.ProgMonitorFactory;
 
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
@@ -96,7 +96,7 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
         public void runTraced() {
           if (MainFrame.getSingleInstance() == null) {
             MainFrame mainFrame = new MainFrame(MsgTableStarterFrame.this, null, null);
-            mainFrame.setLoginProgMonitor(new LoginProgMonitor("Initializing ...", new String[] { "Loading Main Window" }));
+            mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }));
             mainFrame.loginComplete(true, mainFrame);
           }
         }

@@ -198,7 +198,7 @@ public class EmailSendingAttOps extends Object {
           if (unsealingKey != null) {
             link.unSeal(unsealingKey);
             data.setAutoRemovePlainFile(true);
-            data.unSeal(null, link.getSymmetricKey(), null, null, null, link.origSize);
+            data.unSeal(null, link.getSymmetricKey(), null, null, null, null, link.origSize);
           }
         }
       }

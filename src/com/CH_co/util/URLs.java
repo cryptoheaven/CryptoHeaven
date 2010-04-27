@@ -48,6 +48,8 @@ public class URLs extends Object {
   public static int SERVICE_PROVIDER_NAME;
   public static int SERVICE_SOFTWARE_NAME;
 
+  public static int SUPPORT_EMAIL;
+
   public static int DOMAIN;
   public static int DOMAIN_MAIL;
   public static int DOMAIN_WEB;
@@ -152,8 +154,8 @@ public class URLs extends Object {
   private static void loadDefaults() {
     int i = 0;
 
-    customizationKeys = new String[27];
-    customizationStrings = new String[27];
+    customizationKeys = new String[28];
+    customizationStrings = new String[28];
 
     SERVICE_COMMUNITY_NAME = i; 
     customizationKeys[i] = "SERVICE_COMMUNITY_NAME";
@@ -171,8 +173,11 @@ public class URLs extends Object {
     customizationKeys[i] = "SERVICE_SOFTWARE_NAME";
     customizationStrings[i] = "CryptoHeaven"; i++;
 
+    SUPPORT_EMAIL = i;
+    customizationKeys[i] = "SUPPORT_EMAIL";
+    customizationStrings[i] = "Support <support@cryptoheaven.com>"; i++;
 
-    DOMAIN = i; 
+    DOMAIN = i;
     customizationKeys[i] = "DOMAIN";
     customizationStrings[i] = "CryptoHeaven.com"; i++;
 
@@ -336,6 +341,10 @@ public class URLs extends Object {
       try {
         if (privateLabel.getServiceProviderName() != null)
           customizationStrings[SERVICE_PROVIDER_NAME] = privateLabel.getServiceProviderName();
+      } catch (Throwable t) { }
+      try {
+        if (privateLabel.getSupportEmail() != null)
+          customizationStrings[SUPPORT_EMAIL] = privateLabel.getSupportEmail();
       } catch (Throwable t) { }
       try {
         if (privateLabel.getWelcomeEmailFrom() != null)

@@ -21,10 +21,9 @@ import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.sql.Timestamp;
 
-import com.CH_cl.service.ops.DownloadUtilities;
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
@@ -130,7 +129,7 @@ public class FileDataRecord extends Record {
    * @param signingKeyRecord the asymmetric key used to produce signed digests.
    * @param symmetricKey key matreial used for symmetric encryption of the file.
    */
-  public void seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitor progressMonitor) {
+  public void seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "seal()");
 
     int oldPriority = Thread.currentThread().getPriority();
@@ -262,11 +261,11 @@ public class FileDataRecord extends Record {
    * @param destinationDirectory Directory of the plain file, if null then temporary file will be assigned (destinationFileName is irrelevant in that case).
    */
   public void unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey,
-                     File destinationDirectory, String destinationFileName,
-                     ProgMonitor progressMonitor, Long originalSize)
+                     File destinationDirectory, Boolean isDefaultTempDir, String destinationFileName,
+                     ProgMonitorI progressMonitor, Long originalSize)
   {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey, File destinationDirectory, String destinationFileName, ProgMonitor progressMonitor, Long originalSize)");
-    if (trace != null) trace.args(verifyingKeyRecord, symmetricKey, destinationDirectory, destinationFileName, progressMonitor, originalSize);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey, File destinationDirectory, Boolean isDefaultTempDir, String destinationFileName, ProgMonitor progressMonitor, Long originalSize)");
+    if (trace != null) trace.args(verifyingKeyRecord, symmetricKey, destinationDirectory, isDefaultTempDir, destinationFileName, progressMonitor, originalSize);
 
 
     int oldPriority = Thread.currentThread().getPriority();
@@ -293,7 +292,7 @@ public class FileDataRecord extends Record {
       if (destinationDirectory != null) {
         destinationFile = new File(destinationDirectory, destinationFileName);
         // If file goes to temp dir, make sure its unique name and added to cleanup
-        if (destinationDirectory.equals(DownloadUtilities.getDefaultTempDir())) {
+        if (isDefaultTempDir != null && isDefaultTempDir.booleanValue()) {
           while (destinationFile.exists()) {
             Random rnd = new Random();
             int r = rnd.nextInt(99999);

@@ -14,7 +14,7 @@ package com.CH_co.service.msg.dataSets.key;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
@@ -41,7 +41,7 @@ public class Key_KeyIDs_Rq extends ProtocolMsgDataSet {
   }
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     dataOut.writeShort(keyRecords.length);
 
     for (int i=0; i<keyRecords.length; i++) {
@@ -51,7 +51,7 @@ public class Key_KeyIDs_Rq extends ProtocolMsgDataSet {
   } // end writeToStream()
   
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     keyRecords = new KeyRecord[dataIn.readShort()];
 
     for (int i=0; i<keyRecords.length; i++) {

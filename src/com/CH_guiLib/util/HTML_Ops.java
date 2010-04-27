@@ -31,13 +31,10 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class HTML_utils {
-
-  public static String DEFAULT_FONTS = "Arial, Helvetica, Verdana, sans-serif";
-  public static String DEFAULT_FONTS_QUOTED = "\"" + DEFAULT_FONTS + "\"";
+public class HTML_Ops {
 
   public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_utils.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap)");
     if (trace != null) trace.args(htmlMessage != null && htmlMessage.length() < 255 ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null"));
     if (trace != null) trace.args(isRemoveHead);
     if (trace != null) trace.args(isRemoveLeadP);
@@ -114,7 +111,7 @@ public class HTML_utils {
     }
 
     String traceHTMLmsg = (htmlMessage != null && htmlMessage.length() < 255) ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null");
-    if (trace != null) trace.exit(HTML_utils.class, traceHTMLmsg);
+    if (trace != null) trace.exit(HTML_Ops.class, traceHTMLmsg);
     return htmlMessage;
   }
 }

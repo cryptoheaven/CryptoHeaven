@@ -99,10 +99,9 @@ public class DefaultReplyRunner extends ThreadTraced {
     MessageAction reply = null;
 
     if (msgAction != null) {
-      ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+      ServerInterfaceLayer SIL = msgAction.getServerInterfaceLayer();
       // Don't want dumping monitor here on the client side, server side would be ok.
-      if (ProgMonitorPool.isDummy(progressMonitor))
-        progressMonitor = new DefaultProgMonitor(false);
+      ProgMonitorI progressMonitor = SIL.assignProgMonitor(msgAction, Boolean.FALSE);
 
       int actionCode = msgAction.getActionCode();
       progressMonitor.startExecution(actionCode);

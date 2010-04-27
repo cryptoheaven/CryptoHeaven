@@ -15,7 +15,6 @@ package com.CH_gui.list;
 import java.util.*;
 
 import com.CH_co.util.*;
-import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

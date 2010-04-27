@@ -264,8 +264,9 @@ public class MenuTreeModel extends Object {
           "General FAQ|205|-1|-1|-1|"+
           "Quick Tour|206|-1|-1|-1|"+
           "User's Guide|207|-1|-1|-1|"+
-          "Account Upgrade|213|-1|-1|-1|"+
+          "Account Upgrade and Renewal|213|-1|-1|-1|"+
           "Separator|0|"+
+          "Email Support|217|-1|-1|-1|"+
           "Bug Reporting|216|-1|-1|-1|"+
           "Separator|0|"+
           "About "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+"|201|-1|-1|-1|"+
@@ -466,7 +467,8 @@ public class MenuTreeModel extends Object {
           "General FAQ|205|-1|-1|-1|"+
           "Quick Tour|206|-1|-1|-1|"+
           "User's Guide|207|-1|-1|-1|"+
-          "Account Upgrade|213|-1|-1|-1|"+
+          "Account Upgrade and Renewal|213|-1|-1|-1|"+
+          "Email Support|217|-1|-1|-1|"+
           "Bug Reporting|216|-1|-1|-1|"+
           "Separator|0|"+
           "About "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+"|201|-1|-1|-1|"+

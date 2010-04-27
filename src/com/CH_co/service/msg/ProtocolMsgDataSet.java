@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.Misc;
 
 import com.CH_co.io.DataInputStream2; 
@@ -42,8 +42,8 @@ public abstract class ProtocolMsgDataSet extends Object {
   public ProtocolMsgDataSet() {
   }
 
-  public abstract void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException;
-  public abstract void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException;
+  public abstract void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException;
+  public abstract void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException;
 
   /**
    * @return User displayable name of this data set, classes should overwrite this for progress monitoring.

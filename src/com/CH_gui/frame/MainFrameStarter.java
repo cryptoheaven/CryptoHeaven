@@ -12,11 +12,10 @@
 
 package com.CH_gui.frame;
 
-import com.CH_cl.monitor.LoginProgMonitor;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.util.PopupWindow;
+import com.CH_gui.util.PopupWindow;
 
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
@@ -29,6 +28,7 @@ import com.CH_co.util.*;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.InactivityEventQueue;
+import com.CH_gui.monitor.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -69,7 +69,7 @@ public class MainFrameStarter extends Object {
       new LoginFrame(loginCoordinator, splashWindow);
     } else {
       loginCoordinator.loginAttemptCloseCurrentSession();
-      loginCoordinator.setLoginProgMonitor(new LoginProgMonitor("Initializing ...", new String[] { "Loading Main Window" }));
+      loginCoordinator.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }));
       loginCoordinator.loginComplete(true, loginCoordinator);
     }
     if (swingMemoryFootprintTestExitWhenMainScreenLoaded) {
@@ -222,6 +222,15 @@ public class MainFrameStarter extends Object {
         }
       }
 
+      // setup MsgPopup Listener in the form of PopupWindow
+      PopupWindow.getSingleInstance();
+      // setup ProgMonitorFactory
+      ProgMonitorFactory.setImplementationLogin(LoginProgMonitor.class);
+      ProgMonitorFactory.setImplementationMulti(MultiProgressMonitor.class);
+      ProgMonitorFactory.setImplementationTransfer(TransferProgMonitor.class);
+      ProgMonitorFactory.setImplementationWipe(WipeProgMonitor.class);
+
+      // start main GUI
       new MainFrameStarter(splashWindow, skipLogin, swingMemoryFootprintTestExitWhenMainScreenLoaded, initialFolderId, initialMsgLinkId);
 
     } catch (Throwable t) {
@@ -339,10 +348,14 @@ public class MainFrameStarter extends Object {
       this.initialMsgLinkId = initialMsgLinkId;
     }
 
-    private LoginProgMonitor monitor;
+    private ProgMonitorI monitor;
 
-    public LoginProgMonitor getLoginProgMonitor() {
+    public ProgMonitorI getLoginProgMonitor() {
       return monitor;
+    }
+
+    public void setLoginProgMonitor(ProgMonitorI progMonitor) {
+      monitor = progMonitor;
     }
 
     public void loginAttemptCloseCurrentSession() {
@@ -427,7 +440,7 @@ public class MainFrameStarter extends Object {
 
         if (mainStartupFrame[0] == null) {
           MainFrame mainFrame = new MainFrame(null, null, null);
-          mainFrame.setLoginProgMonitor(new LoginProgMonitor("Initializing ...", new String[] { "Loading Main Window" }));
+          mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }));
           mainFrame.loginComplete(true, mainFrame);
           mainStartupFrame[0] = mainFrame;
         } else {
@@ -457,10 +470,6 @@ public class MainFrameStarter extends Object {
       // fetch contacts, root folders (including Sent folder for replying to message), etc...
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE));
       if (trace != null) trace.exit(MainFrameStarter.class);
-    }
-
-    public void setLoginProgMonitor(LoginProgMonitor loginProgMonitor) {
-      monitor = loginProgMonitor;
     }
   } // end class StarterLoginCoordinator
 

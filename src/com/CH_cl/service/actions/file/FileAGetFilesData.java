@@ -16,6 +16,7 @@ import java.io.File;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.DownloadUtilities;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.*;
@@ -72,7 +73,7 @@ public class FileAGetFilesData extends ClientMessageAction {
     // data cache for fetching required keys
     FetchedDataCache cache = getFetchedDataCache();
 
-    ProgMonitor progressMonitor = ProgMonitorPool.getProgMonitor(getStamp());
+    ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(getStamp());
 
     for (int i=0; i<fileDataRecords.length; i++) {
 
@@ -93,8 +94,9 @@ public class FileAGetFilesData extends ClientMessageAction {
         if (symmetricKey == null)
           throw new IllegalStateException("File symmetric key is not available.");
         // un-seal the data record -- create the plain version of encrypted file and verify signatures
+        Boolean isDefaultTempDir = destinationDirectory != null && destinationDirectory.equals(DownloadUtilities.getDefaultTempDir()) ? Boolean.TRUE : Boolean.FALSE;
         fileDataRecords[i].unSeal(verifyingKeyRecord, symmetricKey,
-                                  destinationDirectory, fileLinkRecord.getFileName(),
+                                  destinationDirectory, isDefaultTempDir, fileLinkRecord.getFileName(),
                                   progressMonitor, fileLinkRecord.origSize);
       } catch (Throwable t) {
         // Failure of one of the files, should not affect the other when processing a few of them here.

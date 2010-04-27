@@ -14,7 +14,7 @@ package com.CH_co.service.msg.dataSets.key;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.*;
 import com.CH_co.cryptx.RSAPublicKey;
 
@@ -48,7 +48,7 @@ public class Key_PubKeys_Rp extends ProtocolMsgDataSet {
 
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     // write null indicator
     if (keyRecords == null)
       dataOut.write(0);
@@ -66,7 +66,7 @@ public class Key_PubKeys_Rp extends ProtocolMsgDataSet {
   } // end writeToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     // read null indicator
     int indicator = dataIn.read();
     if (indicator == 0)

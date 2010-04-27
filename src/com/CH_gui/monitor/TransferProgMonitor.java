@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.monitor;
+package com.CH_gui.monitor;
 
 import javax.swing.*;
 
@@ -44,7 +44,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version 
  */
-public final class TransferProgMonitor extends JFrame implements ProgMonitor {
+public final class TransferProgMonitor extends JFrame implements ProgMonitorTransferI {
 
   private String title;
 
@@ -66,7 +66,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
   private Cancellable cancellable;
 
   private int monitoringType;
-  private boolean suppressDownloadSoundsAndAutoClose;
+  private boolean suppressTransferSoundsAndAutoClose;
 
   private static final int MONITORING_DOWNLOAD = 2;
   private static final int MONITORING_UPLOAD = 3;
@@ -85,11 +85,21 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
   private FileLinkRecord[] fileLinks;
 
   /** Creates new TransferProgMonitor */
-  private TransferProgMonitor(String title, String[] tasks, String[] noteHeadings, String[] notes, 
-                          int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressDownloadSoundsAndAutoClose) 
+  public TransferProgMonitor() {
+  }
+
+  /** Initialized new TransferProgMonitor */
+  private void init(String title, String[] tasks, String[] noteHeadings, String[] notes,
+               int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)
   {
-    super(title);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "TransferProgMonitor()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "init(String title, String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)");
+    if (trace != null) trace.args(title, tasks, noteHeadings, notes);
+    if (trace != null) trace.args(initProgBarMin);
+    if (trace != null) trace.args(initProgBarMax);
+    if (trace != null) trace.args(monitoringType);
+    if (trace != null) trace.args(suppressTransferSoundsAndAutoClose);
+
+    setTitle(title);
 
     synchronized (counterMonitor) {
       name = TransferProgMonitor.class.getName() + " #" + counter;
@@ -102,7 +112,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
 
     this.title = title;
     this.monitoringType = monitoringType;
-    this.suppressDownloadSoundsAndAutoClose = suppressDownloadSoundsAndAutoClose;
+    this.suppressTransferSoundsAndAutoClose = suppressTransferSoundsAndAutoClose;
 
     initPanelComponents(tasks, noteHeadings, notes, initProgBarMin, initProgBarMax);
 
@@ -144,29 +154,32 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
   /** 
    * File Download/Open
    */
-  public TransferProgMonitor(String[] tasks, boolean isDownload, boolean suppressDownloadSoundsAndAutoClose) {
-    this(isDownload ? "File Download" : "File Open", tasks, 
+  public void init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose))");
+    if (trace != null) trace.args(tasks, destDir, fileLinks);
+    if (trace != null) trace.args(isDownload);
+    if (trace != null) trace.args(suppressTransferSoundsAndAutoClose);
+    init(isDownload ? "File Download" : "File Open", tasks,
               new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" }, 
               new String[] { " ... ", " ... ", " ... ", " ... " },
-              0, 100, isDownload ? MONITORING_DOWNLOAD : MONITORING_OPEN, suppressDownloadSoundsAndAutoClose
+              0, 100, isDownload ? MONITORING_DOWNLOAD : MONITORING_OPEN, suppressTransferSoundsAndAutoClose
               );
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "TransferProgMonitor(boolean isDownload, String[] tasks)");
-    if (trace != null) trace.args(isDownload);
-    if (trace != null) trace.args(tasks);
+    setDestinationDir(destDir);
+    setFiles(fileLinks);
     if (trace != null) trace.exit(TransferProgMonitor.class);
   }
 
   /** 
    * File Upload
    */
-  public TransferProgMonitor(String[] tasks) {
-    this("File Upload", tasks, 
+  public void init(String[] tasks) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "init(String[] tasks)");
+    if (trace != null) trace.args(tasks);
+    init("File Upload", tasks,
               new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" }, 
               new String[] { " ... ", " ... ", " ... ", " ... " },
               0, 100, MONITORING_UPLOAD, false
               );
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "TransferProgMonitor(boolean isDownload, String[] tasks)");
-    if (trace != null) trace.args(tasks);
     if (trace != null) trace.exit(TransferProgMonitor.class);
   }
 
@@ -220,7 +233,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
       jNotes[i] = new JMyLabel(notes[i]);
     }
 
-    if (monitoringType != MONITORING_OPEN && !suppressDownloadSoundsAndAutoClose) {
+    if (monitoringType != MONITORING_OPEN && !suppressTransferSoundsAndAutoClose) {
       if (monitoringType == MONITORING_UPLOAD) {
         jCloseOnDone = new JMyCheckBox("Close this dialog when all Upload processes finish.");
         jCloseOnDone.setSelected(Boolean.valueOf(GlobalProperties.getProperty("ProgMonitor.TransferProgMonitor.closeOnDone.upload", "true")).booleanValue());
@@ -701,7 +714,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
     if (trace != null) trace.data(10, name);
     allDone = true;
     Stats.stopGlobe(this);
-    if (!suppressDownloadSoundsAndAutoClose) Sounds.playAsynchronous(Sounds.TRANSFER_DONE);
+    if (!suppressTransferSoundsAndAutoClose) Sounds.playAsynchronous(Sounds.TRANSFER_DONE);
     setTitle("Done " + title);
     setCurrentStatus("Done");
     jCancelButton.setText("OK");
@@ -714,7 +727,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitor {
     } else if (monitoringType == MONITORING_DOWNLOAD || monitoringType == MONITORING_OPEN) {
       jImageLabel.setIcon(Images.get(ImageNums.LOCK_OPENED));
     }
-    if (monitoringType == MONITORING_OPEN || (jCloseOnDone != null && jCloseOnDone.isSelected()) || suppressDownloadSoundsAndAutoClose) {
+    if (monitoringType == MONITORING_OPEN || (jCloseOnDone != null && jCloseOnDone.isSelected()) || suppressTransferSoundsAndAutoClose) {
       closeProgMonitor();
     }
     if (monitoringType == MONITORING_OPEN) {

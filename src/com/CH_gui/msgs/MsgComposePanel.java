@@ -12,6 +12,7 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.util.ToolBarProducerI;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -659,6 +660,17 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   public void setSubject(String subject) {
     if (msgComponents != null)
       msgComponents.setSubject(subject);
+  }
+
+  public void setBody(String body) {
+    if (msgComponents != null) {
+      if (msgComponents.getContentMode() == CONTENT_MODE_MAIL_HTML) {
+        msgComponents.getMsgTypeArea().setText(Misc.encodePlainIntoHtml(body));
+      } else if (msgComponents.getContentMode() == CONTENT_MODE_MAIL_PLAIN) {
+        msgComponents.getMsgTypeArea().setText(body);
+      }
+      msgComponents.getMsgTypeArea();
+    }
   }
 
   private void setAttachmentsPanel() {

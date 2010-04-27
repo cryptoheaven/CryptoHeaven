@@ -116,6 +116,27 @@ public class MessageFrame extends JActionFrameClosable {
   }
 
   /** Creates new MessageFrame */
+  public MessageFrame(Record[] initialRecipients, String subject, String plainBody) {
+    super(com.CH_gui.lang.Lang.rb.getString("title_Compose_Message"), true, true);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, String subject, String plainBody)");
+    if (trace != null) trace.args(initialRecipients, subject, plainBody);
+
+    composePanel = new MsgComposePanel(initialRecipients);
+    composePanel.setSubject(subject);
+    composePanel.setBody(plainBody);
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
+    this.getContentPane().add(composePanel, BorderLayout.CENTER);
+
+    // all JActionFrames already size themself
+    setVisible(true);
+
+    composePanel.checkValidityOfRecipients();
+    composePanel.markCurrentContentAndAttachmentsAsOriginal();
+    if (trace != null) trace.exit(MessageFrame.class);
+  }
+
+  /** Creates new MessageFrame */
   public MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg) {
     super(truncate(MsgComposeComponents.getSubjectReply(replyToMsg)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg)");

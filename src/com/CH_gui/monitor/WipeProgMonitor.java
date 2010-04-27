@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.monitor;
+package com.CH_gui.monitor;
 
 import javax.swing.*;
 
@@ -32,7 +32,7 @@ import com.CH_co.util.GlobalProperties;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -40,14 +40,11 @@ import com.CH_co.util.GlobalProperties;
  *
  * <b>$Revision: 1.13 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class WipeProgMonitor extends JFrame implements ProgMonitor {
-
-  private String title;
+public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
 
   private JLabel jImageLabel;
-
 
   private JTextArea jTextArea;
   private JScrollPane jScrollPane;
@@ -70,13 +67,18 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
   private static final Object counterMonitor = new Object();
   private static int counter = 0;
 
+  /** Creates new WipeProgMonitor */
+  public WipeProgMonitor() {
+  }
 
   /** Creates new WipeProgMonitor */
-  private WipeProgMonitor(String title, String[] noteHeadings, String[] notes, 
-                          int initProgBarMin, int initProgBarMax) 
-  {
-    super(title);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "WipeProgMonitor()");
+  private void init(String title, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "init(String title, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
+    if (trace != null) trace.args(title, noteHeadings, notes);
+    if (trace != null) trace.args(initProgBarMin);
+    if (trace != null) trace.args(initProgBarMax);
+
+    setTitle(title);
 
     synchronized (counterMonitor) {
       name = WipeProgMonitor.class.getName() + " #" + counter;
@@ -85,9 +87,6 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
       if (counter == Integer.MAX_VALUE)
         counter = 0;
     }
-
-
-    this.title = title;
 
     initPanelComponents(noteHeadings, notes, initProgBarMin, initProgBarMax);
 
@@ -112,15 +111,16 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
   }
 
 
-  /** 
+  /**
    * File Wipe
    */
-  public WipeProgMonitor() {
-    this("Secure File Wipe", 
-              new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" }, 
+  public void init(Interruptible interruptible) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "init(Interruptible interruptible)");
+    init("Secure File Wipe",
+              new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" },
               new String[] { " ... ", " ... ", " ... ", " ... " },
               0, 100);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "WipeProgMonitor()");
+    setInterrupt(interruptible);
     if (trace != null) trace.exit(WipeProgMonitor.class);
   }
 
@@ -162,7 +162,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "actionPerformed(ActionEvent event)");
         if (trace != null) trace.args(event);
         if (trace != null) trace.data(10, name);
-        GlobalProperties.setProperty("ProgMonitor.WipeProgMonitor.closeOnDone", "" + 
+        GlobalProperties.setProperty("ProgMonitor.WipeProgMonitor.closeOnDone", "" +
           WipeProgMonitor.this.jCloseOnDone.isSelected());
         if (trace != null) trace.exit(getClass());
       }
@@ -209,7 +209,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
       gridX = 1;
     }
 
-    panel.add(jScrollPane, new GridBagConstraints(gridX, index, gridWidth, 1, 10, 10, 
+    panel.add(jScrollPane, new GridBagConstraints(gridX, index, gridWidth, 1, 10, 10,
       GridBagConstraints.WEST, GridBagConstraints.BOTH, insetFive, 0, 0));
     index ++;
 
@@ -218,16 +218,16 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
 
     // insert icon
     if (jImageLabel != null) {
-      panel.add(jImageLabel, new GridBagConstraints(0, 0, 1, index, 0, 0, 
+      panel.add(jImageLabel, new GridBagConstraints(0, 0, 1, index, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     }
 
     /* Add other info such as time left, transfer rate, ... */
-    panel.add(jStatus, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+    panel.add(jStatus, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     index ++;
 
-    panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+    panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     index++;
 
@@ -237,22 +237,22 @@ public class WipeProgMonitor extends JFrame implements ProgMonitor {
       if (jNotes[k].getText().length() == 0)
         hSpaces = 2;
 
-      panel.add(jNoteHeadings[k], new GridBagConstraints(0, index+k, hSpaces, 1, 0, 0, 
+      panel.add(jNoteHeadings[k], new GridBagConstraints(0, index+k, hSpaces, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     }
     for (m=0; m<jNotes.length; m++) {
-      panel.add(jNotes[m], new GridBagConstraints(1, index+m, 1, 1, 10, 0, 
+      panel.add(jNotes[m], new GridBagConstraints(1, index+m, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     }
-    index += k > m ? k : m; 
+    index += k > m ? k : m;
 
-    panel.add(jCloseOnDone, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+    panel.add(jCloseOnDone, new GridBagConstraints(0, index, 2, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
 
     index ++;
 
     // filler
-    //panel.add(new JMyLabel(), new GridBagConstraints(0, index, 2, 1, 10, 10, 
+    //panel.add(new JMyLabel(), new GridBagConstraints(0, index, 2, 1, 10, 10,
       //GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
 
     return panel;

@@ -12,11 +12,11 @@
 
 package comx.Jaguar.gui;
 
+import com.CH_co.util.HTML_utils;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 import com.CH_guiLib.gui.JMyTextPaneWordPastable;
-import com.CH_guiLib.util.HTML_utils;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

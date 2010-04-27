@@ -14,7 +14,7 @@ package com.CH_co.service.msg.dataSets.obj;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.trace.Trace;
 
 import com.CH_co.io.DataInputStream2; 
@@ -51,7 +51,7 @@ public class Obj_IDAndIDList_Rq extends ProtocolMsgDataSet {
   }
  
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDAndIDList_Rq.class, "writeToStream(DataOutputStream2)");
     dataOut.writeLongObj(id);
     // write the ID list
@@ -61,7 +61,7 @@ public class Obj_IDAndIDList_Rq extends ProtocolMsgDataSet {
   } // end writeToStream()
   
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_IDAndIDList_Rq.class, "initFromStream(DataInputStream2)");
     id = dataIn.readLongObj();
     // read the ID list

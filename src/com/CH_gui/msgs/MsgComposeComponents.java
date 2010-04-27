@@ -43,7 +43,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.service.records.RecordGuiUtils;
 
 import com.CH_guiLib.gui.*;
-import com.CH_guiLib.util.*;
+import com.CH_guiLib.util.HTML_Ops;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -1191,7 +1191,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // << comes in HTML
       if (dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         // clear any styles in the header
-        quotedMsgBody = HTML_utils.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, true, true);
+        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, true, true);
         if (convertHTMLBodyToPlain) {
           String html = quotedMsgBody;
           String plain = MsgPanelUtils.extractPlainFromHtml(html);

@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.monitor;
+package com.CH_gui.monitor;
 
 import java.io.*;
 import java.awt.*;
@@ -20,6 +20,7 @@ import java.util.*;
 import javax.swing.*;
 
 import com.CH_co.gui.MyInsets;
+import com.CH_co.monitor.ProgMonitorMultiI;
 import com.CH_co.util.*;
 
 /**
@@ -52,7 +53,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MultiProgressMonitor extends Object {
+public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
 
   private static JFrame progressFrame;
   private static JPanel mainPanel;
@@ -80,10 +81,15 @@ public class MultiProgressMonitor extends Object {
   private int             reportDelta;
   private javax.swing.Timer timer;
 
+  private boolean isClosed = false;
+
   private static boolean ENABLE_DEBUG_CANCEL_NOTE = false;
   private StringBuffer debugBuffer;
 
   private static Component defaultParentComponent;
+
+  public MultiProgressMonitor() {
+  }
 
   /**
    * Constructs a graphic object that shows progress, typically by filling
@@ -106,10 +112,10 @@ public class MultiProgressMonitor extends Object {
    * @param min the lower bound of the range
    * @param max the upper bound of the range
    */
-  public MultiProgressMonitor(Component parentComponent, Object message, String note, int min, int max) {
+  public void init(Object parentComponent, Object message, String note, int min, int max) {
     this.min = min;
     this.max = max;
-    this.parentComponent = parentComponent;
+    this.parentComponent = parentComponent != null ? (Component) parentComponent : null;
 
     cancelOption = new Object[1];
     cancelOption[0] = UIManager.getString("OptionPane.cancelButtonText");
@@ -183,7 +189,7 @@ public class MultiProgressMonitor extends Object {
           }
           progressFrame = inFrame;
           mainPanel = new JPanel(new GridBagLayout());
-          mainPanel.add(new JLabel(), new GridBagConstraints(0, MAX_GUI_MONITORS+1, 1, 1, 10, 10, 
+          mainPanel.add(new JLabel(), new GridBagConstraints(0, MAX_GUI_MONITORS+1, 1, 1, 10, 10,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
           JScrollPane scrollPane = new JScrollPane(mainPanel);
           scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -194,7 +200,7 @@ public class MultiProgressMonitor extends Object {
 
         monitorsL.add(MultiProgressMonitor.this);
         updateTitle();
-        mainPanel.add(this, new GridBagConstraints(0, yPos ++, 1, 1, 10, 0, 
+        mainPanel.add(this, new GridBagConstraints(0, yPos ++, 1, 1, 10, 0,
           GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         mainPanel.revalidate();
         mainPanel.repaint();
@@ -252,7 +258,7 @@ public class MultiProgressMonitor extends Object {
     }
   }
   private synchronized void setProgressAWT(int nv) {
-    if (!isCanceled()) {
+    if (!isCanceled() && !isClosed) {
       v = nv;
       if (nv >= max) {
         // update bar to completion
@@ -309,7 +315,10 @@ public class MultiProgressMonitor extends Object {
     }
   }
 
-  private void cancel() {
+  /**
+   * Cancels the progress simulating GUI click on Cancel button.
+   */
+  public void cancel() {
     if (ENABLE_DEBUG_CANCEL_NOTE)
       com.CH_co.util.MessageDialog.showInfoDialog(null, debugBuffer.toString(), "Debug Notes");
     value = cancelOption[0];
@@ -322,6 +331,7 @@ public class MultiProgressMonitor extends Object {
    * earlier if the operation ends early.
    */
   public void close() {
+    isClosed = true;
     try {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
@@ -374,7 +384,7 @@ public class MultiProgressMonitor extends Object {
       debugBuffer.append("\n\n");
     }
   }
-  
+
   private void updateTitle() {
     JFrame frame = progressFrame;
     if (frame != null) {
@@ -547,7 +557,8 @@ public class MultiProgressMonitor extends Object {
       } catch (IOException x) {
       }
       int max = new Random().nextInt(20)+6;
-      MultiProgressMonitor mon = new MultiProgressMonitor(null, "Test Monitor "+monsV.size(), "total units "+max, 0, max);
+      MultiProgressMonitor mon = new MultiProgressMonitor();
+      mon.init(null, "Test Monitor "+monsV.size(), "total units "+max, 0, max);
       monsV.addElement(mon);
       maxsV.addElement(new Integer(max));
       valuesV.addElement(new Integer(0));

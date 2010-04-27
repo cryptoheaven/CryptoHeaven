@@ -12,14 +12,14 @@
 
 package com.CH_gui.frame;
 
+import com.CH_gui.monitor.MultiProgressMonitor;
 import com.CH_gui.util.ActionUtils;
-import com.CH_cl.monitor.LoginProgMonitor;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
-import com.CH_cl.util.PopupWindow;
+import com.CH_gui.util.PopupWindow;
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
@@ -35,6 +35,8 @@ import com.CH_gui.actionGui.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
+import com.CH_cl.service.ops.SysOps;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_gui.table.TableComponent;
 import com.CH_gui.tree.FolderTreeComponent;
 
@@ -84,12 +86,13 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private static final int MANAGE_WHITELIST = 14;
   private static final int SETUP_PASSWORD_RECOVERY = 15;
   private static final int TRACE_DIAGNOSTICS_ACTION = 16;
+  private static final int EMAIL_SUPPORT_ACTION = 17;
 
   private static ServerInterfaceLayer SIL;
 
   private static MainFrame singleInstance;
 
-  private LoginProgMonitor loginProgMonitor;
+  private ProgMonitorI loginProgMonitor;
 
   private static final String PROPERTY_NAME_PREFIX__PERSONALIZE_EMAIL_ADDRESS_COUNT = "PersonalizeEmailAddressCount";
 
@@ -139,11 +142,11 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     if (trace != null) trace.exit(MainFrame.class);
   }
 
-  public LoginProgMonitor getLoginProgMonitor() {
+  public ProgMonitorI getLoginProgMonitor() {
     return loginProgMonitor;
   }
-  public void setLoginProgMonitor(LoginProgMonitor loginProgMonitor) {
-    this.loginProgMonitor = loginProgMonitor;
+  public void setLoginProgMonitor(ProgMonitorI progMonitor) {
+    this.loginProgMonitor = progMonitor;
   }
 
   /**
@@ -433,8 +436,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     // Check or display the 'upgrade' popup window.
     {
       // See if a user account is expired or out of space, if so this will display a popup window with a message.
-      UserOps.checkExpiry();
-      UserOps.checkQuotas();
+      SysOps.checkExpiry();
+      SysOps.checkQuotas();
 
       UserRecord myUserRec = SIL.getFetchedDataCache().getUserRecord();
       Long userId = SIL.getFetchedDataCache().getMyUserId();
@@ -638,7 +641,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private void initActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "initActions()");
     int leadingActionId = Actions.LEADING_ACTION_ID_MAIN_FRAME;
-    actions = new Action[17];
+    actions = new Action[18];
     actions[EXIT_ACTION] = new ExitAction(leadingActionId + EXIT_ACTION);
     actions[ABOUT_ACTION] = new AboutAction(leadingActionId + ABOUT_ACTION);
     actions[CHANGE_PASS_ACTION] = new ChangePassAction(leadingActionId + CHANGE_PASS_ACTION);
@@ -656,6 +659,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     actions[MANAGE_WHITELIST] = new ManageWhiteListAction(leadingActionId + MANAGE_WHITELIST);
     actions[SETUP_PASSWORD_RECOVERY] = new SetupPasswordRecovery(leadingActionId + SETUP_PASSWORD_RECOVERY);
     actions[TRACE_DIAGNOSTICS_ACTION] = new TraceDiagnosticsAction(leadingActionId + TRACE_DIAGNOSTICS_ACTION);
+    actions[EMAIL_SUPPORT_ACTION] = new EmailSupportAction(leadingActionId + EMAIL_SUPPORT_ACTION);
     if (trace != null) trace.exit(MainFrame.class);
   }
 
@@ -1026,6 +1030,26 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
   }
 
+  /**
+   * Email Support
+   */
+  private class EmailSupportAction extends AbstractActionTraced {
+    public EmailSupportAction(int actionId) {
+      super("Email Support", Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      String msgPlainBody =
+              "Technical Support Form\n\n"+
+              "Please be as specific as possible when reporting any problems.\n\n"+
+              "If the problem is reproducible, please list the steps required to reproduce it.\n\n"+
+              "If the problem is not reproducible (only happened once, or occasionally for no apparent reason), please describe the circumstances in which it occurred and the symptoms observed: (note: it is much harder for us to fix non-reproducible bugs).\n\n"+
+              "If the problem causes any error messages to appear, please copy the exact text displayed and paste it here.\n\n";
+      new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request", msgPlainBody);
+    }
+  }
+
   private void exitAction() {
     exitAction(this);
   }
@@ -1056,13 +1080,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrame.exitAction.runTraced()");
           // from now on don't show any error messages when logging out and quitting.
           MiscGui.suppressAllGUI();
-          // send logout
-          MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_LOGOUT);
-          try {
-            SIL.submitAndWait(msgAction, 5000);
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(MainFrame.class, 100, t);
-          }
           try {
             SIL.destroyServer();
           } catch (Throwable t) {

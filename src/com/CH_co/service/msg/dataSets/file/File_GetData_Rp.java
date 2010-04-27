@@ -15,7 +15,7 @@ package com.CH_co.service.msg.dataSets.file;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.Misc;
 import com.CH_co.trace.Trace;
 
@@ -24,7 +24,7 @@ import com.CH_co.io.DataOutputStream2;
 import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -72,7 +72,7 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
 
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetData_Rp.class, "writeToStream(DataOutputStream2, ProgMonitor)");
     if (trace != null) trace.exit(File_GetData_Rp.class);
   } // end writeToStream()
@@ -118,7 +118,7 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
   } // end partialWriteToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetData_Rp.class, "initFromStream(DataInputStream2, ProgMonitor)");
 
     progressMonitor.setCurrentStatus("Receiving Files");

@@ -14,7 +14,6 @@ package com.CH_cl.service.cache;
 
 import java.security.*;
 import java.util.*;
-import javax.swing.event.EventListenerList;
 
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.*;
@@ -3278,10 +3277,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new UserRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((UserRecordListener)listeners[i+1]).userRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3331,10 +3327,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new UserSettingsRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((UserSettingsRecordListener)listeners[i+1]).userSettingsRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3384,10 +3377,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new FolderRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((FolderRecordListener)listeners[i+1]).folderRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3438,10 +3428,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new FolderShareRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((FolderShareRecordListener)listeners[i+1]).folderShareRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3492,10 +3479,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new FileLinkRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((FileLinkRecordListener)listeners[i+1]).fileLinkRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3546,10 +3530,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new InvEmlRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((InvEmlRecordListener)listeners[i+1]).invEmlRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3600,10 +3581,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new KeyRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((KeyRecordListener)listeners[i+1]).keyRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3654,10 +3632,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new ContactRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((ContactRecordListener)listeners[i+1]).contactRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3710,10 +3685,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new MsgLinkRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((MsgLinkRecordListener)listeners[i+1]).msgLinkRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3765,10 +3737,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new MsgDataRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((MsgDataRecordListener)listeners[i+1]).msgDataRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3817,10 +3786,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new StatRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((StatRecordListener)listeners[i+1]).statRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3870,10 +3836,7 @@ public class FetchedDataCache extends Object {
           // Lazily create the event:
           if (e == null)
             e = new EmailRecordEvent(this, records, eventType);
-          int oldPriority = Thread.currentThread().getPriority();
-          Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
           ((EmailRecordListener)listeners[i+1]).emailRecordUpdated(e);
-          Thread.currentThread().setPriority(oldPriority);
         }
       }
     }
@@ -3921,10 +3884,54 @@ public class FetchedDataCache extends Object {
         // Lazily create the event:
         if (e == null)
           e = new EventObject(source);
-        int oldPriority = Thread.currentThread().getPriority();
-        Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         ((FolderRingListener)listeners[i+1]).fldRingRingUpdate(e);
-        Thread.currentThread().setPriority(oldPriority);
+      }
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+
+  /*******************************************
+   ***   MsgPopup Listener handling       ***
+   *******************************************/
+
+  public synchronized void addMsgPopupListener(MsgPopupListener l) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgPopupListener(MsgPopupListener)");
+    if (trace != null) trace.args(l);
+    myListenerList.add(MsgPopupListener.class, l);
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  public synchronized void removeMsgPopupListener(MsgPopupListener l) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeMsgPopupListener(MsgPopupListener)");
+    if (trace != null) trace.args(l);
+    myListenerList.remove(MsgPopupListener.class, l);
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+
+  /**
+   * Notify all listeners that have registered interest for
+   * notification on this event type.  The event instance
+   * is lazily created using the parameters passed into
+   * the fire method.
+   */
+  public void fireMsgPopupEvent(String htmlText) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireMsgPopupEvent(String htmlText)");
+    if (trace != null) trace.args(htmlText);
+
+    // Guaranteed to return a non-null array
+    Object[] listeners = myListenerList.getListenerList();
+    EventObject e = null;
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length-2; i>=0; i-=2) {
+      if (listeners[i] == MsgPopupListener.class) {
+        // Lazily create the event:
+        if (e == null)
+          e = new EventObject(htmlText);
+        ((MsgPopupListener)listeners[i+1]).msgPopupUpdate(e);
       }
     }
 
@@ -3971,10 +3978,7 @@ public class FetchedDataCache extends Object {
         // Lazily create the event:
         if (e == null)
           e = new EventObject(source);
-        int oldPriority = Thread.currentThread().getPriority();
-        Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
         ((MsgTypingListener)listeners[i+1]).msgTypingUpdate(e);
-        Thread.currentThread().setPriority(oldPriority);
       }
     }
 

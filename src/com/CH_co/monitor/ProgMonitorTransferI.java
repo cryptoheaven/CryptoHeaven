@@ -10,10 +10,10 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.util;
+package com.CH_co.monitor;
 
-import com.CH_gui.menuing.ToolBarModel;
-import java.awt.Component;
+import com.CH_co.service.records.FileLinkRecord;
+import java.io.File;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -25,12 +25,17 @@ import java.awt.Component;
  * @author  Marcin Kurzawa
  * @version
  */
-public interface ToolBarProducerI {
+public interface ProgMonitorTransferI extends ProgMonitorI {
 
-  public ToolBarModel getToolBarModel();
 
-  public String getToolBarTitle();
+  /**
+   * File Download/Open
+   */
+  public void init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose);
 
-  public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component source);
+  /**
+   * File Upload
+   */
+  public void init(String[] tasks);
 
 }

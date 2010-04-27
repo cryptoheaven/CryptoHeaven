@@ -12,7 +12,6 @@
 
 package com.CH_cl.service.ops;
 
-import com.CH_cl.monitor.TransferProgMonitor;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.file.*;
 import com.CH_cl.service.engine.*;
@@ -670,9 +669,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       UploadDownloadSynch.entry(maxThreadsInSynchronizedBlock);
       try {
         // number of visible progress monitors are limited to the number of active transfer connections too
-        TransferProgMonitor progressMonitor = new TransferProgMonitor(fileNames, !openAfterDownload, suppressDownloadSoundsAndAutoClose);
-        progressMonitor.setDestinationDir(destDir);
-        progressMonitor.setFiles(files);
+        ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferDown(fileNames, destDir, files, !openAfterDownload, suppressDownloadSoundsAndAutoClose);
         ProgMonitorPool.registerProgMonitor(progressMonitor, msgAction.getStamp());
 
         replyAction = SIL.submitAndFetchReply(msgAction, 0);

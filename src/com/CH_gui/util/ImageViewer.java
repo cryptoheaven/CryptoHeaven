@@ -10,8 +10,11 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.util;
+package com.CH_gui.util;
 
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Images;
+import com.CH_co.util.MiscGui;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;

@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import com.CH_co.io.DataInputStream2;
 import com.CH_co.io.DataOutputStream2;
-import com.CH_co.monitor.ProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.records.EmailRecord;
 import com.CH_co.trace.Trace;
@@ -56,7 +56,7 @@ public class Eml_Get_Rp extends ProtocolMsgDataSet {
   }
 
   /** Writes out 'this' object to a stream */
-  public void writeToStream(DataOutputStream2 dataOut, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Eml_Get_Rp.class, "writeToStream(DataOutputStream2, ProgMonitor)");
     // write indicator
     if (emailRecords == null)
@@ -83,7 +83,7 @@ public class Eml_Get_Rp extends ProtocolMsgDataSet {
   } // end writeToStream()
 
   /** Initializes 'this' object from a stream. */
-  public void initFromStream(DataInputStream2 dataIn, ProgMonitor progressMonitor, short clientBuild, short serverBuild) throws IOException {
+  public void initFromStream(DataInputStream2 dataIn, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Eml_Get_Rp.class, "initFromStream(DataInputStream2, ProgMonitor)");
     // read indicator
     int indicator = dataIn.read();

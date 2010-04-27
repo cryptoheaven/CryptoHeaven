@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.cache.event;
 
-import com.CH_co.trace.Trace;
-
 /**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">

@@ -52,7 +52,6 @@ import com.CH_gui.postTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
-import com.CH_guiLib.util.HTML_utils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

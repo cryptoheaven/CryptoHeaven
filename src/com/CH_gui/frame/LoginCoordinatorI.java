@@ -12,7 +12,7 @@
 
 package com.CH_gui.frame;
 
-import com.CH_cl.monitor.*;
+import com.CH_co.monitor.ProgMonitorI;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -32,11 +32,11 @@ import com.CH_cl.monitor.*;
  */
 public interface LoginCoordinatorI {
 
-  public LoginProgMonitor getLoginProgMonitor();
+  public ProgMonitorI getLoginProgMonitor();
   public void loginAttemptCloseCurrentSession();
   public void loginComplete(boolean isSuccess, LoginCoordinatorI loginCoordinator);
   public void readyForMainData();
-  public void setLoginProgMonitor(LoginProgMonitor loginProgMonitor);
+  public void setLoginProgMonitor(ProgMonitorI progMonitor);
   public void startPreloadingComponents_Threaded();
 
 }

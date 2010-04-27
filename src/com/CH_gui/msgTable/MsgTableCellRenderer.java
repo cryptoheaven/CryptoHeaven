@@ -433,62 +433,67 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           // Since multiple views may display the same message links, we must choose how to view them in the renderer.
           if (tableModel instanceof MsgTableModel) {
             FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-            MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
-            MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-            subject = (String) mtm.getSubjectColumnValue(mtm, mLink, mData, null, cache);
-            boolean isFlagRed = false;
-            StatRecord statRecord = null;
-            isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew();
-            // set icon if in its own column (not as part of other)
-            if (column > -1) {
-              Icon icon = null;
-              if (mData != null && mData.isTypeAddress()) {
-                icon = Images.get(mData.getIcon());
-              }
-              if (icon == null) {
-                icon = Images.get(mLink.getIcon());
-              }
-              setIcon(icon);
-              // check if need to use BOLD
-              if (isFlagRed) {
-                renderer = jRendererBoldIconized;
-                jRendererBoldIconized.setText(getText());
-                jRendererBoldIconized.setIcon(getIcon());
-                setDefaultBackground(renderer, row, isSelected);
-              }
-            } else {
-              // if part of other column, use the smaller renderer
-              if (isFlagRed) {
-                renderer = jRendererSmallBoldIconized;
-                jRendererSmallBoldIconized.setText(getText());
-              } else {
-                renderer = jRendererSmallPlainIconized;
-                jRendererSmallPlainIconized.setText(getText());
-              }
-              setDefaultBackground(renderer, row, isSelected);
-            }
-            if  (((MsgTableSorter) sTable.getModel()).isThreaded())
-              indentLevel = mLink.getSortThreadLayer();
-            // set Subject
-            if (subject == null || subject.length() == 0)
-              subject = ListRenderer.getRenderedText(mData);
-            ((JLabel) renderer).setText(subject);
+            int rowModel = sTable.convertMyRowIndexToModel(row);
+            if (rowModel >= 0) {
+              MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(rowModel);
+              if (mLink != null) {
+                MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
+                subject = (String) mtm.getSubjectColumnValue(mtm, mLink, mData, null, cache);
+                boolean isFlagRed = false;
+                StatRecord statRecord = null;
+                isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew();
+                // set icon if in its own column (not as part of other)
+                if (column > -1) {
+                  Icon icon = null;
+                  if (mData != null && mData.isTypeAddress()) {
+                    icon = Images.get(mData.getIcon());
+                  }
+                  if (icon == null) {
+                    icon = Images.get(mLink.getIcon());
+                  }
+                  setIcon(icon);
+                  // check if need to use BOLD
+                  if (isFlagRed) {
+                    renderer = jRendererBoldIconized;
+                    jRendererBoldIconized.setText(getText());
+                    jRendererBoldIconized.setIcon(getIcon());
+                    setDefaultBackground(renderer, row, isSelected);
+                  }
+                } else {
+                  // if part of other column, use the smaller renderer
+                  if (isFlagRed) {
+                    renderer = jRendererSmallBoldIconized;
+                    jRendererSmallBoldIconized.setText(getText());
+                  } else {
+                    renderer = jRendererSmallPlainIconized;
+                    jRendererSmallPlainIconized.setText(getText());
+                  }
+                  setDefaultBackground(renderer, row, isSelected);
+                }
+                if  (((MsgTableSorter) sTable.getModel()).isThreaded())
+                  indentLevel = mLink.getSortThreadLayer();
+                // set Subject
+                if (subject == null || subject.length() == 0)
+                  subject = ListRenderer.getRenderedText(mData);
+                ((JLabel) renderer).setText(subject);
 
-            // in Address type tables, if no "Email Address" column, show it here under "Name"
-            if (mtm.getMode() == MsgTableModel.MODE_ADDRESS || mtm.getMode() == MsgTableModel.MODE_WHITELIST) {
-              if (mData != null && mData.isTypeAddress() && !isColumnVisible(table, 16) && !mData.fileAs.equalsIgnoreCase(mData.email)) {
-                JLabel thisCloned = (JLabel) renderer;
-                thisCloned.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
-                thisCloned.setForeground(getForeground());
-                thisCloned.setBackground(getBackground());
-                jTwoLinesRendererSubject.removeAll();
-                jTwoLinesRendererSubject.setLayout(new GridLayout(2, 1));
-                jTwoLinesRendererSubject.add(thisCloned);
-                jRendererSmallPlainIconized2.setText(mData.email);
-                jTwoLinesRendererSubject.add(jRendererSmallPlainIconized2);
-                setDefaultBackground(jRendererSmallPlainIconized2, row, isSelected);
-                setDefaultBackground(jTwoLinesRendererSubject, row, isSelected);
-                renderer = jTwoLinesRendererSubject;
+                // in Address type tables, if no "Email Address" column, show it here under "Name"
+                if (mtm.getMode() == MsgTableModel.MODE_ADDRESS || mtm.getMode() == MsgTableModel.MODE_WHITELIST) {
+                  if (mData != null && mData.isTypeAddress() && !isColumnVisible(table, 16) && !mData.fileAs.equalsIgnoreCase(mData.email)) {
+                    JLabel thisCloned = (JLabel) renderer;
+                    thisCloned.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
+                    thisCloned.setForeground(getForeground());
+                    thisCloned.setBackground(getBackground());
+                    jTwoLinesRendererSubject.removeAll();
+                    jTwoLinesRendererSubject.setLayout(new GridLayout(2, 1));
+                    jTwoLinesRendererSubject.add(thisCloned);
+                    jRendererSmallPlainIconized2.setText(mData.email);
+                    jTwoLinesRendererSubject.add(jRendererSmallPlainIconized2);
+                    setDefaultBackground(jRendererSmallPlainIconized2, row, isSelected);
+                    setDefaultBackground(jTwoLinesRendererSubject, row, isSelected);
+                    renderer = jTwoLinesRendererSubject;
+                  }
+                }
               }
             }
           }

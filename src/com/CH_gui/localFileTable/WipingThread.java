@@ -15,10 +15,9 @@ package com.CH_gui.localFileTable;
 import java.io.*;
 import javax.swing.*;
 
-import com.CH_cl.monitor.*;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
+import com.CH_co.monitor.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
@@ -52,9 +51,8 @@ public class WipingThread extends ThreadTraced {
   }
 
   public void runTraced() {
-    WipeProgMonitor progMonitor = new WipeProgMonitor();
     InterruptibleInputStream in = new InterruptibleInputStream(new RandomInputStream(Rnd.getSecureRandom()));
-    progMonitor.setInterrupt(in);
+    ProgMonitorI progMonitor = ProgMonitorFactory.newInstanceWipe(in);
     for (int i=0; i<filesToWipe.length; i++) {
       File file = filesToWipe[i];
        boolean toRescan = false;

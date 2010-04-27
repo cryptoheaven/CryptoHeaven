@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.monitor;
+package com.CH_gui.monitor;
 
 import javax.swing.*;
 
@@ -28,7 +28,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -36,9 +36,9 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.12 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class LoginProgMonitor extends JFrame implements ProgMonitor {
+public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
 
   private String title;
 
@@ -49,15 +49,22 @@ public class LoginProgMonitor extends JFrame implements ProgMonitor {
   private JProgressBar jProgressBar;
 
   /** Creates new LoginProgMonitor */
-  private LoginProgMonitor(String title, String[] tasks, int initProgBarMin, int initProgBarMax) 
-  {
-    super(title);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "LoginProgMonitor(String title, String[] tasks, int initProgBarMin, int initProgBarMax)");
+  public LoginProgMonitor() {
+  }
+
+  /**
+   * Creates new LoginProgMonitor
+   * Every task takes 4 steps, start send, done send, start receive, done receive.
+   */
+  public void init(String title, String[] tasks) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "init(String title, String[] tasks)");
     if (trace != null) trace.args(title, tasks);
-    if (trace != null) trace.args(initProgBarMin);
-    if (trace != null) trace.args(initProgBarMax);
 
     this.title = title;
+    setTitle(title);
+
+    int initProgBarMin = 0;
+    int initProgBarMax = tasks.length * 4;
 
     initPanelComponents(tasks, initProgBarMin, initProgBarMax);
 
@@ -74,17 +81,6 @@ public class LoginProgMonitor extends JFrame implements ProgMonitor {
     setVisible(true);
     if (trace != null) trace.exit(LoginProgMonitor.class);
   }
-
-
-  /** 
-   * Login Progress Monitor
-   * Every task takes 4 steps, start send, done send, start receive, done receive.
-   */
-  public LoginProgMonitor(String title, String[] tasks) {
-    this(title, tasks, 0, tasks.length * 4);
-  }
-
-
 
   private void initPanelComponents(String[] tasks, int initProgBarMin, int initProgBarMax) {
 
@@ -127,7 +123,7 @@ public class LoginProgMonitor extends JFrame implements ProgMonitor {
     }
 
     for ( ; index < jCheckTasks.length; index++) {
-      panel.add(jCheckTasks[index], new GridBagConstraints(gridX, index, gridWidth, 1, 10, 0, 
+      panel.add(jCheckTasks[index], new GridBagConstraints(gridX, index, gridWidth, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     }
 
@@ -136,16 +132,16 @@ public class LoginProgMonitor extends JFrame implements ProgMonitor {
 
     // insert icon
     if (jImageLabel != null) {
-      panel.add(jImageLabel, new GridBagConstraints(0, 0, 1, index, 0, 0, 
+      panel.add(jImageLabel, new GridBagConstraints(0, 0, 1, index, 0, 0,
           GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     }
 
     /* Add other info such as time left, transfer rate, ... */
-    panel.add(jStatus, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+    panel.add(jStatus, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     index ++;
 
-    panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+    panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
 
     return panel;
