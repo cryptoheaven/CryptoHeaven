@@ -12,9 +12,6 @@
 
 package com.CH_gui.frame;
 
-import java.awt.*;
-import javax.swing.*;
-
 import com.CH_cl.service.cache.*;
 
 import com.CH_co.service.records.*;
@@ -32,13 +29,16 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.postTable.*;
 import com.CH_gui.table.*;
 
+import java.awt.*;
+import javax.swing.*;
+
 /** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -46,7 +46,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.29 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgTableFrame extends JActionFrameClosable implements DisposableObj {
 
@@ -241,7 +241,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
    * Dispose the object and release resources to help in garbage collection.
    */
   public void disposeObj() {
-    if (mainTableComponent != null) 
+    if (mainTableComponent != null)
       mainTableComponent.removeRecordListeners();
   }
 

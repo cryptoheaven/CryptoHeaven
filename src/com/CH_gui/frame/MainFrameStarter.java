@@ -15,7 +15,6 @@ package com.CH_gui.frame;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_gui.util.PopupWindow;
 
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
@@ -29,6 +28,7 @@ import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.InactivityEventQueue;
 import com.CH_gui.monitor.*;
+import com.CH_gui.util.PopupWindow;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -88,9 +88,6 @@ public class MainFrameStarter extends Object {
   public static void main(String[] args, JWindow splashWindow) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrameStarter.class, "main(String[])");
     Thread.currentThread().setName("MainFrameStarter Creator Thread");
-
-    // initialize the stats labels
-    Stats.installStatsLabelMouseAdapter(new StatsInitAndLabelMouseAdapter());
 
     // initialize a clean-up agent to run every 15 minutes for garbage-collection and every 60 minutes for temp file cleanup
     CleanupAgent.startSingleInstance(CleanupAgent.MODE_FINALIZATION | CleanupAgent.MODE_GC | CleanupAgent.MODE_TEMP_FILE_CLEANER,
@@ -329,7 +326,8 @@ public class MainFrameStarter extends Object {
 
     // Fix the static labels in the Stats bar
     if (at != null) {
-      Stats.adjustFontSize(at);
+      // TODO figure out what to do with this font adjustment -- for now comment out to make the code compile!
+//      Stats.adjustFontSize(at);
     }
 
     // Change default label color to black

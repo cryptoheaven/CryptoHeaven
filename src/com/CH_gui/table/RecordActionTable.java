@@ -132,7 +132,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       /** Called whenever the value of the selection changes. */
       public void valueChanged(ListSelectionEvent e) {
         // reset stat size
-        Stats.setSize(-1);
+        Stats.setSizeBytes(-1);
         setEnabledActions();
       }
     });

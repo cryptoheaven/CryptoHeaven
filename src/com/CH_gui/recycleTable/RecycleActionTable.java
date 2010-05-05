@@ -937,7 +937,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     actions[REFRESH_ACTION].setEnabled(w != null);
 
     if (noFolderPairs)
-      Stats.setSize(totalSize != null ? totalSize.longValue() : -1);
+      Stats.setSizeBytes(totalSize != null ? totalSize.longValue() : -1);
   }
 
 

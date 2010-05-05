@@ -12,15 +12,10 @@
 
 package com.CH_co.monitor;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.util.*;
-import javax.swing.*;
-
-import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -40,89 +35,60 @@ import com.CH_co.util.*;
  */
 public class Stats extends Object {
 
-  // All progress monitors should update this label with the current status change.... (used for status bar)
-  protected static JLabel jLastStatus;
   protected static final LinkedList statusHistoryL = new LinkedList();
   protected static final LinkedList statusHistoryDatesL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
   private static final int MAX_HISTORY_SIZE = 100;
 
-  protected static ImageIcon staticPic;
-  protected static ImageIcon movingPic;
-  protected static ImageIcon connectedPic;
-  protected static ImageIcon disconnectedPic;
-  protected static ImageIcon greenLightOnPic;
-  protected static ImageIcon greenLightOffPic;
-
   private static HashMap globeMoversTraceHM = new HashMap(); // for debug, stack traces of our Movers
 
-  protected static JLabel jPing;
-  protected static JLabel jOnlineStatus;
-  protected static JLabel jConnections;
-  protected static JLabel jTransferRate;
-  protected static JLabel jSize;
+  protected static String lastStatus;
+  protected static Boolean lastMovingStatus;
+  protected static Long pingMS;
+  protected static Boolean onlineStatus;
+  protected static Integer connectionsPlain;
+  protected static Integer connectionsHTML;
+  protected static Long transferRate;
+  protected static Long sizeBytes;
 
   private static long maxTransferRate;
 
   protected static final Object monitor = new Object();
+  private static ArrayList statsListeners = new ArrayList();
 
-  static {
-    if (!MiscGui.isAllGUIsuppressed()) {
-      jLastStatus = new JMyLabel();
 
-      staticPic = Images.get(ImageNums.ANIM_GLOBE_FIRST16);
-      movingPic = Images.get(ImageNums.ANIM_GLOBE16);
-      connectedPic = Images.get(ImageNums.LIGHT_GREEN_SMALL);
-      disconnectedPic = Images.get(ImageNums.LIGHT_X_SMALL);
-      greenLightOnPic = Images.get(ImageNums.LIGHT_ON_SMALL);
-      greenLightOffPic = Images.get(ImageNums.LIGHT_OFF_SMALL);
-
-      jPing = new JMyLabel();
-      jOnlineStatus = new JMyLabel();
-      jConnections = new JMyLabel();
-      jTransferRate = new JMyLabel();
-      jSize = new JMyLabel();
-    }
+  public static String getStatusLabel() {
+    return lastStatus;
   }
-
-  public static void adjustFontSize(AffineTransform transform) {
-    Font font = null;
-    if (jLastStatus != null)
-      font = jLastStatus.getFont().deriveFont(transform);
-    if (font != null) {
-      if (jLastStatus != null) jLastStatus.setFont(font);
-      if (jPing != null) jPing.setFont(font);
-      if (jOnlineStatus != null) jOnlineStatus.setFont(font);
-      if (jConnections != null) jConnections.setFont(font);
-      if (jTransferRate != null) jTransferRate.setFont(font);
-      if (jSize != null) jSize.setFont(font);
-    }
+  public static Long getPingMS() {
+    return pingMS;
   }
-
-  public static void installStatsLabelMouseAdapter(MouseListener listener) {
-    if (jLastStatus != null)
-      jLastStatus.addMouseListener(listener);
+  public static Boolean getOnlineStatus() {
+    return onlineStatus;
   }
-
-  public static JLabel getStatusLabel() {
-    return jLastStatus;
+  public static Integer getConnectionsPlain() {
+    return connectionsPlain;
   }
-  public static JLabel getPingLabel() {
-    return jPing;
+  public static Integer getConnectionsHTML() {
+    return connectionsHTML;
   }
-  public static JLabel getOnlineLabel() {
-    return jOnlineStatus;
-  }
-  public static JLabel getConnectionsLabel() {
-    return jConnections;
-  }
-  public static JLabel getTransferRateLabel() {
-    return jTransferRate;
+  public static Long getTransferRate() {
+    return transferRate;
   }
   public static long getMaxTransferRate() {
     return maxTransferRate;
   }
-  public static JLabel getSizeLabel() {
-    return jSize;
+  public static Long getSizeBytes() {
+    return sizeBytes;
+  }
+
+  public static ArrayList[] getStatsHistoryLists() {
+    ArrayList historyL = null;
+    ArrayList historyDatesL = null;
+    synchronized (monitor) {
+      historyL = new ArrayList(statusHistoryL);
+      historyDatesL = new ArrayList(statusHistoryDatesL);
+    }
+    return new ArrayList[] { historyL, historyDatesL };
   }
 
   public static ArrayList getGlobeMoversTraceL() {
@@ -138,8 +104,11 @@ public class Stats extends Object {
   public static void moveGlobe(Object mover) {
     synchronized (monitor) {
       if (globeMoversTraceHM.size() == 0) {
-        if (jLastStatus != null)
-          jLastStatus.setIcon(movingPic);
+        lastMovingStatus = Boolean.TRUE;
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsGlobeMove(lastMovingStatus);
+        }
       }
       if (!globeMoversTraceHM.containsKey(mover)) {
         globeMoversTraceHM.put(mover, Misc.getStack(new Throwable(""+mover+" at " + new Date())));
@@ -152,8 +121,11 @@ public class Stats extends Object {
       if (globeMoversTraceHM.containsKey(mover)) {
         globeMoversTraceHM.remove(mover);
         if (globeMoversTraceHM.size() == 0) {
-          if (jLastStatus != null)
-            jLastStatus.setIcon(staticPic);
+          lastMovingStatus = Boolean.FALSE;
+          for (int i=0; i<statsListeners.size(); i++) {
+            StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+            listener.setStatsGlobeMove(lastMovingStatus);
+          }
         }
       }
     }
@@ -163,9 +135,11 @@ public class Stats extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Stats.class, "setStatus(String newStatus)");
     if (trace != null) trace.args(newStatus);
     synchronized (monitor) {
-      if (jLastStatus != null)
-        jLastStatus.setText(newStatus);
-
+      lastStatus = newStatus;
+      for (int i=0; i<statsListeners.size(); i++) {
+        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+        listener.setStatsLastStatus(lastStatus);
+      }
       statusHistoryL.addFirst(newStatus);
       statusHistoryDatesL.addFirst(new Date());
       while (statusHistoryL.size() > MAX_HISTORY_SIZE) {
@@ -178,33 +152,26 @@ public class Stats extends Object {
 
   public static void setPing(long ms) {
     synchronized (monitor) {
-      if (jPing != null) {
-        if (ms > 2000)
-          jPing.setText("" + ((int) (ms/1000)) + " s");
-        else
-          jPing.setText("" + ms + " ms");
+      pingMS = new Long(ms);
+      for (int i=0; i<statsListeners.size(); i++) {
+        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+        listener.setStatsPing(pingMS);
       }
     }
   }
 
   public static void setConnections(int connectionCount, int[] connectionTypeCounts) {
     synchronized (monitor) {
-      if (jConnections != null) {
-        jConnections.setText("" + connectionCount);
-        jConnections.setToolTipText("<html>Number of open socket connections: <b>" + connectionTypeCounts[0] +
-                                  "</b><br>Number of open HTTP sockets: <b>" + connectionTypeCounts[1] + "</b>");
-      }
+      connectionsPlain = new Integer(connectionTypeCounts[0]);
+      connectionsHTML = new Integer(connectionTypeCounts[1]);
       if (connectionCount > 0) {
-        if (jOnlineStatus != null) {
-          jOnlineStatus.setText("Online");
-          jOnlineStatus.setIcon(connectedPic);
-        }
+        onlineStatus = Boolean.TRUE;
+      } else {
+        onlineStatus = Boolean.FALSE;
       }
-      else {
-        if (jOnlineStatus != null) {
-          jOnlineStatus.setText("Offline");
-          jOnlineStatus.setIcon(disconnectedPic);
-        }
+      for (int i=0; i<statsListeners.size(); i++) {
+        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+        listener.setStatsConnections(connectionsPlain, connectionsHTML);
       }
     }
   }
@@ -212,40 +179,39 @@ public class Stats extends Object {
   public static void setTransferRate(long bytesPerSecond) {
     synchronized (monitor) {
       maxTransferRate = Math.max(maxTransferRate, bytesPerSecond);
-      String size = Misc.getFormattedSize(bytesPerSecond, 4, 3);
-      if (size != null && size.length() > 0) {
-        if (bytesPerSecond > 0) {
-          if (jTransferRate != null)
-            jTransferRate.setIcon(greenLightOnPic);
-        } else {
-          if (jTransferRate != null)
-            jTransferRate.setIcon(greenLightOffPic);
-        }
-        if (jTransferRate != null)
-          jTransferRate.setText(size + "/sec");
-      }
-      else {
-        if (jTransferRate != null) {
-          jTransferRate.setIcon(greenLightOffPic);
-          jTransferRate.setText(null);
-        }
+      transferRate = new Long(bytesPerSecond);
+      for (int i=0; i<statsListeners.size(); i++) {
+        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+        listener.setStatsTransferRate(transferRate);
       }
     }
   }
 
-  public static void setSize(long size) {
+  public static void setSizeBytes(long size) {
     synchronized (monitor) {
-      String sizeS = null;
-      if (size >= 0)
-        sizeS = Misc.getFormattedSize(size, 4, 3);
-      if (sizeS != null && sizeS.length() > 0) {
-        if (jSize != null)
-          jSize.setText(sizeS);
+      sizeBytes = new Long(size);
+      for (int i=0; i<statsListeners.size(); i++) {
+        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+        listener.setStatsSizeBytes(sizeBytes);
       }
-      else {
-        if (jSize != null)
-          jSize.setText(null);
-      }
+    }
+  }
+
+  public static void addStatsListener(StatsListenerI listener) {
+    synchronized (monitor) {
+      statsListeners.add(listener);
+      listener.setStatsConnections(connectionsPlain, connectionsHTML);
+      listener.setStatsGlobeMove(lastMovingStatus);
+      listener.setStatsLastStatus(lastStatus);
+      listener.setStatsPing(pingMS);
+      listener.setStatsSizeBytes(sizeBytes);
+      listener.setStatsTransferRate(transferRate);
+    }
+  }
+
+  public static void removeStatsListener(StatsListenerI listener) {
+    synchronized (monitor) {
+      statsListeners.remove(listener);
     }
   }
 

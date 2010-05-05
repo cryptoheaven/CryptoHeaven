@@ -12,14 +12,12 @@
 
 package com.CH_gui.frame;
 
-import com.CH_gui.monitor.MultiProgressMonitor;
-import com.CH_gui.util.ActionUtils;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.*;
-import com.CH_gui.util.PopupWindow;
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
@@ -35,10 +33,10 @@ import com.CH_gui.actionGui.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
-import com.CH_cl.service.ops.SysOps;
-import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_gui.monitor.*;
 import com.CH_gui.table.TableComponent;
 import com.CH_gui.tree.FolderTreeComponent;
+import com.CH_gui.util.*;
 
 import comx.Tiger.gui.*; // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this line
 
@@ -105,6 +103,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private FolderTreeComponent treeComp;
   private TableComponent tableComp;
   private ContactTableComponent contactComp;
+  private StatsBar statsBar;
 
   private boolean isInitializationsStarted = false;
   private boolean isInitializationsFinished = false;
@@ -345,12 +344,12 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           if (hSplit.getDividerSize() > 5) hSplit.setDividerSize(5);
 
           // status bar
-          JPanel jStatusBar = createStatusBar();
+          statsBar = new StatsBar();
 
           mainPanel = new JPanel();
           mainPanel.setLayout(new BorderLayout());
           mainPanel.add(hSplit, BorderLayout.CENTER);
-          mainPanel.add(jStatusBar, BorderLayout.SOUTH);
+          mainPanel.add(statsBar, BorderLayout.SOUTH);
 
           // getting actions will instantiate Action objects
           ActionUtils.getActionsRecursively(treeComp);
@@ -474,99 +473,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
 
     if (trace != null) trace.exit(MainFrame.class);
-  }
-
-
-  private JPanel createStatusBar() {
-    JPanel jStatusBar = new JPanel();
-    jStatusBar.setLayout(new GridBagLayout());
-    Dimension dim = null;
-
-    JLabel jStatus = Stats.getStatusLabel();
-
-    JLabel jSize = Stats.getSizeLabel();
-    dim = new Dimension(80, 14);
-    jSize.setMinimumSize(dim);
-    jSize.setPreferredSize(dim);
-
-    JLabel jTransferRate = Stats.getTransferRateLabel();
-    dim = new Dimension(120, 14);
-    jTransferRate.setMinimumSize(dim);
-    jTransferRate.setPreferredSize(dim);
-
-    JLabel jPing = Stats.getPingLabel();
-    dim = new Dimension(60, 14);
-    jPing.setMinimumSize(dim);
-    jPing.setPreferredSize(dim);
-
-    JLabel jConnections = Stats.getConnectionsLabel();
-    dim = new Dimension(26, 14);
-    jConnections.setMinimumSize(dim);
-    jConnections.setPreferredSize(dim);
-
-    JLabel jOnlineStatus = Stats.getOnlineLabel();
-    dim = new Dimension(90, 14);
-    jOnlineStatus.setMinimumSize(dim);
-    jOnlineStatus.setPreferredSize(dim);
-
-    Insets insets = new MyInsets(0, 1, 0, 1);
-    Insets insets0 = new MyInsets(0, 0, 0, 0);
-
-    int posX = 0;
-
-    jStatusBar.add(jStatus, new GridBagConstraints(posX, 0, 1, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
-    posX ++;
-    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
-    posX ++;
-
-    jStatusBar.add(jSize, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-    posX ++;
-    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
-    posX ++;
-
-    jStatusBar.add(jTransferRate, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-    posX ++;
-    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
-    posX ++;
-
-    jStatusBar.add(jPing, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-    posX ++;
-    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
-    posX ++;
-
-    jStatusBar.add(jConnections, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-    posX ++;
-    jStatusBar.add(makeStatusSeparator(16), new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.NONE, insets0, 0, 0));
-    posX ++;
-
-    jStatusBar.add(jOnlineStatus, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-        GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-
-    jStatusBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 14));
-    jStatusBar.setBorder(new LineBorder(jStatusBar.getBackground().darker(), 1, true));
-
-    return jStatusBar;
-  }
-
-  private static JComponent makeStatusSeparator(int sepSize) {
-    JPanel sep = new JPanel();
-    sep.setLayout(null);
-    sep.setSize(new java.awt.Dimension(1, sepSize));
-    sep.setMaximumSize(new java.awt.Dimension(1, sepSize));
-    sep.setMinimumSize(new java.awt.Dimension(1, sepSize));
-    sep.setPreferredSize(new java.awt.Dimension(1, sepSize));
-    sep.setBackground(sep.getBackground().darker());
-    return sep;
   }
 
   public FolderTreeComponent getMainTreeComponent(Component forComponent) {

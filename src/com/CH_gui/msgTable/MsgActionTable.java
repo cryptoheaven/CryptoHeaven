@@ -1954,7 +1954,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     }
     updateActionNamesAndIcons(selectedObjType);
 
-    Stats.setSize((!anyUnknownSizes && totalSize != null) ? totalSize.longValue() : -1L);
+    Stats.setSizeBytes((!anyUnknownSizes && totalSize != null) ? totalSize.longValue() : -1L);
   }
 
 

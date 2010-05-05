@@ -958,7 +958,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     deleteAction.updateText(count);
 
     if (noFolderPairs)
-      Stats.setSize(totalSize != null ? totalSize.longValue() : -1);
+      Stats.setSizeBytes(totalSize != null ? totalSize.longValue() : -1);
   }
 
 

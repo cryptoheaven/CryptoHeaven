@@ -12,17 +12,19 @@
 
 package com.CH_gui.frame;
 
-import java.awt.event.*;
-import javax.swing.*;
-
 import com.CH_cl.service.cache.*;
-import com.CH_co.monitor.ProgMonitorFactory;
 
+import com.CH_co.monitor.ProgMonitorFactory;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
+import com.CH_gui.monitor.StatsBar;
+
+import java.awt.BorderLayout;
+import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -40,10 +42,11 @@ import com.CH_gui.action.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MsgTableStarterFrame extends MsgTableFrame implements ActionProducerI {
+public class MsgTableStarterFrame extends MsgTableFrame implements ActionProducerI, DisposableObj {
 
   private Action[] actions;
   private static final int SWITCH_TO_FULL_APPLICATION = 0;
+  private StatsBar statsBar;
 
   /** Creates new MsgTableStarterFrame */
   protected MsgTableStarterFrame(Record parent, MsgLinkRecord[] initialData, boolean isInitDataModel) {
@@ -51,6 +54,9 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableStarterFrame.class, "MsgTableStarterFrame()");
     UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
     setUserTitle(uRec);
+    statsBar = new StatsBar();
+    statsBar.installListeners();
+    getContentPane().add(statsBar, BorderLayout.SOUTH);
     if (trace != null) trace.exit(MsgTableStarterFrame.class);
   }
 
@@ -120,6 +126,15 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
     Action[] a = ActionUtilities.concatinate(super.getActions(), actions);
     if (trace != null) trace.exit(MsgTableStarterFrame.class, a);
     return a;
+  }
+
+  /**
+   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+   * Dispose the object and release resources to help in garbage collection.
+   */
+  public void disposeObj() {
+    statsBar.uninstallListeners();
+    super.disposeObj();
   }
 
   /*******************************************************
