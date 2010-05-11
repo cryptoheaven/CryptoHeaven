@@ -42,6 +42,7 @@ import com.CH_gui.dialog.*;
 import com.CH_gui.folder.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.msgTable.*;
+import com.CH_gui.service.ops.DownloadUtilsGui;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 import java.awt.Dialog;
@@ -266,7 +267,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     public void actionPerformedTraced(ActionEvent event) {
       FileRecord[] fileRecords = (FileRecord[]) getSelectedRecords();
       if (fileRecords != null && fileRecords.length > 0) {
-        DownloadUtilities.downloadFilesChoice(fileRecords, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(fileRecords, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
       }
     }
   }
@@ -641,7 +642,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       };
       Runnable saveTask = new Runnable() {
         public void run() {
-          DownloadUtilities.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
+          DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
         }
       };
       Window w = SwingUtilities.windowForComponent(FileActionTable.this);

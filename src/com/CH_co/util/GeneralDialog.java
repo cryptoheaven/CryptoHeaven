@@ -278,7 +278,6 @@ public class GeneralDialog extends JDialog {
   }
 
 
-
   /**
    * Clicks a specified button when ESCAPE key click is detected.
    */

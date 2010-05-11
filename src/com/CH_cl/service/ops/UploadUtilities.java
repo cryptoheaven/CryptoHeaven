@@ -12,11 +12,9 @@
 
 package com.CH_cl.service.ops;
 
-import java.awt.Component;
 import java.io.File;
 import java.util.Vector;
 
-import com.CH_gui.monitor.TransferProgMonitor;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.fld.*;
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -78,43 +76,19 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     if (trace != null) trace.exit(UploadUtilities.class);
   }
 
-
-  /**
-    * This method is called every time the user requests uploading of a file.
-    * Pops up a file choice dialog to choose which file(s) to upload, then launch UploadCoordinator.
-    * @param shareId is the share to which to upload a file
-    * @param owner is the component by which the filechooser will be displayed
-    */
-  public static void uploadFileChoice(FolderShareRecord shareRecord, Component owner, ServerInterfaceLayer SIL) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadUtilities.class, "uploadFile(Long shareId, Component, ServerInterfaceLayer SIL)");
-    if (trace != null) trace.args(shareRecord, owner, SIL);
-
-    // Choose user share instead of group if user has one...
-    FetchedDataCache cache = SIL.getFetchedDataCache();
-    FolderShareRecord myShare = cache.getFolderShareRecordMy(shareRecord.folderId, false);
-    if (myShare != null) {
-      shareRecord = myShare;
-    }
-
-    /* Let the user choose which file to upload */
-    FileChooser fileChooser = FileChooser.makeNew(owner, false, getDefaultSourceDir());
-    File[] newFiles = fileChooser.getNewSelectedFiles();
-
-    if (newFiles != null && newFiles.length > 0) {
-      if (trace != null) trace.data(10, newFiles);
-      // source directory is the current directory from the file chooser, not the selected files
-      setDefaultSourceDir(fileChooser.getCurrentDirectory());
-
-      // now, upload all selected files and directories...
-      uploadFilesStartCoordinator(newFiles, shareRecord, SIL);
-    }
-
-    if (trace != null) trace.exit(UploadUtilities.class);
-  }
-
   public static void uploadFilesStartCoordinator(File[] newFiles, FolderShareRecord destinationShareRecord, ServerInterfaceLayer SIL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadUtilities.class, "uploadFilesStartCoordinator(File[] newFiles, FolderShareRecord destinationShareRecord, ServerInterfaceLayer SIL)");
     if (trace != null) trace.args(newFiles, destinationShareRecord, SIL);
+
+    // Choose user share instead of group if user has one...
+    if (destinationShareRecord != null) {
+      FetchedDataCache cache = SIL.getFetchedDataCache();
+      FolderShareRecord myDestinationShare = cache.getFolderShareRecordMy(destinationShareRecord.folderId, false);
+      if (myDestinationShare != null) {
+        destinationShareRecord = myDestinationShare;
+      }
+    }
+
     new UploadCoordinator(newFiles, destinationShareRecord, SIL, true).start();
     if (trace != null) trace.exit(UploadUtilities.class);
   }

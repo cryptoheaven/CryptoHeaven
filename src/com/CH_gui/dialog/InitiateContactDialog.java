@@ -33,7 +33,7 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -122,7 +122,7 @@ public class InitiateContactDialog extends GeneralDialog {
           KeyRecord otherKeyRec = cache.getKeyRecordForUser(contactWithIds[0]);
           if (otherKeyRec != null) {
             jOtherEncryption.setText(otherKeyRec.plainPublicKey.shortInfo() + "/" + "AES(256)");
-            jOtherEncryption.setIcon(RecordGuiUtils.getIcon(otherKeyRec));
+            jOtherEncryption.setIcon(RecordUtilsGui.getIcon(otherKeyRec));
           }
         }
       }
@@ -181,9 +181,9 @@ public class InitiateContactDialog extends GeneralDialog {
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
       UserRecord uRec = cache.getUserRecord(contactWithIds[0]);
-      jContactWith = new JMyLabel(uRec.shortInfo(), RecordGuiUtils.getIcon(uRec), JLabel.LEFT);
+      jContactWith = new JMyLabel(uRec.shortInfo(), RecordUtilsGui.getIcon(uRec), JLabel.LEFT);
       KeyRecord kRec = cache.getKeyRecord(cache.getUserRecord().currentKeyId);
-      jOwnerEncryption = new JMyLabel(kRec.plainPublicKey.shortInfo() + "/" + "AES(256)", RecordGuiUtils.getIcon(kRec), JLabel.LEFT);
+      jOwnerEncryption = new JMyLabel(kRec.plainPublicKey.shortInfo() + "/" + "AES(256)", RecordUtilsGui.getIcon(kRec), JLabel.LEFT);
 
       jContactName = new JMyTextField(uRec.handle, 15);
       jContactName.getDocument().addDocumentListener(documentChangeListener);

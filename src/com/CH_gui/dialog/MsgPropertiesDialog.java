@@ -36,7 +36,7 @@ import com.CH_gui.list.ListRenderer;
 import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.msgs.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -901,7 +901,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       jKeyID.setText(dataRecord.getSendPrivKeyId().toString());
     if (kRec != null) {
       jKeyInfo.setText(kRec.plainPublicKey.shortInfo());
-      jKeyInfo.setIcon(RecordGuiUtils.getIcon(kRec));
+      jKeyInfo.setIcon(RecordUtilsGui.getIcon(kRec));
     } else {
       jKeyInfo.setText(com.CH_gui.lang.Lang.rb.getString("label_Key_is_not_available."));
       jKeyInfo.setIcon(Images.get(ImageNums.KEY16));

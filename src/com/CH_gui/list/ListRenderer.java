@@ -29,7 +29,7 @@ import com.CH_cl.service.records.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -304,7 +304,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
     else if (value instanceof Record) {
       Record rec = (Record) value;
-      icon = RecordGuiUtils.getIcon(rec);
+      icon = RecordUtilsGui.getIcon(rec);
     }
     else if (value instanceof File) {
       File file = (File) value;

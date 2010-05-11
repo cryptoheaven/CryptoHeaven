@@ -37,7 +37,7 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -128,7 +128,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     UserRecord uRec = cache.getUserRecord(contactRecord.ownerUserId);
     if (uRec != null) {
       jContactFrom.setText(uRec.shortInfo());
-      jContactFrom.setIcon(RecordGuiUtils.getIcon(uRec));
+      jContactFrom.setIcon(RecordUtilsGui.getIcon(uRec));
       jNewContactName.setText(uRec.handle);
       handleFetched = true;
       setEnabledButtons();
@@ -152,7 +152,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
                     UserRecord[] uRecs = replyData.userRecords;
                     if (uRecs != null && uRecs.length == 1) {
                       jContactFrom.setText(uRecs[0].shortInfo());
-                      jContactFrom.setIcon(RecordGuiUtils.getIcon(uRecs[0]));
+                      jContactFrom.setIcon(RecordUtilsGui.getIcon(uRecs[0]));
                       jNewContactName.setText(uRecs[0].handle);
                       handleFetched = true;
                       setEnabledButtons();
@@ -175,7 +175,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     KeyRecord kRec = cache.getKeyRecordForUser(contactRecord.ownerUserId);
     if (kRec != null) {
       jContactEncryption.setText(kRec.plainPublicKey.shortInfo() + "/" + "AES(256)");
-      jContactEncryption.setIcon(RecordGuiUtils.getIcon(kRec));
+      jContactEncryption.setIcon(RecordUtilsGui.getIcon(kRec));
       keyFetched = true;
       setEnabledButtons();
     }
@@ -198,7 +198,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
                     KeyRecord[] kRecs = replyData.keyRecords;
                     if (kRecs != null && kRecs.length == 1) {
                       jContactEncryption.setText(kRecs[0].plainPublicKey.shortInfo() + "/" + "AES(256)");
-                      jContactEncryption.setIcon(RecordGuiUtils.getIcon(kRecs[0]));
+                      jContactEncryption.setIcon(RecordUtilsGui.getIcon(kRecs[0]));
                       keyFetched = true;
                       setEnabledButtons();
                     }
@@ -295,7 +295,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     jContactReason.setEditable(false);
     jContactReason.setWrapStyleWord(true);
     jContactReason.setLineWrap(true);
-    jYourEncryption = new JMyLabel(keyRecord.plainPublicKey.shortInfo() + "/" + "AES(256)", RecordGuiUtils.getIcon(keyRecord), JLabel.LEFT);
+    jYourEncryption = new JMyLabel(keyRecord.plainPublicKey.shortInfo() + "/" + "AES(256)", RecordUtilsGui.getIcon(keyRecord), JLabel.LEFT);
 
     jNewContactName = new JMyTextField(com.CH_gui.lang.Lang.rb.getString("textfield_Fetching_Username..."));
     documentChangeListener = new DocumentChangeListener();

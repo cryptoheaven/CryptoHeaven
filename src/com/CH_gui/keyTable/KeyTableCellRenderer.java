@@ -21,7 +21,7 @@ import com.CH_gui.table.*;
 import com.CH_gui.sortedTable.JSortedTable;
 
 import com.CH_co.service.records.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -53,7 +53,7 @@ public class KeyTableCellRenderer extends RecordTableCellRenderer {
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         JSortedTable jSortedTable = (JSortedTable) table;
         KeyRecord kRec = (KeyRecord) (((KeyTableModel) jSortedTable.getRawModel()).getRowObject(jSortedTable.convertMyRowIndexToModel(row)));
-        setIcon(RecordGuiUtils.getIcon(kRec));
+        setIcon(RecordUtilsGui.getIcon(kRec));
       }
     }
 

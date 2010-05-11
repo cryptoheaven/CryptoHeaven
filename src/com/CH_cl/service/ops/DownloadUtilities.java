@@ -29,7 +29,6 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
-import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
@@ -192,35 +191,6 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     FileDataRecord fileRec = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
     cachedFileOpened = FileLauncher.openFile(fileRec);
     return cachedFileOpened;
-  }
-
-
-  /**
-   * @param toDownload are the files/messages/directories to fetch
-   * @param fromMsgs are the parent messages that own the file attachments specified, NULL if fetching from a folder.
-   * @param owner component for the file chooser dialog
-   */
-  public static void downloadFilesChoice(Record[] toDownload, MsgLinkRecord[] fromMsgs, Component owner, ServerInterfaceLayer SIL) {
-    downloadFilesChoice(toDownload, fromMsgs, owner, SIL, false);
-  }
-  public static void downloadFilesChoice(Record[] toDownload, MsgLinkRecord[] fromMsgs, Component owner, ServerInterfaceLayer SIL, boolean waitForComplete) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "downloadFilesChoice(Record[] toDownload, MsgLinkRecord[] fromMsgs, Component owner, ServerInterfaceLayer SIL, boolean waitForComplete)");
-    if (trace != null) trace.args(toDownload, fromMsgs, owner, SIL);
-    if (trace != null) trace.args(waitForComplete);
-
-    /* Let the user choose the file destination */
-    FileChooser fileChooser = FileChooser.makeNew(owner, true, getDefaultDestDir());
-    File destDir = fileChooser.getSelectedDir();
-
-    if (destDir != null) {
-      if (trace != null) trace.data(10, destDir);
-      setDefaultDestDir(destDir);
-
-      // now, download all selected files and directories and messages...
-      downloadFilesStartCoordinator(toDownload, fromMsgs, destDir, SIL);
-    }
-
-    if (trace != null) trace.exit(DownloadUtilities.class);
   }
 
   public static void downloadFilesStartCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL) {

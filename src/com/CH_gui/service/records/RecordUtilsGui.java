@@ -29,7 +29,7 @@ import javax.swing.Icon;
  * @author  Marcin Kurzawa
  * @version
  */
-public class RecordGuiUtils {
+public class RecordUtilsGui {
 
   public static Icon getIcon(Record rec) {
     int iconIndex = rec.getIcon();

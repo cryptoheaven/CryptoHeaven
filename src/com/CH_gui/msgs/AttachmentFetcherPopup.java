@@ -33,6 +33,7 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.service.ops.DownloadUtilsGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -254,7 +255,7 @@ public class AttachmentFetcherPopup extends ThreadTraced {
         };
         Runnable saveTask = new Runnable() {
           public void run() {
-            DownloadUtilities.downloadFilesChoice(new FileLinkRecord[] { fLink }, paramParentMsgLinkRecords, parent, MainFrame.getServerInterfaceLayer());
+            DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { fLink }, paramParentMsgLinkRecords, parent, MainFrame.getServerInterfaceLayer());
           }
         };
         MsgLinkRecord parentMsgLink = null;

@@ -39,6 +39,7 @@ import com.CH_gui.fileTable.*;
 import com.CH_gui.folder.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.msgTable.*;
+import com.CH_gui.service.ops.DownloadUtilsGui;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 import java.awt.Component;
@@ -265,11 +266,11 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     public void actionPerformedTraced(ActionEvent event) {
       FileRecord[] fileRecords = (FileRecord[]) getSelectedInstancesOf(FileRecord.class);
       if (fileRecords != null && fileRecords.length > 0) {
-        DownloadUtilities.downloadFilesChoice(fileRecords, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(fileRecords, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
       }
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedInstancesOf(MsgLinkRecord.class);
       if (msgLinks != null && msgLinks.length > 0) {
-        DownloadUtilities.downloadFilesChoice(msgLinks, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(msgLinks, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
       }
     }
   }
@@ -659,7 +660,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
       };
       Runnable saveTask = new Runnable() {
         public void run() {
-          DownloadUtilities.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
+          DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
         }
       };
       Window w = SwingUtilities.windowForComponent(RecycleActionTable.this);

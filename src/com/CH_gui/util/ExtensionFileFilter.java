@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.util;
+package com.CH_gui.util;
 
 import java.io.File;
 import javax.swing.filechooser.FileFilter;

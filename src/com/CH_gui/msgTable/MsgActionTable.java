@@ -49,6 +49,7 @@ import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.postTable.*;
+import com.CH_gui.service.ops.DownloadUtilsGui;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
@@ -471,7 +472,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     public void actionPerformedTraced(ActionEvent event) {
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedRecords();
       if (msgLinks != null && msgLinks.length > 0) {
-        DownloadUtilities.downloadFilesChoice(msgLinks, null, MsgActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(msgLinks, null, MsgActionTable.this, MainFrame.getServerInterfaceLayer());
       }
     }
   }

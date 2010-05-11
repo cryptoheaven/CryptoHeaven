@@ -40,7 +40,7 @@ import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 
 import com.CH_guiLib.gui.*;
 import com.CH_guiLib.util.HTML_Ops;
@@ -585,7 +585,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       if (isChatComposePanel || emlRecs == null || emlRecs.length <= 1) {
         JLabel jFromStaticLabel = null;
         if (myUserRec != null)
-          jFromStaticLabel = new JMyLabel(myUserRec.shortInfo(), RecordGuiUtils.getIcon(myUserRec), JLabel.LEFT);
+          jFromStaticLabel = new JMyLabel(myUserRec.shortInfo(), RecordUtilsGui.getIcon(myUserRec), JLabel.LEFT);
         else
           jFromStaticLabel = new JMyLabel("Not logged In!");
         jFromComponent = jFromStaticLabel;

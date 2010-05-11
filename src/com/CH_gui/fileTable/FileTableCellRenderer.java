@@ -23,7 +23,7 @@ import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -72,7 +72,7 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
             FileTableModel tableModel = (FileTableModel) rawModel;
             Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
             if (rec != null) {
-              icon = RecordGuiUtils.getIcon(rec);
+              icon = RecordUtilsGui.getIcon(rec);
             }
           }
         }

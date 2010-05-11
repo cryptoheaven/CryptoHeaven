@@ -12,7 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.ImageViewer;
 import com.CH_cl.util.DecodingAudioClipPlayer;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
@@ -36,7 +35,9 @@ import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.msgTable.*;
+import com.CH_gui.service.ops.DownloadUtilsGui;
 import com.CH_gui.table.*;
+import com.CH_gui.util.ImageViewer;
 
 import com.CH_guiLib.gui.*;
 
@@ -1004,7 +1005,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                   };
                   Runnable saveTask = new Runnable() {
                     public void run() {
-                      DownloadUtilities.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, new MsgLinkRecord[] { _parentMsgLink }, MsgPreviewPanel.this, MainFrame.getServerInterfaceLayer());
+                      DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, new MsgLinkRecord[] { _parentMsgLink }, MsgPreviewPanel.this, MainFrame.getServerInterfaceLayer());
                     }
                   };
                   Window w = SwingUtilities.windowForComponent(MsgPreviewPanel.this);

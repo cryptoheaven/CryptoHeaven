@@ -35,7 +35,7 @@ import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_cl.service.ops.SysOps;
 import com.CH_gui.usrs.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -190,7 +190,7 @@ public class AccountOptionsDialog extends GeneralDialog {
           }
           if (key != null) {
             jEncryption.setText(key.plainPublicKey.shortInfo() + "/" + "AES(256)");
-            jEncryption.setIcon(RecordGuiUtils.getIcon(key));
+            jEncryption.setIcon(RecordUtilsGui.getIcon(key));
           }
         }
 
@@ -443,7 +443,7 @@ public class AccountOptionsDialog extends GeneralDialog {
       }
     }
     jDefaultEmail.getDocument().addDocumentListener(documentChangeListener);
-    JLabel jEmlLabel = new JMyLabel(RecordGuiUtils.getIcon(emlRec));
+    JLabel jEmlLabel = new JMyLabel(RecordUtilsGui.getIcon(emlRec));
     topPanel.add(emlAddrLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     topPanel.add(jEmlLabel, new GridBagConstraints(1, posY, 1, 1, 0, 0,

@@ -12,6 +12,7 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_gui.util.ExtensionFileFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;

@@ -36,7 +36,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_gui.file.FileUtilities;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.service.records.RecordGuiUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_guiLib.gui.*;
 
 /** 
@@ -179,7 +179,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
     panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Type")), new GridBagConstraints(0, 3, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    JLabel jFileType = new JMyLabel(fileLink.getFileType(), RecordGuiUtils.getIcon(fileLink), JLabel.LEFT);
+    JLabel jFileType = new JMyLabel(fileLink.getFileType(), RecordUtilsGui.getIcon(fileLink), JLabel.LEFT);
     panel.add(jFileType, new GridBagConstraints(1, 3, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
@@ -191,7 +191,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     if (locationRecord != null) {
       if (locationRecord instanceof FolderPair) {
         FolderPair pair = (FolderPair) locationRecord;
-        jLocationRecord = new JMyLabel(pair.getMyName(), RecordGuiUtils.getIcon(pair), JLabel.LEFT);
+        jLocationRecord = new JMyLabel(pair.getMyName(), RecordUtilsGui.getIcon(pair), JLabel.LEFT);
       }
       else
         jLocationRecord = new JMyLabel(locationRecord.toString());
@@ -560,7 +560,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
           if (uRec != null) {
             jDataUser.setText(uRec.shortInfo());
-            jDataUser.setIcon(RecordGuiUtils.getIcon(uRec));
+            jDataUser.setIcon(RecordUtilsGui.getIcon(uRec));
           } else {
             jDataUser.setText(com.CH_gui.lang.Lang.rb.getString("label_Unknown_User_Account"));
             jDataUser.setIcon(Images.get(ImageNums.PERSON_SMALL));
@@ -570,7 +570,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
           if (kRec != null) {
             jDataKeyInfo.setText(kRec.plainPublicKey.shortInfo());
-            jDataKeyInfo.setIcon(RecordGuiUtils.getIcon(kRec));
+            jDataKeyInfo.setIcon(RecordUtilsGui.getIcon(kRec));
           }
           else {
             jDataKeyInfo.setText(com.CH_gui.lang.Lang.rb.getString("Key_is_not_available"));

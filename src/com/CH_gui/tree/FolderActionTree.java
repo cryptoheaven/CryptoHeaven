@@ -12,7 +12,6 @@
 
 package com.CH_gui.tree;
 
-import com.CH_gui.util.ActionUtils;
 import com.CH_co.gui.*;
 import com.CH_co.trace.*;
 import com.CH_co.tree.*;
@@ -38,7 +37,9 @@ import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.msgTable.MsgActionTable;
+import com.CH_gui.service.ops.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.ActionUtils;
 
 import com.CH_guiLib.gui.*;
 
@@ -409,7 +410,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           selected = new FolderPair[] { selectFolder(w, title, new FolderFilter(new short[] { FolderRecord.CATEGORY_FILE_FOLDER, FolderRecord.FILE_FOLDER })) };
         }
         if (selected != null && selected[0] != null) {
-          UploadUtilities.uploadFileChoice(selected[0].getFolderShareRecord(), FolderActionTree.this, MainFrame.getServerInterfaceLayer());
+          UploadUtilsGui.uploadFileChoice(selected[0].getFolderShareRecord(), FolderActionTree.this, MainFrame.getServerInterfaceLayer());
         }
       }
     }
@@ -453,7 +454,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         FolderPair[] folderPairs = new FolderPair[selectedFolderPairs.size()];
         selectedFolderPairs.toArray(folderPairs);
         if (folderPairs != null && folderPairs.length > 0)
-          DownloadUtilities.downloadFilesChoice(folderPairs, null, FolderActionTree.this, MainFrame.getServerInterfaceLayer());
+          DownloadUtilsGui.downloadFilesChoice(folderPairs, null, FolderActionTree.this, MainFrame.getServerInterfaceLayer());
       }
     }
     private void updateText(int countSelectedFolderPairs) {
