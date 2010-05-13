@@ -12,7 +12,6 @@
 
 package com.CH_gui.tree;
 
-import com.CH_gui.util.PopupWindowManager;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.FolderRecUtil;
@@ -27,12 +26,12 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import java.awt.Component;
-import java.awt.Frame;
+import com.CH_gui.util.*;
+
+import java.awt.*;
 import java.awt.dnd.*;
 import java.util.*;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /** 

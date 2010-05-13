@@ -12,15 +12,11 @@
 
 package com.CH_cl.service.actions.cnt;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
-import javax.swing.*;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -223,47 +219,6 @@ public class CntAGetContacts extends ClientMessageAction {
         short status = cRec.status.shortValue();
         if (cRec.ownerUserId != null && cRec.ownerUserId.equals(getFetchedDataCache().getMyUserId()) &&
            (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
-          UserRecord uRec = getFetchedDataCache().getUserRecord(cRec.contactWithId);
-          String userName = uRec != null ? uRec.shortInfo() : ("(" + cRec.contactWithId + ")");
-          String newState = status == ContactRecord.STATUS_ACCEPTED ? "accepted" : "declined";
-          String msg = "Contact '" + cRec.getOwnerNote() + "' with user " + userName + " has been " + newState + " by the other party.";
-          String title = "Contact " + newState;
-
-          if (status == ContactRecord.STATUS_ACCEPTED) {
-            Sounds.playAsynchronous(Sounds.YOU_WERE_AUTHORIZED);
-            final JCheckBox jEnableAudibleNotify = new JMyCheckBox("Enable audible notification when contact's status changes to Available.");
-            jEnableAudibleNotify.setSelected((cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0);
-
-            JPanel panel = new JPanel();
-            panel.setLayout(new GridBagLayout());
-
-            panel.setLayout(new GridBagLayout());
-
-            int posY = 0;
-            panel.add(new JMyLabel(msg), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-                  GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-            posY ++;
-            panel.add(jEnableAudibleNotify, new GridBagConstraints(0, posY, 1, 1, 10, 0,
-                  GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-            posY ++;
-
-            ActionListener defaultButtonAction = new ActionListener() {
-              public void actionPerformed(ActionEvent event) {
-                Object[] objs = new Object[] { cRec.contactId, new Integer(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
-                Obj_List_Co dataSet = new Obj_List_Co();
-                dataSet.objs = objs;
-                getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_ALTER_SETTINGS, dataSet));
-                Window w = SwingUtilities.windowForComponent((Component)event.getSource());
-                w.setVisible(false);
-                w.dispose();
-              }
-            };
-            MessageDialog.showDialog(null, panel, title, MessageDialog.INFORMATION_MESSAGE, null, defaultButtonAction, false, false, false);
-          } else if (status == ContactRecord.STATUS_DECLINED) {
-            Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
-            MessageDialog.showInfoDialog(null, msg, title);
-          }
-
           if (toAcknowledgeV == null) toAcknowledgeV = new Vector();
           toAcknowledgeV.addElement(cRec.contactId);
         }

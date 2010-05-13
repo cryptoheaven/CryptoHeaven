@@ -50,7 +50,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 536;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 538;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -199,6 +199,7 @@ public class GlobalProperties extends Object {
   // build 532 Progress monitors changed to Factory design pattern and moved into the GUI library.
   // build 534 Stats data handler and StatsBar gui view with data listener
   // build 536 Upload/Download control-GUI separation
+  // build 538 more control-GUI separation
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;

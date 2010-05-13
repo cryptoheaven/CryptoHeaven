@@ -13,10 +13,10 @@
 package com.CH_gui.service.ops;
 
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.FileChooser;
 import com.CH_cl.service.ops.UploadUtilities;
 import com.CH_co.service.records.FolderShareRecord;
 import com.CH_co.trace.Trace;
+import com.CH_gui.util.FileChooser;
 
 import java.awt.Component;
 import java.io.File;

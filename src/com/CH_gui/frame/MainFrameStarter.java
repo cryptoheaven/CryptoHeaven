@@ -12,6 +12,7 @@
 
 package com.CH_gui.frame;
 
+import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
@@ -26,7 +27,7 @@ import com.CH_co.util.*;
 
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.dialog.*;
-import com.CH_gui.gui.InactivityEventQueue;
+import com.CH_gui.gui.*;
 import com.CH_gui.monitor.*;
 import com.CH_gui.util.PopupWindow;
 
@@ -226,6 +227,8 @@ public class MainFrameStarter extends Object {
       ProgMonitorFactory.setImplementationMulti(MultiProgressMonitor.class);
       ProgMonitorFactory.setImplementationTransfer(TransferProgMonitor.class);
       ProgMonitorFactory.setImplementationWipe(WipeProgMonitor.class);
+      // setup login action
+      UsrALoginSecureSession.setImplementationFileChooser(SingleFileChooser.class);
 
       // start main GUI
       new MainFrameStarter(splashWindow, skipLogin, swingMemoryFootprintTestExitWhenMainScreenLoaded, initialFolderId, initialMsgLinkId);

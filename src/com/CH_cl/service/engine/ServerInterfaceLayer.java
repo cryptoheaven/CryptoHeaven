@@ -1014,10 +1014,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             workers.add(worker);
             // destroyed worker could be replaced by new one which should now be updating connection counts
             if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
-//            // seperate GUI in another thread, don't use swing here because Engine doesn't like activating GUI timers/classes
-//            final int workerSize = workers.size();
-//            final int[] workerCounts = getWorkerCounts();
-//            new Thread(new Runnable() { public void run() { Stats.setConnections(workerSize, workerCounts); } }).start();
           }
         } // end for
       } // end synchronized

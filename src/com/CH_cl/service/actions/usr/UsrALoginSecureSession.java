@@ -12,38 +12,41 @@
 
 package com.CH_cl.service.actions.usr;
 
+import com.CH_cl.service.actions.*;
+import com.CH_cl.service.cache.*;
 import com.CH_cl.util.GlobalSubProperties;
 
-import java.io.File;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.service.engine.CommonSessionContext;
-import com.CH_co.service.msg.MessageAction;
+import com.CH_co.cryptx.*;
+import com.CH_co.gui.FileChooserI;
+import com.CH_co.service.engine.*;
+import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
-
-import com.CH_co.cryptx.*;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_co.trace.Trace;
+import java.io.*;
+import java.security.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class UsrALoginSecureSession extends ClientMessageAction {
 
+  private static Class fileChooserImpl;
+
   /** Creates new UsrALoginSecureSession */
   public UsrALoginSecureSession() {
+  }
+
+  public static void setImplementationFileChooser(Class impl) {
+    fileChooserImpl = impl;
   }
 
   /** The action handler performs all actions related to the received message (reply),
@@ -121,21 +124,28 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
       // As last resort, let user specify the location of the key
       if (privateKey == null && encPrivateKey == null) {
-        javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
-        fc.setDialogTitle("Open Private Key file:");
-        fc.setSelectedFile(null);
-        int retVal = fc.showOpenDialog(null);
-        if (retVal == javax.swing.JFileChooser.APPROVE_OPTION) {
-          java.io.File file = fc.getSelectedFile();
-          keyPropertyFileName = file.getAbsolutePath();
-          keyPropertyName = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+keyId;
-          GlobalSubProperties keyProperties = new GlobalSubProperties(file, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
-          String property = keyProperties.getProperty(keyPropertyName);
+        if (fileChooserImpl != null) {
+          FileChooserI fc;
+          try {
+            fc = (FileChooserI) fileChooserImpl.newInstance();
+            fc.setDialogTitle("Open Private Key file:");
+            fc.setSelectedFile(null);
+            int retVal = fc.showOpenDialog(null);
+            if (fc.isApproved(retVal)) {
+              File file = fc.getSelectedFile();
+              keyPropertyFileName = file.getAbsolutePath();
+              keyPropertyName = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+keyId;
+              GlobalSubProperties keyProperties = new GlobalSubProperties(file, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+              String property = keyProperties.getProperty(keyPropertyName);
 
-          if (property != null && property.length() > 0) {
-            encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-            // remember the filename for next time -- TRIM the list to at most 5 paths
-            addPathToLastPrivKeyPaths(file.getAbsolutePath());
+              if (property != null && property.length() > 0) {
+                encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+                // remember the filename for next time -- TRIM the list to at most 5 paths
+                addPathToLastPrivKeyPaths(file.getAbsolutePath());
+              }
+            }
+          } catch (Exception ex) {
+            ex.printStackTrace();
           }
         }
       }
@@ -169,7 +179,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
         }
         else {
-          String message = 
+          String message =
               "<html>Private Key to decrypt session keys is not available! " +
               "<p>" +
               "Your key property file appears to be missing or corrupted.  " +

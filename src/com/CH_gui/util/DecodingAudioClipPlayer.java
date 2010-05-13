@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.util;
+package com.CH_gui.util;
 
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
@@ -275,13 +275,11 @@ public class DecodingAudioClipPlayer {
   }//end inner class ClipControl
 
 
-  public static void printUsageAndExit() {
-    System.out.println("DecodingAudioPlayer: usage:");
-    System.out.println("\tjava DecodingAudioPlayer <soundfile>");
-    System.exit(1);
-  }
 
-
+  /**
+   * Main entry point for class testing
+   * @param args
+   */
   public static void main(String[] args) {
     if (args.length != 1) {
       printUsageAndExit();
@@ -289,6 +287,12 @@ public class DecodingAudioClipPlayer {
     String	strFilename = args[0];
     File file = new File (strFilename);
     play(file);
+  }
+
+  private static void printUsageAndExit() {
+    System.out.println("DecodingAudioPlayer: usage:");
+    System.out.println("\tjava DecodingAudioPlayer <soundfile>");
+    System.exit(1);
   }
 
 }

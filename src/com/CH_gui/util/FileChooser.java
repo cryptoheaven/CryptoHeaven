@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_cl.service.ops;
+package com.CH_gui.util;
 
 import javax.swing.*;
 import java.awt.*;

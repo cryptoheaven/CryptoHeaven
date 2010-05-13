@@ -20,11 +20,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgTable.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
@@ -40,7 +35,13 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
-import com.CH_gui.service.records.RecordUtilsGui;
+
+import com.CH_gui.fileTable.*;
+import com.CH_gui.frame.*;
+import com.CH_gui.list.*;
+import com.CH_gui.msgTable.*;
+import com.CH_gui.service.records.*;
+import com.CH_gui.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

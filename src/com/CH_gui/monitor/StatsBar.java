@@ -33,7 +33,7 @@ import javax.swing.border.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class StatsBar extends JPanel implements StatsListenerI {
+public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
 
   private JLabel jLastStatus;
   private JLabel jPing;
@@ -275,6 +275,10 @@ public class StatsBar extends JPanel implements StatsListenerI {
       jTransferRate.setIcon(Images.get(ImageNums.LIGHT_OFF_SMALL));
       jTransferRate.setText(null);
     }
+  }
+
+  public void disposeObj() {
+    uninstallListeners();
   }
 
   private class StatusMouseListener extends MouseAdapter {

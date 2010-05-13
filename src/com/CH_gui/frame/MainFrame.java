@@ -14,10 +14,12 @@ package com.CH_gui.frame;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.*;
+
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
@@ -64,7 +66,7 @@ import javax.swing.border.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoordinatorI, ComponentContainerI {
+public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoordinatorI, ComponentContainerI, DisposableObj {
 
   private Action[] actions;
   private static final int EXIT_ACTION = 0;
@@ -108,6 +110,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private boolean isInitializationsStarted = false;
   private boolean isInitializationsFinished = false;
 
+  private ContactListener contactListener;
+
   static {
     Toolkit.getDefaultToolkit().getSystemEventQueue().push(InactivityEventQueue.getInstance());
   }
@@ -137,6 +141,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
     // set default parent to multi-progress monitors to the main window
     MultiProgressMonitor.setDefaultParentComponent(this);
+
+    contactListener = new ContactListener();
+    FetchedDataCache.getSingleInstance().addContactRecordListener(contactListener);
 
     if (trace != null) trace.exit(MainFrame.class);
   }
@@ -345,6 +352,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
           // status bar
           statsBar = new StatsBar();
+          statsBar.installListeners();
 
           mainPanel = new JPanel();
           mainPanel.setLayout(new BorderLayout());
@@ -609,6 +617,16 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     actions[IMPORT_ADDRESS_BOOK].setEnabled(loggedIn);
     actions[MANAGE_WHITELIST].setEnabled(loggedIn);
     actions[SETUP_PASSWORD_RECOVERY].setEnabled(loggedIn);
+  }
+
+  public void disposeObj() {
+    if (contactListener != null) {
+      FetchedDataCache.getSingleInstance().removeContactRecordListener(contactListener);
+      contactListener = null;
+    }
+    if (statsBar != null) {
+      statsBar.uninstallListeners();
+    }
   }
 
   // =====================================================================
@@ -1155,5 +1173,92 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   public String getVisualsClassKeyName() {
     return visualsClassKeyName;
   }
+
+
+  /**
+   * Listen on updates to the contacts in the cache and notify users of changes.
+   */
+  private class ContactListener implements ContactRecordListener {
+    public void contactRecordUpdated(ContactRecordEvent event) {
+      // Exec on event thread since we must preserve selected rows and don't want visuals
+      // to seperate from selection for a split second.
+      javax.swing.SwingUtilities.invokeLater(new GUIUpdater(event));
+    }
+  }
+
+
+  private class GUIUpdater implements Runnable {
+    private RecordEvent event;
+    public GUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "FolderGUIUpdater(RecordEvent event)");
+      this.event = event;
+      if (trace != null) trace.exit(GUIUpdater.class);
+    }
+    public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "FolderGUIUpdater.run()");
+
+      if (event instanceof ContactRecordEvent) {
+
+        ContactRecord[] contactRecords = ((ContactRecordEvent) event).getContactRecords();
+        final ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        FetchedDataCache cache = SIL.getFetchedDataCache();
+
+        for (int i=0; contactRecords!=null && i<contactRecords.length; i++) {
+          final ContactRecord cRec = contactRecords[i];
+          if (cRec.status != null) {
+            short status = cRec.status.shortValue();
+            if (cRec.ownerUserId != null && cRec.ownerUserId.equals(cache.getMyUserId()) &&
+               (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
+
+              UserRecord uRec = cache.getUserRecord(cRec.contactWithId);
+              String userName = uRec != null ? uRec.shortInfo() : ("(" + cRec.contactWithId + ")");
+              String newState = status == ContactRecord.STATUS_ACCEPTED ? "accepted" : "declined";
+              String msg = "Contact '" + cRec.getOwnerNote() + "' with user " + userName + " has been " + newState + " by the other party.";
+              String title = "Contact " + newState;
+
+              if (status == ContactRecord.STATUS_ACCEPTED) {
+                Sounds.playAsynchronous(Sounds.YOU_WERE_AUTHORIZED);
+                final JCheckBox jEnableAudibleNotify = new JMyCheckBox("Enable audible notification when contact's status changes to Available.");
+                jEnableAudibleNotify.setSelected((cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0);
+
+                JPanel panel = new JPanel();
+                panel.setLayout(new GridBagLayout());
+
+                panel.setLayout(new GridBagLayout());
+
+                int posY = 0;
+                panel.add(new JMyLabel(msg), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+                      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+                posY ++;
+                panel.add(jEnableAudibleNotify, new GridBagConstraints(0, posY, 1, 1, 10, 0,
+                      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+                posY ++;
+
+                ActionListener defaultButtonAction = new ActionListener() {
+                  public void actionPerformed(ActionEvent event) {
+                    Object[] objs = new Object[] { cRec.contactId, new Integer(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
+                    Obj_List_Co dataSet = new Obj_List_Co();
+                    dataSet.objs = objs;
+                    SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_ALTER_SETTINGS, dataSet));
+                    Window w = SwingUtilities.windowForComponent((Component)event.getSource());
+                    w.setVisible(false);
+                    w.dispose();
+                  }
+                };
+                MessageDialog.showDialog(null, panel, title, MessageDialog.INFORMATION_MESSAGE, null, defaultButtonAction, false, false, false);
+              } else if (status == ContactRecord.STATUS_DECLINED) {
+                Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
+                MessageDialog.showInfoDialog(null, msg, title);
+              }
+            }
+          }
+        }
+
+      }
+
+      // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
+      if (trace != null) trace.exit(GUIUpdater.class);
+    }
+  } // end class GUIUpdater
 
 }
