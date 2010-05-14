@@ -12,6 +12,8 @@
 
 package com.CH_co.service.records;
 
+import java.util.Collection;
+
 /** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">

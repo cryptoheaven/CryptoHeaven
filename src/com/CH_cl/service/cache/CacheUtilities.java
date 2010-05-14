@@ -41,11 +41,22 @@ import com.CH_co.util.*;
  */
 public class CacheUtilities extends Object {
 
-
   /** Hide the constructor, all methods are static. */
   private CacheUtilities() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUtilities.class, "CacheUtilities()");
     if (trace != null) trace.exit(CacheUtilities.class);
+  }
+
+  public static boolean hasAttachments(Record rec) {
+    boolean hasAttachments = false;
+    if (rec instanceof MsgLinkRecord) {
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      MsgDataRecord msgData = cache.getMsgDataRecord(((MsgLinkRecord) rec).msgId);
+      hasAttachments = msgData.hasAttachments();
+    } else if (rec instanceof MsgDataRecord) {
+      hasAttachments = ((MsgDataRecord) rec).hasAttachments();
+    }
+    return hasAttachments;
   }
 
    /** Find a corresponding pair in the cache for each record

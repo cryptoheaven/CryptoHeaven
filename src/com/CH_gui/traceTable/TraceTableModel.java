@@ -27,6 +27,7 @@ import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.list.*;
+import com.CH_gui.msgs.AttachmentFetcherPopup;
 import com.CH_gui.table.*;
 
 /** 
@@ -49,6 +50,7 @@ public class TraceTableModel extends RecordTableModel {
 
   // Parent is either MsgLinkRecord or FileLinkRecord
   private Record[] parentObjLinks;
+  private boolean isAttachmentsAdded = false;
   // callback to update GUI if some trace records are hidden
   private CallbackI statsRecivedCallback = null;
 
@@ -118,7 +120,7 @@ public class TraceTableModel extends RecordTableModel {
 
   /** Creates new TraceTableModel */
   public TraceTableModel(Record[] parentObjLinks) {
-    super(columnHeaderDatas[parentObjLinks.length == 1 ? (parentObjLinks[0] instanceof MsgLinkRecord ? (MODE_MSG):(MODE_FILE)) : MODE_MULTI]);
+    super(columnHeaderDatas[parentObjLinks.length > 1 || CacheUtilities.hasAttachments(parentObjLinks[0]) ? MODE_MULTI : (parentObjLinks[0] instanceof MsgLinkRecord ? (MODE_MSG):(MODE_FILE))]);
     initialize(parentObjLinks);
   }
   private void initialize(Record[] parentObjLinks) {
@@ -205,6 +207,14 @@ public class TraceTableModel extends RecordTableModel {
       public void runTraced() {
         removeData();
 
+        MsgLinkRecord[] parentMsgLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(parentObjLinks, MsgLinkRecord.class);
+
+        if (!isAttachmentsAdded) {
+          Record[] attachments = AttachmentFetcherPopup.fetchAttachments(parentMsgLinks);
+          parentObjLinks  = (Record[]) ArrayUtils.concatinate(parentObjLinks, attachments, Record.class);
+          isAttachmentsAdded = true;
+        }
+
         MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(parentObjLinks, MsgLinkRecord.class);
         FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(parentObjLinks, FileLinkRecord.class);
         FolderPair[] folderPairs = (FolderPair[]) ArrayUtils.gatherAllOfType(parentObjLinks, FolderPair.class);
@@ -226,16 +236,40 @@ public class TraceTableModel extends RecordTableModel {
       }
 
       private void doStatRequestMsgOrFile(LinkRecordI[] links) {
+        // do request for non-attachments and attachments seperately
+        ArrayList linksAttachedL = new ArrayList();
+        ArrayList linksNotAttachedL = new ArrayList();
+        for (int i=0; i<links.length; i++) {
+          LinkRecordI link = links[i];
+          if (link.getOwnerObjType().shortValue() == Record.RECORD_TYPE_MESSAGE)
+            linksAttachedL.add(link);
+          else
+            linksNotAttachedL.add(link);
+        }
+        if (linksNotAttachedL.size() > 0)
+          doStatRequestMsgOrFile(linksNotAttachedL);
+        if (linksAttachedL.size() > 0)
+          doStatRequestMsgOrFile(linksAttachedL);
+      }
+      private void doStatRequestMsgOrFile(ArrayList linksL) {
+        LinkRecordI first = (LinkRecordI) linksL.get(0);
+        LinkRecordI[] links = null;
         Stats_Get_Rq request = new Stats_Get_Rq();
-        request.statsForObjType = new Short(links[0] instanceof MsgLinkRecord ? Record.RECORD_TYPE_MSG_LINK : Record.RECORD_TYPE_FILE_LINK);
-        request.objLinkIDs = RecordUtils.getIDs((Record[]) links);
-        if (links[0] instanceof MsgLinkRecord && ((MsgLinkRecord) links[0]).ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
+        if (first instanceof MsgLinkRecord) {
+          request.statsForObjType = new Short(Record.RECORD_TYPE_MSG_LINK);
+          links = (LinkRecordI[]) ArrayUtils.toArray(linksL, MsgLinkRecord.class);
+        } else {
+          request.statsForObjType = new Short(Record.RECORD_TYPE_FILE_LINK);
+          links = (LinkRecordI[]) ArrayUtils.toArray(linksL, FileLinkRecord.class);
+        }
+        request.objLinkIDs = RecordUtils.getIDs(linksL);
+        if (first.getOwnerObjType().shortValue() == Record.RECORD_TYPE_MESSAGE) {
           request.ownerObjType = new Short(Record.RECORD_TYPE_MESSAGE);
-          Long[] msgIDs = links[0].getOwnerObjIDs(links, Record.RECORD_TYPE_MESSAGE);
+          Long[] msgIDs = first.getOwnerObjIDs(links, Record.RECORD_TYPE_MESSAGE);
           request.ownerObjIDs = msgIDs;
         } else {
           request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
-          Long[] folderIDs = links[0].getOwnerObjIDs(links, Record.RECORD_TYPE_FOLDER);
+          Long[] folderIDs = first.getOwnerObjIDs(links, Record.RECORD_TYPE_FOLDER);
           Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderSharesMyForFolders(folderIDs, true));
           request.ownerObjIDs = shareIDs;
         }

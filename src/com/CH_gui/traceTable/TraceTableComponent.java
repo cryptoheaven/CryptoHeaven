@@ -12,7 +12,7 @@
 
 package com.CH_gui.traceTable;
 
-import com.CH_gui.gui.Template;
+import com.CH_cl.service.cache.CacheUtilities;
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.trace.Trace;
@@ -42,7 +42,7 @@ public class TraceTableComponent extends RecordTableComponent {
 
   /** Creates new TraceTableComponent */
   public TraceTableComponent(Record[] parentObjLinks) {
-    super(parentObjLinks != null && parentObjLinks.length > 1 ?  new TraceActionMultiTable(parentObjLinks) : new TraceActionTable(parentObjLinks), Template.get(Template.NONE));
+    super(parentObjLinks != null && (parentObjLinks.length > 1 || CacheUtilities.hasAttachments(parentObjLinks[0])) ?  new TraceActionMultiTable(parentObjLinks) : new TraceActionTable(parentObjLinks), Template.get(Template.NONE));
     initialize(parentObjLinks);
   }
   private void initialize(Record[] parentObjLinks) {

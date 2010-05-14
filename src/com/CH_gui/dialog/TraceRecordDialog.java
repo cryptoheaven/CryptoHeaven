@@ -24,9 +24,9 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_gui.action.*;
 import com.CH_gui.actionGui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.msgs.AttachmentFetcherPopup;
 import com.CH_gui.traceTable.*;
 
 /** 
@@ -106,13 +106,13 @@ public class TraceRecordDialog extends GeneralDialog implements VisualsSavable {
     if (parentObjLinks.length == 1) {
       JLabel label = new JMyLabel(ListRenderer.getRenderedText(parentObjLinks[0]));
       label.setIcon(ListRenderer.getRenderedIcon(parentObjLinks[0]));
-      panel.add(label, new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+      panel.add(label, new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
       posY ++;
     }
 
     TraceTableComponent traceComponent = new TraceTableComponent(parentObjLinks);
-    panel.add(traceComponent, new GridBagConstraints(0, posY, 3, 1, 10, 10, 
+    panel.add(traceComponent, new GridBagConstraints(0, posY, 3, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 5, 5), 0, 0));
     posY ++;
 

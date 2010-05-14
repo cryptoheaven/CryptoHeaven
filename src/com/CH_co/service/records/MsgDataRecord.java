@@ -141,6 +141,16 @@ public class MsgDataRecord extends Record {
     if (trace != null) trace.exit(MsgDataRecord.class);
   }
 
+  public boolean hasAttachments() {
+    return getAttachmentCount() > 0;
+  }
+
+  public int getAttachmentCount() {
+    int numFiles = attachedFiles != null ? attachedFiles.shortValue() : 0;
+    int numMsgs = attachedMsgs != null ? attachedMsgs.shortValue() : 0;
+    return numFiles + numMsgs;
+  }
+
   public Long getId() {
     return msgId;
   }
