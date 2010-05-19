@@ -92,7 +92,7 @@ public class FileUtils extends Object {
 
         String msg = "Exception occurred while downloading file.  The temporary file that was partially written is " + fileName + "  This error is not recoverable, the temporary file will be erased. \n\nException message is: " + ioEx.getMessage();
         String title = "Error Downloading File";
-        MessageDialog.showErrorDialog(null, msg, title, true);
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
       }
 
       // when error occurred, remove partially written file
@@ -172,7 +172,7 @@ public class FileUtils extends Object {
 
               String msg = "Exception occurred while serializing file " + fileName + "  This error is not recoverable, the aciton was terminated. \n\nException message is: " + exceptionStr;
               String title = "Error Uploading File";
-              MessageDialog.showErrorDialog(null, msg, title);
+              NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
             }
           } catch (Throwable t) {
             if (trace != null) trace.exception(getClass(), 100, t);

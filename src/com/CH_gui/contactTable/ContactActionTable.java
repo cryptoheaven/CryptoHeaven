@@ -12,6 +12,9 @@
 
 package com.CH_gui.contactTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.ActionUtils;
 import javax.swing.*;
 import java.awt.event.*;
@@ -34,8 +37,8 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 import com.CH_cl.tree.*;
 
-import com.CH_co.gui.JMyLabel;
-import com.CH_co.gui.MyInsets;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -763,7 +766,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           chatOrShareSpace(ContactActionTable.this, _selectedRecords, useSelected, isChat, folderType);
         }
       };
-      MessageDialog.showDialogYesNo(this, panel, "User account required.", MessageDialog.QUESTION_MESSAGE, true, yesAction, noAction);
+      MessageDialog.showDialogYesNo(this, panel, "User account required.", NotificationCenter.QUESTION_MESSAGE, true, yesAction, noAction);
     } else {
       chatOrShareSpace(ContactActionTable.this, selectedRecords, useSelected, isChat, folderType);
     }

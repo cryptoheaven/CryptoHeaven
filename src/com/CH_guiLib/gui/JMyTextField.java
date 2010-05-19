@@ -12,7 +12,7 @@
 
 package com.CH_guiLib.gui;
 
-import com.CH_co.gui.JMyLabel;
+import com.CH_gui.gui.JMyLabel;
 import com.CH_co.util.MiscGui;
 
 import java.awt.*;

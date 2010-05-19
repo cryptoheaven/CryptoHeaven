@@ -10,10 +10,10 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.gui;
+package com.CH_gui.gui;
 
 import java.awt.*;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import com.CH_co.util.MiscGui;
 
@@ -29,38 +29,40 @@ import com.CH_co.util.MiscGui;
  * Class Details:
  *
  *
- * <b>$Revision: 1.6 $</b>
+ * <b>$Revision: 1.5 $</b>
  * @author  Marcin Kurzawa
  * @version
  */
-public class JMyTextArea extends JTextArea {
+public class JMyLabel extends JLabel {
 
-  /** Creates new JMyTextArea */
-  public JMyTextArea(String s, int rows, int columns) {
-    super(s, rows, columns);
-    MiscGui.initKeyBindings(this);
-    setTabSize(4);
+  /** Creates new JMyLabel */
+  public JMyLabel() {
   }
 
-  /** Creates new JMyTextArea */
-  public JMyTextArea(int rows, int columns) {
-    super(rows, columns);
-    MiscGui.initKeyBindings(this);
-    setTabSize(4);
+  /** Creates new JMyLabel */
+  public JMyLabel(String text) {
+    super(text);
   }
 
-  /** Creates new JMyTextArea */
-  public JMyTextArea(String s) {
-    super(s);
-    MiscGui.initKeyBindings(this);
-    setTabSize(4);
+  public JMyLabel(String text, float fontRelativeSize) {
+    super(text);
+    Font font = getFont();
+    setFont(font.deriveFont((float) (font.getSize()+fontRelativeSize)));
   }
 
-  /** Creates new JMyTextArea */
-  public JMyTextArea() {
-    super();
-    MiscGui.initKeyBindings(this);
-    setTabSize(4);
+  /** Creates new JMyLabel */
+  public JMyLabel(String text, int horizontalAlignment) {
+    super(text, horizontalAlignment);
+  }
+
+  /** Creates new JMyLabel */
+  public JMyLabel(String text, Icon image, int horizontalAlignment) {
+    super(text, image, horizontalAlignment);
+  }
+
+  /** Creates new JMyLabel */
+  public JMyLabel(Icon image) {
+    super(image);
   }
 
   public void paint(Graphics g) {

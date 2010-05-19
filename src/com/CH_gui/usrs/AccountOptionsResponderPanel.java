@@ -12,6 +12,11 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;

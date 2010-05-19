@@ -500,7 +500,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       Long uId = cache.getMyUserId();
       if (uId != null && uId.longValue() < 100) {
-        MessageDialog.showWarningDialog(null, messageText, title, false);
+        NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, messageText);
         System.out.println(title);
         System.out.println(messageText);
         System.out.println();
@@ -1778,9 +1778,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // If client with no prior login encounters a connection exception, it has to exit.
           if (isClient && lastLoginMessageAction == null && t instanceof SILConnectionException) {
             destroyServer();
-            MessageDialog.showErrorDialog(null, t.getMessage(), "Error", true);
-            //MessageDialog.showErrorDialog(null, t.getMessage() + "<p>Click OK to exit.", "Error", true);
-            //Misc.systemExit(-1);
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Error", t.getMessage(), true);
           }
           // Delay before we do anything with re-connectivity.
           try { Thread.sleep(DELAY_NEW_CONNECTION_AFTER_NET_ERROR); } catch (InterruptedException e) { }

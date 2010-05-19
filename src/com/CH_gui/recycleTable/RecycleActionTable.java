@@ -12,6 +12,8 @@
 
 package com.CH_gui.recycleTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -615,7 +617,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 
       Record[] toDelete = RecordUtils.concatinate(folderPairs, fileLinks);
       toDelete = RecordUtils.concatinate(toDelete, msgLinks);
-      confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, toDelete, MessageDialog.DELETE_MESSAGE, false);
+      confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, toDelete, NotificationCenter.DELETE_MESSAGE, false);
       if (confirmed == true) {
         if (fileLinks != null && fileLinks.length > 0) {
           Long[] fileIDs = RecordUtils.getIDs(fileLinks);

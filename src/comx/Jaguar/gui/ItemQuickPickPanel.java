@@ -6,6 +6,8 @@
 
 package comx.Jaguar.gui;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -93,7 +95,7 @@ public class ItemQuickPickPanel extends JPanel {
 
     Dimension singleComponentSize = new Dimension(27, 27);
     for (int i=0; i<emotions.length; i++) {
-      Icon icon = com.CH_co.util.Images.get(emotions[i]);
+      Icon icon = com.CH_gui.util.Images.get(emotions[i]);
       JLabel jIcon = new JMyLabel(icon);
       SingleComponentPane pn = new SingleComponentPane(Color.white, jIcon, new Integer(i), singleComponentSize);
       p.add(pn);

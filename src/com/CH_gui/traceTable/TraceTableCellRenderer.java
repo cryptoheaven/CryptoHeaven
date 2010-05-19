@@ -12,6 +12,7 @@
 
 package com.CH_gui.traceTable;
 
+import com.CH_gui.util.Images;
 import java.awt.*;
 import java.sql.Timestamp;
 import javax.swing.JTable;

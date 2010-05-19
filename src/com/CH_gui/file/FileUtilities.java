@@ -12,6 +12,8 @@
 
 package com.CH_gui.file;
 
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import java.util.*;
 
 import com.CH_gui.frame.MainFrame;
@@ -166,7 +168,7 @@ public class FileUtilities extends Object {
     if (trace != null) trace.args(newName, record);
 
     record.setFileName(newName);
-    record.setFileType((String) MiscGui.getFileIconAndType(newName)[1]);
+    record.setFileType(MiscGui.getFileType(newName));
     record.seal();
 
     ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();

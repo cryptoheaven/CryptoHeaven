@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.util;
+package com.CH_gui.util;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -23,6 +23,11 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 
 import com.CH_co.trace.*;
+import com.CH_co.util.BrowserLauncher;
+import com.CH_co.util.HTML_utils;
+import com.CH_co.util.MiscGui;
+import com.CH_co.util.URLLauncher;
+import com.CH_co.util.URLs;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -60,15 +65,15 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
 
   private Component rendererContainer;
 
-  public HTML_ClickablePane(HTMLEditorKit editorKit) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "HTML_ClickablePane()");
-    setContentType("text/html");
-    if (editorKit != null)
-      setEditorKit(editorKit);
-    setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+"> </body></html>");
-    init(true);
-    if (trace != null) trace.exit(HTML_ClickablePane.class);
-  }
+//  public HTML_ClickablePane(HTMLEditorKit editorKit) {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "HTML_ClickablePane()");
+//    setContentType("text/html");
+//    if (editorKit != null)
+//      setEditorKit(editorKit);
+//    setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+"> </body></html>");
+//    init(true);
+//    if (trace != null) trace.exit(HTML_ClickablePane.class);
+//  }
   /** Creates new HTML_ClickablePane */
   private HTML_ClickablePane(URL startURL, HTMLEditorKit editorKit) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "HTML_ClickablePane()");
@@ -102,43 +107,6 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
 
 
   /**
-   * To fetch a HTML_ClickablePane from a URL, use this method specifying maximum time you are willing to wait...
-   * @param url is the address of page to be loaded.
-   * @param maxWaitMillis Maximum number of milliseconds caller is willing to wait for the url to load, 0 for unlimited
-   * @return loaded HTML_ClickablePane or null if load failed or takes too long
-   */
-  public static HTML_ClickablePane createNewAndLoaded(final URL url, int maxWaitMillis) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "createNewAndLoaded(final URL url, int maxWaitMillis)");
-    if (trace != null) trace.args(url);
-    if (trace != null) trace.args(maxWaitMillis);
-    HTML_ClickablePane pane = null;
-    final Object[] returnBuffer = new Object[1];
-    Thread fetcher = new ThreadTraced("HTML_ClickablePane URL fetcher 1") {
-      public void runTraced() {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "HTML_ClickablePane.createNewAndLoaded.runTraced()");
-        try {
-          HTML_ClickablePane returnPane = new HTML_ClickablePane(url, null);
-          returnPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-          returnPane.setBackground(Color.white);
-          returnBuffer[0] = returnPane;
-        } catch (IOException x) {
-          if (trace != null) trace.exception(getClass(), 100, x);
-        }
-        if (trace != null) trace.exit(getClass());
-      }
-    };
-    fetcher.setDaemon(true);
-    fetcher.start();
-    try {
-      fetcher.join(maxWaitMillis);
-    } catch (InterruptedException e) {
-    }
-    pane = (HTML_ClickablePane) returnBuffer[0];
-    if (trace != null) trace.exit(HTML_ClickablePane.class, pane);
-    return pane;
-  }
-
-  /**
    * To fetch a HTML_ClickablePane from a URL, use this method to immediately
    * return a component that will become loaded in a background thread.
    * @param url is the address of page to be loaded.
@@ -156,19 +124,22 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     if (returnPane != null) {
       returnPane.setBorder(new EmptyBorder(0, 0, 0, 0));
       returnPane.setBackground(Color.white);
-      Thread fetcher = new ThreadTraced("HTML_ClickablePane URL fetcher 2") {
-        public void runTraced() {
-          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "HTML_ClickablePane.createNewAndLoading.runTraced()");
-          try {
-            returnPane.setPage(url);
-          } catch (IOException x) {
-            if (trace != null) trace.exception(getClass(), 100, x);
+      if (url != null) {
+        Thread fetcher = new ThreadTraced("HTML_ClickablePane URL fetcher 2") {
+          public void runTraced() {
+            Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "HTML_ClickablePane.createNewAndLoading.runTraced()");
+            try {
+              if (trace != null) trace.data(10, url);
+              returnPane.setPage(url);
+            } catch (IOException x) {
+              if (trace != null) trace.exception(getClass(), 100, x);
+            }
+            if (trace != null) trace.exit(getClass());
           }
-          if (trace != null) trace.exit(getClass());
-        }
-      };
-      fetcher.setDaemon(true);
-      fetcher.start();
+        };
+        fetcher.setDaemon(true);
+        fetcher.start();
+      }
     }
     if (trace != null) trace.exit(HTML_ClickablePane.class, returnPane);
     return returnPane;

@@ -27,7 +27,6 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import java.awt.Component;
 import java.io.File;
 import java.security.*;
 import java.util.*;
@@ -401,19 +400,6 @@ public class UserOps extends Object {
         sender = new EmailAddressRecord(senderEmailShort);
     }
     return new Object[] { sender, senderEmailShort, senderEmailFull };
-  }
-
-  public static boolean isShowWebAccountRestrictionDialog(Component parent) {
-    boolean isShow = false;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    UserRecord myUserRec = cache.getUserRecord();
-    if (myUserRec != null && myUserRec.isWebAccount()) {
-      String urlStr = "\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + myUserRec.userId + "\"";
-      String htmlText = "<html>This functionality is not available for complementary web accounts.  To upgrade your user account to a Premium Account click here <a href="+urlStr+">"+URLs.get(URLs.SIGNUP_PAGE)+"</a>. <p>Thank You.</html>";
-      MessageDialog.showWarningDialog(parent, htmlText, "Account Incapable", false);
-      isShow = true;
-    }
-    return isShow;
   }
 
   public static boolean sendPassRecoverySettings(ServerInterfaceLayer SIL, PassRecoveryRecord passRecoveryRecord) {

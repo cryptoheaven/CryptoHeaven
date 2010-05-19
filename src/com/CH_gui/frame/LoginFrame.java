@@ -17,7 +17,6 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
@@ -31,6 +30,7 @@ import com.CH_co.util.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 
@@ -633,30 +633,48 @@ public class LoginFrame extends JFrame {
    * Initiates last saved proxy settings.
    */
   private void initiateProxySettings() {
-    // Fetch Proxy settings
+    // Fetch Proxy settings -- use try-catch blocks incase properties are corrupted or blank
     try {
       proxyUsed = Boolean.valueOf(GlobalProperties.getProperty("ProxyUsed", "false"));
-
+    } catch (Throwable t) {
+      proxyUsed = Boolean.FALSE;
+    }
+    try {
       socksProxyUsed = Boolean.valueOf(GlobalProperties.getProperty("SocksProxyUsed", "false"));
       socksProxyAddress = GlobalProperties.getProperty("SocksProxyAddress", "");
       socksProxyPort = Integer.valueOf(GlobalProperties.getProperty("SocksProxyPort", "1080"));
-
+    } catch (Throwable t) {
+      socksProxyUsed = Boolean.FALSE;
+      socksProxyAddress = "";
+      socksProxyPort = new Integer(1080);
+    }
+    try {
       httpProxyUsed = Boolean.valueOf(GlobalProperties.getProperty("HttpProxyUsed", "false"));
       httpProxyAddress = GlobalProperties.getProperty("HttpProxyAddress", "");
       httpProxyPort = Integer.valueOf(GlobalProperties.getProperty("HttpProxyPort", "80"));
-
+    } catch (Throwable t) {
+      httpProxyUsed = Boolean.FALSE;
+      httpProxyAddress = "";
+      httpProxyPort = new Integer(80);
+    }
+    try {
       proxyAuthentication = Boolean.valueOf(GlobalProperties.getProperty("ProxyAuthentication", "false"));
       proxyUsername = GlobalProperties.getProperty("ProxyUsername", "");
       proxyPassword = GlobalProperties.getProperty("ProxyPassword", "");
-
+    } catch (Throwable t) {
+      proxyAuthentication = Boolean.FALSE;
+      proxyUsername = "";
+      proxyPassword = "";
+    }
+    try {
       // enable proxy usage if any proxy type is selected to make it compatible with old client versions
       if (proxyUsed.equals(Boolean.FALSE)) {
         if (socksProxyUsed.equals(Boolean.TRUE) || httpProxyUsed.equals(Boolean.TRUE))
           proxyUsed = Boolean.TRUE;
       }
-
-      if (proxyUsed.booleanValue())
+      if (proxyUsed.booleanValue()) {
         applyProxySettings();
+      }
     } catch (Throwable t) {
     }
   }

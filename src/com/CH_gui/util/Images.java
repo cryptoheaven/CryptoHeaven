@@ -10,17 +10,19 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.util;
+package com.CH_gui.util;
+
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.net.URL;
-import javax.swing.ImageIcon;
-
-import com.CH_co.trace.Trace;
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.swing.ImageIcon;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -46,16 +48,12 @@ public class Images extends Object {
     imageIcons = new ImageIcon[ImageNums.NUMBER_OF_IMAGES];
   }
 
-  public static void printUnusedIconNames() {
+  private static void printUnusedIconNames() {
     Collection unUsedIconNames = ImageNums.getUnusedImageNames();
     Iterator iter = unUsedIconNames.iterator();
     while (iter.hasNext()) {
       System.out.println(iter.next());
     }
-  }
-
-  public static void clearImageCache(int imageCode) {
-    imageIcons[imageCode] = null;
   }
 
   public static ImageIcon get(String name) {
@@ -82,7 +80,7 @@ public class Images extends Object {
     } else if (imageCode == ImageNums.IMAGE_SPECIAL_HANDLING) {
       throw new IllegalArgumentException("Image code needs special handling.");
     } else {
-      if (imageIcons[imageCode] == null) {
+      if (imageIcons[imageCode] == null || ImageNums.isImageUpdated(imageCode)) {
         String fileName = null;
         URL location = null;
         try {
@@ -112,20 +110,24 @@ public class Images extends Object {
           }
           if (location != null) {
             imageIcons[imageCode] = new ImageIcon(location);
+            ImageNums.resetImageUpdated(imageCode);
           }
           if (isShared) {
-            // add a small share hand to the icon
-            ImageIcon shareHandSmallImage = get(ImageNums.SHARE_HAND_L, false);
-            int newHeight = imageIcons[imageCode].getIconHeight() + 2;
-            BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-            Graphics2D g = total.createGraphics();
-            g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
-            double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
-            double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
-            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
-            xform.translate(0.0, moveDownBy);
-            g.drawImage(shareHandSmallImage.getImage(), xform, null);
-            imageIcons[imageCode] = new ImageIcon(total);
+            // only modify the icon if we have the base image loaded
+            if (imageIcons[imageCode] != null) {
+              // add a small share hand to the icon
+              ImageIcon shareHandSmallImage = get(ImageNums.SHARE_HAND_L, false);
+              int newHeight = imageIcons[imageCode].getIconHeight() + 2;
+              BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+              Graphics2D g = total.createGraphics();
+              g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
+              double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
+              double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
+              AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
+              xform.translate(0.0, moveDownBy);
+              g.drawImage(shareHandSmallImage.getImage(), xform, null);
+              imageIcons[imageCode] = new ImageIcon(total);
+            }
           }
         } catch (Throwable t) {
           t.printStackTrace();

@@ -12,6 +12,7 @@
 
 package com.CH_gui.util;
 
+import com.CH_gui.gui.JMyLabel;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;

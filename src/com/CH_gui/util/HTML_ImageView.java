@@ -9,9 +9,10 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Development Team.
  */
-package com.CH_co.util;
+package com.CH_gui.util;
 
 import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.ImageObserver;

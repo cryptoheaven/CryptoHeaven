@@ -12,6 +12,8 @@
 
 package com.CH_gui.print;
 
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -225,7 +227,7 @@ public class PrintPreview extends JDialog {
       dispose();
     } else if (m_target instanceof DocumentRenderer) {
       if (((DocumentRenderer) m_target).scaledDownWarning)
-        com.CH_co.util.MessageDialog.showInfoDialog(this, "Original document formatting is wider than page size.  Document was scaled down to fit on the page.  You may consider reducing margins or changing page orientation.", "Document scaled", false);
+        com.CH_gui.util.MessageDialog.showInfoDialog(this, "Original document formatting is wider than page size.  Document was scaled down to fit on the page.  You may consider reducing margins or changing page orientation.", "Document scaled", false);
     }
   }
 

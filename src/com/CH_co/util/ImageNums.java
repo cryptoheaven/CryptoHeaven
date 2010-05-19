@@ -457,6 +457,7 @@ public class ImageNums extends Object {
   public static final int IMAGE_SPECIAL_HANDLING = -2;
 
   private static final String[] images;
+  private static final boolean[] imageUpdated;
   private static final int[] emotions;
 
   private static final HashSet unUsedIconNames = new HashSet();
@@ -471,6 +472,7 @@ public class ImageNums extends Object {
   static {
     int i = 0;
     images = new String[321+50]; // plus emotions
+    imageUpdated = new boolean[images.length];
 
 
     /******************************************************************
@@ -1543,6 +1545,14 @@ public class ImageNums extends Object {
 
   public static void setImageName(int imageCode, String name) {
     images[imageCode] = name;
+    imageUpdated[imageCode] = true;
+  }
+
+  public static boolean isImageUpdated(int imageCode) {
+    return imageUpdated[imageCode];
+  }
+  public static void resetImageUpdated(int imageCode) {
+    imageUpdated[imageCode] = false;
   }
 
   public static ArrayList getUnusedImageNames() {

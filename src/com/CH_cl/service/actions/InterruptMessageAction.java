@@ -82,7 +82,7 @@ public class InterruptMessageAction extends ClientMessageAction {
                 + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
           } 
           Integer key = new Integer(actionCode);
-          new SingleDialogShower(singleInterruptedDialogArbiter, key, null, MessageDialog.ERROR_MESSAGE, title, msg).start();
+          NotificationCenter.show(singleInterruptedDialogArbiter, key, NotificationCenter.ERROR_MESSAGE, title, msg);
         } else {
           if (trace != null) trace.data(100, "suppress interrupt msg");
         }

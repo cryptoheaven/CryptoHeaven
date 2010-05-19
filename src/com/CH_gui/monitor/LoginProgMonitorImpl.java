@@ -12,6 +12,9 @@
 
 package com.CH_gui.monitor;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import javax.swing.*;
 
 import java.awt.*;
@@ -21,6 +24,8 @@ import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import com.CH_gui.gui.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -38,7 +43,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
+public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
 
   private String title;
 
@@ -48,16 +53,16 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
   private JLabel jStatus;
   private JProgressBar jProgressBar;
 
-  /** Creates new LoginProgMonitor */
-  public LoginProgMonitor() {
+  /** Creates new LoginProgMonitorImpl */
+  public LoginProgMonitorImpl() {
   }
 
   /**
-   * Creates new LoginProgMonitor
+   * Creates new LoginProgMonitorImpl
    * Every task takes 4 steps, start send, done send, start receive, done receive.
    */
   public void init(String title, String[] tasks) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "init(String title, String[] tasks)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "init(String title, String[] tasks)");
     if (trace != null) trace.args(title, tasks);
 
     this.title = title;
@@ -79,7 +84,7 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
     Dimension screenDimension = MiscGui.getScreenUsableSize(0, 0, this);
     setLocation(screenDimension.width/2 - dimension.width/2, screenDimension.height/2 - dimension.height/2);
     setVisible(true);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
 
   private void initPanelComponents(String[] tasks, int initProgBarMin, int initProgBarMax) {
@@ -149,14 +154,14 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
 
 
   public void closeProgMonitor() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "closeProgMonitor()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "closeProgMonitor()");
     ProgMonitorPool.removeProgMonitor(this);
     Stats.stopGlobe(this);
 
     setVisible(false);
     MiscGui.removeAllComponentsAndListeners(this);
     dispose();
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
 
 
@@ -178,63 +183,63 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
   public void startSend(int actionCode, long stamp) {
   }
   public void startSendAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "startSendAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "startSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     setCurrentStatus("Requesting: " + actionName + " ... ");
     progressValue ++;
     jProgressBar.setValue(progressValue);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void startSendData(String dataName) {
   }
   public void doneSend(int actionCode, long stamp) {
   }
   public void doneSendAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "doneSendAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "doneSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     setCurrentStatus("Requesting: " + actionName + ", waiting for reply...");
     progressValue ++;
     jProgressBar.setValue(progressValue);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void doneSendData(String dataName) {
   }
   public void startReceive(int actionCode, long stamp) {
   }
   public void startReceiveAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "startReceiveAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "startReceiveAction(String actionName)");
     if (trace != null) trace.args(actionName);
     setCurrentStatus("Receiving: " + actionName + " ... ");
     progressValue ++;
     jProgressBar.setValue(progressValue);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void startReceiveData(String dataName) {
   }
   public void doneReceive(int actionCode, long stamp) {
   }
   public void doneReceiveAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "doneReceiveAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "doneReceiveAction(String actionName)");
     if (trace != null) trace.args(actionName);
     setCurrentStatus("Receiving: " + actionName + " ... done.");
     progressValue ++;
     jProgressBar.setValue(progressValue);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void doneReceiveData(String dataName) {
   }
   public void startExecution(int actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "startExecution(int actionCode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "startExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     String actionName = MessageActionNameSwitch.getActionInfoName(actionCode);
     setCurrentStatus("Executing: " + actionName + " ... ");
     progressValue ++;
     jProgressBar.setValue(progressValue);
     Stats.setStatus("Executing reply ... [" + actionName + "]");
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void doneExecution(int actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "doneExecution(int actionCode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "doneExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     String actionName = MessageActionNameSwitch.getActionInfoName(actionCode);
     setCurrentStatus("Executing: " + actionName + " ... done.");
@@ -242,7 +247,7 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
     jProgressBar.setValue(progressValue);
     Stats.setStatus("Action completed. [" + actionName + "]");
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void setCurrentStatus(String currentStatus) {
     jStatus.setText(currentStatus);
@@ -258,7 +263,7 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
   public void doneTransfer() {
   }
   public void nextTask() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "nextTask()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "nextTask()");
     if (currentTask >= 0 && currentTask < jCheckTasks.length) {
       MiscGui.setPlainFont(jCheckTasks[currentTask]);
       jCheckTasks[currentTask].setSelected(true);
@@ -269,29 +274,29 @@ public class LoginProgMonitor extends JFrame implements ProgMonitorLoginI {
       MiscGui.setBoldFont(jCheckTasks[currentTask]);
       setTitle(title + ": " + jCheckTasks[currentTask].getText());
     }
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   } // end nextTask()
 
   public void allDone() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "allDone()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "allDone()");
     allDone = true;
     setTitle(title + ": " + "Done");
     closeProgMonitor();
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   } // end allDone()
 
   public void jobKilled() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "jobKilled()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "jobKilled()");
     killed = true;
     setCurrentStatus("Failed: Waiting to retry...");
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void jobForRetry() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitor.class, "jobForRetry()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "jobForRetry()");
     setCurrentStatus("Job Queued for Retry");
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(LoginProgMonitor.class);
+    if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
 
   public void setInterrupt(Interruptible interruptible) {

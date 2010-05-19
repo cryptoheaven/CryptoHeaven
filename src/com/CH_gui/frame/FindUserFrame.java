@@ -12,6 +12,7 @@
 
 package com.CH_gui.frame;
 
+import com.CH_gui.gui.JMyButton;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;

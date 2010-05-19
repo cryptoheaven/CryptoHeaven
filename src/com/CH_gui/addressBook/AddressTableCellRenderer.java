@@ -12,6 +12,7 @@
 
 package com.CH_gui.addressBook;
 
+import com.CH_gui.util.Images;
 import java.awt.*;
 import javax.swing.*;
 

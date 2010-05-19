@@ -56,8 +56,9 @@ public class ErrorBandwidthExceeded extends ClientMessageAction {
       pm.jobKilled();
 
     Str_Rp reply = (Str_Rp) getMsgDataSet();
+    String title = "Bandwidth Limit Exceeded";
     String msg = reply.message;
-    MessageDialog.showErrorDialog(null, msg, "Bandwidth Limit Exceeded");
+    NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
 
     if (trace != null) trace.exit(ErrorBandwidthExceeded.class, null);
     return null;

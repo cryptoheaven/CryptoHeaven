@@ -12,6 +12,12 @@
 
 package com.CH_gui.folder;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -446,7 +452,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
         String warnMsg = com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_folder_sharing_permission_disabled...");
         warnMsg += "\n\n" + sb.toString();
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission.");
-        MessageDialog.showDialog(FolderSharingPanel.this, warnMsg, title, MessageDialog.WARNING_MESSAGE, false);
+        MessageDialog.showDialog(FolderSharingPanel.this, warnMsg, title, NotificationCenter.WARNING_MESSAGE, false);
       }
 
       contacts = (MemberContactRecordI[]) ArrayUtils.getDifference(contacts, noFldShareContacts);

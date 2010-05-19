@@ -381,7 +381,7 @@ public class FetchedDataCache extends Object {
       StringBuffer errorBuffer = new StringBuffer();
       userSettingsRecord.unSeal(kRec, errorBuffer);
       if (errorBuffer.length() > 0)
-        MessageDialog.showErrorDialog(null, errorBuffer.toString(), "Invalid Settings");
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errorBuffer.toString());
     }
 
     synchronized (this) {
@@ -1783,7 +1783,7 @@ public class FetchedDataCache extends Object {
         records = (KeyRecord[]) RecordUtils.merge(keyRecordMap, records);
       }
       if (errorBuffer.length() > 0)
-        MessageDialog.showErrorDialog(null, errorBuffer.toString(), "Invalid Settings");
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errorBuffer.toString());
       fireKeyRecordUpdated(records, RecordEvent.SET);
     }
 

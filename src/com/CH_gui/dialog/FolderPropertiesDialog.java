@@ -12,6 +12,8 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.Images;
+import com.CH_cl.service.actions.ClientMessageAction;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -20,13 +22,11 @@ import javax.swing.border.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.fld.*;
@@ -38,8 +38,9 @@ import com.CH_gui.file.FileUtilities;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.folder.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
-import com.CH_gui.list.*;
 import com.CH_gui.service.records.RecordUtilsGui;
 
 /** 
@@ -525,9 +526,9 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
         }
         if (errorSB.length() > 0) {
           if (anythingToDo)
-            anythingToDo = MessageDialog.showDialogYesNo(null, errorSB.toString(), "Insufficient privileges...", MessageDialog.WARNING_MESSAGE);
+            anythingToDo = MessageDialog.showDialogYesNo(null, errorSB.toString(), "Insufficient privileges...", NotificationCenter.WARNING_MESSAGE);
           else
-            MessageDialog.showDialog(null, errorSB.toString(), "Insufficient privileges...", MessageDialog.ERROR_MESSAGE, false);
+            MessageDialog.showDialog(null, errorSB.toString(), "Insufficient privileges...", NotificationCenter.ERROR_MESSAGE, false);
         }
 
         if (anythingToDo) {

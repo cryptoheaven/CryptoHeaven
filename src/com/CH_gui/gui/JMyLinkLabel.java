@@ -12,6 +12,7 @@
 
 package com.CH_gui.gui;
 
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;

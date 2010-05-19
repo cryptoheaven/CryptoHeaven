@@ -12,6 +12,11 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.ToolBarProducerI;
 import com.CH_gui.menuing.ToolBarModel;
 import javax.swing.*;

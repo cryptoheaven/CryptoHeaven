@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -15,7 +15,7 @@ package com.CH_gui.service.records;
 import com.CH_co.service.records.FileLinkRecord;
 import com.CH_co.service.records.Record;
 import com.CH_co.util.ImageNums;
-import com.CH_co.util.Images;
+import com.CH_gui.util.Images;
 import com.CH_co.util.MiscGui;
 import javax.swing.Icon;
 
@@ -37,7 +37,7 @@ public class RecordUtilsGui {
     if (iconIndex == ImageNums.IMAGE_SPECIAL_HANDLING) {
       if (rec instanceof FileLinkRecord) {
         String fileName = ((FileLinkRecord) rec).getFileName();
-        icon = fileName != null ? (Icon) MiscGui.getFileIconAndType(fileName)[0] : null;
+        icon = fileName != null ? MiscGui.getFileIcon(fileName) : null;
       }
     } else {
       icon = Images.get(iconIndex);

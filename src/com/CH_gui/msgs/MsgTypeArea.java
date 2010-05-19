@@ -12,6 +12,10 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.HTML_ClickablePane;
 import java.awt.*;
 import java.awt.event.*;
 

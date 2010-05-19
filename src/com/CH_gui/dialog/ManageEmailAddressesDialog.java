@@ -12,6 +12,9 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -24,7 +27,6 @@ import javax.swing.text.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -516,7 +518,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
       }
     });
     JButton[] optionButtons = new JButton[] { jOk, jCancel };
-    MessageDialog.showDialog(ManageEmailAddressesDialog.this, panel, title, MessageDialog.QUESTION_MESSAGE, optionButtons, null, false, false, false);
+    MessageDialog.showDialog(ManageEmailAddressesDialog.this, panel, title, NotificationCenter.QUESTION_MESSAGE, optionButtons, null, false, false, false);
     // modal vertion commented out
     //MessageDialog.showDialog(ManageEmailAddressesDialog.this, panel, title, MessageDialog.QUESTION_MESSAGE, optionButtons, null, true, false, false);
     return rcStr[0];

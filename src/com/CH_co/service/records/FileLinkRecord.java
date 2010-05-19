@@ -134,7 +134,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLinkRecord.class, "seal()");
 
     if (symmetricKey == null) {
-      MessageDialog.showErrorDialog(null, "Encryption key is not available.", "Error", false);
+      NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Error", "Encryption key is not available.");
     } else {
       try {
         // encrypt the file type and file name with symmetric key

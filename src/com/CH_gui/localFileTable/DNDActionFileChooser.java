@@ -12,6 +12,10 @@
 
 package com.CH_gui.localFileTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.beans.*;
@@ -33,6 +37,7 @@ import com.CH_gui.action.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.menuing.*;
 import com.CH_gui.msgTable.*;

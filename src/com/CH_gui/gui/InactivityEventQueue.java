@@ -23,7 +23,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.MessageDialog;
+import com.CH_gui.util.MessageDialog;
 import com.CH_gui.frame.MainFrame;
 
 /**

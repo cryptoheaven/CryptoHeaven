@@ -12,6 +12,9 @@
 
 package com.CH_gui.msgTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.HTML_ClickablePane;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
@@ -29,7 +32,6 @@ import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.gui.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.msg.*;
@@ -46,6 +48,7 @@ import com.CH_gui.dialog.*;
 import com.CH_gui.chatTable.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.postTable.*;
@@ -377,7 +380,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (msgLinks != null && msgLinks.length > 0) {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        boolean option = showConfirmationDialog(MsgActionTable.this, title, messageText, msgLinks, MessageDialog.RECYCLE_MESSAGE, true);
+        boolean option = showConfirmationDialog(MsgActionTable.this, title, messageText, msgLinks, NotificationCenter.RECYCLE_MESSAGE, true);
         if (option == true) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));

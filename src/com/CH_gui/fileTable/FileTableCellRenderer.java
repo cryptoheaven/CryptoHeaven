@@ -12,6 +12,7 @@
 
 package com.CH_gui.fileTable;
 
+import com.CH_gui.util.Images;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -76,12 +77,6 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
             }
           }
         }
-        if (icon == null) {
-          int typeColumn = JSortedTable.getColumnIndex(table.getModel(), com.CH_gui.lang.Lang.rb.getString("column_Type"));
-          String fileType = (String) table.getModel().getValueAt(row, typeColumn);
-          icon = MiscGui.getFileInternalIconForType(fileType);
-        }
-
         setIcon(icon);
 
         // Fix up the height of the row in case the file name needs more space.

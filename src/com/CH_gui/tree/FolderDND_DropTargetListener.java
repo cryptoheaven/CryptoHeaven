@@ -12,6 +12,7 @@
 
 package com.CH_gui.tree;
 
+import com.CH_gui.util.MessageDialog;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 

@@ -10,16 +10,17 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.util;
+package com.CH_gui.util;
+
+import com.CH_gui.gui.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.trace.Trace;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -39,30 +40,42 @@ import com.CH_co.trace.Trace;
  */
 public class MessageDialog extends Object {
 
-  public static final int QUESTION_MESSAGE = 9001;
-  public static final int INFORMATION_MESSAGE = 9002;
-  public static final int WARNING_MESSAGE = 9003;
-  public static final int ERROR_MESSAGE = 9004;
-  public static final int RECYCLE_MESSAGE = 9005;
-  public static final int DELETE_MESSAGE = 9006;
-  public static final int EMPTY_RECYCLE_FOLDER = 9007;
-  public static final int EMPTY_SPAM_FOLDER = 9008;
-
   /** Show dialog with "OK" button */
   public static void showDialog(Component parent, String messageText, String title, int messageType, boolean modal) {
     showDialog(parent, messageText, title, messageType, null, null, modal);
   }
+  public static void showDialog(final SingleTokenArbiter arbiter, final Object key, Component parent, String messageText, String title, int messageType) {
+    if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
+      final Object token = new Object();
+      if (arbiter.putToken(key, token)) {
+        final boolean[] tokenRemoved = new boolean[1];
+        DisposableObj disposable = new DisposableObj() {
+          public void disposeObj() {
+            // prevent multiple execution due to possible repetitions of events
+            if (!tokenRemoved[0]) {
+              arbiter.removeToken(key, token);
+              tokenRemoved[0] = true;
+            }
+          }
+        };
+        showDialog(parent, messageText, title, messageType, null, null, false, disposable);
+      }
+    }
+  }
   /**
-   * Shows the message dialog. If no buttons are specified, and 'defaultButtonAction' is specified, 
+   * Shows the message dialog. If no buttons are specified, and 'defaultButtonAction' is specified,
    * then it will be run when user clicks the default OK button.
    * @param buttons is optional
    * @return the dialog which is created and shown
    */
   public static JDialog showDialog(Component parent, String messageText, String title, int messageType, JButton[] buttons, boolean modal) {
-    return showDialog(parent, messageText, title, messageType, buttons, null, modal);
+    return showDialog(parent, messageText, title, messageType, buttons, null, modal, null);
   }
   public static JDialog showDialog(Component parent, String messageText, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, String messageText, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal)");
+    return showDialog(parent, messageText, title, messageType, buttons, defaultButtonAction, modal, null);
+  }
+  public static JDialog showDialog(Component parent, String messageText, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, DisposableObj disposable) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, String messageText, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, DisposableObj disposable)");
     if (trace != null) trace.args(parent, messageText, title);
     if (trace != null) trace.args(messageType);
     if (trace != null) trace.args(modal);
@@ -72,7 +85,7 @@ public class MessageDialog extends Object {
     if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
       Component message = prepareMessage(messageText);
       if (message != null) {
-        dialog = showDialog(parent, message, title, messageType, buttons, defaultButtonAction, modal);
+        dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, true, disposable);
       }
     }
 
@@ -81,23 +94,23 @@ public class MessageDialog extends Object {
   }
   public static JDialog showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal)");
-    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, true);
+    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, true, null);
     if (trace != null) trace.exit(MessageDialog.class, dialog);
     return dialog;
   }
   public static JDialog showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum)");
-    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, playSound, sizeBelowMaximum, true);
+    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, playSound, sizeBelowMaximum, true, null);
     if (trace != null) trace.exit(MessageDialog.class, dialog);
     return dialog;
   }
-  public static JDialog showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, int default_index, int default_cancel, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum, boolean sizeAboveMinimum) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum, boolean sizeAboveMinimum)");
+  public static JDialog showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, int default_index, int default_cancel, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum, boolean sizeAboveMinimum, final DisposableObj disposable) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum, boolean sizeAboveMinimum, DisposableObj disposable)");
 
     if (trace != null) trace.args(parent, message, title);
     if (trace != null) trace.args(messageType);
     if (trace != null) trace.args(modal);
-    if (trace != null) trace.args(buttons, defaultButtonAction);
+    if (trace != null) trace.args(buttons, defaultButtonAction, disposable);
 
     GeneralDialog dialog = null;
 
@@ -129,28 +142,28 @@ public class MessageDialog extends Object {
 
       JLabel icon = null;
       switch (messageType) {
-        case QUESTION_MESSAGE:
+        case NotificationCenter.QUESTION_MESSAGE:
           icon = new JMyLabel((Icon) UIManager.getLookAndFeelDefaults().get("OptionPane.questionIcon"));
           break;
-        case INFORMATION_MESSAGE:
+        case NotificationCenter.INFORMATION_MESSAGE:
           icon = new JMyLabel((Icon) UIManager.getLookAndFeelDefaults().get("OptionPane.informationIcon"));
           break;
-        case WARNING_MESSAGE:
+        case NotificationCenter.WARNING_MESSAGE:
           icon = new JMyLabel((Icon) UIManager.getLookAndFeelDefaults().get("OptionPane.warningIcon"));
           break;
-        case ERROR_MESSAGE:
+        case NotificationCenter.ERROR_MESSAGE:
           icon = new JMyLabel((Icon) UIManager.getLookAndFeelDefaults().get("OptionPane.errorIcon"));
           break;
-        case RECYCLE_MESSAGE:
+        case NotificationCenter.RECYCLE_MESSAGE:
           icon = new JMyLabel(Images.get(ImageNums.FLD_RECYCLE48));
           break;
-        case DELETE_MESSAGE:
+        case NotificationCenter.DELETE_MESSAGE:
           icon = new JMyLabel(Images.get(ImageNums.FILE_REMOVE48));
           break;
-        case EMPTY_RECYCLE_FOLDER:
+        case NotificationCenter.EMPTY_RECYCLE_FOLDER:
           icon = new JMyLabel(Images.get(ImageNums.FLD_RECYCLE_CLEAR48));
           break;
-        case EMPTY_SPAM_FOLDER:
+        case NotificationCenter.EMPTY_SPAM_FOLDER:
           icon = new JMyLabel(Images.get(ImageNums.FLD_CLEAR48));
           break;
       }
@@ -160,10 +173,10 @@ public class MessageDialog extends Object {
       panel.setLayout(new GridBagLayout());
 
       if (icon != null) {
-        panel.add(icon, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+        panel.add(icon, new GridBagConstraints(0, 0, 1, 1, 0, 0,
             GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(10, 10, 10, 10), 0, 0));
       }
-      panel.add(message, new GridBagConstraints(1, 0, 1, 1, 10, 10, 
+      panel.add(message, new GridBagConstraints(1, 0, 1, 1, 10, 10,
           GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(10, 10, 10, 10), 0, 0));
 
       if (parent instanceof Frame) {
@@ -200,6 +213,14 @@ public class MessageDialog extends Object {
       dialog.toFront(); // multiple attempts to bring this window to front, some platforms are buggy with this
       dialog.setVisible(true);
       dialog.toFront(); // multiple attempts to bring this window to front, some platforms are buggy with this
+
+      if (disposable != null) {
+        dialog.addWindowListener(new WindowAdapter() {
+          public synchronized void windowClosed(WindowEvent e) {
+            disposable.disposeObj();
+          }
+        });
+      }
     }
 
     if (trace != null) trace.exit(MessageDialog.class, dialog);
@@ -212,7 +233,7 @@ public class MessageDialog extends Object {
    * @return true if user clicks Yes, false for No .
    */
   public static boolean showDialogYesNo(Component parent, String messageText, String title) {
-    return showDialogYesNo(parent, messageText, title, QUESTION_MESSAGE);
+    return showDialogYesNo(parent, messageText, title, NotificationCenter.QUESTION_MESSAGE);
   }
   public static boolean showDialogYesNo(Component parent, String messageText, String title, int messageType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialogYesNo(Component parent, String messageText, String title, int messageType)");
@@ -229,7 +250,7 @@ public class MessageDialog extends Object {
     return rc;
   }
   public static boolean showDialogYesNo(Component parent, Component message, String title) {
-    return showDialogYesNo(parent, message, title, QUESTION_MESSAGE);
+    return showDialogYesNo(parent, message, title, NotificationCenter.QUESTION_MESSAGE);
   }
   public static boolean showDialogYesNo(Component parent, Component message, String title, int messageType) {
     return showDialogYesNo(parent, message, title, messageType, true, null, null);
@@ -260,9 +281,9 @@ public class MessageDialog extends Object {
         public void hierarchyChanged(HierarchyEvent e) {
           final Component c = e.getComponent();
           long changeFlags = e.getChangeFlags();
-          if ((changeFlags & (HierarchyEvent.SHOWING_CHANGED | HierarchyEvent.DISPLAYABILITY_CHANGED)) != 0 && 
-              c != null && 
-              c.isShowing()) 
+          if ((changeFlags & (HierarchyEvent.SHOWING_CHANGED | HierarchyEvent.DISPLAYABILITY_CHANGED)) != 0 &&
+              c != null &&
+              c.isShowing())
           {
             c.removeHierarchyListener(this);
             c.requestFocus();
@@ -282,7 +303,7 @@ public class MessageDialog extends Object {
       });
       JButton[] buttons = new JButton[] { yes, no };
       boolean sizeAboveMinimum = !(message instanceof JPanel);
-      showDialog(parent, message, title, messageType, buttons, 0, 1, null, modal, true, true, sizeAboveMinimum);
+      showDialog(parent, message, title, messageType, buttons, 0, 1, null, modal, true, true, sizeAboveMinimum, null);
     }
 
     if (trace != null) trace.exit(MessageDialog.class, option[0]);
@@ -292,47 +313,47 @@ public class MessageDialog extends Object {
 
   /* Show error dialog with "OK" button */
   public static void showErrorDialog(Component parent, String messageText, String title) {
-    showDialog(parent, messageText, title, ERROR_MESSAGE, false);
+    showDialog(parent, messageText, title, NotificationCenter.ERROR_MESSAGE, false);
   }
   /* Show error dialog with "OK" button */
   public static void showErrorDialog(Component parent, String messageText, String title, boolean modal) {
-    showDialog(parent, messageText, title, ERROR_MESSAGE, modal);
+    showDialog(parent, messageText, title, NotificationCenter.ERROR_MESSAGE, modal);
   }
   /* Show warning dialog with "OK" button */
   public static void showWarningDialog(Component parent, String messageText, String title) {
-    showDialog(parent, messageText, title, WARNING_MESSAGE, false);
+    showDialog(parent, messageText, title, NotificationCenter.WARNING_MESSAGE, false);
   }
   /* Show warning dialog with "OK" button */
   public static void showWarningDialog(Component parent, String messageText, String title, boolean modal) {
-    showDialog(parent, messageText, title, WARNING_MESSAGE, modal);
+    showDialog(parent, messageText, title, NotificationCenter.WARNING_MESSAGE, modal);
   }
   /* Show info dialog with "OK" button */
   public static void showInfoDialog(Component parent, String messageText, String title) {
-    showDialog(parent, messageText, title, INFORMATION_MESSAGE, false);
+    showDialog(parent, messageText, title, NotificationCenter.INFORMATION_MESSAGE, false);
   }
   /* Show info dialog with "OK" button */
   public static void showInfoDialog(Component parent, String messageText, String title, boolean modal) {
-    showDialog(parent, messageText, title, INFORMATION_MESSAGE, modal);
+    showDialog(parent, messageText, title, NotificationCenter.INFORMATION_MESSAGE, modal);
   }
 
 
   public static void playSound(int msgType) {
     try {
       switch (msgType) {
-        case ERROR_MESSAGE :
+        case NotificationCenter.ERROR_MESSAGE :
           Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
           break;
-        case WARNING_MESSAGE :
-        case EMPTY_RECYCLE_FOLDER :
-        case EMPTY_SPAM_FOLDER :
+        case NotificationCenter.WARNING_MESSAGE :
+        case NotificationCenter.EMPTY_RECYCLE_FOLDER :
+        case NotificationCenter.EMPTY_SPAM_FOLDER :
           Sounds.playAsynchronous(Sounds.DIALOG_WARN);
           break;
-        case INFORMATION_MESSAGE :
+        case NotificationCenter.INFORMATION_MESSAGE :
           Sounds.playAsynchronous(Sounds.DIALOG_INFO);
           break;
-        case QUESTION_MESSAGE :
-        case RECYCLE_MESSAGE :
-        case DELETE_MESSAGE :
+        case NotificationCenter.QUESTION_MESSAGE :
+        case NotificationCenter.RECYCLE_MESSAGE :
+        case NotificationCenter.DELETE_MESSAGE :
           Sounds.playAsynchronous(Sounds.DIALOG_QUESTION);
           break;
       }

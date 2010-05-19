@@ -15,8 +15,9 @@ package com.CH_co.util;
 import com.CH_co.cryptx.Rnd;
 import com.CH_co.io.FileUtils;
 import com.CH_co.io.RandomInputStream;
+import com.CH_co.lang.LangCo;
 import com.CH_co.monitor.ProgMonitorI;
-import java.awt.Component;
+
 import java.io.*;
 
 /** 
@@ -25,7 +26,7 @@ import java.io.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -33,7 +34,7 @@ import java.io.*;
  *
  * <b>$Revision: 1.10 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class CleanupAgent extends Thread {
 
@@ -193,14 +194,15 @@ public class CleanupAgent extends Thread {
     return wipe(file, new RandomInputStream(Rnd.getSecureRandom()), null, null);
   }
 
-  public static boolean wipe(File file, InputStream randomIn, Component parent, ProgMonitorI progMonitor) {
+  public static boolean wipe(File file, InputStream randomIn, ProgMonitorI progMonitor, StringBuffer errBuffer) {
     boolean rc = false;
     try {
       if (file.isFile()) {
         // overwrite contents
         if (!file.canWrite()) {
-          if (parent != null) {
-            MessageDialog.showErrorDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_You_do_not_have_a_write_privilege_neccessary_to_wipe_the_contents_of_the_file_\n") + file.getAbsolutePath(), com.CH_gui.lang.Lang.rb.getString("msgTitle_Wipe_Error"));
+          if (errBuffer != null) {
+            errBuffer.append(LangCo.rb.getString("msg_You_do_not_have_a_write_privilege_neccessary_to_wipe_the_contents_of_the_file_\n") + file.getAbsolutePath());
+            errBuffer.append("\n\n");
           }
         }
         else {
@@ -215,7 +217,7 @@ public class CleanupAgent extends Thread {
       else if (file.isDirectory()) {
         File[] files = file.listFiles();
         for (int i=0; i<files.length; i++) {
-          if (!wipe(files[i], randomIn, parent, progMonitor))
+          if (!wipe(files[i], randomIn, progMonitor, errBuffer))
             break;
         }
       }
@@ -224,9 +226,9 @@ public class CleanupAgent extends Thread {
 
       String task = null;
       if (file.isFile())
-        task = com.CH_gui.lang.Lang.rb.getString("task_Deleting_File") + " ";
+        task = LangCo.rb.getString("task_Deleting_File") + " ";
       else
-        task = com.CH_gui.lang.Lang.rb.getString("task_Deleting_Directory") + " ";
+        task = LangCo.rb.getString("task_Deleting_Directory") + " ";
 
       if (progMonitor != null) {
         progMonitor.setCurrentStatus(task + file.getName());
@@ -242,8 +244,9 @@ public class CleanupAgent extends Thread {
 
     } catch (Throwable t) {
       rc = false;
-      if (parent != null) {
-        MessageDialog.showErrorDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Error_occurred_while_attempting_to_securely_wipe_the_contents_of_the_file_\n") + file.getAbsolutePath() + "\n" + t.getMessage(), com.CH_gui.lang.Lang.rb.getString("msgTitle_Wipe_Error"));
+      if (errBuffer != null) {
+        errBuffer.append(LangCo.rb.getString("msg_Error_occurred_while_attempting_to_securely_wipe_the_contents_of_the_file_\n") + file.getAbsolutePath() + "\n" + t.getMessage());
+        errBuffer.append("\n\n");
       }
     }
     return rc;
@@ -253,12 +256,12 @@ public class CleanupAgent extends Thread {
     long len = file.length();
     if (progMonitor != null) {
       progMonitor.setTransferSize(len);
-      String passS = " " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("[Pass_{0}/2]"), new Object[] {new Integer(pass)});
-      String task = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getName(), passS});
+      String passS = " " + java.text.MessageFormat.format(LangCo.rb.getString("[Pass_{0}/2]"), new Object[] {new Integer(pass)});
+      String task = java.text.MessageFormat.format(LangCo.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getName(), passS});
       progMonitor.setCurrentStatus(task);
       progMonitor.nextTask(task);
-      progMonitor.appendLine(" " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getAbsolutePath(), passS}));
-      progMonitor.setFileNameSource(com.CH_gui.lang.Lang.rb.getString("label_Secure_Random_Stream"));
+      progMonitor.appendLine(" " + java.text.MessageFormat.format(LangCo.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getAbsolutePath(), passS}));
+      progMonitor.setFileNameSource(LangCo.rb.getString("label_Secure_Random_Stream"));
       progMonitor.setFileNameDestination(file.getAbsolutePath());
     }
     try {

@@ -12,6 +12,7 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.GeneralDialog;
 import java.awt.*;
 import javax.swing.*;
 

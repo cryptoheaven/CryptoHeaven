@@ -12,11 +12,10 @@
 
 package com.CH_gui.menuing;
 
-import com.CH_gui.util.ActionUtils;
-import javax.swing.*;
-
 import java.awt.Component;
 import java.util.*;
+
+import javax.swing.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -26,6 +25,7 @@ import com.CH_gui.actionGui.*;
 import com.CH_gui.table.*;
 
 import com.CH_gui.list.List_Viewable;
+import com.CH_gui.util.ActionUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -75,13 +75,7 @@ public class ToolBarModel extends Object {
     this.toolBarPropertyName = toolBarPropertyName;
     this.forceAddAllTools = forceAddAllTools;
 
-    String toolSequence = GlobalProperties.getProperty("ToolBarModel."+toolBarPropertyName);
-    if (toolSequence == null)
-      toolSequence = EMPTY_TOOL_SEQUENCE;
-
-    if (trace != null) trace.data(5, toolSequence);
-
-    Object[] _toolBarModel = buildToolBarModel(new StringTokenizer(toolSequence, "|"));
+    Object[] _toolBarModel = buildModel("ToolBarModel."+toolBarPropertyName, EMPTY_TOOL_SEQUENCE);
     toolBarModel = (ArrayList) _toolBarModel[0];
     toolBarModelHM = (HashMap) _toolBarModel[1];
     //printTools();
@@ -102,7 +96,37 @@ public class ToolBarModel extends Object {
     if (trace != null) trace.exit(ToolBarModel.class);
   }
 
+  private static Object[] buildModel(String propertyName, String emptySequence) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ToolBarModel.class, "buildModel(String propertyName, String emptySequence)");
+    if (trace != null) trace.args(propertyName, emptySequence);
 
+    String toolSequence = GlobalProperties.getProperty(propertyName);
+    if (toolSequence == null)
+      toolSequence = emptySequence;
+    if (trace != null) trace.data(10, toolSequence);
+    Object[] modelSet = null;
+    try {
+      modelSet = buildToolBarModel(new StringTokenizer(toolSequence, "|"));
+    } catch (Exception e1) {
+      try {
+        // we have corrupted properties -- reset them to defaults so that user doesn't have to do it manually
+        GlobalProperties.resetMyAndGlobalProperties();
+        toolSequence = GlobalProperties.getProperty(propertyName);
+        if (toolSequence == null)
+          toolSequence = emptySequence;
+        if (trace != null) trace.data(20, toolSequence);
+        modelSet = buildToolBarModel(new StringTokenizer(toolSequence, "|"));
+      } catch (Exception e2) {
+        // failed again with reset properties - this is probably programming bug
+        e2.printStackTrace();
+        // last resort is the empty sequence
+        modelSet = buildToolBarModel(new StringTokenizer(emptySequence, "|"));
+      }
+    }
+
+    if (trace != null) trace.exit(ToolBarModel.class, modelSet);
+    return modelSet;
+  }
 
   /**
    * Wipes out entire model.

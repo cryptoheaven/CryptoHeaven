@@ -12,6 +12,7 @@
 
 package com.CH_gui.util;
 
+import com.CH_gui.gui.JMyButton;
 import javax.swing.*;
 import java.awt.*;
 

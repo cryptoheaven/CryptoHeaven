@@ -12,6 +12,7 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.io.*;
 import java.security.*;

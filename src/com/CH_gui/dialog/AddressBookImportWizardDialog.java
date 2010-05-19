@@ -12,6 +12,12 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.ExtensionFileFilter;
 import java.awt.*;
 import java.awt.event.*;

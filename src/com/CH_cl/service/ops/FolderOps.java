@@ -12,9 +12,6 @@
 
 package com.CH_cl.service.ops;
 
-import java.awt.*;
-import java.util.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
@@ -26,6 +23,7 @@ import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.util.*;
 
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -33,7 +31,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -41,7 +39,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.22 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderOps extends Object {
 
@@ -50,8 +48,7 @@ public class FolderOps extends Object {
    * Static method to fill the New Folder Request with data provided (usually from GUI entry fields)
    * @return Fld_NewFld_Rq data set suitable to send as a request for new folder, or creat/fetch of chat folder.
    */
-  public static Fld_NewFld_Rq createNewFldRq( Component parentGUI,
-                                              FolderPair parentPair, 
+  public static Fld_NewFld_Rq createNewFldRq( FolderPair parentPair,
                                               short newFolderType,
                                               String newFolderName,
                                               String newFolderDesc,
@@ -63,7 +60,7 @@ public class FolderOps extends Object {
                                               boolean useInheritedSharing,
                                               FolderShareRecord[] additionalShares,
                                               ServerInterfaceLayer SIL
-                                            ) 
+                                            )
   {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
@@ -115,11 +112,11 @@ public class FolderOps extends Object {
             newShare.setSymmetricKey(baSymmetricKey);
             additionalShares[count] = newShare;
             count ++;
-          } 
+          }
           index ++;
         } while (count < additionalShareCount);
       }
-    } 
+    }
 
     request.parentFolderId = parentFolderId;
     request.parentShareId = parentShareId;
@@ -174,8 +171,10 @@ public class FolderOps extends Object {
           request.folderShareRecord.seal(ownerKeyRec);
         }
       } catch (Throwable t) {
-        MessageDialog.showErrorDialog(parentGUI, "Could not fetch user's Public Key.  Operation terminated.", "Fetch Error");
-        throw new RuntimeException("Could not fetch user's Public Key.  Operation terminated.");
+        String title = "Fetch Error";
+        String msg = "Could not fetch user's Public Key.  Operation terminated.";
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+        throw new RuntimeException(msg);
       }
     }
 
@@ -196,8 +195,10 @@ public class FolderOps extends Object {
           else
             additionalShares[i].seal(kRec);
         } else {
-          MessageDialog.showErrorDialog(parentGUI, "Could not fetch user's Public Key to encrypt folder shares.  Operation terminated.", "Fetch Error");
-          throw new RuntimeException("Could not fetch user's Public Key to encrypt folder shares.  Operation terminated.");
+          String title = "Fetch Error";
+          String msg = "Could not fetch user's Public Key to encrypt folder shares.  Operation terminated.";
+          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+          throw new RuntimeException(msg);
         }
       } else {
         if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
@@ -206,8 +207,10 @@ public class FolderOps extends Object {
         if (groupShare != null) {
           additionalShares[i].seal(groupShare.getSymmetricKey());
         } else {
-          MessageDialog.showErrorDialog(parentGUI, "Could not locate group's encryption key.  Operation terminated.", "Fetch Error");
-          throw new RuntimeException("Could not locate group's encryption key.  Operation terminated.");
+          String title = "Fetch Error";
+          String msg = "Could not locate group's encryption key.  Operation terminated.";
+          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+          throw new RuntimeException(msg);
         }
       }
     }
@@ -268,7 +271,7 @@ public class FolderOps extends Object {
     return chatFolderPairs;
   }
 
-  /** 
+  /**
    * @return chatting folder pair for chatting with specified contact searching between specified chat folder records.
    */
   public static FolderPair getChatFolderPairFromCache(MemberContactRecordI[] chatWithContacts, FolderRecord[] chatFlds) {
@@ -329,7 +332,7 @@ public class FolderOps extends Object {
     Long addrFolderId = userRecord.addrFolderId;
     if (addrFolderId == null || cache.getFolderRecord(addrFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.ADDRESS_FOLDER, "Address Book", "Saved Email Addresses", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.ADDRESS_FOLDER, "Address Book", "Saved Email Addresses", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_ADDRESS_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
@@ -352,7 +355,7 @@ public class FolderOps extends Object {
     Long whiteFolderId = userRecord.whiteFolderId;
     if (whiteFolderId == null || cache.getFolderRecord(whiteFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, getOrCreateAddressBook(SIL), FolderRecord.WHITELIST_FOLDER, "Allowed Senders", "List of originators who you have decided should be able to send you messages WITHOUT being checked for Spam. This will prevent their messages being blocked even if our Anti-Spam process calculates that the message is spam.", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(getOrCreateAddressBook(SIL), FolderRecord.WHITELIST_FOLDER, "Allowed Senders", "List of originators who you have decided should be able to send you messages WITHOUT being checked for Spam. This will prevent their messages being blocked even if our Anti-Spam process calculates that the message is spam.", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_WHITE_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
@@ -375,7 +378,7 @@ public class FolderOps extends Object {
     Long draftFolderId = userRecord.draftFolderId;
     if (draftFolderId == null || cache.getFolderRecord(draftFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq draftDataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Drafts", "Saved Message Drafts", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
+      Fld_NewFld_Rq draftDataSet = FolderOps.createNewFldRq(null, FolderRecord.MESSAGE_FOLDER, "Drafts", "Saved Message Drafts", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_DRAFT_OR_GET_OLD, draftDataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
@@ -398,7 +401,7 @@ public class FolderOps extends Object {
     Long junkFolderId = userRecord.junkFolderId;
     if (junkFolderId == null || cache.getFolderRecord(junkFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
@@ -421,7 +424,7 @@ public class FolderOps extends Object {
     Long recycleFolderId = userRecord.recycleFolderId;
     if (recycleFolderId == null || cache.getFolderRecord(recycleFolderId) == null) {
       boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, null, FolderRecord.RECYCLE_FOLDER, "Recycle Bin", "Deleted items are deposited here", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL); // no default expiry
+      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.RECYCLE_FOLDER, "Recycle Bin", "Deleted items are deposited here", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL); // no default expiry
       ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_RECYCLE_OR_GET_OLD, dataSet), 60000);
       // assign folder id back to UserRecord in cache to avoid potential loops
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {

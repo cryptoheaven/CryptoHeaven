@@ -45,7 +45,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
   public UsrALoginSecureSession() {
   }
 
-  public static void setImplementationFileChooser(Class impl) {
+  public static void setImplFileChooser(Class impl) {
     fileChooserImpl = impl;
   }
 
@@ -165,7 +165,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
             if (trace != null) trace.exception(UsrALoginSecureSession.class, 40, t);
             String messageText = "Invalid credentials for the specified account! \n Program will terminate!";
             String title = "Critical Login Error";
-            MessageDialog.showErrorDialog(null, messageText, title, true);
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, messageText, true);
             Misc.systemExit(-101);
           }
           byte[] privateKeyBytes = privateKeyBA.toByteArray();
@@ -187,7 +187,8 @@ public class UsrALoginSecureSession extends ClientMessageAction {
               "The key property file scanned is: <br>" + keyPropertyFileName +
               "<p>" +
               "Program will terminate!";
-          MessageDialog.showErrorDialog(null, message, "Critical Login Error", true);
+          String title = "Critical Login Error";
+          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, message, true);
           Misc.systemExit(-102);
         }
       }

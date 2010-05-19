@@ -12,6 +12,7 @@
 
 package com.CH_gui.list;
 
+import com.CH_gui.util.Images;
 import java.awt.Component;
 import java.io.File;
 import javax.swing.*;
@@ -308,10 +309,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
     else if (value instanceof File) {
       File file = (File) value;
-      if (file.isDirectory())
-        icon = MiscGui.getFileInternalIconForType(MiscGui.getFileInternalType(file));
-      else
-        icon = (Icon) MiscGui.getFileIconAndType(file.getName())[0];
+      icon = MiscGui.getFileIcon(file);
     }
 
     if (icon == null)

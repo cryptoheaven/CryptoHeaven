@@ -12,6 +12,7 @@
 
 package com.CH_gui.statTable;
 
+import com.CH_gui.util.Images;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;

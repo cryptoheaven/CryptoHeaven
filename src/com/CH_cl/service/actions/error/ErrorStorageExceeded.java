@@ -26,7 +26,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,7 +34,7 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ErrorStorageExceeded extends ClientMessageAction {
 
@@ -44,7 +44,7 @@ public class ErrorStorageExceeded extends ClientMessageAction {
     if (trace != null) trace.exit(ErrorStorageExceeded.class);
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -56,11 +56,12 @@ public class ErrorStorageExceeded extends ClientMessageAction {
       pm.jobKilled();
 
     Str_Rp reply = (Str_Rp) getMsgDataSet();
+    String title = "Server Storage Limit Exceeded";
     String msg = reply.message;
-    MessageDialog.showErrorDialog(null, msg, "Server Storage Limit Exceeded");
+    NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
 
     if (trace != null) trace.exit(ErrorStorageExceeded.class, null);
     return null;
   }
- 
+
 }

@@ -12,6 +12,7 @@
 
 package com.CH_gui.table;
 
+import com.CH_gui.util.Images;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.ops.*;
@@ -31,6 +32,7 @@ import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.sortedTable.*;
+import com.CH_gui.util.*;
 
 import java.awt.*;
 import java.awt.dnd.*;
@@ -679,7 +681,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                       String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_User_{0}_has_left_the_chat_area_and_went_Offline."), new Object[] {userName});
                       String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date());
                       String body = date + "\n" + msg;
-                      new SingleDialogShower(offlineDialogArbiter, key, RecordActionTable.this, MessageDialog.INFORMATION_MESSAGE, title, body).start();
+                      MessageDialog.showDialog(offlineDialogArbiter, key, RecordActionTable.this, body, title, NotificationCenter.INFORMATION_MESSAGE);
 
                       // Only one notify per contact that goes offline.
                       break;

@@ -327,7 +327,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
                   chatComps = new Component[1];
                   chatComps[0] = new ChatTableFrame(new FolderPair(sRec, fRec));
                 }
-                MiscGui.nudge(chatComps, cache.getUserRecord().online.charValue() != 'D', true);
+                Nudge.nudge(chatComps, cache.getUserRecord().online.charValue() != 'D', true);
               } catch (Throwable t) {
                 t.printStackTrace();
               }

@@ -146,7 +146,6 @@ public class ChatSessionCreator extends ThreadTraced {
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     Fld_NewFld_Rq request = FolderOps.createNewFldRq(
         null,
-        null,
         FolderRecord.CHATTING_FOLDER, // Chatting folder since July 2006
         myFolderName, folderDesc, shareFolderName, folderDesc,
         new Short(Move_NewFld_Dialog.DEFAULT_CHAT_PURGING_RECORD_NUM),

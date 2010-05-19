@@ -12,7 +12,7 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.ToolBarProducerI;
+import com.CH_gui.util.Images;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -34,7 +34,6 @@ import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.gui.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
@@ -54,10 +53,12 @@ import com.CH_gui.dialog.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.menuing.*;
 import com.CH_gui.msgTable.*;
+import com.CH_gui.util.*;
+
+import com.CH_guiLib.gui.*;
 
 import comx.Tiger.gui.*;
 
@@ -819,7 +820,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                 }
               }).start();
               // person ringing must always hear the ring so that he refrains from abusing it and anoying other people...
-              MiscGui.nudge(_this, true, false);
+              Nudge.nudge(_this, true, false);
             }
           }
         }
@@ -1094,7 +1095,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             okReturnBuffer[0] = true;
             SwingUtilities.windowForComponent((Component) e.getSource()).dispose();
           } else {
-            MessageDialog.showDialog((Component) e.getSource(), "Please select one of the available options.", "Option...", MessageDialog.ERROR_MESSAGE, true);
+            MessageDialog.showDialog((Component) e.getSource(), "Please select one of the available options.", "Option...", NotificationCenter.ERROR_MESSAGE, true);
           }
         }
       });
@@ -1104,7 +1105,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           SwingUtilities.windowForComponent((Component) e.getSource()).dispose();
         }
       });
-      MessageDialog.showDialog(MsgComposePanel.this, panel, title, MessageDialog.QUESTION_MESSAGE, buttons, null, true);
+      MessageDialog.showDialog(MsgComposePanel.this, panel, title, NotificationCenter.QUESTION_MESSAGE, buttons, null, true);
       if (trace != null) trace.exit(getClass(), okReturnBuffer[0]);
       return okReturnBuffer[0];
     }
@@ -1138,7 +1139,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Always_Proceed"));
       buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Proceed"));
       buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
-      final JDialog warningDialog = MessageDialog.showDialog(MsgComposePanel.this, warnScrollPane, title, MessageDialog.WARNING_MESSAGE, buttons, null, false);
+      final JDialog warningDialog = MessageDialog.showDialog(MsgComposePanel.this, warnScrollPane, title, NotificationCenter.WARNING_MESSAGE, buttons, null, false);
       warningDialog.addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
           setSendMessageInProgress(false);
@@ -1617,7 +1618,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     appendInvalidRecipientErrorMsg(errorSB, badFoldersV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
     if (errorSB.length() > 0) {
       String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
-      MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, MessageDialog.WARNING_MESSAGE, false);
+      MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, NotificationCenter.WARNING_MESSAGE, false);
     }
     Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsV.length][];
     for (int recipientType=0; recipientType<filteredSelectedRecipients.length; recipientType++) {
@@ -2127,7 +2128,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           buttons[0] = new JButton("Add at Once");
           buttons[1] = new JButton("Add and Edit");
           buttons[2] = new JButton("No");
-          final JDialog dialog = MessageDialog.showDialog(parentComp, sb.toString(), "New Addresses",  MessageDialog.QUESTION_MESSAGE, buttons, false);
+          final JDialog dialog = MessageDialog.showDialog(parentComp, sb.toString(), "New Addresses",  NotificationCenter.QUESTION_MESSAGE, buttons, false);
           buttons[0].addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               dialog.dispose();
@@ -2333,7 +2334,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       buttons[2] = new JButton("No");
       final Component parentComp = parent != null ? parent : GeneralDialog.getDefaultParent();
       final Window window = SwingUtilities.windowForComponent(parentComp);
-      final JDialog dialog = MessageDialog.showDialog(parentComp, sb.toString(), "New Contacts",  MessageDialog.QUESTION_MESSAGE, buttons, false);
+      final JDialog dialog = MessageDialog.showDialog(parentComp, sb.toString(), "New Contacts",  NotificationCenter.QUESTION_MESSAGE, buttons, false);
       buttons[0].addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           dialog.dispose();

@@ -12,7 +12,6 @@
 
 package com.CH_co.util;
 
-import ch.cl.CryptoHeaven;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.trace.TraceProperties;
 
@@ -37,6 +36,9 @@ public class GlobalProperties extends Object {
 // Constants and variables with relevant static code
 //...........................................................................
 
+  private static final boolean DEBUG_INSERT_RANDOM_PROPERTY_ERRORS = false;
+  private static final String PROPERTIES_RESET_AT_NEXT_LOAD = "properties-reset-at-next-load";
+
   private static final String SOFTWARE_NAME = "CryptoHeaven";
   private static final String SOFTWARE_NAME_EXT = "Client";
   public static final String PROGRAM_NAME = "CryptoHeavenClient";
@@ -50,7 +52,7 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 540;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 548;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -201,27 +203,35 @@ public class GlobalProperties extends Object {
   // build 536 Upload/Download control-GUI separation
   // build 538 more control-GUI separation
   // build 540 Trace of messages includes trace for its attachments
+  // build 542 Journal Prog Monitor factory/interface/implementation for message export.
+  // build 544 File Replace Confirmation factory/interface/implementation.
+  // build 546 Move nudge to GUI utils and remove all GUI from wiping
+  // build 548 Properties reset improvements, and fixes against corrupted properties.
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
 
   static final Properties properties = new Properties();
+  static String[][] defaultProperties = null;
 
   /**
    * Loads initial properties from file when class is loaded.
    */
   static {
-    String date = GlobalProperties.class.getPackage().getImplementationVersion();
-    if (date != null && date.indexOf('$') < 0 && date.indexOf('{') < 0 && date.indexOf('}') < 0) {
-      PROGRAM_BUILD_DATE = date.trim();
-      PROGRAM_FULL_NAME += " compiled on " + PROGRAM_BUILD_DATE;
+    try {
+      String date = GlobalProperties.class.getPackage().getImplementationVersion();
+      if (date != null && date.indexOf('$') < 0 && date.indexOf('{') < 0 && date.indexOf('}') < 0) {
+        PROGRAM_BUILD_DATE = date.trim();
+        PROGRAM_FULL_NAME += " compiled on " + PROGRAM_BUILD_DATE;
+      }
+      PROGRAM_FULL_NAME += " " + PROGRAM_VERSION_STR + " rel. " + PROGRAM_RELEASE;
+      initialLoad();
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
-    PROGRAM_FULL_NAME += " " + PROGRAM_VERSION_STR + " rel. " + PROGRAM_RELEASE;
-    initialLoad();
   }
 
   private static void initialLoad() {
-
     // now load the saved properties possibly overwriting the default ones.
     String it = getPropertiesFullFileName();
     InputStream is = null;
@@ -238,27 +248,79 @@ public class GlobalProperties extends Object {
       } catch (Exception x2) {
       }
     }
-
-//    // Remove all the MenuTreeModel.* from the properties and replace them by properties from this class.
-//    Vector keysToRemoveV = new Vector();
-//    Enumeration enm = properties.keys();
-//    while (enm.hasMoreElements()) {
-//      String key = (String) enm.nextElement();
-//      if (key.startsWith("MenuTreeModel.")) {
-//        keysToRemoveV.addElement(key);
-//      }
-//    }
-//    for (int i=0; i<keysToRemoveV.size(); i++) {
-//      properties.remove(keysToRemoveV.elementAt(i));
-//    }
-
+    if (DEBUG_INSERT_RANDOM_PROPERTY_ERRORS) {
+      // insert random errors into every property
+      Iterator iter = properties.keySet().iterator();
+      while (iter.hasNext()) {
+        String key = (String) iter.next();
+        String value = properties.getProperty(key);
+        StringBuffer sb = new StringBuffer(value);
+        int insertAt = sb.length() > 0 ? new Random().nextInt(sb.length()) : 0;
+        sb.insert(insertAt, (char) new Random().nextInt(256));
+        properties.setProperty(key, sb.toString());
+      }
+    }
     if (!ok) {
       //System.err.println("WARNING: Unable to load \"" + it + "\" .  Will use default values instead.");
     } else {
       cleanupTempFiles();
       cleanupTempFilesOnFinalize();
     } // end if
+    // if properties reset flag is set then reset properties
+    String propResetFlag = properties.getProperty(PROPERTIES_RESET_AT_NEXT_LOAD);
+    if (propResetFlag != null && propResetFlag.equalsIgnoreCase("true")) {
+      resetMyAndGlobalProperties(false);
+      // This is redundant since reset removes this property too,
+      // but keep it just incase future changes keep the property.
+      properties.remove(PROPERTIES_RESET_AT_NEXT_LOAD);
+    }
   } // end initialLoad()
+
+  public static void initDefaultProperties(String[][] initialDefaultProperties) {
+    defaultProperties = initialDefaultProperties;
+    // set initial default properties if they were not loaded from file
+    if (defaultProperties != null) {
+      for (int i=0; i<defaultProperties.length; i++) {
+        try {
+          if (getProperty(defaultProperties[i][0]) == null) {
+            setProperty(defaultProperties[i][0], defaultProperties[i][1]);
+          }
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
+      }
+    }
+  }
+
+  /**
+   * Removes all local properties that are global and for current user.
+   */
+  public static void resetMyAndGlobalProperties() {
+    resetMyAndGlobalProperties(true);
+  }
+  private static void resetMyAndGlobalProperties(boolean insertResetFlagForNextLoad) {
+    Enumeration keys = properties.keys();
+    String myUserPropertyPrefix = getUserPropertyPrefix();
+    String generalUserPropertyPrefix = getGeneralUserPropertyPrefix();
+    ArrayList removeKeysL = new ArrayList();
+    while (keys.hasMoreElements()) {
+      String key = (String) keys.nextElement();
+      if (!key.startsWith(generalUserPropertyPrefix) || key.startsWith(myUserPropertyPrefix)) {
+        if (!key.startsWith("LastUserName") &&
+                !key.startsWith("EncRSAPrivateKey") &&
+                !key.equals("ServerList")
+                )
+          removeKeysL.add(key);
+      }
+    }
+    for (int i=0; i<removeKeysL.size(); i++) {
+      GlobalProperties.remove((String) removeKeysL.get(i));
+    }
+    if (insertResetFlagForNextLoad) {
+      GlobalProperties.setProperty(PROPERTIES_RESET_AT_NEXT_LOAD, "true");
+    }
+    initDefaultProperties(defaultProperties);
+  }
 
   /**
    * Set a Temporary File to be cleaned up.
@@ -288,28 +350,35 @@ public class GlobalProperties extends Object {
     cleanupTempFiles("TempFilesFinalize");
   }
   private static void cleanupTempFiles(String propertyName) {
-    String tempFiles = getProperty(propertyName);
-    if (tempFiles != null) {
-      StringBuffer newTempFiles = new StringBuffer();
-      StringTokenizer st = new StringTokenizer(tempFiles, ";");
-      while (st.hasMoreTokens()) {
-        String filePath = st.nextToken();
-        if (filePath != null && filePath.length() > 0) {
-          File file = new File(filePath);
-          if (file.exists()) {
-            try {
-              if (!CleanupAgent.wipeOrDelete(file)) {
-                newTempFiles.append(";");
-                newTempFiles.append(file.getAbsolutePath());
+    try {
+      String tempFiles = getProperty(propertyName);
+      if (tempFiles != null) {
+        StringBuffer newTempFiles = new StringBuffer();
+        StringTokenizer st = new StringTokenizer(tempFiles, ";");
+        while (st.hasMoreTokens()) {
+          try {
+            String filePath = st.nextToken();
+            if (filePath != null && filePath.length() > 0) {
+              File file = new File(filePath);
+              if (file.exists()) {
+                try {
+                  if (!CleanupAgent.wipeOrDelete(file)) {
+                    newTempFiles.append(";");
+                    newTempFiles.append(file.getAbsolutePath());
+                  }
+                } catch (Throwable t) {
+                  newTempFiles.append(";");
+                  newTempFiles.append(file.getAbsolutePath());
+                }
               }
-            } catch (Throwable t) {
-              newTempFiles.append(";");
-              newTempFiles.append(file.getAbsolutePath());
             }
+          } catch (Exception e) {
+            e.printStackTrace();
           }
-        }
-      } // end while
-      setProperty(propertyName, newTempFiles.toString());
+        } // end while
+        setProperty(propertyName, newTempFiles.toString());
+      }
+    } catch (Throwable t) {
     }
   }
 
@@ -390,31 +459,6 @@ public class GlobalProperties extends Object {
     return properties.propertyNames();
   }
 
-  /**
-   * Removes all local properties that are global and for current user.
-   */
-  public static void resetMyAndGlobalProperties() {
-    Enumeration keys = properties.keys();
-    String myUserPropertyPrefix = getUserPropertyPrefix();
-    String generalUserPropertyPrefix = getGeneralUserPropertyPrefix();
-    Vector removeKeysV = new Vector();
-    while (keys.hasMoreElements()) {
-      String key = (String) keys.nextElement();
-      if (!key.startsWith(generalUserPropertyPrefix) || key.startsWith(myUserPropertyPrefix)) {
-        if (!key.startsWith("LastUserName") &&
-                !key.startsWith("EncRSAPrivateKey") &&
-                !key.equals("ServerList")
-                )
-          removeKeysV.addElement(key);
-      }
-    }
-    for (int i=0; i<removeKeysV.size(); i++) {
-      GlobalProperties.remove((String) removeKeysV.elementAt(i));
-    }
-    CryptoHeaven.initDefaultProperties();
-  }
-
-
   // ********** storing is private *********
   private static void store (OutputStream out, String header) throws IOException {
     properties.store(out, header);
@@ -433,8 +477,6 @@ public class GlobalProperties extends Object {
     try { out.close(); } catch (Exception e) { }
     return success;
   }
-
-
 
   public static void setAlternatePropertiesDir(String dir) {
     TraceProperties.setAlternatePropertiesDir(dir);

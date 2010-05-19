@@ -24,7 +24,7 @@ import com.CH_gui.menuing.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
-import com.CH_co.util.GeneralDialog;
+import com.CH_gui.util.GeneralDialog;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2002

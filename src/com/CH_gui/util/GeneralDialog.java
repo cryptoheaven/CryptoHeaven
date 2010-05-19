@@ -10,15 +10,15 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.util;
+package com.CH_gui.util;
 
-import com.CH_gui.util.ActionUtils;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
 import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -262,6 +262,8 @@ public class GeneralDialog extends JDialog {
       }
     } catch (Throwable t) {
       if (trace != null) trace.exception(GeneralDialog.class, 100, t);
+      // if failed then at the very least pack() window so it shows up with non-zero size
+      pack();
     }
 
     if (trace != null) trace.exit(GeneralDialog.class);

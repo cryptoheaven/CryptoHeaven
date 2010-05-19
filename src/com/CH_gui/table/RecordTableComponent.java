@@ -13,7 +13,6 @@
 
 package com.CH_gui.table;
 
-import com.CH_gui.util.ToolBarProducerI;
 import com.CH_gui.action.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.frame.*;
@@ -23,6 +22,7 @@ import com.CH_gui.menuing.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.recycleTable.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.engine.*;
@@ -31,7 +31,6 @@ import com.CH_cl.service.cache.event.*;
 import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_cl.service.records.filters.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;

@@ -12,8 +12,7 @@
 
 package com.CH_gui.gui;
 
-import com.CH_co.gui.MyInsets;
-import com.CH_co.util.HTML_ClickablePane;
+import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_co.util.URLs;
 
 import java.awt.Color;

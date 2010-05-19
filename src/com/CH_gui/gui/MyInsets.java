@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.gui;
+package com.CH_gui.gui;
 
 import java.awt.Insets;
 import com.CH_co.util.MiscGui;

@@ -12,6 +12,12 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;

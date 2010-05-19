@@ -12,7 +12,7 @@
 
 package com.CH_gui.tree;
 
-import com.CH_co.gui.*;
+import com.CH_gui.util.Images;
 import com.CH_co.trace.*;
 import com.CH_co.tree.*;
 import com.CH_co.util.*;
@@ -25,7 +25,6 @@ import com.CH_co.service.records.filters.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 import com.CH_cl.tree.*;
 
@@ -34,12 +33,14 @@ import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.msgTable.MsgActionTable;
 import com.CH_gui.service.ops.*;
 import com.CH_gui.table.*;
-import com.CH_gui.util.ActionUtils;
+import com.CH_gui.usrs.UserGuiOps;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 
@@ -365,7 +366,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       if (folderPairs != null && folderPairs.length > 0) {
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
-        boolean confirmed = MsgActionTable.showConfirmationDialog(FolderActionTree.this, title, messageText, folderPairs, MessageDialog.RECYCLE_MESSAGE, true);
+        boolean confirmed = MsgActionTable.showConfirmationDialog(FolderActionTree.this, title, messageText, folderPairs, NotificationCenter.RECYCLE_MESSAGE, true);
         if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
@@ -396,7 +397,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Upload"));
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
+      if (!UserGuiOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
         Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
         TreePath[] selectedPaths = getSelectionPaths();
         FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
@@ -757,7 +758,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
+      if (!UserGuiOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
         TreePath[] selectedPaths = getSelectionPaths();
         FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
         if (selected != null && selected.length >= 1) {
@@ -1116,7 +1117,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
     String messageText = "<html>Are you sure you want to <b>permanently delete</b> items from the <br>following folder?  This action cannot be reversed.</html>";
     short folderType = folderToEmpty.getFolderRecord().folderType.shortValue();
-    int messageType = folderType == FolderRecord.RECYCLE_FOLDER ? MessageDialog.EMPTY_RECYCLE_FOLDER : MessageDialog.EMPTY_SPAM_FOLDER;
+    int messageType = folderType == FolderRecord.RECYCLE_FOLDER ? NotificationCenter.EMPTY_RECYCLE_FOLDER : NotificationCenter.EMPTY_SPAM_FOLDER;
     boolean confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, new Record[] { folderToEmpty }, messageType, false);
     if (confirmed) {
       Obj_IDs_Co request = new Obj_IDs_Co();

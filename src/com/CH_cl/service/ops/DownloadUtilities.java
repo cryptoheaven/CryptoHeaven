@@ -18,8 +18,6 @@ import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 
-import com.CH_cl_eml.service.ops.ExportMsgUtilities;
-
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
@@ -53,11 +51,17 @@ import java.util.*;
 
 public class DownloadUtilities extends Object { // implicit no-argument constructor
 
+  private static Class implExportMsgs;
+
   private static int downloadRunnerCount = 0;
   private static int downloadCoordinatorCount = 0;
 
   public static final String PROPERTY_NAME__LOCAL_FILE_DEST_DIR = "DownloadUtilities_localFileDestDir";
   public static final String PROPERTY_NAME__DOWNLOAD_AND_OPEN = "DownloadUtilities_downloadAndOpen";
+
+  public static void setImplExportMsgs(Class impl) {
+    implExportMsgs = impl;
+  }
 
   /**
    * @return The default download directory as specified in the properties, or current directory if default is invalid.
@@ -273,7 +277,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
       // make sure that destination directory exists
       if (!destDir.exists() && !destDir.mkdirs()) {
-        MessageDialog.showErrorDialog(null, "Failed to create necessary directory: " + destDir.getAbsolutePath(), "File Error");
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "File Error", "Failed to create necessary directory: " + destDir.getAbsolutePath());
       }
       else {
 
@@ -298,10 +302,15 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         if (msgsV.size() > 0) {
           MsgLinkRecord[] m = new MsgLinkRecord[msgsV.size()];
           msgsV.toArray(m);
+          String title = "Function not available.";
+          String errMsg = "<html><p>Mail export libraries could not be found.  To activate this functionality please download the latest version of the software from the following page: </p><p><a href=\"http://www.cryptoheaven.com/Download\">http://www.cryptoheaven.com/Download</a></p><p>Please close this software before installing the downloaded package.</p>";
           try {
-            ExportMsgUtilities.runDownloadMsgs(m, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload);
+            ExportMsgsI exportMsgUtilities = (ExportMsgsI) implExportMsgs.newInstance();
+            exportMsgUtilities.runDownloadMsgs(m, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload);
+          } catch (Exception ex) {
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, errMsg);
           } catch (NoClassDefFoundError err) {
-            MessageDialog.showErrorDialog(null, "<html>Mail export libraries could not be found.  To activate this functionality please download the latest version of the software from the following page: <a href=\"http://www.cryptoheaven.com/Download\">http://www.cryptoheaven.com/Download</a>", "Function not available.", false);
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, errMsg);
           }
         }
         // download files

@@ -13,17 +13,14 @@
 package com.CH_co.service.records;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.security.DigestInputStream;
-import java.security.DigestOutputStream;
+import java.util.*;
+import java.util.zip.*;
+import java.security.*;
 import java.sql.Timestamp;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
-import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
@@ -229,7 +226,7 @@ public class FileDataRecord extends Record {
 
         String msg = "Exception occurred while encrypting the file " + inFileName + "  The destination file " + outFileName + " was not completely written.  This error is not recoverable, the output file will be erased.  Please check destination folder for sufficient free space and write access permissions.  Exception message is: " + t.getMessage();
         String title = "Error Uploading File";
-        MessageDialog.showErrorDialog(null, msg, title, false);
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
       }
 
       // clean up temporary file
@@ -301,14 +298,12 @@ public class FileDataRecord extends Record {
           GlobalProperties.addTempFileToCleanup(destinationFile);
         }
         if (destinationFile.exists()) {
-          ConfirmFileReplaceDialog d = null;
-          if (!MiscGui.isAllGUIsuppressed())
-            d = new ConfirmFileReplaceDialog(destinationFile, originalSize, this);
-          // if GUI is suppressed, then default is to REPLACE the file.
-          if (d != null) {
-            if (d.isRename())
-              destinationFile = d.getRenamdFile();
-            else if (!d.isReplace()) {
+          ConfirmFileReplaceI confirmReplace = ConfirmFileReplaceFactory.newInstance(destinationFile, originalSize, this);
+          // if GUI is suppressed, or otherwise the component is not available then default is to REPLACE the file.
+          if (confirmReplace != null) {
+            if (confirmReplace.isRename())
+              destinationFile = confirmReplace.getRenamdFile();
+            else if (!confirmReplace.isReplace()) {
               // File already exists so mark the link to it and
               plainDataFile = destinationFile;
               destinationFile = null;
@@ -449,7 +444,7 @@ public class FileDataRecord extends Record {
 
           // show error dialog
           String title = "File Integrity Check FAILED";
-          boolean option = MessageDialog.showDialogYesNo(null, errorMsg, title, MessageDialog.ERROR_MESSAGE);
+          boolean option = NotificationCenter.showYesNo(NotificationCenter.ERROR_MESSAGE, title, errorMsg);
 
           if (option == true) {
             // cleanup encrypted and plain file that may be partial
@@ -536,7 +531,7 @@ public class FileDataRecord extends Record {
     } catch (Throwable t) {
       if (trace != null) trace.exception(FileDataRecord.class, 100, t);
       String title = "Digest Verification FAILED";
-      MessageDialog.showErrorDialog(null, t.getMessage(), title, false);
+      NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, t.getMessage());
     }
 
     if (trace != null) trace.exit(FileDataRecord.class);

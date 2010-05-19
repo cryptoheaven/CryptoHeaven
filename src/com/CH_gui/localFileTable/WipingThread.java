@@ -12,6 +12,7 @@
 
 package com.CH_gui.localFileTable;
 
+import com.CH_gui.util.MessageDialog;
 import java.io.*;
 import javax.swing.*;
 
@@ -55,13 +56,16 @@ public class WipingThread extends ThreadTraced {
     ProgMonitorI progMonitor = ProgMonitorFactory.newInstanceWipe(in);
     for (int i=0; i<filesToWipe.length; i++) {
       File file = filesToWipe[i];
-       boolean toRescan = false;
+      boolean toRescan = false;
       if (jFileChooser != null && jFileChooser.getCurrentDirectory().equals(file.getParentFile())) {
         toRescan = true;
       }
-      if (!CleanupAgent.wipe(file, in, jFileChooser, progMonitor)) {
+      StringBuffer errBuffer = new StringBuffer();
+      boolean wiped = CleanupAgent.wipe(file, in, progMonitor, errBuffer);
+      if (errBuffer.length() > 0)
+        MessageDialog.showErrorDialog(jFileChooser, errBuffer.toString(), com.CH_gui.lang.Lang.rb.getString("msgTitle_Wipe_Error"));
+      if (!wiped)
         break;
-      }
       if (toRescan) {
         jFileChooser.rescanCurrentDirectory();
       }

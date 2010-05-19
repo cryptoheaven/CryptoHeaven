@@ -12,6 +12,9 @@
 
 package com.CH_gui.folder;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;

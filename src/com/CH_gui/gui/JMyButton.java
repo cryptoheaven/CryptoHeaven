@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.gui;
+package com.CH_gui.gui;
 
 import java.awt.*;
 import javax.swing.*;
@@ -33,36 +33,30 @@ import com.CH_co.util.MiscGui;
  * @author  Marcin Kurzawa
  * @version
  */
-public class JMyLabel extends JLabel {
+public class JMyButton extends JButton {
 
-  /** Creates new JMyLabel */
-  public JMyLabel() {
+  /** Creates new JMyButton */
+  public JMyButton() {
   }
 
-  /** Creates new JMyLabel */
-  public JMyLabel(String text) {
+  /** Creates new JMyButton */
+  public JMyButton(Action a) {
+    super(a);
+  }
+
+  /** Creates new JMyButton */
+  public JMyButton(String text) {
     super(text);
   }
 
-  public JMyLabel(String text, float fontRelativeSize) {
-    super(text);
-    Font font = getFont();
-    setFont(font.deriveFont((float) (font.getSize()+fontRelativeSize)));
+  /** Creates new JMyButton */
+  public JMyButton(Icon icon) {
+    super(icon);
   }
 
-  /** Creates new JMyLabel */
-  public JMyLabel(String text, int horizontalAlignment) {
-    super(text, horizontalAlignment);
-  }
-
-  /** Creates new JMyLabel */
-  public JMyLabel(String text, Icon image, int horizontalAlignment) {
-    super(text, image, horizontalAlignment);
-  }
-
-  /** Creates new JMyLabel */
-  public JMyLabel(Icon image) {
-    super(image);
+  /** Creates new JMyButton */
+  public JMyButton(String text, Icon icon) {
+    super(text, icon);
   }
 
   public void paint(Graphics g) {

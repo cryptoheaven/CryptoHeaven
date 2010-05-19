@@ -12,6 +12,9 @@
 
 package com.CH_gui.folder;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,6 +24,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
+import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
 /** 

@@ -12,6 +12,9 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.HTML_ClickablePane;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;

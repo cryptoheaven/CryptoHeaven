@@ -15,7 +15,7 @@ package comx.Jaguar.gui;
 import java.awt.*;
 import javax.swing.*;
 
-import com.CH_co.gui.MyInsets;
+import com.CH_gui.gui.MyInsets;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

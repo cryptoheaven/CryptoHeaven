@@ -13,7 +13,7 @@
 package com.CH_gui.print;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.HTML_ClickablePane;
+import com.CH_gui.util.HTML_ClickablePane;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

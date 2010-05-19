@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.ops;
 
-import ch.cl.CryptoHeaven;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.sys.*;
 import com.CH_cl.service.engine.*;
@@ -807,7 +805,7 @@ public class AutoUpdater extends ThreadTraced {
 
   private void setUpdateHook() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "setUpdateHook()");
-    String[] originalArgs = CryptoHeaven.getOriginalArgs();
+    String[] originalArgs = AutoUpdaterArgs.getOriginalArgs();
     if (originalArgs == null)
       originalArgs = new String[0];
 

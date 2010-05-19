@@ -12,6 +12,7 @@
 
 package com.CH_gui.traceTable;
 
+import com.CH_gui.util.Images;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

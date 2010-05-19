@@ -12,7 +12,6 @@
 
 package com.CH_gui.table;
 
-import com.CH_gui.util.ActionUtils;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.chatTable.*;
@@ -27,12 +26,12 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.postTable.PostTableComponent;
 import com.CH_gui.recycleTable.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.FolderRecUtil;
 
-import com.CH_co.gui.MyInsets;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.tree.*;

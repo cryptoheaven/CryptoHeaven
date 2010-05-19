@@ -10,10 +10,10 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.gui;
+package com.CH_gui.gui;
 
 import java.awt.*;
-import javax.swing.*;
+import javax.swing.JTextArea;
 
 import com.CH_co.util.MiscGui;
 
@@ -28,25 +28,39 @@ import com.CH_co.util.MiscGui;
  *
  * Class Details:
  *
-*
-* <b>$Revision: 1.5 $</b>
-* @author  Marcin Kurzawa
-* @version
-*/
-public class JMyCheckBox extends JCheckBox {
+ *
+ * <b>$Revision: 1.6 $</b>
+ * @author  Marcin Kurzawa
+ * @version
+ */
+public class JMyTextArea extends JTextArea {
 
-  /** Creates new JCheckBox */
-  public JMyCheckBox() {
+  /** Creates new JMyTextArea */
+  public JMyTextArea(String s, int rows, int columns) {
+    super(s, rows, columns);
+    MiscGui.initKeyBindings(this);
+    setTabSize(4);
   }
 
-  /** Creates new JCheckBox */
-  public JMyCheckBox(String text) {
-    super(text);
+  /** Creates new JMyTextArea */
+  public JMyTextArea(int rows, int columns) {
+    super(rows, columns);
+    MiscGui.initKeyBindings(this);
+    setTabSize(4);
   }
 
-  /** Creates new JCheckBox */
-  public JMyCheckBox(String text, boolean selected) {
-    super(text, selected);
+  /** Creates new JMyTextArea */
+  public JMyTextArea(String s) {
+    super(s);
+    MiscGui.initKeyBindings(this);
+    setTabSize(4);
+  }
+
+  /** Creates new JMyTextArea */
+  public JMyTextArea() {
+    super();
+    MiscGui.initKeyBindings(this);
+    setTabSize(4);
   }
 
   public void paint(Graphics g) {

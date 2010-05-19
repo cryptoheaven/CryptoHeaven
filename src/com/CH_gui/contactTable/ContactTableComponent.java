@@ -12,6 +12,8 @@
 
 package com.CH_gui.contactTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -22,7 +24,6 @@ import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
@@ -287,7 +288,7 @@ public class ContactTableComponent extends RecordTableComponent {
             } else {
               jMinutes.grabFocus();
               jMinutes.selectAll();
-              MessageDialog.showDialog(ContactTableComponent.this, "Please enter a valid integer value.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"), MessageDialog.ERROR_MESSAGE, false);
+              MessageDialog.showDialog(ContactTableComponent.this, "Please enter a valid integer value.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"), NotificationCenter.ERROR_MESSAGE, false);
             }
           }
         });
@@ -296,7 +297,7 @@ public class ContactTableComponent extends RecordTableComponent {
             SwingUtilities.windowForComponent(buttons[1]).dispose();
           }
         });
-        MessageDialog.showDialog(ContactTableComponent.this, panel, "Status Settings", MessageDialog.QUESTION_MESSAGE, buttons, null, false, false, false);
+        MessageDialog.showDialog(ContactTableComponent.this, panel, "Status Settings", NotificationCenter.QUESTION_MESSAGE, buttons, null, false, false, false);
       }
     }
   }

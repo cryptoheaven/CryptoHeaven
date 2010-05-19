@@ -12,6 +12,7 @@
 
 package com.CH_gui.util;
 
+import com.CH_gui.gui.JMyLabel;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgPopupListener;
 

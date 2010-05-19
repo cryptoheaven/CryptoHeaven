@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.gui;
+package com.CH_gui.gui;
 
 import java.awt.*;
 import javax.swing.*;
@@ -28,35 +28,25 @@ import com.CH_co.util.MiscGui;
  *
  * Class Details:
  *
- *
- * <b>$Revision: 1.5 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
-public class JMyButton extends JButton {
+*
+* <b>$Revision: 1.5 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
+public class JMyCheckBox extends JCheckBox {
 
-  /** Creates new JMyButton */
-  public JMyButton() {
+  /** Creates new JCheckBox */
+  public JMyCheckBox() {
   }
 
-  /** Creates new JMyButton */
-  public JMyButton(Action a) {
-    super(a);
-  }
-
-  /** Creates new JMyButton */
-  public JMyButton(String text) {
+  /** Creates new JCheckBox */
+  public JMyCheckBox(String text) {
     super(text);
   }
 
-  /** Creates new JMyButton */
-  public JMyButton(Icon icon) {
-    super(icon);
-  }
-
-  /** Creates new JMyButton */
-  public JMyButton(String text, Icon icon) {
-    super(text, icon);
+  /** Creates new JCheckBox */
+  public JMyCheckBox(String text, boolean selected) {
+    super(text, selected);
   }
 
   public void paint(Graphics g) {

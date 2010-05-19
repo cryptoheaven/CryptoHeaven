@@ -12,6 +12,8 @@
 
 package com.CH_gui.fileTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -414,7 +416,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
         String messageText = "Are you sure you want to send these items to the Recycle Bin?";
         Record[] toDelete = RecordUtils.concatinate(folderPairs, fileLinks);
-        boolean confirmed = MsgActionTable.showConfirmationDialog(FileActionTable.this, title, messageText, toDelete, MessageDialog.RECYCLE_MESSAGE, true);
+        boolean confirmed = MsgActionTable.showConfirmationDialog(FileActionTable.this, title, messageText, toDelete, NotificationCenter.RECYCLE_MESSAGE, true);
         if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderPair recycleFolderPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));

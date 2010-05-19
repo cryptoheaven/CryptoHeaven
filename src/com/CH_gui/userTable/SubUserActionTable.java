@@ -12,6 +12,8 @@
 
 package com.CH_gui.userTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;

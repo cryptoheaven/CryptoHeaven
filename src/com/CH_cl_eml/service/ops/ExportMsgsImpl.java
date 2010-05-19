@@ -2,7 +2,7 @@
  * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
- * 
+ *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Development Team ("Confidential Information").  You
  * shall not disclose such Confidential Information and shall use
@@ -14,30 +14,22 @@ package com.CH_cl_eml.service.ops;
 
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_co.gui.MyInsets;
+import com.CH_cl.service.ops.ExportMsgsI;
+
+import com.CH_co.monitor.ProgMonitorFactory;
+import com.CH_co.monitor.ProgMonitorJournalI;
 import com.CH_co.service.ops.DataAcquisitionHelperI;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.GeneralDialog;
-import com.CH_co.util.MessageDialog;
 import com.CH_co.util.Misc;
-import com.CH_co.util.MiscGui;
+import com.CH_co.util.NotificationCenter;
+
 import com.CH_co_eml.service.ops.EmailSendingAttOps;
 
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 
 import javax.mail.internet.MimeMessage;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -56,49 +48,34 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author  Marcin
  * @version
  */
-public class ExportMsgUtilities {
-  
-  private static JDialog exportProgress = null;
-  private static JTextArea exportArea = null;
-  private static JButton closeButton = null;
-  
-  /** 
+public class ExportMsgsImpl implements ExportMsgsI {
+
+  private static ProgMonitorJournalI exportProgress = null;
+
+  /**
+   * Public no-args constructor for the factory
+   */
+  public ExportMsgsImpl() {
+  }
+
+  /**
    * Export messages with attachments to the destination.
    * @param msgs Remote messages to download.
    * @param fromMsgs is the message parent to specified files or is NULL if downloading from a folder.
    * @param destDir is the Local destination directory to which to download the files
    **/
-  public static void runDownloadMsgs(MsgLinkRecord[] msgs, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ExportMsgUtilities.class, "runDownloadFile(MsgLinkRecord[] msgs, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload)");
+  public void runDownloadMsgs(MsgLinkRecord[] msgs, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ExportMsgsImpl.class, "runDownloadFile(MsgLinkRecord[] msgs, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload)");
     if (trace != null) trace.args(msgs, fromMsgs, destDir, SIL);
     if (trace != null) trace.args(waitForComplete);
     if (trace != null) trace.args(openAfterDownload);
-    
+
     if (exportProgress == null) {
-      exportProgress = new JDialog(GeneralDialog.getDefaultParent(), "Message Export", false);
-      exportProgress.setSize(600, 300);
-      exportArea = new JTextArea();
-      exportArea.setEditable(false);
-      closeButton = new JButton("Close");
-      closeButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          exportArea.setText("");
-          exportProgress.setVisible(false);
-        }
-      });
-      Container cont = exportProgress.getContentPane();
-      cont.setLayout(new GridBagLayout());
-      cont.add(new JScrollPane(exportArea), new GridBagConstraints(0, 0, 1, 1, 10, 10, 
-          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
-      cont.add(closeButton, new GridBagConstraints(0, 1, 1, 1, 0, 0, 
-          GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+      exportProgress = ProgMonitorFactory.newInstanceJournal("Message Export");
     }
-    if (!exportProgress.isVisible()) {
-      MiscGui.setSuggestedWindowLocation(GeneralDialog.getDefaultParent(), exportProgress);
-      exportProgress.setVisible(true);
-    }
-    closeButton.setEnabled(false);
-    addProgress("Downloading to " + destDir.getAbsolutePath() + "\n", true);
+    exportProgress.setVisible(true);
+    exportProgress.setEnabledClose(false);
+    exportProgress.addProgress("Downloading to " + destDir.getAbsolutePath() + "\n");
     if (destDir != null && msgs != null && msgs.length > 0) {
       try {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -107,11 +84,11 @@ public class ExportMsgUtilities {
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           String subject = EmailSendingAttOps.getSubjectForEmail(msgData);
           String filename = Misc.getFileSafeShortString(subject + " " + msgData.msgId + ".eml");
-          addProgress("   " + filename, false);
+          exportProgress.addProgress("   " + filename);
           try {
             // don't recreate already exported messages
             if (new File(destDir, filename).exists() == false) {
-              addProgress(" exporting...", false);
+              exportProgress.addProgress(" exporting...");
               DataAcquisitionHelperI dataHelper  = new DataAcquisitionHelperClient(SIL);
               DefaultMutableTreeNode msgRoot = EmailSendingAttOps.getMessageWithAttachments(dataHelper, cache.getMyUserId(), msgLink.msgLinkId);
               EmailSendingAttOps.fetchAllFileAttachments(dataHelper, msgRoot);
@@ -127,34 +104,31 @@ public class ExportMsgUtilities {
               emailMessage.writeTo(outStream);
               outStream.flush();
               outStream.close();
-              addProgress(" done.", false);
+              exportProgress.addProgress(" done.");
             } else {
-              addProgress(" already exists, skipped.", false);
+              exportProgress.addProgress(" already exists, skipped.");
             }
           } catch (Throwable t) {
             String msg = t.getMessage();
             if (msg == null) msg = "";
-            addProgress(" skipped due to ERROR: " + Misc.getClassNameWithoutPackage(t.getClass()) + " " + msg, false);
+            exportProgress.addProgress(" skipped due to ERROR: " + Misc.getClassNameWithoutPackage(t.getClass()) + " " + msg);
           }
-          addProgress("\n", true);
+          exportProgress.addProgress("\n");
         }
       } catch (NoClassDefFoundError t) {
         // if mail libraries are not installed, we will end up here
         String msg = t.getMessage();
         if (msg == null) msg = "";
-        addProgress(" skipped due to ERROR: " + Misc.getClassNameWithoutPackage(t.getClass()) + " " + msg, false);
+        exportProgress.addProgress(" skipped due to ERROR: " + Misc.getClassNameWithoutPackage(t.getClass()) + " " + msg);
         exportProgress.setVisible(false);
-        MessageDialog.showErrorDialog(null, "<html><p>Mail export libraries could not be found.  To activate this functionality please download the latest version of the software from the following page: </p><p><a href=\"http://www.cryptoheaven.com/Download\">http://www.cryptoheaven.com/Download</a></p><p>Please close this software before installing the downloaded package.</p>", "Function not available.", false);
+        String title = "Function not available.";
+        String errMsg = "<html><p>Mail export libraries could not be found.  To activate this functionality please download the latest version of the software from the following page: </p><p><a href=\"http://www.cryptoheaven.com/Download\">http://www.cryptoheaven.com/Download</a></p><p>Please close this software before installing the downloaded package.</p>";
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, errMsg);
       }
     }
-    closeButton.setEnabled(true);
+    exportProgress.setEnabledClose(true);
 
-    if (trace != null) trace.exit(ExportMsgUtilities.class);
+    if (trace != null) trace.exit(ExportMsgsImpl.class);
   }
- 
-  private static void addProgress(String s, boolean scroll) {
-    exportArea.append(s);
-    if (scroll)
-      exportArea.setCaretPosition(exportArea.getText().length());
-  }
+
 }

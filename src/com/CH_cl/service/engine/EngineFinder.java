@@ -86,7 +86,6 @@ public class EngineFinder extends Object {
             String errMsg = "Could not open an connection to " + url.toExternalForm() + " to fetch the current list of "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" data servers.  Error message returned is: \n\n" + thX.getMessage();
             if (trace != null) trace.exception(EngineFinder.class, 40, thX);
             if (trace != null) trace.data(41, errMsg);
-            //MessageDialog.showErrorDialog(null, errMsg, "Error", true);
           }
           if (reader != null) {
             // Fetch all lines that starts with 'role' and concatinate them with '|' separator.
@@ -122,7 +121,6 @@ public class EngineFinder extends Object {
         String errMsg = "Fetching the current list of "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" data servers from http://" + httpServer[0] + "/server_list.html at port " + httpServer[1] + " failed.  Error message returned is: \n\n" + t.getMessage();
         if (trace != null) trace.exception(EngineFinder.class, 100+i, t);
         if (trace != null) trace.data(101+i, errMsg);
-        //MessageDialog.showErrorDialog(null, errMsg, "Error", true);
       }
     } // end for
 //System.out.println("3: hostsAndPorts=\n" + Misc.objToStr(hostsAndPorts));

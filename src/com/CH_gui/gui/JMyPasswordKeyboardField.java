@@ -12,6 +12,7 @@
 
 package com.CH_gui.gui;
 
+import com.CH_gui.util.Images;
 import com.CH_gui.dialog.MouseTextEntryDialog;
 import java.awt.*;
 import java.awt.event.*;

@@ -12,6 +12,7 @@
 
 package com.CH_gui.frame;
 
+import com.CH_gui.util.Images;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
@@ -21,7 +22,6 @@ import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.BAEncodedPassword;
-import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -38,6 +38,7 @@ import com.CH_gui.gui.*;
 import com.CH_gui.monitor.*;
 import com.CH_gui.table.TableComponent;
 import com.CH_gui.tree.FolderTreeComponent;
+import com.CH_gui.usrs.UserGuiOps;
 import com.CH_gui.util.*;
 
 import comx.Tiger.gui.*; // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this line
@@ -140,7 +141,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
 
     // set default parent to multi-progress monitors to the main window
-    MultiProgressMonitor.setDefaultParentComponent(this);
+    MultiProgressMonitorImpl.setDefaultParentComponent(this);
 
     contactListener = new ContactListener();
     FetchedDataCache.getSingleInstance().addContactRecordListener(contactListener);
@@ -708,7 +709,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      if (!UserOps.isShowWebAccountRestrictionDialog(MainFrame.this)) {
+      if (!UserGuiOps.isShowWebAccountRestrictionDialog(MainFrame.this)) {
         new ChangeUserNameDialog(MainFrame.this);
       }
     }
@@ -1097,7 +1098,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
                 };
                 jOk.addActionListener(defaultButtonAction);
                 JButton[] buttons = new JButton[] { jOk };
-                MessageDialog.showDialog(MainFrame.this, panel, "Update", MessageDialog.INFORMATION_MESSAGE, buttons, defaultButtonAction, false, true, false);
+                MessageDialog.showDialog(MainFrame.this, panel, "Update", NotificationCenter.INFORMATION_MESSAGE, buttons, defaultButtonAction, false, true, false);
               }
             }
           } catch (Throwable t) {
@@ -1245,7 +1246,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
                     w.dispose();
                   }
                 };
-                MessageDialog.showDialog(null, panel, title, MessageDialog.INFORMATION_MESSAGE, null, defaultButtonAction, false, false, false);
+                MessageDialog.showDialog(null, panel, title, NotificationCenter.INFORMATION_MESSAGE, null, defaultButtonAction, false, false, false);
               } else if (status == ContactRecord.STATUS_DECLINED) {
                 Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
                 MessageDialog.showInfoDialog(null, msg, title);

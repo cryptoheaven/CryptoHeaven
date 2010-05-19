@@ -12,6 +12,7 @@
 
 package com.CH_gui.monitor;
 
+import com.CH_gui.util.Images;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -19,7 +20,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import com.CH_co.gui.MyInsets;
+import com.CH_gui.gui.MyInsets;
 import com.CH_co.monitor.ProgMonitorMultiI;
 import com.CH_co.util.*;
 
@@ -53,7 +54,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
+public class MultiProgressMonitorImpl extends Object implements ProgMonitorMultiI {
 
   private static JFrame progressFrame;
   private static JPanel mainPanel;
@@ -88,7 +89,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
 
   private static Component defaultParentComponent;
 
-  public MultiProgressMonitor() {
+  public MultiProgressMonitorImpl() {
   }
 
   /**
@@ -129,7 +130,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
     updateDebugNotes("NEW");
     timer = new javax.swing.Timer(500, new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        synchronized (MultiProgressMonitor.this) {
+        synchronized (MultiProgressMonitorImpl.this) {
           setProgressAWT(v);
         }
       }
@@ -139,7 +140,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
 
   private class ProgressPanel extends JPanel {
     ProgressPanel(Object messageList) {
-      //super(messageList, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, MultiProgressMonitor.this.cancelOption, null);
+      //super(messageList, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, MultiProgressMonitorImpl.this.cancelOption, null);
       setLayout(new GridBagLayout());
       Object[] msgList = (Object[]) messageList;
       int yPos = 0;
@@ -198,7 +199,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
           contentPane.add(scrollPane, BorderLayout.CENTER);
         }
 
-        monitorsL.add(MultiProgressMonitor.this);
+        monitorsL.add(MultiProgressMonitorImpl.this);
         updateTitle();
         mainPanel.add(this, new GridBagConstraints(0, yPos ++, 1, 1, 10, 0,
           GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -224,7 +225,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
           public void windowClosing(WindowEvent we) {
             synchronized (synchro) {
               for (int i=monitorsL.size()-1; i>=0; i--) {
-                MultiProgressMonitor monitor = (MultiProgressMonitor) monitorsL.get(i);
+                MultiProgressMonitorImpl monitor = (MultiProgressMonitorImpl) monitorsL.get(i);
                 monitor.cancel();
               }
             }
@@ -320,7 +321,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
    */
   public void cancel() {
     if (ENABLE_DEBUG_CANCEL_NOTE)
-      com.CH_co.util.MessageDialog.showInfoDialog(null, debugBuffer.toString(), "Debug Notes");
+      com.CH_gui.util.MessageDialog.showInfoDialog(null, debugBuffer.toString(), "Debug Notes");
     value = cancelOption[0];
     close();
   }
@@ -532,7 +533,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
     javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         for (int i=0; i<monsV.size(); i++) {
-          MultiProgressMonitor mon = (MultiProgressMonitor) monsV.elementAt(i);
+          MultiProgressMonitorImpl mon = (MultiProgressMonitorImpl) monsV.elementAt(i);
           int max = ((Integer) maxsV.elementAt(i)).intValue();
           int value = ((Integer) valuesV.elementAt(i)).intValue();
           if (value < max) {
@@ -557,7 +558,7 @@ public class MultiProgressMonitor extends Object implements ProgMonitorMultiI {
       } catch (IOException x) {
       }
       int max = new Random().nextInt(20)+6;
-      MultiProgressMonitor mon = new MultiProgressMonitor();
+      MultiProgressMonitorImpl mon = new MultiProgressMonitorImpl();
       mon.init(null, "Test Monitor "+monsV.size(), "total units "+max, 0, max);
       monsV.addElement(mon);
       maxsV.addElement(new Integer(max));

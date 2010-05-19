@@ -12,6 +12,8 @@
 
 package com.CH_gui.actionGui;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.ToolBarProducerI;
 import com.CH_gui.util.ActionUtils;
 import java.awt.*;
@@ -28,9 +30,9 @@ import com.CH_gui.tree.*;
 
 import com.CH_cl.service.ops.*;
 
-import com.CH_co.gui.JMyButton;
-import com.CH_co.gui.JMyLabel;
-import com.CH_co.gui.MyInsets;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -456,7 +458,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
             }
           });
           JButton[] jButtons = new JButton[] { jEdit, jCancel };
-          MessageDialog.showDialog(JActionFrame.this, choicePanel, "Choose toolbar for customization.", MessageDialog.QUESTION_MESSAGE, jButtons, null, false);
+          MessageDialog.showDialog(JActionFrame.this, choicePanel, "Choose toolbar for customization.", NotificationCenter.QUESTION_MESSAGE, jButtons, null, false);
         }
       }
     }
@@ -793,6 +795,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       }
     } catch (Exception t) {
       if (trace != null) trace.exception(JActionFrame.class, 100, t);
+      // if failed then at the very least pack() frame so it shows up with non-zero size
+      pack();
+      isPackingSize = true;
     }
 
     if (trace != null) trace.exit(JActionFrame.class);

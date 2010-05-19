@@ -12,6 +12,11 @@
 
 package com.CH_gui.monitor;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
 import javax.swing.*;
 
 import java.awt.event.*;
@@ -24,7 +29,7 @@ import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_co.util.GlobalProperties;
+import com.CH_gui.gui.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -42,7 +47,7 @@ import com.CH_co.util.GlobalProperties;
  * @author  Marcin Kurzawa
  * @version
  */
-public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
+public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
 
   private JLabel jImageLabel;
 
@@ -67,13 +72,13 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
   private static final Object counterMonitor = new Object();
   private static int counter = 0;
 
-  /** Creates new WipeProgMonitor */
-  public WipeProgMonitor() {
+  /** Creates new WipeProgMonitorImpl */
+  public WipeProgMonitorImpl() {
   }
 
-  /** Creates new WipeProgMonitor */
+  /** Creates new WipeProgMonitorImpl */
   private void init(String title, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "init(String title, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "init(String title, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
     if (trace != null) trace.args(title, noteHeadings, notes);
     if (trace != null) trace.args(initProgBarMin);
     if (trace != null) trace.args(initProgBarMax);
@@ -81,7 +86,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
     setTitle(title);
 
     synchronized (counterMonitor) {
-      name = WipeProgMonitor.class.getName() + " #" + counter;
+      name = WipeProgMonitorImpl.class.getName() + " #" + counter;
       if (trace != null) trace.data(10, "creating... ", name);
       counter ++;
       if (counter == Integer.MAX_VALUE)
@@ -107,7 +112,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
     setLocation(MiscGui.getSuggestedSpreadedWindowLocation(this));
     setVisible(true);
 
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
 
@@ -115,18 +120,18 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
    * File Wipe
    */
   public void init(Interruptible interruptible) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "init(Interruptible interruptible)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "init(Interruptible interruptible)");
     init("Secure File Wipe",
               new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" },
               new String[] { " ... ", " ... ", " ... ", " ... " },
               0, 100);
     setInterrupt(interruptible);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
 
   private void initPanelComponents(String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "initPanelComponents(String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "initPanelComponents(String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
     if (trace != null) trace.args(noteHeadings, notes);
     if (trace != null) trace.args(initProgBarMin);
     if (trace != null) trace.args(initProgBarMax);
@@ -163,7 +168,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
         if (trace != null) trace.args(event);
         if (trace != null) trace.data(10, name);
         GlobalProperties.setProperty("ProgMonitor.WipeProgMonitor.closeOnDone", "" +
-          WipeProgMonitor.this.jCloseOnDone.isSelected());
+          WipeProgMonitorImpl.this.jCloseOnDone.isSelected());
         if (trace != null) trace.exit(getClass());
       }
     });
@@ -187,7 +192,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
       }
     });
 
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   private JPanel createMainPanel() {
@@ -259,7 +264,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
   }
 
   public void closeProgMonitor() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "closeProgMonitor()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "closeProgMonitor()");
     if (trace != null) trace.data(10, name);
 
     ProgMonitorPool.removeProgMonitor(this);
@@ -281,14 +286,14 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
       }
     }
 
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   private LinkedList historyTotalBytes;
   private LinkedList historyUpdateDates;
 
   private void resetStats(long newSize) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "resetStats(long newSize)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "resetStats(long newSize)");
     if (trace != null) trace.args(newSize);
     if (trace != null) trace.data(10, name);
 
@@ -299,14 +304,14 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
     totalTransferSize = newSize;
     transferStartDateMillis = System.currentTimeMillis();
 
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   /**
    * only last 'numOfStats' are kept to make current calculations.
    */
   private void updateStats(long currentDateMillis, int numOfStats) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "updateStats(long currentDateMillis, int numOfStats)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "updateStats(long currentDateMillis, int numOfStats)");
     if (trace != null) trace.args(currentDateMillis);
     if (trace != null) trace.args(numOfStats);
     if (trace != null) trace.data(10, name);
@@ -366,7 +371,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
     String estimate = Misc.getFormattedTime(timeToGo) + " [" + Misc.getFormattedTime(totalTimeElapsed) + " of " + Misc.getFormattedTime(totalTime) + ")";
     jNotes[0].setText(estimate);
 
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
 
@@ -385,117 +390,117 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
   private boolean jobKilled;
 
   public void enqueue(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "enqueue(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "enqueue(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void dequeue(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "dequeue(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "dequeue(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startSend(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startSend(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startSend(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.moveGlobe(this);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startSendAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startSendAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Sending request ... [" + actionName + "]");
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startSendData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startSendData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startSendData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneSend(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneSend(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneSend(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Waiting for reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneSendAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneSendAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneSendData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneSendData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneSendData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startReceive(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startReceive(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startReceive(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Receiving reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startReceiveAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startReceiveAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startReceiveAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startReceiveData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startReceiveData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startReceiveData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneReceive(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneReceive(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneReceive(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Reply received. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneReceiveAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneReceiveAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneReceiveAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneReceiveData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneReceiveData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneReceiveData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startExecution(int actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "startExecution(int actionCode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Executing reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneExecution(int actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneExecution(int actionCode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Action completed. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void appendLine(String str) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "appendLine(String str)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "appendLine(String str)");
     if (trace != null) trace.args(str);
     if (trace != null) trace.data(10, name);
     String text = jTextArea.getText();
@@ -507,31 +512,31 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
       jTextArea.setText(str);
       jTextArea.setCaretPosition(0);
     }
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void setCurrentStatus(String currentStatus) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "setCurrentStatus(String currentStatus)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setCurrentStatus(String currentStatus)");
     if (trace != null) trace.args(currentStatus);
     if (trace != null) trace.data(10, name);
     jStatus.setText(currentStatus);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void setFileNameSource(String fileName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "setFileNameSource(String fileName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setFileNameSource(String fileName)");
     if (trace != null) trace.args(fileName);
     if (trace != null) trace.data(10, name);
     jNotes[1].setText(fileName);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void setFileNameDestination(String fileName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "setFileNameDestination(String fileName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setFileNameDestination(String fileName)");
     if (trace != null) trace.args(fileName);
     if (trace != null) trace.data(10, name);
     jNotes[2].setText(fileName);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void setTransferSize(long size) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "setTransferSize(long size)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setTransferSize(long size)");
     if (trace != null) trace.args(size);
     if (trace != null) trace.data(10, name);
     jProgressBar.setMinimum(0);
@@ -539,10 +544,10 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
 
     resetStats(size);
     updateStats(System.currentTimeMillis(), 5);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void addBytes(long bytes) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "addBytes(long bytes)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "addBytes(long bytes)");
     if (trace != null) trace.args(bytes);
     if (trace != null) trace.data(10, name);
     boolean updateNow = totalBytes == 0;
@@ -555,30 +560,30 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
     if (updateNow || totalBytes == totalTransferSize || (currentDateMillis - lastTransferUpdateDateMillis) > 1000) {
       updateStats(currentDateMillis, 5);
     }
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneTransfer() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "doneTransfer");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneTransfer");
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
    }
   public void nextTask(String title) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "nextTask");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "nextTask");
     if (trace != null) trace.args(title);
     if (trace != null) trace.data(10, name);
     currentTask ++;
     setTitle(title);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   } // end nextTask()
   public void nextTask() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "nextTask");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "nextTask");
     if (trace != null) trace.data(10, name);
     nextTask("");
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   public void allDone() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "allDone");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "allDone");
     if (trace != null) trace.data(10, name);
     allDone = true;
     setTitle("Done Wiping");
@@ -593,30 +598,30 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
     Stats.stopGlobe(this);
 
     Sounds.playAsynchronous(Sounds.TRANSFER_DONE);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   } // end allDone()
 
   public void jobKilled() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "jobKilled()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "jobKilled()");
     if (trace != null) trace.data(10, name);
     setCurrentStatus("Job Failed!");
     jobKilled = true;
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   public void jobForRetry() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "jobForRetry()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "jobForRetry()");
     if (trace != null) trace.data(10, name);
     setCurrentStatus("Job Queued for Retry.");
     Stats.stopGlobe(this);
     closeProgMonitor();
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
 
   public void setInterrupt(Interruptible interruptible) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitor.class, "setInterrupt(Interruptible interruptible)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setInterrupt(Interruptible interruptible)");
     if (trace != null) trace.args(interrupt);
     if (trace != null) trace.data(10, name);
     this.interrupt = interruptible;
@@ -624,7 +629,7 @@ public class WipeProgMonitor extends JFrame implements ProgMonitorWipeI {
       closeProgMonitor();
       interruptible.interrupt();
     }
-    if (trace != null) trace.exit(WipeProgMonitor.class);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   public boolean isAllDone() {

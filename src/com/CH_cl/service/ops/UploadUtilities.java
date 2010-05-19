@@ -180,7 +180,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
           BASymmetricKey baSymmetricKey = new BASymmetricKey(32);
           boolean useInheritedSharing = true;
-          Fld_NewFld_Rq newFolderRequest = FolderOps.createNewFldRq(null, parentPair, FolderRecord.FILE_FOLDER,
+          Fld_NewFld_Rq newFolderRequest = FolderOps.createNewFldRq(parentPair, FolderRecord.FILE_FOLDER,
                                               folderName, folderDesc, folderName, folderDesc, null, null, baSymmetricKey, useInheritedSharing, null, SIL);
 
           if (trace != null) trace.data(100, "newFolderRequest", newFolderRequest);
@@ -290,7 +290,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       request.fileLinks[i].ownerObjType = ownerObjType;
 
       String fileName = file.getName();
-      request.fileLinks[i].setFileType((String) MiscGui.getFileIconAndType(fileName)[1]);
+      request.fileLinks[i].setFileType(MiscGui.getFileType(fileName));
       request.fileLinks[i].setFileName(fileName);
       request.fileLinks[i].origSize = new Long (file.length());
 

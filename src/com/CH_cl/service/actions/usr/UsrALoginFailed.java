@@ -55,7 +55,7 @@ public class UsrALoginFailed extends ClientMessageAction {
     String msg = dataSet.message;
     if (msg != null && msg.length() > 0 && msg.toLowerCase().indexOf("please specify the account pass") < 0) {
       String title = "Login Failed";
-      MessageDialog.showWarningDialog(null, msg, title, true);
+      NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, msg, true);
     }
 
     if (trace != null) trace.exit(UsrALoginFailed.class, null);

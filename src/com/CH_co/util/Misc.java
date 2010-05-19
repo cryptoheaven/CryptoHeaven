@@ -39,13 +39,26 @@ public class Misc extends Object {
   }
   public static void systemExit(int code) {
     // cleanup files before exiting...
-    GlobalProperties.cleanupTempFiles();
-    GlobalProperties.cleanupTempFilesOnFinalize();
+    try {
+      // any error in the filesystem must not interrupt exit flow
+      GlobalProperties.cleanupTempFiles();
+      GlobalProperties.cleanupTempFilesOnFinalize();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
     // exit
     if (systemExitObj != null) {
-      systemExitObj.disposeObj();
+      try {
+        systemExitObj.disposeObj();
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
       // interrupt running deamon threads
-      CleanupAgent.stopSingleInstance();
+      try {
+        CleanupAgent.stopSingleInstance();
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
     } else {
       System.exit(code);
     }

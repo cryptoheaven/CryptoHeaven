@@ -12,6 +12,13 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;

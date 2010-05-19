@@ -20,7 +20,6 @@ import com.CH_cl.service.records.*;
 import com.CH_cl.util.GlobalSubProperties;
 
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
@@ -30,12 +29,13 @@ import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
-import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
-import com.CH_cl.service.ops.SysOps;
+import com.CH_gui.list.*;
+import com.CH_gui.msgs.*;
+import com.CH_gui.util.*;
 import com.CH_gui.usrs.*;
-import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.service.records.*;
+
+import com.CH_guiLib.gui.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -855,7 +855,7 @@ public class AccountOptionsDialog extends GeneralDialog {
       if (jResetLocalSettings.isSelected()) {
         GlobalProperties.resetMyAndGlobalProperties();
         GlobalProperties.store();
-        MessageDialog.showInfoDialog(null, "Local settings reset and reinitialized.", "Confirmation", false);
+        NotificationCenter.show(NotificationCenter.INFORMATION_MESSAGE, "Settings", "Local settings were reset to defaults.  These changes will take effect next time you start the applications.");
       }
     }
 

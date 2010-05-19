@@ -10,8 +10,11 @@
  * you entered into with CryptoHeaven Development Team.
  */
 
-package com.CH_co.service.records;
+package com.CH_gui.monitor;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -19,9 +22,12 @@ import javax.swing.border.*;
 import javax.swing.*;
 import java.io.*;
 
-import com.CH_co.gui.*;
+import com.CH_co.monitor.ConfirmFileReplaceI;
+import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import com.CH_gui.gui.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -29,7 +35,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -37,9 +43,9 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.14 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public class ConfirmFileReplaceDialog extends GeneralDialog {
+public class ConfirmFileReplaceImpl extends GeneralDialog implements ConfirmFileReplaceI {
 
   private static final int DEFAULT_YES_INDEX = 1;
   private static final int DEFAULT_NO_INDEX = 2;
@@ -54,10 +60,15 @@ public class ConfirmFileReplaceDialog extends GeneralDialog {
   private JCheckBox jRenameCheck;
   private JTextField jRenameText;
 
-  /** Creates new ConfirmFileReplaceDialog */
-  public ConfirmFileReplaceDialog(File originalFile, Long newSize, FileDataRecord newFile) {
+  /** Creates new ConfirmFileReplaceImpl */
+  public ConfirmFileReplaceImpl() {
     super("Confirm File Replace");
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ConfirmFileReplaceDialog.class, "ConfirmFileReplaceDialog(File originalFile, Long new Size, FileDataRecord newFile)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ConfirmFileReplaceImpl.class, "ConfirmFileReplaceDialog()");
+    if (trace != null) trace.exit(ConfirmFileReplaceImpl.class);
+  }
+
+  public void init(File originalFile, Long newSize, FileDataRecord newFile) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ConfirmFileReplaceImpl.class, "init(File originalFile, Long new Size, FileDataRecord newFile)");
     if (trace != null) trace.args(originalFile, newSize, newFile);
 
     this.originalFile = originalFile;
@@ -71,10 +82,10 @@ public class ConfirmFileReplaceDialog extends GeneralDialog {
     jYesButton = buttons[1];
 
     setModal(true);
-    MessageDialog.playSound(MessageDialog.WARNING_MESSAGE);
+    MessageDialog.playSound(NotificationCenter.WARNING_MESSAGE);
     init(null, buttons, mainComponent, DEFAULT_NO_INDEX, DEFAULT_NO_INDEX);
 
-    if (trace != null) trace.exit(ConfirmFileReplaceDialog.class);
+    if (trace != null) trace.exit(ConfirmFileReplaceImpl.class);
   }
 
   private JButton[] createButtons() {
@@ -112,30 +123,30 @@ public class ConfirmFileReplaceDialog extends GeneralDialog {
     panel.setLayout(new GridBagLayout());
 
     int posY = 0;
-    panel.add(new JMyLabel(Images.get(ImageNums.FILE_REPLACE32)), new GridBagConstraints(0, posY, 1, 2, 0, 10, 
+    panel.add(new JMyLabel(Images.get(ImageNums.FILE_REPLACE32)), new GridBagConstraints(0, posY, 1, 2, 0, 10,
           GridBagConstraints.NORTH, GridBagConstraints.NORTH, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel("This folder already contains a file named '" + originalFile.getName() + "'."), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("This folder already contains a file named '" + originalFile.getName() + "'."), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel("Folder name is '" + originalFile.getParent() + "'."), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("Folder name is '" + originalFile.getParent() + "'."), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 15, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel("Would you like to OVERWRITE the existing file:"), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("Would you like to OVERWRITE the existing file:"), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(Misc.getFormattedSize(originalFile.length(), 21, 22), Images.get(ImageNums.FILE32), JLabel.LEFT), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(Misc.getFormattedSize(originalFile.length(), 21, 22), Images.get(ImageNums.FILE32), JLabel.LEFT), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel("with this one?"), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel("with this one?"), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(Misc.getFormattedSize(newSize.longValue(), 21, 22), Images.get(ImageNums.FILE32), JLabel.LEFT), new GridBagConstraints(1, posY, 2, 1, 10, 0, 
+    panel.add(new JMyLabel(Misc.getFormattedSize(newSize.longValue(), 21, 22), Images.get(ImageNums.FILE32), JLabel.LEFT), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -156,9 +167,9 @@ public class ConfirmFileReplaceDialog extends GeneralDialog {
     });
     jRenameText = new JTextField(15);
     jRenameText.setText(originalFile.getName());
-    panel.add(jRenameCheck, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    panel.add(jRenameCheck, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 1), 0, 0));
-    panel.add(jRenameText, new GridBagConstraints(2, posY, 1, 1, 10, 0, 
+    panel.add(jRenameText, new GridBagConstraints(2, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 1, 5, 5), 0, 0));
     posY ++;
 
@@ -179,9 +190,9 @@ public class ConfirmFileReplaceDialog extends GeneralDialog {
     } else {
       isRename = false;
       if (renameTo.length() > 0)
-        MessageDialog.showErrorDialog(ConfirmFileReplaceDialog.this, "Duplicate file '" + renamedFile.getName() + "'.  File already exists.", "File already exists", true);
+        MessageDialog.showErrorDialog(ConfirmFileReplaceImpl.this, "Duplicate file '" + renamedFile.getName() + "'.  File already exists.", "File already exists", true);
       else
-        MessageDialog.showErrorDialog(ConfirmFileReplaceDialog.this, "No alternate file name specified.  Please specify an alternate file name.", "Please specify an alternate file name.", true);
+        MessageDialog.showErrorDialog(ConfirmFileReplaceImpl.this, "No alternate file name specified.  Please specify an alternate file name.", "Please specify an alternate file name.", true);
     }
   }
 
@@ -193,9 +204,9 @@ public class ConfirmFileReplaceDialog extends GeneralDialog {
       isReplace = false;
       boolean canRead = originalFile.canRead();
       if (!canRead)
-        MessageDialog.showErrorDialog(ConfirmFileReplaceDialog.this, "Cannot overwrite file.  Write access denied.", "Cannot Overwrite File", true);
+        MessageDialog.showErrorDialog(ConfirmFileReplaceImpl.this, "Cannot overwrite file.  Write access denied.", "Cannot Overwrite File", true);
       else
-        MessageDialog.showErrorDialog(ConfirmFileReplaceDialog.this, "Cannot overwrite file.  File access is set to Read Only.", "Cannot Overwrite File", true);
+        MessageDialog.showErrorDialog(ConfirmFileReplaceImpl.this, "Cannot overwrite file.  File access is set to Read Only.", "Cannot Overwrite File", true);
     }
   }
 

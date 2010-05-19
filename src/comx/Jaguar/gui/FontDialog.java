@@ -12,6 +12,8 @@
 
 package comx.Jaguar.gui;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -20,6 +22,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
+import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_co.gui.*;
 

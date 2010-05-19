@@ -12,6 +12,7 @@
 
 package com.CH_gui.table;
 
+import com.CH_gui.util.Images;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 

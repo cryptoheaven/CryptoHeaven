@@ -12,6 +12,10 @@
 
 package com.CH_gui.monitor;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.MyInsets;
 import javax.swing.*;
 
 import java.awt.event.*;
@@ -27,6 +31,8 @@ import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+
+import com.CH_gui.gui.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -44,7 +50,7 @@ import com.CH_co.util.*;
  * @author  Marcin Kurzawa
  * @version 
  */
-public final class TransferProgMonitor extends JFrame implements ProgMonitorTransferI {
+public final class TransferProgMonitorImpl extends JFrame implements ProgMonitorTransferI {
 
   private String title;
 
@@ -84,15 +90,15 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
   private File destDir;
   private FileLinkRecord[] fileLinks;
 
-  /** Creates new TransferProgMonitor */
-  public TransferProgMonitor() {
+  /** Creates new TransferProgMonitorImpl */
+  public TransferProgMonitorImpl() {
   }
 
-  /** Initialized new TransferProgMonitor */
+  /** Initialized new TransferProgMonitorImpl */
   private void init(String title, String[] tasks, String[] noteHeadings, String[] notes,
                int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)
   {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "init(String title, String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "init(String title, String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)");
     if (trace != null) trace.args(title, tasks, noteHeadings, notes);
     if (trace != null) trace.args(initProgBarMin);
     if (trace != null) trace.args(initProgBarMax);
@@ -102,7 +108,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
     setTitle(title);
 
     synchronized (counterMonitor) {
-      name = TransferProgMonitor.class.getName() + " #" + counter;
+      name = TransferProgMonitorImpl.class.getName() + " #" + counter;
       if (trace != null) trace.data(10, "creating... ", name);
       counter ++;
       if (counter == Integer.MAX_VALUE)
@@ -147,7 +153,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
     th.setDaemon(true);
     th.start();
 
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
 
@@ -155,7 +161,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
    * File Download/Open
    */
   public void init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose))");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose))");
     if (trace != null) trace.args(tasks, destDir, fileLinks);
     if (trace != null) trace.args(isDownload);
     if (trace != null) trace.args(suppressTransferSoundsAndAutoClose);
@@ -166,21 +172,21 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
               );
     setDestinationDir(destDir);
     setFiles(fileLinks);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   /** 
    * File Upload
    */
   public void init(String[] tasks) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "init(String[] tasks)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "init(String[] tasks)");
     if (trace != null) trace.args(tasks);
     init("File Upload", tasks,
               new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" }, 
               new String[] { " ... ", " ... ", " ... ", " ... " },
               0, 100, MONITORING_UPLOAD, false
               );
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
 
@@ -196,7 +202,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
 
 
   private void initPanelComponents(String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "initPanelComponents(String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "initPanelComponents(String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
     if (trace != null) trace.args(tasks, noteHeadings, notes);
     if (trace != null) trace.args(initProgBarMin);
     if (trace != null) trace.args(initProgBarMin);
@@ -247,9 +253,9 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
           if (trace != null) trace.args(event);
           if (trace != null) trace.data(10, name);
           if (monitoringType == MONITORING_UPLOAD)
-            GlobalProperties.setProperty("ProgMonitor.TransferProgMonitor.closeOnDone.upload", "" + TransferProgMonitor.this.jCloseOnDone.isSelected());
+            GlobalProperties.setProperty("ProgMonitor.TransferProgMonitor.closeOnDone.upload", "" + TransferProgMonitorImpl.this.jCloseOnDone.isSelected());
           else
-            GlobalProperties.setProperty("ProgMonitor.TransferProgMonitor.closeOnDone.download", "" + TransferProgMonitor.this.jCloseOnDone.isSelected());
+            GlobalProperties.setProperty("ProgMonitor.TransferProgMonitor.closeOnDone.download", "" + TransferProgMonitorImpl.this.jCloseOnDone.isSelected());
           if (trace != null) trace.exit(getClass());
         }
       });
@@ -317,7 +323,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
       }
     });
 
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   private JPanel createMainPanel() {
@@ -396,7 +402,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
   }
 
   public void closeProgMonitor() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "closeProgMonitor()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "closeProgMonitor()");
     if (trace != null) trace.data(10, name);
     ProgMonitorPool.removeProgMonitor(this);
     Stats.stopGlobe(this);
@@ -414,7 +420,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
       }
     }
 
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   public boolean isCancelled() {
@@ -425,7 +431,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
   private LinkedList historyUpdateDates;
 
   private void resetStats(long newSize) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "resetStats(long newSize)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "resetStats(long newSize)");
     if (trace != null) trace.args(newSize);
     if (trace != null) trace.data(10, name);
     historyTotalBytes = null;
@@ -434,14 +440,14 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
     totalBytes = 0;
     totalTransferSize = newSize;
     transferStartDateMillis = System.currentTimeMillis();
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   /**
    * only last 'numOfStats' are kept to make current calculations.
    */
   private void updateStats(long currentDateMillis, int numOfStats) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "updateStats(long currentDateMillis, int numOfStats)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "updateStats(long currentDateMillis, int numOfStats)");
     if (trace != null) trace.args(currentDateMillis);
     if (trace != null) trace.args(numOfStats);
     if (trace != null) trace.data(10, name);
@@ -501,7 +507,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
     String estimate = Misc.getFormattedTime(timeToGo) + " (" + Misc.getFormattedTime(totalTimeElapsed) + " of " + Misc.getFormattedTime(totalTime) + ")";
     jNotes[0].setText(estimate);
 
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
 
@@ -520,141 +526,141 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
   private boolean jobKilled;
 
   public void enqueue(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "enqueue(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "enqueue(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.moveGlobe(this);
     Stats.setStatus("New transfer request... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void dequeue(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "dequeue(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "dequeue(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Preparing to transfer ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startSend(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startSend(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startSend(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     //Stats.moveGlobe(this); // moving globe in enqueue()
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startSendAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startSendAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Sending request ... [" + actionName + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startSendData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startSendData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startSendData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneSend(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneSend(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneSend(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Waiting for reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneSendAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneSendAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneSendData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneSendData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneSendData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startReceive(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startReceive(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startReceive(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Receiving reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startReceiveAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startReceiveAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startReceiveAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startReceiveData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startReceiveData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startReceiveData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneReceive(int actionCode, long stamp) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneReceive(int actionCode, long stamp)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneReceive(int actionCode, long stamp)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Reply received. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneReceiveAction(String actionName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneReceiveAction(String actionName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneReceiveAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneReceiveData(String dataName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneReceiveData(String dataName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneReceiveData(String dataName)");
     if (trace != null) trace.args(dataName);
     if (trace != null) trace.data(10, name);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startExecution(int actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "startExecution(int actionCode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Executing reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneExecution(int actionCode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneExecution(int actionCode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
     Stats.setStatus("Action completed. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void setCurrentStatus(String currentStatus) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "setCurrentStatus(String currentStatus)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setCurrentStatus(String currentStatus)");
     if (trace != null) trace.args(currentStatus);
     if (trace != null) trace.data(10, name);
     jStatus.setText(currentStatus);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void setFileNameSource(String fileName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "setFileNameSource(String fileName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setFileNameSource(String fileName)");
     if (trace != null) trace.args(fileName);
     if (trace != null) trace.data(10, name);
     jNotes[1].setText(fileName);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void setFileNameDestination(String fileName) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "setFileNameDestination(String fileName)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setFileNameDestination(String fileName)");
     if (trace != null) trace.args(fileName);
     if (trace != null) trace.data(10, name);
     jNotes[2].setText(fileName);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void setTransferSize(long size) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "setTransferSize(long size)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setTransferSize(long size)");
     if (trace != null) trace.args(size);
     if (trace != null) trace.data(10, name);
     jProgressBar.setMinimum(0);
@@ -662,10 +668,10 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
 
     resetStats(size);
     updateStats(System.currentTimeMillis(), 5);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void addBytes(long bytes) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "addBytes(long bytes)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "addBytes(long bytes)");
     if (trace != null) trace.args(bytes);
     if (trace != null) trace.data(10, name);
     boolean updateNow = totalBytes == 0;
@@ -678,19 +684,19 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
     if (updateNow || totalBytes == totalTransferSize || (currentDateMillis - lastTransferUpdateDateMillis) > 1000) {
       updateStats(currentDateMillis, 5);
     }
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneTransfer() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "doneTransfer");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneTransfer");
     if (trace != null) trace.data(10, name);
     if (currentTask >= 0) {
       MiscGui.setPlainFont(jCheckTasks[currentTask]);
       jCheckTasks[currentTask].setSelected(true);
     }
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void nextTask() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "nextTask");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "nextTask");
     if (trace != null) trace.data(10, name);
     currentTask ++;
     if (currentTask < jCheckTasks.length) {
@@ -706,11 +712,11 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
       currentTask = -1;
       nextTask();
     }
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   } // end nextTask()
 
   public void allDone() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "allDone");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "allDone");
     if (trace != null) trace.data(10, name);
     allDone = true;
     Stats.stopGlobe(this);
@@ -745,29 +751,29 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
         }
       }
     }
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   } // end allDone()
 
   public void jobKilled() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "jobKilled()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "jobKilled()");
     if (trace != null) trace.data(10, name);
     setCurrentStatus("Job Failed!");
     jobKilled = true;
     Stats.stopGlobe(this);
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   public void jobForRetry() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "jobForRetry()");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "jobForRetry()");
     if (trace != null) trace.data(10, name);
     setCurrentStatus("Job Queued for Retry.");
     Stats.stopGlobe(this);
     closeProgMonitor();
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   public void setInterrupt(Interruptible interruptible) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "setInterrupt(Interruptible interruptible)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setInterrupt(Interruptible interruptible)");
     if (trace != null) trace.args(interrupt);
     if (trace != null) trace.data(10, name);
     this.interrupt = interruptible;
@@ -775,7 +781,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
       closeProgMonitor();
       interruptible.interrupt();
     }
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   public boolean isAllDone() {
@@ -786,7 +792,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
   }
 
   public void setCancellable(Cancellable cancellable) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitor.class, "setCancellable(Cancellable cancellable)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setCancellable(Cancellable cancellable)");
     if (trace != null) trace.args(cancellable);
     if (trace != null) trace.data(10, name);
     this.cancellable = cancellable;
@@ -794,7 +800,7 @@ public final class TransferProgMonitor extends JFrame implements ProgMonitorTran
       closeProgMonitor();
       cancellable.setCancelled(true);
     }
-    if (trace != null) trace.exit(TransferProgMonitor.class);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
   public void nextTask(String task) {

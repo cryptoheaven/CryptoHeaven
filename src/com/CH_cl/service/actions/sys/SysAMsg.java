@@ -61,24 +61,24 @@ public class SysAMsg extends ClientMessageAction {
 
     if (modal.booleanValue()) {
       if (msgType.equalsIgnoreCase("i")) {
-        MessageDialog.showInfoDialog(null, body, title, modal.booleanValue());
+        NotificationCenter.show(NotificationCenter.INFORMATION_MESSAGE, title, body, modal.booleanValue());
       } else if (msgType.equalsIgnoreCase("w")) {
-        MessageDialog.showWarningDialog(null, body, title, modal.booleanValue());
+        NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, body, modal.booleanValue());
       } else if (msgType.equalsIgnoreCase("e")) {
-        MessageDialog.showErrorDialog(null, body, title, modal.booleanValue());
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, body, modal.booleanValue());
       }
     } else {
       if (msgDialogArbiter == null) msgDialogArbiter = new SingleTokenArbiter();
       String key = msgType+title+body;
-      int dialogType = MessageDialog.ERROR_MESSAGE;
+      int dialogType = NotificationCenter.ERROR_MESSAGE;
       if (msgType.equalsIgnoreCase("i")) {
-        dialogType = MessageDialog.INFORMATION_MESSAGE;
+        dialogType = NotificationCenter.INFORMATION_MESSAGE;
       } else if (msgType.equalsIgnoreCase("w")) {
-        dialogType = MessageDialog.WARNING_MESSAGE;
+        dialogType = NotificationCenter.WARNING_MESSAGE;
       } else if (msgType.equalsIgnoreCase("e")) {
-        dialogType = MessageDialog.ERROR_MESSAGE;
+        dialogType = NotificationCenter.ERROR_MESSAGE;
       }
-      new SingleDialogShower(msgDialogArbiter, key, null, dialogType, title, body).start();
+      NotificationCenter.show(msgDialogArbiter, key, dialogType, title, body);
     }
 
     if (trace != null) trace.exit(SysAMsg.class, null);

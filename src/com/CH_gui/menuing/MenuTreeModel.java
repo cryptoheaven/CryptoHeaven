@@ -522,25 +522,49 @@ public class MenuTreeModel extends Object {
     if (!isInitialized) {
       isInitialized = true;
 
+      Object[] _treeModelPopup = buildModel("PopupTreeModel."+menuPropertyName, EMPTY_MENU_POPUP_SEQUENCE);
       // First build the popup menu model, then overwrite hot keys with real menu tree model.
-      String menuSequencePopup = GlobalProperties.getProperty("PopupTreeModel."+menuPropertyName);
-      if (trace != null) trace.data(10, menuSequencePopup);
-      if (menuSequencePopup == null || menuSequencePopup.length() == 0)
-        menuSequencePopup = EMPTY_MENU_POPUP_SEQUENCE;
-      Object[] _treeModelPopup = buildMenuTreeModel(null, null, Arrays.asList(menuSequencePopup.split("[\\|]+")).iterator());
       treeModelPopup = (DefaultTreeModel) _treeModelPopup[0];
       treeModelPopupHM = (HashMap) _treeModelPopup[1];
 
-      String menuSequence = GlobalProperties.getProperty("MenuTreeModel."+menuPropertyName);
-      if (trace != null) trace.data(20, menuSequence);
-      if (menuSequence == null || menuSequence.length() == 0)
-        menuSequence = EMPTY_MENU_SEQUENCE;
-      Object[] _treeModel = buildMenuTreeModel(null, null, Arrays.asList(menuSequence.split("[\\|]+")).iterator());
+      Object[] _treeModel = buildModel("MenuTreeModel."+menuPropertyName, EMPTY_MENU_SEQUENCE);
       treeModel = (DefaultTreeModel) _treeModel[0];
       treeModelHM = (HashMap) _treeModel[1];
     }
 
     if (trace != null) trace.exit(MenuTreeModel.class);
+  }
+
+  private static Object[] buildModel(String propertyName, String emptySequence) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MenuTreeModel.class, "initialize(String propertyName, String emptySequence)");
+    if (trace != null) trace.args(propertyName, emptySequence);
+
+    String menuSequence = GlobalProperties.getProperty(propertyName);
+    if (trace != null) trace.data(10, menuSequence);
+    if (menuSequence == null || menuSequence.length() == 0)
+      menuSequence = emptySequence;
+    Object[] modelSet = null;
+    try {
+      modelSet = buildMenuTreeModel(null, null, Arrays.asList(menuSequence.split("[\\|]+")).iterator());
+    } catch (Exception e1) {
+      try {
+        // we have corrupted properties -- reset them to defaults so that user doesn't have to do it manually
+        GlobalProperties.resetMyAndGlobalProperties();
+        menuSequence = GlobalProperties.getProperty(propertyName);
+        if (menuSequence == null || menuSequence.length() == 0)
+          menuSequence = emptySequence;
+        if (trace != null) trace.data(20, menuSequence);
+        modelSet = buildMenuTreeModel(null, null, Arrays.asList(menuSequence.split("[\\|]+")).iterator());
+      } catch (Exception e2) {
+        // failed again with reset properties - this is probably programming bug
+        e2.printStackTrace();
+        // last resort is the empty sequence
+        modelSet = buildMenuTreeModel(null, null, Arrays.asList(emptySequence.split("[\\|]+")).iterator());
+      }
+    }
+
+    if (trace != null) trace.exit(MenuTreeModel.class, modelSet);
+    return modelSet;
   }
 
   /**
@@ -656,7 +680,7 @@ public class MenuTreeModel extends Object {
   private void addAction(Action action, DefaultTreeModel treeModel, Map treeModelHM, boolean ensureVisibility) {
     Integer actionId = (Integer) action.getValue(Actions.ACTION_ID);
     // Attempt to find the node starting from the root.
-    //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) treeModel.getRoot());
+    //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) modelSet.getRoot());
     DefaultMutableTreeNode node = findNode(actionId, treeModelHM);
     MenuActionItem menuNode = null;
     if (node != null) {
@@ -683,7 +707,7 @@ public class MenuTreeModel extends Object {
       }
     } else {
       // if no assigned node, throw it into 'Not Assigned' (-100,000)
-      //node = findNode(new Integer(-100000), (DefaultMutableTreeNode) treeModel.getRoot());
+      //node = findNode(new Integer(-100000), (DefaultMutableTreeNode) modelSet.getRoot());
       node = findNode(new Integer(-100000), treeModelHM);
       if (node != null) {
         menuNode = new MenuActionItem(action);
@@ -927,7 +951,7 @@ public class MenuTreeModel extends Object {
         Action action = actionArray[i];
         Integer actionId = (Integer) action.getValue(Actions.ACTION_ID);
         // Attempt to find the node starting from the root.
-        //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) treeModel.getRoot());
+        //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) modelSet.getRoot());
         DefaultMutableTreeNode node = findNode(actionId, treeModelHM);
         if (node != null) {
           ensureNodeIsInvisible(node);

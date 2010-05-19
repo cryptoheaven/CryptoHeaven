@@ -12,6 +12,9 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.event.*;
@@ -27,7 +30,6 @@ import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.records.filters.*;
 import com.CH_cl.tree.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.service.msg.*;
@@ -600,7 +602,6 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
       newFolderRequest = FolderOps.createNewFldRq
           (
-          this,
           parentFolder,
           getSelectedFolderType(),
           folderName, folderDesc,

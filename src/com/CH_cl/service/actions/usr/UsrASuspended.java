@@ -17,8 +17,6 @@ import com.CH_cl.service.actions.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.Str_Rp;
-import com.CH_co.service.records.*;
-import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.util.*;
 
 /**
@@ -57,7 +55,7 @@ public class UsrASuspended extends ClientMessageAction {
     Str_Rp reply = (Str_Rp) getMsgDataSet();
     if (reply.message != null && reply.message.length() > 0) {
       String title = "Account Suspended";
-      MessageDialog.showWarningDialog(null, reply.message, title, true);
+      NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, reply.message, true);
     }
     Misc.systemExit(-100);
 

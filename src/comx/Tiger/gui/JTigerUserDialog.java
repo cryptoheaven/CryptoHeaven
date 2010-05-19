@@ -12,6 +12,9 @@
 
 package comx.Tiger.gui;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.MyInsets;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Enumeration;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 by CryptoHeaven Development Team,
+ * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -12,6 +12,10 @@
 
 package com.CH_gui.monitor;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
 import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
 import com.CH_co.util.*;

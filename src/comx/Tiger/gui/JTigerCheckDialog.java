@@ -12,6 +12,10 @@
 
 package comx.Tiger.gui;
 
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
 import java.awt.*;
 import java.util.Stack;
 import java.util.Vector;

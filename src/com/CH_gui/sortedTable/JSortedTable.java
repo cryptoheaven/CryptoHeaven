@@ -12,6 +12,9 @@
 
 package com.CH_gui.sortedTable;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.util.HTML_ClickablePane;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;

@@ -12,6 +12,7 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_gui.gui.JMyTextArea;
 import com.CH_co.gui.*;
 
 /**

@@ -12,13 +12,13 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_co.util.NotificationCenter;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
@@ -64,7 +64,7 @@ public class ChoiceDialog extends GeneralDialog {
     JButton[] buttons = createButtons();
     jChoices = createChoices(choices, selectedIndex);
     JPanel panel = createMainPanel(lines, choices, insets);
-    MessageDialog.playSound(MessageDialog.QUESTION_MESSAGE);
+    MessageDialog.playSound(NotificationCenter.QUESTION_MESSAGE);
     init(owner, buttons, panel, DEFAULT_OK_INDEX, DEFAULT_CANCEL_INDEX);
   }
 

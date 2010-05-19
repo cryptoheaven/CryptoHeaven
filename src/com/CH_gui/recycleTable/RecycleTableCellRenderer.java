@@ -12,6 +12,7 @@
 
 package com.CH_gui.recycleTable;
 
+import com.CH_gui.util.Images;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -73,15 +74,11 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
             RecycleTableModel tableModel = (RecycleTableModel) rawModel;
             Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
             // handle File, Msg, Address icons, MsgLinkRecord alone would not give us a proper AddressRecord icon
-            if (rec != null) icon = ListRenderer.getRenderedIcon(rec);
+            if (rec != null) {
+              icon = ListRenderer.getRenderedIcon(rec);
+            }
           }
         }
-        if (icon == null) {
-          int typeColumn = JSortedTable.getColumnIndex(table.getModel(), com.CH_gui.lang.Lang.rb.getString("column_Type"));
-          String fileType = (String) table.getModel().getValueAt(row, typeColumn);
-          icon = MiscGui.getFileInternalIconForType(fileType);
-        }
-
         setIcon(icon);
 
         // Fix up the height of the row in case the file name needs more space.

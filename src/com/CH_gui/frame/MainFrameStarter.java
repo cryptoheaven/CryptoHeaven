@@ -12,10 +12,14 @@
 
 package com.CH_gui.frame;
 
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl_eml.service.ops.ExportMsgsImpl;
 
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
@@ -223,12 +227,15 @@ public class MainFrameStarter extends Object {
       // setup MsgPopup Listener in the form of PopupWindow
       PopupWindow.getSingleInstance();
       // setup ProgMonitorFactory
-      ProgMonitorFactory.setImplementationLogin(LoginProgMonitor.class);
-      ProgMonitorFactory.setImplementationMulti(MultiProgressMonitor.class);
-      ProgMonitorFactory.setImplementationTransfer(TransferProgMonitor.class);
-      ProgMonitorFactory.setImplementationWipe(WipeProgMonitor.class);
+      ProgMonitorFactory.setImplJournal(JournalProgMonitorImpl.class);
+      ProgMonitorFactory.setImplLogin(LoginProgMonitorImpl.class);
+      ProgMonitorFactory.setImplMulti(MultiProgressMonitorImpl.class);
+      ProgMonitorFactory.setImplTransfer(TransferProgMonitorImpl.class);
+      ProgMonitorFactory.setImplWipe(WipeProgMonitorImpl.class);
       // setup login action
-      UsrALoginSecureSession.setImplementationFileChooser(SingleFileChooser.class);
+      UsrALoginSecureSession.setImplFileChooser(SingleFileChooser.class);
+      ConfirmFileReplaceFactory.setImpl(ConfirmFileReplaceImpl.class);
+      DownloadUtilities.setImplExportMsgs(ExportMsgsImpl.class);
 
       // start main GUI
       new MainFrameStarter(splashWindow, skipLogin, swingMemoryFootprintTestExitWhenMainScreenLoaded, initialFolderId, initialMsgLinkId);

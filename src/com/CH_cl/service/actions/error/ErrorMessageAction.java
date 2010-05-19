@@ -22,10 +22,10 @@ import com.CH_co.util.*;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ErrorMessageAction extends ClientMessageAction {
 
@@ -40,12 +40,14 @@ public class ErrorMessageAction extends ClientMessageAction {
     Str_Rp dataSet = (Str_Rp) getMsgDataSet();
     if (dataSet.message != null && dataSet.message.length() > 0) {
       if (dataSet.message.startsWith("System Notice: ")) {
+        String title = "System Notice";
         String msg = dataSet.message.substring("System Notice: ".length());
-        MessageDialog.showWarningDialog(null, msg, "System Notice");
+        NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, msg);
       }
       else {
+        String title = "Error Dialog";
         String msg = "<html> Operation did not complete successfully. <p>" + dataSet.message;
-        MessageDialog.showErrorDialog(null, msg, "Error Dialog");
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
       }
     }
     return null;

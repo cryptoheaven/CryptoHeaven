@@ -12,10 +12,8 @@
 
 package com.CH_gui.tree;
 
-import com.CH_gui.util.ToolBarProducerI;
 import com.CH_cl.tree.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.util.*;
@@ -23,18 +21,14 @@ import com.CH_co.trace.Trace;
 
 import com.CH_gui.action.*;
 import com.CH_gui.actionGui.JActionFrame;
-import com.CH_gui.menuing.*;
 import com.CH_gui.folder.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.menuing.*;
+import com.CH_gui.util.*;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.util.StringTokenizer;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;

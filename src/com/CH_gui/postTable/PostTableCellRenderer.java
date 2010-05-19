@@ -12,6 +12,8 @@
 
 package com.CH_gui.postTable;
 
+import com.CH_gui.util.HTML_ClickablePane;
+import com.CH_gui.util.HTML_EditorKit;
 import java.awt.*;
 import java.security.*;
 import java.util.*;

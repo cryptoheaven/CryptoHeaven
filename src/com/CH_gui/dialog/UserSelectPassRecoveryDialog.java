@@ -12,6 +12,9 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;

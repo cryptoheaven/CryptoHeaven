@@ -18,7 +18,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import com.CH_co.gui.MyInsets;
+import com.CH_gui.gui.MyInsets;
 import com.CH_co.nanoxml.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;

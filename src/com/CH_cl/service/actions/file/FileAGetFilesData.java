@@ -34,7 +34,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -42,7 +42,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
  *
  * <b>$Revision: 1.10 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileAGetFilesData extends ClientMessageAction {
 
@@ -58,7 +58,7 @@ public class FileAGetFilesData extends ClientMessageAction {
     this.destinationDirectory = destinationDirectory;
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -77,9 +77,9 @@ public class FileAGetFilesData extends ClientMessageAction {
 
     for (int i=0; i<fileDataRecords.length; i++) {
 
-      // get the file link for this data record which contains the symmetricKey 
+      // get the file link for this data record which contains the symmetricKey
       FileLinkRecord fileLinkRecord = cache.getFileLinkRecord(fileLinkIds[i]);
-      // get the veryfying key 
+      // get the veryfying key
       Long keyId = fileDataRecords[i].getSigningKeyId();
       KeyRecord verifyingKeyRecord = cache.getKeyRecord(keyId);
 
@@ -114,7 +114,7 @@ public class FileAGetFilesData extends ClientMessageAction {
                        "\nThe private key for digest verification is : " + verifyingKeyRecord.verboseInfo() +
                        "\nThe symmetric key for decryption of the file is : " + (fileLinkRecord.getSymmetricKey() != null ? fileLinkRecord.getSymmetricKey().verboseInfo() : null);
           String title = "Error Dialog";
-          MessageDialog.showErrorDialog(null, msg, title);
+          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
         }
       }
     }

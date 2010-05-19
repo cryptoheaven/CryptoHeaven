@@ -12,11 +12,14 @@
 
 package ch.cl;
 
+import com.CH_cl.service.ops.AutoUpdaterArgs;
 import com.CH_cl.util.GlobalSubProperties;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
+
+import com.CH_gui.util.Images;
 
 import java.awt.*;
 import javax.swing.*;
@@ -173,20 +176,9 @@ public class CryptoHeaven extends Object {
   }
 
   private static boolean DEBUG = false;
-  private static String[] originalStartupArgs;
 
   public static void initDefaultProperties() {
-    String[][] defaultProperties = SingletonHolder_properties.DEFAULT_PROPERTIES;
-    // set initial default properties if they were not loaded from file
-    for (int i=0; i<defaultProperties.length; i++) {
-      try {
-        if (GlobalProperties.getProperty(defaultProperties[i][0]) == null) {
-          GlobalProperties.setProperty(defaultProperties[i][0], defaultProperties[i][1]);
-        }
-      } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
+    GlobalProperties.initDefaultProperties(SingletonHolder_properties.DEFAULT_PROPERTIES);
   }
 
   private static void setDebug() {
@@ -204,7 +196,7 @@ public class CryptoHeaven extends Object {
 
     // Save original arguments incase we need to restart the application
     if (args != null)
-      setOriginalArgs(args);
+      AutoUpdaterArgs.setOriginalArgs(args);
 
     if (args != null) {
       for (int i=0; i<args.length; i++) {
@@ -296,14 +288,6 @@ public class CryptoHeaven extends Object {
       splashWindow.setVisible(false);
       splashWindow.dispose();
     }
-  }
-
-  public static String[] getOriginalArgs() {
-    return originalStartupArgs;
-  }
-
-  private static void setOriginalArgs(String[] args) {
-    originalStartupArgs = args;
   }
 
 }

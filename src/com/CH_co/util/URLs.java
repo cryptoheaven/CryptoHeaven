@@ -107,7 +107,7 @@ public class URLs extends Object {
   public static boolean hasPrivateLabelCustomizationClass() {
     return privateLabel != null;
   }
-  
+
   public static boolean hasPrivateLabelSettingsURL() {
     return PRIVATE_LABEL_SETTINGS_URL != null;
   }
@@ -157,19 +157,19 @@ public class URLs extends Object {
     customizationKeys = new String[28];
     customizationStrings = new String[28];
 
-    SERVICE_COMMUNITY_NAME = i; 
+    SERVICE_COMMUNITY_NAME = i;
     customizationKeys[i] = "SERVICE_COMMUNITY_NAME";
     customizationStrings[i] = "CryptoHeaven Community"; i++;
 
-    SERVICE_NETWORK_NAME = i; 
+    SERVICE_NETWORK_NAME = i;
     customizationKeys[i] = "SERVICE_NETWORK_NAME";
     customizationStrings[i] = "CryptoHeaven Network"; i++;
 
-    SERVICE_PROVIDER_NAME = i; 
+    SERVICE_PROVIDER_NAME = i;
     customizationKeys[i] = "SERVICE_PROVIDER_NAME";
     customizationStrings[i] = "CryptoHeaven Development Team"; i++;
 
-    SERVICE_SOFTWARE_NAME = i; 
+    SERVICE_SOFTWARE_NAME = i;
     customizationKeys[i] = "SERVICE_SOFTWARE_NAME";
     customizationStrings[i] = "CryptoHeaven"; i++;
 
@@ -181,24 +181,24 @@ public class URLs extends Object {
     customizationKeys[i] = "DOMAIN";
     customizationStrings[i] = "CryptoHeaven.com"; i++;
 
-    DOMAIN_WEB = i; 
+    DOMAIN_WEB = i;
     customizationKeys[i] = "DOMAIN_WEB";
     customizationStrings[i] = "www." + get(DOMAIN); i++;
 
-    DOMAIN_MAIL = i; 
+    DOMAIN_MAIL = i;
     customizationKeys[i] = "DOMAIN_MAIL";
     customizationStrings[i] = get(DOMAIN)+",aprava.com,highvip.com,emailhosting.tv,MDemail.net,SecureMedical.net"; i++;
 
-    HOME_PAGE = i; 
+    HOME_PAGE = i;
     customizationKeys[i] = "HOME_PAGE";
     customizationStrings[i] = "http://" + get(DOMAIN_WEB); i++;
 
 
-    DEFAULT_SERVER_1 = i; 
+    DEFAULT_SERVER_1 = i;
     customizationKeys[i] = "DEFAULT_SERVER_1";
     customizationStrings[i] = get(DOMAIN); i++;
 
-    DEFAULT_SERVER_2 = i; 
+    DEFAULT_SERVER_2 = i;
     customizationKeys[i] = "DEFAULT_SERVER_2";
     customizationStrings[i] = "d1." + get(DOMAIN) + ":4383"; i++;
 
@@ -214,64 +214,64 @@ public class URLs extends Object {
     customizationKeys[i] = "SERVER_FIELD_REMOVED";
     customizationStrings[i] = "true"; i++;
 
-    NEW_ACCOUNT_BUTTON = i; 
+    NEW_ACCOUNT_BUTTON = i;
     customizationKeys[i] = "NEW_ACCOUNT_BUTTON"; // valid values are: enable, disable, remove
     customizationStrings[i] = "enable"; i++;
 
-    ACTIVATION_CODE_PAGE = i; 
+    ACTIVATION_CODE_PAGE = i;
     customizationKeys[i] = "ACTIVATION_CODE_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/activation-code.htm"; i++;
 
-    CONNECTIVITY_PAGE = i; 
+    CONNECTIVITY_PAGE = i;
     customizationKeys[i] = "CONNECTIVITY_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/Connectivity"; i++;
 
-    DOWNLOAD_PAGE = i; 
+    DOWNLOAD_PAGE = i;
     customizationKeys[i] = "DOWNLOAD_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/Download/Download.htm"; i++;
 
-    HELP_FAQ_PAGE = i; 
+    HELP_FAQ_PAGE = i;
     customizationKeys[i] = "HELP_FAQ_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/Support/FAQ.htm"; i++;
 
-    HELP_QUICK_TOUR_PAGE = i; 
+    HELP_QUICK_TOUR_PAGE = i;
     customizationKeys[i] = "HELP_QUICK_TOUR_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/QuickTour/QuickTour.htm"; i++;
 
-    HELP_USER_GUIDE_PAGE = i; 
+    HELP_USER_GUIDE_PAGE = i;
     customizationKeys[i] = "HELP_USER_GUIDE_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/UserGuide/UserGuide.htm"; i++;
 
-    REPLY_PAGE = i; 
+    REPLY_PAGE = i;
     customizationKeys[i] = "REPLY_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/ch/web-mail.jsp?uId="; i++;
 
-    SIGNUP_PAGE = i; 
+    SIGNUP_PAGE = i;
     customizationKeys[i] = "SIGNUP_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/ch/signup.jsp"; i++;
 
-    TELL_A_FRIEND_PAGE = i; 
+    TELL_A_FRIEND_PAGE = i;
     customizationKeys[i] = "TELL_A_FRIEND_PAGE";
     customizationStrings[i] = get(HOME_PAGE) + "/tell-a-friend.htm"; i++;
 
-    WELCOME_EMAIL_FROM = i; 
+    WELCOME_EMAIL_FROM = i;
     customizationKeys[i] = "WELCOME_EMAIL_FROM";
     customizationStrings[i] = null; i++;
 
-    WELCOME_EMAIL_SUBJECT = i; 
+    WELCOME_EMAIL_SUBJECT = i;
     customizationKeys[i] = "WELCOME_EMAIL_SUBJECT";
     customizationStrings[i] = null; i++;
 
-    WELCOME_EMAIL_BODY = i; 
+    WELCOME_EMAIL_BODY = i;
     customizationKeys[i] = "WELCOME_EMAIL_BODY";
     String url = get(HOME_PAGE) + "/ch/welcome-email.jsp";
     customizationStrings[i] = "<html><FRAMESET cols=\"*\"><FRAME src=\""+url+"\" name=\"welcomeEmailFrame\"></FRAMESET></html>"; i++;
 
-    WELCOME_TEMPLATE = i; 
+    WELCOME_TEMPLATE = i;
     customizationKeys[i] = "WELCOME_TEMPLATE";
     customizationStrings[i] = get(HOME_PAGE) + "/ch/LoginPage.jsp"; i++;
   }
-  
+
   private static void loadPrivateLabelFromClassDefaults() {
     if (privateLabel != null) {
       try {
@@ -364,7 +364,7 @@ public class URLs extends Object {
       } catch (Throwable t) { }
     }
   }
-  
+
   public static void loadPrivateLabel(String url) {
     if (url == null || url.trim().length() == 0) {
       loadDefaults();
@@ -380,7 +380,7 @@ public class URLs extends Object {
         java.io.InputStream inStream = u.openStream();
         int ch = 0;
         StringBuffer sb = new StringBuffer();
-        while ((ch = inStream.read()) >= 0) 
+        while ((ch = inStream.read()) >= 0)
           sb.append((char) ch);
         //System.out.println("***\nContent="+sb.toString());
         XMLElement xml = new XMLElement();
@@ -420,13 +420,11 @@ public class URLs extends Object {
                   }
 
                   if (replacementHT.size() > 0) {
-                    ArrayList images = ImageNums.getImageNames();
-                    for (int i=0; i<images.size(); i++) {
-                      String replacement = (String) replacementHT.get(images.get(i));
+                    ArrayList imagesL = ImageNums.getImageNames();
+                    for (int i=0; i<imagesL.size(); i++) {
+                      String replacement = (String) replacementHT.get(imagesL.get(i));
                       if (replacement != null) {
                         ImageNums.setImageName(i, replacement);
-                        // clear cache of this image if already loaded
-                        Images.clearImageCache(i);
                       }
                     }
                     // First 4 Customization images
@@ -435,8 +433,6 @@ public class URLs extends Object {
                       String replacement = (String) replacementHT.get(customizationImageName+"-"+i);
                       if (replacement != null) {
                         ImageNums.setImageName(i, replacement);
-                        // clear cache of this image if already loaded
-                        Images.clearImageCache(i);
                       }
                     }
                   }

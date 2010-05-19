@@ -12,6 +12,7 @@
 
 package comx.Jaguar.gui;
 
+import com.CH_gui.gui.JMyLabel;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;

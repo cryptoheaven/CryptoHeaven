@@ -38,7 +38,7 @@ public class OKMessageAction extends ClientMessageAction {
     Str_Rp reply = (Str_Rp) getMsgDataSet();
     if (reply.message != null && reply.message.length() > 0) {
       String title = "OK Dialog";
-      MessageDialog.showInfoDialog(null, reply.message, title);
+      NotificationCenter.show(NotificationCenter.INFORMATION_MESSAGE, title, reply.message);
     }
     return null;
   }

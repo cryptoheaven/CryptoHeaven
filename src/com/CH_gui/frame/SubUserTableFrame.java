@@ -12,6 +12,8 @@
 
 package com.CH_gui.frame;
 
+import com.CH_gui.util.Images;
+import com.CH_gui.gui.JMyLabel;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
