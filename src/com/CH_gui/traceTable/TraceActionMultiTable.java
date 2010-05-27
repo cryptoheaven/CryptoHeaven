@@ -13,7 +13,7 @@
 package com.CH_gui.traceTable;
 
 import com.CH_co.service.records.*;
-import com.CH_co.util.VisualsSavable;
+import com.CH_gui.util.VisualsSavable;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

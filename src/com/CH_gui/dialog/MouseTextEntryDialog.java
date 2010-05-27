@@ -12,14 +12,12 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.JMyButton;
+import com.CH_gui.util.VisualsSavable;
 import com.CH_gui.util.GeneralDialog;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.gui.*;

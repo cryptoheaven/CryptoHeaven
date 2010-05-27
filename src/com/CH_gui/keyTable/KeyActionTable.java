@@ -12,6 +12,7 @@
 
 package com.CH_gui.keyTable;
 
+import com.CH_gui.util.ActionProducerI;
 import java.awt.dnd.*;
 import javax.swing.*;
 
@@ -20,7 +21,6 @@ import com.CH_gui.table.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

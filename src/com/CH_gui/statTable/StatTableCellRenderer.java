@@ -12,22 +12,21 @@
 
 package com.CH_gui.statTable;
 
-import com.CH_gui.util.Images;
-import java.awt.*;
-import java.sql.Timestamp;
-import javax.swing.JTable;
-import javax.swing.table.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+
+import com.CH_co.service.records.*;
+import com.CH_co.util.*;
 
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
-import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import java.awt.*;
+import java.sql.Timestamp;
+import javax.swing.JTable;
+import javax.swing.table.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

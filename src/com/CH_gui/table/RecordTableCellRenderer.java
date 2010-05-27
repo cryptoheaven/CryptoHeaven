@@ -12,15 +12,13 @@
 
 package com.CH_gui.table;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.sortedTable.*;
+import com.CH_gui.util.*;
 
 import java.awt.*;
 import java.sql.Timestamp;

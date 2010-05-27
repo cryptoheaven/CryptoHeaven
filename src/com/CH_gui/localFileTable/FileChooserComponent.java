@@ -12,23 +12,20 @@
 
 package com.CH_gui.localFileTable;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.ToolBarProducerI;
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;
 import java.io.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
 import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.gui.*;
 import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

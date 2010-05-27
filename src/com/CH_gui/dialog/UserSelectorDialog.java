@@ -12,6 +12,7 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.VisualsSavable;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.util.GeneralDialog;
 import javax.swing.*;
@@ -22,10 +23,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.table.*;
 import com.CH_gui.usrs.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

@@ -12,7 +12,6 @@
 
 package com.CH_gui.list;
 
-import com.CH_gui.util.Images;
 import java.awt.Component;
 import java.io.File;
 import javax.swing.*;
@@ -31,6 +30,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -309,7 +309,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
     else if (value instanceof File) {
       File file = (File) value;
-      icon = MiscGui.getFileIcon(file);
+      icon = FileTypesIcons.getFileIcon(file);
     }
 
     if (icon == null)

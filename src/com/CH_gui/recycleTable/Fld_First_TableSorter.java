@@ -14,12 +14,13 @@ package com.CH_gui.recycleTable;
 
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.service.records.Record;
-import javax.swing.table.TableModel;
 
 import com.CH_co.trace.Trace;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.sortedTable.TableSorter;
 import com.CH_gui.table.RecordTableModel;
+
+import javax.swing.table.TableModel;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

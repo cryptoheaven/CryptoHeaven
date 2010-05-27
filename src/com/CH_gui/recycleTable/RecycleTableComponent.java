@@ -12,9 +12,6 @@
 
 package com.CH_gui.recycleTable;
 
-import com.CH_gui.gui.Template;
-import java.awt.dnd.*;
-
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.gui.*;

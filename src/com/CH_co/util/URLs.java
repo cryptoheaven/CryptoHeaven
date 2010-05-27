@@ -108,7 +108,7 @@ public class URLs extends Object {
     return privateLabel != null;
   }
 
-  public static boolean hasPrivateLabelSettingsURL() {
+  private static boolean hasPrivateLabelSettingsURL() {
     return PRIVATE_LABEL_SETTINGS_URL != null;
   }
 

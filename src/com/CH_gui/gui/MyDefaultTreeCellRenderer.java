@@ -12,6 +12,7 @@
 
 package com.CH_gui.gui;
 
+import com.CH_gui.util.MiscGui;
 import java.awt.*;
 import javax.swing.tree.*;
 

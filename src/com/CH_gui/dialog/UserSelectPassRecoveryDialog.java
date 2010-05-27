@@ -21,15 +21,11 @@ import java.awt.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.table.*;
-import com.CH_gui.userTable.*;
 import com.CH_gui.usrs.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

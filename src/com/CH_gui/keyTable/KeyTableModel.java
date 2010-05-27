@@ -13,13 +13,10 @@
 package com.CH_gui.keyTable;
 
 import java.util.*;
-import javax.swing.table.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.records.*;
 
 import com.CH_co.trace.Trace;

@@ -2,7 +2,7 @@
  * Copyright 2001-2010 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
- *
+ * 
  * This software is the confidential and proprietary information
  * of CryptoHeaven Development Team ("Confidential Information").  You
  * shall not disclose such Confidential Information and shall use
@@ -12,32 +12,18 @@
 
 package com.CH_co.util;
 
-import javax.swing.Action;
-
-/** 
+/**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
+ *
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public interface ActionProducerI {
+public interface FileTypeI {
 
-  /**
-   * @return all the acitons that this objects produces.
-   */
-  public Action[] getActions();
+  public String getFileType(String fileName);
 
-  /**
-   * Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true if this object will gather all actions from its childeren or hide them counciously.
-   */
-  public boolean isFinalActionProducer();
-
-  /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
-  public void setEnabledActions();
 }

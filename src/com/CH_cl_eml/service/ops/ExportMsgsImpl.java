@@ -16,13 +16,11 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.ExportMsgsI;
 
-import com.CH_co.monitor.ProgMonitorFactory;
-import com.CH_co.monitor.ProgMonitorJournalI;
+import com.CH_co.monitor.*;
 import com.CH_co.service.ops.DataAcquisitionHelperI;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.Misc;
-import com.CH_co.util.NotificationCenter;
+import com.CH_co.util.*;
 
 import com.CH_co_eml.service.ops.EmailSendingAttOps;
 
@@ -83,7 +81,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
           MsgLinkRecord msgLink = msgs[i];
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           String subject = EmailSendingAttOps.getSubjectForEmail(msgData);
-          String filename = Misc.getFileSafeShortString(subject + " " + msgData.msgId + ".eml");
+          String filename = FileTypes.getFileSafeShortString(subject + " " + msgData.msgId + ".eml");
           exportProgress.addProgress("   " + filename);
           try {
             // don't recreate already exported messages

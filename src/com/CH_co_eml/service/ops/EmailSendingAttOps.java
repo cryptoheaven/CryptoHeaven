@@ -344,9 +344,9 @@ public class EmailSendingAttOps extends Object {
               // case of chat messages, most of them have no subject, so use msgId if there is no subject
               if (emlSubject.length() == 0) {
                 Record[] childRecs = (Record[]) childObjs[3];
-                filename = Misc.getFileSafeShortString(((MsgDataRecord) childRecs[1]).msgId + ".eml");
+                filename = FileTypes.getFileSafeShortString(((MsgDataRecord) childRecs[1]).msgId + ".eml");
               } else {
-                filename = Misc.getFileSafeShortString(emlSubject + ".eml");
+                filename = FileTypes.getFileSafeShortString(emlSubject + ".eml");
               }
               DataSource ds = new ByteArrayDataSource(buffer.toByteArray(), null, filename);
               MimeBodyPart bodyPart = new MimeBodyPart();

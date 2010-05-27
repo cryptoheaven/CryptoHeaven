@@ -343,7 +343,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             // Set interruptable executor of this action
             ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
             // Don't want dumping monitor here on the client side, server side would be ok.
-            if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
+            if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
               if (!workerManager.isDestroyed()) {
                 progressMonitor = new DefaultProgMonitor(false);
                 ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
@@ -578,7 +578,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         long msgActionStamp = msgAction.getStamp();
         int msgActionCode = msgAction.getActionCode();
         ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
-        if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
+        if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
           if (!workerManager.isDestroyed()) {
             progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
             ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
@@ -690,7 +690,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
           ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
           // if no progress monitor, assign a default one... this case could be useful for just created PING request
-          if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
+          if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
             if (!workerManager.isDestroyed()) {
               progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
               ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);

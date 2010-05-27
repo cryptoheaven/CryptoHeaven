@@ -35,9 +35,9 @@ import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.monitor.*;
-import com.CH_gui.table.TableComponent;
-import com.CH_gui.tree.FolderTreeComponent;
-import com.CH_gui.usrs.UserGuiOps;
+import com.CH_gui.table.*;
+import com.CH_gui.tree.*;
+import com.CH_gui.usrs.*;
 import com.CH_gui.util.*;
 
 import comx.Tiger.gui.*; // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this line
@@ -1003,14 +1003,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         public void runTraced() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MainFrame.exitAction.runTraced()");
           // from now on don't show any error messages when logging out and quitting.
-          MiscGui.suppressAllGUI();
+          Misc.suppressAllGUI();
           try {
             SIL.destroyServer();
           } catch (Throwable t) {
             if (trace != null) trace.exception(MainFrame.class, 200, t);
           }
           // If this is applet quitting, reset the gui flag in case it will re-initialize
-          MiscGui.suppressAllGUI(false);
+          Misc.suppressAllGUI(false);
           Misc.systemExit(0);
           if (trace != null) trace.exit(getClass());
         } // end run()

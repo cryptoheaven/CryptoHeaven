@@ -12,6 +12,8 @@
 
 package com.CH_gui.contactTable;
 
+import com.CH_gui.util.VisualsSavable;
+import com.CH_gui.util.ActionProducerI;
 import com.CH_gui.util.Images;
 import com.CH_gui.util.GeneralDialog;
 import com.CH_gui.util.MessageDialog;

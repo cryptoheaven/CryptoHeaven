@@ -126,7 +126,7 @@ public class GeneralDialog extends JDialog {
     if (trace != null) trace.args(default_cancel);
     if (trace != null) trace.args(show);
 
-    if (!MiscGui.isAllGUIsuppressed()) {
+    if (!Misc.isAllGUIsuppressed()) {
       if (default_index >= 0) {
         if (trace != null) trace.data(10, "setting default button...");
         JButton defaultButton = buttons[default_index];
@@ -264,6 +264,8 @@ public class GeneralDialog extends JDialog {
       if (trace != null) trace.exception(GeneralDialog.class, 100, t);
       // if failed then at the very least pack() window so it shows up with non-zero size
       pack();
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(GeneralDialog.class);

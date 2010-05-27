@@ -29,12 +29,11 @@ package com.CH_gui.msgs;
  * @author  Marcin Kurzawa
  */
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
+
 import com.CH_cl.service.ops.DownloadUtilities;
-import com.CH_co.gui.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+import com.CH_gui.gui.*;
 
 import java.awt.*;
 import java.awt.event.*;

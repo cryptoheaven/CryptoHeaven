@@ -14,10 +14,9 @@ package com.CH_gui.frame;
 
 import java.awt.Frame;
 
-import com.CH_cl.service.records.FolderRecUtil;
-
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
+import com.CH_gui.util.OpenChatFolders;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -49,12 +48,12 @@ public class ChatTableFrame extends PostTableFrame {
     if (trace != null) trace.args(folderPair);
     if (trace != null) trace.args(initialState);
     registeredFolderId = folderPair.getId();
-    FolderRecUtil.setOpenChatFolder(registeredFolderId, this);
+    OpenChatFolders.setOpenChatFolder(registeredFolderId, this);
     if (trace != null) trace.exit(ChatTableFrame.class);
   }
 
   public void closeFrame() {
-    FolderRecUtil.clearOpenChatFolder(registeredFolderId, this);
+    OpenChatFolders.clearOpenChatFolder(registeredFolderId, this);
     super.closeFrame();
   }
 

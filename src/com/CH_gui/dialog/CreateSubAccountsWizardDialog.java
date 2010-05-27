@@ -12,9 +12,7 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.MiscGui;
 import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,7 +27,6 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.monitor.Interrupter;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;

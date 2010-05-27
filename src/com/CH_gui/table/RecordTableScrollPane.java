@@ -26,6 +26,8 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
+import com.CH_gui.util.*;
+
 import java.awt.Component;
 import java.awt.Container;
 
@@ -33,7 +35,6 @@ import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;

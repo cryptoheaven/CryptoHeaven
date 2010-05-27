@@ -12,9 +12,7 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.VisualsSavable;
 import com.CH_gui.util.GeneralDialog;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,7 +27,6 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;

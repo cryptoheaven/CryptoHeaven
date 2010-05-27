@@ -12,13 +12,12 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.Images;
 import java.util.*;
-
 import javax.swing.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import com.CH_gui.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

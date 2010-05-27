@@ -12,6 +12,8 @@
 
 package com.CH_gui.gui;
 
+import com.CH_gui.util.VisualsSavable;
+import com.CH_gui.util.MiscGui;
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
@@ -105,6 +107,8 @@ public class JSplitPaneVS extends JSplitPane implements VisualsSavable {
       }
     } catch (Throwable t) {
       if (trace != null) trace.exception(JSplitPaneVS.class, 100, t);
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(JSplitPaneVS.class);

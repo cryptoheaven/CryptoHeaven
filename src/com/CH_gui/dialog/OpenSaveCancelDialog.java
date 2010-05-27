@@ -12,11 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -27,7 +22,6 @@ import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
@@ -35,8 +29,10 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
+import com.CH_gui.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -159,9 +155,9 @@ public class OpenSaveCancelDialog extends GeneralDialog {
 
             MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES, request);
             ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 30000);
-            MiscGui.suppressMsgDialogsGUI(true);
+            Misc.suppressMsgDialogsGUI(true);
             DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-            MiscGui.suppressMsgDialogsGUI(false);
+            Misc.suppressMsgDialogsGUI(false);
             fileData = cache.getFileDataRecord(_fileLink.fileId);
           }
           if (fileData != null) {
@@ -241,7 +237,7 @@ public class OpenSaveCancelDialog extends GeneralDialog {
     // Name line
     panel.add(new JMyLabel("Name:"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 15, 2, 5), 0, 0));
-    Object[] iconAndType = MiscGui.getFileIconAndType(fileLink.getFileName());
+    Object[] iconAndType = FileTypesIcons.getFileIconAndType(fileLink.getFileName());
     JMyLabel jFileName = new JMyLabel(fileLink.getFileName());
     jFileName.setIcon((Icon) iconAndType[0]);
     panel.add(jFileName, new GridBagConstraints(1, posY, 1, 1, 10, 0,

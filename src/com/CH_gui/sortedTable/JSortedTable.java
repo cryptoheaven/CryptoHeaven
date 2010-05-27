@@ -12,21 +12,8 @@
 
 package com.CH_gui.sortedTable;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.util.HTML_ClickablePane;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -35,6 +22,16 @@ import com.CH_gui.dialog.SaveAttachmentsDialog;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

@@ -45,7 +45,7 @@ public class MessageDialog extends Object {
     showDialog(parent, messageText, title, messageType, null, null, modal);
   }
   public static void showDialog(final SingleTokenArbiter arbiter, final Object key, Component parent, String messageText, String title, int messageType) {
-    if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
+    if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
       final Object token = new Object();
       if (arbiter.putToken(key, token)) {
         final boolean[] tokenRemoved = new boolean[1];
@@ -82,7 +82,7 @@ public class MessageDialog extends Object {
     if (trace != null) trace.args(buttons, defaultButtonAction);
 
     JDialog dialog = null;
-    if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
+    if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
       Component message = prepareMessage(messageText);
       if (message != null) {
         dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, true, disposable);
@@ -114,7 +114,7 @@ public class MessageDialog extends Object {
 
     GeneralDialog dialog = null;
 
-    if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
+    if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
 
       // See if we need to attach default action
       if (buttons == null) {
@@ -241,7 +241,7 @@ public class MessageDialog extends Object {
     if (trace != null) trace.args(messageType);
 
     boolean rc = false;
-    if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
+    if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
       Component message = prepareMessage(messageText);
       rc = showDialogYesNo(parent, message, title, messageType);
     }
@@ -264,7 +264,7 @@ public class MessageDialog extends Object {
 
     final boolean[] option = new boolean[1];
 
-    if (!MiscGui.isAllGUIsuppressed() && !MiscGui.isMsgDialogsGUIsuppressed()) {
+    if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
       JButton yes = new JMyButton("Yes");
       yes.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent event) {

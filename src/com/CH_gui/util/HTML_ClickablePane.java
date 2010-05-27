@@ -25,8 +25,6 @@ import javax.swing.text.html.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.HTML_utils;
-import com.CH_co.util.MiscGui;
-import com.CH_co.util.URLLauncher;
 import com.CH_co.util.URLs;
 
 /**

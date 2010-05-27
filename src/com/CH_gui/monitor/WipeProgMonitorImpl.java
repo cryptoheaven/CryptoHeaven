@@ -12,24 +12,19 @@
 
 package com.CH_gui.monitor;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
 import javax.swing.*;
 
 import java.awt.event.*;
 import java.awt.*;
 import java.util.LinkedList;
 
-import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

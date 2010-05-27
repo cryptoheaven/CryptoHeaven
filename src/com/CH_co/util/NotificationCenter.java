@@ -12,8 +12,6 @@
 
 package com.CH_co.util;
 
-import com.CH_gui.util.MessageDialog;
-
 /**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
@@ -35,17 +33,49 @@ public class NotificationCenter {
   public static final int EMPTY_RECYCLE_FOLDER = 9007;
   public static final int EMPTY_SPAM_FOLDER = 9008;
 
+  private static Class implNotificationCenterI;
+
+  public static void setImpl(Class notificationCenterImpl) {
+    implNotificationCenterI = notificationCenterImpl;
+  }
+
   public static void show(int type, String title, String msg) {
-    MessageDialog.showDialog(null, msg, title, type, false);
+    if (implNotificationCenterI != null) {
+      try {
+        NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
+        impl.show(type, title, msg);
+      } catch (Throwable t) {
+      }
+    }
   }
   public static void show(int type, String title, String msg, boolean modal) {
-    MessageDialog.showDialog(null, msg, title, type, modal);
+    if (implNotificationCenterI != null) {
+      try {
+        NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
+        impl.show(type, title, msg, modal);
+      } catch (Throwable t) {
+      }
+    }
   }
   public static void show(final SingleTokenArbiter arbiter, final Object key, int type, String title, String msg) {
-    MessageDialog.showDialog(arbiter, key, null, msg, title, type);
+    if (implNotificationCenterI != null) {
+      try {
+        NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
+        impl.show(arbiter, key, type, title, msg);
+      } catch (Throwable t) {
+      }
+    }
   }
-  public static boolean showYesNo(int type, String title, String msg) {
-    return MessageDialog.showDialogYesNo(null, msg, title, type);
+  public static boolean showYesNo(int type, String title, String msg, boolean defaultChoice) {
+    boolean rc = defaultChoice;
+    if (implNotificationCenterI != null) {
+      try {
+        NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
+        rc = impl.showYesNo(type, title, msg);
+      } catch (Throwable t) {
+      }
+    }
+    return rc;
   }
 
 }

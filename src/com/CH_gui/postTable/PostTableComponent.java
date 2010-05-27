@@ -12,13 +12,11 @@
 
 package com.CH_gui.postTable;
 
-import com.CH_gui.gui.Template;
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
-import javax.swing.JTable;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

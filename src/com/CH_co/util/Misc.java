@@ -34,6 +34,11 @@ public class Misc extends Object {
 
   private static DisposableObj systemExitObj;
 
+  // Used for gui suppression.
+  private static boolean guiSuppressed = false;
+  private static boolean guiSuppressedMsgDialogs = false;
+
+
   public static void setSystemExitObj(DisposableObj exitObj) {
     systemExitObj = exitObj;
   }
@@ -64,7 +69,27 @@ public class Misc extends Object {
     }
   }
   public static boolean isRunningFromApplet() {
-    return systemExitObj != null && systemExitObj instanceof javax.swing.JApplet;
+    return systemExitObj != null && systemExitObj instanceof AppletTypeI;
+  }
+
+
+  /**
+   * Set a flag to suppress all GUI, put it in Misc and not in MiscGUI because MiscGUI class loads some GUI components
+   */
+  public static void suppressAllGUI() {
+    guiSuppressed = true;
+  }
+  public static void suppressAllGUI(boolean flag) {
+    guiSuppressed = flag;
+  }
+  public static void suppressMsgDialogsGUI(boolean suppressMsgDialogs) {
+    guiSuppressedMsgDialogs = suppressMsgDialogs;
+  }
+  public static boolean isAllGUIsuppressed() {
+    return guiSuppressed;
+  }
+  public static boolean isMsgDialogsGUIsuppressed() {
+    return guiSuppressedMsgDialogs;
   }
 
 
@@ -694,71 +719,6 @@ public class Misc extends Object {
       result = sb.toString();
     }
     return result;
-  }
-
-  public  static String getDirSafeString(String str) {
-    StringBuffer sb = new StringBuffer(str.length());
-    int len = str.length();
-    for (int i=0; i<len; i++) {
-      char ch = str.charAt(i);
-      if (Character.isLetterOrDigit(ch) || ch == ' ' || ch == ',' || ch == '.' || ch == '(' || ch == ')' || ch == '[' || ch == ']')
-        sb.append(ch);
-      else
-        sb.append('-');
-    }
-    String fileName = sb.toString();
-    if (fileName.length() > 200) {
-      int iDot = fileName.lastIndexOf('.');
-      String ext = "";
-      if (iDot >= 0) {
-        ext = fileName.substring(iDot);
-      }
-      if (ext.length() > 190)
-        ext = ext.substring(0, 190);
-      fileName = fileName.substring(0, 195-ext.length());
-      fileName += ext;
-    }
-    return fileName;
-  }
-
-  /**
-   * Used by server to create email file attachment filenames so don't change this...
-   * @param str to normalize
-   * @return normalized str
-   */
-  private static String getFileSafeString(String str) {
-    StringBuffer sb = new StringBuffer(str.length());
-    int len = str.length();
-    for (int i=0; i<len; i++) {
-      char ch = str.charAt(i);
-      if (Character.isLetterOrDigit(ch) || ch == '.' || ch == '(' || ch == ')' || ch == '[' || ch == ']')
-        sb.append(ch);
-      else
-        sb.append('-');
-    }
-    String fileName = sb.toString();
-    if (fileName.length() > 200) {
-      int iDot = fileName.lastIndexOf('.');
-      String ext = "";
-      if (iDot >= 0) {
-        ext = fileName.substring(iDot);
-      }
-      if (ext.length() > 190)
-        ext = ext.substring(0, 190);
-      fileName = fileName.substring(0, 195-ext.length());
-      fileName += ext;
-    }
-    return fileName;
-  }
-
-  public static String getFileSafeShortString(String str) {
-    str = str.trim();
-    String fileStr = getFileSafeString(str);
-    int maxCharacters = 200;
-    // leave room for encryption headers..
-    if (fileStr.length() > maxCharacters)
-      fileStr = fileStr.substring(0, maxCharacters);
-    return fileStr;
   }
 
   private static final Compress compressorSCSU = new Compress();

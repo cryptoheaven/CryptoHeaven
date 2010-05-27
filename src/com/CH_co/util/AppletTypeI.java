@@ -12,20 +12,20 @@
 
 package com.CH_co.util;
 
-import javax.swing.Action;
+import java.net.URL;
 
-/** 
+/**
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
+ *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
-public interface PropertyDrivenItem {
+public interface AppletTypeI {
 
-  public void setAction(Action action);
-  public void removePropertyChangeListener();
+  public void showDocument(URL url, String target);
 
 }

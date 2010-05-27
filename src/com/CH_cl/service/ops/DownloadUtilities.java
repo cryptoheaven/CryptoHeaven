@@ -363,7 +363,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
           for (int i=0; i<f.length; i++) {
             FolderRecord folderRecord = f[i].getFolderRecord();
             FolderShareRecord shareRecord = f[i].getFolderShareRecord();
-            String dirName = Misc.getDirSafeString(shareRecord.getFolderName());
+            String dirName = FileTypes.getDirSafeString(shareRecord.getFolderName());
             File newDestDir = new File(destDir, dirName);
 
             // Recursive call should avoid nesting into this folder as we are hendling it here...

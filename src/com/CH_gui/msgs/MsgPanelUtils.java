@@ -12,9 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.HTML_ClickablePane;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
@@ -29,7 +26,6 @@ import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.BASymCipherBulk;
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.usr.*;
@@ -39,7 +35,9 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.util.HTML_Ops;
 

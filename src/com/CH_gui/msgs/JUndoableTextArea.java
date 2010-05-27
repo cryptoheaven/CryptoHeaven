@@ -13,7 +13,6 @@
 package com.CH_gui.msgs;
 
 import com.CH_gui.gui.JMyTextArea;
-import com.CH_co.gui.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

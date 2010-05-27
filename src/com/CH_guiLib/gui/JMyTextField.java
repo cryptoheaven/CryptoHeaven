@@ -13,7 +13,7 @@
 package com.CH_guiLib.gui;
 
 import com.CH_gui.gui.JMyLabel;
-import com.CH_co.util.MiscGui;
+import com.CH_gui.util.MiscGui;
 
 import java.awt.*;
 import java.awt.event.FocusEvent;

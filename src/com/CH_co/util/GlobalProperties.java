@@ -48,11 +48,11 @@ public class GlobalProperties extends Object {
   public static final short PROGRAM_RELEASE_FINAL = 3;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.1f;
-  public static final short PROGRAM_VERSION_MINOR = 5;
+  public static final float PROGRAM_VERSION = 3.2f;
+  public static final short PROGRAM_VERSION_MINOR = 0;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
-  public static final short PROGRAM_BUILD_NUMBER = 548;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 550;  // even
 
   public static String PROGRAM_BUILD_DATE; // read in from a file
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
@@ -206,7 +206,7 @@ public class GlobalProperties extends Object {
   // build 542 Journal Prog Monitor factory/interface/implementation for message export.
   // build 544 File Replace Confirmation factory/interface/implementation.
   // build 546 Move nudge to GUI utils and remove all GUI from wiping
-  // build 548 Properties reset improvements, and fixes against corrupted properties.
+  // build 550 Properties reset improvements, and fixes against corrupted properties.
 
   public static final String SAVE_EXT = ".properties";
   static final String SAVE_FULL_NAME = PROGRAM_NAME + SAVE_EXT;
@@ -296,6 +296,7 @@ public class GlobalProperties extends Object {
    * Removes all local properties that are global and for current user.
    */
   public static void resetMyAndGlobalProperties() {
+    // reset all stored properties and mark for re-reset on next load to erase settings written at app closing
     resetMyAndGlobalProperties(true);
   }
   private static void resetMyAndGlobalProperties(boolean insertResetFlagForNextLoad) {
@@ -306,10 +307,7 @@ public class GlobalProperties extends Object {
     while (keys.hasMoreElements()) {
       String key = (String) keys.nextElement();
       if (!key.startsWith(generalUserPropertyPrefix) || key.startsWith(myUserPropertyPrefix)) {
-        if (!key.startsWith("LastUserName") &&
-                !key.startsWith("EncRSAPrivateKey") &&
-                !key.equals("ServerList")
-                )
+        if (!key.startsWith("LastUserName") && !key.startsWith("EncRSAPrivateKey") && !key.startsWith("TempFiles"))
           removeKeysL.add(key);
       }
     }
@@ -460,11 +458,11 @@ public class GlobalProperties extends Object {
   }
 
   // ********** storing is private *********
-  private static void store (OutputStream out, String header) throws IOException {
+  private static synchronized void store (OutputStream out, String header) throws IOException {
     properties.store(out, header);
   }
 
-  public static boolean store () {
+  public static synchronized boolean store () {
     boolean success = true;
     OutputStream out = null;
     try {

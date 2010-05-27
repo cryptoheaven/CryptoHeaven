@@ -12,6 +12,7 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.VisualsSavable;
 import com.CH_gui.util.Images;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyButton;
@@ -23,7 +24,6 @@ import javax.swing.*;
 
 import com.CH_cl.service.cache.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rp;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
@@ -31,7 +31,6 @@ import com.CH_co.util.*;
 
 import com.CH_gui.actionGui.*;
 import com.CH_gui.list.*;
-import com.CH_gui.msgs.AttachmentFetcherPopup;
 import com.CH_gui.traceTable.*;
 
 /** 

@@ -12,6 +12,8 @@
 
 package com.CH_gui.actionGui;
 
+import com.CH_gui.util.PropertyDrivenItem;
+import com.CH_gui.util.MiscGui;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;

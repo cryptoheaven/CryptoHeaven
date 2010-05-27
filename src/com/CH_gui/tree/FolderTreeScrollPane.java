@@ -14,7 +14,6 @@ package com.CH_gui.tree;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.tree.*;
 
 import com.CH_co.service.records.*;
@@ -288,7 +287,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
               FolderRecord fRec = cache.getFolderRecord(mLink.ownerObjId);
               if (fRec != null && fRec.isChatting() &&
                   fRec.getUpdateCount() > 0 &&
-                  !FolderRecUtil.isOpenChatFolder(fRec.folderId) &&
+                  !OpenChatFolders.isOpenChatFolder(fRec.folderId) &&
                   msgData != null && !msgData.senderUserId.equals(myUserRec.userId)
                   )
               {
@@ -319,7 +318,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
             FolderShareRecord sRec = cache.getFolderShareRecordMy(folderId, true);
             if (sRec != null) {
               try {
-                Collection chatCompsV = FolderRecUtil.getOpenChatFolders(folderId);
+                Collection chatCompsV = OpenChatFolders.getOpenChatFolders(folderId);
                 Component[] chatComps = null;
                 if (chatCompsV != null && chatCompsV.size() > 0) {
                   chatComps = (Component[]) ArrayUtils.toArray(chatCompsV, Component.class);

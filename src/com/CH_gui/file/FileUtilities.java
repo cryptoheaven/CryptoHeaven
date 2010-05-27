@@ -12,8 +12,6 @@
 
 package com.CH_gui.file;
 
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
 import java.util.*;
 
 import com.CH_gui.frame.MainFrame;
@@ -29,6 +27,8 @@ import com.CH_co.service.msg.dataSets.obj.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import com.CH_gui.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -168,7 +168,7 @@ public class FileUtilities extends Object {
     if (trace != null) trace.args(newName, record);
 
     record.setFileName(newName);
-    record.setFileType(MiscGui.getFileType(newName));
+    record.setFileType(FileTypes.getFileType(newName));
     record.seal();
 
     ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();

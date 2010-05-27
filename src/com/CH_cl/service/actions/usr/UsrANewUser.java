@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.actions.usr;
 
-import java.lang.reflect.*;
-
 import com.CH_cl.service.actions.*;
 
 import com.CH_co.trace.Trace;

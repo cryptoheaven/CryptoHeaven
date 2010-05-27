@@ -12,7 +12,6 @@
 
 package com.CH_gui.monitor;
 
-import com.CH_gui.util.Images;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -20,9 +19,11 @@ import java.util.*;
 
 import javax.swing.*;
 
-import com.CH_gui.gui.MyInsets;
 import com.CH_co.monitor.ProgMonitorMultiI;
 import com.CH_co.util.*;
+
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.Images;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

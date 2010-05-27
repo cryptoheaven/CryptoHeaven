@@ -12,11 +12,11 @@
 
 package com.CH_guiLib.gui;
 
+import com.CH_gui.util.MiscGui;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
-
-import com.CH_co.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

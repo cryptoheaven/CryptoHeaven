@@ -12,19 +12,18 @@
 
 package com.CH_gui.frame;
 
-import com.CH_gui.gui.JMyButton;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
 import com.CH_gui.actionGui.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.usrs.*;
 import com.CH_gui.userTable.*;
+import com.CH_gui.util.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

@@ -12,17 +12,6 @@
 
 package com.CH_gui.fileTable;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.MessageDialog;
-import javax.swing.*;
-import javax.swing.event.*;
-
-import java.awt.dnd.*;
-import java.awt.event.*;
-
-import java.util.*;
-import java.lang.reflect.Array;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
@@ -47,9 +36,19 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.service.ops.DownloadUtilsGui;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
+import java.awt.dnd.*;
+import java.awt.event.*;
+
+import java.util.*;
+import java.lang.reflect.Array;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

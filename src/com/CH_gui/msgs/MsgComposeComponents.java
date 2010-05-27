@@ -12,9 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Timestamp;
@@ -29,7 +26,6 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.usr.*;
@@ -44,6 +40,7 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 import com.CH_guiLib.util.HTML_Ops;

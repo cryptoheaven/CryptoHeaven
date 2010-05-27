@@ -132,17 +132,17 @@ public class AttachmentFetcherPopup extends ThreadTraced {
     if (sumFiles > 0) {
       ClientMessageAction msgAction = serverInterfaceLayer.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_GET_MSG_FILE_ATTACHMENTS, request), 60000);
       if (msgAction != null) {
-        MiscGui.suppressMsgDialogsGUI(true);
+        Misc.suppressMsgDialogsGUI(true);
         DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, msgAction);
-        MiscGui.suppressMsgDialogsGUI(false);
+        Misc.suppressMsgDialogsGUI(false);
       }
     }
     if (sumMsgs > 0) {
       ClientMessageAction msgAction = serverInterfaceLayer.submitAndFetchReply(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request), 60000);
       if (msgAction != null) {
-        MiscGui.suppressMsgDialogsGUI(true);
+        Misc.suppressMsgDialogsGUI(true);
         DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, msgAction);
-        MiscGui.suppressMsgDialogsGUI(false);
+        Misc.suppressMsgDialogsGUI(false);
       }
     }
 

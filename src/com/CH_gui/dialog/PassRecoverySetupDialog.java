@@ -12,10 +12,8 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.MiscGui;
 import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.GeneralDialog;
 import com.CH_gui.util.MessageDialog;
 import java.awt.*;
@@ -29,7 +27,6 @@ import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;

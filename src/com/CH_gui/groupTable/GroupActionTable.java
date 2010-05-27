@@ -12,8 +12,6 @@
 
 package com.CH_gui.groupTable;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
@@ -26,6 +24,7 @@ import com.CH_gui.frame.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.records.filters.*;

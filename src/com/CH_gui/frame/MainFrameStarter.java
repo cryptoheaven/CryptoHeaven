@@ -12,8 +12,6 @@
 
 package com.CH_gui.frame;
 
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
@@ -33,7 +31,7 @@ import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.monitor.*;
-import com.CH_gui.util.PopupWindow;
+import com.CH_gui.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -232,10 +230,14 @@ public class MainFrameStarter extends Object {
       ProgMonitorFactory.setImplMulti(MultiProgressMonitorImpl.class);
       ProgMonitorFactory.setImplTransfer(TransferProgMonitorImpl.class);
       ProgMonitorFactory.setImplWipe(WipeProgMonitorImpl.class);
-      // setup login action
+      // setup login action key file chooser
       UsrALoginSecureSession.setImplFileChooser(SingleFileChooser.class);
+      // setup various factories
       ConfirmFileReplaceFactory.setImpl(ConfirmFileReplaceImpl.class);
       DownloadUtilities.setImplExportMsgs(ExportMsgsImpl.class);
+      NotificationCenter.setImpl(NotificationShowerImpl.class);
+      Sounds.setImpl(SoundsPlayerImpl.class);
+      FileTypes.setFileTypeImpl(FileTypesIcons.class);
 
       // start main GUI
       new MainFrameStarter(splashWindow, skipLogin, swingMemoryFootprintTestExitWhenMainScreenLoaded, initialFolderId, initialMsgLinkId);

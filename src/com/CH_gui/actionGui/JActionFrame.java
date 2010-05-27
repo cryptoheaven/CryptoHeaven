@@ -12,33 +12,30 @@
 
 package com.CH_gui.actionGui;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.ToolBarProducerI;
-import com.CH_gui.util.ActionUtils;
+import com.CH_cl.service.ops.*;
+
+import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
+import com.CH_gui.action.*;
+import com.CH_gui.dialog.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.menuing.*;
+import com.CH_gui.table.*;
+import com.CH_gui.toolBar.*;
+import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
+
+import com.CH_guiLib.gui.*;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import javax.swing.*;
 
-import com.CH_gui.action.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.toolBar.DualBox_Launcher;
-import com.CH_gui.tree.*;
-
-import com.CH_cl.service.ops.*;
-
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-import com.CH_gui.table.RecordTableComponent;
-import com.CH_guiLib.gui.JMyRadioButton;
-import java.util.ArrayList;
 import javax.swing.tree.DefaultTreeModel;
 
 /** 
@@ -798,6 +795,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       // if failed then at the very least pack() frame so it shows up with non-zero size
       pack();
       isPackingSize = true;
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(JActionFrame.class);

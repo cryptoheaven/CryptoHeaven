@@ -20,16 +20,14 @@ import com.CH_cl.service.actions.fld.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
 
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.monitor.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.fld.*;
-
-import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
-
-import com.CH_co.monitor.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -290,7 +288,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       request.fileLinks[i].ownerObjType = ownerObjType;
 
       String fileName = file.getName();
-      request.fileLinks[i].setFileType(MiscGui.getFileType(fileName));
+      request.fileLinks[i].setFileType(FileTypes.getFileType(fileName));
       request.fileLinks[i].setFileName(fileName);
       request.fileLinks[i].origSize = new Long (file.length());
 
@@ -378,7 +376,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           fileNames[i] = linkRecords[i].getFileName();
         }
 
-        if (!MiscGui.isAllGUIsuppressed()) {
+        if (!Misc.isAllGUIsuppressed()) {
           ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferUp(fileNames);
           ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionToSend.getStamp());
         }

@@ -13,16 +13,12 @@
 package com.CH_gui.dialog;
 
 import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.GeneralDialog;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 

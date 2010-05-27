@@ -12,6 +12,7 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_gui.util.VisualsSavable;
 import com.CH_gui.util.Images;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyButton;
@@ -24,7 +25,6 @@ import javax.swing.*;
 import javax.swing.text.*;
 import java.io.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 

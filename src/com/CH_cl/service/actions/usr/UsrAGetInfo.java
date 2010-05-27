@@ -82,7 +82,7 @@ public class UsrAGetInfo extends ClientMessageAction {
       }
     }
 
-    if (!MiscGui.isAllGUIsuppressed() && AutoUpdater.isLongInactive()) {
+    if (!Misc.isAllGUIsuppressed() && AutoUpdater.isLongInactive()) {
       getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.SYS_Q_GET_AUTO_UPDATE));
     }
 

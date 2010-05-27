@@ -12,7 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.io.*;
 import java.security.*;
@@ -36,6 +35,7 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
+import com.CH_gui.util.MessageDialog;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

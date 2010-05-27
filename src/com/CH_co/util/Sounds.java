@@ -12,11 +12,7 @@
 
 package com.CH_co.util;
 
-import java.applet.*;
 import java.net.URL;
-import javax.sound.sampled.*;
-
-import com.CH_co.trace.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -43,6 +39,8 @@ public class Sounds extends Object {
   // used for sound suppression by for eg: TestAlive
   private static boolean soundSuppressed = false;
 
+  private static Class soundsPlayerImpl;
+
   public static final int DIALOG_ERROR;
   public static final int DIALOG_WARN;
   public static final int DIALOG_INFO;
@@ -57,13 +55,12 @@ public class Sounds extends Object {
   //public static final int RING_OUT;
 
   private static final String clipNames[];
-  private static AudioClip[] audioClips;
+
 
 
   static {
     int i = 0;
     clipNames = new String[11];
-    audioClips = new AudioClip[clipNames.length];
 
     DIALOG_ERROR = i;
     clipNames[i] = "errorDialog.wav"; i++;
@@ -99,6 +96,14 @@ public class Sounds extends Object {
 //    clipNames[i] = "ringOut.wav"; i++;
   }
 
+  public static void setImpl(Class implSoundsPlayerI) {
+    soundsPlayerImpl = implSoundsPlayerI;
+  }
+
+  public static URL getClip(int audioClipIndex) {
+    return URLs.getResourceURL("sounds/" + clipNames[audioClipIndex]);
+  }
+
   /**
    * Set a flag to suppress all Sound
    */
@@ -109,67 +114,17 @@ public class Sounds extends Object {
     return soundSuppressed;
   }
 
-  private static SingleTokenArbiter singleTokenArbiter = new SingleTokenArbiter();
-  private static Object singleSoundKey = new Object();
-
   public static void playAsynchronous(int audioClipIndex) {
-    if (!soundSuppressed) {
+    if (!DEBUG__SUPPRESS_ALL_SOUNDS && !soundSuppressed && soundsPlayerImpl != null) {
       boolean isSoundEnabled = Boolean.valueOf(GlobalProperties.getProperty(SOUND_ENABLEMENT_PROPERTY, "true")).booleanValue();
       if (isSoundEnabled) {
-        ClipPlayer player = new ClipPlayer(audioClipIndex);
-        player.setDaemon(true);
-        player.start();
+        try {
+          SoundsPlayerI soundsPlayer = (SoundsPlayerI) soundsPlayerImpl.newInstance();
+          soundsPlayer.play(audioClipIndex);
+        } catch (Throwable t) {
+        }
       }
     }
   }
-  private static class ClipPlayer extends ThreadTraced {
-    private int clipIndex;
-
-    private ClipPlayer(int audioClipIndex) {
-      super("ClipPlayer");
-      this.clipIndex = audioClipIndex;
-    }
-    public void runTraced() {
-      if (!DEBUG__SUPPRESS_ALL_SOUNDS) {
-        boolean isError = false;
-        try {
-          URL sourceURL = URLs.getResourceURL("sounds/" + clipNames[clipIndex]);
-          AudioInputStream ais = AudioSystem.getAudioInputStream(sourceURL);
-          if (!ais.getFormat().getEncoding().equals(AudioFormat.Encoding.PCM_SIGNED))
-              ais = AudioSystem.getAudioInputStream(AudioFormat.Encoding.PCM_SIGNED, ais);
-          AudioFormat	audioFormat = ais.getFormat();
-          DataLine.Info	info = new DataLine.Info(Clip.class, audioFormat);
-          final Clip clip = (Clip) AudioSystem.getLine(info);
-          clip.open(ais);
-          clip.addLineListener(new LineListener() {
-            public void update(LineEvent event) {
-              if (clip.isOpen() && !clip.isRunning() && clip.getMicrosecondPosition() == clip.getMicrosecondLength()) {
-                clip.close();
-              }
-            }
-          });
-          clip.start();
-        } catch (Throwable th) {
-          isError = true;
-        }
-        if (isError) {
-          Object singleSoundToken = new Object();
-          if (singleTokenArbiter.putToken(singleSoundKey, singleSoundToken)) {
-            try {
-              if (audioClips[clipIndex] == null) {
-                audioClips[clipIndex] = Applet.newAudioClip(URLs.getResourceURL("sounds/" + clipNames[clipIndex]));
-              }
-              audioClips[clipIndex].play();
-              Thread.sleep(2000);
-              audioClips[clipIndex].stop();
-              Thread.sleep(500);
-            } catch (Throwable t) {
-            }
-            singleTokenArbiter.removeToken(singleSoundKey, singleSoundToken);
-          } // end if putToken()
-        }
-      } // end if no debug
-    } // end run
-  } // end private class ClipPlayer
 
 } // end class Sounds

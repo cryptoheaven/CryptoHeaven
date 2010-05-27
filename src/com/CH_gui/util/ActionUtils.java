@@ -18,9 +18,7 @@ import javax.swing.*;
 import java.util.*;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ActionProducerI;
 import com.CH_co.util.ArrayUtils;
-import com.CH_co.util.ComponentContainerI;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

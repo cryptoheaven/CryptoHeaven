@@ -320,7 +320,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     long msgActionStamp = msgAction.getStamp();
     ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
     if (!destroyed) {
-      if (ProgMonitorPool.isDummy(progressMonitor) && !MiscGui.isAllGUIsuppressed()) {
+      if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
         boolean withDialog = withProgressDialog != null ? withProgressDialog.booleanValue() : !DefaultProgMonitor.isSuppressProgressDialog(msgAction.getActionCode());
         progressMonitor = new DefaultProgMonitor(withDialog);
         ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);

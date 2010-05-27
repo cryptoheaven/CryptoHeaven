@@ -19,7 +19,7 @@ import javax.accessibility.*;
 import javax.swing.Icon;
 import javax.swing.UIManager;
 
-import com.CH_co.util.MiscGui;
+import com.CH_gui.util.MiscGui;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

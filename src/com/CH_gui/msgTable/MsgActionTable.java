@@ -12,9 +12,6 @@
 
 package com.CH_gui.msgTable;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.HTML_ClickablePane;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
@@ -56,6 +53,7 @@ import com.CH_gui.service.ops.DownloadUtilsGui;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -396,8 +394,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     String confirmationProperty = null;
     if (isSkippable) {
       confirmationProperty = "ConfirmationDialog-skip-"+messageType;
-      String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", true);
       try {
+        String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", true);
         confirmationValue = Boolean.valueOf(confirmationPropertyValue).booleanValue();
       } catch (Throwable t) {
       }

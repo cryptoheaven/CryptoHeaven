@@ -12,6 +12,7 @@
 
 package com.CH_gui.menuing;
 
+import com.CH_gui.util.ActionProducerI;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -20,7 +21,6 @@ import java.lang.ref.*;
 import java.util.*;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 import com.CH_gui.actionGui.JActionFrame;
 import comx.Tiger.gui.*;

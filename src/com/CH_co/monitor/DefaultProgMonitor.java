@@ -90,7 +90,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.enqueue(actionCode, stamp);
         // reset progress value in case action was returned back to the queue for retry
         createProgMonitorGUIifNeeded(actionCode);
@@ -106,7 +106,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.dequeue(actionCode, stamp);
         // reset progress value in case action was returned back to the queue for retry
         createProgMonitorGUIifNeeded(actionCode);
@@ -127,7 +127,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.startSend(actionCode, stamp);
         // in case enqueue was not called while creating some special job, the communication layer will start with the "send" call
         // so make sure we have the default prog monitor
@@ -165,7 +165,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.doneSend(actionCode, stamp);
         value++;
         if (withProgressDialog && pm != null) {
@@ -197,7 +197,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.startReceive(actionCode, stamp);
         value++;
         if (withProgressDialog && pm != null) {
@@ -228,7 +228,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.doneReceive(actionCode, stamp);
         value++;
         if (withProgressDialog && pm != null) {
@@ -259,7 +259,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.startExecution(actionCode);
         value++;
         if (withProgressDialog && pm != null) {
@@ -275,7 +275,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
     if (!allDone) {
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         super.doneExecution(actionCode);
         value++;
         if (withProgressDialog && pm != null) {
@@ -295,7 +295,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.data(10, name);
     if (!allDone) {
       value++;
-      if (!MiscGui.isAllGUIsuppressed() && withProgressDialog && pm != null) {
+      if (!Misc.isAllGUIsuppressed() && withProgressDialog && pm != null) {
         pm.setProgress(value);
         pm.setNote(currentStatus);
       }

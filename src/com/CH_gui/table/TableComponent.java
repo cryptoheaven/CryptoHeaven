@@ -30,7 +30,6 @@ import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.FolderRecUtil;
 
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
@@ -962,7 +961,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
         setDisplay(folderType, isInboxFolder, isSentFolder, isSpamFolder, isDraftsFolder);
 
         if (openChatFolderID != null) {
-          FolderRecUtil.clearOpenChatFolder(openChatFolderID, this);
+          OpenChatFolders.clearOpenChatFolder(openChatFolderID, this);
           openChatFolderID = null;
         }
 
@@ -1001,7 +1000,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
             break;
           case FolderRecord.CHATTING_FOLDER:
             openChatFolderID = selectedFolderID;
-            FolderRecUtil.setOpenChatFolder(selectedFolderID, this);
+            OpenChatFolders.setOpenChatFolder(selectedFolderID, this);
             chatTableComponent.initData(selectedFolderID);
             break;
           case FolderRecord.KEY_FOLDER:
@@ -1019,7 +1018,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       if (trace != null) trace.data(100, "selectionAttempted -- in");
       setDisplayed(null);
       if (openChatFolderID != null) {
-        FolderRecUtil.clearOpenChatFolder(openChatFolderID, this);
+        OpenChatFolders.clearOpenChatFolder(openChatFolderID, this);
         openChatFolderID = null;
       }
       if (trace != null) trace.data(110, "selectionAttempted -- out");

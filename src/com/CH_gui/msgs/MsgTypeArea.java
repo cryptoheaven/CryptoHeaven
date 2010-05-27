@@ -12,10 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.HTML_ClickablePane;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -24,7 +20,6 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
@@ -32,6 +27,7 @@ import com.CH_co.util.*;
 
 import com.CH_gui.addressBook.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
 
 // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.

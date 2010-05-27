@@ -22,7 +22,7 @@ import com.CH_gui.msgs.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.MiscGui;
+import com.CH_gui.util.MiscGui;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

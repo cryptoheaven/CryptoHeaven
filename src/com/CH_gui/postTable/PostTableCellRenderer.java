@@ -12,8 +12,6 @@
 
 package com.CH_gui.postTable;
 
-import com.CH_gui.util.HTML_ClickablePane;
-import com.CH_gui.util.HTML_EditorKit;
 import java.awt.*;
 import java.security.*;
 import java.util.*;
@@ -25,7 +23,6 @@ import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
-import com.CH_co.util.*;
 
 import com.CH_gui.gui.URLLauncherCHACTION;
 import com.CH_gui.gui.URLLauncherMAILTO;
@@ -33,6 +30,7 @@ import com.CH_gui.msgs.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

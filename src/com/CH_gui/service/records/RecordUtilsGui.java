@@ -12,11 +12,11 @@
 
 package com.CH_gui.service.records;
 
-import com.CH_co.service.records.FileLinkRecord;
-import com.CH_co.service.records.Record;
-import com.CH_co.util.ImageNums;
-import com.CH_gui.util.Images;
-import com.CH_co.util.MiscGui;
+import com.CH_co.service.records.*;
+import com.CH_co.util.*;
+
+import com.CH_gui.util.*;
+
 import javax.swing.Icon;
 
 /**
@@ -37,7 +37,7 @@ public class RecordUtilsGui {
     if (iconIndex == ImageNums.IMAGE_SPECIAL_HANDLING) {
       if (rec instanceof FileLinkRecord) {
         String fileName = ((FileLinkRecord) rec).getFileName();
-        icon = fileName != null ? MiscGui.getFileIcon(fileName) : null;
+        icon = fileName != null ? FileTypesIcons.getFileIcon(fileName) : null;
       }
     } else {
       icon = Images.get(iconIndex);

@@ -1,6 +1,5 @@
 package com.CH_co.util;
 
-import java.applet.AppletContext;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -58,7 +57,7 @@ public class BrowserLauncher {
   /**
    * If running from Applet, use Applet's method to launch a browser window.
    */
-  private static AppletContext appletContext;
+  private static AppletTypeI appletContext;
 
   /**
    * The Java virtual machine that we are running on.  Actually, in most cases we only care
@@ -251,7 +250,7 @@ public class BrowserLauncher {
    */
   private BrowserLauncher() { }
 
-  public static void setAppletContext(AppletContext _appletContext) {
+  public static void setAppletContext(AppletTypeI _appletContext) {
     appletContext = _appletContext;
   }
 

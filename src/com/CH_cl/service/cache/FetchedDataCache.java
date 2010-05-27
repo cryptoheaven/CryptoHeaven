@@ -2265,8 +2265,7 @@ public class FetchedDataCache extends Object {
                   redFlagCount ++;
               }
             }
-            boolean suppressSound = fRec.isChatting() && !FolderRecUtil.isOpenChatFolder(fRec.folderId);
-            suppressSound |= fRec.folderId.equals(getUserRecord().junkFolderId) || fRec.folderId.equals(getUserRecord().recycleFolderId);
+            boolean suppressSound = fRec.folderId.equals(getUserRecord().junkFolderId) || fRec.folderId.equals(getUserRecord().recycleFolderId);
             fRec.setUpdated(redFlagCount, suppressSound);
           }
         } // end for

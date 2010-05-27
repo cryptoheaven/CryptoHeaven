@@ -19,9 +19,9 @@ import com.CH_cl.service.ops.*;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.sys.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
 import java.util.Date;
 
 /**
@@ -61,7 +61,7 @@ public class SysAGetAutoUpdate extends ClientMessageAction {
     if (set != null && set.updateRecords != null && set.updateRecords.length > 0) {
       FetchedDataCache cache = getFetchedDataCache();
       UserRecord myUser = cache.getUserRecord();
-      if (!MiscGui.isAllGUIsuppressed()) {
+      if (!Misc.isAllGUIsuppressed()) {
         if (AutoUpdater.isLongInactive()) {
           if (myUser != null && myUser.flags != null &&
               !Misc.isBitSet(myUser.flags, UserRecord.FLAG_DISABLE_AUTO_UPDATES) &&

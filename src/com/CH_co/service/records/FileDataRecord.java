@@ -444,7 +444,7 @@ public class FileDataRecord extends Record {
 
           // show error dialog
           String title = "File Integrity Check FAILED";
-          boolean option = NotificationCenter.showYesNo(NotificationCenter.ERROR_MESSAGE, title, errorMsg);
+          boolean option = NotificationCenter.showYesNo(NotificationCenter.ERROR_MESSAGE, title, errorMsg, true);
 
           if (option == true) {
             // cleanup encrypted and plain file that may be partial

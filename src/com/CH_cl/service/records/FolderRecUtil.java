@@ -12,13 +12,7 @@
 
 package com.CH_cl.service.records;
 
-import java.awt.Component;
 import java.util.*;
-
-import com.CH_cl.service.cache.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.util.MultiHashtable;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -44,9 +38,6 @@ public class FolderRecUtil extends Object {
   // When folder view is invalidated, lets keep these marks here.
   private static final Hashtable fldViewInvalidatedHT = new Hashtable();
 
-  // When update comes to the chatting folder, keep track of open Chat Frames or chat Components
-  private static final MultiHashtable openChatFolders = new MultiHashtable(); // use synchronized version of this class
-
 
   public static void markFolderFetchRequestIssued(Long folderId) {
     fldFetchRequestsIssuedHT.put(folderId, Boolean.TRUE);
@@ -68,28 +59,9 @@ public class FolderRecUtil extends Object {
     return b != null ? b.booleanValue() : false;
   }
 
-  public static Collection getOpenChatFolders(Long folderId) {
-    return openChatFolders.getAll(folderId);
-  }
-  public static boolean isOpenChatFolder(Long folderId) {
-    return openChatFolders.get(folderId) != null;
-  }
-  public static void setOpenChatFolder(Long folderId, Component comp) {
-    openChatFolders.put(folderId, comp);
-  }
-  public static void clearOpenChatFolder(Long folderId, Component comp) {
-    openChatFolders.remove(folderId, comp);
-  }
-
-  public static boolean isMySuperRoot(FolderRecord folderRecord) {
-    UserRecord userRec = FetchedDataCache.getSingleInstance().getUserRecord();
-    return folderRecord.isSuperRoot(userRec);
-  }
-
   public static void clear() {
     fldFetchRequestsIssuedHT.clear();
     fldViewInvalidatedHT.clear();
-    openChatFolders.clear();
   }
 
   public static void clearFetchedIDs() {

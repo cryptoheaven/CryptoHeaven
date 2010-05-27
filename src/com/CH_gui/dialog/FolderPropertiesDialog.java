@@ -12,7 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
 import com.CH_cl.service.actions.ClientMessageAction;
 import java.awt.*;
 import java.awt.event.*;
@@ -25,7 +24,6 @@ import javax.swing.event.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
@@ -114,8 +112,9 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     this.cache = FetchedDataCache.getSingleInstance();
 
     FolderRecord folderRecord = folderPair.getFolderRecord();
-    this.amIOwner = folderPair.getFolderRecord().ownerUserId.equals(cache.getMyUserId());
-    this.isMySuperRoot = FolderRecUtil.isMySuperRoot(folderRecord);
+    UserRecord myUser = cache.getUserRecord();
+    this.amIOwner = folderPair.getFolderRecord().ownerUserId.equals(myUser.userId);
+    this.isMySuperRoot = folderRecord.isSuperRoot(myUser);
     this.isSharableType = folderRecord.isSharableType();
 
     JButton[] buttons = createButtons();

@@ -12,19 +12,12 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.queue.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -967,7 +960,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel_updateGUI(MsgLinkRecord parentMsgLink, Object[] attachments, String skipFileNameForSubject, JPanel jAttachments, JPanel jLineAttachments)");
     if (trace != null) trace.args(parentMsgLink, attachments, skipFileNameForSubject);
     boolean visible = false;
-    String skipFileName = skipFileNameForSubject != null ? Misc.getFileSafeShortString(skipFileNameForSubject) : null;
+    String skipFileName = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject) : null;
     jAttachments.removeAll();
     if (attachments != null && attachments.length > 0) {
       jAttachments.setBorder(new EmptyBorder(0, 0, 0, 0));

@@ -12,7 +12,6 @@
 
 package com.CH_gui.recycleTable;
 
-import com.CH_gui.util.Images;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -21,6 +20,7 @@ import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.*;
 

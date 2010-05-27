@@ -16,13 +16,8 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-import java.util.ArrayList;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.ButtonGroup;
 import javax.swing.JTable;
 import javax.swing.event.EventListenerList;

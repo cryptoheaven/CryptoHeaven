@@ -19,7 +19,7 @@ import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 
-import com.CH_gui.util.Images;
+import com.CH_gui.util.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -185,7 +185,7 @@ public class CryptoHeaven extends Object {
     if (DEBUG) {
       Sounds.DEBUG__SUPPRESS_ALL_SOUNDS = true;
       KeyRecord.DEBUG__ALLOW_SHORT_KEYS = true;
-      MiscGui.suppressAllGUI();
+      Misc.suppressAllGUI();
     }
   }
 

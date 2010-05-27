@@ -12,9 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -39,6 +36,7 @@ import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.usrs.*;
+import com.CH_gui.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

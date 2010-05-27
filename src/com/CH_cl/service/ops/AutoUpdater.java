@@ -79,7 +79,7 @@ public class AutoUpdater extends ThreadTraced {
 
   public void runTraced() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "AutoUpdater.runTraced()");
-    if (!isRunning && !Misc.isRunningFromApplet() && !MiscGui.isAllGUIsuppressed()) {
+    if (!isRunning && !Misc.isRunningFromApplet() && !Misc.isAllGUIsuppressed()) {
       isRunning = true;
       lastRunStamp = System.currentTimeMillis();
       try {

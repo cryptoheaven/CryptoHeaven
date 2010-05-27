@@ -12,6 +12,7 @@
 
 package com.CH_gui.gui;
 
+import com.CH_gui.util.URLLauncher;
 import com.CH_gui.util.HTML_ClickablePane;
 import java.awt.*;
 import java.awt.event.*;

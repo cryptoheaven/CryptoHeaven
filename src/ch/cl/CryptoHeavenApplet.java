@@ -12,13 +12,10 @@
 
 package ch.cl;
 
-import com.CH_co.util.ArrayUtils;
-import com.CH_co.util.BrowserLauncher;
-import com.CH_co.util.DisposableObj;
-import com.CH_co.util.Misc;
+import com.CH_co.util.*;
+import java.net.URL;
 
-import javax.swing.JApplet;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -37,7 +34,7 @@ import javax.swing.border.EmptyBorder;
  * @author  Marcin Kurzawa
  * @version
  */
-public class CryptoHeavenApplet extends JApplet implements DisposableObj {
+public class CryptoHeavenApplet extends JApplet implements DisposableObj, AppletTypeI {
 
   private CryptoHeavenApplet applet;
   private JLabel jTitle;
@@ -86,7 +83,7 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj {
   private void setApplet(CryptoHeavenApplet app) {
     applet = app;
     Misc.setSystemExitObj(app);
-    BrowserLauncher.setAppletContext(app != null ? app.getAppletContext() : null);
+    BrowserLauncher.setAppletContext(app != null ? app : null);
   }
 
   /**
@@ -106,6 +103,10 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj {
       } catch (Throwable t) {
       }
     }
+  }
+
+  public void showDocument(URL url, String target) {
+    getAppletContext().showDocument(url, target);
   }
 
 }

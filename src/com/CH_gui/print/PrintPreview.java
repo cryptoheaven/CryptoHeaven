@@ -12,8 +12,6 @@
 
 package com.CH_gui.print;
 
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.util.MessageDialog;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -23,11 +21,12 @@ import javax.swing.border.*;
 
 import com.CH_cl.service.cache.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.*;
 
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
 
 /**
@@ -77,7 +76,7 @@ public class PrintPreview extends JDialog {
   private void initialize(Printable target, Component parent) {
     setSize(695, 485);
     if (parent != null) 
-      com.CH_co.util.MiscGui.setSuggestedWindowLocation(parent, this);
+      com.CH_gui.util.MiscGui.setSuggestedWindowLocation(parent, this);
 
     m_target = target;
 

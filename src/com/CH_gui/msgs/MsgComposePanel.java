@@ -12,7 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_gui.util.Images;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;

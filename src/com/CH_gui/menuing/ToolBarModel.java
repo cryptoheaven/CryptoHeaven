@@ -12,6 +12,7 @@
 
 package com.CH_gui.menuing;
 
+import com.CH_gui.util.MiscGui;
 import java.awt.Component;
 import java.util.*;
 

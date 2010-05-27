@@ -12,7 +12,6 @@
 
 package com.CH_gui.tree;
 
-import com.CH_gui.util.Images;
 import com.CH_co.trace.*;
 import com.CH_co.tree.*;
 import com.CH_co.util.*;
