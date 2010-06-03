@@ -12,15 +12,15 @@
 
 package com.CH_gui.gui;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.dialog.MouseTextEntryDialog;
+import com.CH_co.util.*;
+import com.CH_gui.util.*;
+import com.CH_gui.dialog.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
-
-import com.CH_co.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
