@@ -303,6 +303,7 @@ public class MsgTableModel extends RecordTableModel {
    */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "setAutoUpdate(boolean flag)");
+    if (trace != null) trace.args(flag);
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (flag) {
       if (linkListener == null) {
@@ -321,7 +322,6 @@ public class MsgTableModel extends RecordTableModel {
     }
     if (trace != null) trace.exit(MsgTableModel.class);
   }
-
 
   /**
    * Initializes the model setting the specified folderId as its main variable
@@ -711,11 +711,11 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddPriority) {
-            if (msgData.isImpHigh(msgData.importance.shortValue()))
+            if (msgData.isImpHigh())
               sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_HIGH_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
-            else if (msgData.isImpFYI(msgData.importance.shortValue()))
+            else if (msgData.isImpFYI())
               sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_LOW_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
-            else if (msgData.isImpSystem(msgData.importance.shortValue()))
+            else if (msgData.isImpSystem())
               sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.LIGHT_ON_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
           }
 

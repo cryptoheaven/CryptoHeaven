@@ -108,6 +108,7 @@ public class FileTableModel extends RecordTableModel {
    */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableModel.class, "setAutoUpdate(boolean flag)");
+    if (trace != null) trace.args(flag);
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (flag) {
       if (linkListener == null) {

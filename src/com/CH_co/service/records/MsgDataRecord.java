@@ -943,6 +943,18 @@ public class MsgDataRecord extends Record {
     return (imp & IMPORTANCE_OLD_MASK) == IMPORTANCE_SYSTEM_NOTICE;
   }
 
+  public boolean isImpFYI() {
+    return isImpFYI(importance.shortValue());
+  }
+  public boolean isImpNormal() {
+    return isImpNormal(importance.shortValue());
+  }
+  public boolean isImpHigh() {
+    return isImpHigh(importance.shortValue());
+  }
+  public boolean isImpSystem() {
+    return isImpSystem(importance.shortValue());
+  }
 
   public static boolean isTypeMessage(Short objType) {
     return isTypeMessage(objType.shortValue());

@@ -42,8 +42,8 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.text.Keymap;
 import javax.swing.Timer;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -379,8 +379,9 @@ public class LoginFrame extends JFrame {
       passwordConditionLabel = getPasswordHint();
     if (reTypeLabel == null)
       reTypeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password"));
-    if (retypePassword == null)
+    if (retypePassword == null) {
       retypePassword = new JMyPasswordKeyboardField(com.CH_gui.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."));
+    }
     if (currentEmailLabel == null)
       currentEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Email_Address"));
     if (currentEmail == null)

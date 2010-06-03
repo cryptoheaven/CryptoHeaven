@@ -180,11 +180,23 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, File[] attachFiles) {
-    super(truncate(MsgComposeComponents.getSubjectForward(attachFiles)), true, true);
+    this (initialRecipients, null, null, attachFiles);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, File[] attachFiles)");
-    if (trace != null) trace.args(initialRecipients, attachFiles);
+    if (trace != null) trace.exit(MessageFrame.class);
+  }
+
+
+  /** Creates new MessageFrame */
+  public MessageFrame(Record[] initialRecipients, String subject, String plainBody, File[] attachFiles) {
+    super(truncate(MsgComposeComponents.getSubjectForward(attachFiles)), true, true);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, String subject, String plainBody, File[] attachFiles)");
+    if (trace != null) trace.args(initialRecipients, subject, plainBody, attachFiles);
 
     composePanel = new MsgComposePanel(new Record[][] { initialRecipients }, attachFiles);
+    if (subject != null)
+      composePanel.setSubject(subject);
+    if (plainBody != null)
+      composePanel.setBody(plainBody);
     if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
       this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);

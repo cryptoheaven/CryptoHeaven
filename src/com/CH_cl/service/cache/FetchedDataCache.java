@@ -84,6 +84,7 @@ public class FetchedDataCache extends Object {
   private Map msgLinkRecordMap;
   private MultiHashMap msgLinkRecordMap_byMsgId; // key is the msgId
   private Map msgDataRecordMap;
+  private MultiHashMap msgDataRecordMap_byReplyToMsgId; // key is the replyToMsgId
   private Map emailRecordMap;
   private MultiHashMap addrHashRecordMap_byMsgId; // key is the msgId
   private MultiHashMap addrHashRecordMap_byHash; // key is the hash
@@ -135,6 +136,7 @@ public class FetchedDataCache extends Object {
     msgLinkRecordMap = new HashMap();
     msgLinkRecordMap_byMsgId = new MultiHashMap(true);
     msgDataRecordMap = new HashMap();
+    msgDataRecordMap_byReplyToMsgId = new MultiHashMap(true);
     emailRecordMap = new HashMap();
     addrHashRecordMap_byMsgId = new MultiHashMap(true);
     addrHashRecordMap_byHash = new MultiHashMap(true);
@@ -173,6 +175,7 @@ public class FetchedDataCache extends Object {
       msgLinkRecordMap.clear();
       msgLinkRecordMap_byMsgId.clear();
       msgDataRecordMap.clear();
+      msgDataRecordMap_byReplyToMsgId.clear();
       contactRecordMap.clear();
       for (int i=0; i<3; i++)
         statRecordMaps[i].clear();
@@ -2309,6 +2312,7 @@ public class FetchedDataCache extends Object {
       if (dataRecords != null && dataRecords.length > 0) {
         unWrapMsgDataRecords(dataRecords);
         dataRecords = (MsgDataRecord[]) RecordUtils.merge(msgDataRecordMap, dataRecords);
+        for (int i=0; i<dataRecords.length; i++) msgDataRecordMap_byReplyToMsgId.put(dataRecords[i].replyToMsgId, dataRecords[i]);
       } else if (linkRecords != null && linkRecords.length > 0) {
         // since there are no Msg Datas specified, maybe we should try unWrapping any datas pointed by the link from the cache...
         // this would cover symmetric recrypt case of shared inboxes
@@ -2355,9 +2359,6 @@ public class FetchedDataCache extends Object {
         if (records != null) {
           // for removed links remove them from secondary hashtable
           for (int i=0; i<records.length; i++) msgLinkRecordMap_byMsgId.remove(records[i].msgId, records[i]);
-          // for removed links to Address Records, remove the corresponding AddrHashRecords
-          Long[] msgIDs = MsgLinkRecord.getMsgIDs(records);
-          removeAddrHashRecords(msgIDs);
         }
       }
       fireMsgLinkRecordUpdated(records, RecordEvent.REMOVE);
@@ -2627,6 +2628,7 @@ public class FetchedDataCache extends Object {
         // unSeal Msg Data records
         unWrapMsgDataRecords(records);
         records = (MsgDataRecord[]) RecordUtils.merge(msgDataRecordMap, records);
+        for (int i=0; i<records.length; i++) msgDataRecordMap_byReplyToMsgId.put(records[i].replyToMsgId, records[i]);
       }
       fireMsgDataRecordUpdated(records, RecordEvent.SET);
     }
@@ -2680,7 +2682,10 @@ public class FetchedDataCache extends Object {
     if (records != null && records.length > 0) {
       synchronized (this) {
         records = (MsgDataRecord[]) RecordUtils.remove(msgDataRecordMap, records);
-        removeAddrHashRecords(RecordUtils.getIDs(records));
+        if (records != null) {
+          for (int i=0; i<records.length; i++) msgDataRecordMap_byReplyToMsgId.put(records[i].replyToMsgId, records[i]);
+          removeAddrHashRecords(RecordUtils.getIDs(records));
+        }
       }
       fireMsgDataRecordUpdated(records, RecordEvent.REMOVE);
     }

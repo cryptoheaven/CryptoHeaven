@@ -334,7 +334,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    */
   private void enqueueProgMonitor(MessageAction msgAction) {
     ProgMonitorI progressMonitor = assignProgMonitor(msgAction, null);
-    progressMonitor.enqueue(msgAction.getActionCode(), msgAction.getStamp());
+    if (progressMonitor != null)
+      progressMonitor.enqueue(msgAction.getActionCode(), msgAction.getStamp());
   }
 
   /**

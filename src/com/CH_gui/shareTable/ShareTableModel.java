@@ -128,6 +128,7 @@ public class ShareTableModel extends RecordTableModel {
    */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ShareTableModel.class, "setAutoUpdate(boolean flag)");
+    if (trace != null) trace.args(flag);
     if (flag) {
       if (shareListener == null) {
         shareListener = new FolderShareListener();

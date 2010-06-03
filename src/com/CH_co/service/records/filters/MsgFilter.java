@@ -13,7 +13,6 @@
 package com.CH_co.service.records.filters;
 
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
 

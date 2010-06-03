@@ -54,6 +54,7 @@ public class JMyPasswordKeyboardField extends JPanel {
     setLayout(new BorderLayout(0, 0));
 
     jPass = new JPasswordField(password);
+    jPass.addMouseListener(new TextFieldPopupPasteAdapter());
     setBorder(jPass.getBorder());
     jPass.setBorder(new EmptyBorder(0,0,0,0));
 

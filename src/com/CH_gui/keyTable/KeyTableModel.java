@@ -97,6 +97,7 @@ public class KeyTableModel extends RecordTableModel {
    */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyTableModel.class, "setAutoUpdate(boolean flag)");
+    if (trace != null) trace.args(flag);
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (flag) {
       if (keyListener == null) {

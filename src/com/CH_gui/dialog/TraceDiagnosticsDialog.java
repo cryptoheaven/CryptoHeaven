@@ -13,18 +13,16 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.records.EmailAddressRecord;
-import com.CH_co.gui.*;
-import com.CH_co.service.records.Record;
+import com.CH_cl.service.cache.*;
+import com.CH_cl.service.records.*;
+
+import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
-import com.CH_gui.frame.MessageFrame;
+
+import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -100,7 +98,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
       public void actionPerformed(ActionEvent event) {
         File traceFile = TraceProperties.getLastTraceFile();
         traceStop();
-        new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, new File[] { traceFile });
+        new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request with Diagnostics", MainFrame.getSupportMsgBodyTemplate(), new File[] { traceFile });
         closeDialog();
       }
     });

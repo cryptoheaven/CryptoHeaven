@@ -21,7 +21,6 @@ import javax.swing.border.*;
 import java.util.Random;
 
 import com.CH_co.cryptx.Rnd;
-import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 
 /** 
@@ -127,6 +126,7 @@ public class MouseTextEntry extends JPanel {
     panel.setLayout(new GridBagLayout());
 
     jPass = new JPasswordField(initialStr);
+    jPass.addMouseListener(new TextFieldPopupPasteAdapter());
     //jPass.setEditable(false);
     //jPass.addKeyListener(buttonActionListener);
 

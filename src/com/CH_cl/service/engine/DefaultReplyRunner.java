@@ -104,17 +104,21 @@ public class DefaultReplyRunner extends ThreadTraced {
       ProgMonitorI progressMonitor = SIL.assignProgMonitor(msgAction, Boolean.FALSE);
 
       int actionCode = msgAction.getActionCode();
-      progressMonitor.startExecution(actionCode);
+      if (progressMonitor != null)
+        progressMonitor.startExecution(actionCode);
       // RUN
       try {
         reply = msgAction.runAction();
       } catch (Throwable t) {
         if (trace != null) trace.exception(DefaultReplyRunner.class, 100, t);
       }
-      progressMonitor.doneExecution(actionCode);
+      if (progressMonitor != null)
+        progressMonitor.doneExecution(actionCode);
 
-      if (reply == null && msgAction.getStamp() != 0)
-        progressMonitor.allDone();
+      if (reply == null && msgAction.getStamp() != 0) {
+        if (progressMonitor != null)
+          progressMonitor.allDone();
+      }
     }
 
     if (trace != null) trace.exit(DefaultReplyRunner.class, reply);
