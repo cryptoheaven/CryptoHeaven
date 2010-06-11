@@ -15,12 +15,10 @@ package com.CH_gui.tree;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
-import com.CH_cl.tree.*;
 
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.trace.*;
-import com.CH_co.tree.*;
 
 import com.CH_gui.frame.MainFrame;
 
@@ -79,7 +77,7 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
 
         FolderTreeSelectionExpansion selectionExpansion = null;
         FolderTreeModelCl model = null;
-        FolderTreeNode root = null;
+        FolderTreeNodeGui root = null;
         synchronized (treeLock) {
           // suppress consideration for selection changes by event processors...
           fTree.suppressSelection(true);

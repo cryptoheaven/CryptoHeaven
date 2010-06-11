@@ -9,14 +9,13 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Development Team.
  */
-package com.CH_cl.tree;
+package com.CH_gui.tree;
 
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.tree.*;
 import com.CH_co.util.*;
 
 import java.util.*;
@@ -41,7 +40,7 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
 
   /** Creates new FolderTreeModelCl */
   public FolderTreeModelCl() {
-    this(new FolderTreeNode());
+    this(new FolderTreeNodeGui());
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModel()");
     if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
@@ -57,12 +56,12 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
   }
 
   /** Creates new FolderTreeModelCl */
-  public FolderTreeModelCl(FolderTreeNode root) {
+  public FolderTreeModelCl(FolderTreeNodeGui root) {
     super(root);
   }
 
   /** Creates new FolderTreeModelCl */
-  public FolderTreeModelCl(FolderTreeNode root, RecordFilter filter, FolderPair[] initialFolderPairs) {
+  public FolderTreeModelCl(FolderTreeNodeGui root, RecordFilter filter, FolderPair[] initialFolderPairs) {
     super(root, filter, initialFolderPairs);
   }
 
@@ -82,7 +81,7 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
       trace.args(keepCacheResidantChildren);
     }
 
-    FolderTreeNode nodeToRemove = findNode(folder.getId(), true);
+    FolderTreeNodeGui nodeToRemove = findNode(folder.getId(), true);
 
     if (nodeToRemove != null) {
 
@@ -94,7 +93,7 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
         if (enm != null && enm.hasMoreElements()) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           while (enm.hasMoreElements()) {
-            FolderTreeNode childNode = (FolderTreeNode) enm.nextElement();
+            FolderTreeNodeGui childNode = (FolderTreeNodeGui) enm.nextElement();
             FolderPair fPair = childNode.getFolderObject();
             if (cache.getFolderRecord(fPair.getId()) != null) {
               if (keepChildrenL == null) keepChildrenL = new ArrayList();

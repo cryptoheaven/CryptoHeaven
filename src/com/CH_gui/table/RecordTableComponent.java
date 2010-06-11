@@ -13,22 +13,10 @@
 
 package com.CH_gui.table;
 
-import com.CH_gui.action.*;
-import com.CH_gui.contactTable.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.recycleTable.*;
-import com.CH_gui.util.*;
-
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.service.msg.*;
@@ -38,7 +26,19 @@ import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
-import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.action.*;
+import com.CH_gui.actionGui.*;
+import com.CH_gui.contactTable.*;
+import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.list.*;
+import com.CH_gui.menuing.*;
+import com.CH_gui.msgs.*;
+import com.CH_gui.msgTable.*;
+import com.CH_gui.recycleTable.*;
+import com.CH_gui.service.records.*;
+import com.CH_gui.util.*;
+
 import com.CH_guiLib.gui.*;
 
 import java.awt.BorderLayout;
@@ -929,7 +929,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 }
               }
               // participants got sorted so compare using "equals" method
-              if (participants[i].equals(owner))
+              if (participants[i] != null && participants[i].equals(owner))
                 text = "[" + text + "]";
               JLabel label = new JMyLabel(text);
               label.setBorder(new EmptyBorder(0,3,0,3));

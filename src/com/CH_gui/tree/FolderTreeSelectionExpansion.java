@@ -12,15 +12,11 @@
 
 package com.CH_gui.tree;
 
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.tree.TreePath;
-
-import com.CH_cl.tree.*;
 
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
-import com.CH_co.tree.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -28,7 +24,7 @@ import com.CH_co.tree.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -36,7 +32,7 @@ import com.CH_co.tree.*;
  *
  * <b>$Revision: 1.12 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderTreeSelectionExpansion extends Object {
 
@@ -60,10 +56,10 @@ public class FolderTreeSelectionExpansion extends Object {
     FolderTreeSelectionExpansion newVisuals = new FolderTreeSelectionExpansion();
 
     FolderTreeModelCl model = folderTree.getFolderTreeModel();
-    FolderTreeNode root = model.getRootNode();
+    FolderTreeNodeGui root = model.getRootNode();
     Enumeration enm = root.depthFirstEnumeration();
     while (enm.hasMoreElements()) {
-      FolderTreeNode node = (FolderTreeNode) enm.nextElement();
+      FolderTreeNodeGui node = (FolderTreeNodeGui) enm.nextElement();
       if (node != root) {
         TreePath path = new TreePath(model.getPathToRoot(node));
         FolderPair fPair = node.getFolderObject();
@@ -88,7 +84,7 @@ public class FolderTreeSelectionExpansion extends Object {
 
     FolderTreeModelCl model = folderTree.getFolderTreeModel();
     for (int i=0; i<visibleFolderIDsV.size(); i++) {
-      FolderTreeNode node = model.findNode((Long) visibleFolderIDsV.elementAt(i), true);
+      FolderTreeNodeGui node = model.findNode((Long) visibleFolderIDsV.elementAt(i), true);
       if (node != null) {
         TreePath path = new TreePath(model.getPathToRoot(node));
         if (path != null) {
@@ -99,7 +95,7 @@ public class FolderTreeSelectionExpansion extends Object {
     Vector selectionPathsV = new Vector();
     for (int i=0; i<selectedFolderIDsV.size(); i++) {
       Long folderId = (Long) selectedFolderIDsV.elementAt(i);
-      FolderTreeNode node = model.findNode(folderId, true);
+      FolderTreeNodeGui node = model.findNode(folderId, true);
       if (node != null) {
         TreePath path = new TreePath(model.getPathToRoot(node));
         if (path != null) {

@@ -12,7 +12,6 @@
 
 package com.CH_gui.tree;
 
-import com.CH_gui.util.MessageDialog;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 
@@ -24,16 +23,11 @@ import com.CH_gui.addressBook.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.msgTable.*;
+import com.CH_gui.util.*;
 
 import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;

@@ -12,8 +12,6 @@
 
 package com.CH_gui.tree;
 
-import com.CH_cl.tree.*;
-
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.util.*;

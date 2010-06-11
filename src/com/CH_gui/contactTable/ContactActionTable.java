@@ -12,35 +12,22 @@
 
 package com.CH_gui.contactTable;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.ActionProducerI;
-import com.CH_gui.util.Images;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.ActionUtils;
-import javax.swing.*;
-import java.awt.event.*;
-import java.awt.dnd.*;
-import java.lang.reflect.Array;
-import java.util.*;
-
 import com.CH_gui.action.*;
 import com.CH_gui.actionGui.*;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
-import com.CH_cl.tree.*;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -49,12 +36,18 @@ import com.CH_co.service.msg.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 import com.CH_gui.list.ListRenderer;
+
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.dnd.*;
+import java.awt.event.*;
+import java.lang.reflect.Array;
+import java.util.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

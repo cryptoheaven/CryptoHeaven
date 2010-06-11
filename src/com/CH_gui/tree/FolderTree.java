@@ -13,7 +13,6 @@
 package com.CH_gui.tree;
 
 import com.CH_cl.service.cache.*;
-import com.CH_cl.tree.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -28,7 +27,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 /** 
@@ -64,7 +62,7 @@ public class FolderTree extends JTree implements DisposableObj {
 
   /** Creates new FolderTree */
   public FolderTree() {
-    this(new FolderTreeNode());
+    this(new FolderTreeNodeGui());
   }
   /** Creates new FolderTree */
   public FolderTree(RecordFilter filter) {
@@ -72,23 +70,23 @@ public class FolderTree extends JTree implements DisposableObj {
   }
   /** Creates new FolderTree */
   public FolderTree(RecordFilter filter, FolderPair[] initialFolderPairs) {
-    this(new FolderTreeNode(), filter, initialFolderPairs);
+    this(new FolderTreeNodeGui(), filter, initialFolderPairs);
   }
 
   /** Creates new FolderTree */
-  public FolderTree(FolderTreeNode root) {
+  public FolderTree(FolderTreeNodeGui root) {
     this(new FolderTreeModelCl(root));
   }
 
   /** Creates new FolderTree */
-  public FolderTree(FolderTreeNode root, RecordFilter filter, FolderPair[] initialFolderPairs) {
+  public FolderTree(FolderTreeNodeGui root, RecordFilter filter, FolderPair[] initialFolderPairs) {
     this(new FolderTreeModelCl(root, filter, initialFolderPairs));
   }
 
   /** Creates new FolderTree */
   public FolderTree(FolderTreeModelCl treeModel) {
     super(treeModel);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "FolderTree(FolderTreeNode)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "FolderTree(FolderTreeNodeGui)");
     init();
     if (trace != null) trace.exit(FolderTree.class);
   }
@@ -419,7 +417,7 @@ public class FolderTree extends JTree implements DisposableObj {
   public void setSelectedFolder(Long folderId) {
     FolderTreeNode node = getFolderTreeModel().findNode(folderId, true);
     if (node != null) {
-      TreeNode[] pathNodes = node.getPath();
+      MyTreeNode[] pathNodes = node.getPath();
       TreePath path = new TreePath(pathNodes);
       getSelectionModel().setSelectionPath(path);
     }

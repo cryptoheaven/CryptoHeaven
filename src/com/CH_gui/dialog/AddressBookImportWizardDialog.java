@@ -12,13 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.ExtensionFileFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -26,28 +19,22 @@ import java.sql.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.filechooser.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
-
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
-import com.CH_cl.util.*;
-import com.CH_cl.tree.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.tree.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.addressBook.*;
@@ -57,6 +44,7 @@ import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

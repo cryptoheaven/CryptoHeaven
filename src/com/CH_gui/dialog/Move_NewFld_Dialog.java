@@ -12,10 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.Images;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.event.*;
@@ -29,7 +25,6 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.records.filters.*;
-import com.CH_cl.tree.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -45,8 +40,10 @@ import com.CH_co.util.*;
 import com.CH_gui.folder.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.*;
+
+import com.CH_guiLib.gui.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

@@ -54,7 +54,7 @@ import javax.swing.event.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -62,7 +62,7 @@ import javax.swing.event.*;
  *
  * <b>$Revision: 1.3 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class RecycleActionTable extends RecordActionTable implements ActionProducerI {
 
@@ -226,10 +226,10 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 
 
   // =====================================================================
-  // LISTENERS FOR THE MENU ITEMS        
+  // LISTENERS FOR THE MENU ITEMS
   // =====================================================================
 
-  /** 
+  /**
    * Open single file (no directories or multi selections)
    */
   private class OpenFileAction extends AbstractActionTraced {
@@ -252,8 +252,8 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  /** 
-   * Download a file/directory to the local system using DownloadUtilities to do all the work 
+  /**
+   * Download a file/directory to the local system using DownloadUtilities to do all the work
    */
   private class DownloadAction extends AbstractActionTraced {
     public DownloadAction(int actionId) {
@@ -501,7 +501,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
         new MsgTableFrame(parentFolderPair);
     }
   }
-  
+
   /**
    * Open Recycle Bin in seperate window
    */
@@ -754,7 +754,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     //if (forDirs)
     //  isDescendantOk = false;
 
-    // If there are no selected folders, we are copying/moving files or msgs only and forbiden folder 
+    // If there are no selected folders, we are copying/moving files or msgs only and forbiden folder
     // will be the one that is parent to the selected files or msgs.
     if (forFiles || forMsgs) {
       FolderPair parentFolderPair = ((RecycleTableModel) getTableModel()).getParentFolderPair();
@@ -770,8 +770,8 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
 
 
     Move_NewFld_Dialog d = null;
-    if (w instanceof Frame) d = new Move_NewFld_Dialog((Frame) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache); 
-    else if (w instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache); 
+    if (w instanceof Frame) d = new Move_NewFld_Dialog((Frame) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache);
+    else if (w instanceof Dialog) d = new Move_NewFld_Dialog((Dialog) w, allFolderPairs, forbidenPairs, null, title, isDescendantOk, cache);
 
     FolderPair chosenPair = null;
     if (d != null) {
@@ -783,7 +783,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   }
 
   /****************************************************************************/
-  /*        A c t i o n P r o d u c e r I                                  
+  /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
 
   /** @return all the acitons that this objects produces.
@@ -802,7 +802,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     actions[SORT_ASC_ACTION].setEnabled(true);
     actions[SORT_DESC_ACTION].setEnabled(true);
     actions[CUSTOMIZE_COLUMNS_ACTION].setEnabled(true);
-    for (int i=SORT_BY_FIRST_COLUMN_ACTION; i<SORT_BY_FIRST_COLUMN_ACTION+NUM_OF_SORT_COLUMNS; i++) 
+    for (int i=SORT_BY_FIRST_COLUMN_ACTION; i<SORT_BY_FIRST_COLUMN_ACTION+NUM_OF_SORT_COLUMNS; i++)
       actions[i].setEnabled(true);
 
     // enable Empty action only if there any objects in the table...

@@ -25,7 +25,6 @@ import com.CH_co.service.records.filters.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.filters.*;
-import com.CH_cl.tree.*;
 
 import com.CH_gui.action.*;
 import com.CH_gui.contactTable.*;
@@ -1197,22 +1196,19 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         folderTree = folderPairs;
       }
       // Create a deapth-first logical order for the sub-tree
-      FolderTreeModelCl folderTreeModel = new FolderTreeModelCl();
-      folderTreeModel.addNodes(folderTree);
-      FolderTreeNode rootNode = folderTreeModel.getRootNode();
+      FolderTreeNode rootNode = new FolderTreeNode();
+      rootNode.addNodes(folderTree, true);
       Enumeration enm = rootNode.depthFirstEnumeration();
       Vector protectedMasterFoldersV = null;
       while (enm.hasMoreElements()) {
         FolderTreeNode n = (FolderTreeNode) enm.nextElement();
         FolderPair fPair = (FolderPair) n.getUserObject();
         if (fPair != null) {
-
           // Check that this folder is still available.
           // It might have dissapeared when server reply came back from previous deletion in the batch.
           Long folderId = fPair.getFolderRecord().getId();
-          if (cache.getFolderRecord(folderId) != null &&
-              (folderTreeModel == null || folderTreeModel.findNode(folderId, true) != null))
-          {
+          if (cache.getFolderRecord(folderId) != null && FolderTreeNode.findNode(folderId, true, rootNode) != null) {
+
             boolean canDelete = true;
             if (userRecord.isBusinessSubAccount() &&
                 fPair.getFolderRecord().ownerUserId.equals(userRecord.masterId) &&
