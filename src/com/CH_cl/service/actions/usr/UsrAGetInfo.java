@@ -57,6 +57,13 @@ public class UsrAGetInfo extends ClientMessageAction {
       isMyPasswordResetBitSwitchedON = true;
     }
 
+    if (cache.getUserRecord() != null &&
+            Misc.isBitSet(cache.getUserRecord().flags, UserRecord.FLAG_DISABLE_AUTO_UPDATES) &&
+            !Misc.isBitSet(uRec.flags, UserRecord.FLAG_DISABLE_AUTO_UPDATES))
+    {
+      AutoUpdater.resetInactiveStamp();
+    }
+
     if (uRec != null) {
       cache.setUserRecord(uRec);
     }

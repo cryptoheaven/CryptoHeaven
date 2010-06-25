@@ -222,7 +222,7 @@ public class LoginFrame extends JFrame {
     }
     if (defaultPassword != null) {
       // if password needs to be entered, dialog will show with password field in focus
-      password.getPasswordField().addHierarchyListener(new InitialFocusRequestor());
+      password.addHierarchyListener(new InitialFocusRequestor());
       // if no errors on the dialog
       if (isInputValid() == null) {
         new OKActionListener().actionPerformed(null);
@@ -1438,7 +1438,7 @@ public class LoginFrame extends JFrame {
           MessageDialog.showErrorDialog(LoginFrame.this, RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
           password.setText(""); retypePassword.setText("");
           error = true;
-          password.getPasswordField().requestFocus();
+          password.requestFocus();
         }
 
         // clear password arrays
@@ -1556,9 +1556,9 @@ public class LoginFrame extends JFrame {
         } else {
           LoginFrame.this.setVisible(true);
           userName.selectAll();
-          password.getPasswordField().requestFocus();
-          password.getPasswordField().getCaret().setVisible(true);
-          password.getPasswordField().selectAll();
+          password.requestFocus();
+          password.getCaret().setVisible(true);
+          password.selectAll();
         }
       }
 

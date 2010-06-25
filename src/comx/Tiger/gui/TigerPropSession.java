@@ -43,4 +43,14 @@ public class TigerPropSession extends PropSpellingSession {
     return userLexicons != null ? userLexicons.length : 0;
   }
 
+  public void setOptionsFromProperties(Properties properties, String prefix) {
+    super.setOptionsFromProperties(properties, prefix);
+    try {
+      TigerBkgChecker.backgroundCheckEnabled = Boolean.valueOf(properties.getProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, ""+TigerBkgChecker.backgroundCheckEnabled)).booleanValue();
+      int countLanguageLexicons = SingleTigerSession.countLanguageLexicons(this);
+      if (countLanguageLexicons < 1) TigerBkgChecker.backgroundCheckEnabled = false;
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
 }

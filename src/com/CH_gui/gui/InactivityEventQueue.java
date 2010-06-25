@@ -25,6 +25,8 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_gui.util.MessageDialog;
 import com.CH_gui.frame.MainFrame;
+import comx.Tiger.gui.SingleTigerSession;
+import comx.Tiger.gui.TigerPropSession;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -254,6 +256,10 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
           InactivityEventQueue eventQueue = InactivityEventQueue.getInstance();
           eventQueue.initialize();
           eventQueue.setDelayToRemainder();
+        }
+        if (userSettingsRecord.spellingProps != null) {
+          TigerPropSession tigerSession = SingleTigerSession.getSingleInstance();
+          tigerSession.setOptionsFromProperties(userSettingsRecord.spellingProps, null);
         }
       }
       if (trace != null) trace.exit(UserSettingsUpdater.class);

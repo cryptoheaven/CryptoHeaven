@@ -217,6 +217,8 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
 
     jEmlList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     jEmlList.setCellRenderer(new MyListCellRenderer());
+    jEmlList.setPrototypeCellValue("Fist name Last name <first.last@domain.com>");
+    jEmlList.setVisibleRowCount(15);
     jEmlList.addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(ListSelectionEvent e) {
         currentEml = jEmlList.getSelectedIndex();

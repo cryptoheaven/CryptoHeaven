@@ -38,9 +38,8 @@ import javax.swing.text.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class JMyPasswordKeyboardField extends JPanel {
+public class JMyPasswordKeyboardField extends JPasswordField {
 
-  private JPasswordField jPass;
   private JButton jPassKeys;
 
   /** Creates new JMyPasswordKeyboardField */
@@ -51,18 +50,15 @@ public class JMyPasswordKeyboardField extends JPanel {
     this(buttonToolTip, null);
   }
   public JMyPasswordKeyboardField(String buttonToolTip, String password) {
-    setLayout(new BorderLayout(0, 0));
-
-    jPass = new JPasswordField(password);
-    jPass.addMouseListener(new TextFieldPopupPasteAdapter());
-    setBorder(jPass.getBorder());
-    jPass.setBorder(new EmptyBorder(0,0,0,0));
+    super(password);
+    addMouseListener(new TextFieldPopupPasteAdapter());
 
     Icon icon = Images.get(ImageNums.KEYBOARD);
     jPassKeys = new JMyButtonNoFocus(icon);
     if (icon == null)
       jPassKeys.setText("Keyboard");
-    if (buttonToolTip != null) jPassKeys.setToolTipText(buttonToolTip);
+    if (buttonToolTip != null)
+      jPassKeys.setToolTipText(buttonToolTip);
     jPassKeys.setBorder(new EmptyBorder(0,0,0,0));
     jPassKeys.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     jPassKeys.setRequestFocusEnabled(false);
@@ -73,12 +69,9 @@ public class JMyPasswordKeyboardField extends JPanel {
             MouseTextEntryDialog dialog = null;
             Window parentWindow = SwingUtilities.windowForComponent(JMyPasswordKeyboardField.this);
             if (parentWindow instanceof Dialog) {
-              dialog = new MouseTextEntryDialog((Dialog) parentWindow, new String(jPass.getPassword()));
+              dialog = new MouseTextEntryDialog((Dialog) parentWindow, JMyPasswordKeyboardField.this);
             } else if (parentWindow instanceof Frame) {
-              dialog = new MouseTextEntryDialog((Frame) parentWindow, new String(jPass.getPassword()));
-            }
-            if (dialog != null && dialog.isOKeyed()) {
-              jPass.setText(new String(dialog.getPass()));
+              dialog = new MouseTextEntryDialog((Frame) parentWindow, JMyPasswordKeyboardField.this);
             }
           }
         });
@@ -95,37 +88,23 @@ public class JMyPasswordKeyboardField extends JPanel {
 
     // remove enter key binding from the password fields
     KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-    Keymap oldPassMap = jPass.getKeymap();
+    Keymap oldPassMap = getKeymap();
     oldPassMap.removeKeyStrokeBinding(enter);
 
-    add(jPass, "Center");
+    setLayout(new BorderLayout(0,0));
     add(jPassKeys, "East");
   }
 
-  public JPasswordField getPasswordField() {
-    return jPass;
-  }
-
-  public Document getDocument() {
-    return jPass.getDocument();
-  }
-
   public void setEnabled(boolean flag) {
-    jPass.setEnabled(flag);
-    jPassKeys.setEnabled(flag);
+    super.setEnabled(flag);
+    if (jPassKeys != null)
+      jPassKeys.setEnabled(flag);
   }
 
   public void setEditable(boolean flag) {
-    jPass.setEditable(flag);
-    jPassKeys.setEnabled(flag);
-  }
-
-  public char[] getPassword() {
-    return jPass.getPassword();
-  }
-
-  public void setText(String s) {
-    jPass.setText(s);
+    super.setEditable(flag);
+    if (jPassKeys != null)
+      jPassKeys.setEnabled(flag);
   }
 
 }

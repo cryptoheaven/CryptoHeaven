@@ -92,48 +92,7 @@ public class PropSpellingSession extends SpellingSession
 
     loadLanguageLexicons();
 
-    String s6;
-    if ((s6 = properties1.getProperty(s3 + "CASE_SENSITIVE_OPT")) != null)
-      setOption(1, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "IGNORE_ALL_CAPS_WORD_OPT")) != null)
-      setOption(2, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "IGNORE_CAPPED_WORD_OPT")) != null)
-      setOption(4, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "IGNORE_MIXED_CASE_OPT")) != null)
-      setOption(8, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "IGNORE_MIXED_DIGITS_OPT")) != null)
-      setOption(16, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "IGNORE_NON_ALPHA_WORD_OPT")) != null)
-      setOption(32, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "REPORT_DOUBLED_WORD_OPT")) != null)
-      setOption(64, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "REPORT_MIXED_CASE_OPT")) != null)
-      setOption(128, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "REPORT_MIXED_DIGITS_OPT")) != null)
-      setOption(256, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "REPORT_UNCAPPED_OPT")) != null)
-      setOption(1024, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "SPLIT_CONTRACTED_WORDS_OPT")) != null)
-      setOption(2048, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "SPLIT_HYPHENATED_WORDS_OPT")) != null)
-      setOption(4096, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "SPLIT_WORDS_OPT")) != null)
-      setOption(8192, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "STRIP_POSSESSIVES_OPT")) != null)
-      setOption(16384, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "SUGGEST_SPLIT_WORDS_OPT")) != null)
-      setOption(32768, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "IGNORE_DOMAIN_NAMES_OPT")) != null)
-      setOption(0x10000, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties1.getProperty(s3 + "ALLOW_ACCENTED_CAPS_OPT")) != null)
-      setOption(0x20000, Boolean.valueOf(s6).booleanValue());
-    minSuggestDepth = 50;
-    if ((s6 = properties1.getProperty(s3 + "MinSuggestDepth")) != null)
-      minSuggestDepth = Integer.valueOf(s6).intValue();
-    if ((s6 = properties1.getProperty(s3 + "Suggestions")) != null && s6.equalsIgnoreCase("Phonetic"))
-      comparator = new EnglishPhoneticComparator();
-    else
-      comparator = new TypographicalComparator();
+    setOptionsFromProperties(properties1, s3);
   }
 
   public PropSpellingSession(Properties properties1)
@@ -146,6 +105,51 @@ public class PropSpellingSession extends SpellingSession
     this(properties1, url, null, null, null);
   }
 
+  public void setOptionsFromProperties(Properties properties, String prefix) {
+    String s3 = prefix != null ? prefix : "";
+    String s6;
+    if ((s6 = properties.getProperty(s3 + "CASE_SENSITIVE_OPT")) != null)
+      setOption(1, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "IGNORE_ALL_CAPS_WORD_OPT")) != null)
+      setOption(2, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "IGNORE_CAPPED_WORD_OPT")) != null)
+      setOption(4, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "IGNORE_MIXED_CASE_OPT")) != null)
+      setOption(8, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "IGNORE_MIXED_DIGITS_OPT")) != null)
+      setOption(16, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "IGNORE_NON_ALPHA_WORD_OPT")) != null)
+      setOption(32, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "REPORT_DOUBLED_WORD_OPT")) != null)
+      setOption(64, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "REPORT_MIXED_CASE_OPT")) != null)
+      setOption(128, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "REPORT_MIXED_DIGITS_OPT")) != null)
+      setOption(256, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "REPORT_UNCAPPED_OPT")) != null)
+      setOption(1024, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "SPLIT_CONTRACTED_WORDS_OPT")) != null)
+      setOption(2048, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "SPLIT_HYPHENATED_WORDS_OPT")) != null)
+      setOption(4096, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "SPLIT_WORDS_OPT")) != null)
+      setOption(8192, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "STRIP_POSSESSIVES_OPT")) != null)
+      setOption(16384, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "SUGGEST_SPLIT_WORDS_OPT")) != null)
+      setOption(32768, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "IGNORE_DOMAIN_NAMES_OPT")) != null)
+      setOption(0x10000, Boolean.valueOf(s6).booleanValue());
+    if ((s6 = properties.getProperty(s3 + "ALLOW_ACCENTED_CAPS_OPT")) != null)
+      setOption(0x20000, Boolean.valueOf(s6).booleanValue());
+    minSuggestDepth = 50;
+    if ((s6 = properties.getProperty(s3 + "MinSuggestDepth")) != null)
+      minSuggestDepth = Integer.valueOf(s6).intValue();
+    if ((s6 = properties.getProperty(s3 + "Suggestions")) != null && s6.equalsIgnoreCase("Phonetic"))
+      comparator = new EnglishPhoneticComparator();
+    else
+      comparator = new TypographicalComparator();
+  }
   public void loadLanguageLexicons() {
     Vector vector = new Vector();
 

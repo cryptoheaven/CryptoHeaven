@@ -12,15 +12,14 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.GeneralDialog;
+import com.CH_co.trace.Trace;
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-
-import com.CH_co.trace.Trace;
-
-import com.CH_gui.gui.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -38,7 +37,7 @@ import com.CH_gui.gui.*;
  * @author  Marcin Kurzawa
  * @version 
  */
-public class MouseTextEntryDialog extends GeneralDialog implements VisualsSavable {
+public class MouseTextEntryDialog extends GeneralDialog {
 
   private static final int DEFAULT_OK_BUTTON_INDEX = 0;
   private static final int DEFAULT_CANCEL_BUTTON_INDEX = 1;
@@ -49,24 +48,32 @@ public class MouseTextEntryDialog extends GeneralDialog implements VisualsSavabl
   private MouseTextEntry mouseTextEntry;
 
   private boolean isOKeyed;
+  private JTextComponent editingTextComp;
 
   /** Creates new MouseTextEntryDialog */
-  public MouseTextEntryDialog(Dialog parent, String initialStr) {
+  public MouseTextEntryDialog(Dialog parent, JTextComponent textComp) {
     super(parent, com.CH_gui.lang.Lang.rb.getString("title_Virtual_Keyboard"));
-    init(parent, initialStr);
+    this.editingTextComp = textComp;
+    init(parent, textComp);
   }
-  public MouseTextEntryDialog(Frame parent, String initialStr) {
+  public MouseTextEntryDialog(Frame parent, JTextComponent textComp) {
     super(parent, com.CH_gui.lang.Lang.rb.getString("title_Virtual_Keyboard"));
-    init(parent, initialStr);
+    this.editingTextComp = textComp;
+    init(parent, textComp);
   }
-  private void init(Component parent, String initialStr) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MouseTextEntryDialog.class, "init(Component parent, String initialStr)");
-    if (trace != null) trace.args(parent, initialStr);
+  private void init(Component parent, JTextComponent textComp) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MouseTextEntryDialog.class, "init(Component parent, TextComponent textComp)");
+    if (trace != null) trace.args(parent, textComp);
+
+    String initialText = "";
+    try {
+      initialText = textComp.getText();
+    } catch (Exception e) {
+    }
 
     JButton[] buttons = createButtons();
-    mouseTextEntry = createMainPanel(initialStr);
+    mouseTextEntry = createMainPanel(initialText);
 
-    setModal(true);
     super.init(parent, buttons, mouseTextEntry, DEFAULT_OK_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
 
     if (trace != null) trace.exit(MouseTextEntryDialog.class);
@@ -96,6 +103,7 @@ public class MouseTextEntryDialog extends GeneralDialog implements VisualsSavabl
   private class OKActionListener implements ActionListener {
     public void actionPerformed (ActionEvent event) {
       isOKeyed = true;
+      editingTextComp.setText(new String(getPass()));
       closeDialog();
     }
   }
@@ -114,11 +122,4 @@ public class MouseTextEntryDialog extends GeneralDialog implements VisualsSavabl
     return isOKeyed;
   }
 
-  /*******************************************************
-  *** V i s u a l s S a v a b l e    interface methods ***
-  *******************************************************/
-  public static final String visualsClassKeyName = "MouseTextEntryDialog";
-  public String getVisualsClassKeyName() {
-    return visualsClassKeyName;
-  }
 }

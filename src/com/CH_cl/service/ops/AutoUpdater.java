@@ -85,7 +85,7 @@ public class AutoUpdater extends ThreadTraced {
       try {
         // Filter out updates that we should not apply based on non-build sensitive and same file size
         if (updateRecs != null && updateRecs.length > 0) {
-          Vector updateRecsV = new Vector();
+          ArrayList updateRecsL = new ArrayList();
           File mainDir = null;
           for (int i=0; i<updateRecs.length; i++) {
             AutoUpdateRecord updateRec = (AutoUpdateRecord) updateRecs[i];
@@ -119,10 +119,10 @@ public class AutoUpdater extends ThreadTraced {
               }
             }
             if (apply) {
-              updateRecsV.addElement(updateRec);
+              updateRecsL.add(updateRec);
             }
           }
-          updateRecs = (AutoUpdateRecord[]) ArrayUtils.toArray(updateRecsV, AutoUpdateRecord.class);
+          updateRecs = (AutoUpdateRecord[]) ArrayUtils.toArray(updateRecsL, AutoUpdateRecord.class);
         }
 
         if (trace != null) trace.data(10, "update records after filtering what to apply", updateRecs);
@@ -970,6 +970,12 @@ public class AutoUpdater extends ThreadTraced {
     }
     if (trace != null) trace.exit(AutoUpdater.class, longInactive);
     return longInactive;
+  }
+
+  public static void resetInactiveStamp() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "resetInactiveStamp()");
+    lastRunStamp = 0;
+    if (trace != null) trace.exit(AutoUpdater.class);
   }
 
 }
