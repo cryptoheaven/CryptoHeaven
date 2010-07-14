@@ -96,7 +96,7 @@ public class MsgTypeListener extends Object implements DocumentListener {
         Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderShareRecordsForFolder(folderId));
         if (shareIDs != null && shareIDs.length > 0) {
           dataSet.objs = new Object[] { folderId, shareIDs };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TYPING, dataSet));
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TYPING, dataSet), 15000, 3);
         }
       }
     }

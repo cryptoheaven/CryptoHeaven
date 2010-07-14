@@ -896,10 +896,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                 // Fetch any shares that are not in cache yet
                 if (shareIDsV.size() > 0) {
                   Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsV, Long.class);
-                  MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000);
+                  MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000, 3);
                 }
                 // See if we need to create any additional shares
-                Vector addSharesV = new Vector();
+                ArrayList addSharesL = new ArrayList();
                 //int fakeShareIdIndex = 0;
                 for (int i=0; i<selected.length; i++) {
                   FolderPair fPair = selected[i];
@@ -924,17 +924,17 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                     // Fetch public key for 'toUserId' if not already fetched
                     KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
                     if (kRec == null || kRec.plainPublicKey == null) {
-                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000);
+                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000, 3);
                       kRec = cache.getKeyRecordForUser(toUserId);
                     }
                     newShare.seal(kRec);
-                    addSharesV.addElement(newShare);
+                    addSharesL.add(newShare);
                   }
                 }
                 // Send Ownership Transfer request
                 Fld_AddShares_Rq addSharesRequest = new Fld_AddShares_Rq();
-                if (addSharesV.size() > 0) {
-                  addSharesRequest.shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(addSharesV, FolderShareRecord.class);
+                if (addSharesL.size() > 0) {
+                  addSharesRequest.shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(addSharesL, FolderShareRecord.class);
                 }
                 addSharesRequest.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
                 MessageAction requestAction = new MessageAction(CommandCodes.FLD_Q_TRANSFER_OWNERSHIP, new Obj_List_Co(new Object[] { toUserId, folderIDs, addSharesRequest }));

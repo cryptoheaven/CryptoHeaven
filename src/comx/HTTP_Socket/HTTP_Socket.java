@@ -39,9 +39,11 @@ import comx.HTTP_Common.*;
 public class HTTP_Socket extends Socket {
 
   private static Random rnd = new Random();
-  private static boolean insertRandomErrors = false;
-  private static int insertRandomErrorFrequency = 15;
-  private static int socketCreateSuccessRate = 2;
+  private static boolean DEBUG_ON__INSERT_RANDOM_ERRORS = false;
+  private static boolean DEBUG_ON__DROP_PACKETS = false;
+  private static int DEBUG_INSERT_RANDOM_ERROR_FREQUENCY = 15;
+  private static int DEBUG_SOCKET_CREATE_SUCCESS_RATE = 3;
+  private static int DEBUG_DROP_PACKETS_FREQUENCY = 50;
 
   private static boolean ENABLE_SOCKET_CONNECTIONS = true;
   private static boolean ENABLE_HTTP_CONNECTIONS = true;
@@ -136,7 +138,7 @@ public class HTTP_Socket extends Socket {
   }
 
   private void makeSocket(final String proxyHost, final int proxyPort, long timeout) {
-    boolean makeOk = ENABLE_SOCKET_CONNECTIONS && (!insertRandomErrors || rnd.nextInt(socketCreateSuccessRate) == 0);
+    boolean makeOk = ENABLE_SOCKET_CONNECTIONS && (!DEBUG_ON__INSERT_RANDOM_ERRORS || rnd.nextInt(DEBUG_SOCKET_CREATE_SUCCESS_RATE) == 0);
     if (!makeOk) {
     } else
     synchronized (socketMonitor) {
@@ -437,6 +439,11 @@ public class HTTP_Socket extends Socket {
               }
             }
           }
+          if (DEBUG_ON__DROP_PACKETS && rnd.nextInt(DEBUG_DROP_PACKETS_FREQUENCY) == 0) {
+            // packet dropped
+            System.out.println("request packet dropped");
+            sendDS = null;
+          }
           if (sendDS != null) {
             // make a cache of data before we try to send it
             sentCacheFifo.add(sendDS);
@@ -453,9 +460,9 @@ public class HTTP_Socket extends Socket {
               // Adjust retry watermarks.
               DataSetCache.setDSWatermarks(sendDS, recvFifo);
               DataOutputStream dOut = socketOutput;
-              boolean insertError = insertRandomErrors && rnd.nextInt(insertRandomErrorFrequency) == 0;
+              boolean insertError = DEBUG_ON__INSERT_RANDOM_ERRORS && rnd.nextInt(DEBUG_INSERT_RANDOM_ERROR_FREQUENCY) == 0;
               {
-                if (insertError && rnd.nextBoolean()) {
+                if (insertError) {
                   System.out.println("~~~~~~~~~~ inserting error Sending 1 ~~~~~~~~~~~");
                   throw new IOException("broken");
                 }
@@ -545,9 +552,9 @@ public class HTTP_Socket extends Socket {
               int byteLength  = dataIn.readInt();
               byte[] bytes = new byte[byteLength];
               int countRead = 0;
-              boolean insertError = insertRandomErrors && rnd.nextInt(insertRandomErrorFrequency) == 0;
+              boolean insertError = DEBUG_ON__INSERT_RANDOM_ERRORS && rnd.nextInt(DEBUG_INSERT_RANDOM_ERROR_FREQUENCY) == 0;
               {
-                if (insertError && rnd.nextBoolean()) {
+                if (insertError) {
                   System.out.println("~~~~~~~~~~ inserting error Reciving ~~~~~~~~~~~");
                   throw new IOException("broken");
                 }
@@ -565,7 +572,12 @@ public class HTTP_Socket extends Socket {
                   }
                 }
               }
-              enqueueReplyDS(replyDS);
+              if (DEBUG_ON__DROP_PACKETS && rnd.nextInt(DEBUG_DROP_PACKETS_FREQUENCY) == 0) {
+                // packet dropped
+                System.out.println("reply packet dropped");
+              } else {
+                enqueueReplyDS(replyDS);
+              }
             } else {
               try { Thread.sleep(50); } catch (Throwable t) { }
             }
@@ -668,9 +680,9 @@ public class HTTP_Socket extends Socket {
               boolean doPOST = sendDS.data != null && sendDS.data.length > MAX_URL_DATA_SIZE;
               if (trace != null) trace.info(90, "doPOST", doPOST);
               //System.out.println("doPOST "+ doPOST);
-              boolean insertError = insertRandomErrors && rnd.nextInt(insertRandomErrorFrequency) == 0;
+              boolean insertError = DEBUG_ON__INSERT_RANDOM_ERRORS && rnd.nextInt(DEBUG_INSERT_RANDOM_ERROR_FREQUENCY) == 0;
               {
-                if (insertError && rnd.nextBoolean()) {
+                if (insertError) {
                   System.out.println("~~~~~~~~~~ inserting error SendRecv out ~~~~~~~~~~~");
                   throw new IOException("broken");
                 }

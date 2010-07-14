@@ -503,7 +503,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
               File_GetFiles_Rq request = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
               int action = CommandCodes.FILE_Q_GET_FILES_STAGED;
-              SIL.submitAndReturn(new MessageAction(action, request));
+              SIL.submitAndReturn(new MessageAction(action, request), 30000, 3);
             }
             if (folder.isMsgType() || folder.isRecycleType()) {
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
@@ -513,7 +513,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
                 messageMode = ((MsgTableModel) recordTableModel).getMode();
               }
               int action = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
-              SIL.submitAndReturn(new MessageAction(action, request));
+              SIL.submitAndReturn(new MessageAction(action, request), 30000, 3);
             }
           }
         }

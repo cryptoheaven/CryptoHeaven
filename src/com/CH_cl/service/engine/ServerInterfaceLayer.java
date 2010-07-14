@@ -68,6 +68,8 @@ import comx.HTTP_Socket.*;
  */
 public final class ServerInterfaceLayer extends Object implements WorkerManagerI, RequestSubmitterI {
 
+  private static final boolean DEBUG_ON__SUPPERSS_RETRIES = false;
+
   private static final String PROPERTY_LAST_ENGINE_HOST = "lastEngineHost";
   private static final String PROPERTY_LAST_ENGINE_PORT = "lastEnginePort";
 
@@ -370,12 +372,15 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public void submitAndReturn(MessageAction msgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction)");
     if (trace != null) trace.args(msgAction);
-
     if (msgAction.isInterruptible()) // interruptable actions should pass interraptable objects down the reply chain, so use a thread that will wait for reply
-      submitAndReturn(msgAction, 0, null, null, null);
+      submitAndReturn(msgAction, 0, 0, null, null, null);
     else
       submitAndReturnNow(msgAction);
-
+    if (trace != null) trace.exit(ServerInterfaceLayer.class);
+  }
+  public void submitAndReturn(MessageAction msgAction, long timeout, int maxRetries) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout, int maxRetries)");
+    submitAndReturn(msgAction, timeout, maxRetries, null, null, null);
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
@@ -386,19 +391,23 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @param timeoutJob a runnable element when timeout is reached (afterJob and timeoutJob are exclusive, either one or the other)
    */
   public void submitAndReturn(final MessageAction msgAction, final long timeout, final Runnable afterJob, final Runnable timeoutJob) {
-    submitAndReturn(msgAction, timeout, null, afterJob, timeoutJob);
+    submitAndReturn(msgAction, timeout, 0, null, afterJob, timeoutJob);
   }
   public void submitAndReturn(final MessageAction msgAction, final long timeout, final Runnable replyReceivedJob, final Runnable afterJob, final Runnable timeoutJob) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout, final Runnable replyReceivedJob, Runnable afterJob, Runnable timeoutJob)");
+    submitAndReturn(msgAction, timeout, 0, replyReceivedJob, afterJob, timeoutJob);
+  }
+  public void submitAndReturn(final MessageAction msgAction, final long timeout, final int maxRetries, final Runnable replyReceivedJob, final Runnable afterJob, final Runnable timeoutJob) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout, int maxRetries, final Runnable replyReceivedJob, Runnable afterJob, Runnable timeoutJob)");
     if (trace != null) trace.args(msgAction);
     if (trace != null) trace.args(timeout);
+    if (trace != null) trace.args(maxRetries);
     if (trace != null) trace.args(afterJob, timeoutJob);
 
     Thread th = new ThreadTraced("Job-Submitter-and-After-Job-Runner") {
       public void runTraced() {
         Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "submitAndReturn.runTraced()");
         try {
-          boolean noTimeout = submitAndWait(msgAction, timeout, replyReceivedJob);
+          boolean noTimeout = submitAndWait(msgAction, timeout, maxRetries, replyReceivedJob);
           if (noTimeout) {
             if (afterJob != null)
               afterJob.run();
@@ -582,6 +591,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           if (replyMsg == null) {
             if (trace != null) trace.data(70, "TIMEOUT");
             if (trace != null) trace.data(71, "specified timeout was", timeout);
+            if (trace != null) trace.data(72, "timeout - clear any open progress dialogs");
+            ProgMonitorPool.getProgMonitor(msgAction.getStamp()).jobKilled();
           }
           stampList.notifyAll();
         } // end synchronized (stampList)
@@ -598,6 +609,32 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class, replyMsg);
     return replyMsg;
   } // end submitAndFetchReply()
+
+  public ClientMessageAction submitAndFetchReply(MessageAction msgAction, long timeout, int maxRetries) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndFetchReply(MessageAction, long timeout, int maxRetries)");
+    if (trace != null) trace.args(msgAction);
+    if (trace != null) trace.args(timeout);
+    if (trace != null) trace.args(maxRetries);
+    if (DEBUG_ON__SUPPERSS_RETRIES)
+      maxRetries = 0;
+    if (timeout == 0 && maxRetries > 0)
+      throw new IllegalArgumentException("Timeout must be > 0 if maxRetries > 0");
+    ClientMessageAction replyMsg = null;
+    int tryCount = 0;
+    while (true) { // individual action retry in case of timeout
+      if (trace != null) trace.data(10, "submitting job, tryCount=", tryCount);
+      tryCount ++;
+      replyMsg = submitAndFetchReply(msgAction, timeout);
+      if (replyMsg != null || tryCount > maxRetries)
+        break;
+      if (trace != null) trace.data(30, "loop again - timeout reached");
+    }
+    if (replyMsg == null) {
+      if (trace != null) trace.data(40, "TIMEOUT reached, replyMsg is NULL");
+    }
+    if (trace != null) trace.exit(ServerInterfaceLayer.class, replyMsg);
+    return replyMsg;
+  }
 
   /**
    * Removes and returns the reply message from the done list.
@@ -635,7 +672,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @param timeout in milliseconds for each transaction, 0=infinite
    * @param msgAction the message action to be submitted.
    */
-  public void submitAndWait(MessageAction msgAction) { submitAndWait(msgAction, 0); }
+  public void submitAndWait(MessageAction msgAction) { submitAndWait(msgAction, 0, 0, null); }
   /**
    * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
    * @param timeout in milliseconds for each transaction, 0=infinite
@@ -643,10 +680,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @return true if reply was recived in time, false when timeout reached.
    */
   public boolean submitAndWait(MessageAction msgAction, long timeout) {
-    return submitAndWait(msgAction, timeout, null);
+    return submitAndWait(msgAction, timeout, 0, null);
+  }
+  public boolean submitAndWait(MessageAction msgAction, long timeout, int maxRetries) {
+    return submitAndWait(msgAction, timeout, maxRetries, null);
   }
   public boolean submitAndWait(MessageAction msgAction, long timeout, final Runnable replyReceivedJob) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndWait(MessageAction msgAction, MessageAction, timeout, final Runnable replyReceivedJob)");
+    return submitAndWait(msgAction, timeout, 0, replyReceivedJob);
+  }
+  public boolean submitAndWait(MessageAction msgAction, long timeout, int maxRetries, final Runnable replyReceivedJob) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndWait(MessageAction msgAction, long timeout, int maxRetries, final Runnable replyReceivedJob)");
     if (trace != null) trace.args(msgAction);
     if (trace != null) trace.args(timeout);
     if (trace != null) trace.args(replyReceivedJob);
@@ -655,7 +698,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     boolean replyReceivedJobExecuted = false;
 
     do {
-      final ClientMessageAction replyMsg = submitAndFetchReply(msgAction, timeout);
+      final ClientMessageAction replyMsg = submitAndFetchReply(msgAction, timeout, maxRetries);
 
       if (trace != null) trace.data(20, replyMsg);
       if (replyMsg != null) {
@@ -1271,7 +1314,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       Stamp stamp = (Stamp) tempStampList.get(i);
       synchronized (stamp) {
         stamp.notifyAll();
-        // In case outstanding jobs were not in the queue, but already sent to server, 
+        // In case outstanding jobs were not in the queue, but already sent to server,
         // kill corresponding progress monitors so they don't popup in a few seconds.
         ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
         if (pm != null)

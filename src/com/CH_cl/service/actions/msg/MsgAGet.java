@@ -129,7 +129,7 @@ public class MsgAGet extends ClientMessageAction {
     if (userIDsL != null && userIDsL.size() > 0) {
       Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
       userIDs = (Long[]) ArrayUtils.removeDuplicates(userIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000);
+      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000, 3);
     }
 
 
@@ -148,7 +148,7 @@ public class MsgAGet extends ClientMessageAction {
 //      Long[] keyIDs = new Long[keyIDsV.size()];
 //      keyIDsV.toArray(keyIDs);
 //      keyIDs = (Long[]) ArrayUtils.removeDuplicates(keyIDs);
-//      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyIDs)), 60000);
+//      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyIDs)), 30000, 3);
 //    }
 
 
@@ -167,7 +167,7 @@ public class MsgAGet extends ClientMessageAction {
     if (folderIDsL != null && folderIDsL.size() > 0) {
       Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
+      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000, 3);
     }
 
     // if this was a bulk fetch done in stages, gather Messages which exist in the cache but should be removed
@@ -231,7 +231,7 @@ public class MsgAGet extends ClientMessageAction {
       if (needMsgBody_dataIDsV != null) {
         for (int i=0; i<needMsgBody_dataIDsV.size(); i++) {
           Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.get(i)), (Long)(needMsgBody_linkIDsV.get(i)), null, new Long(1)});
-          getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 120000);
+          getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000, 3);
         }
       }
     }
@@ -305,7 +305,7 @@ public class MsgAGet extends ClientMessageAction {
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request));
+        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request), 30000, 3);
       }
     }
 
@@ -378,7 +378,7 @@ public class MsgAGet extends ClientMessageAction {
       }
       if (hashesL != null) {
         Obj_List_Co requestSet = new Obj_List_Co(hashesL);
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet));
+        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet), 30000, 3);
         cache.addRequestedAddrHashes(hashesL);
       }
     }
@@ -460,7 +460,7 @@ public class MsgAGet extends ClientMessageAction {
             msgAction = new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request);
           }
           msgAction.setInterruptsFrom(this);
-          getServerInterfaceLayer().submitAndReturn(msgAction);
+          getServerInterfaceLayer().submitAndReturn(msgAction, 30000, 3);
         }
       }
     }

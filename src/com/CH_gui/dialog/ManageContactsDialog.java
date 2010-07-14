@@ -12,23 +12,11 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.records.filters.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -41,6 +29,14 @@ import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
+import com.CH_gui.util.GeneralDialog;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -356,7 +352,7 @@ public class ManageContactsDialog extends GeneralDialog {
           jOk.setEnabled(false);
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
           final FetchedDataCache cache = SIL.getFetchedDataCache();
-          final ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.CNT_Q_GET_GROUP_CONTACTS, new Obj_IDList_Co(RecordUtils.getIDs(selectedUserRecords))), 60000);
+          final ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.CNT_Q_GET_GROUP_CONTACTS, new Obj_IDList_Co(RecordUtils.getIDs(selectedUserRecords))), 60000, 3);
           if (msgAction != null) {
             try {
               SwingUtilities.invokeAndWait(new Runnable() {

@@ -736,7 +736,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
         // If we only had a brief, we won't have it and we'll have to try again after BODY FETCH
         Long keyId = dataRecord.getSendPrivKeyId();
         if (keyId != null && cache.getKeyRecord(keyId) == null) {
-          SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000);
+          SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000, 3);
         }
 
         // Data will never be null, its impossible to fetch links without some kind of data record.
@@ -750,14 +750,14 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
             request = new Obj_IDList_Co(new Long[] { null, msgLink.msgLinkId });
           }
           MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_BODY, request);
-          SIL.submitAndWait(msgAction, 60000);
+          SIL.submitAndWait(msgAction, 60000, 3);
           // When the reply is processed, the MsgData record hold by our reference should be updated,
           // also, the link will get updated with potentially new delivery timestamp, etc.
 
           // Check if we still don't have the key - this is possible if we skipped the first key fetch due to having only a MSG BRIEF and NO BODY
           keyId = dataRecord.getSendPrivKeyId();
           if (keyId != null && cache.getKeyRecord(keyId) == null) {
-            SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000);
+            SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 60000, 3);
             updateData(dataRecord);
           }
         } else {
@@ -892,9 +892,9 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       };
       // send requests
       if (sumFiles > 0)
-        SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_GET_MSG_FILE_ATTACHMENTS, request), 30000, afterJob, null);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_GET_MSG_FILE_ATTACHMENTS, request), 30000, 3, null, afterJob, null);
       if (sumMsgs > 0)
-        SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request), 30000, afterJob, null);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request), 30000, 3, null, afterJob, null);
     }
 
     // jKeyID and jKeyInfo

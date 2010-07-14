@@ -692,7 +692,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (msgLinkRecord != null && msgDataRecord != null) {
       msgLinkRecord.status = (Short) Misc.setBitObj(newHTMLstate == msgDataRecord.isHtmlMail(), msgLinkRecord.status, MsgLinkRecord.STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE);
       // Make the setting persistant
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { msgLinkRecord.msgLinkId, msgLinkRecord.status })));
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { msgLinkRecord.msgLinkId, msgLinkRecord.status })), 30000, 3);
     }
 
     // make sure we update the GUI right away
@@ -1632,7 +1632,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             jLoadingLabel.setVisible(true);
             // Prepare and send the request
             ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(previewMsgLink);
-            serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 60000);
+            serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 60000, 3);
             if (previewMsgData == null)
               previewMsgData = cache.getMsgDataRecord(previewMsgLink.msgId);
           }

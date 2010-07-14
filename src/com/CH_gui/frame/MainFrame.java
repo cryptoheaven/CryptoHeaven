@@ -220,7 +220,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         initialMsgLinkId = null;
         if (msgLinkId != null) {
           if (trace != null) trace.data(50, "initial msgLinkId", msgLinkId);
-          SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_MSG, new Obj_IDList_Co(new Long[] { null, msgLinkId })), 20000);
+          SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_MSG, new Obj_IDList_Co(new Long[] { null, msgLinkId })), 30000, 3);
           MsgLinkRecord msgLink = cache.getMsgLinkRecord(msgLinkId);
           if (msgLink != null && msgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             FolderRecord fldRec = cache.getFolderRecord(msgLink.ownerObjId);
@@ -265,7 +265,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               if (trace != null) trace.exit(getClass());
             }
           };
-          SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderId)), 20000);
+          SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderId)), 25000, 3);
           try { SwingUtilities.invokeAndWait(folderSelect2); } catch (Throwable t) { }
         }
         if (loginCoordinator != null) {
@@ -1122,7 +1122,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
             // Show Password Recovery only if Password is set
             Boolean isSet = isPasswordSet();
             if (isSet != null && isSet.booleanValue()) {
-              ClientMessageAction replyAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_CHALLENGE, new Obj_List_Co(cache.getMyUserId())), 60000);
+              ClientMessageAction replyAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_CHALLENGE, new Obj_List_Co(cache.getMyUserId())), 30000, 3);
               DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
               if (replyAction != null && replyAction.getActionCode() == CommandCodes.USR_A_PASS_RECOVERY_GET_CHALLENGE) {
                 PassRecoveryRecord myPassRecoveryRec = cache.getMyPassRecoveryRecord();

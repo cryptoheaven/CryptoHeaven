@@ -957,7 +957,7 @@ public class MsgTableModel extends RecordTableModel {
               if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
             }
           };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, replyReceivedJob, afterJob, afterJob);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 30000, 3, replyReceivedJob, afterJob, afterJob);
         }
       }
     } // end synchronized

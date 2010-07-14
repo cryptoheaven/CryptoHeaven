@@ -446,7 +446,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(draftMsgLink);
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, 3, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -533,7 +533,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(forwardMsg);
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, 3, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -577,7 +577,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(replyToMsg);
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 10000, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, 3, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -757,7 +757,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       final Component _this = this;
       Thread th = new ThreadTraced("Ring Pressed") {
         public void runTraced() {
-          ClientMessageAction msgAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())));
+          ClientMessageAction msgAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())), 15000, 3);
           DefaultReplyRunner.runAction(msgAction);
           if (msgAction.getActionCode() == CommandCodes.FLD_A_RING_RING) {
             Obj_List_Co reply = (Obj_List_Co) msgAction.getMsgDataSet();
@@ -1725,12 +1725,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       Object[] emls = new Object[unknownEmailsV.size()];
       unknownEmailsV.toArray(emls);
       Object[] set = new Object[] { emls, Boolean.valueOf(convertNotHostedEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
-      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
+      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000, 3);
     }
     // fetch unknown users
     if (unknownUserIDsV.size() > 0) {
       if (trace != null) trace.data(50, unknownUserIDsV);
-      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000);
+      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000, 3);
     }
 
     if (trace != null) trace.data(60, "convert all EmailAddressRecords to UserRecords or ContactRecords");
@@ -2090,7 +2090,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         if (hashesV != null) {
           Obj_List_Co requestSet = new Obj_List_Co(hashesV);
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-          ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet), 60000);
+          ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet), 30000, 3);
           cache.addRequestedAddrHashes(hashesV);
           DefaultReplyRunner.nonThreadedRun(SIL, reply);
           if (reply != null) {
@@ -2348,7 +2348,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                   Obj_IDList_Co request = new Obj_IDList_Co();
                   request.IDs = new Long[] { contactWithId };
                   MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-                  ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 60000);
+                  ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 60000, 3);
                   if (replyMsg != null && replyMsg.getActionCode() == CommandCodes.KEY_A_GET_PUBLIC_KEYS) {
                     Key_PubKeys_Rp replyData = (Key_PubKeys_Rp) replyMsg.getMsgDataSet();
                     KeyRecord[] kRecs = replyData.keyRecords;

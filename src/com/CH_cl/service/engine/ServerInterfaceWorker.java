@@ -65,12 +65,17 @@ import com.CH_cl.service.actions.*;
  */
 public final class ServerInterfaceWorker extends Object implements Interruptible {
 
+  private static final boolean DEBUG_ON__REQUEST_PACKET_DROP_ENABLED = false;
+  private static final boolean DEBUG_ON__REPLY_PACKET_DROP_ENABLED = false;
+  private static final int DEBUG__REQUEST_PACKET_DROP_FREQUENCY = 10;
+  private static final int DEBUG__REPLY_PACKET_DROP_FREQUENCY = 10;
+
   public static final long PING_PONG_INTERVAL = 1000 * 60 * 1; // 1 minute
   private static final long PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK = 5; // zero for no pinging and exit after first ping delay
 
   /** Worker's manager */
   private WorkerManagerI workerManager;
-  /** Where all replies are submited */
+  /** Where all replies are submitted */
   private FifoWriterI replyFifoWriterI;
   /** Where all requests are taken from */
   private final PriorityFifoReaderI requestPriorityFifoReaderI;
@@ -539,7 +544,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       } // end if LOGIN aciton or LOGIN error
       else {
         if (trace != null) trace.data(60, "Not a LOGIN related action, just submit the message.");
-        replyFifoWriterI.add(msgAction);
+        if (DEBUG_ON__REPLY_PACKET_DROP_ENABLED && new Random().nextInt(DEBUG__REPLY_PACKET_DROP_FREQUENCY) == 0) {
+          System.out.println("reply dropped");
+        } else {
+          replyFifoWriterI.add(msgAction);
+        }
       }
 
       if (trace != null) trace.exit(ReaderThread.class);
@@ -572,6 +581,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         } else {
           msgAction = (MessageAction) requestPriorityFifoReaderI.remove();
         }
+      }
+
+      if (DEBUG_ON__REQUEST_PACKET_DROP_ENABLED && new Random().nextInt(DEBUG__REQUEST_PACKET_DROP_FREQUENCY) == 0) {
+        System.out.println("request dropped");
+        msgAction = null;
       }
 
       if (msgAction != null) {

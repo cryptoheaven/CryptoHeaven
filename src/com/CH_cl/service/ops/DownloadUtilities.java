@@ -419,7 +419,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
               _folderIDsBeingFetched.remove(fldRecs[i].folderId);
             }
             _folderIDsBeingFetched.notifyAll();
-            if (_folderIDsBeingFetched.size() == 0)
+            if (_folderIDsBeingFetched.isEmpty())
               _cache.removeFolderRecordListener(this);
           }
         }
@@ -436,13 +436,13 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       MsgLinkRecord[] existingMsgLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
       request.exceptLinkIDs = RecordUtils.getIDs(existingMsgLinks);
       MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_FULL, request);
-      SIL.submitAndReturn(msgAction);
+      SIL.submitAndReturn(msgAction, 30000, 3);
     }
 
     // wait until all folder fetching completes
     synchronized (_folderIDsBeingFetched) {
       while (true) {
-        if (_folderIDsBeingFetched.size() == 0) {
+        if (_folderIDsBeingFetched.isEmpty()) {
           break;
         } else {
           try {
@@ -479,7 +479,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
               _folderIDsBeingFetched.remove(fldRecs[i].folderId);
             }
             _folderIDsBeingFetched.notifyAll();
-            if (_folderIDsBeingFetched.size() == 0)
+            if (_folderIDsBeingFetched.isEmpty())
               _cache.removeFolderRecordListener(this);
           }
         }
@@ -502,7 +502,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     // wait until all folder fetching completes
     synchronized (_folderIDsBeingFetched) {
       while (true) {
-        if (_folderIDsBeingFetched.size() == 0) {
+        if (_folderIDsBeingFetched.isEmpty()) {
           break;
         } else {
           try {

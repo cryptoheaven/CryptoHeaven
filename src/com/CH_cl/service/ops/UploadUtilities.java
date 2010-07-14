@@ -184,7 +184,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           if (trace != null) trace.data(100, "newFolderRequest", newFolderRequest);
 
           MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_NEW_FOLDER, newFolderRequest);
-          ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction);
+          ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction, 60000);
           Long newShareId = null;
           // get the folderId of directory just created
           if (replyAction instanceof FldAGetFolders) {

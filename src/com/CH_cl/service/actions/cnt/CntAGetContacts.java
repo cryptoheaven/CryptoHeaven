@@ -79,7 +79,7 @@ public class CntAGetContacts extends ClientMessageAction {
     if (folderIDsV != null && folderIDsV.size() > 0) {
       Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsV, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 120000);
+      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000, 3);
     }
 
     // See if we got any contacts for which we don't have user handles fetched
@@ -105,7 +105,7 @@ public class CntAGetContacts extends ClientMessageAction {
       }
       if (unknownUserIDsV != null && unknownUserIDsV.size() > 0) {
         Long[] unknownUserIDs = (Long[]) ArrayUtils.toArray(unknownUserIDsV, Long.class);
-        getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDs)), 30000);
+        getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDs)), 30000, 3);
       }
     }
 

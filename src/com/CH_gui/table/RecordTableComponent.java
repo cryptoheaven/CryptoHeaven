@@ -681,7 +681,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               Set groupIDsSet = cache.getFolderGroupIDsSet(myUID);
               if (evaluatedFolder.getFolderShareRecord().isOwnedBy(myUID, groupIDsSet)) {
 
-                ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SIZE, new Obj_ID_Rq(evaluatedFolder.getFolderShareRecord().shareId)), 60000);
+                ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SIZE, new Obj_ID_Rq(evaluatedFolder.getFolderShareRecord().shareId)), 60000, 3);
 
                 // default to 1 element if the count times out and we don't know if its empty or not...
                 if (msgAction == null) {

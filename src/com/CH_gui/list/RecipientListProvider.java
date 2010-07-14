@@ -149,7 +149,7 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
         FolderRecUtil.markFolderFetchRequestIssued(fRec.folderId);
         // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
         Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(sRec.shareId, Record.RECORD_TYPE_FOLDER, fRec.folderId, null, (short) Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
-        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request));
+        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request), 30000, 3);
       }
     }
   }

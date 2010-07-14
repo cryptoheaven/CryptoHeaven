@@ -199,15 +199,15 @@ public class FldAGetFolders extends ClientMessageAction {
 
     if (shareIDsHS != null && shareIDsHS.size() > 0) {
       Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsHS, Long.class);
-      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)));
+      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 30000, 3);
       // also request an update to related folders to avoid potential loops if out of synch data between shares and folders
       Long[] folderIDs = FolderShareRecord.getFolderIDs(cache.getFolderShareRecords(shareIDs));
-      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)));
+      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 30000, 3);
     }
 
     if (userIDsHS != null && userIDsHS.size() > 0) {
       Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsHS, Long.class);
-      SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)));
+      SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000, 3);
     }
 
     // Check if there are any folder shares that need recrypting to symmetric key.
@@ -310,7 +310,7 @@ public class FldAGetFolders extends ClientMessageAction {
           doDelayedRedFlagCount(SIL, null);
         }
       };
-      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_RED_FLAG_COUNT, new Obj_IDList_Co(toProcessShareIDs)), 30000, afterJob, timeoutJob);
+      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_RED_FLAG_COUNT, new Obj_IDList_Co(toProcessShareIDs)), 30000, 3, null, afterJob, timeoutJob);
     }
   } // end doDelayedRedFlagCount()
 

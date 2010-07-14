@@ -98,7 +98,7 @@ public class FileAGetFiles extends ClientMessageAction {
     if (folderIDsV != null && folderIDsV.size() > 0) {
       Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsV, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
+      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000, 3);
     }
 
 
@@ -140,7 +140,7 @@ public class FileAGetFiles extends ClientMessageAction {
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request));
+        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request), 30000, 3);
       }
     }
 
@@ -196,7 +196,7 @@ public class FileAGetFiles extends ClientMessageAction {
           File_GetFiles_Rq request = new File_GetFiles_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, timeStamp);
           MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
           msgAction.setInterruptsFrom(this);
-          getServerInterfaceLayer().submitAndReturn(msgAction);
+          getServerInterfaceLayer().submitAndReturn(msgAction, 30000, 3);
         }
       }
     }
