@@ -126,7 +126,7 @@ public class CryptoHeaven extends Object {
       {com.CH_gui.frame.FolderTreeFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 385 height 427 Location x 0 y 0"},
       {com.CH_gui.frame.GroupTableFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 495 height 320 Location x 0 y 0"},
       {com.CH_gui.frame.LocalFileTableFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 500 height 500 Location x 0 y 0"},
-      {com.CH_gui.frame.MainFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 980 height 740 Location x 0 y 0"},
+      {com.CH_gui.frame.MainFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 1050 height 800 Location x 0 y 0"},
       {com.CH_gui.frame.MessageFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 670 height 550 Location x 0 y 0"},
       {com.CH_gui.frame.MsgPreviewFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 700 height 575 Location x 0 y 0"},
       {com.CH_gui.frame.MsgTableFrame.visualsClassKeyName+"_VS_Ver5", "Dimension width 800 height 735 Location x 0 y 0"},
