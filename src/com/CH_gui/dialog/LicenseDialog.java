@@ -82,6 +82,28 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
 //    panel.add(new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
 //        GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(0, 0, 5, 0), 0, 0));
 
+    JTextArea jAboutArea = new JMyTextArea(getLicenseText());
+    jAboutArea.setWrapStyleWord(true);
+    jAboutArea.setLineWrap(true);
+    jAboutArea.setEditable(false);
+    jAboutArea.moveCaretPosition(0);
+    jAboutArea.select(0, 0);
+
+    KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+    Keymap aboutAreaMap = jAboutArea.getKeymap();
+    aboutAreaMap.removeKeyStrokeBinding(enter);
+
+    panel.add(new JScrollPane(jAboutArea), new GridBagConstraints(0, 2, 1, 1, 10, 10, 
+        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
+
+    return panel;
+  }
+
+  /**
+   * Fetches license text from resource file.
+   * @return
+   */
+  private String getLicenseText() {
     String licenseText = "";
     try {
       InputStream inStream = URLs.getResourceURL("License.txt").openStream();
@@ -101,24 +123,8 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
       String preAboutText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
       licenseText = preAboutText+"\n\n" + licenseText;
     }
-
-    JTextArea jAboutArea = new JMyTextArea(licenseText);
-    jAboutArea.setWrapStyleWord(true);
-    jAboutArea.setLineWrap(true);
-    jAboutArea.setEditable(false);
-    jAboutArea.moveCaretPosition(0);
-    jAboutArea.select(0, 0);
-
-    KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-    Keymap aboutAreaMap = jAboutArea.getKeymap();
-    aboutAreaMap.removeKeyStrokeBinding(enter);
-
-    panel.add(new JScrollPane(jAboutArea), new GridBagConstraints(0, 2, 1, 1, 10, 10, 
-        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
-
-    return panel;
+    return licenseText;
   }
-
 
   private class OKActionListener implements ActionListener {
     public void actionPerformed (ActionEvent event) {
