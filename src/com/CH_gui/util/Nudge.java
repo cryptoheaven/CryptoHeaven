@@ -68,7 +68,7 @@ public class Nudge {
                 }
                 try { Thread.sleep(50); } catch (InterruptedException ex) { }
                 if (includeTitleRoll && window instanceof JActionFrame)
-                  ((JActionFrame) window).triggerVisualUpdateNotificationRoll("  *ring*");
+                  ((JActionFrame) window).triggerVisualUpdateNotificationRoll(null, "  *ring*");
               }
             };
             th.setDaemon(true);
