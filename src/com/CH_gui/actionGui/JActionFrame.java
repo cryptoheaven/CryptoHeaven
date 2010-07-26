@@ -841,14 +841,14 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         String[] emailStrings = UserOps.getCachedDefaultEmail(uRec, false);
         emailStr = emailStrings != null ? " :: " + emailStrings[2] : "";
       }
-      setTitle(getDefaultTitle() + " :: " + uRec.shortInfo() + emailStr);
+      setTitle(uRec.shortInfo() + emailStr);
     } else {
       setTitle(getDefaultTitle());
     }
   }
 
   /**
-   * Overwrite super.setTitle() to accomodate visual update notifications through title animations.
+   * Overwrite super.setTitle() to accommodate visual update notifications through title animations.
    */
   public synchronized void setTitle(String title) {
     if (title != null) {
@@ -865,32 +865,32 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   public synchronized String getTitle() {
     return frameTitle;
   }
-  public synchronized void triggerVisualUpdateNotificationAnim(String temporaryTitle, String titleAppendix, int millis) {
-    triggerVisualUpdateNotification(temporaryTitle, titleAppendix, millis, TitleUpdateNotifier.MODE_ANIM);
+  public synchronized void triggerVisualUpdateNotificationAnim(String temporaryTitle, String titlePrependix, String titleAppendix, int millis) {
+    triggerVisualUpdateNotification(temporaryTitle, titlePrependix, titleAppendix, millis, TitleUpdateNotifier.MODE_ANIM);
   }
-  public synchronized void triggerVisualUpdateNotificationStill(String temporaryTitle, String titleAppendix, int millis) {
-    triggerVisualUpdateNotification(temporaryTitle, titleAppendix, millis, TitleUpdateNotifier.MODE_STILL);
+  public synchronized void triggerVisualUpdateNotificationStill(String temporaryTitle, String titlePrependix, String titleAppendix, int millis) {
+    triggerVisualUpdateNotification(temporaryTitle, titlePrependix, titleAppendix, millis, TitleUpdateNotifier.MODE_STILL);
   }
-  private synchronized void triggerVisualUpdateNotification(String temporaryTitle, String titleAppendix, int millis, int mode) {
+  private synchronized void triggerVisualUpdateNotification(String temporaryTitle, String titlePrependix, String titleAppendix, int millis, int mode) {
     if (temporaryTitle != null && millis > 0) {
       if (notifyTimer == null) {
         updateNotifier = new TitleUpdateNotifier();
         notifyTimer = new Timer(50, updateNotifier);
       }
-      updateNotifier.addJob(mode, temporaryTitle, titleAppendix, System.currentTimeMillis()+millis, 50, false);
+      updateNotifier.addJob(mode, temporaryTitle, titlePrependix, titleAppendix, System.currentTimeMillis()+millis, 50, false);
       if (!notifyTimer.isRunning()) notifyTimer.start();
     }
   }
   public synchronized void triggerVisualUpdateNotificationRoll() {
-    triggerVisualUpdateNotificationRoll("   *new*");
+    triggerVisualUpdateNotificationRoll(null, "   *new*");
   }
-  public synchronized void triggerVisualUpdateNotificationRoll(String titleAppendix) {
+  public synchronized void triggerVisualUpdateNotificationRoll(String titlePrependix, String titleAppendix) {
     if (isWindowDeactivated) {
       if (notifyTimer == null) {
         updateNotifier = new TitleUpdateNotifier();
         notifyTimer = new Timer(100, updateNotifier);
       }
-      updateNotifier.addJob(TitleUpdateNotifier.MODE_ROLL, null, titleAppendix, TitleUpdateNotifier.RUN_TIME__UNSPECIFIED, 100, true);
+      updateNotifier.addJob(TitleUpdateNotifier.MODE_ROLL, null, titlePrependix, titleAppendix, TitleUpdateNotifier.RUN_TIME__UNSPECIFIED, 100, true);
       if (!notifyTimer.isRunning()) notifyTimer.start();
     }
   }
@@ -910,11 +910,12 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         }
       }
     }
-    private synchronized void addJob(int mode, String temporaryTitle, String titleAppendix, long expiryTime, int delay, boolean stopOnWindowActivation) {
+    private synchronized void addJob(int mode, String temporaryTitle, String titlePrependix, String titleAppendix, long expiryTime, int delay, boolean stopOnWindowActivation) {
       if (jobsL == null) jobsL = new ArrayList();
       Settings settings = new Settings();
       settings.runningMode = mode;
       settings.tempTitle = temporaryTitle;
+      settings.titlePrependix = titlePrependix;
       settings.titleAppendix = titleAppendix;
       settings.expiryTime = expiryTime;
       settings.delay = delay;
@@ -964,8 +965,13 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
             newTitle = roll(state, (state.tempTitle != null ? state.tempTitle : frameTitle) + " ");
           else if (state.runningMode == MODE_ANIM)
             newTitle = anim(state, state.tempTitle != null ? state.tempTitle : frameTitle);
-          else if (state.runningMode == MODE_STILL)
+          else if (state.runningMode == MODE_STILL) {
             newTitle = state.tempTitle != null ? state.tempTitle : frameTitle;
+            if (state.titlePrependix != null)
+              newTitle = state.titlePrependix + newTitle;
+            if (state.titleAppendix != null)
+              newTitle += state.titleAppendix;
+          }
         }
       }
       JActionFrame.super.setTitle(newTitle);
@@ -975,6 +981,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       if (state.notifyState == 0 || state.notifyState == str.length()) state.pauseState *= -1;
       if (state.pauseState == 0) state.pauseState = 1;
       String newStr = caps(state.notifyState, str);
+      if (state.titlePrependix != null)
+        newStr = state.titlePrependix + newStr;
       if (state.titleAppendix != null)
         newStr += state.titleAppendix;
       if (state.pauseState == 1) {
@@ -988,6 +996,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     private synchronized String roll(Settings state, String str) {
       String wrapped = wrap(state.notifyState, str.toUpperCase());
       String newStr = wrapped;//java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_WRAPPED_TITLE_WITH"), new Object[] {wrapped});
+      if (state.titlePrependix != null)
+        newStr = state.titlePrependix + newStr;
       if (state.titleAppendix != null)
         newStr += state.titleAppendix;
       if (str.length() == 0)
@@ -1038,6 +1048,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     private int runningMode;
     private long expiryTime;
     private String tempTitle;
+    private String titlePrependix;
     private String titleAppendix;
     private int delay;
     private boolean stopOnWindowActivation;
