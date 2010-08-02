@@ -24,7 +24,7 @@ package com.CH_co.util;
  */
 public class HTML_utils {
 
-  public static final String DEFAULT_FONTS = "Arial, Helvetica, Verdana, sans-serif";
+  public static final String DEFAULT_FONTS = "Dialog, Arial, Helvetica, Verdana, sans-serif";
   public static final String DEFAULT_FONTS_QUOTED = "\"" + DEFAULT_FONTS + "\"";
 
 }

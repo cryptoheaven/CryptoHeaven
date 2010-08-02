@@ -708,13 +708,13 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
                   Fld_NewFld_Rq requestNew = getNewFolderRequest();
                   if (requestNew != null) {
                     MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_NEW_FOLDER, requestNew);
-                    replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction);
+                    replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
                   }
                 } else {
                   Obj_List_Co requestMove = getMoveFolderRequest();
                   if (requestMove != null) {
                     MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_MOVE_FOLDER, requestMove);
-                    replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction);
+                    replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
                   }
                 }
                 DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyAction);

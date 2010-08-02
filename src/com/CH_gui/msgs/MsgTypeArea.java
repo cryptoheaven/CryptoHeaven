@@ -179,9 +179,13 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
     jTextMessage.setLineWrap(true);
     jTextMessage.setEditable(true);
     jTextMessage.setEnabled(true);
-    jTextMessage.setBorder(new EmptyBorder(0, 0, 0, 0));
+    jTextMessage.setMargin(UIManager.getInsets("EditorPane.margin")); // matching to the corresponding HTML component
     jTextMessage.addKeyListener(enterKeyListener);
 
+    Font font = UIManager.getFont("Label.font");
+    font = font.deriveFont(Font.PLAIN, 14.0f);
+    jTextMessage.setFont(font);
+    
     // <<< begin
     if (JAGUAR_EDITOR_PRESENT) {
       try {

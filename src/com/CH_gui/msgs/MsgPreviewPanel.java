@@ -633,6 +633,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       jTextMsg.setWrapStyleWord(true);
       jTextMsg.setLineWrap(true);
       jTextMsg.setEditable(false);
+      jTextMsg.setMargin(UIManager.getInsets("EditorPane.margin")); // matching to the corresponding HTML component
+
+      Font font = UIManager.getFont("Label.font");
+      font = font.deriveFont(Font.PLAIN, 14.0f);
+      jTextMsg.setFont(font);
     }
     if (forHTML) {
       textComp = jHtmlMsg;

@@ -1756,7 +1756,7 @@ public class LoginFrame extends JFrame {
       // It is possible to get back request when connection failed so we will retry in that case.
       for (int i=0; i<3; i++) {
         if (trace != null) trace.data(20, "login short loop", i);
-        replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction);
+        replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 60000);
         if (replyAction == null || replyAction.getActionCode() != msgAction.getActionCode()) break;
       }
 
@@ -1835,8 +1835,8 @@ public class LoginFrame extends JFrame {
     // It is possible to get back request when connection failed so we will retry in that case.
     for (int i=0; i<3; i++) {
       if (trace != null) trace.data(20, "fetch login info short loop", i);
-      replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction);
-      if (replyAction.getActionCode() != msgAction.getActionCode()) break;
+      replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 60000);
+      if (replyAction == null || replyAction.getActionCode() != msgAction.getActionCode()) break;
     }
 
     if (replyAction.getActionCode() == CommandCodes.SYS_A_REPLY_DATA_SETS) {

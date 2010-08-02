@@ -538,6 +538,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
       synchronized (stampList) {
         // register a stamp so that executor returns the reply message to the done list
+        if (stampList.contains(lStamp)) {
+          if (trace != null) trace.data(5, "stampList already contains " + lStamp);
+          System.out.println("stampList already contains " + lStamp);
+        }
         stampList.add(lStamp);
         stampList.notifyAll();
       }
@@ -558,8 +562,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         // When stamp is put on the stampList2, the submitter is ready to hear about request completion.
         synchronized (stampList) {
           synchronized (stampList2) {
-            if (stampList2.contains(lStamp))
-              throw new IllegalStateException("We are trying to add a stamp to list 2, but it is already there!");
+            if (stampList2.contains(lStamp)) {
+              if (trace != null) trace.data(15, "stampList2 already contains " + lStamp);
+              System.out.println("stampList2 already contains " + lStamp);
+            }
             stampList2.add(lStamp);
           } // end synchronized (stampList2)
           // This notify can unlock the execution thread waiting for the submitter to get ready...
@@ -568,7 +574,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         try {
           if (trace != null) trace.data(21, "wait on lStamp .. start", lStamp);
           // wait until this specific reply actions arrives
-          lStamp.notifyAll();
           lStamp.wait(timeout);
         } catch (InterruptedException e) {
         }
@@ -586,6 +591,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           synchronized (stampList2) {
             stampList2.remove(lStamp);
           }
+          // Pickup reply from done list (synchs on doneList)
           replyMsg = findAndRemoveMsgForStamp(lStamp);
 
           if (replyMsg == null) {
@@ -594,10 +600,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             if (trace != null) trace.data(72, "timeout - clear any open progress dialogs");
             ProgMonitorPool.getProgMonitor(msgAction.getStamp()).jobKilled();
           }
-          stampList.notifyAll();
         } // end synchronized (stampList)
-
-        lStamp.notifyAll();
       } // end synchronized
 
       // copy original Interrupts to the reply
@@ -1258,68 +1261,89 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
     destroyed = true;
 
-    if (loginCompletionNotifier != null)
-      loginCompletionNotifier.serverDestroyed(this);
+    try {
+      if (loginCompletionNotifier != null)
+        loginCompletionNotifier.serverDestroyed(this);
+    } catch (Throwable t) {
+    }
 
-    disconnectAndClear();
+    try {
+      disconnectAndClear();
+    } catch (Throwable t) {
+    }
 
     // clear the job queue, killing and removing all jobs
-    if (jobFifo != null) {
-      while (true) {
-        Object o = jobFifo.remove();
-        if (o instanceof MessageAction) {
-          MessageAction msgAction = (MessageAction) o;
-          ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
-          if (pm != null)
-            pm.jobKilled();
+    try {
+      if (jobFifo != null) {
+        while (true) {
+          Object o = jobFifo.remove();
+          if (o instanceof MessageAction) {
+            MessageAction msgAction = (MessageAction) o;
+            ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+            if (pm != null)
+              pm.jobKilled();
+          }
+          if (jobFifo.size() == 0)
+            break;
         }
-        if (jobFifo.size() == 0)
-          break;
       }
+    } catch (Throwable t) {
     }
 
     // in case there are any progress monitors left over somewhere, kill them
-    ProgMonitorPool.killAll();
+    try {
+      ProgMonitorPool.killAll();
+    } catch (Throwable t) {
+    }
 
     // kill the reply queue (execution queue)
     if (trace != null) trace.data(31, "killing execution queue");
-    executionQueue.getFifoWriterI().clear();
-    executionQueue.kill();
-    executionQueue = null;
+    try {
+      executionQueue.getFifoWriterI().clear();
+      executionQueue.kill();
+      executionQueue = null;
+    } catch (Throwable t) {
+    }
     if (trace != null) trace.data(32, "execution queue killed");
 
     // kill the independentExecutionQueue
     if (trace != null) trace.data(33, "killing independent execution queue");
-    independentExecutionQueue.getFifoWriterI().clear();
-    independentExecutionQueue.kill();
-    independentExecutionQueue = null;
+    try {
+      independentExecutionQueue.getFifoWriterI().clear();
+      independentExecutionQueue.kill();
+      independentExecutionQueue = null;
+    } catch (Throwable t) {
+    }
     if (trace != null) trace.data(34, "execution queue killed");
 
     // release all threads waiting on the stamps
     if (trace != null) trace.data(51, "releasing all threads waiting on stamps");
     ArrayList tempStampList = new ArrayList();
-    synchronized (stampList) {
-      // avoid deadlock by copying stamps and notifying threads outside of "stampList" synchronized block
-      tempStampList.addAll(stampList);
-      stampList.clear();
-      synchronized (stampList2) {
-        stampList2.clear();
+    try {
+      synchronized (stampList) {
+        // avoid deadlock by copying stamps and notifying threads outside of "stampList" synchronized block
+        tempStampList.addAll(stampList);
+        stampList.clear();
+        synchronized (stampList2) {
+          stampList2.clear();
+        }
+        synchronized (doneList) {
+          doneList.clear();
+        }
+        stampList.notifyAll();
+      } // end synchronized (stampList)
+      for (int i=0; i<tempStampList.size(); i++) {
+        Stamp stamp = (Stamp) tempStampList.get(i);
+        synchronized (stamp) {
+          stamp.notifyAll();
+          // In case outstanding jobs were not in the queue, but already sent to server,
+          // kill corresponding progress monitors so they don't popup in a few seconds.
+          ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
+          if (pm != null)
+            pm.jobKilled();
+        }
       }
-      synchronized (doneList) {
-        doneList.clear();
-      }
-      stampList.notifyAll();
-    } // end synchronized (stampList)
-    for (int i=0; i<tempStampList.size(); i++) {
-      Stamp stamp = (Stamp) tempStampList.get(i);
-      synchronized (stamp) {
-        stamp.notifyAll();
-        // In case outstanding jobs were not in the queue, but already sent to server,
-        // kill corresponding progress monitors so they don't popup in a few seconds.
-        ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
-        if (pm != null)
-          pm.jobKilled();
-      }
+    } catch (Throwable t) {
     }
     if (trace != null) trace.data(70, "all threads released and stamps cleared.");
 
@@ -1362,7 +1386,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       }
     }
     hostsAndPorts = null;
-    logoutWorkers();
+    try {
+      logoutWorkers();
+    } catch (Throwable t) {
+    }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
@@ -1658,68 +1685,81 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         // set the ServerInterfaceLayer for every message reply that is about to be processed.
         nextMsgAction.setServerInterfaceLayer(ServerInterfaceLayer.this);
 
-        if (trace != null) trace.data(10, "synchron on stampList");
-        synchronized (stampList) {
-          if (trace != null) trace.data(11, "synchron on stampList done");
-          if (trace != null) trace.data(12, "reply=", nextMsgAction);
+        if (trace != null) trace.data(10, "wait until submitter is prepared and ready, if not prepared escape without waiting");
+        Stamp stamp = new Stamp(nextMsgAction.getStamp());
+        Stamp exactStamp = null;
+        int index = -1;
 
-          Stamp stamp = new Stamp(nextMsgAction.getStamp());
-
-          // find the exact object on which a Thread may be waiting.
-          int index = stampList.indexOf(stamp);
-          if (trace != null) trace.data(14, "index", index);
-          // if anyone is waiting for this object, then put it into doneList
-          if (index >= 0) {
-            // someone is waiting for it for sure
-
-            // Wait till the submitter is ready to hear about completion of a reply to it's request.
-            boolean submitterReady = false;
-            boolean refreshIndex = false;
-            while (!submitterReady) {
+        // wait until submitter is prepared and ready, if not prepared escape without waiting
+        boolean submitterPrepared = true;
+        boolean submitterReady = false;
+        long waitStart = System.currentTimeMillis();
+        while (submitterPrepared && !submitterReady) {
+          if (System.currentTimeMillis() - waitStart > 10000) {
+            System.out.println("Waited for submitter prepared-ready state over 10s, escaping!");
+            break;
+          }
+          if (trace != null) trace.data(20, "synchronizing on stampList to check if prepared");
+          synchronized (stampList) {
+            index = stampList.indexOf(stamp);
+            submitterPrepared = index >= 0;
+            if (trace != null) trace.data(21, "prepared=", submitterPrepared);
+            if (submitterPrepared) {
+              exactStamp = (Stamp) stampList.get(index);
+              if (trace != null) trace.data(22, "synchronizing on stampList2 to check if ready");
               synchronized (stampList2) {
                 submitterReady = stampList2.contains(stamp);
+                if (trace != null) trace.data(23, "ready=", submitterReady);
               }
-              if (trace != null) trace.data(30, "submitterReady", submitterReady);
               if (!submitterReady) {
                 try {
-                  if (trace != null) trace.data(31, "wait stampList");
-                  refreshIndex = true;
-                  // wait until this specific reply actions arrives
-                  stampList.notifyAll();
-                  stampList.wait();
+                  // wait for 1s or until submitter reaches ready state
+                  if (trace != null) trace.data(24, "wait for 1s or until submitter reaches ready state");
+                  stampList.wait(1000);
                 } catch (InterruptedException e) {
                 }
-                if (trace != null) trace.data(32, "wait stampList done");
               }
-            } // end while (!submitterReady)
+            }
+          }
+        } // end waiting for prepared-ready state
 
-
+        // use exact stamp if possible to match synchronizing block of the receiving thread
+        Object lStamp = exactStamp != null ? exactStamp : stamp;
+        synchronized (lStamp) {
+          if (submitterPrepared && submitterReady) {
+            synchronized (stampList) {
+              // Recheck if waiting thread didn't escape due to timeout
+              // while we were not synchronized on the original exactStamp.
+              index = stampList.indexOf(stamp);
+            }
+          }
+          // If someone is waiting for it for sure
+          if (submitterPrepared && submitterReady && index >= 0) {
+            // Submitter is ready for sure, so put the reply on the done list then
+            // notify on monitor stamp to realease the submitter!
             if (trace != null) trace.data(40, "adding reply to done list");
             synchronized (doneList) {
               doneList.add(nextMsgAction);
               if (trace != null) trace.data(41, "adding done");
             }
-
-            // Refresh the 'index' as we lost synchronization on stampList and it might have got changed!
-            if (refreshIndex)
-              index = stampList.indexOf(stamp);
-
-            if (index < 0) {
-              throw new IllegalStateException("The stamp must be present, but its not!");
+            // wake up sibmitter to pickup the reply from done list
+            if (trace != null) trace.data(51, "synchron done on exactStamp=", exactStamp);
+            if (trace != null) trace.data(52, "notify/wake-up the Thread waiting on stamp=", lStamp);
+            lStamp.notifyAll();
+            // cleanup stampLists in case submitter doesn't do it in time for next queued reply
+            if (trace != null) trace.data(55, "about to perform stamp cleanup");
+            synchronized (stampList) {
+              if (trace != null) trace.data(56, "performing stamp cleanup");
+              // remove the stamp and the reply message from the lists
+              stampList.remove(lStamp);
+              synchronized (stampList2) {
+                stampList2.remove(lStamp);
+              }
             }
-
-            Stamp exactStampObj = (Stamp) stampList.get(index);
-            if (trace != null) trace.data(50, "synchron on exactStampObj", exactStampObj);
-            // wake up the waiting thread
-            synchronized (exactStampObj) {
-              if (trace != null) trace.data(51, "synchron on exactStampObj done", exactStampObj);
-              if (trace != null) trace.data(52, "notify/wake-up the Thread waiting on stamp", exactStampObj);
-              exactStampObj.notifyAll();
-            }
-
-            // no one is waiting for this message, just run it (by handing it over to the independent executor).
+            if (trace != null) trace.data(57, "stamp cleanup done");
           } else {
             if (trace != null) trace.data(60, "no one waiting for this reply, run it.");
+            // no one waiting for this reply, run it.
             // Running independent jobs by independent queue frees up the execution queue while
             // those jobs are being run, plus it ensures the FCFS order of independent jobs.
             if (!destroyed) {
@@ -1728,10 +1768,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               }
             }
           }
-
-          stampList.notifyAll();
-        } // end synchronized (stampList)
-
+        }
       } catch (Throwable t) {
         // execution of server reply went wrong -- critical error.
         if (trace != null) trace.exception(QueueExecutionFunction.class, 100, t);

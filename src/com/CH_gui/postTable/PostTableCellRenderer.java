@@ -200,7 +200,13 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
         mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
         mData = cache.getMsgDataRecord(mLink.msgId);
         pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
-        sb = (StringBuffer) mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
+        Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
+        if (subjectValue != null) {
+          if (subjectValue instanceof StringBuffer)
+            sb = (StringBuffer) subjectValue;
+          else
+            sb = new StringBuffer(subjectValue.toString());
+        }
         if (((MsgTableSorter) sTable.getModel()).isThreaded()) {
           indentLevel = mLink.getSortThreadLayer();
         }

@@ -260,7 +260,6 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
    ******************************************/
 
   public void msgPopupUpdate(EventObject e) {
-    System.out.println("update popup with " +e.toString());
     getSingleInstance().addForScrolling(e.getSource().toString());
   }
 

@@ -48,4 +48,8 @@ public class Stamp {
   public boolean equals(Object o) {
     return o instanceof Stamp && ((Stamp) o).value == value;
   }
+
+  public String toString() {
+    return String.valueOf(value);
+  }
 }

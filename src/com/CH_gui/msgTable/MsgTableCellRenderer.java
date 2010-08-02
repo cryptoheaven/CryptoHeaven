@@ -441,7 +441,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(rowModel);
               if (mLink != null) {
                 MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-                subject = (String) mtm.getSubjectColumnValue(mtm, mLink, mData, null, cache);
+                Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, null, cache);
+                subject = subjectValue != null ? subjectValue.toString() : null;
                 boolean isFlagRed = false;
                 StatRecord statRecord = null;
                 isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew();

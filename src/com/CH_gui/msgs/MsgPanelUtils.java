@@ -59,15 +59,9 @@ import com.CH_guiLib.util.HTML_Ops;
  */
 public class MsgPanelUtils extends Object {
 
-  /*
-  public static String HTML_START1 = "<html>";
-  public static String HTML_START2 = "<font face='Arial' size='-1'>";
-  public static String HTML_END1 = "</html>";
-  public static String HTML_END2 = "</font>";
-   */
-
   //public static String HTML_FONT_START = "<font face='Arial' size='-1'>";
-  public static final String HTML_FONT_START = "<font face='Arial' size='-1'>";
+  //public static final String HTML_FONT_START = "<font face='Arial' size='-1'>";
+  public static final String HTML_FONT_START = "<font face=\"Dialog, Arial\">";
   public static final String HTML_FONT_END = "</font>";
 
   public static final String HTML_START = "<html>";

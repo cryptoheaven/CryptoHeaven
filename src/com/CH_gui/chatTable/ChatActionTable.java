@@ -258,7 +258,7 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
                 Record r = MsgPanelUtils.convertUserIdToFamiliarUser(userId, false, true);
                 String name = ListRenderer.getRenderedText(r);
                 String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("USER-NAME_is_typing_a_message."), new Object[] {name});
-                f.triggerVisualUpdateNotificationStill(msg, null, TYPING_NOTIFY_MILLIS);
+                f.triggerVisualUpdateNotificationStill(msg, f.getTitle() + " :: ", null, TYPING_NOTIFY_MILLIS);
               }
             }
           }

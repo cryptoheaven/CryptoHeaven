@@ -787,7 +787,7 @@ public class MsgDataRecord extends Record {
   private String getHTMLforPart(XMLElement e, boolean useVerticalLayout, boolean useSmallerFont) {
     StringBuffer sb = new StringBuffer();
     String width = "";
-    String size = useSmallerFont ? "size='-2'" : "size='-1'";
+    String size = useSmallerFont ? "size='-1'" : "";
     if (e != null) {
       Vector v = e.getChildren();
       if (v.size() > 0) {

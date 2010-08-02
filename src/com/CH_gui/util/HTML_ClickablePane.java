@@ -183,10 +183,10 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
    */
   public void initFont() {
     // add a CSS rule to force body tags to use the default label font
-    // instead of the value in javax.swing.text.html.default.csss
-    Font font = UIManager.getFont("Label.font");
-    String bodyRule = "body { font-family: " + font.getFamily() + "; " + "font-size: " + font.getSize() + "pt; }";
+    // instead of the value in javax.swing.text.html.default.css
+    String bodyRule = "body { font-family: Dialog; " + "font-size: " + "14pt; }";
     ((HTMLDocument) getDocument()).getStyleSheet().addRule(bodyRule);
+
     /*
     Object token = new Object();
     if (arbiter.putToken(arbiter, token)) {

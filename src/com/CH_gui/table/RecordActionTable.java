@@ -728,7 +728,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                     msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_declined."), new Object[] {userName});
               }
               if (msg != null) {
-                frame.triggerVisualUpdateNotificationAnim(msg, null, 7000);
+                String userStr = ListRenderer.getRenderedText(FetchedDataCache.getSingleInstance().getUserRecord());
+                frame.triggerVisualUpdateNotificationAnim(msg, userStr + " :: ", null, 7000);
                 Stats.setStatus(msg);
               }
             } // end if in JActionFrame
