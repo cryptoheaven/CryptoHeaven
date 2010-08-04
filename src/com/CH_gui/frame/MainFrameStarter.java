@@ -336,12 +336,6 @@ public class MainFrameStarter extends Object {
       }
     }
 
-    // Fix the static labels in the Stats bar
-    if (at != null) {
-      // TODO figure out what to do with this font adjustment -- for now comment out to make the code compile!
-//      Stats.adjustFontSize(at);
-    }
-
     // Change default label color to black
     try {
       table.put("Label.foreground", Color.black);
