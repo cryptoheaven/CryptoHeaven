@@ -292,8 +292,8 @@ public class MessageAction extends Message implements Cancellable {
     return sendTryCount >= MAX_SEND_TRY_COUNT-1;
   }
 
-  public void setCancelled(boolean cancelled) {
-    this.cancelled = cancelled;
+  public void setCancelled() {
+    this.cancelled = true;
   }
   public boolean isCancelled() {
     return cancelled;

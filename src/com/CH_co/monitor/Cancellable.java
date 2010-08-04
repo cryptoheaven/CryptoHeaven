@@ -24,6 +24,6 @@ package com.CH_co.monitor;
  */
 public interface Cancellable {
 
-  public void setCancelled(boolean cancelled);
+  public void setCancelled();
 
 }

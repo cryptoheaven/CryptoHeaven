@@ -306,7 +306,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
 
         Cancellable ourCancellable = cancellable;
         if (ourCancellable != null)
-          ourCancellable.setCancelled(true);
+          ourCancellable.setCancelled();
 
         Interruptible ourInterrupt = interrupt;
         if (allDone || jobKilled) {
@@ -794,7 +794,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     this.cancellable = cancellable;
     if (cancelled) {
       closeProgMonitor();
-      cancellable.setCancelled(true);
+      cancellable.setCancelled();
     }
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }

@@ -106,7 +106,7 @@ public class FileAGetFilesData extends ClientMessageAction {
         if (isCancelled() || progressMonitor.isCancelled()) {
           // Just ignore the error as operation was cancelled by the user.
           // Just incase it was a streaming reply, set the message as canceled for others to see.
-          setCancelled(true);
+          setCancelled();
         } else {
           String msg = "Exception message is : " + t.getMessage() +
                        "\n\nError occurred while decrypting and decompressing of file : " + fileLinkRecord.getFileName() +
