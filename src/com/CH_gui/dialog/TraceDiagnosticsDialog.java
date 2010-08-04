@@ -13,7 +13,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.*;
 import com.CH_cl.service.records.*;
 
 import com.CH_co.service.records.*;
@@ -27,7 +26,6 @@ import com.CH_gui.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.*;
 import javax.swing.*;
 
 /**
@@ -89,7 +87,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     jButtons[0] = new JMyButton("Start Diagnostics");
     jButtons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
-        traceStart();
+        TraceDiagnostics.traceStart();
       }
     });
     jStart = jButtons[0];
@@ -97,7 +95,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     jButtons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         File traceFile = TraceProperties.getLastTraceFile();
-        traceStop();
+        TraceDiagnostics.traceStop();
         new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request with Diagnostics", MainFrame.getSupportMsgBodyTemplate(), new File[] { traceFile });
         closeDialog();
       }
@@ -176,72 +174,8 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     return panel;
   }
 
-  public static void traceStart() {
-    String[][] props = new String[][] {
-      {"TraceEnabled",                  "true"},
-      {"Trace.*",                       "true"},
-      {"Debug.Level.*",                 "10"},
-      {"TraceBufferKB",                 "1"},
-      {"OutputType",                    "file"},
-      {"OutputFilePrefix",              "BugReport-"+FetchedDataCache.getSingleInstance().getMyUserId()+"_"+Misc.getFormattedDateFileStr(new Date())},
-      {"OutputFileUseUniqueID",         "false"},
-      {"OutputFileExt",                 "txt"},
-      {"OutputFileSizeMB",              "0"},
-      };
-    for (int i=0; i<props.length; i++) {
-      TraceProperties.setProperty(props[i][0], props[i][1]);
-    }
-    Trace.initialLoad(false, true);
-    initialDiagnosticsInfo();
-  }
-  private static void initialDiagnosticsInfo() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceDiagnosticsDialog.class, "initialDiagnosticsInfo()");
-    if (trace != null) {
-      Runtime runtime = Runtime.getRuntime();
-
-      trace.data(1, GlobalProperties.PROGRAM_FULL_NAME);
-      trace.data(2, "max memory", Misc.getFormattedSize(runtime.maxMemory(), 4, 3));
-      trace.data(3, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
-      trace.data(4, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
-
-      trace.data(100, "List of Environmet Variables");
-
-      Properties props = System.getProperties();
-      Enumeration keyEnum = props.keys();
-      TreeMap propMap = new TreeMap();
-      while (keyEnum.hasMoreElements()) {
-        String key = (String) keyEnum.nextElement();
-        String value = props.getProperty(key);
-        propMap.put(key, value);
-      }
-      Set keySet = propMap.keySet();
-      Iterator keyIter = keySet.iterator();
-      int count = 0;
-      while (keyIter.hasNext()) {
-        String key = (String) keyIter.next();
-        String value = (String) propMap.get(key);
-        count ++;
-        trace.data(100+count, key, value);
-      }
-    }
-    if (trace != null) trace.exit(TraceDiagnosticsDialog.class);
-  }
-
-  public static void traceStop() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceDiagnosticsDialog.class, "traceStop()");
-    if (trace != null) {
-      Runtime runtime = Runtime.getRuntime();
-      trace.data(1, "total memory", Misc.getFormattedSize(runtime.totalMemory(), 4, 3));
-      trace.data(2, "free memory", Misc.getFormattedSize(runtime.freeMemory(), 4, 3));
-      trace.data(3, "TRACE STOP");
-    }
-    TraceProperties.setProperty("TraceEnabled", "false");
-    Trace.initialLoad();
-    if (trace != null) trace.exit(TraceDiagnosticsDialog.class);
-  }
-
   public void closeDialog() {
-    traceStop();
+    TraceDiagnostics.traceStop();
     closed = true;
     super.closeDialog();
   }

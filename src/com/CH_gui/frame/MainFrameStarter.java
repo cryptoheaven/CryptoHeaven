@@ -24,7 +24,7 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.ContactFilterCo;
-import com.CH_co.trace.Trace;
+import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.actionGui.JActionFrame;
@@ -192,9 +192,9 @@ public class MainFrameStarter extends Object {
             i++;
             String onOff = args[i];
             if (onOff.equalsIgnoreCase("on") || onOff.equalsIgnoreCase("true"))
-              TraceDiagnosticsDialog.traceStart();
+              TraceDiagnostics.traceStart();
             else if (onOff.equalsIgnoreCase("off") || onOff.equalsIgnoreCase("false"))
-              TraceDiagnosticsDialog.traceStop();
+              TraceDiagnostics.traceStop();
           } else if (args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("/?") || args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("/help")) {
             System.out.println("Usage 1: [-D[!]<propertiesDir>] [-privateLabelURL <URL>] [-username <username>] [<-password <password>>|<-password-blank>] [-signup] [-signupEmail <emailAddress>] [-folderId <id>] [-msgLinkId <id>] [-no-splash]");
             System.out.println("Usage 2: -localKeyChangePass <localKeyId> <old name> <old password> <new name> <new password>");

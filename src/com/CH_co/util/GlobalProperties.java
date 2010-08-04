@@ -204,8 +204,9 @@ public class GlobalProperties extends Object {
   // build 560 Timeout-retry for server submittions
   // build 562 Message compose and preview fonts/sizes, and window title change
   // build 564 Rework of synchronization between SIL job submitter and responder.
+  // build 566 Create TraceDiagnostics from common static code.
 
-  public static final short PROGRAM_BUILD_NUMBER = 564;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 566;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.2f;
