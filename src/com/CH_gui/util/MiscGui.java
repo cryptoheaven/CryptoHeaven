@@ -29,10 +29,10 @@ import javax.swing.text.*;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MiscGui extends Object {
 
@@ -49,26 +49,24 @@ public class MiscGui extends Object {
    */
 
   static {
-    //if (RenderingHints.VALUE_ANTIALIAS_DEFAULT.equals(RenderingHints.VALUE_ANTIALIAS_OFF)) {
-      String version = System.getProperty("java.version");
-      StringTokenizer st = new StringTokenizer(version, ".");
-      int majorVersion = 0;
-      int minorVersion = 0;
-      if (st.hasMoreTokens()) {
-        try {
-          majorVersion = Integer.parseInt(st.nextToken());
-        } catch (Throwable t) {
-        }
+    String version = System.getProperty("java.version");
+    StringTokenizer st = new StringTokenizer(version, ".");
+    int majorVersion = 0;
+    int minorVersion = 0;
+    if (st.hasMoreTokens()) {
+      try {
+        majorVersion = Integer.parseInt(st.nextToken());
+      } catch (Throwable t) {
       }
-      if (st.hasMoreTokens()) {
-        try {
-          minorVersion = Integer.parseInt(st.nextToken());
-        } catch (Throwable t) {
-        }
+    }
+    if (st.hasMoreTokens()) {
+      try {
+        minorVersion = Integer.parseInt(st.nextToken());
+      } catch (Throwable t) {
       }
-      isAntiAliasingCapable = majorVersion >= 2 || (majorVersion == 1 && minorVersion >= 4);
-      isAntiAliasingEnabled = Boolean.valueOf(GlobalProperties.getProperty(ANTIALIASING_ENABLEMENT_PROPERTY, "true")).booleanValue();
-    //}
+    }
+    isAntiAliasingCapable = majorVersion >= 2 || (majorVersion == 1 && minorVersion >= 4);
+    isAntiAliasingEnabled = Boolean.valueOf(GlobalProperties.getProperty(ANTIALIASING_ENABLEMENT_PROPERTY, "true")).booleanValue();
   }
 
   private static final JTextComponent.KeyBinding[] defaultBindings = {
@@ -116,7 +114,7 @@ public class MiscGui extends Object {
   }
    */
 
-  /** 
+  /**
    * load default bindings
    */
   public static void initKeyBindings(JTextComponent c) {
@@ -164,7 +162,7 @@ public class MiscGui extends Object {
     EmptyBorder border = new EmptyBorder(5,5,5,5);
     buttonPanel.setBorder(border);
 
-    for (int i=0; i<cols; i++) 
+    for (int i=0; i<cols; i++)
       if (buttons[i] != null)
         buttonPanel.add(buttons[i]);
 
@@ -286,7 +284,7 @@ public class MiscGui extends Object {
     }
     return screenInsets;
   }
-  
+
   /**
    * Find screen size adjusted for insets;
    * @return
@@ -334,9 +332,9 @@ public class MiscGui extends Object {
     Dimension screenSize = new Dimension(scrWidth, scrHeight);
     return screenSize;
   }
-  
+
   /**
-     * Returns an point which has been adjusted to take into account of the 
+     * Returns an point which has been adjusted to take into account of the
      * desktop bounds, taskbar and multi-monitor configuration.
      * <p>
      * This adustment code is from JPopupMenu.adjustPopupLocationToFitScreen()
@@ -535,7 +533,7 @@ public class MiscGui extends Object {
             Container cont = (Container) c;
             Component[] components = cont.getComponents();
             removeAllComponentsRecur2(cont, components);
-          } 
+          }
         }
       }
     } catch (Throwable t) {
@@ -812,7 +810,7 @@ public class MiscGui extends Object {
           }
 
           CaretListener[] caretListeners = (CaretListener[]) textComp.getListeners(CaretListener.class);
-          if (caretListeners != null && caretListeners.length > 0) 
+          if (caretListeners != null && caretListeners.length > 0)
             for (int i=0; i<caretListeners.length; i++)
               textComp.removeCaretListener(caretListeners[i]);
 
