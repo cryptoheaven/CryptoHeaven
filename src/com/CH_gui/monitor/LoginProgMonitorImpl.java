@@ -12,21 +12,17 @@
 
 package com.CH_gui.monitor;
 
-import com.CH_gui.util.MiscGui;
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
-import javax.swing.*;
+import com.CH_gui.util.*;
 
-import java.awt.*;
-
-import com.CH_co.gui.*;
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
+
+import java.awt.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
