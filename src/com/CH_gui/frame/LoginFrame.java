@@ -157,7 +157,6 @@ public class LoginFrame extends JFrame {
   private TypeAheadPopupList typeAheadPopupList;
 
   private JWindow keyGenSplash = null;
-  private ProgMonitorI loginProgMonitor;
 
   public static String defaultPassword;
   public static String defaultMode;
@@ -1626,6 +1625,7 @@ public class LoginFrame extends JFrame {
 
     if (!newAccountFailure) {
       Usr_LoginSecSess_Rq request = getLoginRequestAndClear();
+      ProgMonitorI loginProgMonitor = null;
       if (request != null) {
         // HTTP fetch server list and create ServerInterfaceLayer
         performConnect();
