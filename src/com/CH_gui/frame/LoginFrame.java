@@ -582,16 +582,16 @@ public class LoginFrame extends JFrame {
 
   private static String[] getUserList() {
     String usersStr = GlobalProperties.getProperty(PROPERTY_USER_NAME_LIST, "");
-    Vector userListV = new Vector();
+    ArrayList usersL = new ArrayList();
     StringTokenizer st = new StringTokenizer(usersStr);
     while (st.hasMoreTokens()) {
       String userS = st.nextToken();
       String userName = Misc.escapeWhiteDecode(userS);
-      userListV.addElement(userName);
+      usersL.add(userName);
     }
-    String[] userList = new String[userListV.size()];
-    if (userListV.size() > 0)
-      userListV.toArray(userList);
+    String[] userList = new String[usersL.size()];
+    if (usersL.size() > 0)
+      usersL.toArray(userList);
     return userList;
   }
 
@@ -602,31 +602,31 @@ public class LoginFrame extends JFrame {
     return putUserList(userList, additionalMostRecentUsername, null);
   }
   private static String[] putUserList(String[] userList, String additionalMostRecentUsername, String removeUsername) {
-    Vector userListV = new Vector(Arrays.asList(userList));
+    ArrayList usersL = new ArrayList(Arrays.asList(userList));
     if (removeUsername != null && removeUsername.trim().length() > 0) {
       String toRemove = removeUsername.trim();
-      userListV.removeElement(toRemove);
+      usersL.remove(toRemove);
     }
     if (additionalMostRecentUsername != null && additionalMostRecentUsername.trim().length() > 0) {
       String toAdd = additionalMostRecentUsername.trim();
-      userListV.removeElement(toAdd);
-      userListV.insertElementAt(toAdd, 0);
+      usersL.remove(toAdd);
+      usersL.add(0, toAdd);
       // trim list to max 100 entries
-      while (userListV.size() > 100)
-        userListV.removeElementAt(userListV.size()-1);
+      while (usersL.size() > 100)
+        usersL.remove(usersL.size()-1);
       // set the default username property too
       GlobalProperties.setProperty(PROPERTY_USER_NAME, toAdd);
     }
     StringBuffer usersStr = new StringBuffer();
-    for (int i=0; i<userListV.size(); i++) {
+    for (int i=0; i<usersL.size(); i++) {
       if (i > 0)
         usersStr.append(' ');
-      usersStr.append(Misc.escapeWhiteEncode(userListV.elementAt(i).toString()));
+      usersStr.append(Misc.escapeWhiteEncode(usersL.get(i).toString()));
     }
     GlobalProperties.setProperty(PROPERTY_USER_NAME_LIST, usersStr.toString());
-    userList = new String[userListV.size()];
-    if (userListV.size() > 0)
-      userListV.toArray(userList);
+    userList = new String[usersL.size()];
+    if (usersL.size() > 0)
+      usersL.toArray(userList);
     return userList;
   }
 
