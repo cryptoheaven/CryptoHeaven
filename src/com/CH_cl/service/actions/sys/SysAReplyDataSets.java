@@ -78,6 +78,8 @@ public class SysAReplyDataSets extends ClientMessageAction {
           }
           if (action != null) {
             // Do not set random stamp as it is not needed anymore (because the carrying action already returned) and it would mess up the progress monitors
+            // Don't want ZERO stamp either as this interferes with LOGIN progress monitors
+            action.copyStampFromAction(this);
             action.setMsgDataSet(data);
             action.setActionCode(actionCode.intValue());
             action.setServerInterfaceLayer(getServerInterfaceLayer());
