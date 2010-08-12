@@ -273,6 +273,9 @@ public class MessageAction extends Message implements Cancellable {
     super.copyDataSetFromMessage(sourceAction);
   }
 
+  public void copyStampFromAction(MessageAction sourceAction) {
+    this.uniqueStamp = sourceAction.uniqueStamp;
+  }
 
   /**
    * Initialize the Message Action with the context of the communications through which it came.
