@@ -55,9 +55,8 @@ public class UsrASuspended extends ClientMessageAction {
     Str_Rp reply = (Str_Rp) getMsgDataSet();
     if (reply.message != null && reply.message.length() > 0) {
       String title = "Account Suspended";
-      NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, reply.message, true);
+      NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, reply.message);
     }
-    Misc.systemExit(-100);
 
     if (trace != null) trace.exit(UsrASuspended.class, null);
     return null;
