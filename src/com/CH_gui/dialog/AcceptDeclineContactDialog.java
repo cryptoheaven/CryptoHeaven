@@ -12,27 +12,12 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.key.*;
@@ -45,7 +30,16 @@ import com.CH_co.util.*;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -400,18 +394,6 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
       final Long uId = contactRecord.ownerUserId;
       new InitiateContactDialog(AcceptDeclineContactDialog.this, new Long[] { uId });
 
-//      UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(contactRecord.ownerUserId);
-//      String usr = uRec.shortInfo();
-//
-//      String messageText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Create_Mutual_Contact?"), new Object[] {usr, usr, usr, usr});
-//      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Create_Mutual_Contact?");
-//      
-//      ActionListener yesAction = new ActionListener() {
-//        public void actionPerformed(ActionEvent event) {
-//          new InitiateContactDialog(AcceptDeclineContactDialog.this, new Long[] { uId });
-//        }
-//      };
-//      MessageDialog.showDialogYesNo(this, MessageDialog.prepareMessage(messageText), title, MessageDialog.QUESTION_MESSAGE, false, yesAction, null);
     }
     if (trace != null) trace.exit(AcceptDeclineContactDialog.class);
   }
