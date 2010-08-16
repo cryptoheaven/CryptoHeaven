@@ -1437,6 +1437,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public synchronized boolean isLastLoginMsgActionSet() {
     return lastLoginMessageAction != null;
   }
+  public boolean isLoggedIn() {
+    boolean rc = false;
+    if (isLastLoginMsgActionSet())
+      if (getFetchedDataCache().getMyUserId() != null)
+        rc = true;
+    return rc;
+  }
   public synchronized ProtocolMsgDataSet getLoginMsgDataSet() {
     if (lastLoginMessageAction != null) {
       ProtocolMsgDataSet tempDataSet = lastLoginMessageAction.getMsgDataSet();
@@ -1859,7 +1866,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // If client with no prior login encounters a connection exception, it has to exit.
           if (isClient && lastLoginMessageAction == null && t instanceof SILConnectionException) {
             destroyServer();
-            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Error", t.getMessage(), true);
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Error", t.getMessage());
           }
           // Delay before we do anything with re-connectivity.
           try { Thread.sleep(DELAY_NEW_CONNECTION_AFTER_NET_ERROR); } catch (InterruptedException e) { }
