@@ -133,15 +133,17 @@ public class UsrALoginSecureSession extends ClientMessageAction {
             int retVal = fc.showOpenDialog(null);
             if (fc.isApproved(retVal)) {
               File file = fc.getSelectedFile();
-              keyPropertyFileName = file.getAbsolutePath();
-              keyPropertyName = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+keyId;
-              GlobalSubProperties keyProperties = new GlobalSubProperties(file, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
-              String property = keyProperties.getProperty(keyPropertyName);
+              if (file != null) {
+                keyPropertyFileName = file.getAbsolutePath();
+                keyPropertyName = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+keyId;
+                GlobalSubProperties keyProperties = new GlobalSubProperties(file, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+                String property = keyProperties.getProperty(keyPropertyName);
 
-              if (property != null && property.length() > 0) {
-                encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-                // remember the filename for next time -- TRIM the list to at most 5 paths
-                addPathToLastPrivKeyPaths(file.getAbsolutePath());
+                if (property != null && property.length() > 0) {
+                  encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+                  // remember the filename for next time -- TRIM the list to at most 5 paths
+                  addPathToLastPrivKeyPaths(file.getAbsolutePath());
+                }
               }
             }
           } catch (Exception ex) {
@@ -163,10 +165,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
             privateKeyBA = symCipher.blockDecrypt(encPrivateKey);
           } catch (Throwable t) {
             if (trace != null) trace.exception(UsrALoginSecureSession.class, 40, t);
-            String messageText = "Invalid credentials for the specified account! \n Program will terminate!";
-            String title = "Critical Login Error";
-            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, messageText, true);
-            Misc.systemExit(-101);
+            throw new SecurityException("Invalid credentials for the specified account! \n\nLogin cannot complete!\n\n"+t.getMessage());
           }
           byte[] privateKeyBytes = privateKeyBA.toByteArray();
           privateKeyBA.clearContent();
@@ -186,10 +185,8 @@ public class UsrALoginSecureSession extends ClientMessageAction {
               "Could not find property field " + keyPropertyName + " to load your encrypted private key. " +
               "The key property file scanned is: <br>" + keyPropertyFileName +
               "<p>" +
-              "Program will terminate!";
-          String title = "Critical Login Error";
-          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, message, true);
-          Misc.systemExit(-102);
+              "Login cannot complete!";
+          throw new SecurityException(message);
         }
       }
 
