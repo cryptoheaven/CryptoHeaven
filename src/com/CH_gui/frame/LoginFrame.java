@@ -37,7 +37,7 @@ import com.CH_guiLib.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.io.File;
+import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
@@ -239,11 +239,6 @@ public class LoginFrame extends JFrame {
 
     // Start initializing secure random, we'll need it for login
     Rnd.initSecureRandom();
-  }
-
-
-  private boolean getStoreRemoteFlag() {
-    return storeRemoteFlag;
   }
 
   /* @return true is if this is a new account dialog */
@@ -1327,13 +1322,12 @@ public class LoginFrame extends JFrame {
       int retVal = fc.showSaveDialog(null);
       if (retVal == javax.swing.JFileChooser.APPROVE_OPTION) {
         java.io.File file = fc.getSelectedFile();
-        if (file.exists()) {
-          boolean overwriteOk = MessageDialog.showDialogYesNo(null, "Overwrite existing file?\n\nAre you sure you want to add this key to the already existing file?\n\n"+file.getAbsolutePath(), "Overwrite existing file?");
-          if (!overwriteOk)
-            continue; // retry the loop
+        if (isPrivKeyFileChoiceValid(file)) {
+          chosenFile = file;
+          break;
+        } else {
+          continue; // retry the loop
         }
-        chosenFile = file;
-        break;
       } else {
         break;
       }
@@ -1341,6 +1335,50 @@ public class LoginFrame extends JFrame {
     return chosenFile;
   }
 
+  private static boolean isPrivKeyFileChoiceValid(File file) {
+    boolean rc = true;
+    if (file.exists()) {
+      FileInputStream fileIn = null;
+      boolean fileFormatValid = false;
+      String errorMsg = null;
+      try {
+        Properties testLoad = new Properties();
+        fileIn = new FileInputStream(file);
+        testLoad.load(fileIn);
+        fileIn.close();
+        fileFormatValid = true;
+      } catch (Exception e) {
+        errorMsg = e.getLocalizedMessage();
+      } finally {
+        try { fileIn.close(); } catch (Exception e) { }
+      }
+      if (!fileFormatValid) {
+        MessageDialog.showErrorDialog(null, "File verification failed.  Please choose a different file.\n\nFile:\n"+file.getAbsolutePath()+"\n\nReason:\n"+errorMsg, "File error", true);
+        rc = false;
+      } else {
+        boolean appendOk = MessageDialog.showDialogYesNo(null, "Append to existing file?\n\nAre you sure you want to add this key to the already existing file?\n\n"+file.getAbsolutePath(), "Append to existing file?");
+        if (!appendOk)
+          rc = false;
+      }
+    } else {
+      // test if file can be created
+      boolean canCreate = false;
+      String errorMsg = null;
+      try {
+        file.createNewFile();
+        canCreate = true;
+      } catch (Exception e) {
+        errorMsg = e.getLocalizedMessage();
+      } finally {
+        try { file.delete(); } catch (Exception e) { }
+      }
+      if (!canCreate) {
+        MessageDialog.showErrorDialog(null, "File could not be created.  Please choose a different file.\n\nFile:\n"+file.getAbsolutePath()+"\n\nReason:\n"+errorMsg, "File error", true);
+        rc = false;
+      }
+    }
+    return rc;
+  }
 
   private class AdvancedListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
@@ -1360,7 +1398,9 @@ public class LoginFrame extends JFrame {
         if (tempStoreRemoteFlag) {
           storeRemoteFlag = tempStoreRemoteFlag;
         } else if (prevStoreRemoteFlag != tempStoreRemoteFlag) {
-          File privKeyFile = choosePrivKeyStorageFile(new File("private-key.properties"));
+          String userHome = System.getProperty("user.home");
+          File privKeyFileDefault = userHome != null && userHome.length() > 0 ? new File(new File(userHome), "private-key.properties") : new File("private-key.properties");
+          File privKeyFile = choosePrivKeyStorageFile(privKeyFileDefault);
           if (privKeyFile != null) {
             localPrivKeyFile = privKeyFile;
             storeRemoteFlag = tempStoreRemoteFlag;
@@ -1614,7 +1654,7 @@ public class LoginFrame extends JFrame {
         performConnect();
         if (createNewAccount(request)) {
           newAccountCreated = true;
-          isStoreRemoteFlag = getStoreRemoteFlag();
+          isStoreRemoteFlag = storeRemoteFlag;
         } else {
           MainFrame.getServerInterfaceLayer().destroyServer();
           MainFrame.setServerInterfaceLayer(null);
@@ -1805,7 +1845,6 @@ public class LoginFrame extends JFrame {
       if (replyAction != null)
         replyAction.runAction();
     } catch (Exception e) {
-      e.printStackTrace();
       success = false;
       if (trace != null) trace.data(200, "closing prog monitor, exception during login");
       loginProgMonitor.allDone();

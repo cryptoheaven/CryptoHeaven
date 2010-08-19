@@ -1038,12 +1038,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   public static boolean isLoggedIn() {
-    boolean rc = false;
-    if (SIL != null)
-      if (SIL.isLastLoginMsgActionSet())
-        if (SIL.getFetchedDataCache().getMyUserId() != null)
-          rc = true;
-    return rc;
+    return SIL != null && SIL.isLoggedIn();
   }
 
   /**

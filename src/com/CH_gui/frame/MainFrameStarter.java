@@ -379,9 +379,6 @@ public class MainFrameStarter extends Object {
           loginCoordinator.getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
         }
 
-//        // All parent-less dialogs should go on top of the main window from now on.
-//        GeneralDialog.setDefaultParent(this);
-
         // Mark Active Status right away since the GUI timer is scheduled in intervals...
         // if user was disconnected in INACTIVE state, he should be marked active now...
         InactivityEventQueue.getInstance().sendActiveFlagIfInactive();
