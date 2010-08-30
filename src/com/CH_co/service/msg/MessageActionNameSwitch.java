@@ -352,7 +352,7 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.SYS_Q_GET_TEMP_PUB_KEY), "Get Public Key" },
 
       // System Login
-      { new Integer(CommandCodes.SYS_Q_LOGIN), "Open a Secure Channel" },
+      { new Integer(CommandCodes.SYS_Q_LOGIN), "Open Secure Channel" },
 
       // System Query
       { new Integer(CommandCodes.SYS_Q_QUERY), "Query" },
@@ -363,7 +363,7 @@ public class MessageActionNameSwitch extends Object {
 
 
       // Login Secure Session
-      { new Integer(CommandCodes.USR_A_LOGIN_SECURE_SESSION), "Open a Secure Channel and Login" },
+      { new Integer(CommandCodes.USR_A_LOGIN_SECURE_SESSION), "Open Secure Channel" },
 
       // Login failed -- 
       { new Integer(CommandCodes.USR_E_HANDLE_PASSWORD_COMBO_DNE), "User Handle-Password pair does not exist" },
@@ -540,8 +540,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.SYS_A_GET_TEMP_PUB_KEY), "Get Public Key" },
 
       // System Login
-      { new Integer(CommandCodes.SYS_A_LOGIN), "Open a Secure Channel" },
-      { new Integer(CommandCodes.SYS_E_LOGIN), "Open a Secure Channel Failed" },
+      { new Integer(CommandCodes.SYS_A_LOGIN), "Open Secure Channel" },
+      { new Integer(CommandCodes.SYS_E_LOGIN), "Open Secure Channel Failed" },
 
       // System Query
       { new Integer(CommandCodes.SYS_A_QUERY), "Query" },
