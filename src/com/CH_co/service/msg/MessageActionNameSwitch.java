@@ -53,7 +53,7 @@ public class MessageActionNameSwitch extends Object {
       // =====================
 
       // Login Secure Session
-      { new Integer(CommandCodes.USR_Q_LOGIN_SECURE_SESSION), "Open a Secure Channel and Login" },
+      { new Integer(CommandCodes.USR_Q_LOGIN_SECURE_SESSION), "Open Secure Channel" },
       // Get Login Info
       { new Integer(CommandCodes.USR_Q_GET_LOGIN_INFO), "Get Login Data" },
       // Get Re-Connection Update
