@@ -59,7 +59,7 @@ public class MessageActionNameSwitch extends Object {
       // Get Re-Connection Update
       { new Integer(CommandCodes.USR_Q_GET_RECONNECT_UPDATE), "Get Re-Connection Update" },
       // Get My Info
-      { new Integer(CommandCodes.USR_Q_GET_INFO), "Retrieve Account Information" },
+      { new Integer(CommandCodes.USR_Q_GET_INFO), "Retrieve Account" },
       // Get Sub-Account Info
       { new Integer(CommandCodes.USR_Q_GET_SUB_ACCOUNTS), "Get Account Information" },
       // Create New User
@@ -370,7 +370,7 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.USR_E_USER_LOCKED_OUT), "User Locked Out" },
       { new Integer(CommandCodes.USR_E_LOGIN_FAILED), "Login Failed" },
       // Get My Info
-      { new Integer(CommandCodes.USR_A_GET_INFO), "Retrieve Account Information" },
+      { new Integer(CommandCodes.USR_A_GET_INFO), "Retrieve Account" },
       // Get Sub-Account Info
       { new Integer(CommandCodes.USR_A_GET_SUB_ACCOUNTS), "Get Account Information" },
       // Create New User
