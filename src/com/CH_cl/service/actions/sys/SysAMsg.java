@@ -55,19 +55,12 @@ public class SysAMsg extends ClientMessageAction {
 
     Obj_List_Co reply = (Obj_List_Co) getMsgDataSet();
     String msgType = (String) reply.objs[0];
-    Boolean modal = (Boolean) reply.objs[1];
+    Boolean modal = (Boolean) reply.objs[1]; // depreciated
     String title = (String) reply.objs[2];
     String body = (String) reply.objs[3];
 
-    if (modal.booleanValue()) {
-      if (msgType.equalsIgnoreCase("i")) {
-        NotificationCenter.show(NotificationCenter.INFORMATION_MESSAGE, title, body, modal.booleanValue());
-      } else if (msgType.equalsIgnoreCase("w")) {
-        NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, body, modal.booleanValue());
-      } else if (msgType.equalsIgnoreCase("e")) {
-        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, body, modal.booleanValue());
-      }
-    } else {
+    // Suppress the dialog if title and body are empty
+    if (title != null && body != null) {
       if (msgDialogArbiter == null) msgDialogArbiter = new SingleTokenArbiter();
       String key = msgType+title+body;
       int dialogType = NotificationCenter.ERROR_MESSAGE;
