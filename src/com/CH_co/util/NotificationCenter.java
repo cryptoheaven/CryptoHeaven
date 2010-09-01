@@ -48,15 +48,6 @@ public class NotificationCenter {
       }
     }
   }
-  public static void show(int type, String title, String msg, boolean modal) {
-    if (implNotificationCenterI != null) {
-      try {
-        NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
-        impl.show(type, title, msg, modal);
-      } catch (Throwable t) {
-      }
-    }
-  }
   public static void show(final SingleTokenArbiter arbiter, final Object key, int type, String title, String msg) {
     if (implNotificationCenterI != null) {
       try {
@@ -66,16 +57,14 @@ public class NotificationCenter {
       }
     }
   }
-  public static boolean showYesNo(int type, String title, String msg, boolean defaultChoice) {
-    boolean rc = defaultChoice;
+  public static void showYesNo(int type, String title, String msg, boolean defaultChoice, Runnable yes, Runnable no) {
     if (implNotificationCenterI != null) {
       try {
         NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
-        rc = impl.showYesNo(type, title, msg);
+        impl.showYesNo(type, title, msg, yes, no);
       } catch (Throwable t) {
       }
     }
-    return rc;
   }
 
 }

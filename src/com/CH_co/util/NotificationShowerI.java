@@ -25,8 +25,7 @@ package com.CH_co.util;
 public interface NotificationShowerI {
 
   public void show(int type, String title, String msg);
-  public void show(int type, String title, String msg, boolean modal);
   public void show(final SingleTokenArbiter arbiter, final Object key, int type, String title, String msg);
-  public boolean showYesNo(int type, String title, String msg);
+  public void showYesNo(int type, String title, String msg, Runnable yes, Runnable no);
 
 }

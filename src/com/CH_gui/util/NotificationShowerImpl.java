@@ -36,16 +36,19 @@ public class NotificationShowerImpl implements NotificationShowerI {
     MessageDialog.showDialog(null, msg, title, type, false);
   }
 
-  public void show(int type, String title, String msg, boolean modal) {
-    MessageDialog.showDialog(null, msg, title, type, modal);
-  }
-
   public void show(SingleTokenArbiter arbiter, Object key, int type, String title, String msg) {
     MessageDialog.showDialog(arbiter, key, null, msg, title, type);
   }
 
-  public boolean showYesNo(int type, String title, String msg) {
-    return MessageDialog.showDialogYesNo(null, msg, title, type);
+  public void showYesNo(int type, String title, String msg, Runnable yes, Runnable no) {
+    boolean rc = MessageDialog.showDialogYesNo(null, msg, title, type);
+    if (rc) {
+      if (yes != null)
+        yes.run();
+    } else {
+      if (no != null)
+        no.run();
+    }
   }
 
 }

@@ -444,20 +444,20 @@ public class FileDataRecord extends Record {
 
           // show error dialog
           String title = "File Integrity Check FAILED";
-          boolean option = NotificationCenter.showYesNo(NotificationCenter.ERROR_MESSAGE, title, errorMsg, true);
-
-          if (option == true) {
-            // cleanup encrypted and plain file that may be partial
-            if (encDataFile != null) {
-              CleanupAgent.wipeOrDelete(encDataFile);
-              encDataFile = null;
+          Runnable yesRunnable = new Runnable() {
+            public void run() {
+              // cleanup encrypted and plain file that may be partial
+              if (encDataFile != null) {
+                CleanupAgent.wipeOrDelete(encDataFile);
+                encDataFile = null;
+              }
+              if (plainDataFile != null) {
+                CleanupAgent.wipeOrDelete(plainDataFile);
+                plainDataFile = null;
+              }
             }
-            if (plainDataFile != null) {
-              CleanupAgent.wipeOrDelete(plainDataFile);
-              plainDataFile = null;
-            }
-          }
-
+          };
+          NotificationCenter.showYesNo(NotificationCenter.ERROR_MESSAGE, title, errorMsg, true, yesRunnable, null);
         }
       } // end if destinationFile != null
 
