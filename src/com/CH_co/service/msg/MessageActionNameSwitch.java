@@ -125,7 +125,7 @@ public class MessageActionNameSwitch extends Object {
       // Remove Emails 
       { new Integer(CommandCodes.EML_Q_REMOVE), "Remove Email Address" },
       // Check for availability of Email Address
-      { new Integer(CommandCodes.EML_Q_CHECK_AVAIL), "Check availability of Email Address" },
+      { new Integer(CommandCodes.EML_Q_CHECK_AVAIL), "Check Availability" },
       // Lookup email addresses
       { new Integer(CommandCodes.EML_Q_LOOKUP_ADDR), "Lookup email address" },
 
