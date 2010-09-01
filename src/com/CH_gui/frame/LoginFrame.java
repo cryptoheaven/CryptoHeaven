@@ -24,6 +24,7 @@ import com.CH_co.service.records.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.*;
+import com.CH_co.service.msg.dataSets.Str_Rp;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
@@ -1671,7 +1672,7 @@ public class LoginFrame extends JFrame {
         performConnect();
         // try to login...
         loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"),
-                new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_a_Secure_Channel_and_Login"),
+                new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_Secure_Channel"),
                                 com.CH_gui.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
                                 //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"),
                                 com.CH_gui.lang.Lang.rb.getString("label_Load_Main_Program") } );
@@ -2039,12 +2040,16 @@ public class LoginFrame extends JFrame {
       Obj_List_Co chkRequest2 = new Obj_List_Co(set2);
       MessageAction chkAction2 = new MessageAction(CommandCodes.EML_Q_CHECK_AVAIL, chkRequest2);
       ClientMessageAction replyChkAction2 = MainFrame.getServerInterfaceLayer().submitAndFetchReply(chkAction2, 30000);
-      DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyChkAction2);
       if (replyChkAction2 != null && replyChkAction2.getActionCode() >= 0) {
         chkEmailOk = true;
       } else if (replyChkAction2 != null && replyChkAction2.getActionCode() < 0) {
         MessageDialog.showWarningDialog(null, "Email address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.", com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
+        // Suppress the generic error because we have a more user-friendly version below,
+        // and we still want to run the reply action to comply with SIL rules and progress monitors, etc.
+        if (replyChkAction2.getMsgDataSet() instanceof Str_Rp)
+          ((Str_Rp) replyChkAction2.getMsgDataSet()).message = null;
       }
+      DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyChkAction2);
 
       // username and email address check passed, create new user account now...
       if (chkEmailOk) {
