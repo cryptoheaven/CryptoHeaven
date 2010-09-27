@@ -495,7 +495,10 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     UserRecord defUsr = getDefaultUserSettings(newStatus);
     toUpgrade.notifyByEmail = new Short((short) upgradeUserSettingBits(toUpgrade.notifyByEmail, defUsr.notifyByEmail, keepOldPermits, EMAIL_MASK__NO_GRANT));
     toUpgrade.acceptingSpam = new Short((short) upgradeUserSettingBits(toUpgrade.acceptingSpam, defUsr.acceptingSpam, keepOldPermits, ACC_SPAM_MASK__NO_GRANT));
+    // Do not change the Key-On-Server flag as it would create inconsistency with actual key location.
+    boolean keyOnServer = Misc.isBitSet(toUpgrade.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
     toUpgrade.flags = new Long(upgradeUserSettingBits(toUpgrade.flags, defUsr.flags, keepOldPermits, FLAG_MASK__NO_GRANT));
+    toUpgrade.flags = (Long) Misc.setBitObj(keyOnServer, toUpgrade.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
     // make sure that "Send notifications by email" are off when there is no email address set.
     boolean validEmailFormat = EmailRecord.gatherAddresses(toUpgrade.emailAddress) != null;
     toUpgrade.notifyByEmail = new Short((short) Misc.setBit(validEmailFormat, toUpgrade.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
