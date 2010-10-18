@@ -148,7 +148,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private boolean isWaitingForMsgBody;
   private String no_selected_msg_html;
 
-  private QueueMM1 msgPreviewUpdateQueue;
   private Fifo msgPreviewUpdateFifo;
 
   private Vector componentsForPopupV = new Vector();
@@ -697,7 +696,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (msgLinkRecord != null && msgDataRecord != null) {
       msgLinkRecord.status = (Short) Misc.setBitObj(newHTMLstate == msgDataRecord.isHtmlMail(), msgLinkRecord.status, MsgLinkRecord.STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE);
       // Make the setting persistant
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { msgLinkRecord.msgLinkId, msgLinkRecord.status })), 30000, 3);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { msgLinkRecord.msgLinkId, msgLinkRecord.status })), 30000);
     }
 
     // make sure we update the GUI right away
@@ -1549,9 +1548,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       FetchedDataCache.getSingleInstance().removeMsgDataRecordListener(dataListener);
       dataListener = null;
     } 
-    if (msgPreviewUpdateQueue != null) {
-      msgPreviewUpdateQueue.kill();
-      msgPreviewUpdateQueue = null;
+    if (msgPreviewUpdateFifo != null) {
+      msgPreviewUpdateFifo.clear();
+      msgPreviewUpdateFifo.close();
+      msgPreviewUpdateFifo = null;
     }
     componentsForPopupV.clear();
   }
@@ -1637,7 +1637,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             jLoadingLabel.setVisible(true);
             // Prepare and send the request
             ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(previewMsgLink);
-            serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 60000, 3);
+            serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 60000);
             if (previewMsgData == null)
               previewMsgData = cache.getMsgDataRecord(previewMsgLink.msgId);
           }
@@ -1998,12 +1998,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   private synchronized void addToMsgPreviewUpdateQueue(MsgLinkRecord msgLinkRecord) {
-    if (msgPreviewUpdateQueue == null) {
+    if (msgPreviewUpdateFifo == null) {
       msgPreviewUpdateFifo = new Fifo();
-      msgPreviewUpdateQueue = new QueueMM1("Msg Preview Update Queue", msgPreviewUpdateFifo, new MsgPreviewUpdaterProcessor());
+      msgPreviewUpdateFifo.installSink("Msg Preview Update Queue", new MsgPreviewUpdaterProcessor());
     }
-    if (msgPreviewUpdateFifo != null)
-      msgPreviewUpdateFifo.add(msgLinkRecord);
+    msgPreviewUpdateFifo.add(msgLinkRecord);
   }
 
 } // end class MsgPreviewPanel

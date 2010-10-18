@@ -12,24 +12,23 @@
 
 package com.CH_gui.usrs;
 
-import com.CH_gui.util.ActionProducerI;
-import com.CH_gui.util.Images;
+import com.CH_gui.action.*;
+import com.CH_gui.actionGui.*;
+import com.CH_gui.dialog.*;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
+import com.CH_gui.util.ActionProducerI;
+import com.CH_gui.util.Images;
+
+import com.CH_co.util.*;
+import com.CH_co.trace.Trace;
 
 import java.awt.*;
 import java.awt.event.*;
 
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
-import com.CH_gui.dialog.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

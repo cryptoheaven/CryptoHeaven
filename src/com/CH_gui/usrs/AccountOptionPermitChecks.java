@@ -12,20 +12,16 @@
 
 package com.CH_gui.usrs;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
+import com.CH_gui.gui.*;
 import com.CH_gui.util.MessageDialog;
+
+import com.CH_co.service.records.UserRecord;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.service.records.UserRecord;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

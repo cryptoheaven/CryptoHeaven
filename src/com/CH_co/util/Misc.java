@@ -32,6 +32,8 @@ import java.util.zip.*;
  */
 public class Misc extends Object {
 
+  public static boolean DEBUG_ON_MINIMIZE_STATIC_MEMORY_BUFFERS = false;
+
   private static DisposableObj systemExitObj;
 
   // Used for gui suppression.
@@ -72,6 +74,17 @@ public class Misc extends Object {
     return systemExitObj != null && systemExitObj instanceof AppletTypeI;
   }
 
+  public static void killSocket(Socket socket) {
+    try { socket.shutdownInput(); } catch (Throwable t) { }
+    try { socket.shutdownOutput(); } catch (Throwable t) { }
+    try { socket.close(); } catch (Throwable t) { }
+    try {
+      synchronized (socket) {
+        socket.notifyAll();
+      }
+    } catch (Throwable t) {
+    }
+  }
 
   /**
    * Set a flag to suppress all GUI, put it in Misc and not in MiscGUI because MiscGUI class loads some GUI components
@@ -266,24 +279,6 @@ public class Misc extends Object {
         strB.append("Iterator");
         objToStr(al, strB);
         strB.append(')');
-//      } else if (obj instanceof Map) {
-//        Map map = (Map) obj;
-//        Set keys = map.keySet();
-//        int len = map.size();
-//        strB.append("Map[len="); strB.append(len); strB.append("](");
-//        Iterator iter = keys.iterator();
-//        int i = 0;
-//        while (iter.hasNext()) {
-//          Object key = iter.next();
-//          Object value = map.get(key);
-//          objToStr(key, strB);
-//          strB.append('=');
-//          objToStr(value, strB);
-//          if (i+1 < len)
-//            strB.append(", ");
-//          i ++;
-//        }
-//        strB.append(')');
       } else if (obj instanceof String) {
         String str = (String) obj;
         // replace all \n with \n
@@ -297,11 +292,10 @@ public class Misc extends Object {
           strB.append(ch);
         }
         strB.append("\"");
-        //strB.append("\"" + obj + "\"");
       } else if (obj instanceof Number) {
-        strB.append("#" + obj);
+        strB.append("#").append(obj);
       } else if (obj instanceof Boolean || obj instanceof Character) {
-        strB.append("'" + obj + "'");
+        strB.append("'").append(obj).append("'");
       } else {
         strB.append(obj);
         //toReadableOutput(obj.toString(), null, strB);

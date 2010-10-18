@@ -896,7 +896,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                 // Fetch any shares that are not in cache yet
                 if (shareIDsV.size() > 0) {
                   Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsV, Long.class);
-                  MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000, 3);
+                  MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000);
                 }
                 // See if we need to create any additional shares
                 ArrayList addSharesL = new ArrayList();
@@ -924,7 +924,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
                     // Fetch public key for 'toUserId' if not already fetched
                     KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
                     if (kRec == null || kRec.plainPublicKey == null) {
-                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000, 3);
+                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000);
                       kRec = cache.getKeyRecordForUser(toUserId);
                     }
                     newShare.seal(kRec);

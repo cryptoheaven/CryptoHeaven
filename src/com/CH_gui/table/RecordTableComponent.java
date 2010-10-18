@@ -1104,6 +1104,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           includingMsgBodies = true;
       }
       ((TextSearchFilter) filter).setIncludingMsgBodies(includingMsgBodies);
+      ((TextSearchFilter) filter).setSearchTextProvider(tableModel);
     }
     recordTableScrollPane.getTableModel().setFilterNarrowing(filter);
     showTableOrDelayedTemplate();

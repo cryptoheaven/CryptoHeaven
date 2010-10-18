@@ -12,11 +12,7 @@
 
 package com.CH_gui.msgs;
 
-import javax.swing.event.*;
-import javax.swing.text.*;
-
 import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
 
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -24,6 +20,8 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.frame.MainFrame;
+
+import javax.swing.event.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -96,7 +94,7 @@ public class MsgTypeListener extends Object implements DocumentListener {
         Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderShareRecordsForFolder(folderId));
         if (shareIDs != null && shareIDs.length > 0) {
           dataSet.objs = new Object[] { folderId, shareIDs };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TYPING, dataSet), 15000, 3);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TYPING, dataSet), 15000);
         }
       }
     }

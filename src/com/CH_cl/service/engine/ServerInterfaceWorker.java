@@ -71,7 +71,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private static final int DEBUG__REPLY_PACKET_DROP_FREQUENCY = 10;
 
   public static final long PING_PONG_INTERVAL = 1000 * 60 * 1; // 1 minute
-  private static final long PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK = 5; // zero for no pinging and exit after first ping delay
+  private static final long PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK = 1; // zero for no pinging and exit after first ping delay
 
   /** Worker's manager */
   private WorkerManagerI workerManager;
@@ -94,7 +94,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   /** Login message action that should be used for login. */
   private MessageAction loginMsgAction;
 
-  /** Temporary holder for login message attemtps. */
+  /** Temporary holder for login message attempts. */
   private MessageAction attemptLoginMessageAction;
   /** Flag which is set when Worker is quitting. */
   private boolean finished = false;
@@ -102,9 +102,6 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
   private final Object busyMonitor = new Object();
   private int busyCount = 0;
-
-  private long idleStartDate;
-  private final Object idleStartDateMonitor = new Object();
 
   private boolean isPersistantWorker = false;
 
@@ -131,7 +128,10 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "()");
     this.creationTimestamp = System.currentTimeMillis();
-    this.sessionContext = new ClientSessionContext(connectedSocket, requestSubmitter);
+    if (workerManager.isClientMode())
+      this.sessionContext = new ClientSessionContext(connectedSocket, requestSubmitter);
+    else
+      this.sessionContext = new ClientSessionContext(connectedSocket, requestSubmitter, false);
     this.workerManager = workerManager;
     this.replyFifoWriterI = replyFifoWriterI;
     this.requestPriorityFifoReaderI = requestPriorityFifoReaderI;
@@ -304,6 +304,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
       boolean cleanBreak = false;
       ClientMessageAction msgAction = null;
+      int prevMsgActionCode = 0;
       int msgActionCode = 0;
       long msgActionStamp = 0;
 
@@ -318,24 +319,18 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           // filled with the Message received.  Also set the context for lifetime of that action.
           DataInputStream2 dataIn = sessionContext.getDataInputStream2();
 
-          boolean validCode = false;
           // read the start byte from stream so we know that something is coming our way
           try {
             msgActionCode = ClientMessageAction.readActionCodeFromStream(dataIn);
-            // check the validity of the action code
-            String name = ClientActionSwitch.switchCodeToActionName(msgActionCode);
-            if (name != null) {
-              validCode = true;
-            }
           } catch (Throwable t) {
             if (trace != null) trace.exception(ReaderThread.class, 30, t);
-            validCode = false;
+            throw new IllegalStateException("Error reading Action Code, prevMsgActionCode="+prevMsgActionCode, t);
           }
-          if (!validCode) {
-            if (!workerManager.isLastLoginMsgActionSet()) {
-              // no-op
-            }
-            throw new IllegalStateException("Action code is not valid, connection broken.");
+
+          // check the validity of the action code
+          String name = ClientActionSwitch.switchCodeToActionName(msgActionCode);
+          if (name == null) {
+            throw new IllegalStateException("Action code is not valid, connection broken. msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode);
           }
 
           boolean suppressBusy = JobFifo.getJobType(msgActionCode) == JobFifo.JOB_TYPE_SEAMLESS;
@@ -406,6 +401,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             break;
           }
 
+          prevMsgActionCode = msgActionCode;
           msgAction = null;
           msgActionCode = 0;
           msgActionStamp = 0;
@@ -414,18 +410,21 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         // catch re-login try
       } catch (IOException ioX) {
         if (trace != null) trace.exception(ReaderThread.class, 100, ioX);
-
+        if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(ioX));
         // These should never happen, if so -- coding error.
-      }  catch (IllegalAccessException aX) {
+      } catch (IllegalAccessException aX) {
         if (trace != null) trace.exception(ReaderThread.class, 110, aX);
+        if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(aX));
       } catch (InstantiationException iX) {
         if (trace != null) trace.exception(ReaderThread.class, 120, iX);
+        if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(iX));
       } catch (ClassNotFoundException cX) {
         if (trace != null) trace.exception(ReaderThread.class, 130, cX);
-
+        if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(cX));
         // Finally catch all throwable runtime exceptions.
       } catch (Throwable t) {
         if (trace != null) trace.exception(ReaderThread.class, 200, t);
+        if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(t));
       }
 
       if (msgActionCode != 0) {
@@ -442,12 +441,17 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         // We need to wake-up any submitting threads should this transaction die.
         // All interruptable actions which did not see a reply must be processed as interrupted.
         synchronized (outgoingInterruptableActionsHM) {
-          Iterator iter = outgoingInterruptableActionsHM.values().iterator();
-          while (iter.hasNext()) {
-            MessageAction mAction = (MessageAction) iter.next();
-            InterruptMessageAction interruptAction = new InterruptMessageAction(mAction);
-            interruptAction.setClientContext(sessionContext);
-            replyFifoWriterI.add(interruptAction);
+          try {
+            Iterator iter = outgoingInterruptableActionsHM.values().iterator();
+            while (iter.hasNext()) {
+              MessageAction mAction = (MessageAction) iter.next();
+              InterruptMessageAction interruptAction = new InterruptMessageAction(mAction);
+              interruptAction.setClientContext(sessionContext);
+              replyFifoWriterI.add(interruptAction);
+            }
+          } catch (Throwable t) {
+            // catch all to allow the rest of the cleanup
+            t.printStackTrace();
           }
           outgoingInterruptableActionsHM.clear();
         }
@@ -456,6 +460,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       // Release worker incase exceptions caused the previous release to be skipped.
       synchronized (readerDoneMonitor) {
         readerDoneMonitor.notify();
+      }
+
+      if (trace != null) trace.data(300, "SIL Reader exits, server-mode="+(!workerManager.isClientMode())+", cleanBreak="+cleanBreak+", msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode);
+      if (!workerManager.isClientMode()) {
+        System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " exit! cleanBreak=" + cleanBreak + ", msgActionCode=" + msgActionCode+", prevMsgActionCode="+prevMsgActionCode);
       }
 
       if (trace != null) trace.exit(ReaderThread.class);
@@ -618,11 +627,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         while (!finished) {
 
           int round = 0;
-
-          synchronized (idleStartDateMonitor) {
-            idleStartDate = System.currentTimeMillis();
-          }
-
+          long idleStartDate = System.currentTimeMillis();
 
           // grab next message action from the queue
           while (msgAction == null && !finished) {
@@ -660,6 +665,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
                     msgAction = new MessageAction(CommandCodes.SYS_Q_PING, new PingPong_Cm());
                   } else {
                     // not main workers after sometime should quit, cleanly
+                    if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " chose not to send ping!  Finishing! isMainWorker()=" + isMainWorker() + ", pingPongStreakCount=" + pingPongStreakCount);
                     finished = true;
                     cleanLogout = true;
                   }
@@ -668,7 +674,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
                   if (trace != null) trace.data(25, "wait for requests in the queue");
                   // we must idle waiting for requests in the queue
                   try {
-                    requestPriorityFifoReaderI.wait(PING_PONG_INTERVAL + 100); // 100ms extra
+                    // calculate the remainder of time to the ping-pong interval
+                    long pingPongRemainder = PING_PONG_INTERVAL - (currentDate - idleStartDate);
+                    pingPongRemainder = Math.max(1L, pingPongRemainder); // always positive
+                    pingPongRemainder = Math.min(PING_PONG_INTERVAL, pingPongRemainder); // PING_PONG_INTERVAL is maximum incase clock changed
+                    requestPriorityFifoReaderI.wait(pingPongRemainder + 100); // 100ms extra
                   } catch (InterruptedException e) { }
                 }
               }
@@ -763,34 +773,42 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       // pushing it back to the queue for resend.
       } catch (SocketException e) {
         if (trace != null) trace.exception(WriterThread.class, 100, e);
+        if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exception:\n"+Misc.getStack(e));
       } catch (IOException e) {
         if (trace != null) trace.exception(WriterThread.class, 110, e);
+        if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exception:\n"+Misc.getStack(e));
       } catch (Throwable t) {
         if (trace != null) trace.exception(WriterThread.class, 120, t);
+        if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exception:\n"+Misc.getStack(t));
       }
 
-      if (!cleanLogout && msgAction != null) {
-        if (!msgAction.isCancelled()) {
-          if (JobFifo.isJobForRetry(msgAction)) {
-            // Get job's progress monitor
-            ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
-            // If PM was not cancelled (ie: got reply of storage exceeded)
-            // PM may be null if it was already destroyed.
-            if (pm == null || (!pm.isCancelled() && !pm.isJobKilled())) {
-              msgAction.markSendTry();
-              workerManager.pushbackRequest(msgAction);
+      try {
+        if (!cleanLogout && msgAction != null) {
+          if (!msgAction.isCancelled()) {
+            if (JobFifo.isJobForRetry(msgAction)) {
+              // Get job's progress monitor
+              ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+              // If PM was not cancelled (ie: got reply of storage exceeded)
+              // PM may be null if it was already destroyed.
+              if (pm == null || (!pm.isCancelled() && !pm.isJobKilled())) {
+                msgAction.markSendTry();
+                workerManager.pushbackRequest(msgAction);
 
-              if (pm != null)
-                pm.jobForRetry();
-              // Since we will retry this action, it is not yet done and should not be interrupted.
-              synchronized (outgoingInterruptableActionsHM) {
-                outgoingInterruptableActionsHM.remove(new Stamp(msgAction.getStamp()));
-              }
-              // Don't allow it to be killed so pretend nothing happend and it will be retried.
-              msgAction = null;
-            } // end if PM not cancelled
+                if (pm != null)
+                  pm.jobForRetry();
+                // Since we will retry this action, it is not yet done and should not be interrupted.
+                synchronized (outgoingInterruptableActionsHM) {
+                  outgoingInterruptableActionsHM.remove(new Stamp(msgAction.getStamp()));
+                }
+                // Don't allow it to be killed so pretend nothing happend and it will be retried.
+                msgAction = null;
+              } // end if PM not cancelled
+            }
           }
         }
+      } catch (Throwable t) {
+        // catch all to allow the rest of the cleanup to continue
+        t.printStackTrace();
       }
 
       // If not pushedback, then kill it, pushing back would set it to null...
@@ -815,13 +833,23 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         // Reader thread completes the actions by taking them out of the hash table by their stamp.
         // Those action cannot be retried because we don't know if they failed or not, we sent them but no replies yet.
         synchronized (outgoingInterruptableActionsHM) {
-          Iterator iter = outgoingInterruptableActionsHM.values().iterator();
-          while (iter.hasNext()) {
-            MessageAction mAction = (MessageAction) iter.next();
-            replyFifoWriterI.add(new InterruptMessageAction(mAction));
+          try {
+            Iterator iter = outgoingInterruptableActionsHM.values().iterator();
+            while (iter.hasNext()) {
+              MessageAction mAction = (MessageAction) iter.next();
+              replyFifoWriterI.add(new InterruptMessageAction(mAction));
+            }
+          } catch (Throwable t) {
+            // catch all to allow the rest of the cleanup to continue
+            t.printStackTrace();
           }
           outgoingInterruptableActionsHM.clear();
         }
+      }
+
+      if (trace != null) trace.data(300, "SIL Writer exits, server-mode="+(!workerManager.isClientMode())+", cleanLogout="+cleanLogout);
+      if (!workerManager.isClientMode()) {
+        System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exit! cleanLogout=" + cleanLogout);
       }
 
       if (trace != null) trace.exit(WriterThread.class);

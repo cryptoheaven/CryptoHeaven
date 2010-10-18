@@ -168,7 +168,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
               // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
               // use initial fetch size of MAX size because we are not waiting for multiple stages of fetching before continuing... probably should wait for completion or interruption of all stages
               Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(destPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, destPair.getFolderRecord().folderId, null, (short) Msg_GetMsgs_Rq.FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT, (Timestamp) null);
-              MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request), 120000, 3);
+              MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request), 120000);
             }
           }
 

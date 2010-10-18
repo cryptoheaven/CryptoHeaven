@@ -96,7 +96,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private final ArrayList workers = new ArrayList();
   /** All the ready messages go through this queue.
       No jobs are being run by that queue, they are handled to the submitting threads to be run. */
-  private QueueMM1 executionQueue;
+  private Fifo executionQueue;
   /** Job Queue */
   private JobFifo jobFifo;
   /** Waiting Jobs Scanner to relieve the waiting jobs for extensive periods of time,
@@ -105,7 +105,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /** The jobs that no one is waiting for are executed by the Independent queue.
       This queue ensures that jobs are executed in order that they arrive, and frees up the
       ExecutionQueue so that its not blocked while independent jobs are being run. */
-  private QueueMM1 independentExecutionQueue;
+  private Fifo independentExecutionQueue;
 
   /** List to put the waiting stamps. */
   private final ArrayList stampList = new ArrayList();
@@ -133,6 +133,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private static final int DELAY_PENALIZED_CONNECTION_TYPE = 5000;
   // always delay protocoled sockets just a tiny bit to allow plain Socket some advantage of being first to connect...
   private static final int DELAY_PROTOCOLED_CONNECTION  = 1500;
+  private static final int MAX_CONNECTION_DELAY = Math.max(DELAY_PENALIZED_CONNECTION_TYPE, DELAY_PROTOCOLED_CONNECTION);
 
   /**
    * Main Worker should send Ping-Pong to retain a persistant connection.
@@ -148,9 +149,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public Date lastWorkerActivityStamp;
   public boolean lastWorkerActivityResyncPending;
 
-  private BurstableMonitor burstableMonitorWorkerCreatings;
-  private BurstableMonitor burstableMonitorWorkerCreationTrials;
-  private BurstableMonitor burstableMonitorWorkersExceptions;
+  private BurstableBucket burstableMonitorWorkerCreatings;
+  private BurstableBucket burstableMonitorWorkerCreationTrials;
+  private BurstableBucket burstableMonitorWorkersExceptions;
 
   /**
    * Creates new ServerInterfaceLayer
@@ -222,14 +223,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
 
     // Create the execution queue
-    this.executionQueue = new QueueMM1("Execution Queue", new QueueExecutionFunction());
+    this.executionQueue = new Fifo();
+    this.executionQueue.installSink("Execution Queue", new QueueExecutionFunction());
 
     // Create the job queue
     this.jobFifo = new JobFifo();
 
     // Create the independent execution queue
     independentExecutor = independentExecutor != null ? independentExecutor : new IndependentClientQueueExecutionFunction(this);
-    this.independentExecutionQueue = new QueueMM1("Independent Exec Queue", independentExecutor);
+    this.independentExecutionQueue = new Fifo();
+    this.independentExecutionQueue.installSink("Independent Exec Queue", independentExecutor);
 
     // set MAX connection count
     if (fixedMaxConnectionCount == null) {
@@ -373,14 +376,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction)");
     if (trace != null) trace.args(msgAction);
     if (msgAction.isInterruptible()) // interruptable actions should pass interraptable objects down the reply chain, so use a thread that will wait for reply
-      submitAndReturn(msgAction, 0, 0, null, null, null);
+      submitAndReturn(msgAction, 0, null, null, null);
     else
       submitAndReturnNow(msgAction);
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
-  public void submitAndReturn(MessageAction msgAction, long timeout, int maxRetries) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout, int maxRetries)");
-    submitAndReturn(msgAction, timeout, maxRetries, null, null, null);
+  public void submitAndReturn(MessageAction msgAction, long timeout) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout)");
+    submitAndReturn(msgAction, timeout, null, null, null);
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
@@ -391,23 +394,19 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @param timeoutJob a runnable element when timeout is reached (afterJob and timeoutJob are exclusive, either one or the other)
    */
   public void submitAndReturn(final MessageAction msgAction, final long timeout, final Runnable afterJob, final Runnable timeoutJob) {
-    submitAndReturn(msgAction, timeout, 0, null, afterJob, timeoutJob);
+    submitAndReturn(msgAction, timeout, null, afterJob, timeoutJob);
   }
   public void submitAndReturn(final MessageAction msgAction, final long timeout, final Runnable replyReceivedJob, final Runnable afterJob, final Runnable timeoutJob) {
-    submitAndReturn(msgAction, timeout, 0, replyReceivedJob, afterJob, timeoutJob);
-  }
-  public void submitAndReturn(final MessageAction msgAction, final long timeout, final int maxRetries, final Runnable replyReceivedJob, final Runnable afterJob, final Runnable timeoutJob) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout, int maxRetries, final Runnable replyReceivedJob, Runnable afterJob, Runnable timeoutJob)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction msgAction, long timeout, final Runnable replyReceivedJob, Runnable afterJob, Runnable timeoutJob)");
     if (trace != null) trace.args(msgAction);
     if (trace != null) trace.args(timeout);
-    if (trace != null) trace.args(maxRetries);
     if (trace != null) trace.args(afterJob, timeoutJob);
 
     Thread th = new ThreadTraced("Job-Submitter-and-After-Job-Runner") {
       public void runTraced() {
         Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "submitAndReturn.runTraced()");
         try {
-          boolean noTimeout = submitAndWait(msgAction, timeout, maxRetries, replyReceivedJob);
+          boolean noTimeout = submitAndWait(msgAction, timeout, replyReceivedJob);
           if (noTimeout) {
             if (afterJob != null)
               afterJob.run();
@@ -454,7 +453,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // Rest after worker creating failure.
           // Stall the current thread for some 3 seconds on repetitive exception
           if (burstableMonitorWorkersExceptions == null)
-            burstableMonitorWorkersExceptions = new BurstableMonitor(2, 3000, 0);
+            burstableMonitorWorkersExceptions = new BurstableBucket(2, 0.333, true, 0);
           burstableMonitorWorkersExceptions.passThrough();
 
           // Schedule a retry in 30 seconds.
@@ -680,7 +679,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
    * @param timeout in milliseconds for each transaction, 0=infinite
    * @param msgAction the message action to be submitted.
-   * @return true if reply was recived in time, false when timeout reached.
+   * @return true if reply was received in time, false when timeout reached.
    */
   public boolean submitAndWait(MessageAction msgAction, long timeout) {
     return submitAndWait(msgAction, timeout, 0, null);
@@ -695,6 +694,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndWait(MessageAction msgAction, long timeout, int maxRetries, final Runnable replyReceivedJob)");
     if (trace != null) trace.args(msgAction);
     if (trace != null) trace.args(timeout);
+    if (trace != null) trace.args(maxRetries);
     if (trace != null) trace.args(replyReceivedJob);
 
     boolean noTimeout = true;
@@ -890,7 +890,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         for (int i=0; i<numberOfWorkersToCreate; i++) {
           // Control throughput of worker creation as a safety mechanism for server connectivity
           if (burstableMonitorWorkerCreatings == null)
-            burstableMonitorWorkerCreatings = new BurstableMonitor(2, 5000, 100); // max 2 workers in 5 seconds each at least 100ms apart
+            burstableMonitorWorkerCreatings = new BurstableBucket(2, 1.0/5.0, true, 100); // max 2 workers in 5 seconds each at least 100ms apart
           burstableMonitorWorkerCreatings.passThrough();
 
           ServerInterfaceWorker worker = null;
@@ -899,7 +899,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           for (int workerTrial=0; workerTrial<maxWorkerTrials; workerTrial++) {
             // Control throughput of trials as a safety mechanism for server connectivity
             if (burstableMonitorWorkerCreationTrials == null)
-              burstableMonitorWorkerCreationTrials = new BurstableMonitor(10, 5000, 100); // max 10 trials in 5 seconds each at least 100ms apart
+              burstableMonitorWorkerCreationTrials = new BurstableBucket(10, 1.0/5.0, true, 100); // max 10 trials in 5 seconds each at least 100ms apart
             burstableMonitorWorkerCreationTrials.passThrough();
 
             int[] hostIndexesToTry = null;
@@ -1196,7 +1196,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
       // Wait for established connection reasonable amount of time.
       try {
-        socketConnector.join(12000);
+        socketConnector.join(20000+MAX_CONNECTION_DELAY);
       } catch (InterruptedException e) {
       }
 
@@ -1240,7 +1240,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   private FifoWriterI getReplyFifoWriterI() {
-    return executionQueue.getFifoWriterI();
+    return executionQueue;
   }
 
 
@@ -1299,8 +1299,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     // kill the reply queue (execution queue)
     if (trace != null) trace.data(31, "killing execution queue");
     try {
-      executionQueue.getFifoWriterI().clear();
-      executionQueue.kill();
+      executionQueue.clear();
+      executionQueue.close();
       executionQueue = null;
     } catch (Throwable t) {
     }
@@ -1309,8 +1309,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     // kill the independentExecutionQueue
     if (trace != null) trace.data(33, "killing independent execution queue");
     try {
-      independentExecutionQueue.getFifoWriterI().clear();
-      independentExecutionQueue.kill();
+      independentExecutionQueue.clear();
+      independentExecutionQueue.close();
       independentExecutionQueue = null;
     } catch (Throwable t) {
     }
@@ -1586,6 +1586,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
+   * Client mode or Server mode
+   * @return
+   */
+  public boolean isClientMode() {
+    return isClient;
+  }
+
+  /**
    * @return true if the specified worker is registered as the Main Worker.
    */
   public boolean isMainWorker(ServerInterfaceWorker worker) {
@@ -1771,7 +1779,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             // those jobs are being run, plus it ensures the FCFS order of independent jobs.
             if (!destroyed) {
               synchronized (ServerInterfaceLayer.this) {
-                independentExecutionQueue.getFifoWriterI().add(nextMsgAction);
+                independentExecutionQueue.add(nextMsgAction);
               }
             }
           }

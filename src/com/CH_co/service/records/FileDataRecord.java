@@ -153,7 +153,7 @@ public class FileDataRecord extends Record {
       // create a temporary file for the encrypted data
       tempFile = File.createTempFile(TEMP_ENCRYPTED_FILE_PREFIX, null);
       tempFileOut = new FileOutputStream(tempFile);
-      BufferedOutputStream bufFileOut = new BufferedOutputStream(tempFileOut, 1024*32);
+      BufferedOutputStream bufFileOut = new BufferedOutputStream(tempFileOut, 1024*8);
       DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, new SHA256());
       //DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, MessageDigest.getInstance("SHA-1"));
       BlockCipherOutputStream cipherOut = new BlockCipherOutputStream(dFileOut, symmetricKey);

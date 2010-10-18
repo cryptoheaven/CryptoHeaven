@@ -12,21 +12,20 @@
 
 package comx.HTTP_Socket;
 
+import com.CH_co.trace.*;
+import comx.HTTP_Common.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-import com.CH_co.trace.*;
-
-import comx.HTTP_Common.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,7 +33,7 @@ import comx.HTTP_Common.*;
  *
  * <b>$Revision: 1.6 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class HTTP_Socket extends Socket {
 
@@ -50,10 +49,10 @@ public class HTTP_Socket extends Socket {
   private static int MIN_TIME_SOCKET_REMAKE_DELAY = 2000;
   private static int MAX_TIME_SOCKET_REMAKE_DELAY = 4000;
 
-  private static int CONNECTION_HTTP_TIMEOUT = 10000;
-  private static int CONNECTION_SOCKET_TIMEOUT = 5000;
+  private static int CONNECTION_HTTP_TIMEOUT = 15000;
+  private static int CONNECTION_SOCKET_TIMEOUT = 10000;
 
-  private static int MAX_SEND_TRIES = 300;
+  private static int MAX_SEND_TRIES = 30;
   private static int TIME_DELAY_AFTER_FAILED_SEND_TRY = 1000;
 
   private static int MIN_TIME_TO_WAIT_TO_REQUEST_REPLY__HTTP = 50;
@@ -171,11 +170,8 @@ public class HTTP_Socket extends Socket {
         socketTimeout[0] = true;
         socket = socketReturnBuf[0];
         try {
-          socketInput = new DataInputStream(new BufferedInputStream(socket.getInputStream(), socket.getReceiveBufferSize()));
-          //socketPrinter = new PrintStream(new BufferedOutputStream(socket.getOutputStream(), socket.getSendBufferSize()), false);
-          socketOutput = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream(), socket.getSendBufferSize()));
-          //socketInput = new DataInputStream(socket.getInputStream());
-          //socketPrinter = new PrintStream(socket.getOutputStream(), false);
+          socketInput = new DataInputStream(socket.getInputStream());
+          socketOutput = new DataOutputStream(socket.getOutputStream());
         } catch (Throwable t) {
           dumpSocket();
         }
@@ -254,8 +250,6 @@ public class HTTP_Socket extends Socket {
       if (trace != null) trace.data(10, "creating input stream pipes");
       recvPipeOut = new LargePipedOutputStream();
       recvPipeIn_Public = new LargePipedInputStream((LargePipedOutputStream) recvPipeOut, MAX_POST_DATA_SIZE);
-      //recvPipeOut = new BufferedOutputStream(recvPipeOut, MAX_POST_DATA_SIZE);
-      //recvPipeIn_Public = new BufferedInputStream(recvPipeIn_Public, MAX_POST_DATA_SIZE);
     }
     if (trace != null) trace.exit(HTTP_Socket.class, recvPipeIn_Public);
     return recvPipeIn_Public;
@@ -267,8 +261,6 @@ public class HTTP_Socket extends Socket {
       if (trace != null) trace.data(10, "creating output stream pipes");
       sendPipeOut_Public = new LargePipedOutputStream();
       sendPipeIn = new LargePipedInputStream((LargePipedOutputStream) sendPipeOut_Public, MAX_POST_DATA_SIZE);
-      //sendPipeOut_Public = new BufferedOutputStream(sendPipeOut_Public, MAX_POST_DATA_SIZE);
-      //sendPipeIn = new BufferedInputStream(sendPipeIn, MAX_POST_DATA_SIZE);
     }
     if (trace != null) trace.exit(HTTP_Socket.class, sendPipeOut_Public);
     return sendPipeOut_Public;
@@ -719,7 +711,6 @@ public class HTTP_Socket extends Socket {
               InputStream in = null;
               if (content instanceof InputStream)
                 in = (InputStream) content;
-              //in = new BufferedInputStream(in, 8*1024);
               {
                 if (insertError) {
                   System.out.println("~~~~~~~~~~ inserting error SendRecv in ~~~~~~~~~~~");
@@ -970,18 +961,18 @@ public class HTTP_Socket extends Socket {
       synchronized (recvFifo) {
         ArrayList chain = replyDS.chain;
         replyDS.chain = null;
-        Vector v = new Vector();
+        ArrayList list = new ArrayList();
         recvFifo.add(replyDS, replyDS.sequenceId);
-        v.addElement(replyDS);
+        list.add(replyDS);
         if (chain != null) {
           for (int i=0; i<chain.size(); i++) {
             DataSet ds = (DataSet) chain.remove(0);
             recvFifo.add(ds, ds.sequenceId);
-            v.addElement(ds);
+            list.add(ds);
           }
         }
-        for (int i=0; i<v.size(); i++) {
-          sentCacheFifo.manageCache((DataSet) v.elementAt(i), sendFifo);
+        for (int i=0; i<list.size(); i++) {
+          sentCacheFifo.manageCache((DataSet) list.get(i), sendFifo);
         }
       }
     }

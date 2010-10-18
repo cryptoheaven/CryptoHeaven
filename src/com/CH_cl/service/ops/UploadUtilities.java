@@ -12,9 +12,6 @@
 
 package com.CH_cl.service.ops;
 
-import java.io.File;
-import java.util.Vector;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.fld.*;
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -28,6 +25,9 @@ import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+
+import java.io.File;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -140,29 +140,29 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
       FetchedDataCache cache = null;
 
-      Vector dirsV = new Vector();
-      Vector filesV = new Vector();
+      ArrayList dirsL = new ArrayList();
+      ArrayList filesL = new ArrayList();
       // distinguish between files and directories
       for (int i=0; i<files.length; i++) {
         File file = files[i];
         if (file.isDirectory())
-          dirsV.addElement(file);
+          dirsL.add(file);
         else if (file.isFile())
-          filesV.addElement(file);
+          filesL.add(file);
         else
           throw new IllegalArgumentException("File not found: " + file);
       }
       // upload files
-      if (filesV.size() > 0) {
-        File[] f = new File[filesV.size()];
-        filesV.toArray(f);
+      if (filesL.size() > 0) {
+        File[] f = new File[filesL.size()];
+        filesL.toArray(f);
 
         runUploadFile(f, shareRecord, SIL, isThreadedRun);
       }
       // process directories
-      if (dirsV.size() > 0) {
-        File[] f = new File[dirsV.size()];
-        dirsV.toArray(f);
+      if (dirsL.size() > 0) {
+        File[] f = new File[dirsL.size()];
+        dirsL.toArray(f);
 
         for (int i=0; i<f.length; i++) {
 

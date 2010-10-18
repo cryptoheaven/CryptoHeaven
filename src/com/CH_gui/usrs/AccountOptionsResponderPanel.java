@@ -12,11 +12,16 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_gui.gui.*;
 import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
+import com.CH_guiLib.gui.*;
+
+import com.CH_co.nanoxml.*;
+import com.CH_co.service.records.AutoResponderRecord;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
@@ -25,16 +30,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.records.AutoResponderRecord;
-import com.CH_co.service.records.UserRecord;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

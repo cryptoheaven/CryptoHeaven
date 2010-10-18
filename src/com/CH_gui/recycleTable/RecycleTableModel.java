@@ -514,7 +514,7 @@ public class RecycleTableModel extends RecordTableModel {
                 if (!fetchedIds.contains(shareId)) fetchedIds.add(shareId);
               }
             };
-            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, 3, null, afterJob, afterJob);
+            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, null, afterJob, afterJob);
           }
           {
             // Request Msgs
@@ -534,7 +534,7 @@ public class RecycleTableModel extends RecordTableModel {
                   if (!fetchedIdsFull.contains(shareId)) fetchedIdsFull.add(shareId);
               }
             };
-            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, 3, null, afterJob, afterJob);
+            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, null, afterJob, afterJob);
           }
         }
       }

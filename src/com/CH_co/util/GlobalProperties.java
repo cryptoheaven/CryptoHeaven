@@ -206,12 +206,14 @@ public class GlobalProperties extends Object {
   // build 564 Rework of synchronization between SIL job submitter and responder.
   // build 566 Create TraceDiagnostics from common static code.
   // build 568 Fix broken auto-responder
+  // build 570 SIL-servant additional tracing and IP flooding prevention
+  // build 572 BurstableMonitor -> BurstableBucket, minimized SIL retries to login related actions only
 
-  public static final short PROGRAM_BUILD_NUMBER = 568;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 572;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.2f;
-  public static final short PROGRAM_VERSION_MINOR = 3;
+  public static final short PROGRAM_VERSION_MINOR = 4;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
 
@@ -341,11 +343,9 @@ public class GlobalProperties extends Object {
     addTempFileToCleanup(tempFile, "TempFilesFinalize");
   }
   private static void addTempFileToCleanup(File tempFile, String propertyName) {
-    tempFile.deleteOnExit();
     String tempFiles = GlobalProperties.getProperty(propertyName, "");
     tempFiles += ";" + tempFile.getAbsolutePath();
     GlobalProperties.setProperty(propertyName, tempFiles);
-    GlobalProperties.store();
   }
 
   /**

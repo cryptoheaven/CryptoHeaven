@@ -962,7 +962,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     if (SIL != null) {
       MessageAction msgAction = new MessageAction(CommandCodes.CNT_Q_GET_CONTACTS);
-      SIL.submitAndReturn(msgAction, 30000, 3);
+      SIL.submitAndReturn(msgAction, 30000);
     }
 
     if (trace != null) trace.exit(ContactActionTable.class);

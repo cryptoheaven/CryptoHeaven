@@ -436,7 +436,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       MsgLinkRecord[] existingMsgLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
       request.exceptLinkIDs = RecordUtils.getIDs(existingMsgLinks);
       MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_FULL, request);
-      SIL.submitAndReturn(msgAction, 30000, 3);
+      SIL.submitAndReturn(msgAction, 30000);
     }
 
     // wait until all folder fetching completes

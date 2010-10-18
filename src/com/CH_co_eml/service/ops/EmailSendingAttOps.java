@@ -45,6 +45,9 @@ import javax.swing.tree.*;
  */
 public class EmailSendingAttOps extends Object {
 
+  // Prevent chain letters from breaking the runtime by consuming all the memory
+  private static int MAX_ATTACHMENT_LEVELS = 10;
+
   /**
    * Fetches the message structure including all message and file attachments.
    * @return root of the tree which contains the complete nested message structure of message links and attached files.
@@ -93,7 +96,8 @@ public class EmailSendingAttOps extends Object {
         if (!isPrivileged) {
           data.setEncText(new BASymCipherBulk(new byte[0]));
         } else {
-          getAttachmentsRecur(dataAcquisitionHelper, fromUserId, child);
+          if (child.getLevel() < MAX_ATTACHMENT_LEVELS)
+            getAttachmentsRecur(dataAcquisitionHelper, fromUserId, child);
         }
       }
     }
@@ -224,8 +228,8 @@ public class EmailSendingAttOps extends Object {
    * This is to avoid loops to sending message to inside of the system.
    * @return msgRoot User Object holds the resulting MIME message
    */
-  public static void convertMessageTreeToMimeMessageFormat(DataAcquisitionHelperI dataAcquisitionHelper, DefaultMutableTreeNode msgRoot, String smtpHostProperty, String smtpHostValue, boolean includeReplyLink, boolean forExport) throws SQLException, MessagingException, IOException {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(EmailSendingAttOps.class, "convertMessageTreeToMimeMessageFormat(DataAcquisitionHelperI dataAcquisitionHelper, DefaultMutableTreeNode msgRoot, String smtpHostProperty, String smtpHostValue, boolean includeReplyLink, boolean forExport)");
+  public static void convertMessageTreeToMimeMessageFormat(DataAcquisitionHelperI dataAcquisitionHelper, DefaultMutableTreeNode msgRoot, String smtpHostProperty, String smtpHostValue, boolean includeReplyLink, boolean forExport, ArrayList returnTempFilesBufferL) throws SQLException, MessagingException, IOException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(EmailSendingAttOps.class, "convertMessageTreeToMimeMessageFormat(DataAcquisitionHelperI dataAcquisitionHelper, DefaultMutableTreeNode msgRoot, String smtpHostProperty, String smtpHostValue, boolean includeReplyLink, boolean forExport, ArrayList returnTempFilesBufferL)");
     if (trace != null) trace.args(dataAcquisitionHelper, msgRoot, smtpHostProperty, smtpHostValue);
     if (trace != null) trace.args(includeReplyLink);
     if (trace != null) trace.args(forExport);
@@ -323,7 +327,8 @@ public class EmailSendingAttOps extends Object {
         }
         part.setContent(body, contentType);
         //part.setText(body, "UTF-8", contentType.substring(contentType.indexOf('/')+1));
-        node.setUserObject(new Object[] { mimeMessage, mimeMultipart, mimeBodyPart, recs }); // keep a reference to recs so it doesn't get garbage collected before it is sent
+        // keep a reference to recs so it doesn't get garbage collected before it is sent
+        node.setUserObject(new Object[] { mimeMessage, mimeMultipart, mimeBodyPart, recs });
 
         // iterate through children and attach them to our multipart
         if (!node.isLeaf()) {
@@ -335,9 +340,13 @@ public class EmailSendingAttOps extends Object {
             if (childObjs[0] != null) {
               // serialize a message and attach as a file
               MimeMessage mm = (MimeMessage) childObjs[0];
-              ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-              mm.writeTo(buffer);
-              buffer.flush();
+              File tempFile = File.createTempFile(FileDataRecord.TEMP_PLAIN_FILE_PREFIX, null);
+              // once temporary file is created, add it to collection for removal after we are done with this message tree
+              returnTempFilesBufferL.add(tempFile);
+              FileOutputStream tempFileOut = new FileOutputStream(tempFile);
+              mm.writeTo(tempFileOut);
+              tempFileOut.flush();
+              tempFileOut.close();
               // take filename from the email because it already handles Records of Address type and Message type...
               String emlSubject = mm.getSubject();
               String filename = null;
@@ -348,7 +357,7 @@ public class EmailSendingAttOps extends Object {
               } else {
                 filename = FileTypes.getFileSafeShortString(emlSubject + ".eml");
               }
-              DataSource ds = new ByteArrayDataSource(buffer.toByteArray(), null, filename);
+              DataSource ds = new FileDataSource(tempFile);
               MimeBodyPart bodyPart = new MimeBodyPart();
               bodyPart.setDataHandler(new DataHandler(ds));
               bodyPart.setDisposition("attachment; filename=\"" + filename + "\"");
@@ -457,34 +466,6 @@ public class EmailSendingAttOps extends Object {
 
     if (trace != null) trace.exit(EmailSendingAttOps.class, recs);
     return recs;
-  }
-
-  /**
-   * Private class to convert a byte array to a data source
-   */
-  private static class ByteArrayDataSource implements DataSource {
-     byte[] bytes;
-     String contentType, name;
-     public ByteArrayDataSource(byte[] bytes, String contentType, String name) {
-        this.bytes = bytes;
-        if (contentType == null)
-           this.contentType = "application/octet-stream";
-        else
-           this.contentType = contentType;
-        this.name = name;
-     }
-     public String getContentType() {
-        return contentType;
-     }
-     public InputStream getInputStream() {
-        return new ByteArrayInputStream(bytes, 0, bytes.length);
-     }
-     public String getName() {
-        return name;
-     }
-     public OutputStream getOutputStream() throws IOException {
-        throw new FileNotFoundException();
-     }
   }
 
 }

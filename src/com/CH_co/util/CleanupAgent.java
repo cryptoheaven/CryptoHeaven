@@ -201,7 +201,7 @@ public class CleanupAgent extends Thread {
         // overwrite contents
         if (!file.canWrite()) {
           if (errBuffer != null) {
-            errBuffer.append(LangCo.rb.getString("msg_You_do_not_have_a_write_privilege_neccessary_to_wipe_the_contents_of_the_file_\n") + file.getAbsolutePath());
+            errBuffer.append(LangCo.rb.getString("msg_You_do_not_have_a_write_privilege_neccessary_to_wipe_the_contents_of_the_file_\n")).append(file.getAbsolutePath());
             errBuffer.append("\n\n");
           }
         }
@@ -245,7 +245,7 @@ public class CleanupAgent extends Thread {
     } catch (Throwable t) {
       rc = false;
       if (errBuffer != null) {
-        errBuffer.append(LangCo.rb.getString("msg_Error_occurred_while_attempting_to_securely_wipe_the_contents_of_the_file_\n") + file.getAbsolutePath() + "\n" + t.getMessage());
+        errBuffer.append(LangCo.rb.getString("msg_Error_occurred_while_attempting_to_securely_wipe_the_contents_of_the_file_\n")).append(file.getAbsolutePath()).append("\n").append(t.getMessage());
         errBuffer.append("\n\n");
       }
     }

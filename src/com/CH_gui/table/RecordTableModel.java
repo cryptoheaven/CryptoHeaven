@@ -141,8 +141,9 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
    */
   public synchronized void reInitData() {
     FolderPair fPair = getParentFolderPair();
-    if (fPair != null)
+    if (fPair != null) {
       initData(fPair.getId(), true);
+    }
   }
 
   public void setEditable(boolean b) {

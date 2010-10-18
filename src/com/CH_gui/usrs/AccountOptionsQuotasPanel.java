@@ -12,17 +12,6 @@
 
 package com.CH_gui.usrs;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
-import java.awt.*;
-import java.sql.*;
-import java.text.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
-import com.CH_co.gui.*;
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -30,6 +19,14 @@ import com.CH_co.util.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.sql.*;
+import java.text.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

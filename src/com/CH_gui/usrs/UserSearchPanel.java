@@ -12,26 +12,14 @@
 
 package com.CH_gui.usrs;
 
-import com.CH_gui.util.MiscGui;
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.MessageDialog;
-import com.CH_gui.util.ToolBarProducerI;
-import com.CH_gui.menuing.ToolBarModel;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import com.CH_gui.actionGui.JActionButton;
+import com.CH_gui.actionGui.*;
 import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.table.*;
 import com.CH_gui.userTable.*;
+import com.CH_gui.util.*;
+import com.CH_gui.menuing.ToolBarModel;
 
 import com.CH_guiLib.gui.*;
 
@@ -39,14 +27,18 @@ import com.CH_cl.service.actions.*;
 import com.CH_cl.service.actions.usr.*;
 import com.CH_cl.service.engine.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
-
-import com.CH_co.util.*;
 import com.CH_co.trace.*;
-import com.CH_gui.actionGui.JActionFrame;
+import com.CH_co.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

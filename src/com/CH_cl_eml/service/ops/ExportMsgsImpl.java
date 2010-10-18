@@ -26,6 +26,7 @@ import com.CH_co_eml.service.ops.EmailSendingAttOps;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 
 import javax.mail.internet.MimeMessage;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -83,6 +84,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
           String subject = EmailSendingAttOps.getSubjectForEmail(msgData);
           String filename = FileTypes.getFileSafeShortString(subject + " " + msgData.msgId + ".eml");
           exportProgress.addProgress("   " + filename);
+          ArrayList returnTempFilesBufferL = new ArrayList();
           try {
             // don't recreate already exported messages
             if (new File(destDir, filename).exists() == false) {
@@ -94,7 +96,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
 
               String smtpHostProperty = null; // EngineGlobalProperties.PROP_EMAIL_SMTP_HOST;
               String smtpHostValue = null; //EngineGlobalProperties.getProperty(smtpHostProperty);
-              EmailSendingAttOps.convertMessageTreeToMimeMessageFormat(dataHelper, msgRoot, smtpHostProperty, smtpHostValue, false, true); // the recipients are also set but from possibly truncated lists
+              EmailSendingAttOps.convertMessageTreeToMimeMessageFormat(dataHelper, msgRoot, smtpHostProperty, smtpHostValue, false, true, returnTempFilesBufferL); // the recipients are also set but from possibly truncated lists
               MimeMessage emailMessage = (MimeMessage) ((Object[]) msgRoot.getUserObject())[0];
               File outFile = new File(destDir, filename);
               outFile.createNewFile();
@@ -110,6 +112,11 @@ public class ExportMsgsImpl implements ExportMsgsI {
             String msg = t.getMessage();
             if (msg == null) msg = "";
             exportProgress.addProgress(" skipped due to ERROR: " + Misc.getClassNameWithoutPackage(t.getClass()) + " " + msg);
+          } finally {
+            // cleanup any temp files created during export
+            for (int z=0; z<returnTempFilesBufferL.size(); z++) {
+              CleanupAgent.wipeOrDelete((File) returnTempFilesBufferL.get(z));
+            }
           }
           exportProgress.addProgress("\n");
         }

@@ -49,12 +49,28 @@ public class ClientSessionContext extends CommonSessionContext {
   // through the same writer/reader pair that this message went through.
   private RequestSubmitterI requestSubmitter;
 
-  /** Creates new ClientSessionContext */
+  /**
+   * Creates new ClientSessionContext WITH rate control for CLIENT side use.
+   */
   public ClientSessionContext(Socket connectedSocket, RequestSubmitterI requestSubmitter) throws IOException {
     super(connectedSocket, SpeedLimiter.connInRate, SpeedLimiter.connOutRate, true);
-    //super(connectedSocket);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ClientSessionContext.class, "()");
-    if (trace != null) trace.args(connectedSocket);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ClientSessionContext.class, "ClientSessionContext(Socket connectedSocket, RequestSubmitterI requestSubmitter)");
+    if (trace != null) trace.args(connectedSocket, requestSubmitter);
+    this.requestSubmitter = requestSubmitter;
+    this.clientVersion = GlobalProperties.PROGRAM_VERSION;
+    this.clientRelease = GlobalProperties.PROGRAM_RELEASE;
+    this.clientBuild = GlobalProperties.PROGRAM_BUILD_NUMBER;
+    if (trace != null) trace.exit(ClientSessionContext.class);
+  }
+  /**
+   * Creates new ClientSessionContext without rate control for SERVER side use
+   */
+  public ClientSessionContext(Socket connectedSocket, RequestSubmitterI requestSubmitter, boolean isClientRateControlled) throws IOException {
+    super(connectedSocket);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ClientSessionContext.class, "ClientSessionContext(Socket connectedSocket, RequestSubmitterI requestSubmitter, boolean isClientRateControlled)");
+    if (trace != null) trace.args(connectedSocket, requestSubmitter);
+    if (trace != null) trace.args(isClientRateControlled);
+    if (isClientRateControlled) throw new IllegalArgumentException("For client side use different constructor!");
     this.requestSubmitter = requestSubmitter;
     this.clientVersion = GlobalProperties.PROGRAM_VERSION;
     this.clientRelease = GlobalProperties.PROGRAM_RELEASE;

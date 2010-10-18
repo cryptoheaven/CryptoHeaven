@@ -12,14 +12,12 @@
 
 package com.CH_cl.service.records.filters;
 
-import java.util.*;
-
-import com.CH_cl.service.cache.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.util.*;
+
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -127,7 +125,7 @@ public class TextSearchFilter extends AbstractRecordFilter implements RecordFilt
     }
     return match;
   }
-  
+
   public String getSearchStr() {
     return searchStr;
   }
@@ -138,5 +136,17 @@ public class TextSearchFilter extends AbstractRecordFilter implements RecordFilt
 
   public void setIncludingMsgBodies(boolean includeMsgBodies) {
     this.includeMsgBodies = includeMsgBodies;
+  }
+
+  public void setSearchTextProvider(SearchTextProviderI searchTextProvider) {
+    this.searchTextProvider = searchTextProvider;
+  }
+
+  public String toString() {
+    return "[TextSearchFilter"
+      + ": searchStr=" + searchStr
+      + ", includeMsgBodies=" + includeMsgBodies
+      + ", searchTextProvider=" + searchTextProvider
+      + "]";
   }
 }

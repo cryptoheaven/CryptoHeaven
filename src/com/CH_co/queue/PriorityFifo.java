@@ -21,9 +21,9 @@ import com.CH_co.trace.Trace;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -31,7 +31,7 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.13 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class PriorityFifo extends Object implements PriorityFifoWriterI, PriorityFifoReaderI {
 
@@ -41,11 +41,18 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
   public static final long PRIORITY_LOWEST = Long.MAX_VALUE;
 
   private LinkedList list;
+  /** Closed flag */
+  private boolean closed;
+
+  private ProcessingFunctionI processingFunction = null;
+  private String processingFunctionRunnerName = null;
+  private boolean isProcessingFunctionRunning = false;
 
   /** Creates new PriorityFifo */
   public PriorityFifo() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "PriorityFifo()");
     this.list = new LinkedList();
+    this.closed = false;
     if (trace != null) trace.exit(PriorityFifo.class);
   }
 
@@ -57,6 +64,9 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     if (trace != null) trace.args(obj);
     if (trace != null) trace.args(priority);
 
+    if (closed)
+      throw new IllegalStateException("Fifo is closed, no new items can be added.");
+
     if (priority < PRIORITY_HIGHEST || priority > PRIORITY_LOWEST)
       throw new IllegalArgumentException("Priority is out of supported range.");
 
@@ -64,7 +74,7 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     int index = 0;
     Iterator iter = list.iterator();
     while (iter.hasNext()) {
-      ObjectPair pair = (ObjectPair) 
+      ObjectPair pair = (ObjectPair)
       iter.next();
       if (pair.priority > priority)
         break;
@@ -75,6 +85,12 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     list.add(index, new ObjectPair(obj, priority));
 
     notifyAll();
+
+    // If sink installed, run it to consume the item.
+    if (processingFunction != null) {
+      consume();
+    }
+
     if (trace != null) trace.exit(PriorityFifo.class);
   }
 
@@ -84,6 +100,33 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     if (trace != null) trace.exit(PriorityFifo.class);
   }
 
+  private synchronized void consume() {
+    if (!isProcessingFunctionRunning) {
+      isProcessingFunctionRunning = true;
+      try {
+        Thread th = new Thread("Priority Fifo Consumer - " + processingFunctionRunnerName) {
+          public void run() {
+            while (true) {
+              Object obj = null;
+              synchronized (PriorityFifo.this) {
+                if (PriorityFifo.this.size() == 0) {
+                  isProcessingFunctionRunning = false;
+                  break;
+                } else {
+                  obj = PriorityFifo.this.remove();
+                }
+              }
+              try { processingFunction.processQueuedObject(obj); } catch (Throwable t) { }
+            }
+          }
+        };
+        th.setDaemon(true);
+        th.start();
+      } catch (Throwable t) {
+        isProcessingFunctionRunning = false;
+      }
+    }
+  }
 
   /** @return the next object in the fifo within specified priority bounds. */
   public synchronized Object remove(long higherInclusiveBound, long lowerInclusiveBound) {
@@ -147,6 +190,19 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "clear()");
     list.clear();
     if (trace != null) trace.exit(PriorityFifo.class);
+  }
+
+  /** Closes the Fifo, no new items will be accepted */
+  public synchronized void close() {
+    closed = true;
+  }
+
+  public synchronized PriorityFifo installSink(String runnerName, ProcessingFunctionI function) {
+    if (processingFunction != null)
+      throw new IllegalStateException("Sink already installed!");
+    processingFunction = function;
+    processingFunctionRunnerName = runnerName;
+    return this;
   }
 
   public synchronized Iterator iterator() {

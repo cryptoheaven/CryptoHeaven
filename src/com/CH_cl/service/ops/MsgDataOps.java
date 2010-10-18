@@ -46,7 +46,7 @@ public class MsgDataOps extends Object {
     } else {
       MsgLinkRecord mLink = cache.getMsgLinkRecord(msgLinkId);
       ProtocolMsgDataSet request = prepareRequestToFetchMsgBody(mLink);
-      SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000, 3);
+      SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000);
       // re-check the cache after request has completed
       mData = cache.getMsgDataRecord(msgId);
     }

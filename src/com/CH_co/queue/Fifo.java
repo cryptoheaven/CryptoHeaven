@@ -34,6 +34,10 @@ public class Fifo extends Object implements FifoReaderI, FifoWriterI {
   /** Closed flag */
   private boolean closed;
 
+  private ProcessingFunctionI processingFunction = null;
+  private String processingFunctionRunnerName = null;
+  private boolean isProcessingFunctionRunning = false;
+
   /** Creates new FIFO LinkedList */
   public Fifo() {
     closed = false;
@@ -61,7 +65,41 @@ public class Fifo extends Object implements FifoReaderI, FifoWriterI {
     count ++;
     if (trace != null) trace.data(20, "count="+count);
     notify();
+
+    // If sink installed, run it to consume the item.
+    if (processingFunction != null) {
+      consume();
+    }
+
     if (trace != null) trace.exit(Fifo.class);
+  }
+
+  private synchronized void consume() {
+    if (!isProcessingFunctionRunning) {
+      isProcessingFunctionRunning = true;
+      try {
+        Thread th = new Thread("Fifo Consumer - " + processingFunctionRunnerName) {
+          public void run() {
+            while (true) {
+              Object obj = null;
+              synchronized (Fifo.this) {
+                if (Fifo.this.size() == 0) {
+                  isProcessingFunctionRunning = false;
+                  break;
+                } else {
+                  obj = Fifo.this.remove();
+                }
+              }
+              try { processingFunction.processQueuedObject(obj); } catch (Throwable t) { }
+            }
+          }
+        };
+        th.setDaemon(true);
+        th.start();
+      } catch (Throwable t) {
+        isProcessingFunctionRunning = false;
+      }
+    }
   }
 
   /** 
@@ -124,6 +162,14 @@ public class Fifo extends Object implements FifoReaderI, FifoWriterI {
     while (size()>0)
       remove();
     if (trace != null) trace.exit(Fifo.class);
+  }
+
+  public synchronized Fifo installSink(String runnerName, ProcessingFunctionI function) {
+    if (processingFunction != null)
+      throw new IllegalStateException("Sink already installed!");
+    processingFunction = function;
+    processingFunctionRunnerName = runnerName;
+    return this;
   }
 
 }

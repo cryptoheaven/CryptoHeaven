@@ -24,7 +24,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -32,7 +32,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.14 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class SpeedLimiter extends Object {
 
@@ -47,6 +47,9 @@ public class SpeedLimiter extends Object {
   public static long globalCombinedRate = DEFAULT_THROUGHPUT;
   public static long connInRate = 0;
   public static long connOutRate = 0;
+
+  private static long totalByteCountRead;
+  private static long totalByteCountWritten;
 
   private static final LinkedList inboundStartDateMillisL = new LinkedList();
   private static final LinkedList inboundTotalBytesL = new LinkedList();
@@ -71,7 +74,7 @@ public class SpeedLimiter extends Object {
     if (PROPERTY_SAVE_ENABLED)
       readSpeedProperties();
 
-    // Make a thread to reset the global stats from time to time 
+    // Make a thread to reset the global stats from time to time
     // so that visual throughput display gets reset from time to time even if there are no requests
     // going through.
     Thread globalStatReseter = new ThreadTraced("Global Stat Reseter") {
@@ -156,13 +159,13 @@ public class SpeedLimiter extends Object {
         while (timeList.size() > 0) {
           long dateL = ((Long) timeList.getFirst()).longValue();
           // If expired or invalid date, remove it
-          if (dateL + KEEP_HISTORY_MILLIS < currentDateMillis || 
-              dateL > currentDateMillis) 
+          if (dateL + KEEP_HISTORY_MILLIS < currentDateMillis ||
+              dateL > currentDateMillis)
           {
             timeList.removeFirst();
             byteList.removeFirst();
           }
-          else 
+          else
             break;
         }
       }
@@ -170,12 +173,14 @@ public class SpeedLimiter extends Object {
   }
 
   public static void moreBytesRead(int additionalBytes) {
+    totalByteCountRead += additionalBytes;
     if (globalInRate > 0) {
       moreBytesSlowDown(additionalBytes, inboundStartDateMillisL, inboundTotalBytesL, globalInRate);
     }
     moreBytesGlobal(additionalBytes);
   }
   public static void moreBytesWritten(int additionalBytes) {
+    totalByteCountWritten += additionalBytes;
     if (globalOutRate > 0) {
       moreBytesSlowDown(additionalBytes, outboundStartDateMillisL, outboundTotalBytesL, globalOutRate);
     }
@@ -201,7 +206,7 @@ public class SpeedLimiter extends Object {
         // Don't update if the global counter has started less than 200 ms ago
         if (elapsedMillis > 200) {
           if (byteRate > (lastTransferUpdateRate * 1.3) || byteRate < (lastTransferUpdateRate / 1.3) ||
-              currentDateMillis - lastTransferUpdateDateMillis > 1000) 
+              currentDateMillis - lastTransferUpdateDateMillis > 1000)
           {
             Stats.setTransferRate(byteRate);
             lastTransferUpdateRate = byteRate;
@@ -213,7 +218,7 @@ public class SpeedLimiter extends Object {
   }
 
 
-  /** 
+  /**
    * @param elapsedMillis elapsed time from which statistics are counted.
    * @param totalBytes Total bytes transfered from the startDate
    * @param maxThroughput Maximum allowed throughput in kpbs (kilo bits per second)
@@ -241,7 +246,7 @@ public class SpeedLimiter extends Object {
         Thread.sleep(additionalWaitMills);
       } catch (InterruptedException e) {
         // Interruption here is OK.
-        // For example when writer of HEAVY job finished and interrupts the reader, 
+        // For example when writer of HEAVY job finished and interrupts the reader,
         // if the reader is sleaping here, it will wake up.
         /*
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SpeedLimitedInputStream.class, "exception handling in slowDown()");

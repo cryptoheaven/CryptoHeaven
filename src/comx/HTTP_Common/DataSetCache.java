@@ -62,11 +62,10 @@ public class DataSetCache extends Object {
     removeConfirmed(recivedDS.responseSequenceIdProcessed);
     // if retry capable packet
     if (recivedDS.responseSequenceIdAvailable != -1 && recivedDS.responseSequenceIdProcessed != -1) {
-    //if (recivedDS.sequenceId % DataSet.RETRY_PACKET_BATCH_SIZE == 0) {
       moveRetryPacketsToSend(sendFifo, recivedDS.responseSequenceIdAvailable, recivedDS.responseSequenceIdProcessed);
 //      if (cache.size() > 0) {
 //        synchronized (this) {
-//          StringBuffer sb = new StringBuffer("manageCache: size ");
+//          StringBuilder sb = new StringBuilder("manageCache: size ");
 //          sb.append(cache.size() + " : ");
 //          java.util.Iterator iter = cache.iterator();
 //          while (iter.hasNext())
@@ -95,18 +94,22 @@ public class DataSetCache extends Object {
   }
   
   private synchronized void moveToSend(OrderedFifo sendFifo, long hiIdToExclude) {
+    boolean isDebug = false;
     if (hiIdToExclude > -1) {
-      StringBuffer sb = new StringBuffer();
+      StringBuffer sb = null;
+      if (isDebug)
+        sb = new StringBuffer();
       while (cache.size() > 0 && ((DataSet) cache.peek()).sequenceId < hiIdToExclude) {
         DataSet cachedDS = (DataSet) cache.remove();
-        if (sb.length() == 0)
-          sb.append(" ++ PUSH BACK ");
-        sb.append(cachedDS.sequenceId + " ");
+        if (isDebug) {
+          if (sb.length() == 0)
+            sb.append(" ++ PUSH BACK ");
+          sb.append(cachedDS.sequenceId + " ");
+        }
         sendFifo.add(cachedDS, cachedDS.sequenceId);
       }
-      if (sb.length() > 0) {
-        //System.out.println(sb.toString());
-      }
+      if (isDebug && sb.length() > 0)
+        System.out.println(sb.toString());
     }
   }
 

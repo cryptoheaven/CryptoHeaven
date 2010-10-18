@@ -446,7 +446,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(draftMsgLink);
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, 3, null, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -533,7 +533,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(forwardMsg);
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, 3, null, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -577,7 +577,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(replyToMsg);
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, 3, null, updateGUIthreadSafe, updateGUIthreadSafe);
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -1725,12 +1725,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       Object[] emls = new Object[unknownEmailsV.size()];
       unknownEmailsV.toArray(emls);
       Object[] set = new Object[] { emls, Boolean.valueOf(convertNotHostedEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
-      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000, 3);
+      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
     }
     // fetch unknown users
     if (unknownUserIDsV.size() > 0) {
       if (trace != null) trace.data(50, unknownUserIDsV);
-      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000, 3);
+      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000);
     }
 
     if (trace != null) trace.data(60, "convert all EmailAddressRecords to UserRecords or ContactRecords");
