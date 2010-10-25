@@ -208,8 +208,10 @@ public class GlobalProperties extends Object {
   // build 568 Fix broken auto-responder
   // build 570 SIL-servant additional tracing and IP flooding prevention
   // build 572 BurstableMonitor -> BurstableBucket, minimized SIL retries to login related actions only
+  // build 574 Ping includes information regarding last reported network delay
+  // build 576 Speed Limited streams can calculate rate without limiting throughput, fixes with restoreVisuals() exception handling, private label enhancements for replyURL and support email template
 
-  public static final short PROGRAM_BUILD_NUMBER = 572;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 576;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.2f;

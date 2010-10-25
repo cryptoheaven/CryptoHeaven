@@ -151,6 +151,9 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     if (trace != null) trace.exit(ServerInterfaceWorker.class);
   }
 
+  protected long calculateRate() {
+    return sessionContext.calculateRate();
+  }
 
   private void markPersistant() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "markPersistant()");

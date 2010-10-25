@@ -545,6 +545,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       recordTableModel.updateHeaderDataFromTo(visuals, jSTable);
     } catch (Exception t) {
       if (trace != null) trace.exception(RecordTableScrollPane.class, 100, t);
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(RecordTableScrollPane.class);

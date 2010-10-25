@@ -323,7 +323,7 @@ public class EmailSendingAttOps extends Object {
         }
         if (node.isRoot() && includeReplyLink) {
           body += com.CH_co.service.ops.EmailSendingOps.getEmailBannerDivider(contentType);
-          body += com.CH_co.service.ops.EmailSendingOps.getSecureReplyBanner(data.senderUserId, data.getSubject(), contentType, null);
+          body += com.CH_co.service.ops.EmailSendingOps.getSecureReplyBanner(data.senderUserId, data.getSubject(), contentType, null, null);
         }
         part.setContent(body, contentType);
         //part.setText(body, "UTF-8", contentType.substring(contentType.indexOf('/')+1));

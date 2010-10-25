@@ -22,12 +22,12 @@ import java.util.*;
  * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class SpeedLimitedOutputStream extends OutputStream {
 
   private OutputStream out;
-  private long rate;
+  private long maxRate; // -1 to disable tracking and enforcement, 0 to enable tracking but disable enforcement
 
   private LinkedList startDateMillisL = new LinkedList();
   private LinkedList totalBytesL = new LinkedList();
@@ -35,13 +35,13 @@ public class SpeedLimitedOutputStream extends OutputStream {
   // if globaly hooked up, then the rate will be shared between all streams globaly hooked up
   private boolean globalRateHookup;
 
-  /** 
-   * Creates new SpeedLimitedOutputStream 
-   * @param rate Maximum allowed throughput in kpbs (kilo bits per second)
+  /**
+   * Creates new SpeedLimitedOutputStream
+   * @param maxRate Maximum allowed throughput in kpbs (kilo bits per second)
    */
-  public SpeedLimitedOutputStream(OutputStream out, long rate, boolean globalRateHookup) {
+  public SpeedLimitedOutputStream(OutputStream out, long maxRate, boolean globalRateHookup) {
     this.out = out;
-    this.rate = rate;
+    this.maxRate = maxRate;
     this.globalRateHookup = globalRateHookup;
   }
 
@@ -49,9 +49,13 @@ public class SpeedLimitedOutputStream extends OutputStream {
     if (globalRateHookup) {
       SpeedLimiter.moreBytesWritten(additionalBytes);
     }
-    if (rate > 0) {
-      SpeedLimiter.moreBytesSlowDown(additionalBytes, startDateMillisL, totalBytesL, rate);
+    if (maxRate >= 0) {
+      SpeedLimiter.moreBytesSlowDown(additionalBytes, startDateMillisL, totalBytesL, maxRate);
     }
+  }
+
+  public long calculateRate() {
+    return SpeedLimiter.calculateRate(startDateMillisL, totalBytesL);
   }
 
   public void write(int b) throws IOException {

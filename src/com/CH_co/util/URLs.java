@@ -49,6 +49,7 @@ public class URLs extends Object {
   public static int SERVICE_SOFTWARE_NAME;
 
   public static int SUPPORT_EMAIL;
+  public static int SUPPORT_BODY;
 
   public static int DOMAIN;
   public static int DOMAIN_MAIL;
@@ -154,8 +155,8 @@ public class URLs extends Object {
   private static void loadDefaults() {
     int i = 0;
 
-    customizationKeys = new String[28];
-    customizationStrings = new String[28];
+    customizationKeys = new String[29];
+    customizationStrings = new String[29];
 
     SERVICE_COMMUNITY_NAME = i;
     customizationKeys[i] = "SERVICE_COMMUNITY_NAME";
@@ -176,6 +177,15 @@ public class URLs extends Object {
     SUPPORT_EMAIL = i;
     customizationKeys[i] = "SUPPORT_EMAIL";
     customizationStrings[i] = "Support <support@cryptoheaven.com>"; i++;
+
+    SUPPORT_BODY = i;
+    customizationKeys[i] = "SUPPORT_BODY";
+    customizationStrings[i] = "Technical Support Form\n\n"+
+              "Please be as specific as possible when reporting any problems.\n\n"+
+              "If the problem is reproducible, please list the steps required to reproduce it.\n\n"+
+              "If the problem is not reproducible (only happened once, or occasionally for no apparent reason), please describe the circumstances in which it occurred and the symptoms observed: (note: it is much harder for us to fix non-reproducible bugs).\n\n"+
+              "If the problem causes any error messages to appear, please copy the exact text displayed and paste it here.\n\n";
+    i++;
 
     DOMAIN = i;
     customizationKeys[i] = "DOMAIN";
@@ -345,6 +355,10 @@ public class URLs extends Object {
       try {
         if (privateLabel.getSupportEmail() != null)
           customizationStrings[SUPPORT_EMAIL] = privateLabel.getSupportEmail();
+      } catch (Throwable t) { }
+      try {
+        if (privateLabel.getSupportEmailBody() != null)
+          customizationStrings[SUPPORT_BODY] = privateLabel.getSupportEmailBody();
       } catch (Throwable t) { }
       try {
         if (privateLabel.getWelcomeEmailFrom() != null)

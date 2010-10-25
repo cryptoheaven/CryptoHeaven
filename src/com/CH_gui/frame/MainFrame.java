@@ -964,18 +964,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request", getSupportMsgBodyTemplate());
+      new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request", URLs.get(URLs.SUPPORT_BODY));
     }
-  }
-
-  public static String getSupportMsgBodyTemplate() {
-    String msgPlainBody =
-              "Technical Support Form\n\n"+
-              "Please be as specific as possible when reporting any problems.\n\n"+
-              "If the problem is reproducible, please list the steps required to reproduce it.\n\n"+
-              "If the problem is not reproducible (only happened once, or occasionally for no apparent reason), please describe the circumstances in which it occurred and the symptoms observed: (note: it is much harder for us to fix non-reproducible bugs).\n\n"+
-              "If the problem causes any error messages to appear, please copy the exact text displayed and paste it here.\n\n";
-    return msgPlainBody;
   }
 
   private void exitAction() {

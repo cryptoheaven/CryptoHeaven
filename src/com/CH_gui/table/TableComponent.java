@@ -1080,6 +1080,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       setPreferredSize(new Dimension(width, height));
     } catch (Throwable t) {
       if (trace != null) trace.exception(TableComponent.class, 100, t);
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(TableComponent.class);

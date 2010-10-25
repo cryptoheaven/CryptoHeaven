@@ -261,6 +261,17 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class, this);
   }
 
+  public long calculateRate() {
+    long rate = 0;
+    synchronized (workers) {
+      for (int i=0; i<workers.size(); i++) {
+        ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
+        rate += worker.calculateRate();
+      }
+    }
+    return rate;
+  }
+
   private void randomizeList(List list, Random rnd) {
     int length = list.size();
     for (int i=0; i<length-1; i++) {

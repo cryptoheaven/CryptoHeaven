@@ -1212,6 +1212,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         setPreferredSize(new Dimension(width, height));
       } catch (Throwable t) {
         if (trace != null) trace.exception(RecordTableComponent.class, 100, t);
+        // reset the properties since they are corrupted
+        GlobalProperties.resetMyAndGlobalProperties();
       }
     }
 

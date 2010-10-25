@@ -96,7 +96,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
       public void actionPerformed(ActionEvent event) {
         File traceFile = TraceProperties.getLastTraceFile();
         TraceDiagnostics.traceStop();
-        new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request with Diagnostics", MainFrame.getSupportMsgBodyTemplate(), new File[] { traceFile });
+        new MessageFrame(new Record[] { new EmailAddressRecord(URLs.get(URLs.SUPPORT_EMAIL)) }, "Support Request with Diagnostics", URLs.get(URLs.SUPPORT_BODY), new File[] { traceFile });
         closeDialog();
       }
     });

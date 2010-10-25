@@ -38,7 +38,7 @@ public class SpeedLimiter extends Object {
 
   private static final boolean PROPERTY_SAVE_ENABLED = false;
 
-  private static final int DEFAULT_THROUGHPUT = 1024*8; // kbps
+  private static final int DEFAULT_THROUGHPUT = 0; // kbps, 0 for unlimited with rate tracking, -1 for unlimited without rate tracking
   public static final long KEEP_HISTORY_MILLIS = 3000; // 5 seconds of history
   public static final long MIN_GRANUALITY_MILLIS = 150; // make new entries into history no more often than GRANUALITY specified
 
@@ -118,6 +118,9 @@ public class SpeedLimiter extends Object {
     return sum;
   }
 
+  /**
+   * Adds byte count to the time-window lists, maintains current counts in lists, delays to enforce maxRate
+   */
   protected static void moreBytesSlowDown(int additionalBytes, LinkedList timeList, LinkedList byteList, long maxRate) {
     long elapsedMillis = 0;
     long totalBytes = 0;
@@ -151,6 +154,21 @@ public class SpeedLimiter extends Object {
       }
     }
     SpeedLimiter.slowDown(elapsedMillis, totalBytes, maxRate);
+  }
+
+  public static long calculateRate(LinkedList timeList, LinkedList byteList) {
+    long elapsedMillis = 0;
+    long totalBytes = 0;
+    synchronized (timeList) {
+      synchronized (byteList) {
+        long currentDateMillis = System.currentTimeMillis();
+        consumeExpiredHistory(timeList, byteList, currentDateMillis);
+        elapsedMillis = sumMillis(timeList, currentDateMillis);
+        totalBytes = sumBytes(byteList);
+      }
+    }
+    long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
+    return byteRate;
   }
 
   private static void consumeExpiredHistory(LinkedList timeList, LinkedList byteList, long currentDateMillis) {
@@ -200,7 +218,8 @@ public class SpeedLimiter extends Object {
         long currentDateMillis = System.currentTimeMillis();
         long elapsedMillis = sumMillis(globalStartDateMillisL, currentDateMillis);
         long totalBytes = sumBytes(globalTotalBytesL);
-        long byteRate = (long) (totalBytes / (elapsedMillis / 1000.0));
+        // avoid division by 0
+        long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
 
         // Update when rate changes more than 30% or is 1 second since last update has passed.
         // Don't update if the global counter has started less than 200 ms ago

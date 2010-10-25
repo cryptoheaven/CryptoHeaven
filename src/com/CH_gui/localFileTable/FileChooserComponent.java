@@ -200,6 +200,8 @@ public class FileChooserComponent extends JPanel implements ToolBarProducerI, Vi
       }
     } catch (Throwable t) {
       if (trace != null) trace.exception(FileChooserComponent.class, 100, t);
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(FileChooserComponent.class);

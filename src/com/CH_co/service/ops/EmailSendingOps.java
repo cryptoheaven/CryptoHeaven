@@ -33,11 +33,14 @@ public class EmailSendingOps {
     return bannerDivider;
   }
 
-  public static String getSecureReplyBanner(Long userId, String messageSubject, String contentType, String toEmailAddress) {
+  public static String getSecureReplyBanner(Long userId, String messageSubject, String contentType, String toEmailAddress, String replyPageURL) {
     String secureReplyBanner = "";
     if (contentType != null) {
       String subjectENC = "subject=" + java.net.URLEncoder.encode("Re: " + messageSubject);
-      String replyPage = URLs.get(URLs.REPLY_PAGE)+userId;
+      String replyPage = replyPageURL != null ? replyPageURL : URLs.get(URLs.REPLY_PAGE);
+      if (!replyPage.endsWith("?uId="))
+        replyPage += "?uId=";
+      replyPage += userId;
       String replyURL = replyPage+"&"+subjectENC;
       if (toEmailAddress != null && toEmailAddress.length() > 0) {
         String name = EmailRecord.getPersonalOrNick(toEmailAddress);

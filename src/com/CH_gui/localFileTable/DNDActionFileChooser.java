@@ -399,6 +399,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
       setCurrentDirectory(dir);
     } catch (Throwable t) {
       if (trace != null) trace.exception(DNDFileChooser.class, 100, t);
+      // reset the properties since they are corrupted
+      GlobalProperties.resetMyAndGlobalProperties();
     }
 
     if (trace != null) trace.exit(DNDFileChooser.class);

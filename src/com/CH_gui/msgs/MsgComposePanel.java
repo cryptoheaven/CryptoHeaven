@@ -665,9 +665,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   public void setBody(String body) {
     if (msgComponents != null) {
       if (msgComponents.getContentMode() == CONTENT_MODE_MAIL_HTML) {
-        msgComponents.getMsgTypeArea().setText("<html><body><p>"+Misc.encodePlainIntoHtml(body)+"</p></body></html>");
+        if (body.startsWith("<HTML>") || body.startsWith("<html>"))
+          msgComponents.getMsgTypeArea().setText(body);
+        else
+          msgComponents.getMsgTypeArea().setText("<html><body><p>"+Misc.encodePlainIntoHtml(body)+"</p></body></html>");
       } else if (msgComponents.getContentMode() == CONTENT_MODE_MAIL_PLAIN) {
-        msgComponents.getMsgTypeArea().setText(body);
+
+        if (body.startsWith("<HTML>") || body.startsWith("<html>"))
+          msgComponents.getMsgTypeArea().setText(MsgPanelUtils.extractPlainFromHtml(body));
+        else
+          msgComponents.getMsgTypeArea().setText(body);
       }
       msgComponents.getMsgTypeArea();
     }

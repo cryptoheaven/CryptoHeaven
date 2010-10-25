@@ -19,15 +19,15 @@ import java.util.*;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class SpeedLimitedInputStream extends InputStream {
 
   private InputStream in;
-  private long rate;
+  private long maxRate; // -1 to disable tracking and enforcement, 0 to enable tracking but disable enforcement
 
   private LinkedList startDateMillisL = new LinkedList();
   private LinkedList totalBytesL = new LinkedList();
@@ -35,13 +35,13 @@ public class SpeedLimitedInputStream extends InputStream {
   // if globaly hooked up, then the rate will be shared between all streams globaly hooked up
   private boolean globalRateHookup;
 
-  /** 
-   * Creates new SpeedLimitedInputStream 
-   * @param rate Maximum allowed throughput in kpbs (kilo bits per second)
+  /**
+   * Creates new SpeedLimitedInputStream
+   * @param maxRate Maximum allowed throughput in kpbs (kilo bits per second)
    */
-  public SpeedLimitedInputStream(InputStream in, long rate, boolean globalRateHookup) {
+  public SpeedLimitedInputStream(InputStream in, long maxRate, boolean globalRateHookup) {
     this.in = in;
-    this.rate = rate;
+    this.maxRate = maxRate;
     this.globalRateHookup = globalRateHookup;
   }
 
@@ -49,13 +49,13 @@ public class SpeedLimitedInputStream extends InputStream {
   private boolean CONNECTION_BREAK_TEST_ENABLED = false;
   private long totalBytes;
   public long testBreakBytes = -1;
-  
+
   private void checkSlowDown(int additionalBytes) throws IOException {
     if (globalRateHookup) {
       SpeedLimiter.moreBytesRead(additionalBytes);
     }
-    if (rate > 0) {
-      SpeedLimiter.moreBytesSlowDown(additionalBytes, startDateMillisL, totalBytesL, rate);
+    if (maxRate >= 0) {
+      SpeedLimiter.moreBytesSlowDown(additionalBytes, startDateMillisL, totalBytesL, maxRate);
     }
     if (CONNECTION_BREAK_TEST_ENABLED && testBreakBytes >= 0) {
       totalBytes += additionalBytes;
@@ -69,6 +69,9 @@ public class SpeedLimitedInputStream extends InputStream {
     }
   }
 
+  public long calculateRate() {
+    return SpeedLimiter.calculateRate(startDateMillisL, totalBytesL);
+  }
 
   public int available() throws IOException {
     return in.available();

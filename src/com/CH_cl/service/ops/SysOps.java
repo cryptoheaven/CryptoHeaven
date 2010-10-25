@@ -56,23 +56,23 @@ public class SysOps {
         //warning = "<html>Your account is due for renewal today.";
       } else if (balanceDays <= -3 && balanceDays >= -7) {
         // already expired but withing grace period 7 days...
-        error = "<html>Your account is past due for renewal.  Account expired on "+dateExpiredS+".  ";
+        error = "<html><font size='-1'>Your account is past due for renewal.  Account expired on "+dateExpiredS+".  ";
         if (uRec.isBusinessSubAccount())
           error += "To renew your account please contact your administrator.";
         else
           error += "<a href="+url+">Click here</a> to renew your account now.";
-        error += "</html>";
+        error += "</font></html>";
       } else if (balanceDays < -7) {
         if (balanceDays < -7 && balanceDays >= -15) {
-          error = "<html>Your account is expired since "+dateExpiredS+".  ";
+          error = "<html><font size='-1'>Your account is expired since "+dateExpiredS+".  ";
         } else if (balanceDays < -15) {
-          error = "<html>Your account is expired since "+dateExpiredS+" and will soon be deleted.  ";
+          error = "<html><font size='-1'>Your account is expired since "+dateExpiredS+" and will soon be deleted.  ";
         }
         if (uRec.isBusinessSubAccount())
           error += "To renew your account please contact your administrator.";
         else
           error += "<a href="+url+">Click here</a> to renew your account now.";
-        error += "</html>";
+        error += "</font></html>";
       }
 
       // don't bother sub-accounts with warinig messages
@@ -120,19 +120,19 @@ public class SysOps {
         String title = "Account Usage Notice";
         if (error) {
           if (uRec.isBusinessSubAccount()) {
-            String htmlText = "<html>Your account limits are exceeded, please contact your administrator to assign you larger quotas.</html>";
+            String htmlText = "<html><font size='-1'>Your account limits are exceeded, please contact your administrator to assign you larger quotas.</font></html>";
             cache.fireMsgPopupEvent(htmlText);
           } else {
-            String htmlText = "<html>Your account limits are exceeded, <a href="+urlStr+">click here</a> to upgrade.</html>";
+            String htmlText = "<html><font size='-1'>Your account limits are exceeded, <a href="+urlStr+">click here</a> to upgrade.</font></html>";
             cache.fireMsgPopupEvent(htmlText);
           }
         }
         else {
           if (uRec.isBusinessSubAccount()) {
-            String htmlText = "<html>Your account is near capacity, please contact your administrator to assign you larger quotas.</html>";
+            String htmlText = "<html><font size='-1'>Your account is near capacity, please contact your administrator to assign you larger quotas.</font></html>";
             cache.fireMsgPopupEvent(htmlText);
           } else {
-            String htmlText = "<html>Your account is near capacity, <a href="+urlStr+">click here</a> to upgrade.</html>";
+            String htmlText = "<html><font size='-1'>Your account is near capacity, <a href="+urlStr+">click here</a> to upgrade.</font></html>";
             cache.fireMsgPopupEvent(htmlText);
           }
         }
