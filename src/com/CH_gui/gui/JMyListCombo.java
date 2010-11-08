@@ -12,19 +12,17 @@
 
 package com.CH_gui.gui;
 
+import com.CH_co.util.*;
+
+import com.CH_gui.list.*;
 import com.CH_gui.util.Images;
+import com.CH_guiLib.gui.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.list.*;
-
-import com.CH_guiLib.gui.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -53,8 +51,8 @@ public class JMyListCombo extends JPanel {
   private EventListenerList myListenerList = new EventListenerList();
   private ObjectsProviderI provider;
 
-  /** 
-   * Creates new JMyListCombo 
+  /**
+   * Creates new JMyListCombo
    * @param index=0 is element in the list, index=1 is version of element displayed on top, index=2 custom action listener
    */
   public JMyListCombo(int initialSelection, ObjectsProviderI provider, ActionListener defaultActionListener) {
@@ -80,7 +78,7 @@ public class JMyListCombo extends JPanel {
     jLabel = new JMyButtonNoFocus(text, icon);
     jLabel.setToolTipText(tip);
     //jLabel.setBorder(new EmptyBorder(2, 0, 2, 0));
-    jLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
+    jLabel.setBorder(new EmptyBorder(2, 2, 2, 2));
     jLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
     jDropDown = new JMyButtonNoFocus(new JMyDropdownIcon());
@@ -90,9 +88,9 @@ public class JMyListCombo extends JPanel {
     EtchedBorder border = new EtchedBorder();
     setBorder(border);
     setLayout(new GridBagLayout());
-    add(jLabel, new GridBagConstraints(0, 0, 1, 1, 10, 10, 
+    add(jLabel, new GridBagConstraints(0, 0, 1, 1, 10, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-    add(jDropDown, new GridBagConstraints(1, 0, 1, 1, 0, 10, 
+    add(jDropDown, new GridBagConstraints(1, 0, 1, 1, 0, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     ActionListener popupAction = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -136,7 +134,7 @@ public class JMyListCombo extends JPanel {
             popup.add(menuItems[i]);
           }
           popup.pack();
-          // wrong-popup-location 
+          // wrong-popup-location
           // Point point = MiscGui.getSuggestedPopupLocation(JMyListCombo.this, popup);
           // popup.show(JMyListCombo.this, point.x, point.y);
           popup.show(JMyListCombo.this, 0, JMyListCombo.this.getSize().height);

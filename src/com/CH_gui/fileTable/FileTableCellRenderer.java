@@ -99,6 +99,7 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
 
       // set the FLAG
       else if (rawColumn == 0) {
+        setText("");
         if (value != null) {
           setBorder(RecordTableCellRenderer.BORDER_ICON);
           if (table instanceof JSortedTable) {
@@ -108,13 +109,24 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
               FileTableModel tableModel = (FileTableModel) rawModel;
               Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
               if (rec instanceof FileLinkRecord) {
-                FileLinkRecord fileLink = (FileLinkRecord) rec;
-
-                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
-                if (statRecord != null) {
-                  setIcon(Images.get(StatRecord.getIconForFlag((Short) value)));
-                  setText("");
-                  setToolTipText(StatRecord.getInfo((Short) value));
+                FileLinkRecord link = (FileLinkRecord) rec;
+                boolean isStarred = link.isStarred();
+                int flagIcon = ImageNums.IMAGE_NONE;
+                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_FILE);
+                if (statRecord != null)
+                  flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
+                if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {
+                  setIcon(Images.get(ImageNums.STAR_BRIGHTER));
+                  setToolTipText("Starred and Flagged");
+                } else if (isStarred) {
+                  setIcon(Images.get(ImageNums.STAR_BRIGHT));
+                  setToolTipText("Starred");
+                } else if (flagIcon != ImageNums.IMAGE_NONE) {
+                  setIcon(Images.get(flagIcon));
+                  setToolTipText(StatRecord.getInfo(statRecord.getFlag()));
+                } else {
+                  setIcon(Images.get(ImageNums.STAR_WIRE));
+                  setToolTipText(null);
                 }
               }
             }

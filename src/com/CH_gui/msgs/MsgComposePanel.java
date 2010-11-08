@@ -13,6 +13,7 @@
 package com.CH_gui.msgs;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -27,6 +28,7 @@ import java.util.*;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.event.MsgTypingListener;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
@@ -48,6 +50,7 @@ import com.CH_co.util.*;
 import com.CH_gui.action.*;
 import com.CH_gui.actionGui.*;
 import com.CH_gui.addressBook.*;
+import com.CH_gui.chatTable.ChatActionTable;
 import com.CH_gui.dialog.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
@@ -124,6 +127,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private boolean isSuppressInitialSignatures;
 
   private MsgComposeComponents msgComponents;
+  private TypingListener typingListener;
 
   // set when source of the message is a draft
   private MsgLinkRecord fromDraftMsgLink;
@@ -293,6 +297,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         }
       }
     });
+
+    typingListener = new TypingListener();
+    cache.addMsgTypingListener(typingListener);
 
     // Clear all changes when creating components with initial text
     undoMngr.discardAllEdits();
@@ -847,11 +854,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
    */
   private class SendAction extends AbstractActionTraced {
     public SendAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Send"), Images.get(ImageNums.MAIL_SEND16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Send_message"), Images.get(ImageNums.MAIL_SEND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Send_composed_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_SEND24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Send"));
+      putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
         putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Save"));
         putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Save_composed_address."));
@@ -2522,6 +2530,63 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
 
+  private class TypingListener implements MsgTypingListener {
+    public void msgTypingUpdate(EventObject event) {
+      // Exec on event thread to avoid potential GUI deadlocks
+      if (isChatComposePanel) {
+        Object s = event.getSource();
+        if (s instanceof Obj_List_Co) {
+          Obj_List_Co o = (Obj_List_Co) s;
+          Long userId = (Long) o.objs[0];
+          Long folderId = (Long) o.objs[1];
+          if (folderId != null) {
+            javax.swing.SwingUtilities.invokeLater(new TypingGUIUpdater(userId, folderId));
+          }
+        }
+      }
+    }
+  }
+
+
+  private class TypingGUIUpdater implements Runnable {
+    private long endTime;
+    private Long userId;
+    private Long folderId;
+    public TypingGUIUpdater(Long userId, Long folderId) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TypingGUIUpdater.class, "TypingGUIUpdater(Long userId, Long folderId)");
+      this.userId = userId;
+      this.folderId = folderId;
+      this.endTime = System.currentTimeMillis() + ChatActionTable.TYPING_NOTIFY_MILLIS;
+      if (trace != null) trace.exit(TypingGUIUpdater.class);
+    }
+    public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TypingGUIUpdater.class, "TypingGUIUpdater.run()");
+
+      Record r = MsgPanelUtils.convertUserIdToFamiliarUser(userId, false, true);
+      final String name = ListRenderer.getRenderedText(r);
+
+      Timer timer = new Timer(0, new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          JLabel jTyping = msgComponents.getTypingLabel();
+          if (folderId != null && folderId.equals(getTypeNotifyFolderId()) && System.currentTimeMillis() < endTime) {
+            jTyping.setText(name + " is typing a message...");
+            if (!jTyping.isVisible())
+              jTyping.setVisible(true);
+          } else {
+            ((Timer) e.getSource()).stop();
+            jTyping.setVisible(false);
+          }
+
+        }
+      });
+      timer.start();
+      timer.setDelay(1000);
+      // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
+      if (trace != null) trace.exit(TypingGUIUpdater.class);
+    }
+  }
+
+
   /***********************************************************
   *** T o o l B a r P r o d u c e r I    interface methods ***
   ***********************************************************/
@@ -2653,6 +2718,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       } catch (Throwable t) {
       }
     }
+    if (typingListener != null) {
+      cache.removeMsgTypingListener(typingListener);
+      typingListener = null;
+    }
     dropTargetV.clear();
     componentsForDNDV.clear();
     componentsForPopupV.clear();
@@ -2665,7 +2734,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   public Long getTypeNotifyFolderId() {
     Long folderId = null;
     Record[] recipients = selectedRecipients[MsgLinkRecord.RECIPIENT_TYPE_TO];
-    if (recipients != null && recipients.length == 1) {
+    if (recipients != null && recipients.length == 1 && recipients[0] != null) {
       folderId = recipients[0].getId();
     }
     return folderId;

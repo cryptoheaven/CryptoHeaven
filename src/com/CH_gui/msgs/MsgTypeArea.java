@@ -67,7 +67,8 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
   private KeyListener enterKeyListener;
   private KeyListener registeredEnterKeyListener;
 
-  private JMyLinkLikeLabel jHTML;
+//  private JMyLinkLikeLabel jHTML;
+  private JButton jHTML;
 
   private boolean isHTML;
   private String PROPERTY_NAME_isHTML_prefix = "MsgTypeArea" + "_isHTML";
@@ -159,9 +160,25 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
     jTextAreaPanel.setLayout(new BorderLayout(0, 0));
 
     if (isHTML) {
-      jHTML = new JMyLinkLikeLabel("Plain Text", -2);
+//      jHTML = new JMyLinkLikeLabel("Plain Text", -2);
+//      jHTML = new JMyButton("Use Basic Editor");
+      if (isChatMode)
+        jHTML = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_PLAIN));
+      else
+        jHTML = new JMyButtonNoFocus("Plain Text");
     } else {
-      jHTML = new JMyLinkLikeLabel("Rich Text", -2);
+//      jHTML = new JMyLinkLikeLabel("Rich Text", -2);
+//      jHTML = new JMyButton("Use Advanced Editor");
+      if (isChatMode)
+        jHTML = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_RICH));
+      else
+        jHTML = new JMyButtonNoFocus("Rich Text");
+    }
+    if (isChatMode) {
+      jHTML.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      jHTML.setBorder(new EmptyBorder(2, 2, 2, 2));
+    } else {
+      jHTML.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2)));
     }
     jHTML.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
@@ -293,7 +310,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
     return subject;
   }
 
-  public JMyLinkLikeLabel getHTMLSwitchButton() {
+  public JButton getHTMLSwitchButton() {
     return jHTML;
   }
 
@@ -506,7 +523,12 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
       if (isHTML) {
         jMessage = jHtmlMessage;
         //jHTML.setIcon(Images.get(ImageNums.TO_PLAIN40_16));
-        jHTML.setText("Plain Text");
+//        jHTML.setText("Plain Text");
+        //jHTML.setText("Use Basic Editor");
+        if (isChatMode)
+          jHTML.setIcon(Images.get(ImageNums.EDITOR_PLAIN));
+        else
+          jHTML.setText("Plain Text");
         // if there is no <html> or <p> then insert text between HTML armor
         String lowerText = text.toLowerCase();
         if (text.length() == 0 || text.trim().length() == 0) {
@@ -523,7 +545,11 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI {
       } else {
         jMessage = jTextMessage;
         //jHTML.setIcon(Images.get(ImageNums.TO_HTML40_16));
-        jHTML.setText("Rich Text");
+        //jHTML.setText("Use Advanced Editor");
+        if (isChatMode)
+          jHTML.setIcon(Images.get(ImageNums.EDITOR_RICH));
+        else
+          jHTML.setText("Rich Text");
       }
       textComp = getTextComponent();
       textComp.setText(text);

@@ -98,7 +98,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private JPanel jLineRecipients;
   private boolean lineRecipientsVisibilityAllowed;
   private JPanel jRecipients;
-  private JLabel jSubjectLabel;
+  private JLabel jStar;
   private JLabel jSubject;
   private JLabel jLoadingLabel;
   private JMyLinkLikeLabel jNotSpam;
@@ -115,6 +115,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private JTextField jPasswordField;
   private JComponent jMessage;
   private JMyLinkLikeLabel jHTML;
+//  private JButton jHTML;
   private JButton jAttachment;
   private boolean isAttachmentButton;
 
@@ -145,6 +146,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private static final String STR_SELECT_A_SINGLE_MESSAGE = "<html><p align=\"left\">To view a message in this reading window, click on a message in the list.<br>To select more then one, hold Shift or Control key and click the desired messages.</p></html>";
   private static final String STR_SELECT_A_SINGLE_ADDRESS = "<html><p align=\"left\">To view address details in this reading window, click on an address in the list.<br>To select more then one, hold Shift or Control key and click the desired addresses.</p></html>";
   private static final String STR_MSG_BODY_UNAVAILABLE = "<html><p align=\"left\">Message content is currently unavailable.  If this is a shared Inbox, folder owner <br>must access these messages before they will become available to other participants.</p></html>";
+  private static final String STR_LOADING = "Loading...";
   private boolean isWaitingForMsgBody;
   private String no_selected_msg_html;
 
@@ -298,8 +300,12 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
     if (isHTML) {
       jHTML = new JMyLinkLikeLabel("Plain Text", LINK_RELATIVE_FONT_SIZE);
+//      jHTML = new JMyButton("Plain Text");
+//      jHTML.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2)));
     } else {
       jHTML = new JMyLinkLikeLabel("Rich Text", LINK_RELATIVE_FONT_SIZE);
+//      jHTML = new JMyButton("Rich Text");
+//      jHTML.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2)));
     }
     jHTML.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
@@ -333,8 +339,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       }
     });
 
+    jStar = new JMyLabel();
+    jStar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    jStar.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        if (msgLinkRecord != null)
+          MsgActionTable.markStarred(new MsgLinkRecord[] { msgLinkRecord }, !msgLinkRecord.isStarred());
+      }
+    });
     jSubject = new JMyLabel();
-    jLoadingLabel = new JMyLabel("Loading...");
+    jLoadingLabel = new JMyLabel(STR_LOADING);
     jLoadingLabel.setVisible(false);
     jExpiration = new JMyLabel();
     jPasswordField = new JMyTextField(10);
@@ -543,9 +557,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     JLabel jMinHeight5 = new JMyLabel(" ");
     jLineSubject.add(jMinHeight5, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    jSubjectLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject"));
-//    jLineSubject.add(jSubjectLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-//          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+    jLineSubject.add(jStar, new GridBagConstraints(1, 0, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 3, 0, 3), 0, 0));
     jSubject.setFont(jSubject.getFont().deriveFont(Font.BOLD));
     jLineSubject.add(jSubject, new GridBagConstraints(2, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
@@ -753,18 +766,24 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       if (isHTML) {
         if (!msgDataRecord.isHtmlMail()) {
           jHTML.setText("Plain Text", LINK_BG_FOCUS_COLOR);
+//          jHTML.setText("Plain Text");
+//          jHTML.setBackground(LINK_BG_FOCUS_COLOR);
           if (!jHTML.isVisible()) jHTML.setVisible(true);
         } else {
           jHTML.setText("Plain Text");
+//          jHTML.setBackground(UIManager.getColor("Button.background"));
           boolean isPLAINpreferred = isDefaultToPLAINpreferred(msgDataRecord);
           if (jHTML.isVisible() != isPLAINpreferred) jHTML.setVisible(isPLAINpreferred);
         }
       } else {
         if (msgDataRecord.isHtmlMail()) {
           jHTML.setText("Rich Text", LINK_BG_FOCUS_COLOR);
+//          jHTML.setText("Rich Text");
+//          jHTML.setBackground(LINK_BG_FOCUS_COLOR);
           if (!jHTML.isVisible()) jHTML.setVisible(true);
         } else {
           jHTML.setText("Rich Text");
+//          jHTML.setBackground(UIManager.getColor("Button.background"));
           if (jHTML.isVisible()) jHTML.setVisible(false);
         }
       }
@@ -1345,7 +1364,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             break; // will come back here in a recursive call to set the actual text body...
           }
           if (text == null) {
-            text = STR_MSG_BODY_UNAVAILABLE;
+            if (msgDataRecord.getEncText() != null)
+              text = STR_MSG_BODY_UNAVAILABLE;
+            else
+              text = STR_LOADING;
             convertHTMLtoPLAIN = !isHTML;
             isWaitingForMsgBody = true;
           } else if (msgDataRecord.bodyPassHash != null && msgDataRecord.getTextBody() == null && msgDataRecord.getEncText() != null && msgDataRecord.getEncText().size() > 0) {
@@ -1356,7 +1378,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           }
           MsgPanelUtils.setPreviewContent_Threaded(text, isHTML, convertHTMLtoPLAIN, skipHeaderClearing, jMessage);
         } else {
-          MsgPanelUtils.setPreviewContent_Threaded(no_selected_msg_html, isHTML, false, true, jMessage);
+          MsgPanelUtils.setPreviewContent_Threaded(msgLinkRecord == null ? no_selected_msg_html : STR_LOADING, isHTML, false, true, jMessage);
           // Clear panels and make them original size.
           setRecipientsPanel(null, jRecipients, jLineRecipients);
           setAttachmentsButton();
@@ -1468,10 +1490,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       jPasswordField.setText("");
       jLinePassword.setVisible(isPassword);
       //if (isPassword) jLinePassword.requestFocus();
-      if (msgMode) {
-        jSubjectLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Subject"));
-      } else if (addrMode) {
-        jSubjectLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Name"));
+      if (addrMode) {
         setHTMLMode(true);
       }
     }
@@ -1639,9 +1658,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             jLoadingLabel.setVisible(true);
             // Prepare and send the request
             ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(previewMsgLink);
-            serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 60000);
-            if (previewMsgData == null)
-              previewMsgData = cache.getMsgDataRecord(previewMsgLink.msgId);
+            serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000);
           }
         } catch (Throwable t) {
           if (trace != null) trace.exception(getClass(), 100, t);
@@ -1732,6 +1749,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           jReplyTo.setText("");
           jLineReplyTo.setVisible(false);
           jRecipients.removeAll();
+          jStar.setIcon(null);
           jSubject.setIcon(null);
           jSubject.setText("");
           //jNotSpam.setText("");
@@ -1829,6 +1847,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             setAttachmentsPanel(msgLink, dataRecord, jAttachments, jLineAttachments);
           }
 
+          jStar.setIcon(Images.get(msgLink.isStarred() ? ImageNums.STAR_BRIGHT : ImageNums.STAR_WIRE));
           ImageText exp = dataRecord.getExpirationIconAndText(cache.getMyUserId());
           jExpiration.setIcon(Images.get(exp));
           jExpiration.setText(exp.getText());

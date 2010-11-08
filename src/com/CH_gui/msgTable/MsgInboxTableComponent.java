@@ -37,8 +37,8 @@ import com.CH_gui.table.*;
 public class MsgInboxTableComponent extends RecordTableComponent {
 
   /** Creates new MsgInboxTableComponent */
-  public MsgInboxTableComponent(boolean previewMode) {
-    super(new MsgInboxActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_INBOX), previewMode), Template.get(Template.EMPTY_MAIL));
+  public MsgInboxTableComponent(boolean previewMode, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new MsgInboxActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_INBOX), previewMode), Template.get(Template.EMPTY_MAIL), null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgInboxTableComponent.class, "MsgInboxTableComponent(boolean previewMode)");
     if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(MsgInboxTableComponent.class);

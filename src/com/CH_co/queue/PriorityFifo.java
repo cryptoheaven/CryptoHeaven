@@ -74,8 +74,7 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     int index = 0;
     Iterator iter = list.iterator();
     while (iter.hasNext()) {
-      ObjectPair pair = (ObjectPair)
-      iter.next();
+      ObjectPair pair = (ObjectPair) iter.next();
       if (pair.priority > priority)
         break;
       index ++;
@@ -84,7 +83,7 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     if (trace != null) trace.data(10, "insertion index", index);
     list.add(index, new ObjectPair(obj, priority));
 
-    notifyAll();
+    notify();
 
     // If sink installed, run it to consume the item.
     if (processingFunction != null) {

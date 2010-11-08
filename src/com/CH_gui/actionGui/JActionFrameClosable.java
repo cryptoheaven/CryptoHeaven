@@ -12,20 +12,18 @@
 
 package com.CH_gui.actionGui;
 
-import com.CH_gui.util.MiscGui;
-import com.CH_gui.util.ActionProducerI;
-import com.CH_gui.util.Images;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -211,7 +209,7 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   /**    A c t i o n   P r o d u c e r  I     **/
   /*********************************************/
 
-  /** @return all the acitons that this objects produces.
+  /** @return all the actions that this objects produces.
    */
   public Action[] getActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrameClosable.class, "getActions()");

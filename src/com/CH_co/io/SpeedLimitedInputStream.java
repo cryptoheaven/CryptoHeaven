@@ -29,8 +29,7 @@ public class SpeedLimitedInputStream extends InputStream {
   private InputStream in;
   private long maxRate; // -1 to disable tracking and enforcement, 0 to enable tracking but disable enforcement
 
-  private LinkedList startDateMillisL = new LinkedList();
-  private LinkedList totalBytesL = new LinkedList();
+  private LinkedList timeCountL = new LinkedList();
 
   // if globaly hooked up, then the rate will be shared between all streams globaly hooked up
   private boolean globalRateHookup;
@@ -55,7 +54,7 @@ public class SpeedLimitedInputStream extends InputStream {
       SpeedLimiter.moreBytesRead(additionalBytes);
     }
     if (maxRate >= 0) {
-      SpeedLimiter.moreBytesSlowDown(additionalBytes, startDateMillisL, totalBytesL, maxRate);
+      SpeedLimiter.moreBytesSlowDown(additionalBytes, timeCountL, maxRate);
     }
     if (CONNECTION_BREAK_TEST_ENABLED && testBreakBytes >= 0) {
       totalBytes += additionalBytes;
@@ -70,7 +69,7 @@ public class SpeedLimitedInputStream extends InputStream {
   }
 
   public long calculateRate() {
-    return SpeedLimiter.calculateRate(startDateMillisL, totalBytesL);
+    return SpeedLimiter.calculateRate(timeCountL);
   }
 
   public int available() throws IOException {

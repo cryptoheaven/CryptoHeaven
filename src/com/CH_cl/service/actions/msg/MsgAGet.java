@@ -12,22 +12,22 @@
 
 package com.CH_cl.service.actions.msg;
 
-import java.sql.Timestamp;
-import java.util.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.FolderRecUtil;
 
-import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 import com.CH_co.service.msg.*;
-import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.dataSets.stat.*;
+import com.CH_co.service.records.*;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -453,13 +453,10 @@ public class MsgAGet extends ClientMessageAction {
           numNew = (short) Math.max(numNew, Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE);
 
           Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, numNew, timeStamp);
-          MessageAction msgAction = null;
-          if (full) {
-            msgAction = new MessageAction(CommandCodes.MSG_Q_GET_FULL, request);
-          } else {
-            msgAction = new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request);
-          }
+          int actionCode = full ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
+          MessageAction msgAction = new MessageAction(actionCode, request);
           msgAction.setInterruptsFrom(this);
+          //msgAction.setPriority(PriorityJobFifo.MAIN_WORKER_HIGH_PRIORITY);
           getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
         }
       }

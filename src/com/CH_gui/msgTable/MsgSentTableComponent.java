@@ -36,8 +36,8 @@ import com.CH_gui.table.*;
 public class MsgSentTableComponent extends RecordTableComponent {
 
   /** Creates new MsgSentTableComponent */
-  public MsgSentTableComponent(boolean previewMode) {
-    super(new MsgSentActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_SENT), previewMode), Template.get(Template.EMPTY_MAIL_SENT));
+  public MsgSentTableComponent(boolean previewMode, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new MsgSentActionTable(new MsgTableModel(null, MsgTableModel.MODE_MSG_SENT), previewMode), Template.get(Template.EMPTY_MAIL_SENT), null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgSentTableComponent.class, "MsgSentTableComponent(boolean previewMode)");
     if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(MsgSentTableComponent.class);

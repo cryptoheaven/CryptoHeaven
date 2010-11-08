@@ -36,8 +36,8 @@ import com.CH_gui.table.*;
 public class GroupTableComponent extends RecordTableComponent {
 
   /** Creates new GroupTableComponent */
-  public GroupTableComponent() {
-    super(new GroupActionTable(), Template.get(Template.EMPTY_GROUP), Template.get(Template.BACK_GROUP), Template.get(Template.CATEGORY_GROUP));
+  public GroupTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new GroupActionTable(), Template.get(Template.EMPTY_GROUP), Template.get(Template.BACK_GROUP), Template.get(Template.CATEGORY_GROUP), suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableComponent.class, "GroupTableComponent()");
     if (trace != null) trace.exit(GroupTableComponent.class);
   }

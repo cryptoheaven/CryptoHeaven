@@ -134,9 +134,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   private Component categoryChatFolder;
   private Component categoryGroupFolder;
 
+  private boolean suppressToolbar, suppressUtilityBar, suppressVisualsSavable;
+
   /** Creates new TableComponent */
-  public TableComponent(String propertyName) {
+  public TableComponent(String propertyName, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
     this(propertyName, null);
+    this.suppressToolbar = suppressToolbar;
+    this.suppressUtilityBar = suppressUtilityBar;
+    this.suppressVisualsSavable = suppressVisualsSavable;
   }
   public TableComponent(String propertyName, Component welcomeScreen) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "TableComponent(String propertyName, Component welcomeScreen)");
@@ -301,7 +306,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initAddressTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (addressTableComponent == null) {
-        addressTableComponent = new AddressTableComponent(false);
+        addressTableComponent = new AddressTableComponent(false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(addressTableComponent);
@@ -316,7 +321,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initWhiteListTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (whiteListTableComponent == null) {
-        whiteListTableComponent = new WhiteListTableComponent(false);
+        whiteListTableComponent = new WhiteListTableComponent(false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(whiteListTableComponent);
@@ -331,7 +336,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initFileTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (fileTableComponent == null) {
-        fileTableComponent = new FileTableComponent();
+        fileTableComponent = new FileTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         // add previously registered folder selection listeners
         if (folderSelectionListeners != null) {
           EventListener[] listeners = folderSelectionListeners.getListeners(FolderSelectionListener.class);
@@ -354,7 +359,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initPostTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (postTableComponent == null) {
-        postTableComponent = new PostTableComponent();
+        postTableComponent = new PostTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(postTableComponent);
@@ -369,7 +374,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initChatTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (chatTableComponent == null) {
-        chatTableComponent = new ChatTableComponent();
+        chatTableComponent = new ChatTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         chatComposePanel = new MsgComposePanel(null, MsgDataRecord.OBJ_TYPE_MSG, true);
         if (chatTableComponent.getToolBarModel() != null) {
           chatTableComponent.getToolBarModel().addComponentActions(chatComposePanel);
@@ -390,7 +395,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (msgTableComponent == null) {
-        msgTableComponent = new MsgTableComponent();
+        msgTableComponent = new MsgTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(msgTableComponent);
@@ -405,7 +410,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgInboxTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (msgInboxTableComponent == null) {
-        msgInboxTableComponent = new MsgInboxTableComponent(false);
+        msgInboxTableComponent = new MsgInboxTableComponent(false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(msgInboxTableComponent);
@@ -420,7 +425,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgSentTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (msgSentTableComponent == null) {
-        msgSentTableComponent = new MsgSentTableComponent(false);
+        msgSentTableComponent = new MsgSentTableComponent(false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(msgSentTableComponent);
@@ -435,7 +440,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgSpamTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (msgSpamTableComponent == null) {
-        msgSpamTableComponent = new MsgSpamTableComponent(false);
+        msgSpamTableComponent = new MsgSpamTableComponent(false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(msgSpamTableComponent);
@@ -450,7 +455,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initMsgDraftsTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (msgDraftsTableComponent == null) {
-        msgDraftsTableComponent = new MsgDraftsTableComponent(false);
+        msgDraftsTableComponent = new MsgDraftsTableComponent(false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(msgDraftsTableComponent);
@@ -465,7 +470,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initKeyTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (keyTableComponent == null) {
-        keyTableComponent = new KeyTableComponent(FetchedDataCache.getSingleInstance().getKeyRecords());
+        keyTableComponent = new KeyTableComponent(FetchedDataCache.getSingleInstance().getKeyRecords(), suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(keyTableComponent);
@@ -480,7 +485,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initGroupTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (groupTableComponent == null) {
-        groupTableComponent = new GroupTableComponent();
+        groupTableComponent = new GroupTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(groupTableComponent);
@@ -495,7 +500,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "initRecycleTableComponent()");
     synchronized (initTableComponentMonitor) {
       if (recycleTableComponent == null) {
-        recycleTableComponent = new RecycleTableComponent();
+        recycleTableComponent = new RecycleTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
         Window w = SwingUtilities.windowForComponent(this);
         if (w != null && w instanceof JActionFrame) {
           ((JActionFrame) w).addComponentActions(recycleTableComponent);
@@ -605,12 +610,14 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       if (vs1 != null) {
         String key = MiscGui.getVisualsKeyName(vs1);
         String value = vs1.getVisuals();
-        GlobalProperties.setProperty(key, value);
+        if (key != null && value != null) // visuals maybe disabled so value would be null
+          GlobalProperties.setProperty(key, value);
       }
       if (vs2 != null) {
         String key = MiscGui.getVisualsKeyName(vs2);
         String value = vs2.getVisuals();
-        GlobalProperties.setProperty(key, value);
+        if (key != null && value != null) // visuals maybe disabled so value would be null
+          GlobalProperties.setProperty(key, value);
       }
 
       // remember the new mode
@@ -631,7 +638,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       switch (displayMode) {
         case FolderRecord.CATEGORY_MAIL_FOLDER:
           if (categoryMailFolder == null) {
-            RecordTableComponent table = new MsgTableComponent();
+            RecordTableComponent table = new MsgTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
             table.initData(new Long(FolderRecord.CATEGORY_MAIL_ID));
             categoryMailFolder = table;
           }
@@ -639,7 +646,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           break;
         case FolderRecord.CATEGORY_FILE_FOLDER:
           if (categoryFileFolder == null) {
-            RecordTableComponent table = new FileTableComponent();
+            RecordTableComponent table = new FileTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
             table.initData(new Long(FolderRecord.CATEGORY_FILE_ID));
             categoryFileFolder = table;
           }
@@ -647,7 +654,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           break;
         case FolderRecord.CATEGORY_CHAT_FOLDER:
           if (categoryChatFolder == null) {
-            RecordTableComponent table = new ChatTableComponent();
+            RecordTableComponent table = new ChatTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
             table.initData(new Long(FolderRecord.CATEGORY_CHAT_ID));
             categoryChatFolder = table;
           }
@@ -655,7 +662,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           break;
         case FolderRecord.CATEGORY_GROUP_FOLDER:
           if (categoryGroupFolder == null) {
-            RecordTableComponent table = new GroupTableComponent();
+            RecordTableComponent table = new GroupTableComponent(suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
             table.initData(new Long(FolderRecord.CATEGORY_GROUP_ID));
             categoryGroupFolder = table;
           }

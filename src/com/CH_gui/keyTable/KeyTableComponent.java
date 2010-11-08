@@ -25,7 +25,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -33,14 +33,14 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.15 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class KeyTableComponent extends RecordTableComponent {
 
 
   /** Creates new KeyTableComponent */
-  public KeyTableComponent() {
-    super(new KeyActionTable());
+  public KeyTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new KeyActionTable(), null, null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyTableComponent.class, "KeyTableComponent()");
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     setTitle(cache.getFolderRecord(cache.getUserRecord().keyFolderId));
@@ -48,8 +48,8 @@ public class KeyTableComponent extends RecordTableComponent {
   }
 
   /** Creates new KeyTableComponent */
-  public KeyTableComponent(KeyRecord[] initialData) {
-    super(new KeyActionTable(initialData));
+  public KeyTableComponent(KeyRecord[] initialData, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new KeyActionTable(initialData), null, null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyTableComponent.class, "KeyTableComponent(KeyRecord[] initialData)");
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord myUser = cache.getUserRecord();

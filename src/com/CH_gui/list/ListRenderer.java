@@ -123,7 +123,9 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
     else if (value instanceof ContactRecord) {
       ContactRecord cRec = (ContactRecord) value;
-      label = cRec.getNote(FetchedDataCache.getSingleInstance().getMyUserId());
+      Long myUserId = FetchedDataCache.getSingleInstance().getMyUserId();
+      if (myUserId != null)
+        label = cRec.getNote(myUserId);
     }
     else if (value instanceof FolderPair) {
       FolderPair fPair = (FolderPair) value;

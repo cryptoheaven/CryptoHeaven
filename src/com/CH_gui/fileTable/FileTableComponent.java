@@ -12,9 +12,6 @@
 
 package com.CH_gui.fileTable;
 
-import com.CH_gui.gui.Template;
-import java.awt.dnd.*;
-
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.gui.*;
@@ -26,7 +23,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,13 +31,19 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.16 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileTableComponent extends RecordTableComponent {
 
   /** Creates new FileTableComponent */
-  public FileTableComponent() {
-    super(new FileActionTable(), Template.get(Template.EMPTY_FILES), Template.get(Template.BACK_FILES), Template.get(Template.CATEGORY_FILE));
+//  public FileTableComponent() {
+//    super(new FileActionTable(), Template.get(Template.EMPTY_FILES), Template.get(Template.BACK_FILES), Template.get(Template.CATEGORY_FILE));
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableComponent.class, "FileTableComponent()");
+//    if (trace != null) trace.exit(FileTableComponent.class);
+//  }
+
+  public FileTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new FileActionTable(), Template.get(Template.EMPTY_FILES), Template.get(Template.BACK_FILES), Template.get(Template.CATEGORY_FILE), suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableComponent.class, "FileTableComponent()");
     if (trace != null) trace.exit(FileTableComponent.class);
   }
@@ -49,7 +52,7 @@ public class FileTableComponent extends RecordTableComponent {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableComponent.class, "initDataModel(Long folderId)");
     if (trace != null) trace.args(folderId);
     ((FileTableModel) getActionTable().getTableModel()).initData(folderId);
-    if (trace != null) trace.exit(FileTableComponent.class);  
+    if (trace != null) trace.exit(FileTableComponent.class);
   }
 
   /*******************************************************

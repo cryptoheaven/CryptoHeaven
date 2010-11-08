@@ -832,7 +832,7 @@ public class FetchedDataCache extends Object {
    ****************************************/
 
   /**
-   * Adds new records or record updates into the cach, unseals them and fires appropriate event.
+   * Adds new records or record updates into the cache, unseals them and fires appropriate event.
    */
   public void addFolderShareRecords(FolderShareRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderShareRecords(FolderShareRecord[])");
@@ -1885,19 +1885,20 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
-      // xxxx to-do: this should be after unwrap
-      // invalidate cached values for folders because rendering might have changed...
-      FolderRecord[] fRecs = getFolderRecords();
-      for (int i=0; i<fRecs.length; i++) {
-        fRecs[i].invalidateCachedValues();
-      }
-
       synchronized (this) {
         unWrapContactRecords(records);
         records = (ContactRecord[]) RecordUtils.merge(contactRecordMap, records);
       }
-
       fireContactRecordUpdated(records, RecordEvent.SET);
+
+      // Gather any folders that may use the contact name and dispatch event because rendering may need to change ... skip my own shares ...
+      Long[] contactUserIDs = ContactRecord.getInvolvedUserIDs(records);
+      contactUserIDs = (Long[]) ArrayUtils.getDifference(contactUserIDs, new Long[] { myUserId });
+      FolderShareRecord[] involvedShares = getFolderShareRecordsForUsers(contactUserIDs);
+      FolderRecord[] involvedFolders = getFolderRecords(FolderShareRecord.getFolderIDs(involvedShares));
+      for (int i=0; i<involvedFolders.length; i++)
+        involvedFolders[i].invalidateCachedValues();
+      fireFolderRecordUpdated(involvedFolders, RecordEvent.SET);
 
       // After notification is done, make previous status equal current status,
       // so that late unnecessary notification are not triggered when managing contacts.

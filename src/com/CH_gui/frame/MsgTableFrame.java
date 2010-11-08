@@ -110,19 +110,20 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         folderType == FolderRecord.RECYCLE_FOLDER) {
       // check for message folder types or special folders
       if (folderType == FolderRecord.ADDRESS_FOLDER) {
-        mainTableComponent = new AddressTableComponent(msgPreviewMode);
+        mainTableComponent = new AddressTableComponent(msgPreviewMode, false, false, false);
       } else if (folderType == FolderRecord.WHITELIST_FOLDER) {
-        mainTableComponent = new WhiteListTableComponent(msgPreviewMode);
+        mainTableComponent = new WhiteListTableComponent(msgPreviewMode, false, false, false);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().msgFolderId)) {
-        mainTableComponent = new MsgInboxTableComponent(msgPreviewMode);
+        mainTableComponent = new MsgInboxTableComponent(msgPreviewMode, false, false, false);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().junkFolderId)) {
-        mainTableComponent = new MsgSpamTableComponent(msgPreviewMode);
+        mainTableComponent = new MsgSpamTableComponent(msgPreviewMode, false, false, false);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().sentFolderId)) {
-        mainTableComponent = new MsgSentTableComponent(msgPreviewMode);
+        mainTableComponent = new MsgSentTableComponent(msgPreviewMode, false, false, false);
       } else if (folderPair != null && folderPair.getId().equals(FetchedDataCache.getSingleInstance().getUserRecord().draftFolderId)) {
-        mainTableComponent = new MsgDraftsTableComponent(msgPreviewMode);
+        mainTableComponent = new MsgDraftsTableComponent(msgPreviewMode, false, false, false);
       } else { // recycle and all other mail will default here
-        mainTableComponent = new MsgTableComponent(msgPreviewMode ? Template.get(Template.NONE) : Template.get(Template.EMPTY_MAIL), msgPreviewMode);
+        boolean suppressVisualsSavable = msgPreviewMode;
+        mainTableComponent = new MsgTableComponent(msgPreviewMode ? Template.get(Template.NONE) : Template.get(Template.EMPTY_MAIL), msgPreviewMode, false, false, suppressVisualsSavable);
       }
 
       short objType = (folderType == FolderRecord.ADDRESS_FOLDER || folderType == FolderRecord.WHITELIST_FOLDER) ? MsgDataRecord.OBJ_TYPE_ADDR : MsgDataRecord.OBJ_TYPE_MSG;
@@ -176,7 +177,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       }
       // posting folder
       else {
-        mainTableComponent = new PostTableComponent();
+        mainTableComponent = new PostTableComponent(false, false, false);
         mainComponent = mainTableComponent;
       }
     }

@@ -51,14 +51,9 @@ public class SpeedLimiter extends Object {
   private static long totalByteCountRead;
   private static long totalByteCountWritten;
 
-  private static final LinkedList inboundStartDateMillisL = new LinkedList();
-  private static final LinkedList inboundTotalBytesL = new LinkedList();
-
-  private static final LinkedList outboundStartDateMillisL = new LinkedList();
-  private static final LinkedList outboundTotalBytesL = new LinkedList();
-
-  private static final LinkedList globalStartDateMillisL = new LinkedList();
-  private static final LinkedList globalTotalBytesL = new LinkedList();
+  private static final LinkedList inboundTimeCountL = new LinkedList();
+  private static final LinkedList outboundTimeCountL = new LinkedList();
+  private static final LinkedList globalTimeCountL = new LinkedList();
 
   private static long lastTransferUpdateDateMillis;
   private static long lastTransferUpdateRate;
@@ -99,21 +94,21 @@ public class SpeedLimiter extends Object {
   }
 
 
-  private static long sumMillis(LinkedList timeList, long currentDateMillis) {
-    if (timeList.size() > 0)
-      return Math.max(0L, currentDateMillis - ((Long) timeList.getFirst()).longValue());
+  private static long sumMillis(LinkedList timeCountList, long currentDateMillis) {
+    if (timeCountList.size() > 0)
+      return Math.max(0L, currentDateMillis - ((TimeCountPair) timeCountList.getFirst()).getTime());
     else
       return 0;
   }
-  private static long sumBytes(LinkedList byteList) {
+  private static long sumBytes(LinkedList timeCountList) {
     long sum = 0;
-    Iterator iter = byteList.iterator();
+    Iterator iter = timeCountList.iterator();
 
     // skip the first value
     if (iter.hasNext()) iter.next();
 
     while (iter.hasNext()) {
-      sum += ((Long) iter.next()).longValue();
+      sum += ((TimeCountPair) iter.next()).getCount();
     }
     return sum;
   }
@@ -121,70 +116,58 @@ public class SpeedLimiter extends Object {
   /**
    * Adds byte count to the time-window lists, maintains current counts in lists, delays to enforce maxRate
    */
-  protected static void moreBytesSlowDown(int additionalBytes, LinkedList timeList, LinkedList byteList, long maxRate) {
+  protected static void moreBytesSlowDown(int additionalBytes, LinkedList timeCountList, long maxRate) {
     long elapsedMillis = 0;
     long totalBytes = 0;
-    synchronized (timeList) {
-      synchronized (byteList) {
-        long currentDateMillis = System.currentTimeMillis();
-        boolean added = false;
-        // if last entry is less than 200 ms away, add it to the last, else create a new one.
-
-        if (timeList.size() > 0) {
-          long lastUpdateMillis = ((Long) timeList.getLast()).longValue();
-          if (currentDateMillis - lastUpdateMillis < MIN_GRANUALITY_MILLIS) {
-            // leave the old--previous timestamp and add the bytes to the last entry already in the list
-            long lastBytes = ((Long) byteList.getLast()).longValue();
-            byteList.removeLast();
-            byteList.addLast(new Long(lastBytes + additionalBytes));
-            added = true;
-          }
+    synchronized (timeCountList) {
+      long currentDateMillis = System.currentTimeMillis();
+      boolean added = false;
+      // if last entry is less than 200 ms away, add it to the last, else create a new one.
+      if (timeCountList.size() > 0) {
+        TimeCountPair timeCount = (TimeCountPair) timeCountList.getLast();
+        long lastUpdateMillis = timeCount.getTime();
+        if (currentDateMillis - lastUpdateMillis < MIN_GRANUALITY_MILLIS) {
+          // leave the old--previous timestamp and add the bytes to the last entry already in the list
+          timeCount.addCount(additionalBytes);
+          added = true;
         }
-
-        if (!added) {
-          timeList.addLast(new Long(currentDateMillis));
-          byteList.addLast(new Long(additionalBytes));
-        }
-
-        // consume expired history
-        consumeExpiredHistory(timeList, byteList, currentDateMillis);
-        //System.out.println("additionalBytes="+additionalBytes+", list size="+timeList.size());
-        elapsedMillis = sumMillis(timeList, currentDateMillis);
-        totalBytes = sumBytes(byteList);
       }
+
+      if (!added) {
+        timeCountList.addLast(new TimeCountPair(currentDateMillis, additionalBytes));
+      }
+
+      // consume expired history
+      consumeExpiredHistory(timeCountList, currentDateMillis);
+      //System.out.println("additionalBytes="+additionalBytes+", list size="+timeList.size());
+      elapsedMillis = sumMillis(timeCountList, currentDateMillis);
+      totalBytes = sumBytes(timeCountList);
     }
     SpeedLimiter.slowDown(elapsedMillis, totalBytes, maxRate);
   }
 
-  public static long calculateRate(LinkedList timeList, LinkedList byteList) {
+  public static long calculateRate(LinkedList timeCountList) {
     long elapsedMillis = 0;
     long totalBytes = 0;
-    synchronized (timeList) {
-      synchronized (byteList) {
-        long currentDateMillis = System.currentTimeMillis();
-        consumeExpiredHistory(timeList, byteList, currentDateMillis);
-        elapsedMillis = sumMillis(timeList, currentDateMillis);
-        totalBytes = sumBytes(byteList);
-      }
+    synchronized (timeCountList) {
+      long currentDateMillis = System.currentTimeMillis();
+      consumeExpiredHistory(timeCountList, currentDateMillis);
+      elapsedMillis = sumMillis(timeCountList, currentDateMillis);
+      totalBytes = sumBytes(timeCountList);
     }
     long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
     return byteRate;
   }
 
-  private static void consumeExpiredHistory(LinkedList timeList, LinkedList byteList, long currentDateMillis) {
-    synchronized (timeList) {
-      synchronized (byteList) {
-        while (timeList.size() > 0) {
-          long dateL = ((Long) timeList.getFirst()).longValue();
-          // If expired or invalid date, remove it
-          if (dateL + KEEP_HISTORY_MILLIS < currentDateMillis ||
-              dateL > currentDateMillis)
-          {
-            timeList.removeFirst();
-            byteList.removeFirst();
-          }
-          else
-            break;
+  private static void consumeExpiredHistory(LinkedList timeCountList, long currentDateMillis) {
+    synchronized (timeCountList) {
+      while (timeCountList.size() > 0) {
+        long dateL = ((TimeCountPair) timeCountList.getFirst()).getTime();
+        // If expired or invalid date, remove it
+        if (dateL + KEEP_HISTORY_MILLIS < currentDateMillis || dateL > currentDateMillis) {
+          timeCountList.removeFirst();
+        } else {
+          break;
         }
       }
     }
@@ -193,19 +176,19 @@ public class SpeedLimiter extends Object {
   public static void moreBytesRead(int additionalBytes) {
     totalByteCountRead += additionalBytes;
     if (globalInRate > 0) {
-      moreBytesSlowDown(additionalBytes, inboundStartDateMillisL, inboundTotalBytesL, globalInRate);
+      moreBytesSlowDown(additionalBytes, inboundTimeCountL, globalInRate);
     }
     moreBytesGlobal(additionalBytes);
   }
   public static void moreBytesWritten(int additionalBytes) {
     totalByteCountWritten += additionalBytes;
     if (globalOutRate > 0) {
-      moreBytesSlowDown(additionalBytes, outboundStartDateMillisL, outboundTotalBytesL, globalOutRate);
+      moreBytesSlowDown(additionalBytes, outboundTimeCountL, globalOutRate);
     }
     moreBytesGlobal(additionalBytes);
   }
   private static void moreBytesGlobal(int additionalBytes) {
-    moreBytesSlowDown(additionalBytes, globalStartDateMillisL, globalTotalBytesL, globalCombinedRate);
+    moreBytesSlowDown(additionalBytes, globalTimeCountL, globalCombinedRate);
     updateTransferRateStats();
   }
 
@@ -213,24 +196,22 @@ public class SpeedLimiter extends Object {
    * Updates user displayable total throughput label.
    */
   private static void updateTransferRateStats() {
-    synchronized (globalStartDateMillisL) {
-      synchronized (globalTotalBytesL) {
-        long currentDateMillis = System.currentTimeMillis();
-        long elapsedMillis = sumMillis(globalStartDateMillisL, currentDateMillis);
-        long totalBytes = sumBytes(globalTotalBytesL);
-        // avoid division by 0
-        long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
+    synchronized (globalTimeCountL) {
+      long currentDateMillis = System.currentTimeMillis();
+      long elapsedMillis = sumMillis(globalTimeCountL, currentDateMillis);
+      long totalBytes = sumBytes(globalTimeCountL);
+      // avoid division by 0
+      long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
 
-        // Update when rate changes more than 30% or is 1 second since last update has passed.
-        // Don't update if the global counter has started less than 200 ms ago
-        if (elapsedMillis > 200) {
-          if (byteRate > (lastTransferUpdateRate * 1.3) || byteRate < (lastTransferUpdateRate / 1.3) ||
-              currentDateMillis - lastTransferUpdateDateMillis > 1000)
-          {
-            Stats.setTransferRate(byteRate);
-            lastTransferUpdateRate = byteRate;
-            lastTransferUpdateDateMillis = currentDateMillis;
-          }
+      // Update when rate changes more than 30% or is 1 second since last update has passed.
+      // Don't update if the global counter has started less than 200 ms ago
+      if (elapsedMillis > 200) {
+        if (byteRate > (lastTransferUpdateRate * 1.3) || byteRate < (lastTransferUpdateRate / 1.3) ||
+            currentDateMillis - lastTransferUpdateDateMillis > 1000)
+        {
+          Stats.setTransferRate(byteRate);
+          lastTransferUpdateRate = byteRate;
+          lastTransferUpdateDateMillis = currentDateMillis;
         }
       }
     }
@@ -312,4 +293,21 @@ public class SpeedLimiter extends Object {
     }
   }
 
+  private static class TimeCountPair {
+    private long time;
+    private long count;
+    private TimeCountPair(long time, long count) {
+      this.time = time;
+      this.count = count;
+    }
+    private void addCount(long additionalCount) {
+      count += additionalCount;
+    }
+    private long getCount() {
+      return count;
+    }
+    private long getTime() {
+      return time;
+    }
+  }
 }

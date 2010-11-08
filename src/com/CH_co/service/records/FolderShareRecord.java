@@ -23,10 +23,10 @@ import com.CH_co.util.*;
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p>  
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderShareRecord extends Record implements LinkRecordI {
 
@@ -119,8 +119,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Seals the <code> folderName, folderDesc, symmetricKey </code> 
-   * into <code> encFolderName, encFolderDesc, encSymmetricKey </code> 
+   * Seals the <code> folderName, folderDesc, symmetricKey </code>
+   * into <code> encFolderName, encFolderDesc, encSymmetricKey </code>
    * using the sealant object which is the Key Record and BASymmetricKey.
    * Also sets pubKeyId.
    */
@@ -143,8 +143,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   }
 
   /**
-   * Seals the <code> folderName, folderDesc </code> 
-   * into <code> encFolderName, encFolderDesc </code> 
+   * Seals the <code> folderName, folderDesc </code>
+   * into <code> encFolderName, encFolderDesc </code>
    * using the sealant object which is the BASymmetricKey of this record.
    */
   public void seal() {
@@ -169,8 +169,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Seals the <code> folderName, folderDesc, symmetricKey </code> 
-   * to <code> encFolderName, endFolderDesc, encSymmetricKey </code> 
+   * Seals the <code> folderName, folderDesc, symmetricKey </code>
+   * to <code> encFolderName, endFolderDesc, encSymmetricKey </code>
    * using the sealant object which is the owner's symKeyFldShares.
    */
   public void seal(BASymmetricKey symKeyFldShares) {
@@ -198,8 +198,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code> 
-   * into <code> folderName, folderDesc, symmetricKey </code> 
+   * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code>
+   * into <code> folderName, folderDesc, symmetricKey </code>
    * using the unSealant object which is the RSAPrivateKey and BASymmetricKey.
    */
   public void unSeal(RSAPrivateKey privateKey) {
@@ -238,8 +238,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code> 
-   * into <code> folderName, folderDesc, symmetricKey </code> 
+   * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code>
+   * into <code> folderName, folderDesc, symmetricKey </code>
    * using the unSealant object which is the user's symKeyFldShares.
    */
   public void unSeal(BASymmetricKey symKeyFldShares) {
@@ -290,8 +290,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
       Vector recsV = new Vector();
       for (int i=0; i<records.length; i++) {
         FolderShareRecord share = records[i];
-        if (share.isOwnedByUser() && 
-            ArrayUtils.find(desiredUserIDs, share.ownerUserId) >= 0 && 
+        if (share.isOwnedByUser() &&
+            ArrayUtils.find(desiredUserIDs, share.ownerUserId) >= 0 &&
             !recsV.contains(share))
           recsV.addElement(share);
       }
@@ -304,14 +304,14 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "FolderShareRecord[] shareRecords");
     if (trace != null) trace.args(shareRecords);
 
-    Vector folderIDsV = new Vector();
+    HashSet folderIDsHS = new HashSet();
     if (shareRecords != null) {
       for (int i=0; i<shareRecords.length; i++) {
-        if (folderIDsV.contains(shareRecords[i].folderId) == false)
-          folderIDsV.addElement(shareRecords[i].folderId);
+        if (folderIDsHS.contains(shareRecords[i].folderId) == false)
+          folderIDsHS.add(shareRecords[i].folderId);
       }
     }
-    Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsV, Long.class);
+    Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsHS, Long.class);
 
     if (trace != null) trace.exit(FolderShareRecord.class, folderIDs);
     return folderIDs;
@@ -324,7 +324,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     Vector ownerIDsV = new Vector();
     if (shareRecords != null) {
       for (int i=0; i<shareRecords.length; i++) {
-        if (shareRecords[i].ownerType.shortValue() == Record.RECORD_TYPE_GROUP && 
+        if (shareRecords[i].ownerType.shortValue() == Record.RECORD_TYPE_GROUP &&
             ownerIDsV.contains(shareRecords[i].ownerUserId) == false)
           ownerIDsV.addElement(shareRecords[i].ownerUserId);
       }
@@ -342,7 +342,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     Vector ownerIDsV = new Vector();
     if (shareRecords != null) {
       for (int i=0; i<shareRecords.length; i++) {
-        if (shareRecords[i].ownerType.shortValue() == Record.RECORD_TYPE_USER && 
+        if (shareRecords[i].ownerType.shortValue() == Record.RECORD_TYPE_USER &&
             ownerIDsV.contains(shareRecords[i].ownerUserId) == false)
           ownerIDsV.addElement(shareRecords[i].ownerUserId);
       }
@@ -401,7 +401,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public void merge(Record updated) {
     if (updated instanceof FolderShareRecord) {
       FolderShareRecord record = (FolderShareRecord) updated;
-      if (record.shareId        != null) shareId        = record.shareId;      
+      if (record.shareId        != null) shareId        = record.shareId;
       if (record.folderId       != null) folderId       = record.folderId;
       if (record.ownerType      != null) ownerType      = record.ownerType;
       if (record.ownerUserId    != null) ownerUserId    = record.ownerUserId;

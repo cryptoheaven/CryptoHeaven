@@ -23,7 +23,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -31,13 +31,13 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.1 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class RecycleTableComponent extends RecordTableComponent {
 
   /** Creates new RecycleTableComponent */
-  public RecycleTableComponent() {
-    super(new RecycleActionTable(), Template.get(Template.EMPTY_RECYCLE), Template.get(Template.NONE));
+  public RecycleTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new RecycleActionTable(), Template.get(Template.EMPTY_RECYCLE), Template.get(Template.NONE), null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleTableComponent.class, "RecycleTableComponent()");
     if (trace != null) trace.exit(RecycleTableComponent.class);
   }
@@ -46,7 +46,7 @@ public class RecycleTableComponent extends RecordTableComponent {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleTableComponent.class, "initDataModel(Long folderId)");
     if (trace != null) trace.args(folderId);
     ((RecycleTableModel) getActionTable().getTableModel()).initData(folderId);
-    if (trace != null) trace.exit(RecycleTableComponent.class);  
+    if (trace != null) trace.exit(RecycleTableComponent.class);
   }
 
   /*******************************************************

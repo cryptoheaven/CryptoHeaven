@@ -19,6 +19,8 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.dialog.SaveAttachmentsDialog;
+import com.CH_gui.fileTable.FileActionTable;
+import com.CH_gui.fileTable.FileTableModel;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
@@ -99,30 +101,53 @@ public class JSortedTable extends JTable implements DisposableObj {
             MouseEvent event = new MouseEvent(component, e.getID(), e.getWhen(), e.getModifiers(), cellX, cellY, e.getClickCount(), e.isPopupTrigger());
             ((HTML_ClickablePane) component).processMouseEvent(event);
           }
-          // if clicked at attachment icon then activate it
+
           TableModel tableModel = sTable.getRawModel();
+
+          // if clicked at attachment (1) icon or star (2) icon then activate it
           if (tableModel instanceof MsgTableModel) {
             MsgTableModel mtm = (MsgTableModel) tableModel;
             int rawColumn = mtm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
-            if (rawColumn == 1) {
+            if (rawColumn == 1 || rawColumn == 2) {
               int rawRow = sTable.convertMyRowIndexToModel(viewRow);
-              FetchedDataCache cache = FetchedDataCache.getSingleInstance();
               MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
-              MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
-              if (msgData != null) {
-                int numOfAttachments = 0;
-                if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
-                  numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
-                  // if regular email, don't show serialized email as attachment in the table...
-                  if (msgData.isEmail()) {
-                    numOfAttachments --;
+              if (rawColumn == 1) {
+                // attachments column
+                FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+                MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
+                if (msgData != null) {
+                  int numOfAttachments = 0;
+                  if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
+                    numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
+                    // if regular email, don't show serialized email as attachment in the table...
+                    if (msgData.isEmail()) {
+                      numOfAttachments --;
+                    }
+                  }
+                  if (numOfAttachments > 0) {
+                    Window w = SwingUtilities.windowForComponent(sTable);
+                    if (w instanceof Frame) new SaveAttachmentsDialog((Frame) w, new MsgLinkRecord[] { msgLink });
+                    else if (w instanceof Dialog) new SaveAttachmentsDialog((Dialog) w, new MsgLinkRecord[] { msgLink });
                   }
                 }
-                if (numOfAttachments > 0) {
-                  Window w = SwingUtilities.windowForComponent(sTable);
-                  if (w instanceof Frame) new SaveAttachmentsDialog((Frame) w, new MsgLinkRecord[] { msgLink });
-                  else if (w instanceof Dialog) new SaveAttachmentsDialog((Dialog) w, new MsgLinkRecord[] { msgLink });
-                }
+              } else if (rawColumn == 2) {
+                // flag column
+                MsgActionTable.markStarred(new MsgLinkRecord[] { msgLink }, !msgLink.isStarred());
+              }
+            }
+          }
+
+          // if clicked at star icon then activate it
+          if (tableModel instanceof FileTableModel) {
+            FileTableModel ftm = (FileTableModel) tableModel;
+            int rawColumn = ftm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
+            if (rawColumn == 0) {
+              // flag/star column
+              int rawRow = sTable.convertMyRowIndexToModel(viewRow);
+              FileRecord fileRec = (FileRecord) ftm.getRowObject(rawRow);
+              if (fileRec instanceof FileLinkRecord) {
+                FileLinkRecord fileLink = (FileLinkRecord) fileRec;
+                FileActionTable.markStarred(new FileLinkRecord[] { fileLink }, !fileLink.isStarred());
               }
             }
           }

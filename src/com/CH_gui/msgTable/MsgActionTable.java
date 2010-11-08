@@ -36,6 +36,7 @@ import com.CH_co.service.msg.dataSets.stat.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.monitor.*;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
@@ -110,10 +111,12 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   public static final int FILTER_ACTION = 27;
   private static final int DOWNLOAD_ACTION = 28;
   private static final int MSG_COMPOSE_ACTION = 29;
+  public static final int STAR_ADD_ACTION = 30;
+  public static final int STAR_REMOVE_ACTION = 31;
 
-  private static final int SORT_ASC_ACTION = 30;
-  private static final int SORT_DESC_ACTION = 31;
-  private static final int SORT_BY_FIRST_COLUMN_ACTION = 32;
+  private static final int SORT_ASC_ACTION = 32;
+  private static final int SORT_DESC_ACTION = 33;
+  private static final int SORT_BY_FIRST_COLUMN_ACTION = 34;
   private static final int CUSTOMIZE_COLUMNS_ACTION = SORT_BY_FIRST_COLUMN_ACTION + NUM_OF_SORT_COLUMNS;
 
   private static final int NUM_ACTIONS = CUSTOMIZE_COLUMNS_ACTION + 1;
@@ -197,6 +200,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     }
     actions[MARK_AS_READ_ACTION] = new MarkAsReadAction(leadingActionId + MARK_AS_READ_ACTION);
     actions[MARK_AS_UNREAD_ACTION] = new MarkAsUnreadAction(leadingActionId + MARK_AS_UNREAD_ACTION);
+    actions[STAR_ADD_ACTION] = new StarAddAction(leadingActionId + STAR_ADD_ACTION);
+    actions[STAR_REMOVE_ACTION] = new StarRemoveAction(leadingActionId + STAR_REMOVE_ACTION);
     if (!msgPreviewMode) {
       actions[MARK_ALL_READ_ACTION] = new MarkAllReadAction(leadingActionId + MARK_ALL_READ_ACTION);
       actions[OPEN_IN_SEPERATE_WINDOW_ACTION] = new OpenInSeperateWindowAction(leadingActionId + OPEN_IN_SEPERATE_WINDOW_ACTION);
@@ -999,7 +1004,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Read"), Images.get(ImageNums.FLAG_BLANK_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_messages_as_read."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_TOOL));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Read"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -1013,10 +1018,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
    */
   private class MarkAsUnreadAction extends AbstractActionTraced {
     public MarkAsUnreadAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unread"), Images.get(ImageNums.FLAG_GREEN_SMALL));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unread"), Images.get(ImageNums.FLAG_RED_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_messages_as_unread."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_GREEN24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_RED_TOOL));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Unread"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -1030,10 +1035,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
    */
   private class MarkAllReadAction extends AbstractActionTraced {
     public MarkAllReadAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Read"), Images.get(ImageNums.FLAG_BLANK_DOUBLE16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Read"), Images.get(ImageNums.FLAG_BLANK_DOUBLE_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_messages_in_selected_folder_as_read."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE_TOOL));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_All_Read"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -1042,8 +1047,31 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     }
   }
 
+  private class StarAddAction extends AbstractActionTraced {
+    public StarAddAction(int actionId) {
+      super(com.CH_gui.lang.Lang.rb.getString("action_Add_Star"), Images.get(ImageNums.STAR_BRIGHT));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      markSelectedStarred(true);
+    }
+  }
+
+  private class StarRemoveAction extends AbstractActionTraced {
+    public StarRemoveAction(int actionId) {
+      super(com.CH_gui.lang.Lang.rb.getString("action_Remove_Star"), Images.get(ImageNums.STAR_WIRE));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      markSelectedStarred(false);
+    }
+  }
+
   /**
-   * Open in seperate window
+  /**
+   * Open in separate window
    */
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
@@ -1419,6 +1447,27 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (trace != null) trace.exit(MsgActionTable.class);
   }
 
+  private void markSelectedStarred(boolean markStarred) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgActionTable.class, "markSelectedStarred(boolean markStarred)");
+    if (trace != null) trace.args(markStarred);
+    MsgLinkRecord[] records = (MsgLinkRecord[]) getSelectedRecords();
+    markStarred(records, markStarred);
+    if (trace != null) trace.exit(MsgActionTable.class);
+  }
+  public static void markStarred(MsgLinkRecord[] records, boolean markStarred) {
+    if (records != null && records.length > 0) {
+      for (int i=0; i<records.length; i++) {
+        MsgLinkRecord link = records[i];
+        if (link.isStarred() != markStarred) {
+          link.markStarred(markStarred);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { link.getId(), link.status })), 30000);
+        }
+      }
+//      // immediatelly update the cache without waiting on the results from the server
+//      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+//      cache.addMsgLinkRecords(records);
+    }
+  }
 
   /**
    * Move or Copy action has been activated, send an appropriate request.
@@ -1734,6 +1783,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     // Check for read and unread messages and if initiation contact with sender is ok.
     boolean anyRead = false;
     boolean anyUnread = false;
+    boolean anyStarred = false;
+    boolean anyUnstarred = false;
     boolean initiateContactOk = false;
     boolean anyMsgsSelected = false;
     boolean anyAddrsSelected = false;
@@ -1776,6 +1827,12 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
             else if (statRecord.mark.equals(StatRecord.FLAG_NEW))
               anyUnread = true;
           }
+        }
+        if (!(anyStarred && anyUnstarred)) {
+          if (records[i].isStarred())
+            anyStarred = true;
+          else
+            anyUnstarred = true;
         }
       }
     }
@@ -1850,6 +1907,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (!msgPreviewMode) {
         actions[MARK_ALL_READ_ACTION].setEnabled(anyUnreadGlobal);
       }
+      actions[STAR_ADD_ACTION].setEnabled(false);
+      actions[STAR_REMOVE_ACTION].setEnabled(false);
       actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION].setEnabled(false);
       actions[INVITE_SENDER_ACTION].setEnabled(false);
       actions[ADD_SENDER_TO_ADDRESS_BOOK_ACTION].setEnabled(false);
@@ -1877,6 +1936,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (!msgPreviewMode) {
         actions[MARK_ALL_READ_ACTION].setEnabled(anyUnreadGlobal);
       }
+      actions[STAR_ADD_ACTION].setEnabled(anyUnstarred);
+      actions[STAR_REMOVE_ACTION].setEnabled(anyStarred);
       actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION].setEnabled(true);
       actions[INVITE_SENDER_ACTION].setEnabled(initiateContactOk || anyAddrsSelected);
       actions[ADD_SENDER_TO_ADDRESS_BOOK_ACTION].setEnabled(anyMsgsSelected);
@@ -1904,6 +1965,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (!msgPreviewMode) {
         actions[MARK_ALL_READ_ACTION].setEnabled(anyUnreadGlobal);
       }
+      actions[STAR_ADD_ACTION].setEnabled(anyUnstarred);
+      actions[STAR_REMOVE_ACTION].setEnabled(anyStarred);
       actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION].setEnabled(true);
       actions[INVITE_SENDER_ACTION].setEnabled(initiateContactOk || anyAddrsSelected);
       actions[ADD_SENDER_TO_ADDRESS_BOOK_ACTION].setEnabled(anyMsgsSelected);

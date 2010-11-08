@@ -78,11 +78,12 @@ public class StatRecord extends Record { // implicit no-argument constructor
         icon = ImageNums.IMAGE_NONE;
         break;
       case STATUS__UNSEEN_DELIVERED:
-        icon = ImageNums.FLAG_GREEN_SMALL;
+        icon = ImageNums.FLAG_RED_SMALL;
         break;
-      case STATUS__SEEN_UNDELIVERED:
-        icon = ImageNums.FLAG_YELLOW_SMALL;
-        break;
+      // Yellow flags are eliminated, green flags replaced by red (red now has double meaning to simplify the interface) -- use Trace function to get such detailed information
+//      case STATUS__SEEN_UNDELIVERED:
+//        icon = ImageNums.FLAG_YELLOW_SMALL;
+//        break;
     }
     return icon;
   }

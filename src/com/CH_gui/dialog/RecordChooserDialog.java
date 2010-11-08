@@ -12,17 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
@@ -36,6 +25,17 @@ import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
+import com.CH_gui.util.VisualsSavable;
+import com.CH_gui.util.GeneralDialog;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.*;
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -228,7 +228,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     folderTreeComponent.setBorder(new EmptyBorder(0,0,0,0));
     folderTreeComponent.setPreferredSize(new Dimension(200, 300));
     // create the tables holder
-    tableComponent = new TableComponent(getVisualsClassKeyName());
+    tableComponent = new TableComponent(getVisualsClassKeyName(), true, false, true);
     tableComponent.setBorder(new EmptyBorder(0,0,0,0));
     // connect the tree with tables
     folderTreeComponent.addTreeSelectionListener(tableComponent);
@@ -449,19 +449,19 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
       String changeName = event.getPropertyName();
       if (changeName.equals(JFileChooser.SELECTED_FILES_CHANGED_PROPERTY)) {
         File[] files = (File[]) jFileChooser.getSelectedFiles();
-        Vector normalFilesV = new Vector();
+        ArrayList normalFilesL = new ArrayList();
         if (files != null) {
           for (int i=0; i<files.length; i++) {
             if (files[i].isFile()) {
-              normalFilesV.addElement(new File(files[i].getAbsolutePath()));
+              normalFilesL.add(new File(files[i].getAbsolutePath()));
             }
           }
           // set new Default Upload Directory to the one sourced last
           UploadUtilities.setDefaultSourceDir(jFileChooser.getCurrentDirectory());
         }
-        if (normalFilesV.size() > 0) {
-          File[] normalFiles = new File[normalFilesV.size()];
-          normalFilesV.toArray(normalFiles);
+        if (normalFilesL.size() > 0) {
+          File[] normalFiles = new File[normalFilesL.size()];
+          normalFilesL.toArray(normalFiles);
           addObjectsToList(normalFiles);
           setEnabledButtons();
         }

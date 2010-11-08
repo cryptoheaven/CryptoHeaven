@@ -833,7 +833,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               // correct the Chat Log title to ommit the participants...
               String name  = share.getFolderName();
               String defaultChatFolderName = com.CH_gui.lang.Lang.rb.getString("folderName_Chat_Log");
-              if (name.startsWith(defaultChatFolderName))
+              if (name == null || name.startsWith(defaultChatFolderName))
                 jTitleLabel.setText("Chat");
             }
           } else {

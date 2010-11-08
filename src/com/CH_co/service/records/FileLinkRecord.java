@@ -38,6 +38,9 @@ import com.CH_co.cryptx.*;
  */
 public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
+  public static final short STATUS_FLAG__DEFAULT = 0;
+  public static final short STATUS_FLAG__STARRED = 32;
+
   public Long fileLinkId;
   public Long fileId;
   public Long ownerObjId;
@@ -47,6 +50,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
   private BASymCipherBulk encFileDesc;
   private BASymCipherBulk encSymmetricKey;
   public Long origSize;
+  public Short status;
   public Timestamp recordCreated;
   public Timestamp recordUpdated;
 
@@ -79,6 +83,13 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
   public String getMyName() {
     return fileName;
+  }
+
+  public boolean isStarred() {
+    return status != null && (status.shortValue() & STATUS_FLAG__STARRED) != 0;
+  }
+  public void markStarred(boolean setStar) {
+    status = (Short) Misc.setBitObj(setStar, status != null ? status : new Short(STATUS_FLAG__DEFAULT), STATUS_FLAG__STARRED);
   }
 
   public void setEncFileType      (BASymCipherBulk encFileType)     { this.encFileType = encFileType;         }
@@ -266,6 +277,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
       if (record.encFileDesc       != null) encFileDesc      = record.encFileDesc;
       if (record.encSymmetricKey   != null) encSymmetricKey  = record.encSymmetricKey;
       if (record.origSize          != null) origSize         = record.origSize;
+      if (record.status            != null) status           = record.status;
       if (record.recordCreated     != null) recordCreated    = record.recordCreated;
       if (record.recordUpdated     != null) recordUpdated    = record.recordUpdated;
 
@@ -297,6 +309,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
       + ", encFileDesc="      + encFileDesc
       + ", encSymmetricKey="  + encSymmetricKey
       + ", origSize="         + origSize
+      + ", status="           + status
       + ", recordCreated="    + recordCreated
       + ", recordUpdated="    + recordUpdated
       + ", un-sealed data >> "
@@ -318,6 +331,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
       + "\n, encFileDesc="      + encFileDesc
       + "\n, encSymmetricKey="  + encSymmetricKey
       + "\n, origSize="         + origSize
+      + "\n, status="           + status
       + "\n, recordCreated="    + recordCreated
       + "\n, recordUpdated="    + recordUpdated
       + "\n un-sealed data >> "

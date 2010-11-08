@@ -1181,8 +1181,7 @@ public class MyDefaultMutableTreeNode implements MyMutableTreeNode {
     s.writeObject(tValues);
   }
 
-  private void readObject(ObjectInputStream s)
-          throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
     Object[] tValues;
 
     s.defaultReadObject();
@@ -1201,14 +1200,13 @@ public class MyDefaultMutableTreeNode implements MyMutableTreeNode {
     public PreorderEnumeration(MyTreeNode rootNode) {
       super();
       Vector v = new Vector(1);
-      v.addElement(rootNode);	// PENDING: don't really need a vector
+      v.addElement(rootNode);	// PENDING: don't really need a vector, but anything that can be cast to Enumeration
       stack = new Stack();
       stack.push(v.elements());
     }
 
     public boolean hasMoreElements() {
-      return (!stack.empty()
-              && ((Enumeration) stack.peek()).hasMoreElements());
+      return (!stack.empty() && ((Enumeration) stack.peek()).hasMoreElements());
     }
 
     public Object nextElement() {
@@ -1249,8 +1247,7 @@ public class MyDefaultMutableTreeNode implements MyMutableTreeNode {
       if (subtree.hasMoreElements()) {
         retval = (MyTreeNode) subtree.nextElement();
       } else if (children.hasMoreElements()) {
-        subtree = new PostorderEnumeration(
-                (MyTreeNode) children.nextElement());
+        subtree = new PostorderEnumeration((MyTreeNode) children.nextElement());
         retval = (MyTreeNode) subtree.nextElement();
       } else {
         retval = root;
@@ -1268,7 +1265,7 @@ public class MyDefaultMutableTreeNode implements MyMutableTreeNode {
     public BreadthFirstEnumeration(MyTreeNode rootNode) {
       super();
       Vector v = new Vector(1);
-      v.addElement(rootNode);	// PENDING: don't really need a vector
+      v.addElement(rootNode);	// PENDING: don't really need a vector, but anything that can be cast to Enumeration
       queue = new Queue();
       queue.enqueue(v.elements());
     }

@@ -12,18 +12,15 @@
 
 package com.CH_co.service.msg.dataSets.msg;
 
-import java.io.IOException;
-
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.util.Misc;
-
-import com.CH_co.trace.Trace;
-
 import com.CH_co.io.DataInputStream2; 
 import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
-
 import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
+
+import java.io.IOException;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -31,7 +28,7 @@ import com.CH_co.service.records.MsgLinkRecord;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -39,7 +36,7 @@ import com.CH_co.service.records.MsgLinkRecord;
  *
  * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Msg_MoveCopy_Rq extends ProtocolMsgDataSet {
 

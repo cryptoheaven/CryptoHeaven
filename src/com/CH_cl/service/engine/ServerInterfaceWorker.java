@@ -299,7 +299,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReaderThread.class, "ReaderThread(String threadName)");
       if (trace != null) trace.args(threadName);
       setDaemon(true);
-      if (trace != null) trace.exit(ReaderThread.class, this);
+      if (trace != null) trace.exit(ReaderThread.class);
     }
 
     public void runTraced() {
@@ -578,7 +578,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WriterThread.class, "WriterThread(String threadName)");
       if (trace != null) trace.args(threadName);
       setDaemon(true);
-      if (trace != null) trace.exit(WriterThread.class, this);
+      if (trace != null) trace.exit(WriterThread.class);
     }
 
     private MessageAction nextMessage() {

@@ -42,6 +42,7 @@ public class PriorityJobFifo extends PriorityFifo {
 
   public static final int MAIN_WORKER_HIGH_PRIORITY = 0;
   public static final int MAIN_WORKER_LOW_PRIORITY = 100;
+  public static final int MAIN_WORKER_LOWEST_PRIORITY = 200;
 
   public static final int JOB_TYPE_HEAVY = 1;
   public static final int JOB_TYPE_LIGHT = 2;
@@ -81,65 +82,69 @@ public class PriorityJobFifo extends PriorityFifo {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "getJobPriority(MessageAction msgAction)");
     if (trace != null) trace.args(msgAction);
 
-    int code = msgAction.getActionCode();
-    long priority = 0;
-    switch (code) {
-      case CommandCodes.SYS_Q_VERSION :
-      case CommandCodes.USR_Q_LOGIN_SECURE_SESSION :
-        priority = MAIN_WORKER_HIGH_PRIORITY + 10;
-        break;
-      case CommandCodes.SYS_Q_NOTIFY :
-        priority = MAIN_WORKER_HIGH_PRIORITY + 20;
-        break;
-      case CommandCodes.FILE_Q_GET_FILES_DATA :
-      case CommandCodes.FILE_Q_NEW_FILES :
-        priority = PRIORITY_LOWEST;
-        // try to establish if file is small to make the priority NORMAL
-        try {
-          if (code == CommandCodes.FILE_Q_GET_FILES_DATA) {
-            Obj_IDs_Co request = (Obj_IDs_Co) msgAction.getMsgDataSet();
-            Long[] fileLinkIDs = request.IDs[0];
-            long sizeSum = getFileOrigSizeSum(fileLinkIDs);
-            if (sizeSum < getMaxFileSizeForMainConnection()) {
-              priority = MAIN_WORKER_LOW_PRIORITY;
-            }
-          } else if (code == CommandCodes.FILE_Q_NEW_FILES) {
-            File_NewFiles_Rq request = (File_NewFiles_Rq) msgAction.getMsgDataSet();
-            long sizeSum = FileDataRecord.getFileEncSizeSum(request.fileDataRecords);
-            if (sizeSum < getMaxFileSizeForMainConnection()) {
-              priority = MAIN_WORKER_LOW_PRIORITY;
-            }
-          }
-        } catch (Throwable t) {
-        }
-        break;
-      case CommandCodes.MSG_Q_NEW :
-        int type = getJobType(msgAction);
-        if (type == JOB_TYPE_HEAVY) {
+    Long priorityValue = msgAction.getPriority();
+    if (priorityValue == null) {
+      int code = msgAction.getActionCode();
+      long priority = 0;
+      switch (code) {
+        case CommandCodes.SYS_Q_VERSION :
+        case CommandCodes.USR_Q_LOGIN_SECURE_SESSION :
+          priority = MAIN_WORKER_HIGH_PRIORITY + 10;
+          break;
+        case CommandCodes.SYS_Q_NOTIFY :
+          priority = MAIN_WORKER_HIGH_PRIORITY + 20;
+          break;
+        case CommandCodes.FILE_Q_GET_FILES_DATA :
+        case CommandCodes.FILE_Q_NEW_FILES :
           priority = PRIORITY_LOWEST;
           // try to establish if file is small to make the priority NORMAL
           try {
-            Msg_New_Rq request = (Msg_New_Rq) msgAction.getMsgDataSet();
-            long sizeSum = FileDataRecord.getFileEncSizeSum(request.localFiles.fileDataRecords);
-            if (sizeSum < getMaxFileSizeForMainConnection()) {
-              priority = MAIN_WORKER_LOW_PRIORITY;
+            if (code == CommandCodes.FILE_Q_GET_FILES_DATA) {
+              Obj_IDs_Co request = (Obj_IDs_Co) msgAction.getMsgDataSet();
+              Long[] fileLinkIDs = request.IDs[0];
+              long sizeSum = getFileOrigSizeSum(fileLinkIDs);
+              if (sizeSum < getMaxFileSizeForMainConnection()) {
+                priority = MAIN_WORKER_LOW_PRIORITY;
+              }
+            } else if (code == CommandCodes.FILE_Q_NEW_FILES) {
+              File_NewFiles_Rq request = (File_NewFiles_Rq) msgAction.getMsgDataSet();
+              long sizeSum = FileDataRecord.getFileEncSizeSum(request.fileDataRecords);
+              if (sizeSum < getMaxFileSizeForMainConnection()) {
+                priority = MAIN_WORKER_LOW_PRIORITY;
+              }
             }
           } catch (Throwable t) {
           }
-        } else {
-          priority = MAIN_WORKER_LOW_PRIORITY;
-        }
-        break;
-      case CommandCodes.FLD_A_GET_FOLDERS :
-        priority = MAIN_WORKER_LOW_PRIORITY + 20;
-        break;
+          break;
+        case CommandCodes.MSG_Q_NEW :
+          int type = getJobType(msgAction);
+          if (type == JOB_TYPE_HEAVY) {
+            priority = PRIORITY_LOWEST;
+            // try to establish if file is small to make the priority NORMAL
+            try {
+              Msg_New_Rq request = (Msg_New_Rq) msgAction.getMsgDataSet();
+              long sizeSum = FileDataRecord.getFileEncSizeSum(request.localFiles.fileDataRecords);
+              if (sizeSum < getMaxFileSizeForMainConnection()) {
+                priority = MAIN_WORKER_LOW_PRIORITY;
+              }
+            } catch (Throwable t) {
+            }
+          } else {
+            priority = MAIN_WORKER_LOW_PRIORITY;
+          }
+          break;
+        case CommandCodes.FLD_A_GET_FOLDERS :
+          priority = MAIN_WORKER_LOW_PRIORITY + 20;
+          break;
 
-      default :
-        priority = MAIN_WORKER_LOW_PRIORITY;
+        default :
+          priority = MAIN_WORKER_LOW_PRIORITY;
+      }
+      priorityValue = new Long(priority);
     }
 
-    if (trace != null) trace.exit(PriorityJobFifo.class, priority);
-    return priority;
+    if (trace != null) trace.exit(PriorityJobFifo.class, priorityValue.longValue());
+    return priorityValue.longValue();
   }
 
   public static int getJobType(MessageAction msgAction) {
@@ -249,7 +254,7 @@ public class PriorityJobFifo extends PriorityFifo {
   } // end countWorkerJobs();
 
   /**
-   * Prioritazes and adds a jobs.
+   * Prioritizes and adds a jobs.
    */
   public synchronized void addJob(MessageAction msgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "addJob(MessageAction msgAction)");

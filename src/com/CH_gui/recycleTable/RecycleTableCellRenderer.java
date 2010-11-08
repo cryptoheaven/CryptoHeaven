@@ -102,6 +102,7 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
       // set the FLAG
       else if (rawColumn == 0) {
         if (value != null) {
+          setText("");
           setBorder(RecordTableCellRenderer.BORDER_ICON);
           if (table instanceof JSortedTable) {
             JSortedTable sTable = (JSortedTable) table;
@@ -109,18 +110,32 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
             if (rawModel instanceof RecycleTableModel) {
               RecycleTableModel tableModel = (RecycleTableModel) rawModel;
               Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
+              boolean isStarred = false;
+              int flagIcon = ImageNums.IMAGE_NONE;
               StatRecord statRecord = null;
               if (rec instanceof FileLinkRecord) {
-                FileLinkRecord fileLink = (FileLinkRecord) rec;
-                statRecord = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+                FileLinkRecord link = (FileLinkRecord) rec;
+                isStarred = link.isStarred();
+                statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_FILE);
               } else if (rec instanceof MsgLinkRecord) {
-                MsgLinkRecord msgLink = (MsgLinkRecord) rec;
-                statRecord = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+                MsgLinkRecord link = (MsgLinkRecord) rec;
+                isStarred = link.isStarred();
+                statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_MESSAGE);
               }
-              if (statRecord != null) {
-                setIcon(Images.get(StatRecord.getIconForFlag((Short) value)));
-                setText("");
-                setToolTipText(StatRecord.getInfo((Short) value));
+              if (statRecord != null)
+                flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
+              if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {
+                setIcon(Images.get(ImageNums.STAR_BRIGHTER));
+                setToolTipText("Starred and Flagged");
+              } else if (isStarred) {
+                setIcon(Images.get(ImageNums.STAR_BRIGHT));
+                setToolTipText("Starred");
+              } else if (flagIcon != ImageNums.IMAGE_NONE) {
+                setIcon(Images.get(flagIcon));
+                setToolTipText(StatRecord.getInfo(statRecord.getFlag()));
+              } else {
+                setIcon(Images.get(ImageNums.STAR_WIRE));
+                setToolTipText(null);
               }
             }
           }

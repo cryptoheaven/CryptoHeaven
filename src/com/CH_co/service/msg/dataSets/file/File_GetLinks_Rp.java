@@ -124,6 +124,8 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
         dataOut.writeBytes(fileLinks[i].getEncFileDesc());
         dataOut.writeBytes(fileLinks[i].getEncSymmetricKey());
         dataOut.writeLongObj(fileLinks[i].origSize);
+        if (clientBuild >= 580 && serverBuild >= 580)
+          dataOut.writeSmallint(fileLinks[i].status);
         dataOut.writeTimestamp(fileLinks[i].recordCreated);
         dataOut.writeTimestamp(fileLinks[i].recordUpdated);
       }
@@ -167,6 +169,8 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
         fileLinks[i].setEncFileDesc(dataIn.readSymCipherBulk());
         fileLinks[i].setEncSymmetricKey(dataIn.readSymCipherBulk());
         fileLinks[i].origSize = dataIn.readLongObj();
+        if (clientBuild >= 580 && serverBuild >= 580)
+          fileLinks[i].status = dataIn.readSmallint();
         fileLinks[i].recordCreated = dataIn.readTimestamp();
         fileLinks[i].recordUpdated = dataIn.readTimestamp();
       }

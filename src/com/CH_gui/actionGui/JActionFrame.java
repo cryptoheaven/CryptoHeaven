@@ -59,7 +59,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   public static boolean ENABLE_FRAME_TOOLBARS = false;
   private boolean isWithToolBars = false;
 
-  private static Integer versionedVisualsSavable = new Integer(5);
+  private static Integer versionedVisualsSavable = new Integer(6);
 
   private static final boolean ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS = false;
   public static boolean ENABLE_MENU_CUSTOMIZATION_ACTION = true;
@@ -299,21 +299,6 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       menuTreeModel.putMenuProperties();
     if (toolBarModel != null) {
       toolBarModel.putToolBarProperties();
-
-      // Get tool bar position (ie: NORTH, SOUTH, EAST, WEST).
-      // Don't know how to do this, we will assume that horizontal allignment means NORTH, vertical means WEST.
-      // TO-DO: Learn how to determine placement of toolbar (ie: NORTH, WEST, EAST, SOUTH) to save it into properties.
-      /*
-      Container contentPane = getContentPane();
-      BorderLayout l = (BorderLayout) contentPane.getLayout();
-      System.out.println("BorderLayout="+l.toString());
-      for (int i=0; i<10; i++) {
-        try {
-          System.out.println(""+i+" "+contentPane.getComponent(i));
-        } catch (Exception t) {
-        }
-      }
-       */
       JToolBar bar = toolBarModel.getToolBar();
       int orientation = bar.getOrientation();
       String placement = BorderLayout.NORTH;
@@ -380,7 +365,6 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   private class CustomizeToolsAction extends AbstractActionTraced {
     public CustomizeToolsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Toolbar_..."), Images.get(ImageNums.TOOLS16));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Customize_Toolbar"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -466,7 +450,6 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   private class CustomizeMenuAction extends AbstractActionTraced {
     public CustomizeMenuAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Menus_..."), Images.get(ImageNums.TOOLS16));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Customize_Menu_Bar"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
     }

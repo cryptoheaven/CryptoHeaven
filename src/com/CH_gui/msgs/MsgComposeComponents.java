@@ -80,6 +80,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private boolean isVoicemailLineVisible;
 
   private JMyListCombo jSendCombo; // in chat mode
+  private JLabel jTyping; // typing notification in chat mode
   private JLabel jFromLabel;
   private JComponent jFromComponent;
   private JPanel jFromLine;
@@ -111,8 +112,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private JButton jAttach;
   private JLabel jReplyToLabel;
   private JLabel jReplyTo;
-  private JMyLinkLikeLabel jHTML;
-  private JMyLinkLikeLabel jShowBcc;
+//  private JMyLinkLikeLabel jHTML;
+  private JButton jHTML;
+//  private JMyLinkLikeLabel jShowBcc;
+  private JButton jShowBcc;
   private boolean isShownBcc = false;
   private MsgTypeArea msgTypeArea;
 
@@ -233,6 +236,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     return jSendCombo;
   }
 
+  public JLabel getTypingLabel() {
+    return jTyping;
+  }
 
   public boolean isAnyContent() {
     return getMsgSubject().length() > 0 || msgTypeArea.isAnyContent();
@@ -456,7 +462,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     //defaultHTML = false;
     msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, isChatComposePanel, false, isChatComposePanel);
     jHTML = msgTypeArea.getHTMLSwitchButton();
-    jShowBcc = new JMyLinkLikeLabel("Show BCC", MsgPreviewPanel.LINK_RELATIVE_FONT_SIZE);
+//    jShowBcc = new JMyLinkLikeLabel("Show BCC", MsgPreviewPanel.LINK_RELATIVE_FONT_SIZE);
+    jShowBcc = new JMyButtonNoFocus("Show BCC");
+    jShowBcc.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
     isShownBcc = false;
     jShowBcc.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
@@ -514,7 +522,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         String label = recipientType==MsgComposePanel.TO ? "button_To" : ( recipientType==MsgComposePanel.CC ? "button_Cc" : "button_Bcc");
         jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString(label), Images.get(ImageNums.MAIL_RECIPIENTS16));
         jSelectRecipients[recipientType].setAlignmentX(JButton.LEFT_ALIGNMENT);
-        jSelectRecipients[recipientType].setBorder(new EtchedBorder());
+        jSelectRecipients[recipientType].setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
         jSelectRecipients[recipientType].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         final int recType = recipientType;
         jSelectRecipients[recipientType].addActionListener(new ActionListener() {
@@ -609,30 +617,41 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
       ObjectsProviderI sendObjectsProvider = new ObjectsProviderI() {
         public Object[] provide(Object args) {
-          Icon icon = (Icon) composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.TOOL_ICON);
+          Icon icon = (Icon) composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.MENU_ICON);
           String text = (String) composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.NAME);
           String tip = "<html>" + composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.TOOL_TIP) + "<br>" + com.CH_gui.lang.Lang.rb.getString("actionTip_Send_mail_button_tip");
-          JLabel label = new JMyLabel(text, icon, JLabel.LEFT);
-          label.setToolTipText(tip);
+          JLabel sendLabel = new JMyLabel(text, icon, JLabel.LEFT);
+          sendLabel.setToolTipText(tip);
 
-          final JActionCheckBoxMenuItem menuItem = new JActionCheckBoxMenuItem();
-          menuItem.setText("Use ENTER key to send messages.");
-          menuItem.setToolTipText("Changes user setting.");
-
+          final JActionCheckBoxMenuItem settingsItem = new JActionCheckBoxMenuItem();
+          settingsItem.setText("Use ENTER key to send messages.");
+          settingsItem.setToolTipText("Changes user setting.");
           final UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
           boolean selected = uRec != null && (uRec.flags.longValue() & UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES) != 0;
-          menuItem.setSelected(selected);
-
-          ActionListener settingsActionListener = new ActionListener() {
+          settingsItem.setSelected(selected);
+          ActionListener settingsListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               Usr_AltUsrData_Rq request = new Usr_AltUsrData_Rq();
               request.userRecord = (UserRecord) uRec.clone();
-              request.userRecord.flags = new Long(Misc.setBit(menuItem.isSelected(), request.userRecord.flags, UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES));
+              request.userRecord.flags = new Long(Misc.setBit(settingsItem.isSelected(), request.userRecord.flags, UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES));
               MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_ALTER_DATA, request));
             }
           };
 
-          Object[][] objects = new Object[][] { { menuItem, label, settingsActionListener } };
+          final JActionCheckBoxMenuItem copyItem = new JActionCheckBoxMenuItem();
+          String sentFolderName = getSentFolderName();
+          copyItem.setText("Copy To " + sentFolderName);
+          copyItem.setToolTipText("Save a copy of composed messages in the " + sentFolderName + " folder.");
+          copyItem.setSelected(jCopyToOutgoing != null && jCopyToOutgoing.isSelected());
+
+          ActionListener copyListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              if (jCopyToOutgoing != null)
+                jCopyToOutgoing.setSelected(copyItem.isSelected());
+            }
+          };
+
+          Object[][] objects = new Object[][] { { settingsItem, sendLabel, settingsListener }, { copyItem, sendLabel, copyListener }};
           return objects;
         }
       };
@@ -644,11 +663,14 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       };
 
       jSendCombo = new JMyListCombo(0, sendObjectsProvider, sendActionListener);
+      jTyping = new JMyLabel("typing...");
+      jTyping.setIcon(Images.get(ImageNums.PENCIL16));
+      jTyping.setVisible(false);
 
       jRing = new JMyButtonNoFocus(Images.get(ImageNums.RING_BELL));
       jRing.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
       jRing.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      jRing.setBorder(new EmptyBorder(1, 1, 1, 1));
+      jRing.setBorder(new EmptyBorder(2, 2, 2, 2));
       jRing.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
           composeMngrI.ringPressed();
@@ -675,7 +697,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jAttach = new JMyButtonNoFocus(Images.get(ImageNums.ATTACH16));
       jAttach.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Attachments"));
       jAttach.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      jAttach.setBorder(new EmptyBorder(1, 1, 1, 1));
+      jAttach.setBorder(new EmptyBorder(2, 2, 2, 2));
       jAttach.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
           composeMngrI.selectAttachmentsPressed();
@@ -700,17 +722,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     });
 
     // "Copy to Sent"
-    UserRecord myUser = cache.getUserRecord();
-    FolderRecord sentFolder = null;
-    FolderShareRecord sentShare = null;
-    if (myUser != null) {
-      sentFolder = cache.getFolderRecord(cache.getUserRecord().sentFolderId);
-    }
-    Icon sentFolderIcon = sentFolder != null ? Images.get(sentFolder.getIcon(false, myUser)) : Images.get(ImageNums.FLD_MAIL_SENT_CLOSED16);
-
-    if (sentFolder != null)
-      sentShare = cache.getFolderShareRecordMy(sentFolder.folderId, false);
-    String sentShareName = sentShare != null ? sentShare.getFolderName() : com.CH_gui.lang.Lang.rb.getString("folder_Sent");
+    Icon sentFolderIcon = getSentFolderIcon();
+    String sentShareName = getSentFolderName();
     jCopyToOutgoing = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Copy_To"), false);
 
     jOutgoing = new JMyLabel(sentShareName, sentFolderIcon, JLabel.LEFT);
@@ -727,11 +740,33 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     // resize the send button to hight of priority combo button
     if (jSendCombo != null)
-      jSendCombo.setPreferredSize(new Dimension(84, jPriority.getPreferredSize().height));
+      jSendCombo.setPreferredSize(new Dimension(140, jPriority.getPreferredSize().height));
 
     if (trace != null) trace.exit(MsgComposeComponents.class);
   }
 
+  private Icon getSentFolderIcon() {
+    UserRecord myUser = cache.getUserRecord();
+    FolderRecord sentFolder = null;
+    if (myUser != null) {
+      sentFolder = cache.getFolderRecord(cache.getUserRecord().sentFolderId);
+    }
+    Icon sentFolderIcon = sentFolder != null ? Images.get(sentFolder.getIcon(false, myUser)) : Images.get(ImageNums.FLD_MAIL_SENT_CLOSED16);
+    return sentFolderIcon;
+  }
+
+  private String getSentFolderName() {
+    UserRecord myUser = cache.getUserRecord();
+    FolderRecord sentFolder = null;
+    FolderShareRecord sentShare = null;
+    if (myUser != null) {
+      sentFolder = cache.getFolderRecord(cache.getUserRecord().sentFolderId);
+    }
+    if (sentFolder != null)
+      sentShare = cache.getFolderShareRecordMy(sentFolder.folderId, false);
+    String sentShareName = sentShare != null ? sentShare.getFolderName() : com.CH_gui.lang.Lang.rb.getString("folder_Sent");
+    return sentShareName;
+  }
 
   /**
    * Set message content with the signature is available.
@@ -905,41 +940,42 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
 
   private void initMainPanelForChat(JPanel panel) {
-    int posY = 3;
+    jPriority.setSelectedIndex(MsgComposePanel.PRIORITY_INDEX_NORMAL);
+    composeMngrI.priorityPressed();
 
+    int posY = 3;
     // most important components go first to be first in focus order
-    panel.add(msgTypeArea, new GridBagConstraints(0, posY, 8, 1, 50, 50,
+    panel.add(msgTypeArea, new GridBagConstraints(0, posY, 9, 1, 50, 50,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
     // put other components next in the focus order
     posY = 0;
-
-    // Send Button on the top left
-    panel.add(jSendCombo, new GridBagConstraints(0, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 2, 2, 2), 0, 0));
-
-    jPriority.setSelectedIndex(MsgComposePanel.PRIORITY_INDEX_NORMAL);
-    composeMngrI.priorityPressed();
-    panel.add(jPriorityLabel, new GridBagConstraints(1, posY, 1, 1, 20, 0,
+    panel.add(jPriorityLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 2), 0, 0));
-    panel.add(jPriority, new GridBagConstraints(2, posY, 1, 1, 8, 0,
-          GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(2, 2, 2, 2), 0, 0));
-    // "Copy to Sent"
-    panel.add(jCopyToOutgoing, new GridBagConstraints(3, posY, 1, 1, 8, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 0), 0, 0));
-    panel.add(jOutgoing, new GridBagConstraints(4, posY, 1, 1, 8, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 2), 0, 0));
-    // ring
-    panel.add(jRing, new GridBagConstraints(5, posY, 1, 1, 6, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 0), 0, 0));
+    panel.add(jPriority, new GridBagConstraints(1, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 2), 0, 0));
+//    // "Copy to Sent"
+//    panel.add(jCopyToOutgoing, new GridBagConstraints(2, posY, 1, 1, 0, 0,
+//          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 20, 2, 0), 0, 0));
+//    panel.add(jOutgoing, new GridBagConstraints(3, posY, 1, 1, 0, 0,
+//          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 2), 0, 0));
     // attach
-    panel.add(jAttach, new GridBagConstraints(6, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 1), 0, 0));
+    panel.add(jAttach, new GridBagConstraints(4, posY, 1, 1, 0, 0,
+          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 20, 0, 0), 0, 0));
+    // ring
+    panel.add(jRing, new GridBagConstraints(5, posY, 1, 1, 0, 0,
+          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     // html
-    panel.add(jHTML, new GridBagConstraints(7, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 1, 2, 2), 0, 0));
-    posY ++;
+    panel.add(jHTML, new GridBagConstraints(6, posY, 1, 1, 0, 0,
+          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
 
+    panel.add(jTyping, new GridBagConstraints(7, posY, 1, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 20, 2, 2), 0, 0));
+
+    panel.add(jSendCombo, new GridBagConstraints(8, posY, 1, 1, 0, 0,
+          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 20, 2, 1), 0, 0));
+
+    posY ++;
 
     // this row was for TO: in mail mode
     posY ++;
@@ -954,7 +990,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // this row was for Attachments in mail mode
       panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 2, 2, 2), 0, 0));
-      panel.add(jAttachments, new GridBagConstraints(1, posY, 7, 1, 100, 0,
+      panel.add(jAttachments, new GridBagConstraints(1, posY, 8, 1, 100, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 2, 2, 2), 0, 0));
     }
   }

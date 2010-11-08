@@ -36,14 +36,14 @@ import com.CH_gui.table.*;
 public class MsgTableComponent extends RecordTableComponent {
 
   /** Creates new MsgTableComponent */
-  public MsgTableComponent() {
-    this(Template.get(Template.EMPTY_MAIL), false);
+  public MsgTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    this(Template.get(Template.EMPTY_MAIL), false, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
   }
-  public MsgTableComponent(String emptyTemplateName, boolean msgPreviewMode) {
-    this(Template.get(Template.EMPTY_MAIL), Template.get(Template.NONE), Template.get(Template.CATEGORY_MAIL), msgPreviewMode);
+  public MsgTableComponent(String emptyTemplateName, boolean msgPreviewMode, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    this(Template.get(Template.EMPTY_MAIL), Template.get(Template.NONE), Template.get(Template.CATEGORY_MAIL), msgPreviewMode, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
   }
-  public MsgTableComponent(String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean msgPreviewMode) {
-    super(new MsgActionTable(msgPreviewMode), emptyTemplateName, backTemplateName, categoryTemplateName, false, false, msgPreviewMode);
+  public MsgTableComponent(String emptyTemplateName, String backTemplateName, String categoryTemplateName, boolean msgPreviewMode, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new MsgActionTable(msgPreviewMode), emptyTemplateName, backTemplateName, categoryTemplateName, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableComponent.class, "MsgTableComponent()");
     if (trace != null) trace.exit(MsgTableComponent.class);
   }

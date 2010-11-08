@@ -291,10 +291,19 @@ public class RecycleTableModel extends RecordTableModel {
 
       switch (column) {
         case 0:
+          boolean isStarred = fileLink.isStarred();
+          boolean isFlagged = false;
           StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
-          if (stat != null) {
-            value = stat.getFlag();
-          }
+          if (stat != null)
+            isFlagged = StatRecord.getIconForFlag(stat.getFlag()) != ImageNums.IMAGE_NONE;
+          if (isStarred && isFlagged)
+            value = new Short((short) 1);
+          else if (isStarred)
+            value = new Short((short) 2);
+          else if (isFlagged)
+            value = new Short((short) 3);
+          else
+            value = new Short((short) 4);
           break;
         case 1: value = fileLink.getFileName();
           break;
@@ -341,9 +350,19 @@ public class RecycleTableModel extends RecordTableModel {
 
       switch (column) {
         case 0:
-          StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+         boolean isStarred = msgLink.isStarred();
+          boolean isFlagged = false;
+          StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
           if (stat != null)
-            value = stat.getFlag();
+            isFlagged = StatRecord.getIconForFlag(stat.getFlag()) != ImageNums.IMAGE_NONE;
+          if (isStarred && isFlagged)
+            value = new Short((short) 1);
+          else if (isStarred)
+            value = new Short((short) 2);
+          else if (isFlagged)
+            value = new Short((short) 3);
+          else
+            value = new Short((short) 4);
           break;
         // Subject or Posting or Address Name
         case 1:

@@ -38,14 +38,13 @@ import com.CH_gui.table.*;
 public class AddressTableComponent extends RecordTableComponent {
 
   /** Creates new AddressTableComponent */
-  public AddressTableComponent(boolean previewMode) {
-    this(new AddressActionTable(new MsgTableModel(null, MsgTableModel.MODE_ADDRESS), previewMode), Template.get(Template.EMPTY_ADDRESSES));
+  public AddressTableComponent(boolean previewMode, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    this(new AddressActionTable(new MsgTableModel(null, MsgTableModel.MODE_ADDRESS), previewMode), Template.get(Template.EMPTY_ADDRESSES), suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AddressTableComponent.class, "AddressTableComponent(boolean previewMode)");
-    if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(AddressTableComponent.class);
   }
-  public AddressTableComponent(RecordActionTable actionTable, String emptyTemplate) {
-    super(actionTable, emptyTemplate);
+  public AddressTableComponent(RecordActionTable actionTable, String emptyTemplate, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(actionTable, emptyTemplate, null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
   }
 
   public void initDataModel(Long folderId) {

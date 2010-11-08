@@ -51,7 +51,7 @@ import com.CH_gui.table.RecordTableModel;
  */
 public class ChatActionTable extends MsgActionTable implements DisposableObj {
 
-  private static final int TYPING_NOTIFY_MILLIS = 6000; // 6 sec.
+  public static final int TYPING_NOTIFY_MILLIS = 6000; // 6 sec.
   private MsgTypingListener msgTypingListener;
   private MsgLinkListener msgLinkRecordListener;
   private TableModelSortListener sortListener = null;

@@ -37,8 +37,8 @@ import com.CH_gui.table.*;
 public class PostTableComponent extends RecordTableComponent {
 
   /** Creates new PostTableComponent */
-  public PostTableComponent() {
-    super(new PostActionTable(new MsgTableModel(null, MsgTableModel.MODE_POST)), Template.get(Template.EMPTY_POSTINGS));
+  public PostTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new PostActionTable(new MsgTableModel(null, MsgTableModel.MODE_POST)), Template.get(Template.EMPTY_POSTINGS), null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PostTableComponent.class, "PostTableComponent()");
     if (trace != null) trace.exit(PostTableComponent.class);
   }

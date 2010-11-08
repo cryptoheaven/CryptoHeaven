@@ -456,10 +456,19 @@ public class MsgTableModel extends RecordTableModel {
           break;
         // Flag
         case 2:
+          boolean isStarred = msgLink.isStarred();
+          boolean isFlagged = false;
           StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
-          if (stat != null) {
-            value = stat.getFlag(isModeMsgBody());
-          }
+          if (stat != null)
+            isFlagged = StatRecord.getIconForFlag(stat.getFlag(isModeMsgBody())) != ImageNums.IMAGE_NONE;
+          if (isStarred && isFlagged)
+            value = new Short((short) 1);
+          else if (isStarred)
+            value = new Short((short) 2);
+          else if (isFlagged)
+            value = new Short((short) 3);
+          else
+            value = new Short((short) 4);
           break;
         // From
         case 3:
@@ -655,6 +664,7 @@ public class MsgTableModel extends RecordTableModel {
           boolean toAddPriority = false;
           boolean toAddAttachment = false;
           boolean toAddFlag = false;
+          boolean toAddStar = false;
 
           String fromName = null;
           String prevFromName = null;
@@ -670,8 +680,8 @@ public class MsgTableModel extends RecordTableModel {
           if (model.getColumnHeaderData().convertRawColumnToModel(6) == -1) {
             toAddSent = true;
           }
-          // if table has no 'Priority' or 'Attachments' column prepend 'Priority' to the body
-          if (model.getColumnHeaderData().convertRawColumnToModel(0) == -1 && model.getColumnHeaderData().convertRawColumnToModel(1) == -1) {
+          // if table has no 'Priority' column prepend 'Priority' to the body
+          if (model.getColumnHeaderData().convertRawColumnToModel(0) == -1) {
             toAddPriority = true;
           }
           // if table has no 'Attachment' column prepend it to the body
@@ -682,21 +692,25 @@ public class MsgTableModel extends RecordTableModel {
           if (model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
             toAddFlag = true;
           }
+          // if table has no 'Flag' column prepend 'Star' to the body only if it is present
+          if (msgLink.isStarred() && model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
+            toAddStar = true;
+          }
 
+          int flagIcon = ImageNums.IMAGE_NONE;
           if (toAddFlag) {
             StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
             if (stat != null) {
               Short flagS = stat.getFlag(model.isModeMsgBody());
-              if (flagS != null) {
-                short flag = flagS.shortValue();
-                if (flag == StatRecord.STATUS__UNSEEN_UNDELIVERED)
-                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_RED_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
-                else if (flag == StatRecord.STATUS__UNSEEN_DELIVERED)
-                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_GREEN_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
-                else if (flag == StatRecord.STATUS__SEEN_UNDELIVERED)
-                  sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_YELLOW_12) + ".png\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
-              }
+              flagIcon = StatRecord.getIconForFlag(flagS);
             }
+          }
+          if (toAddStar && flagIcon != ImageNums.IMAGE_NONE) {
+            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.STAR_BRIGHTER) + ".png\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\"/>");
+          } else if (toAddStar) {
+            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.STAR_BRIGHT) + ".png\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\"/>");
+          } else if (flagIcon != ImageNums.IMAGE_NONE) {
+            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(flagIcon) + ".png\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\"/>");
           }
 
           if (toAddFrom || toAddSent) {

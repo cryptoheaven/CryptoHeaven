@@ -12,25 +12,22 @@
 
 package com.CH_gui.msgTable;
 
+import com.CH_cl.service.cache.*;
+import com.CH_co.service.records.*;
+import com.CH_co.util.*;
+
+import com.CH_gui.gui.*;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.sortedTable.*;
+import com.CH_gui.table.*;
 import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
+
 import java.awt.*;
 import java.sql.Timestamp;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
-
-import com.CH_cl.service.cache.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
-import com.CH_gui.table.*;
-import com.CH_gui.sortedTable.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -137,13 +134,13 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             boolean col_19 = isColumnVisible(table, 19); // expiry column
             boolean col_20 = isColumnVisible(table, 20); // password protection column
             if (!col_19 || !col_20) {
-              if (!col_20) {
+              if (!col_20 && mData != null) {
                 if (mData.bodyPassHash != null) {
                   icon = Images.get(ImageNums.KEY16);
                   toolTip = "Password Protected";
                 }
               }
-              if (!col_19) {
+              if (!col_19 && mData != null) {
                 ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId());
                 if (exp.getIcon() != ImageNums.IMAGE_NONE) {
                   icon = Images.get(exp);
@@ -152,22 +149,28 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               }
             }
             // if no "Importance" icon then use it for "Attachments" if it was removed
-            if (icon == null && !isColumnVisible(table, 1)) {
-              if (mData != null) {
-                int numOfAttachments = 0;
-                if (mData.attachedFiles != null && mData.attachedMsgs != null) {
-                  numOfAttachments = mData.attachedFiles.shortValue() + mData.attachedMsgs.shortValue();
-                  // if regular email, don't show serialized email as attachment in the table...
-                  if (mData.isEmail()) {
-                    numOfAttachments --;
+            // If "msg-body" display mode then leave the icons to be prepanded to the body field.
+            if (icon == null && !isColumnVisible(table, 1) && mData != null && table instanceof JSortedTable) {
+              JSortedTable sTable = (JSortedTable) table;
+              TableModel rawModel = sTable.getRawModel();
+              if (rawModel instanceof MsgTableModel) {
+                MsgTableModel tableModel = (MsgTableModel) rawModel;
+                if (!tableModel.isModeMsgBody()) {
+                  int numOfAttachments = 0;
+                  if (mData.attachedFiles != null && mData.attachedMsgs != null) {
+                    numOfAttachments = mData.attachedFiles.shortValue() + mData.attachedMsgs.shortValue();
+                    // if regular email, don't show serialized email as attachment in the table...
+                    if (mData.isEmail()) {
+                      numOfAttachments --;
+                    }
                   }
-                }
-                if (numOfAttachments > 0) {
-                  icon = Images.get(ImageNums.ATTACH16);
-                  if (numOfAttachments == 1)
-                    toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
-                  else
-                    toolTip = "" + numOfAttachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
+                  if (numOfAttachments > 0) {
+                    icon = Images.get(ImageNums.ATTACH16);
+                    if (numOfAttachments == 1)
+                      toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
+                    else
+                      toolTip = "" + numOfAttachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
+                  }
                 }
               }
             }
@@ -205,7 +208,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
                 MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
                 boolean isSet = false;
-                if (!col_19) {
+                if (!col_19 && mData != null) {
                   ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId());
                   if (exp.getIcon() != ImageNums.IMAGE_NONE) {
                     icon = Images.get(exp);
@@ -213,7 +216,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                     isSet = true;
                   }
                 }
-                if (!isSet && !col_20) {
+                if (!isSet && !col_20 && mData != null) {
                   if (mData.bodyPassHash != null) {
                     icon = Images.get(ImageNums.KEY16);
                     toolTip = "Password Protected";
@@ -221,10 +224,18 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                   }
                 }
                 // default to Importance column
-                if (!isSet) {
-                  ImageText pri = MsgDataRecord.getPriorityTextAndIcon(mData.importance.shortValue());
-                  toolTip = pri.getText();
-                  icon = Images.get(pri);
+                // If "msg-body" display mode then leave the icons to be prepanded to the body field.
+                if (!isSet && table instanceof JSortedTable) {
+                  JSortedTable sTable = (JSortedTable) table;
+                  TableModel rawModel = sTable.getRawModel();
+                  if (rawModel instanceof MsgTableModel) {
+                    MsgTableModel tableModel = (MsgTableModel) rawModel;
+                    if (!tableModel.isModeMsgBody()) {
+                      ImageText pri = MsgDataRecord.getPriorityTextAndIcon(mData.importance.shortValue());
+                      toolTip = pri.getText();
+                      icon = Images.get(pri);
+                    }
+                  }
                 }
               }
             }
@@ -244,11 +255,24 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               MsgTableModel tableModel = (MsgTableModel) rawModel;
               Record rec = tableModel.getRowObject(sTable.convertMyRowIndexToModel(row));
               if (rec instanceof MsgLinkRecord) {
-                MsgLinkRecord mLink = (MsgLinkRecord) rec;
-                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
-                if (statRecord != null) {
-                  setIcon(Images.get(StatRecord.getIconForFlag((Short) value)));
-                  setToolTipText(StatRecord.getInfo((Short) value));
+                MsgLinkRecord link = (MsgLinkRecord) rec;
+                boolean isStarred = link.isStarred();
+                int flagIcon = ImageNums.IMAGE_NONE;
+                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_MESSAGE);
+                if (statRecord != null)
+                  flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
+                if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {
+                  setIcon(Images.get(ImageNums.STAR_BRIGHTER));
+                  setToolTipText("Starred and Flagged");
+                } else if (isStarred) {
+                  setIcon(Images.get(ImageNums.STAR_BRIGHT));
+                  setToolTipText("Starred");
+                } else if (flagIcon != ImageNums.IMAGE_NONE) {
+                  setIcon(Images.get(flagIcon));
+                  setToolTipText(StatRecord.getInfo(statRecord.getFlag()));
+                } else {
+                  setIcon(Images.get(ImageNums.STAR_WIRE));
+                  setToolTipText(null);
                 }
               }
             }
@@ -545,10 +569,18 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
 
         // Flag
         if (!isColumnVisible(table, 2)) {
+          boolean isStarred = mLink != null && mLink.isStarred();
+          int flagIcon = ImageNums.IMAGE_NONE;
           StatRecord statRecord = null;
           if (mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null) {
-            JLabel icon = new JLabel(Images.get(statRecord.getIcon()));
-            jIconSetRenderer.add(icon);
+            flagIcon = statRecord.getIcon();
+          }
+          if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {
+            jIconSetRenderer.add(new JLabel(Images.get(ImageNums.STAR_BRIGHTER)));
+          } else if (isStarred) {
+            jIconSetRenderer.add(new JLabel(Images.get(ImageNums.STAR_BRIGHT)));
+          } else if (flagIcon != ImageNums.IMAGE_NONE) {
+            jIconSetRenderer.add(new JLabel(Images.get(flagIcon)));
           } else {
             jIconSetRenderer.add(jNoIcon1);
           }

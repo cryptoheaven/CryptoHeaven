@@ -21,7 +21,7 @@ import com.CH_co.trace.Trace;
  * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class CommandCodes extends Object {
 
@@ -147,12 +147,12 @@ public class CommandCodes extends Object {
   // Get Available Domains
   public static final int EML_Q_GET_DOMAINS = 1905;
   public static final int EML_A_GET_DOMAINS = 10905;
-  // Create Emails 
+  // Create Emails
   public static final int EML_Q_CREATE = 1910;
-  // Alter Emails 
+  // Alter Emails
   public static final int EML_Q_ALTER = 1920;
   public static final int EML_Q_MANAGE = 1925;
-  // Remove Emails 
+  // Remove Emails
   public static final int EML_Q_REMOVE = 1930;
   public static final int EML_A_REMOVE = 10930;
   // Check for availability of Email Address
@@ -294,7 +294,7 @@ public class CommandCodes extends Object {
   public static final int FILE_Q_GET_FILES_DATA_ATTRIBUTES = 1820;
   public static final int FILE_A_GET_FILES_DATA_ATTRIBUTES = 10820;
 
-  // Get File Data 
+  // Get File Data
   public static final int FILE_Q_GET_FILES_DATA = 1830;
   public static final int FILE_A_GET_FILES_DATA = 10830;
 
@@ -316,6 +316,8 @@ public class CommandCodes extends Object {
   // Save Msg File Attachments
   public static final int FILE_Q_SAVE_MSG_FILE_ATT = 1880;
 
+  // Update Status
+  public static final int FILE_Q_UPDATE_STATUS = 1890;
 
   // ========================
   // *** Contact Commands ***
@@ -471,7 +473,7 @@ public class CommandCodes extends Object {
   public static final int SYS_Q_PING = 5000;
   public static final int SYS_A_PONG = 5001;
 
-  // No-op, sometimes used to release the Writer-Reader worker pair 
+  // No-op, sometimes used to release the Writer-Reader worker pair
   // when no reply to a request is available.
   public static final int SYS_A_NOOP = 5002;
 

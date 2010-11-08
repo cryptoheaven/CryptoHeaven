@@ -43,6 +43,7 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   public static final short STATUS_FLAG__FORWARDED = 4;
   public static final short STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE = 8;
   public static final short STATUS_FLAG__HIDDEN_THROUGH_BCC = 16;
+  public static final short STATUS_FLAG__STARRED = 32;
 
   public static final short RECIPIENT_TYPE_TO = 0;
   public static final short RECIPIENT_TYPE_CC = 1;
@@ -106,9 +107,18 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
       statusName = "Replied";
     else if ((st & STATUS_FLAG__FORWARDED) != 0)
       statusName = "Forwarded";
+    else if ((st & STATUS_FLAG__STARRED) != 0)
+      statusName = "Starred";
     else 
       statusName = "Normal";
     return statusName;
+  }
+
+  public boolean isStarred() {
+    return status != null && (status.shortValue() & STATUS_FLAG__STARRED) != 0;
+  }
+  public void markStarred(boolean setStar) {
+    status = (Short) Misc.setBitObj(setStar, status != null ? status : new Short(STATUS_FLAG__DEFAULT), STATUS_FLAG__STARRED);
   }
 
   public void setEncSymmetricKey (BA encSymmetricKey)          { this.encSymmetricKey   = encSymmetricKey;   }

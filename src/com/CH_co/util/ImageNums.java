@@ -180,18 +180,21 @@ public class ImageNums extends Object {
   public static final int LOCK_CLOSED_WEB_SMALL;
   public static final int LOCK_OPEN_SMALL;
   public static final int LOCK_OPEN_WEB_SMALL;
+
+  public static final int FLAG_BLANK_DOUBLE_SMALL;
+  public static final int FLAG_BLANK_DOUBLE_TOOL;
+
   public static final int FLAG_BLANK_SMALL;
-  public static final int FLAG_BLANK24;
-  public static final int FLAG_BLANK_DOUBLE16;
-  public static final int FLAG_BLANK_DOUBLE24;
+  public static final int FLAG_BLANK_TOOL;
+
   public static final int FLAG_GRAY_SMALL;
-  public static final int FLAG_GREEN_SMALL;
-  public static final int FLAG_GREEN24;
+
   public static final int FLAG_RED_SMALL;
-  public static final int FLAG_YELLOW_SMALL;
-  public static final int FLAG_GREEN_12;
-  public static final int FLAG_RED_12;
-  public static final int FLAG_YELLOW_12;
+  public static final int FLAG_RED_TOOL;
+
+  public static final int STAR_BRIGHT;
+  public static final int STAR_BRIGHTER;
+  public static final int STAR_WIRE;
 
   public static final int TRACE_HISTORY12_13;
   public static final int TRACE_HISTORY13;
@@ -388,6 +391,9 @@ public class ImageNums extends Object {
   public static final int HTML_IMAGE_FAILED;
   public static final int RESIZE_DRAG_SE; // South-East direction
 
+  public static final int EDITOR_PLAIN;
+  public static final int EDITOR_RICH;
+  public static final int PENCIL16;
   public static final int RING_BELL;
   public static final int VOLUME16;
   public static final int VOLUME24;
@@ -471,7 +477,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[321+50]; // plus emotions
+    images = new String[322+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -864,41 +870,36 @@ public class ImageNums extends Object {
     LOCK_OPEN_WEB_SMALL = i;
     images[i] = "lock-open-web-small"; i++;
 
+    FLAG_BLANK_DOUBLE_SMALL = i;
+    images[i] = "flag-blank-double-small"; i++;
+
+    FLAG_BLANK_DOUBLE_TOOL = i;
+    images[i] = "flag-blank-double-tool"; i++;
+
     FLAG_BLANK_SMALL = i;
     images[i] = "flag-blank-small"; i++;
 
-    FLAG_BLANK24 = i;
-    images[i] = "flag-blank-24"; i++;
-
-    FLAG_BLANK_DOUBLE16 = i;
-    images[i] = "flag-blank-double-16"; i++;
-
-    FLAG_BLANK_DOUBLE24 = i;
-    images[i] = "flag-blank-double-24"; i++;
+    FLAG_BLANK_TOOL = i;
+    images[i] = "flag-blank-tool"; i++;
 
     FLAG_GRAY_SMALL = i;
     images[i] = "flag-gray-small"; i++;
 
-    FLAG_GREEN_SMALL = i;
-    images[i] = "flag-green-small"; i++;
-
-    FLAG_GREEN24 = i;
-    images[i] = "flag-green-24"; i++;
-
     FLAG_RED_SMALL = i;
     images[i] = "flag-red-small"; i++;
 
-    FLAG_YELLOW_SMALL = i;
-    images[i] = "flag-yellow-small"; i++;
+    FLAG_RED_TOOL = i;
+    images[i] = "flag-red-tool"; i++;
 
-    FLAG_GREEN_12 = i;
-    images[i] = "flag-green-12"; i++;
+    STAR_BRIGHT = i;
+    images[i] = "star-bright"; i++;
 
-    FLAG_RED_12 = i;
-    images[i] = "flag-red-12"; i++;
+    STAR_BRIGHTER = i;
+    images[i] = "star-brighter"; i++;
 
-    FLAG_YELLOW_12 = i;
-    images[i] = "flag-yellow-12"; i++;
+    STAR_WIRE = i;
+    images[i] = "star-wire"; i++;
+
 
     TRACE_HISTORY12_13 = i;
     images[i] = "TraceHist12_13"; i++;
@@ -1417,6 +1418,15 @@ public class ImageNums extends Object {
     RESIZE_DRAG_SE = i;
     images[i] = "resize-drag-se"; i++;
 
+
+    EDITOR_PLAIN = i;
+    images[i] = "editor-plain"; i++;
+
+    EDITOR_RICH = i;
+    images[i] = "editor-rich"; i++;
+
+    PENCIL16 = i;
+    images[i] = "pencil16"; i++;
 
     RING_BELL = i;
     images[i] = "Bell16"; i++;

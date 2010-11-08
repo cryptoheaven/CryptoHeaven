@@ -310,7 +310,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           MainFrame.this.addComponentActions(MainFrame.this);
 
           // Make the main table
-          tableComp = new TableComponent("Browse");
+          tableComp = new TableComponent("Browse", false, false, false);
           tableComp.initAddressTableComponent();
           tableComp.initPostTableComponent(); // fastest msg type component to change any prior address related menu changes
           tableComp.initChatTableComponent(); // chat menu loads here for the first time
@@ -657,7 +657,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       super(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
             new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) }), Images.get(ImageNums.INFO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      //putValue(Actions.TOOL_ICON, Images.get(ImageNums.INFO16));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -672,7 +671,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class ChangePassAction extends AbstractActionTraced {
     public ChangePassAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -703,7 +701,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private class ChangeUserNameAction extends AbstractActionTraced {
     public ChangeUserNameAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -738,7 +735,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public AccountOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Account_Options"), Images.get(ImageNums.USER_EDIT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Account_Options"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -748,7 +744,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
 
   /**
-   * Switch Identiry to login as a different user
+   * Switch Identity to login as a different user
    */
   private class SwitchIdentityAction extends AbstractActionTraced {
     public SwitchIdentityAction(int actionId) {
@@ -929,8 +925,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
    */
   private class SetupPasswordRecovery extends AbstractActionTraced {
     public SetupPasswordRecovery(int actionId) {
-      super("Setup Password Recovery");
-      putValue(Actions.TOOL_TIP, "Setup Password Recovery");
+      super(com.CH_gui.lang.Lang.rb.getString("action_Setup_Password_Recovery"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -944,7 +939,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
    */
   private class TraceDiagnosticsAction extends AbstractActionTraced {
     public TraceDiagnosticsAction(int actionId) {
-      super("Problem Reporting", Images.get(ImageNums.TOOLS_FIX16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Problem_Reporting"), Images.get(ImageNums.TOOLS_FIX16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Send Diagnostics Information");
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -959,7 +954,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
    */
   private class EmailSupportAction extends AbstractActionTraced {
     public EmailSupportAction(int actionId) {
-      super("Email Support", Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Email_Support"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }

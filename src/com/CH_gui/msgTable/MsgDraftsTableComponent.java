@@ -37,8 +37,8 @@ import com.CH_gui.table.*;
 public class MsgDraftsTableComponent extends RecordTableComponent {
 
   /** Creates new MsgDraftsTableComponent */
-  public MsgDraftsTableComponent(boolean previewMode) {
-    super(new MsgDraftsActionTable(new MsgTableModel(null, MsgTableModel.MODE_DRAFTS), previewMode), Template.get(Template.EMPTY_MAIL_DRAFTS));
+  public MsgDraftsTableComponent(boolean previewMode, boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new MsgDraftsActionTable(new MsgTableModel(null, MsgTableModel.MODE_DRAFTS), previewMode), Template.get(Template.EMPTY_MAIL_DRAFTS), null, null, suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDraftsTableComponent.class, "MsgDraftsTableComponent(boolean previewMode)");
     if (trace != null) trace.args(previewMode);
     if (trace != null) trace.exit(MsgDraftsTableComponent.class);

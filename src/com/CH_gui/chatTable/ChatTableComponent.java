@@ -43,8 +43,8 @@ import javax.swing.SwingUtilities;
 public class ChatTableComponent extends RecordTableComponent {
 
   /** Creates new ChatTableComponent */
-  public ChatTableComponent() {
-    super(new ChatActionTable(new MsgTableModel(null, MsgTableModel.MODE_CHAT)), Template.get(Template.EMPTY_CHAT), Template.get(Template.NONE), Template.get(Template.CATEGORY_CHAT));
+  public ChatTableComponent(boolean suppressToolbar, boolean suppressUtilityBar, boolean suppressVisualsSavable) {
+    super(new ChatActionTable(new MsgTableModel(null, MsgTableModel.MODE_CHAT)), Template.get(Template.EMPTY_CHAT), Template.get(Template.NONE), Template.get(Template.CATEGORY_CHAT), suppressToolbar, suppressUtilityBar, suppressVisualsSavable);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatTableComponent.class, "ChatTableComponent()");
     getRecordTableScrollPane().getJSortedTable().setRowMargin(0);
     addHierarchyListener(new HierarchyListener() {

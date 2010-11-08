@@ -74,7 +74,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private static final String PROPERTY_LAST_ENGINE_PORT = "lastEnginePort";
 
   // For every 3 additional non-heavy jobs waiting, create additional connection.
-  private static final int FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION = 5; // used to have 3 here
+  private static final int FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION = 2; // used to have 5 here
 
   // Delay between retrying establishing a new connection after connectivity broke.
   private static final int DELAY_NEW_CONNECTION_AFTER_NET_ERROR = 15 * 1000; // 15 sec
@@ -136,7 +136,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private static final int MAX_CONNECTION_DELAY = Math.max(DELAY_PENALIZED_CONNECTION_TYPE, DELAY_PROTOCOLED_CONNECTION);
 
   /**
-   * Main Worker should send Ping-Pong to retain a persistant connection.
+   * Main Worker should send Ping-Pong to retain a persistent connection.
    * Also, this worker will handle the small item's queue.
    */
   private ServerInterfaceWorker mainWorker;
@@ -162,7 +162,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts);
     if (trace != null) trace.args(isClient);
-    if (trace != null) trace.exit(ServerInterfaceLayer.class, this);
+    if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
    * Creates new ServerInterfaceLayer
@@ -258,7 +258,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     jobScanner.setDaemon(true);
     jobScanner.start();
 
-    if (trace != null) trace.exit(ServerInterfaceLayer.class, this);
+    if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
   public long calculateRate() {
@@ -815,7 +815,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       // when main worker exists (the login message is available for new connections)
       if (hasMainWorker()) {
         // for every some non-heavy jobs create additional worker
-        countWorkersToCreate += (countAllJobs - countLargeFileJobs)/FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION;
+        countWorkersToCreate += (countAllJobs - countLargeFileJobs) / (FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION * countAllWorkers);
         // If we should create at least 1 connection because there are jobs long awaiting to be sent...
         if (forceAdditionalConnection && countWorkersToCreate < 1) {
           countWorkersToCreate = 1;
@@ -1817,7 +1817,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     public void runTraced() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "WaitingJobsScanner.runTraced()");
 
-      int delay = 5000;
+      int NORMAL_DELAY = 3000;
+      int delay = NORMAL_DELAY;
       while (!destroyed) {
         try {
           boolean checkForImmediateJobsNow = false;
@@ -1831,7 +1832,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               } catch (InterruptedException e) {
                 if (trace != null) trace.data(12, "waiting in jobs scanner interrupted");
               }
-              delay = 5000;
+              delay = NORMAL_DELAY;
             }
             // If scanner sleep was interrupted, then check immediately in job queue
             // for waiting jobs and try to create workers to serve them.
@@ -1875,7 +1876,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               // Another mechanizm is meant for that.
               if (hasPersistantMainWorker()) {
                 ensureEnoughAllWorkersExist(forceAdditionalConnection);
-                delay = 15000;
+                delay = (int) ((double) NORMAL_DELAY * 2.5d);
               }
             }
             lastScanHeadJob = headJob;

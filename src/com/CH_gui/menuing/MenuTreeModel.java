@@ -169,6 +169,8 @@ public class MenuTreeModel extends Object {
           ")|"+
         "Edit|-40|"+KeyEvent.VK_E+"|"+
           "(|"+
+            "Add Star|730|-1|-1|-1|"+
+            "Remove Star|731|-1|-1|-1|"+
             "Mark as Seen|709|"+KeyEvent.VK_R+"|"+KeyEvent.VK_R+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
             "Mark as Unseen|710|"+KeyEvent.VK_U+"|"+KeyEvent.VK_U+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
             "Mark All Seen|711|"+KeyEvent.VK_A+"|"+KeyEvent.VK_A+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+
@@ -368,6 +370,8 @@ public class MenuTreeModel extends Object {
           ")|"+
         "Edit|-40|-1|"+
           "(|"+
+            "Add Star|730|-1|-1|-1|"+
+            "Remove Star|731|-1|-1|-1|"+
             "Mark as Seen|709|-1|-1|-1|"+
             "Mark as Unseen|710|-1|-1|-1|"+
             "Mark All Seen|711|-1|-1|-1|"+

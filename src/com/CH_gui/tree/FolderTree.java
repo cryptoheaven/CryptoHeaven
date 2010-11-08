@@ -55,7 +55,11 @@ public class FolderTree extends JTree implements DisposableObj {
   static {
     FolderTreeNode.folderTreeNodeSortNameProviderI = new FolderTreeNodeSortNameProviderI() {
       public String getSortName(FolderPair fPair) {
-        return getFolderAndShareNamesForTreeDisplaySort(fPair);
+        String sortName = getFolderAndShareNamesForTreeDisplaySort(fPair);
+        // If name is known/unsealed, append unique ID to prevent jumping sort positions when folders have identical names and types
+        if (sortName != null && sortName.length() > 0)
+          sortName += " " + fPair.getId();
+        return sortName;
       }
     };
   }
@@ -190,7 +194,7 @@ public class FolderTree extends JTree implements DisposableObj {
             if (fName.startsWith(defaultChatFolderName)) {
               if (ownerAndChatNotes.length() > 0) {
                 nodeText = "";
-                appendPostfix = " chat";
+                appendPostfix = "chat";
               } else {
                 nodeText = "Chat...";
               }
@@ -257,8 +261,11 @@ public class FolderTree extends JTree implements DisposableObj {
 
             nodeText = newNameSB.toString();
           }
-          if (appendPostfix != null)
+          if (appendPostfix != null) {
+            if (!nodeText.endsWith(" "))
+              nodeText += " ";
             nodeText += appendPostfix;
+          }
           // only when folder name has been retrieved and decrypted we know the proper display text
           if (folderName != null)
             fRec.setCachedDisplayText(nodeText);

@@ -217,6 +217,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FILE_Q_RENAME), "Rename File" },
       // Save Msg File Attachments
       { new Integer(CommandCodes.FILE_Q_SAVE_MSG_FILE_ATT), "Save Message File Attachment(s)" },
+      // Update Status
+      { new Integer(CommandCodes.FILE_Q_UPDATE_STATUS), "Update Status" },
 
 
       // ========================

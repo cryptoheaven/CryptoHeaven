@@ -24,6 +24,10 @@ package com.CH_gui.groupTable;
  */
 public class GroupTableComponent4Frame extends GroupTableComponent {
 
+   public GroupTableComponent4Frame() {
+    super(false, false, false);
+  }
+
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/

@@ -12,18 +12,14 @@
 
 package com.CH_co.service.msg.dataSets.file;
 
-import java.io.IOException;
-
-import com.CH_co.cryptx.*;
+import com.CH_co.io.*;
 import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
-import com.CH_co.io.DataInputStream2; 
-import com.CH_co.io.DataOutputStream2;
-import com.CH_co.service.msg.ProtocolMsgDataSet;
-import com.CH_co.service.records.FileLinkRecord;
-import com.CH_co.service.records.FileDataRecord;
+import java.io.IOException;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -44,7 +40,7 @@ import com.CH_co.service.records.FileDataRecord;
 public class File_NewFiles_Rq extends ProtocolMsgDataSet {
 
   // <numberOfFiles> { 
-  //    <ownerObjId> <ownerObjType> <encFileType> <encFileName> <encFileDesc> <encSymmetricKey> <origSize> 
+  //    <ownerObjId> <ownerObjType> <encFileType> <encFileName> <encFileDesc> <encSymmetricKey> <origSize> <status>
   //    <encOrigDataDigest> <encSignedOrigDigest> <encEncDataDigest> <signingKeyId> <encSize> <encDataFile> 
   //    }+
 
@@ -86,6 +82,8 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
         dataOut.writeBytes(fileLinks[i].getEncFileDesc());
         dataOut.writeBytes(fileLinks[i].getEncSymmetricKey());
         dataOut.writeLongObj(fileLinks[i].origSize);
+        if (clientBuild >= 580 && serverBuild >= 580)
+          dataOut.writeSmallint(fileLinks[i].status);
 
         dataOut.writeBytes(fileDataRecords[i].getEncOrigDataDigest());
         dataOut.writeBytes(fileDataRecords[i].getEncSignedOrigDigest());
@@ -124,6 +122,8 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
         fileLinks[i].setEncFileName(new BASymCipherBulk(dataIn.readBytes()));
         fileLinks[i].setEncSymmetricKey(new BASymCipherBulk(dataIn.readBytes()));
         fileLinks[i].origSize = dataIn.readLongObj();
+        if (clientBuild >= 580 && serverBuild >= 580)
+          fileLinks[i].status = dataIn.readSmallint();
 
         // read in the file data record variables
         fileDataRecords[i] = new FileDataRecord();
@@ -142,8 +142,8 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
 
   
   /** Initializes 'this' object from a stream. */
-  public void partialInitFromStream(DataInputStream2 dataIn, int index, short clientBuild) throws IOException {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_NewFiles_Rq.class, "partialInitFromStream(DataInputStream2 dataIn, int index, short clientBuild)");
+  public void partialInitFromStream(DataInputStream2 dataIn, int index, short clientBuild, short serverBuild) throws IOException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_NewFiles_Rq.class, "partialInitFromStream(DataInputStream2 dataIn, int index, short clientBuild, short serverBuild)");
     if (trace != null) trace.args(index);
     if (trace != null) trace.args(clientBuild);
 
@@ -156,6 +156,8 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
     fileLinks[index].setEncFileDesc(dataIn.readSymCipherBulk());
     fileLinks[index].setEncSymmetricKey(dataIn.readSymCipherBulk());
     fileLinks[index].origSize = dataIn.readLongObj();
+    if (clientBuild >= 580 && serverBuild >= 580)
+      fileLinks[index].status = dataIn.readSmallint();
 
     // read in the file data record variables
     fileDataRecords[index] = new FileDataRecord();

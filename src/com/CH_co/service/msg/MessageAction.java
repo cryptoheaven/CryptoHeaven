@@ -54,6 +54,9 @@ public class MessageAction extends Message implements Cancellable {
   private int sendTryCount;
   private final static int MAX_SEND_TRY_COUNT = 2;
 
+  // Manual override of job priority used in queueing requests.
+  private Long priority = null;
+
   /** Creates new MessageAction */
   protected MessageAction() {
   }
@@ -164,6 +167,12 @@ public class MessageAction extends Message implements Cancellable {
     return stampTime;
   }
 
+  public Long getPriority() {
+    return priority;
+  }
+  public void setPriority(long priorityValue) {
+    priority = new Long(priorityValue);
+  }
 
   /** Output this Message to a specified stream. */
   public void writeToStream(DataOutputStream2 out, short clientBuild, short serverBuild) throws IOException {

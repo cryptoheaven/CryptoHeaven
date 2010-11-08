@@ -24,6 +24,10 @@ package com.CH_gui.chatTable;
  */
 public class ChatTableComponent4Frame extends ChatTableComponent {
 
+  public ChatTableComponent4Frame() {
+    super(false, false, false);
+  }
+
   /*******************************************************
   *** V i s u a l s S a v a b l e    interface methods ***
   *******************************************************/

@@ -90,9 +90,12 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private static final int OPEN_FILE_ACTION = 13;
   private static final int FILTER_ACTION = 14;
 
-  private static final int SORT_ASC_ACTION = 15;
-  private static final int SORT_DESC_ACTION = 16;
-  private static final int SORT_BY_FIRST_COLUMN_ACTION = 17;
+  private static final int STAR_ADD_ACTION = 15;
+  private static final int STAR_REMOVE_ACTION = 16;
+
+  private static final int SORT_ASC_ACTION = 17;
+  private static final int SORT_DESC_ACTION = 18;
+  private static final int SORT_BY_FIRST_COLUMN_ACTION = 19;
   private static final int CUSTOMIZE_COLUMNS_ACTION = SORT_BY_FIRST_COLUMN_ACTION + NUM_OF_SORT_COLUMNS;
 
   private static final int NUM_ACTIONS = CUSTOMIZE_COLUMNS_ACTION + 1;
@@ -141,6 +144,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     actions[MARK_AS_SEEN_ACTION] = new MarkAsSeenAction(leadingMsgActionId + MsgActionTable.MARK_AS_READ_ACTION);
     actions[MARK_AS_UNSEEN_ACTION] = new MarkAsUnseenAction(leadingMsgActionId + MsgActionTable.MARK_AS_UNREAD_ACTION);
     actions[MARK_ALL_SEEN_ACTION] = new MarkAllSeenAction(leadingMsgActionId + MsgActionTable.MARK_ALL_READ_ACTION);
+    actions[STAR_ADD_ACTION] = new StarAddAction(leadingMsgActionId + MsgActionTable.STAR_ADD_ACTION);
+    actions[STAR_REMOVE_ACTION] = new StarRemoveAction(leadingMsgActionId + MsgActionTable.STAR_REMOVE_ACTION);
 
     actions[OPEN_IN_SEPERATE_WINDOW_ACTION] = new OpenInSeperateWindowAction(leadingActionId + OPEN_IN_SEPERATE_WINDOW_ACTION);
     actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION] = new TracePrivilegeAndHistoryAction(leadingMsgActionId + MsgActionTable.TRACE_PRIVILEGE_AND_HISTORY_ACTION);
@@ -503,7 +508,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Seen"), Images.get(ImageNums.FLAG_BLANK_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_files_as_seen."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_TOOL));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Seen"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -517,10 +522,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
    */
   private class MarkAsUnseenAction extends AbstractActionTraced {
     public MarkAsUnseenAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unseen"), Images.get(ImageNums.FLAG_GREEN_SMALL));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_as_Unseen"), Images.get(ImageNums.FLAG_RED_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_selected_files_as_unseen."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_GREEN24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_RED_TOOL));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Unseen"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -534,10 +539,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
    */
   private class MarkAllSeenAction extends AbstractActionTraced {
     public MarkAllSeenAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Seen"), Images.get(ImageNums.FLAG_BLANK_DOUBLE16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Mark_All_Seen"), Images.get(ImageNums.FLAG_BLANK_DOUBLE_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Mark_all_files_in_selected_folder_as_seen."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLAG_BLANK_DOUBLE_TOOL));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_All_Seen"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -546,8 +551,30 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     }
   }
 
+  private class StarAddAction extends AbstractActionTraced {
+    public StarAddAction(int actionId) {
+      super(com.CH_gui.lang.Lang.rb.getString("action_Add_Star"), Images.get(ImageNums.STAR_BRIGHT));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      markSelectedStarred(true);
+    }
+  }
+
+  private class StarRemoveAction extends AbstractActionTraced {
+    public StarRemoveAction(int actionId) {
+      super(com.CH_gui.lang.Lang.rb.getString("action_Remove_Star"), Images.get(ImageNums.STAR_WIRE));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      markSelectedStarred(false);
+    }
+  }
+
   /**
-   * Open in seperate window
+   * Open in separate window
    */
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
@@ -702,7 +729,27 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     if (trace != null) trace.exit(FileActionTable.class);
   }
 
-
+   private void markSelectedStarred(boolean markStarred) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgActionTable.class, "markSelectedStarred(boolean markStarred)");
+    if (trace != null) trace.args(markStarred);
+    FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+    markStarred(records, markStarred);
+    if (trace != null) trace.exit(MsgActionTable.class);
+  }
+  public static void markStarred(FileLinkRecord[] records, boolean markStarred) {
+    if (records != null && records.length > 0) {
+      for (int i=0; i<records.length; i++) {
+        FileLinkRecord link = (FileLinkRecord) records[i];
+        if (link.isStarred() != markStarred) {
+          link.markStarred(markStarred);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.FILE_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { link.getId(), link.status })), 30000);
+        }
+      }
+//      // immediatelly update the cache without waiting on the results from the server
+//      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+//      cache.addFileLinkRecords(records);
+    }
+  }
 
   /**
    * Show a Move / Copy dialog and get the chosen destination FolderPair.
@@ -856,7 +903,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     // check for 'seen' and 'unseen' files
     boolean anySeen = false;
     boolean anyUnseen = false;
-
+    boolean anyStarred = false;
+    boolean anyUnstarred = false;
     boolean anyFileLink = false;
 
     if (records != null) {
@@ -876,6 +924,12 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
               else if (statRecord.mark.equals(StatRecord.FLAG_NEW))
                 anyUnseen = true;
             }
+          }
+          if (!(anyStarred && anyUnstarred)) {
+            if (fLink.isStarred())
+              anyStarred = true;
+            else
+              anyUnstarred = true;
           }
         }
       }
@@ -920,6 +974,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       actions[MARK_AS_SEEN_ACTION].setEnabled(false);
       actions[MARK_AS_UNSEEN_ACTION].setEnabled(false);
       actions[MARK_ALL_SEEN_ACTION].setEnabled(anyUnseenGlobal);
+      actions[STAR_ADD_ACTION].setEnabled(false);
+      actions[STAR_REMOVE_ACTION].setEnabled(false);
       actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION].setEnabled(false);
     } else if (count == 1) {
       actions[OPEN_FILE_ACTION].setEnabled(noFolderPairs);
@@ -932,6 +988,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       actions[MARK_AS_SEEN_ACTION].setEnabled(anyUnseen);
       actions[MARK_AS_UNSEEN_ACTION].setEnabled(anySeen);
       actions[MARK_ALL_SEEN_ACTION].setEnabled(anyUnseenGlobal);
+      actions[STAR_ADD_ACTION].setEnabled(anyUnstarred);
+      actions[STAR_REMOVE_ACTION].setEnabled(anyStarred);
       actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION].setEnabled(true);
     } else if (count > 1) {
       actions[OPEN_FILE_ACTION].setEnabled(false);
@@ -944,6 +1002,8 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       actions[MARK_AS_SEEN_ACTION].setEnabled(anyUnseen);
       actions[MARK_AS_UNSEEN_ACTION].setEnabled(anySeen);
       actions[MARK_ALL_SEEN_ACTION].setEnabled(anyUnseenGlobal);
+      actions[STAR_ADD_ACTION].setEnabled(anyUnstarred);
+      actions[STAR_REMOVE_ACTION].setEnabled(anyStarred);
       actions[TRACE_PRIVILEGE_AND_HISTORY_ACTION].setEnabled(true);
     }
 

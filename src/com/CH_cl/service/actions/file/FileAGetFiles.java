@@ -196,6 +196,7 @@ public class FileAGetFiles extends ClientMessageAction {
           File_GetFiles_Rq request = new File_GetFiles_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, timeStamp);
           MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
           msgAction.setInterruptsFrom(this);
+          //msgAction.setPriority(PriorityJobFifo.MAIN_WORKER_LOWEST_PRIORITY);
           getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
         }
       }

@@ -45,7 +45,7 @@ public class RecycleTableFrame extends JActionFrameClosable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableFrame.class, "RecycleTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 
-    RecycleTableComponent mainComponent = new RecycleTableComponent();
+    RecycleTableComponent mainComponent = new RecycleTableComponent(false, false, false);
     mainComponent.initData(folderPair.getId());
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);
 

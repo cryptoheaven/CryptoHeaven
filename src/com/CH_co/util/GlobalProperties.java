@@ -210,12 +210,14 @@ public class GlobalProperties extends Object {
   // build 572 BurstableMonitor -> BurstableBucket, minimized SIL retries to login related actions only
   // build 574 Ping includes information regarding last reported network delay
   // build 576 Speed Limited streams can calculate rate without limiting throughput, fixes with restoreVisuals() exception handling, private label enhancements for replyURL and support email template
+  // build 578 Changed chat message entry layout and added 'typing' notification into chat entry panel, removed toolbars from attachment chooser dialog
+  // build 580 New actions: Add Star, Remove Star, removed coloured flags leaving only the red flags
 
-  public static final short PROGRAM_BUILD_NUMBER = 576;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 580;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.2f;
-  public static final short PROGRAM_VERSION_MINOR = 4;
+  public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
 

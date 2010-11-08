@@ -45,7 +45,7 @@ public class FileTableFrame extends JActionFrameClosable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableFrame.class, "FileTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 
-    FileTableComponent mainComponent = new FileTableComponent();
+    FileTableComponent mainComponent = new FileTableComponent(false, false, false);
     mainComponent.initData(folderPair.getId());
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);
 
