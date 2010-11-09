@@ -556,7 +556,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         stampList.notifyAll();
       }
 
-      // once stamp is registered, submit the action
+      // once stamp is registered, mark action expiry time and submit the action
+      if (timeout > 0)
+        msgAction.setExpiryTime(System.currentTimeMillis() + timeout);
       submitAndReturnNow(msgAction);
 
       // We cannot synchronize on the Stamp before submitAndReturn because other independent exec threads

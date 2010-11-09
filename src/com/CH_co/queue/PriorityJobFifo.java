@@ -28,7 +28,7 @@ import com.CH_co.service.records.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -36,7 +36,7 @@ import com.CH_co.service.records.*;
  *
  * <b>$Revision: 1.5 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class PriorityJobFifo extends PriorityFifo {
 
@@ -68,11 +68,11 @@ public class PriorityJobFifo extends PriorityFifo {
   }
 
   public static boolean isJobLogin(int code) {
-    return code == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || 
+    return code == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
            code == CommandCodes.SYSENG_Q_LOGIN;
   }
   public static boolean isJobForRetry(MessageAction msgAction) {
-    return msgAction != null && !msgAction.areRetriesExceeded() && 
+    return msgAction != null && !msgAction.areRetriesExceeded() &&
            !PriorityJobFifo.isJobLogin(msgAction.getActionCode()) &&
            msgAction.getActionCode() != CommandCodes.SYS_Q_PING &&
            getJobType(msgAction) != JOB_TYPE_HEAVY;
@@ -260,7 +260,7 @@ public class PriorityJobFifo extends PriorityFifo {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "addJob(MessageAction msgAction)");
     if (trace != null) trace.args(msgAction);
 
-    add(msgAction, getJobPriority(msgAction));
+    add(msgAction, getJobPriority(msgAction), msgAction.getExpiryTime());
 
     if (trace != null) trace.exit(PriorityJobFifo.class);
   }
