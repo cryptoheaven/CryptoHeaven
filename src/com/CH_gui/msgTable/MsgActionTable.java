@@ -802,7 +802,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           StringBuffer sb = new StringBuffer();
 
           sb.append("<html><body>");
-          sb.append("<font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>" + ListRenderer.getRenderedText(model.getParentFolderPair()) + "</b></font>");
+          sb.append("<font size='-1' face=" + HTML_utils.DEFAULT_FONTS_QUOTED + "><b>").append(ListRenderer.getRenderedText(model.getParentFolderPair())).append("</b></font>");
           sb.append("<hr color=#000000 noshade size=2>");
           sb.append("<table cellpadding='0' cellspacing='0' border='0'>");
           sb.append("<tr>");
@@ -1144,8 +1144,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      Vector inviteUIDsV = new Vector();
-      Vector inviteEmailAddrsV = new Vector();
+      ArrayList inviteUIDsL = new ArrayList();
+      ArrayList inviteEmailAddrsL = new ArrayList();
       StringBuffer inviteEmailAddrs = new StringBuffer();
 
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedRecords();
@@ -1164,8 +1164,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
                 emailAddr = dataRecord.email;
               }
               if (emailAddr != null && emailAddr.trim().length() > 0) {
-                if (!inviteEmailAddrsV.contains(emailAddr)) {
-                  inviteEmailAddrsV.addElement(emailAddr);
+                if (!inviteEmailAddrsL.contains(emailAddr)) {
+                  inviteEmailAddrsL.add(emailAddr);
                   inviteEmailAddrs.append(emailAddr);
                   inviteEmailAddrs.append("; ");
                 }
@@ -1175,26 +1175,26 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
               Long userId = cache.getMyUserId();
               ContactRecord cRec = cache.getContactRecordOwnerWith(userId, dataRecord.senderUserId);
               if (cRec == null && !userId.equals(dataRecord.senderUserId)) {
-                if (!inviteUIDsV.contains(withUserId)) {
-                  inviteUIDsV.addElement(withUserId);
+                if (!inviteUIDsL.contains(withUserId)) {
+                  inviteUIDsL.add(withUserId);
                 }
               }
             }
           }
         }
 
-        boolean anyToInvite = inviteUIDsV.size() > 0 || inviteEmailAddrsV.size() > 0;
+        boolean anyToInvite = inviteUIDsL.size() > 0 || inviteEmailAddrsL.size() > 0;
         if (!anyToInvite) {
           // if no email address available, at least show empty dialog
-          inviteEmailAddrsV.addElement("");
+          inviteEmailAddrsL.add("");
           inviteEmailAddrs.append("");
         }
         Window w = SwingUtilities.windowForComponent(MsgActionTable.this);
-        if (inviteUIDsV.size() > 0) {
-          if (w instanceof Frame) new InitiateContactDialog((Frame) w, RecordUtils.getIDs2(inviteUIDsV));
-          else if (w instanceof Dialog) new InitiateContactDialog((Dialog) w, RecordUtils.getIDs2(inviteUIDsV));
+        if (inviteUIDsL.size() > 0) {
+          if (w instanceof Frame) new InitiateContactDialog((Frame) w, RecordUtils.getIDs2(inviteUIDsL));
+          else if (w instanceof Dialog) new InitiateContactDialog((Dialog) w, RecordUtils.getIDs2(inviteUIDsL));
         }
-        if (inviteEmailAddrsV.size() > 0) {
+        if (inviteEmailAddrsL.size() > 0) {
           if (w instanceof Dialog) new InviteByEmailDialog((Dialog) w, inviteEmailAddrs.toString());
           else if (w instanceof Frame) new InviteByEmailDialog((Frame) w, inviteEmailAddrs.toString());
         }
@@ -1402,13 +1402,13 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (trace != null) trace.args(newMark);
 
     MsgTableModel tableModel = (MsgTableModel) getTableModel();
-    Vector linksV = new Vector();
+    ArrayList linksL = new ArrayList();
     for (int i=0; i<tableModel.getRowCount(); i++) {
-      linksV.addElement(tableModel.getRowObjectNoTrace(i));
+      linksL.add(tableModel.getRowObjectNoTrace(i));
     }
-    if (linksV.size() > 0) {
-      MsgLinkRecord[] links = new MsgLinkRecord[linksV.size()];
-      linksV.toArray(links);
+    if (linksL.size() > 0) {
+      MsgLinkRecord[] links = new MsgLinkRecord[linksL.size()];
+      linksL.toArray(links);
       markRecordsAs(links, newMark);
     }
 
@@ -1421,15 +1421,15 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (records != null && records.length > 0) {
       // gather all stats which need to be updated
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      Vector statsV = new Vector();
+      ArrayList statsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
         StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
         if (statRecord != null && !statRecord.mark.equals(newMark))
-          statsV.addElement(statRecord);
+          statsL.add(statRecord);
       }
-      if (statsV.size() > 0) {
-        StatRecord[] stats = new StatRecord[statsV.size()];
-        statsV.toArray(stats);
+      if (statsL.size() > 0) {
+        StatRecord[] stats = new StatRecord[statsL.size()];
+        statsL.toArray(stats);
         // clone the stats to send the request
         StatRecord[] statsClones = (StatRecord[]) RecordUtils.cloneRecords(stats);
 
@@ -1619,14 +1619,14 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       else if (ownerObjType == Record.RECORD_TYPE_MESSAGE) {
         Long[] ownerObjIDs = MsgLinkRecord.getOwnerObjIDs(mLinks, Record.RECORD_TYPE_MESSAGE);
         // Find some message links for the owner messages
-        Vector msgLinksV = new Vector();
+        ArrayList msgLinksL = new ArrayList();
         for (int i=0; i<ownerObjIDs.length; i++) {
           MsgLinkRecord[] msgLinksForMsg = cache.getMsgLinkRecordsForMsg(ownerObjIDs[i]);
           if (msgLinksForMsg != null && msgLinksForMsg.length > 0)
-            msgLinksV.addElement(msgLinksForMsg[0]);
+            msgLinksL.add(msgLinksForMsg[0]);
         }
-        MsgLinkRecord[] msgLinks = new MsgLinkRecord[msgLinksV.size()];
-        msgLinksV.toArray(msgLinks);
+        MsgLinkRecord[] msgLinks = new MsgLinkRecord[msgLinksL.size()];
+        msgLinksL.toArray(msgLinks);
 
         request.fromMsgLinkIDs = RecordUtils.getIDs(msgLinks);
 
