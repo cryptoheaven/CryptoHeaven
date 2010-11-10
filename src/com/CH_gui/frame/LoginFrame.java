@@ -1797,7 +1797,7 @@ public class LoginFrame extends JFrame {
       // It is possible to get back request when connection failed so we will retry in that case.
       for (int i=0; i<3; i++) {
         if (trace != null) trace.data(20, "login short loop", i);
-        replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 60000);
+        replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 90000);
         if (replyAction == null || replyAction.getActionCode() != msgAction.getActionCode()) break;
       }
 
@@ -1875,7 +1875,7 @@ public class LoginFrame extends JFrame {
     // It is possible to get back request when connection failed so we will retry in that case.
     for (int i=0; i<3; i++) {
       if (trace != null) trace.data(20, "fetch login info short loop", i);
-      replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 60000);
+      replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 90000);
       if (replyAction == null || replyAction.getActionCode() != msgAction.getActionCode()) break;
     }
 
@@ -2039,7 +2039,7 @@ public class LoginFrame extends JFrame {
       Object[] set2 = new Object[] { new Object[] { request.requestedEmailAddress }, Boolean.FALSE };
       Obj_List_Co chkRequest2 = new Obj_List_Co(set2);
       MessageAction chkAction2 = new MessageAction(CommandCodes.EML_Q_CHECK_AVAIL, chkRequest2);
-      ClientMessageAction replyChkAction2 = MainFrame.getServerInterfaceLayer().submitAndFetchReply(chkAction2, 30000);
+      ClientMessageAction replyChkAction2 = MainFrame.getServerInterfaceLayer().submitAndFetchReply(chkAction2, 90000);
       if (replyChkAction2 != null && replyChkAction2.getActionCode() >= 0) {
         chkEmailOk = true;
       } else if (replyChkAction2 != null && replyChkAction2.getActionCode() < 0) {
@@ -2056,7 +2056,7 @@ public class LoginFrame extends JFrame {
         // remember the new user private key for the purpose of decrypting the login reply session key
         ServerInterfaceLayer.getFetchedDataCache().setNewUserPrivateKey(request.keyRecord.getPrivateKey());
         MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_NEW_USER, request);
-        ClientMessageAction replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
+        ClientMessageAction replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 90000);
         if (replyAction.getActionCode() == CommandCodes.USR_A_NEW_USER){
           success = true;
         } else {
