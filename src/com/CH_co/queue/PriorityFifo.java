@@ -59,11 +59,10 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
   /**
    * Lower priority number, closer in the queue.
    */
-  public synchronized void add(Object obj, long priority, Long expiryTime) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "add(Object obj, long priority, Long expiryTime)");
+  public synchronized void add(Object obj, long priority) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "add(Object obj, long priority)");
     if (trace != null) trace.args(obj);
     if (trace != null) trace.args(priority);
-    if (trace != null) trace.args(expiryTime);
 
     if (closed)
       throw new IllegalStateException("Fifo is closed, no new items can be added.");
@@ -82,7 +81,7 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     }
 
     if (trace != null) trace.data(10, "insertion index", index);
-    list.add(index, new ObjectPair(obj, priority, expiryTime));
+    list.add(index, new ObjectPair(obj, priority));
 
     notify();
 
@@ -93,14 +92,10 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
 
     if (trace != null) trace.exit(PriorityFifo.class);
   }
-  public synchronized void add(Object obj, long priority) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "add(Object obj, long priority)");
-    add(obj, priority, null);
-    if (trace != null) trace.exit(PriorityFifo.class);
-  }
+
   public synchronized void add(Object obj) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "add(Object obj)");
-    add(obj, PRIORITY_HIGHEST, null);
+    add(obj, PRIORITY_HIGHEST);
     if (trace != null) trace.exit(PriorityFifo.class);
   }
 
@@ -138,8 +133,6 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     if (trace != null) trace.args(higherInclusiveBound);
     if (trace != null) trace.args(lowerInclusiveBound);
 
-    removeExpired();
-
     long lowValue = higherInclusiveBound < lowerInclusiveBound ? higherInclusiveBound : lowerInclusiveBound;
     long highValue = higherInclusiveBound < lowerInclusiveBound ? lowerInclusiveBound : higherInclusiveBound;
 
@@ -174,24 +167,9 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     return obj;
   }
 
-  private synchronized void removeExpired() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "removeExpired()");
-    long now = System.currentTimeMillis();
-    Iterator iter = list.iterator();
-    while (iter.hasNext()) {
-      ObjectPair pair = (ObjectPair) iter.next();
-      if (pair.expiryTime != null && pair.expiryTime.longValue() < now) {
-        iter.remove();
-      }
-    }
-    if (trace != null) trace.exit(PriorityFifo.class);
-    return;
-  }
-
   /** @return the next to remove object without removing it. */
   public synchronized Object peek() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "peek()");
-    removeExpired();
     ObjectPair pair = (ObjectPair) list.getFirst();
     Object obj = pair.obj;
     if (trace != null) trace.exit(PriorityFifo.class, obj);
@@ -201,7 +179,6 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
   /** Get number of objects in the fifo */
   public synchronized int size() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "size()");
-    removeExpired();
     int size = list.size();
     if (trace != null) trace.exit(PriorityFifo.class, size);
     return size;
@@ -228,7 +205,6 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
   }
 
   public synchronized Iterator iterator() {
-    removeExpired();
     return new PriorityFifoIterator(this);
   }
 
@@ -236,20 +212,10 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
   private static class ObjectPair {
     Object obj;
     long priority;
-    Long expiryTime;
 
-    ObjectPair(Object obj, long priority, Long expiryTime) {
+    ObjectPair(Object obj, long priority) {
       this.obj = obj;
       this.priority = priority;
-      this.expiryTime = expiryTime;
-    }
-
-    public String toString() {
-      return "[OpjectPair"
-        + ": obj="        + obj
-        + ", priority="   + priority
-        + ", expiryTime=" + expiryTime
-        + "]";
     }
   }
 

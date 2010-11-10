@@ -266,16 +266,16 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
 
     Long[] ownerObjIDs = null;
     if (msgLinks != null) {
-      ArrayList msgLinksL = null;
+      Vector msgLinksV = null;
       for (int i=0; i<msgLinks.length; i++) {
         if (msgLinks[i].ownerObjType.shortValue() == ownerType) {
           Long id = msgLinks[i].ownerObjId;
-          if (msgLinksL == null) msgLinksL = new ArrayList();
-          if (!msgLinksL.contains(id))
-            msgLinksL.add(id);
+          if (msgLinksV == null) msgLinksV = new Vector();
+          if (!msgLinksV.contains(id))
+            msgLinksV.addElement(id);
         }
       }
-      ownerObjIDs = (Long[]) ArrayUtils.toArray(msgLinksL, Long.class);
+      ownerObjIDs = (Long[]) ArrayUtils.toArray(msgLinksV, Long.class);
     }
 
     if (trace != null) trace.exit(MsgLinkRecord.class, ownerObjIDs);

@@ -56,7 +56,6 @@ public class MessageAction extends Message implements Cancellable {
 
   // Manual override of job priority used in queueing requests.
   private Long priority = null;
-  private Long expiryTime = null;
 
   /** Creates new MessageAction */
   protected MessageAction() {
@@ -168,12 +167,6 @@ public class MessageAction extends Message implements Cancellable {
     return stampTime;
   }
 
-  public Long getExpiryTime() {
-    return expiryTime;
-  }
-  public void setExpiryTime(long timeOfExpiry) {
-    expiryTime = new Long(timeOfExpiry);
-  }
   public Long getPriority() {
     return priority;
   }

@@ -212,9 +212,8 @@ public class GlobalProperties extends Object {
   // build 576 Speed Limited streams can calculate rate without limiting throughput, fixes with restoreVisuals() exception handling, private label enhancements for replyURL and support email template
   // build 578 Changed chat message entry layout and added 'typing' notification into chat entry panel, removed toolbars from attachment chooser dialog
   // build 580 New actions: Add Star, Remove Star, removed coloured flags leaving only the red flags
-  // build 582 PriorityFifo gets new expiryTime attribute to purge expired jobs
 
-  public static final short PROGRAM_BUILD_NUMBER = 582;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 580;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.2f;
