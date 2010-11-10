@@ -65,7 +65,7 @@ public class AccountOptionsDialog extends GeneralDialog {
   private static final int DEFAULT_OK_INDEX = 0;
   private static final int DEFAULT_CANCEL_INDEX = 1;
 
-  private JMyTextOptionField jDefaultEmail;
+  private JTextField jDefaultEmail;
   private JMyLabel jEncryption;
   private JTextField jContactEmail;
   private JTextField jActivationCode;
@@ -275,6 +275,7 @@ public class AccountOptionsDialog extends GeneralDialog {
               EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
               defaultEmail = emlRec.getEmailAddressFull().toLowerCase();
               jDefaultEmail.setText(emlRec.getEmailAddressFull());
+              jDefaultEmail.setCaretPosition(0);
               setEditableDefaultEmail(myUserRecord, emlRec);
             }
 
@@ -407,7 +408,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     JLabel jAccountStatus = new JMyLabel(userRec.getAccountType());
     if (userRec.isHeld())
       jAccountStatus.setIcon(Images.get(ImageNums.WARNING16));
-    topPanel.add(jAccountStatus, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+    topPanel.add(jAccountStatus, new GridBagConstraints(1, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -417,7 +418,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     topPanel.add(new JMyLabel(ListRenderer.getRenderedIcon(userRec)), new GridBagConstraints(1, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 2), 0, 0));
-    topPanel.add(accName, new GridBagConstraints(2, posY, 1, 1, 10, 0,
+    topPanel.add(accName, new GridBagConstraints(2, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
@@ -431,15 +432,22 @@ public class AccountOptionsDialog extends GeneralDialog {
         else if (w instanceof Frame) new ManageEmailAddressesDialog((Frame) w, userRec, AccountOptionsDialog.this);
       }
     };
-    jDefaultEmail = new JMyTextOptionField(emlRec.address, new JMyDropdownIcon(), emlAction);
+    //jDefaultEmail = new JMyTextOptionField(emlRec.address, new JMyDropdownIcon(), emlAction);
+    jDefaultEmail = new JMyTextField(emlRec.address);
+    jDefaultEmail.setCaretPosition(0);
+    JButton jManage = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString("button_Manage"));
+    jManage.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
+    jManage.addActionListener(emlAction);
     if (userRec.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
       EmailRecord emlRecord = cache.getEmailRecord(userRec.defaultEmlId);
       if (emlRecord != null) {
         defaultEmail = emlRecord.getEmailAddressFull().toLowerCase();
         jDefaultEmail.setText(emlRecord.getEmailAddressFull());
+        jDefaultEmail.setCaretPosition(0);
         setEditableDefaultEmail(myUserRec, emlRecord);
       } else {
         jDefaultEmail.setText(FETCHING_DATA);
+        jDefaultEmail.setCaretPosition(0);
       }
     }
     jDefaultEmail.getDocument().addDocumentListener(documentChangeListener);
@@ -449,13 +457,15 @@ public class AccountOptionsDialog extends GeneralDialog {
     topPanel.add(jEmlLabel, new GridBagConstraints(1, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 2), 0, 0));
     topPanel.add(jDefaultEmail, new GridBagConstraints(2, posY, 1, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 5), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 2), 0, 0));
+    topPanel.add(jManage, new GridBagConstraints(3, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
     topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jEncryption = new JMyLabel("...");
-    topPanel.add(jEncryption, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+    topPanel.add(jEncryption, new GridBagConstraints(1, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -477,7 +487,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jActivationCode = new JMyTextField();
     jActivationCode.getDocument().addDocumentListener(documentChangeListener);
-    topPanel.add(jActivationCode, new GridBagConstraints(1, posY, 2, 1, 10, 0,
+    topPanel.add(jActivationCode, new GridBagConstraints(1, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -1002,6 +1012,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         String[] emls = UserOps.getCachedDefaultEmail(uRec, false);
         if (emls != null) {
           jDefaultEmail.setText(emls[2]);
+          jDefaultEmail.setCaretPosition(0);
           defaultEmail = emls[2].toLowerCase();
         }
         setEnabledButtons();
