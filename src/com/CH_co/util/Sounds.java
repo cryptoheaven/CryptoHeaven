@@ -55,12 +55,14 @@ public class Sounds extends Object {
   //public static final int RING_OUT;
 
   private static final String clipNames[];
-
+  private static final long clipPlayStamps[];
+  private static long MIN_CLIP_TIME_APART = 1000;
 
 
   static {
     int i = 0;
     clipNames = new String[11];
+    clipPlayStamps = new long[11];
 
     DIALOG_ERROR = i;
     clipNames[i] = "errorDialog.wav"; i++;
@@ -119,8 +121,14 @@ public class Sounds extends Object {
       boolean isSoundEnabled = Boolean.valueOf(GlobalProperties.getProperty(SOUND_ENABLEMENT_PROPERTY, "true")).booleanValue();
       if (isSoundEnabled) {
         try {
-          SoundsPlayerI soundsPlayer = (SoundsPlayerI) soundsPlayerImpl.newInstance();
-          soundsPlayer.play(audioClipIndex);
+          long now = System.currentTimeMillis();
+          long lastPlayed = clipPlayStamps[audioClipIndex];
+          long expired = lastPlayed + MIN_CLIP_TIME_APART;
+          if (expired < now || lastPlayed > now) {
+            clipPlayStamps[audioClipIndex] = now;
+            SoundsPlayerI soundsPlayer = (SoundsPlayerI) soundsPlayerImpl.newInstance();
+            soundsPlayer.play(audioClipIndex);
+          }
         } catch (Throwable t) {
         }
       }
