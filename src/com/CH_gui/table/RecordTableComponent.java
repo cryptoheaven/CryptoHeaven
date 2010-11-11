@@ -801,6 +801,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private void changeDescription(Long folderId) {
     boolean isParticipantsPanelMade = false;
     boolean isAnyOnline = false;
+    boolean isAnyOffline = false;
     if (folderId == null) {
       jDescriptionLabel.setText(null);
     } else {
@@ -921,7 +922,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 }
               } else if (participants[i] instanceof ContactRecord) {
                 ContactRecord cRec = (ContactRecord) participants[i];
-                isAnyOnline |= cRec.isOnlineStatus();
+                boolean isOnline = cRec.isOnlineStatus();
+                isAnyOnline |= isOnline;
+                isAnyOffline |= !isOnline;
               } else if (participants[i] instanceof FolderRecord) {
                 FolderRecord fldRec = (FolderRecord) participants[i];
                 if (fldRec.isGroupType()) {
@@ -942,7 +945,10 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               }
               panel.add(label);
             }
-            jOfflinePanel.setVisible(fRec.isChatting() && !isAnyOnline);
+            // Also use isAnyOffline to only show the offline-panel when we are sure we have offline contacts,
+            // not just lack of information when for example refreshing folders, etc.
+            if (isAnyOnline || isAnyOffline)
+              jOfflinePanel.setVisible(fRec.isChatting() && !isAnyOnline && isAnyOffline);
           }
         } // end share != null
       } catch (Throwable t) {
