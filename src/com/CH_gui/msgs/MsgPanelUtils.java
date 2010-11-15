@@ -12,13 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
-import java.awt.*;
-import java.io.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
@@ -40,6 +33,13 @@ import com.CH_gui.list.*;
 import com.CH_gui.util.*;
 
 import com.CH_guiLib.util.HTML_Ops;
+
+import java.awt.*;
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -177,9 +177,9 @@ public class MsgPanelUtils extends Object {
     if (trace != null) trace.args(recipients);
     if (trace != null) trace.args(gatherFirst_N_only);
 
-    Vector recsVto = new Vector();
-    Vector recsVcc = new Vector();
-    Vector recsVbcc = new Vector();
+    ArrayList recsLto = new ArrayList();
+    ArrayList recsLcc = new ArrayList();
+    ArrayList recsLbcc = new ArrayList();
     int countGathered = 0;
     if (recipients != null && recipients.length() > 0) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -196,8 +196,8 @@ public class MsgPanelUtils extends Object {
           }
 
           // depending if TO: or CC: collect to a different set
-          Vector recsV = isCopy ? recsVcc : recsVto;
-          recsV = isCopyBlind ? recsVbcc : recsV;
+          ArrayList recsL = isCopy ? recsLcc : recsLto;
+          recsL = isCopyBlind ? recsLbcc : recsL;
 
           String sId = st.nextToken();
           Record rec = null;
@@ -206,12 +206,12 @@ public class MsgPanelUtils extends Object {
             if (typeChar == MsgDataRecord.RECIPIENT_USER) {
               rec = convertUserIdToFamiliarUser(lId, true, false);
               if (rec != null) {
-                recsV.addElement(rec);
+                recsL.add(rec);
               } else {
                 UserRecord uRec = new UserRecord();
                 uRec.userId = lId;
                 uRec.handle = com.CH_gui.lang.Lang.rb.getString("User");
-                recsV.addElement(uRec);
+                recsL.add(uRec);
               }
               countGathered ++;
             } // end "u"
@@ -219,21 +219,21 @@ public class MsgPanelUtils extends Object {
               FolderShareRecord sRec = cache.getFolderShareRecordMy(lId, true);
               FolderRecord fRec = cache.getFolderRecord(lId);
               if (sRec != null && fRec != null) {
-                recsV.addElement(new FolderPair(sRec, fRec));
+                recsL.add(new FolderPair(sRec, fRec));
               } else {
                 fRec = new FolderRecord();
                 fRec.folderId = lId;
                 fRec.folderType = new Short(FolderRecord.FILE_FOLDER);
                 fRec.numOfShares = new Short((short)1);
-                recsV.addElement(fRec);
+                recsL.add(fRec);
               }
               countGathered ++;
             } // end "b"
           } else if (typeChar == MsgDataRecord.RECIPIENT_EMAIL_INTERNET) {
-            recsV.addElement(new EmailAddressRecord(Misc.escapeWhiteDecode(sId)));
+            recsL.add(new EmailAddressRecord(Misc.escapeWhiteDecode(sId)));
             countGathered ++;
           } else if (typeChar == MsgDataRecord.RECIPIENT_EMAIL_NEWS) {
-            recsV.addElement(new NewsAddressRecord(Misc.escapeWhiteDecode(sId)));
+            recsL.add(new NewsAddressRecord(Misc.escapeWhiteDecode(sId)));
             countGathered ++;
           }
         } // end while
@@ -244,17 +244,17 @@ public class MsgPanelUtils extends Object {
     }
 
     Record[][] recs = new Record[3][];
-    recs[MsgLinkRecord.RECIPIENT_TYPE_TO] = new Record[recsVto.size()];
-    recs[MsgLinkRecord.RECIPIENT_TYPE_CC] = new Record[recsVcc.size()];
-    recs[MsgLinkRecord.RECIPIENT_TYPE_BCC] = new Record[recsVbcc.size()];
-    if (recsVto.size() > 0) {
-      recsVto.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_TO]);
+    recs[MsgLinkRecord.RECIPIENT_TYPE_TO] = new Record[recsLto.size()];
+    recs[MsgLinkRecord.RECIPIENT_TYPE_CC] = new Record[recsLcc.size()];
+    recs[MsgLinkRecord.RECIPIENT_TYPE_BCC] = new Record[recsLbcc.size()];
+    if (recsLto.size() > 0) {
+      recsLto.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_TO]);
     }
-    if (recsVcc.size() > 0) {
-      recsVcc.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_CC]);
+    if (recsLcc.size() > 0) {
+      recsLcc.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_CC]);
     }
-    if (recsVbcc.size() > 0) {
-      recsVbcc.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_BCC]);
+    if (recsLbcc.size() > 0) {
+      recsLbcc.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_BCC]);
     }
 
     if (trace != null) trace.exit(MsgPanelUtils.class, recs);
@@ -305,8 +305,8 @@ public class MsgPanelUtils extends Object {
     if (trace != null) trace.args(records);
 
     Record[] users = null;
-    Vector cRecsV = new Vector();
-    Vector fRecsV = new Vector();
+    ArrayList cRecsL = new ArrayList();
+    ArrayList fRecsL = new ArrayList();
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long userId = cache.getMyUserId();
@@ -314,36 +314,36 @@ public class MsgPanelUtils extends Object {
       for (int i=0; i<records.length; i++) {
         if (records[i] instanceof ContactRecord) {
           ContactRecord cRec = (ContactRecord) records[i];
-          if (!cRecsV.contains(cRec) && cRec.ownerUserId.equals(userId) && cRec.isOfActiveType())
-            cRecsV.addElement(cRec);
+          if (!cRecsL.contains(cRec) && cRec.ownerUserId.equals(userId) && cRec.isOfActiveType())
+            cRecsL.add(cRec);
         } else if (records[i] instanceof FolderPair) {
           FolderPair fPair = (FolderPair) records[i];
           if (fPair.getFolderRecord().isGroupType()) {
-            if (!fRecsV.contains(fPair))
-              fRecsV.addElement(fPair);
+            if (!fRecsL.contains(fPair))
+              fRecsL.add(fPair);
           }
         }
       }
     }
 
-    Vector usersV = new Vector(cRecsV);
+    ArrayList usersL = new ArrayList(cRecsL);
 
-    if (fRecsV.size() > 0) {
+    if (fRecsL.size() > 0) {
       ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_ACCESS_USERS, new Obj_IDList_Co(RecordUtils.getIDs(fRecsV))), 30000);
+      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_ACCESS_USERS, new Obj_IDList_Co(RecordUtils.getIDs(fRecsL))), 30000);
       DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       if (msgAction != null && msgAction.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
         Usr_UsrHandles_Rp usrSet = (Usr_UsrHandles_Rp) msgAction.getMsgDataSet();
         UserRecord[] usrRecs = usrSet.userRecords;
         for (int i=0; i<usrRecs.length; i++) {
           Record user = MsgPanelUtils.convertUserIdToFamiliarUser(usrRecs[i].userId, true, false);
-          if (!usersV.contains(user))
-            usersV.addElement(user);
+          if (!usersL.contains(user))
+            usersL.add(user);
         }
       }
     }
 
-    users = (Record[]) ArrayUtils.toArray(usersV, Record.class);
+    users = (Record[]) ArrayUtils.toArray(usersL, Record.class);
 
     if (trace != null) trace.exit(MsgPanelUtils.class, users);
     return users;
@@ -586,12 +586,12 @@ public class MsgPanelUtils extends Object {
         if (doc instanceof DefaultStyledDocument) {
           DefaultStyledDocument sDoc = (DefaultStyledDocument) doc;
           Enumeration enm = sDoc.getStyleNames();
-          Vector stylesV = new Vector();
+          ArrayList stylesL = new ArrayList();
           while (enm.hasMoreElements()) {
-            stylesV.addElement(enm.nextElement());
+            stylesL.add(enm.nextElement());
           }
-          for (int i=0; i<stylesV.size(); i++) {
-            String styleName = (String) stylesV.elementAt(i);
+          for (int i=0; i<stylesL.size(); i++) {
+            String styleName = (String) stylesL.get(i);
             sDoc.removeStyle(styleName);
           }
         }
@@ -621,7 +621,7 @@ public class MsgPanelUtils extends Object {
               for (int j=0; j<comps2.length; j++) {
                 Component comp2 = comps2[j];
                 //System.out.println("j " + comp2.getName() + ", " + comp2.getClass() + ", " + comp2.getClass().getName() + ", " + comp2.getClass().getSimpleName());
-                cnt2.remove(comps2[j]);
+                cnt2.remove(comp2);
               }
             }
           }
@@ -868,7 +868,6 @@ public class MsgPanelUtils extends Object {
           {"<br>", "</p><p>"},
       });
       String[][] startTags = new String[][] {
-        { "<head", "<HEAD" },
         { "<style", "<STYLE" },
         { "<script", "<SCRIPT" },
         { "<map", "<MAP" },
@@ -878,7 +877,6 @@ public class MsgPanelUtils extends Object {
         { "<input", "<INPUT"},
       };
       String[][] endTags = new String[][] {
-        { "</head>", "</HEAD>" },
         { "</style>", "</STYLE>" },
         { "</script>", "</SCRIPT>" },
         { "</map>", "</MAP>" },
@@ -892,12 +890,23 @@ public class MsgPanelUtils extends Object {
         null,
         null,
         null,
-        null,
         "<TD>",
         "<TABLE>",
         "<!--INPUT--!>",
       };
       html = ArrayUtils.removeTags(html, startTags, endTags, replacementTags);
+      { // HEAD cleanup
+        int indexBodyStart = html.indexOf("<body"); if (indexBodyStart < 0) indexBodyStart = html.indexOf("<BODY");
+        int indexHeadEnd = html.indexOf("</head"); if (indexHeadEnd < 0) indexHeadEnd = html.indexOf("</HEAD");
+        if (indexBodyStart < indexHeadEnd) {
+          // skip HEAD cleanup because it seems that body is inside the HEAD tag
+        } else {
+          startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
+          endTags = new String[][] {{ "</head>", "</HEAD>" }};
+          replacementTags = new String[] { null };
+          html = ArrayUtils.removeTags(html, startTags, endTags, replacementTags);
+        }
+      }
       boolean success = MsgPanelUtils.setMessageContent(html, true, paneForPlainExtraction);
       if (!success) {
         MsgPanelUtils.setMessageContent(originalHtml, true, paneForPlainExtraction);
@@ -966,7 +975,7 @@ public class MsgPanelUtils extends Object {
                 Object[] data = null;
                 synchronized (previewContentHM) {
                   // in case there is no data, wait for it
-                  if (previewContentHM.size() == 0) {
+                  if (previewContentHM.isEmpty()) {
                     try {
                       // wake-up periodically so it has a chance to quit if applet is destroyed without JVM exit
                       previewContentHM.wait(1000);
