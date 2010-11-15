@@ -42,17 +42,15 @@ public class HTML_Ops {
 
     if (htmlMessage != null) {
       if (isRemoveHead) {
-        String[][] startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
-        String[][] endTags = new String[][] {{ "</head>", "</HEAD>" }};
-        htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
-//        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage, new String[][] {
-//                        {" src='http", " scr='http"},
-//                        {" src=\"http", " scr=\"http"},
-//                        {" SRC='HTTP", " SCR='HTTP"},
-//                        {" SRC=\"HTTP", " SCR=\"HTTP"},
-//                        {" SRC='http", " SCR='http"},
-//                        {" SRC=\"http", " SCR=\"http"},
-//                  });
+        int indexBodyStart = htmlMessage.indexOf("<body"); if (indexBodyStart < 0) indexBodyStart = htmlMessage.indexOf("<BODY");
+        int indexHeadEnd = htmlMessage.indexOf("</head"); if (indexHeadEnd < 0) indexHeadEnd = htmlMessage.indexOf("</HEAD");
+        if (indexBodyStart < indexHeadEnd) {
+          // skip HEAD cleanup because it seems that body is inside the HEAD tag
+        } else {
+          String[][] startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
+          String[][] endTags = new String[][] {{ "</head>", "</HEAD>" }};
+          htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+        }
       }
 
       boolean removedLeadP = !isRemoveLeadP;
