@@ -12,15 +12,16 @@
 
 package com.CH_gui.sortedTable;
 
-import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.*;
+import com.CH_cl.service.ops.*;
 
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_gui.dialog.SaveAttachmentsDialog;
-import com.CH_gui.fileTable.FileActionTable;
-import com.CH_gui.fileTable.FileTableModel;
+import com.CH_gui.dialog.*;
+import com.CH_gui.fileTable.*;
+import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.table.*;
@@ -85,32 +86,48 @@ public class JSortedTable extends JTable implements DisposableObj {
     getTableHeader().setDefaultRenderer(new TableHeaderRenderer());
 
     addMouseListener(new MouseAdapter() {
+      private long lastPopupTriggerTime;
+      public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger())
+          lastPopupTriggerTime = System.currentTimeMillis();
+      }
+      public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger())
+          lastPopupTriggerTime = System.currentTimeMillis();
+      }
+      /**
+       * Dispatch from mouseClicked, because from mouseReleased the chat http link clicks don't work
+       */
       public void mouseClicked(MouseEvent e) {
-        if (!e.isPopupTrigger()) {
-          JSortedTable sTable = JSortedTable.this;
-          int viewRow = rowAtPoint(e.getPoint());
-          int viewColumn = columnAtPoint(e.getPoint());
-          int modelColumn = sTable.convertColumnIndexToModel(viewColumn);
-          Rectangle cellRect = sTable.getCellRect(viewRow, viewColumn, false);
-          int cellX = e.getPoint().x-cellRect.x;
-          int cellY = e.getPoint().y-cellRect.y;
-          TableCellRenderer renderer = getCellRenderer(viewRow, viewColumn);
-          Object value = sTable.getValueAt(viewRow, viewColumn);
-          Component component = renderer.getTableCellRendererComponent(sTable, value, false, false, viewRow, modelColumn);
-          if (component instanceof HTML_ClickablePane) {
-            MouseEvent event = new MouseEvent(component, e.getID(), e.getWhen(), e.getModifiers(), cellX, cellY, e.getClickCount(), e.isPopupTrigger());
-            ((HTML_ClickablePane) component).processMouseEvent(event);
-          }
+        if (!e.isPopupTrigger() && Math.abs(System.currentTimeMillis() - lastPopupTriggerTime) > 1000)
+          mouseClickNoPopup(e);
+      }
+      private void mouseClickNoPopup(MouseEvent e) {
+        JSortedTable sTable = JSortedTable.this;
+        int viewRow = rowAtPoint(e.getPoint());
+        int viewColumn = columnAtPoint(e.getPoint());
+        int modelColumn = sTable.convertColumnIndexToModel(viewColumn);
+        Rectangle cellRect = sTable.getCellRect(viewRow, viewColumn, false);
+        int cellX = e.getPoint().x-cellRect.x;
+        int cellY = e.getPoint().y-cellRect.y;
+        TableCellRenderer renderer = getCellRenderer(viewRow, viewColumn);
+        Object value = sTable.getValueAt(viewRow, viewColumn);
+        Component component = renderer.getTableCellRendererComponent(sTable, value, false, false, viewRow, modelColumn);
+        if (component instanceof HTML_ClickablePane) {
+          MouseEvent event = new MouseEvent(component, e.getID(), e.getWhen(), e.getModifiers(), cellX, cellY, e.getClickCount(), e.isPopupTrigger());
+          ((HTML_ClickablePane) component).processMouseEvent(event);
+        }
 
-          TableModel tableModel = sTable.getRawModel();
+        TableModel tableModel = sTable.getRawModel();
 
-          // if clicked at attachment (1) icon or star (2) icon then activate it
-          if (tableModel instanceof MsgTableModel) {
-            MsgTableModel mtm = (MsgTableModel) tableModel;
-            int rawColumn = mtm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
-            if (rawColumn == 1 || rawColumn == 2) {
-              int rawRow = sTable.convertMyRowIndexToModel(viewRow);
-              MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
+        // if clicked at attachment (1) icon or star (2) icon then activate it
+        if (tableModel instanceof MsgTableModel) {
+          MsgTableModel mtm = (MsgTableModel) tableModel;
+          int rawColumn = mtm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
+          if (rawColumn == 1 || rawColumn == 2) {
+            int rawRow = sTable.convertMyRowIndexToModel(viewRow);
+            MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
+            if (msgLink != null) {
               if (rawColumn == 1) {
                 // attachments column
                 FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -131,24 +148,31 @@ public class JSortedTable extends JTable implements DisposableObj {
                   }
                 }
               } else if (rawColumn == 2) {
-                // flag column
+                // flag/star column
                 MsgActionTable.markStarred(new MsgLinkRecord[] { msgLink }, !msgLink.isStarred());
               }
             }
           }
+          // See if we should remove the red flag from posting/chatting (open content) folder tables
+          if (mtm.isModeMsgBody()) {
+            int rawRow = sTable.convertMyRowIndexToModel(viewRow);
+            MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
+            if (msgLink != null)
+              StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+          }
+        }
 
-          // if clicked at star icon then activate it
-          if (tableModel instanceof FileTableModel) {
-            FileTableModel ftm = (FileTableModel) tableModel;
-            int rawColumn = ftm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
-            if (rawColumn == 0) {
-              // flag/star column
-              int rawRow = sTable.convertMyRowIndexToModel(viewRow);
-              FileRecord fileRec = (FileRecord) ftm.getRowObject(rawRow);
-              if (fileRec instanceof FileLinkRecord) {
-                FileLinkRecord fileLink = (FileLinkRecord) fileRec;
-                FileActionTable.markStarred(new FileLinkRecord[] { fileLink }, !fileLink.isStarred());
-              }
+        // if clicked at star icon then activate it
+        if (tableModel instanceof FileTableModel) {
+          FileTableModel ftm = (FileTableModel) tableModel;
+          int rawColumn = ftm.getColumnHeaderData().convertColumnToRawModel(modelColumn);
+          if (rawColumn == 0) {
+            // flag/star column
+            int rawRow = sTable.convertMyRowIndexToModel(viewRow);
+            FileRecord fileRec = (FileRecord) ftm.getRowObject(rawRow);
+            if (fileRec instanceof FileLinkRecord) {
+              FileLinkRecord fileLink = (FileLinkRecord) fileRec;
+              FileActionTable.markStarred(new FileLinkRecord[] { fileLink }, !fileLink.isStarred());
             }
           }
         }

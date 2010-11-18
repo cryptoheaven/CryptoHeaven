@@ -470,6 +470,21 @@ public class FolderTree extends JTree implements DisposableObj {
     return folderPairs;
   }
 
+  /** @return an array of FolderPairs of all specified nodes in the tree */
+  public static FolderPair getLastPathComponentFolderPair(TreePath treePath) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "getLastPathComponentFolderPair(TreePath)");
+    if (trace != null) trace.args(treePath);
+
+    FolderPair folderPair = null;
+    if (treePath != null) {
+      FolderTreeNode node = (FolderTreeNode) treePath.getLastPathComponent();
+      folderPair = node.getFolderObject();
+    }
+
+    if (trace != null) trace.exit(FolderTree.class, folderPair);
+    return folderPair;
+  }
+
   /** @return an array of folder ids of specified nodes which paths are given */
   public static Long[] getLastPathComponentFolderIds(TreePath[] treePaths) {
     FolderPair[] folderPairs = getLastPathComponentFolderPairs(treePaths);

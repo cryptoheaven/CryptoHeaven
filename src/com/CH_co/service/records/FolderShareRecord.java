@@ -43,9 +43,9 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public static final String SHARE_LOCAL_NAME = "My Local Computer";
   public static final String SHARE_LOCAL_DESC = "Local File System View";
 
-  public static final String CATEGORY_FILE_NAME = "File Folders";
+  public static final String CATEGORY_FILE_NAME = "Files";
   public static final String CATEGORY_FILE_DESC = " "; //"File Folders [DESCRIPTION]";
-  public static final String CATEGORY_MAIL_NAME = "eMail Folders";
+  public static final String CATEGORY_MAIL_NAME = "eMail";
   public static final String CATEGORY_MAIL_DESC = " "; //"eMail Folders [DESCRIPTION]";
   public static final String CATEGORY_CHAT_NAME = "Instant Message History";
   public static final String CATEGORY_CHAT_DESC = " "; //"Instant Message History [DESCRIPTION]";

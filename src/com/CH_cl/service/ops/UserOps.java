@@ -55,19 +55,19 @@ public class UserOps extends Object {
     if (trace != null) trace.args(SIL, statRecords);
 
     // Gather all userIDs for which we don't have user handles and fetch them.
-    Vector userIDsV = null;
+    ArrayList userIDsL = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     for (int i=0; i<statRecords.length; i++) {
       StatRecord stat = statRecords[i];
       if (cache.getUserRecord(stat.ownerUserId) == null) {
-        if (userIDsV == null) userIDsV = new Vector();
-        if (!userIDsV.contains(stat.ownerUserId)) {
-          userIDsV.addElement(stat.ownerUserId);
+        if (userIDsL == null) userIDsL = new ArrayList();
+        if (!userIDsL.contains(stat.ownerUserId)) {
+          userIDsL.add(stat.ownerUserId);
         }
       }
     }
-    if (userIDsV != null && userIDsV.size() > 0) {
-      Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsV, Long.class);
+    if (userIDsL != null && userIDsL.size() > 0) {
+      Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
       SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000);
     }
 
@@ -79,25 +79,25 @@ public class UserOps extends Object {
     if (trace != null) trace.args(SIL, emailRecords);
 
     // Gather all userIDs for which we don't have user handles and fetch them.
-    Vector userIDsV = null;
+    ArrayList userIDsL = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     for (int i=0; i<emailRecords.length; i++) {
       EmailRecord email = emailRecords[i];
       if (email.userId != null && cache.getUserRecord(email.userId) == null) {
-        if (userIDsV == null) userIDsV = new Vector();
-        if (!userIDsV.contains(email.userId)) {
-          userIDsV.addElement(email.userId);
+        if (userIDsL == null) userIDsL = new ArrayList();
+        if (!userIDsL.contains(email.userId)) {
+          userIDsL.add(email.userId);
         }
       }
       if (email.creatorId != null && cache.getUserRecord(email.creatorId) == null) {
-        if (userIDsV == null) userIDsV = new Vector();
-        if (!userIDsV.contains(email.creatorId)) {
-          userIDsV.addElement(email.creatorId);
+        if (userIDsL == null) userIDsL = new ArrayList();
+        if (!userIDsL.contains(email.creatorId)) {
+          userIDsL.add(email.creatorId);
         }
       }
     }
-    if (userIDsV != null && userIDsV.size() > 0) {
-      Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsV, Long.class);
+    if (userIDsL != null && userIDsL.size() > 0) {
+      Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
       SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000);
     }
 

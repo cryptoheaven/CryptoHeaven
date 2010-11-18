@@ -133,11 +133,12 @@ public class GeneralDialog extends JDialog {
         this.getRootPane().setDefaultButton(defaultButton);
         if (trace != null) trace.data(11, "setting default button... done.");
       }
+      this.getContentPane().setLayout(new BorderLayout());
       if (header != null)
-        this.getContentPane().add("North", header);
-      this.getContentPane().add("Center", mainComponent);
+        this.getContentPane().add(header, BorderLayout.NORTH);
+      this.getContentPane().add(mainComponent, BorderLayout.CENTER);
       if (buttons != null)
-        this.getContentPane().add("South", MiscGui.createButtonPanel(buttons));
+        this.getContentPane().add(MiscGui.createButtonPanel(buttons), BorderLayout.SOUTH);
 
       if (default_cancel >= 0 && buttons.length > default_cancel) {
         if (trace != null) trace.data(20, "setting cancel button...");

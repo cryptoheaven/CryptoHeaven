@@ -286,6 +286,15 @@ public class TraceTableModel extends RecordTableModel {
           Stats_Get_Rp statsReply = (Stats_Get_Rp) reply.getMsgDataSet();
           if (trace != null) trace.data(20, statsReply);
           UserOps.fetchUnknownUsers(serverInterfaceLayer, statsReply.stats);
+          // Re-numerate all virtual stats with negative IDs as they are virtual privilege records,
+          // to ensure uniqueness of IDs when fetching stats sequentially for messages and their attachments.
+          if (statsReply.stats != null) {
+            int size = getRowCount();
+            for (int i=0; i<statsReply.stats.length; i++) {
+              if (statsReply.stats[i].statId.longValue() < 0)
+                statsReply.stats[i].statId = new Long(-(size+i));
+            }
+          }
           updateData(statsReply.stats);
           if (statsRecivedCallback != null)
             statsRecivedCallback.callback(statsReply);

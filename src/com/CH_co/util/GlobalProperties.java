@@ -212,12 +212,14 @@ public class GlobalProperties extends Object {
   // build 576 Speed Limited streams can calculate rate without limiting throughput, fixes with restoreVisuals() exception handling, private label enhancements for replyURL and support email template
   // build 578 Changed chat message entry layout and added 'typing' notification into chat entry panel, removed toolbars from attachment chooser dialog
   // build 580 New actions: Add Star, Remove Star, removed coloured flags leaving only the red flags
+  // build 582 Login failed message with guessed handle choices and direct email to handle retry
+  // build 584 StatRecords get another flag FLAG_MARKED_NEW to distinguish genuinely new items and those marked as new, simplified folder category names and 1-click category expand
 
-  public static final short PROGRAM_BUILD_NUMBER = 580;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 584;  // even
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.2f;
-  public static final short PROGRAM_VERSION_MINOR = 5;
+  public static final float PROGRAM_VERSION = 3.3f;
+  public static final short PROGRAM_VERSION_MINOR = 0;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
 

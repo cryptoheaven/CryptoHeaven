@@ -30,9 +30,7 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.tree.TreePath;
 
 /** 
@@ -115,9 +113,9 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
       TreePath path = tree.getPathForLocation(location.x, location.y);
 
       if ((toMoveAddr || toMoveMsg || toMoveFile || toUpload || toMoveFolder) && path != null) {
-        FolderPair[] pairs = tree.getLastPathComponentFolderPairs(new TreePath[] { path });
-        if (pairs != null && pairs.length > 0 && pairs[0].getFolderRecord() != null) {
-          FolderRecord fRec = pairs[0].getFolderRecord();
+        FolderPair pair = tree.getLastPathComponentFolderPair(path);
+        if (pair != null && pair.getFolderRecord() != null) {
+          FolderRecord fRec = pair.getFolderRecord();
           short type = fRec.folderType.shortValue();
           int sourceActions = event.getSourceActions();
 
@@ -268,18 +266,18 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
       //Point location = event.getLocation();
       TreePath path = tree.getPathForLocation(location.x, location.y);
 
-      FolderPair[] pairs = null;
+      FolderPair pair = null;
       if (path != null)
-        pairs = tree.getLastPathComponentFolderPairs(new TreePath[] { path });
+        pair = tree.getLastPathComponentFolderPair(path);
 
       boolean isFolderAccepted = false;
       boolean isFileAccepted = false;
       boolean isDropAccepted = false;
 
       // if valid destination for any non-folder drop operation
-      if (pairs != null && pairs.length > 0 && pairs[0].getFolderRecord() != null && pairs[0].getFolderShareRecord() != null) {
+      if (pair != null && pair.getFolderRecord() != null && pair.getFolderShareRecord() != null) {
 
-        FolderRecord fRec = pairs[0].getFolderRecord();
+        FolderRecord fRec = pair.getFolderRecord();
         boolean isFileFolderType = fRec.isFileType();
         boolean isAddrFolderType = fRec.isAddressType();
         boolean isMsgFolderType = fRec.isMsgType(); // includes address folders too
@@ -287,7 +285,7 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
         boolean isFileCategoryType = fRec.isCategoryType() && fRec.folderType.shortValue() == FolderRecord.CATEGORY_FILE_FOLDER;
 
         if (isFileFolderType || isMsgFolderType || isRecycleFolderType || isFileCategoryType) {
-          FolderPair[] fPairs = new FolderPair[] { pairs[0] };
+          FolderPair[] fPairs = new FolderPair[] { pair };
           boolean toMoveAddr = false;
           boolean toMoveMsg = false;
           boolean toMoveFile = false;
@@ -369,8 +367,8 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
             isDropAccepted = true;
             List fileList = (List) tr.getTransferData(DataFlavor.javaFileListFlavor);
             Iterator iterator = fileList.iterator();
-            Vector directoriesV = new Vector();
-            Vector acceptedFilesV = new Vector();
+            ArrayList directoriesL = new ArrayList();
+            ArrayList acceptedFilesL = new ArrayList();
             boolean anyFolders = false;
             boolean anyFiles = false;
             while (iterator.hasNext()) {
@@ -380,9 +378,9 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
               if (!anyFiles)
                 anyFiles = file.isFile();
               if (file.isDirectory())
-                directoriesV.addElement(file);
+                directoriesL.add(file);
               if ((isFolderAccepted && file.isDirectory()) || (isFileAccepted && file.isFile()))
-                acceptedFilesV.addElement(file);
+                acceptedFilesL.add(file);
             }
 
             if (!isMsgFolderType) { // isFileFolderType or any other folder other than message folder
@@ -392,19 +390,19 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
                   String body = "The destination folder is capable of holding folders only.  To upload files please select a file folder destination.";
                   MessageDialog.showWarningDialog(null, body, title, true);
                 } else if (anyFolders) {
-                  File[] dirs = (File[]) ArrayUtils.toArray(directoriesV, File.class);
+                  File[] dirs = (File[]) ArrayUtils.toArray(directoriesL, File.class);
                   UploadUtilities.uploadFilesStartCoordinator(dirs, null, MainFrame.getServerInterfaceLayer());
                 }
-              } else if (acceptedFilesV.size() > 0) {
-                File[] files = (File[]) ArrayUtils.toArray(acceptedFilesV, File.class);
+              } else if (acceptedFilesL.size() > 0) {
+                File[] files = (File[]) ArrayUtils.toArray(acceptedFilesL, File.class);
                 UploadUtilities.uploadFilesStartCoordinator(files, fPairs[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
               }
             } else {
               if (anyFiles && !anyFolders) {
-                File[] files = (File[]) ArrayUtils.toArray(acceptedFilesV, File.class);
+                File[] files = (File[]) ArrayUtils.toArray(acceptedFilesL, File.class);
                 new MessageFrame(fPairs, files); // don't use pairs array because it might contain folders for unacceptable type, so create a new one with well checked object
               } else if (!anyFiles && anyFolders) {
-                File[] files = (File[]) ArrayUtils.toArray(directoriesV, File.class);
+                File[] files = (File[]) ArrayUtils.toArray(directoriesL, File.class);
                 UploadUtilities.uploadFilesStartCoordinator(files, fPairs[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
               } else {
                 String title = "Invalid Selection";
@@ -423,11 +421,11 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
         FolderDND_TransferableData data = (FolderDND_TransferableData) tr.getTransferData(FolderDND_Transferable.FOLDER_RECORD_FLAVOR);
         FolderPair[] fldPairs = CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(data.folderIDs));
         // Don't allow dropping onto itself
-        boolean dropOntoItself = pairs != null && pairs.length == 1 && pairs[0].equals(fldPairs[0]);
+        boolean dropOntoItself = pair != null && pair.equals(fldPairs[0]);
         if (!dropOntoItself) {
           event.acceptDrop(DnDConstants.ACTION_MOVE);
           isDropAccepted = true;
-          FolderPair toPair = pairs != null && pairs.length > 0 ? pairs[0] : fldPairs[0];
+          FolderPair toPair = pair != null ? pair : fldPairs[0];
           if (toPair.getId().longValue() < 0)
             toPair = fldPairs[0];
           FileActionTable.doMoveOrSaveAttachmentsAction(toPair, null, fldPairs);

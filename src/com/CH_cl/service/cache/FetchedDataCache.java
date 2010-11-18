@@ -1485,7 +1485,7 @@ public class FetchedDataCache extends Object {
       fireFileLinkRecordUpdated(records, RecordEvent.SET);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records);
+      statUpdatesInFoldersForVisualNotification(records, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -1508,7 +1508,7 @@ public class FetchedDataCache extends Object {
       removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_FILE), false);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records);
+      statUpdatesInFoldersForVisualNotification(records, true);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2132,7 +2132,7 @@ public class FetchedDataCache extends Object {
       fireMsgLinkRecordUpdated(records, RecordEvent.SET);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records);
+      statUpdatesInFoldersForVisualNotification(records, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2186,9 +2186,10 @@ public class FetchedDataCache extends Object {
    * updates' count.
    * @param records can be instances of StatRecord, FileLinkRecords, MsgLinkRecords
    */
-  public void statUpdatesInFoldersForVisualNotification(Record[] records) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "statUpdatesInFoldersForVisualNotification(Record[] records)");
+  public void statUpdatesInFoldersForVisualNotification(Record[] records, boolean suppressAudibleNotification) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "statUpdatesInFoldersForVisualNotification(Record[] records, boolean suppressAudibleNotification)");
     if (trace != null) trace.args(records);
+    if (trace != null) trace.args(suppressAudibleNotification);
 
     // Many cache queries are done in possibly not synchronized block so catch
     // any exceptions due to possible inconsistant cache states.
@@ -2200,7 +2201,8 @@ public class FetchedDataCache extends Object {
       FolderRecord[] folderRecs = null;
 
       if (records instanceof StatRecord[]) {
-        objLinkIDs = StatRecord.getLinkIDs((StatRecord[]) records);
+        StatRecord[] stats = (StatRecord[]) records;
+        objLinkIDs = StatRecord.getLinkIDs(stats);
         fileLinks = getFileLinkRecords(objLinkIDs);
         msgLinks = getMsgLinkRecords(objLinkIDs);
         if (trace != null) trace.data(10, objLinkIDs);
@@ -2261,15 +2263,23 @@ public class FetchedDataCache extends Object {
               statIDs = RecordUtils.getIDs(links);
 
             int redFlagCount = 0;
+            int newFlagCount = 0;
             if (statIDs != null && statIDs.length > 0) {
               // Gather Stats for each folder
               for (int k=0; k<statIDs.length; k++) {
                 StatRecord stat = getStatRecord(statIDs[k], statType);
-                if (stat != null && stat.mark.equals(StatRecord.FLAG_NEW) && stat.firstDelivered == null)
-                  redFlagCount ++;
+                if (stat != null) {
+                  if (stat.isFlagRed())
+                    redFlagCount ++;
+                  if (stat.isFlagNew())
+                    newFlagCount ++;
+                }
               }
             }
-            boolean suppressSound = fRec.folderId.equals(getUserRecord().junkFolderId) || fRec.folderId.equals(getUserRecord().recycleFolderId);
+            boolean suppressSound = suppressAudibleNotification
+                    || newFlagCount == 0
+                    || fRec.folderId.equals(getUserRecord().junkFolderId)
+                    || fRec.folderId.equals(getUserRecord().recycleFolderId);
             fRec.setUpdated(redFlagCount, suppressSound);
           }
         } // end for
@@ -2340,7 +2350,7 @@ public class FetchedDataCache extends Object {
 
     // recalculate flags in the involved folders
     if (linkRecords != null && linkRecords.length > 0) {
-      statUpdatesInFoldersForVisualNotification(linkRecords);
+      statUpdatesInFoldersForVisualNotification(linkRecords, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2368,7 +2378,7 @@ public class FetchedDataCache extends Object {
       removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_MESSAGE), false);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records);
+      statUpdatesInFoldersForVisualNotification(records, true);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2814,7 +2824,7 @@ public class FetchedDataCache extends Object {
         }
       }
       fireStatRecordUpdated(records, RecordEvent.SET);
-      statUpdatesInFoldersForVisualNotification(records);
+      statUpdatesInFoldersForVisualNotification(records, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2849,7 +2859,7 @@ public class FetchedDataCache extends Object {
       fireStatRecordUpdated(records, RecordEvent.REMOVE);
 
       if (visualNotification)
-        statUpdatesInFoldersForVisualNotification(records);
+        statUpdatesInFoldersForVisualNotification(records, true);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);

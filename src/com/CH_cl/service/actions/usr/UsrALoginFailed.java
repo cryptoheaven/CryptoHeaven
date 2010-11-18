@@ -18,6 +18,8 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -50,9 +52,19 @@ public class UsrALoginFailed extends ClientMessageAction {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UsrALoginFailed.class, "runAction()");
     // Unlock the Reader and Writer because login sequence is done, wether successful or not.
     getClientContext().releaseLoginStreamers();
-    Str_Rp dataSet = (Str_Rp) getMsgDataSet();
+    ProtocolMsgDataSet dataSet = getMsgDataSet();
 
-    String msg = dataSet.message;
+    String msg = null;
+    if (dataSet instanceof Str_Rp) {
+      Str_Rp strDataSet = (Str_Rp) dataSet;
+      msg = strDataSet.message;
+    } else if (dataSet instanceof Obj_List_Co) {
+      Obj_List_Co objDataSet = (Obj_List_Co) dataSet;
+      msg = (String) objDataSet.objs[0];
+      String retryHandle = (String) objDataSet.objs[1];
+      String[] possibleHandles = (String[]) objDataSet.objs[2];
+    }
+
     if (msg != null && msg.length() > 0 && msg.toLowerCase().indexOf("please specify the account pass") < 0) {
       String title = "Login Failed";
       NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, msg);

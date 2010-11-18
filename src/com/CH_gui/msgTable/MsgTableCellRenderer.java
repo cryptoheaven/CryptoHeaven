@@ -320,7 +320,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
         JLabel thisCloned = null;
         StatRecord statRecord = null;
-        if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew())
+        if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagRed())
           thisCloned = jRendererBoldIconized;
         else
           thisCloned = jRendererPlainIconized;
@@ -402,7 +402,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
           JLabel jAddrRenderer = null;
           StatRecord statRecord = null;
-          if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew())
+          if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagRed())
             jAddrRenderer = jRendererBoldIconized;
           else
             jAddrRenderer = jRendererPlainIconized;
@@ -469,7 +469,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 subject = subjectValue != null ? subjectValue.toString() : null;
                 boolean isFlagRed = false;
                 StatRecord statRecord = null;
-                isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagNew();
+                isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE)) != null && statRecord.isFlagRed();
                 // set icon if in its own column (not as part of other)
                 if (column > -1) {
                   Icon icon = null;

@@ -353,7 +353,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         if (sourceFolder != null) {
           newCountUpdate = new Runnable() {
             public void run() {
-              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
+              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, true);
             }
           };
         }
@@ -390,7 +390,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
             if (sourceFolder != null) {
               newCountUpdate = new Runnable() {
                 public void run() {
-                  cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
+                  cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, true);
                 }
               };
             }
@@ -530,7 +530,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      markSelectedAs(StatRecord.FLAG_NEW);
+      markSelectedAs(StatRecord.FLAG_MARKED_NEW);
     }
   }
 
@@ -921,7 +921,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
             if (statRecord != null) {
               if (statRecord.mark.equals(StatRecord.FLAG_OLD))
                 anySeen = true;
-              else if (statRecord.mark.equals(StatRecord.FLAG_NEW))
+              else if (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))
                 anyUnseen = true;
             }
           }
@@ -943,7 +943,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         if (fRec instanceof FileLinkRecord) {
           FileLinkRecord fLink = (FileLinkRecord) fRec;
           StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
-          if (statRecord != null && statRecord.mark.equals(StatRecord.FLAG_NEW)) {
+          if (statRecord != null && (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))) {
             anyUnseenGlobal = true;
             break;
           }

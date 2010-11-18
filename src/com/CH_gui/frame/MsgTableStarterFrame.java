@@ -104,7 +104,7 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
         public void runTraced() {
           if (MainFrame.getSingleInstance() == null) {
             MainFrame mainFrame = new MainFrame(MsgTableStarterFrame.this, null, null);
-            mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }));
+            mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
             mainFrame.loginComplete(true, mainFrame);
           }
         }

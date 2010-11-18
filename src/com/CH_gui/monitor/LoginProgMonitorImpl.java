@@ -49,6 +49,7 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
   private JCheckBox[] jCheckTasks;
   private JLabel jStatus;
   private JProgressBar jProgressBar;
+  private JLabel jInfoNote;
 
   /** Creates new LoginProgMonitorImpl */
   public LoginProgMonitorImpl() {
@@ -58,9 +59,9 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
    * Creates new LoginProgMonitorImpl
    * Every task takes 4 steps, start send, done send, start receive, done receive.
    */
-  public void init(String title, String[] tasks) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "init(String title, String[] tasks)");
-    if (trace != null) trace.args(title, tasks);
+  public void init(String title, String[] tasks, String infoNote) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "init(String title, String[] tasks, String infoNote)");
+    if (trace != null) trace.args(title, tasks, infoNote);
 
     this.title = title;
     setTitle(title);
@@ -68,7 +69,7 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
     int initProgBarMin = 0;
     int initProgBarMax = tasks.length * 4;
 
-    initPanelComponents(tasks, initProgBarMin, initProgBarMax);
+    initPanelComponents(tasks, initProgBarMin, initProgBarMax, infoNote);
 
     getContentPane().add("Center", createMainPanel());
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
@@ -84,7 +85,7 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
 
-  private void initPanelComponents(String[] tasks, int initProgBarMin, int initProgBarMax) {
+  private void initPanelComponents(String[] tasks, int initProgBarMin, int initProgBarMax, String infoNote) {
 
     jImageLabel = new JMyLabel(Images.get(ImageNums.ANIM_KEY));
     jImageLabel.setPreferredSize(new Dimension(110, 60));
@@ -103,6 +104,8 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
     jProgressBar.setMinimum(initProgBarMin);
     jProgressBar.setMaximum(initProgBarMax);
 
+    if (infoNote != null)
+      jInfoNote = new JMyLabel(infoNote);
   }
 
   private JPanel createMainPanel() {
@@ -145,6 +148,12 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
 
     panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
+    index ++;
+
+    if (jInfoNote != null) {
+      panel.add(jInfoNote, new GridBagConstraints(0, index, 2, 1, 10, 0,
+          GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
+    }
 
     return panel;
   }

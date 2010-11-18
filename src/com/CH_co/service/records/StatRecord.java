@@ -12,11 +12,11 @@
 
 package com.CH_co.service.records;
 
-import java.sql.Timestamp;
-import java.util.Vector;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -24,7 +24,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -32,13 +32,14 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.17 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class StatRecord extends Record { // implicit no-argument constructor
 
   public static final Short FLAG_NEW = new Short((short) 1);
   public static final Short FLAG_OLD = new Short((short) 2);
   public static final short FLAG_BCC = 4; // server only flag, client never sees it
+  public static final Short FLAG_MARKED_NEW = new Short((short) 8);
 
   public static final short STATUS__UNSEEN_UNDELIVERED = 3;
   public static final short STATUS__UNSEEN_DELIVERED = 4;
@@ -60,8 +61,8 @@ public class StatRecord extends Record { // implicit no-argument constructor
   public Timestamp firstSeen;
   public Timestamp firstDelivered;
 
-  public Long getId() { 
-    return statId; 
+  public Long getId() {
+    return statId;
   }
 
   public int getIcon() {
@@ -93,11 +94,11 @@ public class StatRecord extends Record { // implicit no-argument constructor
   }
   public Short getFlag(boolean forceIfSeenThenDelivered) {
     Short value = null;
-    if ((mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered == null)
+    if (((mark.shortValue() & FLAG_NEW.shortValue()) != 0 || (mark.shortValue() & FLAG_MARKED_NEW.shortValue()) != 0) && firstDelivered == null)
       value = new Short(STATUS__UNSEEN_UNDELIVERED);
     else if ((mark.shortValue() & FLAG_OLD.shortValue()) != 0 && firstDelivered != null)
       value = new Short(STATUS__SEEN_DELIVERED);
-    else if ((mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered != null)
+    else if (((mark.shortValue() & FLAG_NEW.shortValue()) != 0 || (mark.shortValue() & FLAG_MARKED_NEW.shortValue()) != 0) && firstDelivered != null)
       value = new Short(STATUS__UNSEEN_DELIVERED);
     else if ((mark.shortValue() & FLAG_OLD.shortValue()) != 0 && firstDelivered == null) {
       if (!forceIfSeenThenDelivered)
@@ -131,28 +132,28 @@ public class StatRecord extends Record { // implicit no-argument constructor
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StatRecord.class, "getLinkIDs(StatRecord[] statRecords)");
     if (trace != null) trace.args(statRecords);
 
-    Vector linkIDsV = new Vector();
+    ArrayList linkIDsL = new ArrayList();
     if (statRecords != null) {
       for (int i=0; i<statRecords.length; i++) {
-        if (linkIDsV.contains(statRecords[i].objLinkId) == false)
-          linkIDsV.addElement(statRecords[i].objLinkId);
+        if (linkIDsL.contains(statRecords[i].objLinkId) == false)
+          linkIDsL.add(statRecords[i].objLinkId);
       }
     }
-    Long[] linkIDs = (Long[]) ArrayUtils.toArray(linkIDsV, Long.class);
+    Long[] linkIDs = (Long[]) ArrayUtils.toArray(linkIDsL, Long.class);
 
     if (trace != null) trace.exit(StatRecord.class, linkIDs);
     return linkIDs;
   }
 
   public static Long[] getUserIDs(StatRecord[] statRecords) {
-    Vector userIDsV = new Vector();
+    ArrayList userIDsL = new ArrayList();
     if (statRecords != null) {
       for (int i=0; i<statRecords.length; i++) {
-        if (userIDsV.contains(statRecords[i].ownerUserId) == false)
-          userIDsV.addElement(statRecords[i].ownerUserId);
+        if (userIDsL.contains(statRecords[i].ownerUserId) == false)
+          userIDsL.add(statRecords[i].ownerUserId);
       }
     }
-    Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsV, Long.class);
+    Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
     return userIDs;
   }
 
@@ -160,27 +161,30 @@ public class StatRecord extends Record { // implicit no-argument constructor
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StatRecord.class, "gatherStatsOfType(StatRecord[] statRecords, byte objType)");
     if (trace != null) trace.args(statRecords);
     if (trace != null) trace.args(objType);
-    Vector statsV = new Vector();
+    ArrayList statsL = new ArrayList();
     if (statRecords != null) {
       for (int i=0; i<statRecords.length; i++) {
         if (statRecords[i].objType.byteValue() == objType)
-          statsV.addElement(statRecords[i]);
+          statsL.add(statRecords[i]);
       }
     }
-    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsV, StatRecord.class);
+    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsL, StatRecord.class);
     if (trace != null) trace.exit(StatRecord.class, stats);
     return stats;
   }
 
-  public boolean isFlagGreen() {
-    return (mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered != null;
-  }
+//  public boolean isFlagGreen() {
+//    return (mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered != null;
+//  }
 
   public boolean isFlagRed() {
-    return (mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered == null;
+    return (mark.shortValue() & FLAG_NEW.shortValue()) != 0 || (mark.shortValue() & FLAG_MARKED_NEW.shortValue()) != 0;
+  }
+  public boolean isFlagRedManual() {
+    return (mark.shortValue() & FLAG_MARKED_NEW.shortValue()) != 0;
   }
   public boolean isFlagNew() {
-    return (mark.shortValue() & FLAG_NEW.shortValue()) != 0;
+    return (mark.shortValue() & FLAG_NEW.shortValue()) != 0 && firstDelivered == null;
   }
 
   public void merge(Record updated) {
@@ -200,7 +204,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
       firstDelivered = record.firstDelivered;
        */
     }
-    else 
+    else
       super.mergeError(updated);
   }
 

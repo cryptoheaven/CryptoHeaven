@@ -145,29 +145,22 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
             }
           }
         }
-//        { // expand selected root
-//          Object source = mouseEvent.getSource();
-//          if (source instanceof FolderTree) {
-//            FolderTree treeSource = (FolderTree) source;
-//            int row = treeSource.getRowForLocation(mouseEvent.getX(), mouseEvent.getY());
-//            if (row >= 0) {
-//              TreePath path = treeSource.getPathForRow(row);
-//              if (path.getPathCount() <= 2) {
-//                treeSource.expandPath(path);
-//              }
-////                if (!treeSource.hasBeenExpanded(path))
-////                  treeSource.expandPath(path);
-////                else if (doubleClick) {
-////                  boolean isExpanded = treeSource.isExpanded(path);
-////                  if (isExpanded)
-////                    treeSource.collapsePath(path);
-////                  else
-////                    treeSource.expandPath(path);
-////                }
-////              }
-//            }
-//          }
-//        }
+        // expand selected Category Folder
+        {
+          Object source = mouseEvent.getSource();
+          if (source instanceof FolderTree) {
+            FolderTree treeSource = (FolderTree) source;
+            int row = treeSource.getRowForLocation(mouseEvent.getX(), mouseEvent.getY());
+            if (row >= 0) {
+              TreePath path = treeSource.getPathForRow(row);
+              FolderPair folderPair = getLastPathComponentFolderPair(path);
+              if (folderPair != null && folderPair.getFolderRecord() != null && folderPair.getFolderRecord().isCategoryType()) {
+                if (!treeSource.isExpanded(path))
+                  treeSource.expandPath(path);
+              }
+            }
+          }
+        }
         if (trace != null) trace.exit(MouseAdapter.class);
       }
     }); // end addMouseListener()

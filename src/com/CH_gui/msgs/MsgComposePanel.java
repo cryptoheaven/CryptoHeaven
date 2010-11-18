@@ -12,20 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import java.sql.Timestamp;
-import java.util.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.MsgTypingListener;
@@ -41,6 +27,7 @@ import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.key.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -63,6 +50,21 @@ import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
 
 import comx.Tiger.gui.*;
+
+import java.awt.event.*;
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.datatransfer.*;
+import java.io.*;
+import java.sql.Timestamp;
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.Timer;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+import javax.swing.undo.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -2788,7 +2790,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             dialog.closeDialog();
           }
         }
-        // Chat: clear attachments panel, priority combo, message area
+        // Chat: clear attachments panel, priority combo, message area, flip flags
         else {
           // clear all attachments
           selectedAttachments = new Object[0];
@@ -2805,6 +2807,32 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           msgComponents.focusMessageArea();
 
           undoMngr.discardAllEdits();
+
+          // clear red flags
+          Record[] toRecipients = getSelectedRecipients(MsgLinkRecord.RECIPIENT_TYPE_TO);
+          if (toRecipients != null && toRecipients.length == 1 && toRecipients[0] instanceof FolderPair) {
+            FolderPair toFolderPair = (FolderPair) toRecipients[0];
+            MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsForFolder(toFolderPair.getId());
+            if (msgLinks != null && msgLinks.length > 0) {
+              ArrayList statUpdatesL = new ArrayList();
+              for (int i=0; i<msgLinks.length; i++) {
+                StatRecord stat = cache.getStatRecord(msgLinks[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+                if (stat != null && stat.mark.equals(StatRecord.FLAG_NEW)) {
+                  // clone the stats to send the request
+                  StatRecord statClone = (StatRecord) stat.clone();
+                  // set mark to "old" on the clone
+                  statClone.mark = StatRecord.FLAG_OLD;
+                  statUpdatesL.add(statClone);
+                }
+              }
+              if (!statUpdatesL.isEmpty()) {
+                StatRecord[] statUpdates = new StatRecord[statUpdatesL.size()];
+                statUpdatesL.toArray(statUpdates);
+                Stats_Update_Rq request = new Stats_Update_Rq(statUpdates);
+                MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
+              }
+            }
+          }
         }
 
         // check for unknown recipients for addition to Address Book

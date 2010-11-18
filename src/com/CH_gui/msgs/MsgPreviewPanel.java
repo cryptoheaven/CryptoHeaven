@@ -1763,12 +1763,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           setAttachmentsPanel(null, null, jAttachments, jLineAttachments);
         } else {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-          MsgDataRecord dataRecord = msgData;
 
-          boolean msgDataChanged = (msgDataRecord != null && !msgDataRecord.equals(dataRecord)) ||
-                                   !dataRecord.equals(msgDataRecord) ||
-                                   !dataRecord.isPrivilegedBodyAccess(cache.getMyUserId(), new Date()) || // in case the body got expired, update preview
-                                   (isWaitingForMsgBody && dataRecord.getText() != null);
+          // If we are about to display another message
+          boolean isSwitchingDataView = !msgData.equals(msgDataRecord);
+          // If switching msg data, or the data has changed and gui needs to update in anyway
+          boolean msgDataChanged = isSwitchingDataView ||
+                                   !msgData.equals(msgDataRecord) ||
+                                   !msgData.isPrivilegedBodyAccess(cache.getMyUserId(), new Date()) || // in case the body got expired, update preview
+                                   (isWaitingForMsgBody && msgData.getText() != null);
 
           // Force msgDataChanged if layout changed...
           JSplitPane splitPane = MiscGui.getParentSplitPane(MsgPreviewPanel.this);
@@ -1780,7 +1782,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           }
 
           // assign a global view msg data 
-          msgDataRecord = dataRecord;
+          msgDataRecord = msgData;
 
           // create the Add Contact link if email address is not in the Address Books
           //jFromNameAddContact.setText("");
@@ -1801,11 +1803,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           // Set text and icon for the From field in the preview.
           Record fromRec = null;
           {
-            String fromEmailAddress = dataRecord.getFromEmailAddress();
-            if (dataRecord.isEmail() || fromEmailAddress != null) {
+            String fromEmailAddress = msgData.getFromEmailAddress();
+            if (msgData.isEmail() || fromEmailAddress != null) {
               fromRec = CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress);
             } else {
-              fromRec = MsgPanelUtils.convertUserIdToFamiliarUser(dataRecord.senderUserId, false, true);
+              fromRec = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
             }
           }
           if (fromRec != null) {
@@ -1813,14 +1815,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             jFromName.setText(ListRenderer.getRenderedText(fromRec, false, false, true));
           } else {
             jFromName.setIcon(Images.get(ImageNums.PERSON_SMALL));
-            jFromName.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {dataRecord.senderUserId}));
+            jFromName.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {msgData.senderUserId}));
           }
 
           if (msgDataChanged) {
-            jMsgDate.setText(Misc.getFormattedTimestamp(dataRecord.dateCreated, DateFormat.MEDIUM, DateFormat.MEDIUM));
+            jMsgDate.setText(Misc.getFormattedTimestamp(msgData.dateCreated, DateFormat.MEDIUM, DateFormat.MEDIUM));
 
-            String[] replyTos = dataRecord.getReplyToAddresses();
-            if (replyTos != null && (replyTos.length > 1 || (replyTos.length == 1 && !EmailRecord.isAddressEqual(replyTos[0], dataRecord.getFromEmailAddress())))) {
+            String[] replyTos = msgData.getReplyToAddresses();
+            if (replyTos != null && (replyTos.length > 1 || (replyTos.length == 1 && !EmailRecord.isAddressEqual(replyTos[0], msgData.getFromEmailAddress())))) {
               jReplyTo.setIcon(Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
               StringBuffer _replyTos = new StringBuffer();
               for (int i=0; i<replyTos.length; i++) {
@@ -1836,29 +1838,33 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               jReplyTo.setText("");
             }
 
-            setRecipientsPanel(dataRecord, jRecipients, jLineRecipients);
+            setRecipientsPanel(msgData, jRecipients, jLineRecipients);
 
-            jSubject.setIcon(ListRenderer.getRenderedIcon(dataRecord));
-            jSubject.setText(ListRenderer.getRenderedText(dataRecord));
+            jSubject.setIcon(ListRenderer.getRenderedIcon(msgData));
+            jSubject.setText(ListRenderer.getRenderedText(msgData));
             jSubject.setToolTipText(jSubject.getText());
 
-            jPasswordHintText.setText(dataRecord.bodyPassHint != null ? dataRecord.bodyPassHint : "None");
+            jPasswordHintText.setText(msgData.bodyPassHint != null ? msgData.bodyPassHint : "None");
             setAttachmentsButton();
-            setAttachmentsPanel(msgLink, dataRecord, jAttachments, jLineAttachments);
+            setAttachmentsPanel(msgLink, msgData, jAttachments, jLineAttachments);
           }
 
           jStar.setIcon(Images.get(msgLink.isStarred() ? ImageNums.STAR_BRIGHT : ImageNums.STAR_WIRE));
-          ImageText exp = dataRecord.getExpirationIconAndText(cache.getMyUserId());
+          ImageText exp = msgData.getExpirationIconAndText(cache.getMyUserId());
           jExpiration.setIcon(Images.get(exp));
           jExpiration.setText(exp.getText());
 
-          boolean displayHtmlMode = !isDefaultToPLAINpreferred(msgLink, dataRecord);
+          boolean displayHtmlMode = !isDefaultToPLAINpreferred(msgLink, msgData);
 
           // update text only if content changed
           if (isHTML != displayHtmlMode || msgDataChanged)
             setCurrentMessageText(displayHtmlMode);
+          // see if a red flag needs to be "unset"
+          if (isSwitchingDataView) {
+            StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+          }
         } // end else
-        setGUIComponentsForObj(msgDataRecord);
+        setGUIComponentsForObj(msgData);
         // we changed the message header data, lets display it
         try {
           revalidate();

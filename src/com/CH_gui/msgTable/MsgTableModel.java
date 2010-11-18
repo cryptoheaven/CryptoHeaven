@@ -242,7 +242,7 @@ public class MsgTableModel extends RecordTableModel {
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 70), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), new Integer(120), new Integer(110), new Integer(110), new Integer(120), new Integer(16) },
           { new Integer(5), new Integer(1), new Integer(17) }, // current list columns
           { new Integer(2), new Integer(0), new Integer(5), new Integer(1), new Integer(16), new Integer(17), new Integer(18) }, // wide list columns
-          { new Integer(5), new Integer(1), new Integer(17) }, // narrow list columns
+          { new Integer(2), new Integer(5), new Integer(1), new Integer(17) }, // narrow list columns
           { new Integer(5), new Integer(16), new Integer(6) }
         }),
       // WhiteList

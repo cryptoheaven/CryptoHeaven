@@ -70,12 +70,12 @@ public class ProgMonitorFactory {
     return monitor;
   }
 
-  public static ProgMonitorI newInstanceLogin(String title, String[] tasks) {
+  public static ProgMonitorI newInstanceLogin(String title, String[] tasks, String infoNote) {
     ProgMonitorI monitor = null;
     if (implLogin != null) {
       try {
         monitor = (ProgMonitorLoginI) implLogin.newInstance();
-        ((ProgMonitorLoginI) monitor).init(title, tasks);
+        ((ProgMonitorLoginI) monitor).init(title, tasks, infoNote);
       } catch (Exception e) {
         e.printStackTrace();
       }

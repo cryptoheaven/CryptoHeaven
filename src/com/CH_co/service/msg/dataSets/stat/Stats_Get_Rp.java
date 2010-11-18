@@ -105,6 +105,11 @@ public void setIsTraceRecord(boolean isTrace) {
         Short mark = stats[i].mark;
         if (mark != null) {
           mark = (Short) Misc.setBitObj(false, mark, StatRecord.FLAG_BCC);
+          // clients prior to build 584 don't know how to handle FLAG_MARKED_NEW so overload it to FLAG_NEW
+          if (clientBuild < 584) {
+            if (mark.equals(StatRecord.FLAG_MARKED_NEW))
+              mark = StatRecord.FLAG_NEW;
+          }
         }
         dataOut.writeSmallint(mark);
         dataOut.writeTimestamp(stats[i].firstSeen);

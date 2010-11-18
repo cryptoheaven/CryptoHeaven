@@ -1026,7 +1026,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      markSelectedAs(StatRecord.FLAG_NEW);
+      markSelectedAs(StatRecord.FLAG_MARKED_NEW);
     }
   }
 
@@ -1464,6 +1464,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         }
       }
 //      // immediatelly update the cache without waiting on the results from the server
+//      // Commented out immediate cache update because it caused some flashing with various message updates comming from the server.
 //      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 //      cache.addMsgLinkRecords(records);
     }
@@ -1528,7 +1529,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         if (sourceFolder != null) {
           newCountUpdate = new Runnable() {
             public void run() {
-              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder });
+              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, true);
             }
           };
         }
@@ -1824,7 +1825,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           if (statRecord != null) {
             if (statRecord.mark.equals(StatRecord.FLAG_OLD))
               anyRead = true;
-            else if (statRecord.mark.equals(StatRecord.FLAG_NEW))
+            else if (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))
               anyUnread = true;
           }
         }
@@ -1845,7 +1846,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         if (rec instanceof MsgLinkRecord) {
           MsgLinkRecord msgLink = (MsgLinkRecord) rec;
           StatRecord statRecord = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
-          if (statRecord != null && statRecord.mark.equals(StatRecord.FLAG_NEW)) {
+          if (statRecord != null && (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))) {
             anyUnreadGlobal = true;
             break;
           }

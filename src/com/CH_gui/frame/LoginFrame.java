@@ -163,6 +163,10 @@ public class LoginFrame extends JFrame {
   public static String defaultMode;
   public static String defaultSignupEmail;
 
+  private boolean isUsernameForRetry;
+  private boolean isUsernameInRetry;
+  private String usernamePreRetry;
+
   /** Creates new LoginFrame */
   public LoginFrame(LoginCoordinatorI loginCoordinator, Window splashWindow) {
     super(com.CH_gui.lang.Lang.rb.getString("title_Login_Window"));
@@ -1454,6 +1458,10 @@ public class LoginFrame extends JFrame {
       setDaemon(true);
     }
     public void runTraced() {
+      // keep track of the regular vs retry cycle
+      isUsernameInRetry = isUsernameForRetry;
+      isUsernameForRetry = false;
+
       // start clean
       login_request = null;
       newUser_request = null;
@@ -1475,7 +1483,11 @@ public class LoginFrame extends JFrame {
         char[] pass2 = retypePassword.getPassword();
         /* Password and re-typed password do not match */
         if (!Arrays.equals(pass1, pass2)) {
-          MessageDialog.showErrorDialog(LoginFrame.this, RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              MessageDialog.showErrorDialog(LoginFrame.this, RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+            }
+          });
           password.setText(""); retypePassword.setText("");
           error = true;
           password.requestFocus();
@@ -1495,7 +1507,11 @@ public class LoginFrame extends JFrame {
             eName = eName.substring(0, eName.indexOf('@')).trim();
           eName = EmailRecord.validateEmailNickOrDomain(eName, null, null, true);
           if (eName == null) {
-            MessageDialog.showErrorDialog(LoginFrame.this, "You have entered an invalid Username.  Please choose another Username.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+            SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                MessageDialog.showErrorDialog(LoginFrame.this, "You have entered an invalid Username.  Please choose another Username.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+              }
+            });
             error = true;
           } else {
             requestedEmailAddress = eName + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0];
@@ -1590,10 +1606,15 @@ public class LoginFrame extends JFrame {
 
       if (!error) {
         LoginFrame.this.setVisible(false);
-        if (performLogin()) {
+        boolean isLoginSuccess = performLogin();
+        if (isLoginSuccess) {
           LoginFrame.this.closeFrame();
           loginCoordinator.loginComplete(true, loginCoordinator);
-        } else {
+        } else if (!isUsernameForRetry) {
+          if (isUsernameInRetry) {
+            setUsername(usernamePreRetry);
+            usernamePreRetry = null;
+          }
           LoginFrame.this.setVisible(true);
           userName.selectAll();
           password.requestFocus();
@@ -1605,6 +1626,10 @@ public class LoginFrame extends JFrame {
       // if error occurred than enable inputs
       // ALSO in case the dialog is reshown, inputs should be enabled -- so always enable inputs
       setEnabledInputs(true);
+      if (!error && isUsernameForRetry) {
+        // launch the action again and reset the flag -- optionally with user approval
+        new OKActionListener().actionPerformed(null);
+      }
     }
   }
 
@@ -1675,7 +1700,8 @@ public class LoginFrame extends JFrame {
                 new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_Secure_Channel"),
                                 com.CH_gui.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
                                 //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"),
-                                com.CH_gui.lang.Lang.rb.getString("label_Load_Main_Program") } );
+                                com.CH_gui.lang.Lang.rb.getString("label_Load_Main_Program") },
+                                isUsernameInRetry ? "Retrying with username: " + userName.getText() : null);
         loginCoordinator.setLoginProgMonitor(loginProgMonitor);
         loginSuccess = login(request, loginProgMonitor);
       }
@@ -1799,6 +1825,21 @@ public class LoginFrame extends JFrame {
         if (trace != null) trace.data(20, "login short loop", i);
         replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 90000);
         if (replyAction == null || replyAction.getActionCode() != msgAction.getActionCode()) break;
+      }
+      // If we are in the original typed-in-username cycle, check for failure and retry suggestion
+      if (!isUsernameInRetry && replyAction != null && replyAction.getActionCode() == CommandCodes.USR_E_LOGIN_FAILED) {
+        ProtocolMsgDataSet dataSet = replyAction.getMsgDataSet();
+        if (dataSet instanceof Obj_List_Co) {
+          Obj_List_Co objDataSet = (Obj_List_Co) dataSet;
+          if (objDataSet.objs != null && objDataSet.objs.length >= 3 && objDataSet.objs[1] != null) {
+            // Reset the message so it doesn't get displayed, we are handling it here with a automatic retry
+            objDataSet.objs[0] = null;
+            String retryHandle = (String) objDataSet.objs[1];
+            usernamePreRetry = userName.getText();
+            isUsernameForRetry = true;
+            setUsername(retryHandle);
+          }
+        }
       }
 
       if (replyAction != null && replyAction.getActionCode() == CommandCodes.USR_A_LOGIN_SECURE_SESSION) {

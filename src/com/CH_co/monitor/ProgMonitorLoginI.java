@@ -24,6 +24,6 @@ package com.CH_co.monitor;
  */
 public interface ProgMonitorLoginI extends ProgMonitorI {
 
-  public void init(String title, String[] tasks);
+  public void init(String title, String[] tasks, String infoNote);
 
 }
