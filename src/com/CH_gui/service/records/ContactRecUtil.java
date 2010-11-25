@@ -27,7 +27,7 @@ import javax.swing.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -35,52 +35,55 @@ import javax.swing.*;
  *
  * <b>$Revision: 1.6 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ContactRecUtil extends Object {
 
   public static ImageIcon getStatusIcon(Short status, Long ownerUserId) {
-    ImageIcon icon = null;
+    return Images.get(getStatusIconCode(status, ownerUserId));
+  }
+  public static int getStatusIconCode(Short status, Long ownerUserId) {
+    int iconCode = -1;
     short s = status.shortValue();
     switch (s) {
       case ContactRecord.STATUS_INITIATED :
         if (ownerUserId.equals(FetchedDataCache.getSingleInstance().getMyUserId())) {
-          icon = Images.get(ImageNums.STATUS_WAITING16);
+          iconCode = ImageNums.STATUS_WAITING16;
         }
         else {
-          icon = Images.get(ImageNums.STATUS_QUESTION16);
+          iconCode = ImageNums.STATUS_QUESTION16;
         }
         break;
       case ContactRecord.STATUS_ACCEPTED :
-        icon = Images.get(ImageNums.STATUS_OFFLINE16);
+        iconCode = ImageNums.STATUS_OFFLINE16;
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED :
-        icon = Images.get(ImageNums.STATUS_OFFLINE16);
+        iconCode = ImageNums.STATUS_OFFLINE16;
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE :
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE :
-        icon = Images.get(ImageNums.STATUS_ONLINE16);
+        iconCode = ImageNums.STATUS_ONLINE16;
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE :
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AWAY :
-        icon = Images.get(ImageNums.STATUS_AWAY16);
+        iconCode = ImageNums.STATUS_AWAY16;
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_NA :
-        icon = Images.get(ImageNums.STATUS_NA16);
+        iconCode = ImageNums.STATUS_NA16;
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_DND :
-        icon = Images.get(ImageNums.STATUS_DND16);
+        iconCode = ImageNums.STATUS_DND16;
         break;
       case ContactRecord.STATUS_DECLINED :
-        icon = Images.get(ImageNums.DELETE16);
+        iconCode = ImageNums.DELETE16;
         break;
       case ContactRecord.STATUS_DECLINED_ACKNOWLEDGED :
-        icon = Images.get(ImageNums.DELETE16);
+        iconCode = ImageNums.DELETE16;
         break;
       default :
-        icon = Images.get(ImageNums.PRIORITY_HIGH_SMALL);
+        iconCode = ImageNums.PRIORITY_HIGH_SMALL;
     }
-    return icon;
+    return iconCode;
   }
 
   public static String getStatusText(Short status, Long ownerUserId) {
@@ -88,7 +91,7 @@ public class ContactRecUtil extends Object {
     short s = status.shortValue();
     switch (s) {
       case ContactRecord.STATUS_INITIATED :
-        statusText = "Initiated"; 
+        statusText = "Initiated";
         if (ownerUserId.equals(FetchedDataCache.getSingleInstance().getMyUserId())) {
           statusText += " (Awaiting Authorization)";
         }
@@ -117,10 +120,10 @@ public class ContactRecUtil extends Object {
         statusText = "Online; Do Not Disturb";
         break;
       case ContactRecord.STATUS_DECLINED :
-        statusText = "Declined"; 
+        statusText = "Declined";
         break;
       case ContactRecord.STATUS_DECLINED_ACKNOWLEDGED :
-        statusText = "Declined and Acknowledged"; 
+        statusText = "Declined and Acknowledged";
         break;
       default :
         statusText = "unknown";
