@@ -49,6 +49,7 @@ public class Sounds extends Object {
   public static final int UPDATE_CLIP;
   public static final int TRANSFER_DONE;
   public static final int ONLINE;
+  public static final int OFFLINE;
   public static final int YOU_WERE_AUTHORIZED;
   public static final int WINDOW_POPUP;
   public static final int RING_BELL;
@@ -61,8 +62,8 @@ public class Sounds extends Object {
 
   static {
     int i = 0;
-    clipNames = new String[11];
-    clipPlayStamps = new long[11];
+    clipNames = new String[12];
+    clipPlayStamps = new long[12];
 
     DIALOG_ERROR = i;
     clipNames[i] = "errorDialog.wav"; i++;
@@ -85,6 +86,9 @@ public class Sounds extends Object {
     ONLINE = i;
     clipNames[i] = "online.wav"; i++;
 
+    OFFLINE  = i;
+    clipNames[i] = "offline.wav"; i++;
+
     YOU_WERE_AUTHORIZED = i;
     clipNames[i] = "youWereAuthorized.wav"; i++;
 
@@ -94,8 +98,6 @@ public class Sounds extends Object {
     RING_BELL = i;
     clipNames[i] = "ringBell.wav"; i++;
 
-//    RING_OUT = i;
-//    clipNames[i] = "ringOut.wav"; i++;
   }
 
   public static void setImpl(Class implSoundsPlayerI) {
