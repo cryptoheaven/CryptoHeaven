@@ -352,18 +352,18 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static Long[] getOwnerUserIDs(ContactRecord[] cRecs, boolean uniqueOnly) {
     Long[] ids = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector idsV = new Vector();
+      ArrayList idsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         Long id = cRecs[i].ownerUserId;
         if (uniqueOnly) {
-          if (!idsV.contains(id)) {
-            idsV.addElement(id);
+          if (!idsL.contains(id)) {
+            idsL.add(id);
           }
         } else {
-          idsV.addElement(id);
+          idsL.add(id);
         }
       }
-      ids = (Long[]) ArrayUtils.toArray(idsV, Long.class);
+      ids = (Long[]) ArrayUtils.toArray(idsL, Long.class);
     }
     return ids;
   }
@@ -371,18 +371,18 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static Long[] getContactWithUserIDs(ContactRecord[] cRecs, boolean uniqueOnly) {
     Long[] ids = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector idsV = new Vector();
+      ArrayList idsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         Long id = cRecs[i].contactWithId;
         if (uniqueOnly) {
-          if (!idsV.contains(id)) {
-            idsV.addElement(id);
+          if (!idsL.contains(id)) {
+            idsL.add(id);
           }
         } else {
-          idsV.addElement(id);
+          idsL.add(id);
         }
       }
-      ids = (Long[]) ArrayUtils.toArray(idsV, Long.class);
+      ids = (Long[]) ArrayUtils.toArray(idsL, Long.class);
     }
     return ids;
   }
@@ -390,18 +390,18 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static Long[] getCreatorIDs(ContactRecord[] cRecs, boolean uniqueOnly) {
     Long[] ids = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector idsV = new Vector();
+      ArrayList idsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         Long id = cRecs[i].creatorId;
         if (uniqueOnly) {
-          if (!idsV.contains(id)) {
-            idsV.addElement(id);
+          if (!idsL.contains(id)) {
+            idsL.add(id);
           }
         } else {
-          idsV.addElement(id);
+          idsL.add(id);
         }
       }
-      ids = (Long[]) ArrayUtils.toArray(idsV, Long.class);
+      ids = (Long[]) ArrayUtils.toArray(idsL, Long.class);
     }
     return ids;
   }
@@ -419,12 +419,12 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static ContactRecord[] filterDesiredStatusRecords(ContactRecord[] cRecs, Short status) {
     ContactRecord[] recs = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         if (status.equals(cRecs[i].status))
-          recsV.addElement(cRecs[i]);
+          recsL.add(cRecs[i]);
       }
-      recs = (ContactRecord[]) ArrayUtils.toArray(recsV, ContactRecord.class);
+      recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);
     }
     return recs;
   }
@@ -432,12 +432,12 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static ContactRecord[] filterDesiredOwnerRecords(ContactRecord[] cRecs, Long owner) {
     ContactRecord[] recs = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         if (cRecs[i].ownerUserId.equals(owner))
-          recsV.addElement(cRecs[i]);
+          recsL.add(cRecs[i]);
       }
-      recs = (ContactRecord[]) ArrayUtils.toArray(recsV, ContactRecord.class);
+      recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);
     }
     return recs;
   }
@@ -445,18 +445,18 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static ContactRecord[] filterStatusOnlineRecords(ContactRecord[] cRecs) {
     ContactRecord[] recs = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         if (isOnlineStatus(cRecs[i].status))
-          recsV.addElement(cRecs[i]);
+          recsL.add(cRecs[i]);
       }
-      recs = (ContactRecord[]) ArrayUtils.toArray(recsV, ContactRecord.class);
+      recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);
     }
     return recs;
   }
 
   public static ContactRecord[] filterToAcceptOrDecline(ContactRecord[] contactRecords, Long myUserId) {
-    Vector toAcceptDeclineV = null;
+    ArrayList toAcceptDeclineL = null;
     for (int i=0; i<contactRecords.length; i++) {
       ContactRecord cRec = contactRecords[i];
       if (cRec.status != null) {
@@ -466,12 +466,12 @@ public class ContactRecord extends Record implements MemberContactRecordI {
             status == ContactRecord.STATUS_INITIATED
            )
         {
-          if (toAcceptDeclineV == null) toAcceptDeclineV = new Vector();
-          toAcceptDeclineV.addElement(cRec);
+          if (toAcceptDeclineL == null) toAcceptDeclineL = new ArrayList();
+          toAcceptDeclineL.add(cRec);
         }
       }
     }
-    ContactRecord[] cRecs = (ContactRecord[]) ArrayUtils.toArray(toAcceptDeclineV, ContactRecord.class);
+    ContactRecord[] cRecs = (ContactRecord[]) ArrayUtils.toArray(toAcceptDeclineL, ContactRecord.class);
     return cRecs;
   }
 
@@ -479,14 +479,14 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static ContactRecord[] filterDesiredPermitFlags(ContactRecord[] cRecs, int flagsSet, int mask) {
     ContactRecord[] recs = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         int perms = cRecs[i].permits.intValue();
         if ((perms & mask) == flagsSet) {
-          recsV.addElement(cRecs[i]);
+          recsL.add(cRecs[i]);
         }
       }
-      recs = (ContactRecord[]) ArrayUtils.toArray(recsV, ContactRecord.class);
+      recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);
     }
     return recs;
   }
@@ -494,19 +494,19 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static MemberContactRecordI[] filterDesiredPermitFlags(MemberContactRecordI[] cRecs, int flagsSet, int mask, Boolean keepGroups) {
     MemberContactRecordI[] recs = null;
     if (cRecs != null && cRecs.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         if (cRecs[i].getMemberType() == Record.RECORD_TYPE_GROUP && keepGroups != null) {
           if (keepGroups.booleanValue())
-            recsV.addElement(cRecs[i]);
+            recsL.add(cRecs[i]);
         } else if (cRecs[i] instanceof ContactRecord) {
           int perms = ((ContactRecord) cRecs[i]).permits.intValue();
           if ((perms & mask) == flagsSet) {
-            recsV.addElement(cRecs[i]);
+            recsL.add(cRecs[i]);
           }
         }
       }
-      recs = (ContactRecord[]) ArrayUtils.toArray(recsV, ContactRecord.class);
+      recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);
     }
     return recs;
   }
