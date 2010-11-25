@@ -19,8 +19,6 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
-import com.CH_co.gui.*;
-
 /** 
  * <b>Copyright</b> &copy; 2001-2010
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
