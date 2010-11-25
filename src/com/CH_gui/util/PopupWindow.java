@@ -16,7 +16,6 @@ import com.CH_gui.gui.JMyLabel;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgPopupListener;
 
-import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
@@ -32,7 +31,7 @@ import javax.swing.border.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -40,7 +39,7 @@ import javax.swing.border.*;
  *
  * <b>$Revision: 1.9 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class PopupWindow extends JWindow implements MsgPopupListener {
 
@@ -100,7 +99,7 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
 
   private void init() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PopupWindow.class, "init()");
-    scroller = new Scroller(pixelsPerSecond, framesPerSecond, 8000, false);
+    scroller = new Scroller(pixelsPerSecond, framesPerSecond, 3000, false);
 
     JLayeredPane lp = getLayeredPane();
     lp.setLayout(null);
@@ -129,11 +128,27 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
 
   public void addForScrolling(String htmlText) {
     if (htmlText != null && htmlText.length() > 0) {
-      addForScrolling(new HTML_ClickablePane(htmlText));
+      addForScrolling(new HTML_ClickablePane(htmlText), Sounds.WINDOW_POPUP);
+    }
+  }
+
+  public void addForScrolling(String htmlText, boolean suppressSound) {
+    if (htmlText != null && htmlText.length() > 0) {
+      addForScrolling(new HTML_ClickablePane(htmlText), suppressSound ? -1 : Sounds.WINDOW_POPUP);
+    }
+  }
+
+  public void addForScrolling(String htmlText, int audioClipIndex) {
+    if (htmlText != null && htmlText.length() > 0) {
+      addForScrolling(new HTML_ClickablePane(htmlText), audioClipIndex);
     }
   }
 
   public void addForScrolling(JComponent componentToScroll) {
+    addForScrolling(componentToScroll, Sounds.WINDOW_POPUP);
+  }
+
+  public void addForScrolling(JComponent componentToScroll, int audioClipIndex) {
     synchronized (objMonitor) {
       if (pausing) {
         pausingSoFar = 0;
@@ -144,7 +159,8 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
       if (dirDown) {
         dirDown = false;
         // Play the sound if direction changes.
-        Sounds.playAsynchronous(Sounds.WINDOW_POPUP);
+        if (audioClipIndex >= 0)
+          Sounds.playAsynchronous(audioClipIndex);
       }
       if (!isShowing()) {
         setVisible(true);
@@ -165,7 +181,7 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
   private Scroller getScroller() {
     return scroller;
   }
-  
+
   /**
    * Hides and resets the window.
    */
@@ -233,7 +249,7 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
           if (!dirDown)
             shiftPixels = -shiftPixels;
 
-          // see if we should snap 
+          // see if we should snap
           if (dirDown && windowShiftPosition < windowStartsFrom && windowShiftPosition + shiftPixels > windowStartsFrom)
             shiftPixels = windowStartsFrom - windowShiftPosition;
           else if (!dirDown && -windowShiftPosition < size.height && -(windowShiftPosition + shiftPixels) > size.height)
