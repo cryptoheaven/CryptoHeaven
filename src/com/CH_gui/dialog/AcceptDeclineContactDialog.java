@@ -327,7 +327,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     jNotifyOfOnlineStatus = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Notify_of_online_status."));
     jNotifyOfOnlineStatus.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS) == 0);
     jAudibleNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Enable_audible_notification..."));
-    jAudibleNotify.setSelected((contactRecord.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0);
+    jAudibleNotify.setSelected((contactRecord.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0);
 
     JPanel jPermitsPanel = new JPanel();
     jPermitsPanel.setLayout(new GridBagLayout());
@@ -373,7 +373,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     if (!jNotifyOfOnlineStatus.isSelected())
       permits |= ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS;
     if (!jAudibleNotify.isSelected())
-      permits |= ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY;
+      permits |= ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY;
     contactRecord.permits = new Integer(permits);
 
     Cnt_AcceptDecline_Rq request = new Cnt_AcceptDecline_Rq(contactRecord);

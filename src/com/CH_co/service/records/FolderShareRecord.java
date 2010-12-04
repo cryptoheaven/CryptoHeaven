@@ -274,12 +274,12 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public static FolderShareRecord[] filterDesiredFolderRecords(FolderShareRecord[] records, Long folderId) {
     FolderShareRecord[] recs = null;
     if (records != null && records.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
         if (records[i].folderId.equals(folderId))
-          recsV.addElement(records[i]);
+          recsL.add(records[i]);
       }
-      recs = (FolderShareRecord[]) ArrayUtils.toArray(recsV, FolderShareRecord.class);
+      recs = (FolderShareRecord[]) ArrayUtils.toArray(recsL, FolderShareRecord.class);
     }
     return recs;
   }
@@ -287,15 +287,15 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public static FolderShareRecord[] filterDesiredFolderRecords(FolderShareRecord[] records, Long[] desiredUserIDs) {
     FolderShareRecord[] recs = null;
     if (records != null && records.length > 0) {
-      Vector recsV = new Vector();
+      ArrayList recsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
         FolderShareRecord share = records[i];
         if (share.isOwnedByUser() &&
             ArrayUtils.find(desiredUserIDs, share.ownerUserId) >= 0 &&
-            !recsV.contains(share))
-          recsV.addElement(share);
+            !recsL.contains(share))
+          recsL.add(share);
       }
-      recs = (FolderShareRecord[]) ArrayUtils.toArray(recsV, FolderShareRecord.class);
+      recs = (FolderShareRecord[]) ArrayUtils.toArray(recsL, FolderShareRecord.class);
     }
     return recs;
   }
@@ -321,15 +321,15 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "getOwnerGroupIDs(FolderShareRecord[] shareRecords)");
     if (trace != null) trace.args(shareRecords);
 
-    Vector ownerIDsV = new Vector();
+    ArrayList ownerIDsL = new ArrayList();
     if (shareRecords != null) {
       for (int i=0; i<shareRecords.length; i++) {
         if (shareRecords[i].ownerType.shortValue() == Record.RECORD_TYPE_GROUP &&
-            ownerIDsV.contains(shareRecords[i].ownerUserId) == false)
-          ownerIDsV.addElement(shareRecords[i].ownerUserId);
+            ownerIDsL.contains(shareRecords[i].ownerUserId) == false)
+          ownerIDsL.add(shareRecords[i].ownerUserId);
       }
     }
-    Long[] ownerIDs = (Long[]) ArrayUtils.toArray(ownerIDsV, Long.class);
+    Long[] ownerIDs = (Long[]) ArrayUtils.toArray(ownerIDsL, Long.class);
 
     if (trace != null) trace.exit(FolderShareRecord.class, ownerIDs);
     return ownerIDs;
@@ -339,15 +339,15 @@ public class FolderShareRecord extends Record implements LinkRecordI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "getOwnerUserIDs(FolderShareRecord[] shareRecords)");
     if (trace != null) trace.args(shareRecords);
 
-    Vector ownerIDsV = new Vector();
+    ArrayList ownerIDsL = new ArrayList();
     if (shareRecords != null) {
       for (int i=0; i<shareRecords.length; i++) {
         if (shareRecords[i].ownerType.shortValue() == Record.RECORD_TYPE_USER &&
-            ownerIDsV.contains(shareRecords[i].ownerUserId) == false)
-          ownerIDsV.addElement(shareRecords[i].ownerUserId);
+            ownerIDsL.contains(shareRecords[i].ownerUserId) == false)
+          ownerIDsL.add(shareRecords[i].ownerUserId);
       }
     }
-    Long[] ownerIDs = (Long[]) ArrayUtils.toArray(ownerIDsV, Long.class);
+    Long[] ownerIDs = (Long[]) ArrayUtils.toArray(ownerIDsL, Long.class);
 
     if (trace != null) trace.exit(FolderShareRecord.class, ownerIDs);
     return ownerIDs;

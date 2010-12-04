@@ -128,26 +128,30 @@ public class MainFrameStarter extends Object {
             i ++;
             try {
               final Long millisToKill = Long.valueOf(args[i]);
-              new Thread() {
-                public void run() {
+              Thread th = new ThreadTraced("Delayed Kill Thread") {
+                public void runTraced() {
                   try { Thread.sleep(millisToKill.longValue()); } catch (InterruptedException e) { }
                   Misc.systemExit(-1);
                 }
-              }.start();
+              };
+              th.setDaemon(true);
+              th.start();
             } catch (Throwable t) {
             }
           } else if (args[i].equalsIgnoreCase("-killAfterRandomMilliseconds")) {
             i ++;
             try {
               final Long rndMillisToKill = Long.valueOf(args[i]);
-              new Thread() {
-                public void run() {
+              Thread th = new ThreadTraced("Delayed Kill Thread") {
+                public void runTraced() {
                   Random rnd = new Random();
                   int delay = rnd.nextInt(rndMillisToKill.intValue());
                   try { Thread.sleep(delay); } catch (InterruptedException e) { }
                   Misc.systemExit(-1);
                 }
-              }.start();
+              };
+              th.setDaemon(true);
+              th.start();
             } catch (Throwable t) {
             }
           } else if (args[i].equalsIgnoreCase("-no-splash")) {

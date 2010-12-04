@@ -12,11 +12,9 @@
 
 package com.CH_cl.service.actions.file;
 
-import java.io.File;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl.service.ops.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.*;
@@ -27,6 +25,8 @@ import com.CH_co.service.msg.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.obj.*;
+
+import java.io.File;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -98,6 +98,7 @@ public class FileAGetFilesData extends ClientMessageAction {
         fileDataRecords[i].unSeal(verifyingKeyRecord, symmetricKey,
                                   destinationDirectory, isDefaultTempDir, fileLinkRecord.getFileName(),
                                   progressMonitor, fileLinkRecord.origSize);
+        StatOps.markOldIfNeeded(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
       } catch (Throwable t) {
         // Failure of one of the files, should not affect the other when processing a few of them here.
         if (trace != null) trace.exception(FileAGetFilesData.class, 100, t);

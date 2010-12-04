@@ -14,6 +14,7 @@
 package com.CH_gui.table;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheUtilities;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
@@ -41,20 +42,9 @@ import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Rectangle;
-
+import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.beans.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -928,7 +918,17 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               } else if (participants[i] instanceof FolderRecord) {
                 FolderRecord fldRec = (FolderRecord) participants[i];
                 if (fldRec.isGroupType()) {
-                  isAnyOnline = true;
+                  // look inside the group for online/offline contacts
+                  Long[] accessUsers = CacheUtilities.findAccessUsers(cache.getFolderShareRecordsForFolder(fldRec.folderId));
+                  for (int a=0; a<accessUsers.length; a++) {
+                    Record accessUser = MsgPanelUtils.convertUserIdToFamiliarUser(accessUsers[a], true, true);
+                    if (accessUser instanceof ContactRecord) {
+                      ContactRecord cRec = (ContactRecord) accessUser;
+                      boolean isOnline = cRec.isOnlineStatus();
+                      isAnyOnline |= isOnline;
+                      isAnyOffline |= !isOnline;
+                    }
+                  }
                 }
               }
               // participants got sorted so compare using "equals" method

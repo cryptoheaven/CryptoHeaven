@@ -12,12 +12,6 @@
 
 package com.CH_gui.util;
 
-import com.CH_gui.util.PopupWindow;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.html.*;
-
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 
@@ -25,8 +19,10 @@ import com.CH_gui.actionGui.JActionFrameClosable;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.*;
 
-import com.CH_guiLib.gui.*;
 import com.CH_guiLib.util.HTML_Ops;
+
+import java.awt.*;
+import java.awt.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -46,52 +42,68 @@ import com.CH_guiLib.util.HTML_Ops;
  */
 public class PopupWindowManager extends Object {
 
-  public static void addForScrolling(final Component component, MsgDataRecord msgData) {
-    try {
-      String user = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true));
-      final String sub = msgData.isTypeAddress() ? msgData.fileAs : msgData.getSubject();
-      final boolean addSub = sub != null && sub.length() > 0;
+  private static long lastMsgStamp;
 
-      String body = null;
-      if (msgData.isHtml()) {
-        body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
-      } else {
-        body = msgData.getEncodedHTMLData();
-      }
-      String msgBody = (addSub ? ("<b>" + sub + "</b> ") : "") + body;
-      String hrefStart = "<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='-1'><a href=\""+user+"\">";
-      String hrefEnd = "</a>";
-      String text = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("USER_says_-_MESSAGE"), new Object[] {hrefStart, user, hrefEnd, msgBody});
-      final JTextPane msgPane = new JMyTextPane();
-      MiscGui.initKeyBindings(msgPane);
-      msgPane.setContentType("text/html");
-      msgPane.setText(text);
-      HTML_ClickablePane.setBaseToDefault((HTMLDocument) msgPane.getDocument());  // editor base to display images....
-      Font f = msgPane.getFont();
-      msgPane.setFont(f.deriveFont(f.getSize2D()-1));
-      msgPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      PopupWindow.getSingleInstance().addForScrolling(msgPane);
-      msgPane.addMouseListener(new MouseAdapter() {
-        public void mouseClicked(MouseEvent e) {
-          if (component instanceof Window) {
-            Window w = (Window) component;
-            if (w instanceof JActionFrameClosable && ((JActionFrameClosable) w).isClosed()) {
-              // already closed, no-op
-            } else {
-              if (!w.isShowing()) {
-                w.setVisible(true);
-              }
-              if (w instanceof Frame) {
-                ((Frame)w).setState(Frame.NORMAL);
-              }
-              w.toFront();
-            }
-          }
-          PopupWindow.getSingleInstance().dismiss();
-          e.consume();
+  /**
+   * @param rec MsgDataRecord for which to store the last stamp
+   * @return true if it was marked, false if specified msg was older than last marked stamp
+   */
+  public static boolean markNewMsgStamp(MsgDataRecord msgData) {
+    boolean isNew = false;
+    long msgStamp = msgData.dateCreated.getTime();
+    if (msgStamp > lastMsgStamp) {
+      isNew = true;
+      lastMsgStamp = msgStamp;
+    }
+    return isNew;
+  }
+  public static void addForScrolling(final Component[] componentBuffer, MsgDataRecord msgData, boolean suppressIsNewCheck) {
+    try {
+      if (suppressIsNewCheck || markNewMsgStamp(msgData)) {
+        String user = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true));
+        final String sub = msgData.isTypeAddress() ? msgData.fileAs : msgData.getSubject();
+        final boolean addSub = sub != null && sub.length() > 0;
+
+        String body = null;
+        if (msgData.isHtml()) {
+          body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
+        } else {
+          body = msgData.getEncodedHTMLData();
         }
-      });
+        // body could be null in rare connectivity/synchronization problems when client missed body fetch reply
+        if (body != null) {
+          String msgBody = (addSub ? ("<b>" + sub + "</b> ") : "") + body;
+          String htmlText = "<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='-1'>"
+                  + "<img src=\"images/" + ImageNums.getImageName(ImageNums.CHAT16) + ".png\" height=\"16\" width=\"16\">&nbsp;"
+                  + Misc.encodePlainIntoHtml(user)
+                  + ":&nbsp;"
+                  + msgBody;
+          HTML_ClickablePane msgPane = new HTML_ClickablePane(htmlText);
+          PopupWindow.getSingleInstance().addForScrolling(msgPane);
+          msgPane.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+              if (componentBuffer[0] instanceof Window) {
+                Window w = (Window) componentBuffer[0];
+                if (w instanceof JActionFrameClosable && ((JActionFrameClosable) w).isClosed()) {
+                  // already closed, no-op
+                } else {
+                  if (!w.isShowing()) {
+                    w.setVisible(true);
+                  }
+                  if (w instanceof Frame) {
+                    ((Frame)w).setState(Frame.NORMAL);
+                  }
+                  w.toFront();
+                }
+              }
+              PopupWindow.getSingleInstance().dismiss();
+              e.consume();
+            }
+          });
+        }
+      }
     } catch (Throwable t) {
     }
   }
+
 }

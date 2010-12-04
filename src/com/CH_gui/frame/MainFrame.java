@@ -1203,7 +1203,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               if (status == ContactRecord.STATUS_ACCEPTED) {
                 Sounds.playAsynchronous(Sounds.YOU_WERE_AUTHORIZED);
                 final JCheckBox jEnableAudibleNotify = new JMyCheckBox("Enable audible notification when contact's status changes to Available.");
-                jEnableAudibleNotify.setSelected((cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0);
+                jEnableAudibleNotify.setSelected((cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0);
 
                 JPanel panel = new JPanel();
                 panel.setLayout(new GridBagLayout());
@@ -1220,7 +1220,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
                 ActionListener defaultButtonAction = new ActionListener() {
                   public void actionPerformed(ActionEvent event) {
-                    Object[] objs = new Object[] { cRec.contactId, new Integer(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) };
+                    Object[] objs = new Object[] { cRec.contactId, new Integer(jEnableAudibleNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) };
                     Obj_List_Co dataSet = new Obj_List_Co();
                     dataSet.objs = objs;
                     SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_ALTER_SETTINGS, dataSet));

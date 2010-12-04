@@ -997,8 +997,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               // Clear other sockets that might have been created too
               // remove socket that we are using so it doesn't get cleaned up here
               socketBuffers[joinedIndexFirst][0] = null;
-              Thread cleanupOtherSockets = new Thread("Cleanup Other Sockets") {
-                public void run() {
+              Thread cleanupOtherSockets = new ThreadTraced("Cleanup Other Sockets") {
+                public void runTraced() {
                   // join with all socket creating threads...
                   for (int i=0; i<ths.length; i++) {
                     if (ths[i] != null) {

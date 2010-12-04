@@ -38,9 +38,6 @@ import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 import com.CH_gui.util.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
-
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
@@ -49,6 +46,9 @@ import java.awt.event.*;
 
 import java.util.*;
 import java.lang.reflect.Array;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -218,15 +218,15 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     FileRecord[] fileRecords = null;
     List recordsL = getSelectedRecordsL();
     if (recordsL != null && recordsL.size() > 0) {
-      Vector selectedV = new Vector();
+      ArrayList selectedL = new ArrayList();
       for (int i=0; i<recordsL.size(); i++) {
         if (recordsL.get(i).getClass().equals(classType)) {
-          selectedV.addElement(recordsL.get(i));
+          selectedL.add(recordsL.get(i));
         }
       }
-      if (selectedV.size() > 0) {
-        fileRecords = (FileRecord[]) Array.newInstance(classType, selectedV.size());
-        selectedV.toArray(fileRecords);
+      if (selectedL.size() > 0) {
+        fileRecords = (FileRecord[]) Array.newInstance(classType, selectedL.size());
+        selectedL.toArray(fileRecords);
       }
     }
 
@@ -688,15 +688,15 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   }
   private void markAllAs(Short newMark) {
     FileTableModel tableModel = (FileTableModel) getTableModel();
-    Vector linksV = new Vector();
+    ArrayList linksL = new ArrayList();
     for (int i=0; i<tableModel.getRowCount(); i++) {
       Record rec = tableModel.getRowObjectNoTrace(i);
       if (rec instanceof FileLinkRecord)
-        linksV.addElement(rec);
+        linksL.add(rec);
     }
-    if (linksV.size() > 0) {
-      FileLinkRecord[] links = new FileLinkRecord[linksV.size()];
-      linksV.toArray(links);
+    if (linksL.size() > 0) {
+      FileLinkRecord[] links = new FileLinkRecord[linksL.size()];
+      linksL.toArray(links);
       markRecordsAs(links, newMark);
     }
   }
@@ -706,15 +706,15 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     if (records != null && records.length > 0) {
       // gather all stats which need to be updated
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      Vector statsV = new Vector();
+      ArrayList statsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
         StatRecord statRecord = cache.getStatRecord(records[i].fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
         if (statRecord != null && !statRecord.mark.equals(newMark))
-          statsV.addElement(statRecord);
+          statsL.add(statRecord);
       }
-      if (statsV.size() > 0) {
-        StatRecord[] stats = new StatRecord[statsV.size()];
-        statsV.toArray(stats);
+      if (statsL.size() > 0) {
+        StatRecord[] stats = new StatRecord[statsL.size()];
+        statsL.toArray(stats);
         // clone the stats to send the request
         StatRecord[] statsClones = (StatRecord[]) RecordUtils.cloneRecords(stats);
 
@@ -828,14 +828,14 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       // We are working with message attachments
       else if (ownerObjType == Record.RECORD_TYPE_MESSAGE) {
         // Find some message links for the owner messages
-        Vector msgLinksV = new Vector();
+        ArrayList msgLinksL = new ArrayList();
         for (int i=0; i<ownerObjIDs.length; i++) {
           MsgLinkRecord[] linksForMsg = cache.getMsgLinkRecordsForMsg(ownerObjIDs[i]);
           if (linksForMsg != null && linksForMsg.length > 0)
-            msgLinksV.addElement(linksForMsg[0]);
+            msgLinksL.add(linksForMsg[0]);
         }
-        MsgLinkRecord[] msgLinks = new MsgLinkRecord[msgLinksV.size()];
-        msgLinksV.toArray(msgLinks);
+        MsgLinkRecord[] msgLinks = new MsgLinkRecord[msgLinksL.size()];
+        msgLinksL.toArray(msgLinks);
 
         request.fromMsgLinkIDs = RecordUtils.getIDs(msgLinks);
 
@@ -1062,7 +1062,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "fireFolderSelectionChange(FolderRecord)");
     if (trace != null) trace.args(selectedFolder);
 
-    Vector toNotifyV = null;
+    ArrayList toNotifyL = null;
     FolderSelectionEvent e = null;
     synchronized (folderSelectionListenerList) {
       // Guaranteed to return a non-null array
@@ -1074,18 +1074,18 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           // Lazily create the event:
           if (e == null)
             e = new FolderSelectionEvent(this, selectedFolder);
-          if (toNotifyV == null)
-            toNotifyV = new Vector();
-          toNotifyV.addElement(listeners[i+1]);
+          if (toNotifyL == null)
+            toNotifyL = new ArrayList();
+          toNotifyL.add(listeners[i+1]);
         }
       }
     }
 
-    if (toNotifyV != null && toNotifyV.size() > 0) {
+    if (toNotifyL != null && toNotifyL.size() > 0) {
       int oldPriority = Thread.currentThread().getPriority();
       Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-      for (int i=0; i<toNotifyV.size(); i++) {
-        ((FolderSelectionListener)toNotifyV.elementAt(i)).folderSelectionChanged(e);
+      for (int i=0; i<toNotifyL.size(); i++) {
+        ((FolderSelectionListener)toNotifyL.get(i)).folderSelectionChanged(e);
       }
       Thread.currentThread().setPriority(oldPriority);
     }

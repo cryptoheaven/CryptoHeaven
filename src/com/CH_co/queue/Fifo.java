@@ -12,6 +12,7 @@
 
 package com.CH_co.queue;
 
+import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 
 /** 
@@ -78,8 +79,8 @@ public class Fifo extends Object implements FifoReaderI, FifoWriterI {
     if (!isProcessingFunctionRunning) {
       isProcessingFunctionRunning = true;
       try {
-        Thread th = new Thread("Fifo Consumer - " + processingFunctionRunnerName) {
-          public void run() {
+        Thread th = new ThreadTraced("Fifo Consumer - " + processingFunctionRunnerName) {
+          public void runTraced() {
             while (true) {
               Object obj = null;
               synchronized (Fifo.this) {

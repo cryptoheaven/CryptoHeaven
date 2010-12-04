@@ -12,16 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.sql.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
@@ -45,6 +35,16 @@ import com.CH_guiLib.gui.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.tree.*;
 import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import javax.swing.tree.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

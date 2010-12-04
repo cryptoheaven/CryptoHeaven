@@ -12,7 +12,9 @@
 
 package com.CH_gui.util;
 
+import com.CH_co.util.Sounds;
 import com.CH_gui.gui.JMyLabel;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -25,7 +27,7 @@ import javax.swing.Timer;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -33,7 +35,7 @@ import javax.swing.Timer;
  *
  * <b>$Revision: 1.9 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Scroller extends JPanel {
 
@@ -87,10 +89,10 @@ public class Scroller extends JPanel {
   /**
    * Add a component to be scrolled, it should already be sized correctly.
    */
-  public synchronized void addForScrolling(JComponent c) {
+  public synchronized void addForScrolling(JComponent c, int audioClipIndex) {
     if (scrolledComponentsV.size() == 0 && pauseMillis > 0)
       pausing = true;
-    scrolledComponentsV.addElement(c);
+    scrolledComponentsV.addElement(new ComponentIndexPair(c, audioClipIndex));
     c.setOpaque(setComponentsOpaque);
     c.setSize(getSize());
 
@@ -114,11 +116,13 @@ public class Scroller extends JPanel {
     if (windowBottomPosition-windowShiftPosition < d.height) {
       if (scrolledComponentsV.size()-1 > lastElementInView) {
         lastElementInView ++;
-        JComponent c = (JComponent) scrolledComponentsV.elementAt(lastElementInView);
+        ComponentIndexPair compIndexPair = (ComponentIndexPair) scrolledComponentsV.elementAt(lastElementInView);
+        JComponent c = compIndexPair.comp;
         Dimension dc = c.getSize();
         c.setBounds(0, windowBottomPosition, dc.width, dc.height);
         windowBottomPosition += dc.height;
         add(c);
+        Sounds.playAsynchronous(compIndexPair.index);
       }
     }
   }
@@ -126,7 +130,8 @@ public class Scroller extends JPanel {
   private synchronized void checkForRemovalsFromViewWindow() {
     while (scrolledComponentsV.size() > 0) {
       Dimension d = getSize();
-      JComponent firstElement = (JComponent) scrolledComponentsV.elementAt(0);
+      ComponentIndexPair compIndexPair = (ComponentIndexPair) scrolledComponentsV.elementAt(0);
+      JComponent firstElement = compIndexPair.comp;
       Dimension fd = firstElement.getSize();
       if (fd.height <= windowShiftPosition) {
         remove(firstElement);
@@ -138,7 +143,8 @@ public class Scroller extends JPanel {
         // adjust the other elements bounds after origin shift
         int yPos = 0;
         for (int i=0; i<=lastElementInView; i++) {
-          JComponent tc = (JComponent) scrolledComponentsV.elementAt(i);
+          ComponentIndexPair pair = (ComponentIndexPair) scrolledComponentsV.elementAt(i);
+          JComponent tc = pair.comp;
           Dimension tcd = tc.getSize();
           tc.setBounds(0, yPos, tcd.width, tcd.height);
           yPos += tcd.height;
@@ -168,6 +174,14 @@ public class Scroller extends JPanel {
     super.paint(g);
   }
 
+  private class ComponentIndexPair {
+    private JComponent comp;
+    int index;
+    private ComponentIndexPair(JComponent comp, int index) {
+      this.comp = comp;
+      this.index = index;
+    }
+  }
 
   private class TimerListener implements ActionListener {
     public void actionPerformed(ActionEvent event) {
@@ -191,7 +205,8 @@ public class Scroller extends JPanel {
         } else {
           float sp = pixelsPerSecond / framesPerSecond;
           int shiftPixels = (int) (!biggerStepsOnSlowMachines ? sp : sp * ((double) delayed / (double) timer.getDelay()));
-          JComponent c = (JComponent) scrolledComponentsV.elementAt(0);
+          ComponentIndexPair compIndexPair = (ComponentIndexPair) scrolledComponentsV.elementAt(0);
+          JComponent c = compIndexPair.comp;
           Dimension cd = c.getSize();
 
           // see if snap
@@ -235,7 +250,7 @@ public class Scroller extends JPanel {
       while (true) {
         count ++;
         JLabel ll = new JMyLabel("" + count + " : " +d.readLine());
-        s.addForScrolling(ll);
+        s.addForScrolling(ll, Sounds.WINDOW_POPUP);
       }
     } catch (Throwable t) {
     }

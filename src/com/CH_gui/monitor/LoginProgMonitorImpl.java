@@ -12,14 +12,13 @@
 
 package com.CH_gui.monitor;
 
-import com.CH_gui.util.*;
-
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 
 import java.awt.*;
 import javax.swing.*;

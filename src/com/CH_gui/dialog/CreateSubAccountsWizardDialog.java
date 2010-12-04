@@ -12,14 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.MiscGui;
-import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.*;
@@ -40,9 +32,18 @@ import com.CH_co.trace.*;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
 import com.CH_gui.msgs.*;
 import com.CH_gui.usrs.*;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.MessageDialog;
+
+import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

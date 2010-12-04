@@ -12,16 +12,6 @@
 
 package com.CH_gui.msgTable;
 
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
@@ -55,6 +45,16 @@ import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 import com.CH_gui.tree.*;
 import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

@@ -12,6 +12,7 @@
 
 package com.CH_co.queue;
 
+import com.CH_co.trace.ThreadTraced;
 import java.util.LinkedList;
 import java.util.Iterator;
 
@@ -103,8 +104,8 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     if (!isProcessingFunctionRunning) {
       isProcessingFunctionRunning = true;
       try {
-        Thread th = new Thread("Priority Fifo Consumer - " + processingFunctionRunnerName) {
-          public void run() {
+        Thread th = new ThreadTraced("Priority Fifo Consumer - " + processingFunctionRunnerName) {
+          public void runTraced() {
             while (true) {
               Object obj = null;
               synchronized (PriorityFifo.this) {

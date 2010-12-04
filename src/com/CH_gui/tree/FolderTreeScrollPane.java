@@ -18,7 +18,6 @@ import com.CH_cl.service.cache.event.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.service.msg.*;
-
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -286,15 +285,39 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
               FolderRecord fRec = cache.getFolderRecord(mLink.ownerObjId);
               if (fRec != null && fRec.isChatting() &&
                   fRec.getUpdateCount() > 0 &&
-                  !OpenChatFolders.isOpenChatFolder(fRec.folderId) &&
                   msgData != null && !msgData.senderUserId.equals(myUserRec.userId)
                   )
               {
-                FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, true);
-                if (sRec != null) {
-                  ChatTableFrame chatFrame = new ChatTableFrame(new FolderPair(sRec, fRec), Frame.ICONIFIED);
-                  chatFrame.triggerVisualUpdateNotificationRoll();
-                  PopupWindowManager.addForScrolling(chatFrame, msgData);
+                if (!OpenChatFolders.isOpenChatFolder(fRec.folderId)) {
+                  FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, true);
+                  if (sRec != null) {
+                    // Only continue with set of GUI actions when we are sure the message is trully new, not an update of older msg.
+                    if (PopupWindowManager.markNewMsgStamp(msgData)) {
+                      // For quick sound use buffer and create the actual GUI chat frame later.
+                      Component componentBuffer[] = new Component[1];
+                      PopupWindowManager.addForScrolling(componentBuffer, msgData, true);
+                      ChatTableFrame chatFrame = new ChatTableFrame(new FolderPair(sRec, fRec), Frame.ICONIFIED);
+                      componentBuffer[0] = chatFrame;
+                      chatFrame.triggerVisualUpdateNotificationRoll();
+                    }
+                  }
+                } else {
+                  Component chatComp = OpenChatFolders.getOpenChatFolder(fRec.folderId);
+                  Frame chatFrame = null;
+                  if (chatComp instanceof Frame) {
+                    chatFrame = (Frame) chatComp;
+                  } else {
+                    Window chatWindow = SwingUtilities.windowForComponent(chatComp);
+                    if (chatWindow instanceof Frame) {
+                      chatFrame = (Frame) chatWindow;
+                    }
+                  }
+                  if (chatFrame != null) {
+                    int state = chatFrame.getState();
+                    if (state == Frame.ICONIFIED) {
+                      PopupWindowManager.addForScrolling(new Component[] { chatFrame }, msgData, false); // no suppression of isNewCheck
+                    }
+                  }
                 }
               }
             }

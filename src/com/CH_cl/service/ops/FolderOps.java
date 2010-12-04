@@ -232,42 +232,36 @@ public class FolderOps extends Object {
   /**
    * @return all chatting folder pairs related to the specified contact, including multi-user chat folders.
    */
-  public static FolderPair[] getAllChatFolderPairsFromCache(ContactRecord chatWithContact, FolderRecord[]  chatFlds, boolean includeNonOneToOne) {
+  public static FolderPair[] getAllChatFolderPairsFromCache(ContactRecord chatWithContact, FolderRecord[]  chatFlds) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    Vector chatFolderPairsV = null;
+    ArrayList chatFolderPairsL = null;
     // Any chatting folders present?
     if (chatFlds != null) {
       Long userId = cache.getMyUserId();
       for (int i=0; i<chatFlds.length; i++) {
-        // By default only 1-1 folders are considered, with two shares, my and other.
-        if (includeNonOneToOne || chatFlds[i].numOfShares.shortValue() == 2) {
-          // Check folder's shares to confirm that one is mine and second other guy's.
-          FolderShareRecord[] chatShares = cache.getFolderShareRecordsForFolder(chatFlds[i].folderId);
-          if (chatShares != null && chatShares.length > 1 && (includeNonOneToOne || chatShares.length == 2)) {
-            FolderRecord chatFolder = null;
-            FolderShareRecord chatShare = null;
-            boolean foundMy = false;
-            boolean foundOther = false;
-            for (int k=0; k<chatShares.length; k++) {
-              if (chatShares[k].ownerUserId.equals(userId)) {
-                chatShare = chatShares[k];
-                foundMy = true;
-              }
-              else if (chatShares[k].ownerUserId.equals(chatWithContact.contactWithId))
-                foundOther = true;
-            }
-            if (foundMy && foundOther) {
-              // May begin chatting in currently found chat folder
-              chatFolder = chatFlds[i];
-              if (chatFolderPairsV == null) chatFolderPairsV = new Vector();
-              chatFolderPairsV.addElement(new FolderPair(chatShare, chatFolder));
-            }
+        // Check folder's shares to confirm that one is mine and second other guy's.
+        FolderShareRecord[] chatShares = cache.getFolderShareRecordsForFolder(chatFlds[i].folderId);
+        Long[] accessUserIDs = CacheUtilities.findAccessUsers(chatShares);
+        if (accessUserIDs.length >= 2) {
+          boolean foundMy = false;
+          boolean foundOther = false;
+          for (int a=0; a<accessUserIDs.length; a++) {
+            Long accessUserId = accessUserIDs[a];
+            if (accessUserId.equals(userId))
+              foundMy = true;
+            else if (accessUserId.equals(chatWithContact.contactWithId))
+              foundOther = true;
+          }
+          if (foundMy && foundOther) {
+            if (chatFolderPairsL == null) chatFolderPairsL = new ArrayList();
+            FolderShareRecord chatShare = cache.getFolderShareRecordMy(chatFlds[i].folderId, true);
+            chatFolderPairsL.add(new FolderPair(chatShare, chatFlds[i]));
           }
         }
       } // end for
     }
     // Found required chatting folder.
-    FolderPair[] chatFolderPairs = (FolderPair[]) ArrayUtils.toArray(chatFolderPairsV, FolderPair.class);
+    FolderPair[] chatFolderPairs = (FolderPair[]) ArrayUtils.toArray(chatFolderPairsL, FolderPair.class);
     return chatFolderPairs;
   }
 

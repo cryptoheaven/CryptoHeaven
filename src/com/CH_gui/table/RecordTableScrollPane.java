@@ -23,18 +23,19 @@ import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.records.*;
 
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
+import com.CH_gui.gui.JBottomStickViewport;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.util.*;
 
 import java.awt.Component;
 import java.awt.Container;
-
+import java.awt.event.*;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
@@ -72,6 +73,9 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
   private Thread silentValidator;
   private boolean isDisposed = false;
+
+  // Used to enable auto-scroll correction if recently resized
+  private long lastResizeStamp = 0;
 
   /** Creates new RecordTableScrollPane */
   public RecordTableScrollPane(RecordTableModel recordTableModel) {
@@ -171,13 +175,48 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     setViewport(new JBottomStickViewport());
+
+    addComponentListener(new ComponentAdapter() {
+      public void componentResized(ComponentEvent e) {
+        lastResizeStamp = System.currentTimeMillis();
+      }
+    });
+    getVerticalScrollBar().setUnitIncrement(16);
+    getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+      private boolean isAutoScroll = false;
+      public void adjustmentValueChanged(AdjustmentEvent e) {
+        JScrollBar vBar = getVerticalScrollBar();
+        if (e.getValueIsAdjusting() || vBar.getValueIsAdjusting()) {
+          if (isAutoScroll) {
+            isAutoScroll = false;
+          }
+        }
+        if (!e.getValueIsAdjusting() && !vBar.getValueIsAdjusting()) {
+          if (isAutoScroll) {
+            if (Math.abs(System.currentTimeMillis() - lastResizeStamp) < 1000)
+              vBar.setValue(vBar.getMaximum());
+          } else {
+            // if MAX is the same then this cannot change our autoscroll property
+            isAutoScroll = vBar.getValue() > 0
+                    &&  vBar.getVisibleAmount() < vBar.getMaximum()
+                    // 15 pixels from the bottom of viewable component, not from the bottom of the adjustment bar
+                    && vBar.getMaximum() - (vBar.getValue() + vBar.getVisibleAmount()) < 15;
+            if (isAutoScroll) {
+              // Snap to position
+              if (Math.abs(System.currentTimeMillis() - lastResizeStamp) < 1000)
+                vBar.setValue(vBar.getMaximum());
+            }
+          }
+        }
+      }
+    });
+
     setViewportView(jSTable);
     getViewport().setBackground(jSTable.getBackground());
     setBorder(new EmptyBorder(0,0,0,0));
 
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this)));
   }
-
 
   public RecordTableModel getTableModel() {
     return recordTableModel;

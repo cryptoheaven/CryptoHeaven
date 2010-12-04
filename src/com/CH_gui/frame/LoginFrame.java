@@ -41,6 +41,7 @@ import java.awt.geom.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.Timer;
@@ -1256,7 +1257,7 @@ public class LoginFrame extends JFrame {
     if (getUserName().length() > 0) {
       pass1 = password.getPassword();
       if (isPasswordPresent(pass1) || defaultPassword != null || pass1.length == 0) { // 0 len pass for login to new web accounts only
-        if (isNewAccountDialog && isPasswordValid(pass1) || !isNewAccountDialog) {
+        if (!isNewAccountDialog || isPasswordValid(pass1)) {
           if (!isNewAccountDialog || isPasswordValid(pass2 = retypePassword.getPassword())) {
             if (!isNewAccountDialog || currentEmail.getText().trim().length() == 0 || EmailRecord.isEmailFormatValid(currentEmail.getText().trim())) {
               String serverS = getServerStr();

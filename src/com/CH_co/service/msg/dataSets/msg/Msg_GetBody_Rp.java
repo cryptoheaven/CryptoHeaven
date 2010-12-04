@@ -12,9 +12,6 @@
 
 package com.CH_co.service.msg.dataSets.msg;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.monitor.ProgMonitorI;
@@ -24,6 +21,9 @@ import com.CH_co.io.DataOutputStream2;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.msg.dataSets.stat.*;
+
+import java.io.IOException;
+import java.sql.Timestamp;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010

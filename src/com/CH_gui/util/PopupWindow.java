@@ -43,6 +43,7 @@ import javax.swing.border.*;
  */
 public class PopupWindow extends JWindow implements MsgPopupListener {
 
+  private MouseMotionToTopListener toTopListener;
   private Scroller scroller;
 
   private Point location;
@@ -99,7 +100,7 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
 
   private void init() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PopupWindow.class, "init()");
-    scroller = new Scroller(pixelsPerSecond, framesPerSecond, 3000, false);
+    scroller = new Scroller(pixelsPerSecond, framesPerSecond, 1000, false);
 
     JLayeredPane lp = getLayeredPane();
     lp.setLayout(null);
@@ -123,10 +124,16 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
     setSize(size);
     setLocation(location.x, location.y + windowShiftPosition);
 
+    toTopListener = new MouseMotionToTopListener();
+    background.addMouseMotionListener(toTopListener);
+    scroller.addMouseMotionListener(toTopListener);
+    lp.addMouseMotionListener(toTopListener);
+    addMouseMotionListener(toTopListener);
+
     if (trace != null) trace.exit(PopupWindow.class);
   }
 
-  public void addForScrolling(String htmlText) {
+  private void addForScrolling(String htmlText) {
     if (htmlText != null && htmlText.length() > 0) {
       addForScrolling(new HTML_ClickablePane(htmlText), Sounds.WINDOW_POPUP);
     }
@@ -138,17 +145,11 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
     }
   }
 
-  public void addForScrolling(String htmlText, int audioClipIndex) {
-    if (htmlText != null && htmlText.length() > 0) {
-      addForScrolling(new HTML_ClickablePane(htmlText), audioClipIndex);
-    }
-  }
-
   public void addForScrolling(JComponent componentToScroll) {
     addForScrolling(componentToScroll, Sounds.WINDOW_POPUP);
   }
 
-  public void addForScrolling(JComponent componentToScroll, int audioClipIndex) {
+  private void addForScrolling(JComponent componentToScroll, int audioClipIndex) {
     synchronized (objMonitor) {
       if (pausing) {
         pausingSoFar = 0;
@@ -158,14 +159,11 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
       }
       if (dirDown) {
         dirDown = false;
-        // Play the sound if direction changes.
-        if (audioClipIndex >= 0)
-          Sounds.playAsynchronous(audioClipIndex);
       }
       if (!isShowing()) {
         setVisible(true);
-        toFront();
       }
+      toTop();
 
       if (timer == null) {
         timer = new Timer((int) (1000/framesPerSecond), new TimerListener());
@@ -174,8 +172,19 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
         timer.restart();
       }
 
-      scroller.addForScrolling(componentToScroll);
+      // scroller will have its own sound if window stays open but components scroll
+      scroller.addForScrolling(componentToScroll, audioClipIndex);
+      componentToScroll.addMouseMotionListener(toTopListener);
     }
+  }
+
+  /**
+   * Make this popup window on top of all other windows in this JVM.
+   */
+  private void toTop() {
+    setAlwaysOnTop(true);
+    toFront();
+    setAlwaysOnTop(false);
   }
 
   private Scroller getScroller() {
@@ -270,6 +279,15 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
       }
     }
   }
+
+  private class MouseMotionToTopListener implements MouseMotionListener {
+    public void mouseDragged(MouseEvent e) {
+      toTop();
+    }
+    public void mouseMoved(MouseEvent e) {
+      toTop();
+    }
+   }
 
   /******************************************
    ***   MsgPopup Listener handling       ***

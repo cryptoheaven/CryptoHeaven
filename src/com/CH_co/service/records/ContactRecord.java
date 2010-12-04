@@ -12,12 +12,12 @@
 
 package com.CH_co.service.records;
 
-import java.util.*;
-import java.sql.Timestamp;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -50,7 +50,7 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   public static final int PERMIT_DISABLE_SHARE_FOLDERS = 2;
   public static final int PERMIT_DISABLE_SEE_ONLINE_STATUS = 4;
   public static final int PERMIT__THIS_CONTACT_IS_GIVEN = 8;
-  public static final int SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY = 16; // personal user setting is not protected by given-modify-permits
+  public static final int SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY = 16; // personal user setting is not protected by given-modify-permits
 
   public Long contactId;
   public Long folderId;

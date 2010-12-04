@@ -12,26 +12,14 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.*;
 import com.CH_gui.service.records.ContactRecUtil;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.border.*;
-import javax.swing.*;
-import javax.swing.event.*;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
@@ -44,6 +32,13 @@ import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
 import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.border.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -379,7 +374,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     jNotifyOfOnlineStatus.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS) == 0);
 
     jEnableAudibleOnlineNotify.setEnabled(amIOwner && jNotifyOfOnlineStatus.isSelected());
-    jEnableAudibleOnlineNotify.setSelected((contactRecord.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0);
+    jEnableAudibleOnlineNotify.setSelected((contactRecord.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0);
 
     if (trace != null) trace.data(110, contactRecord.permits);
     if (trace != null) trace.data(111, jAllowMessaging.isSelected());
@@ -516,7 +511,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     newPermits |= jAllowFolderSharing.isSelected() ? 0 : ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS;
     newPermits |= jNotifyOfOnlineStatus.isSelected() ? 0 : ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS;
     newPermits |= contactRecord.isGiven() ? ContactRecord.PERMIT__THIS_CONTACT_IS_GIVEN : 0;
-    newPermits |= jEnableAudibleOnlineNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY;
+    newPermits |= jEnableAudibleOnlineNotify.isSelected() ? 0 : ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY;
     if (trace != null) trace.exit(ContactPropertiesDialog.class, newPermits);
     return newPermits;
   }

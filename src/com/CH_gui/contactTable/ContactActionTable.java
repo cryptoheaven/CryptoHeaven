@@ -233,15 +233,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     Record[] records = null;
     List recordsL = getSelectedRecordsL();
     if (recordsL != null && recordsL.size() > 0) {
-      Vector selectedV = new Vector();
+      ArrayList selectedL = new ArrayList();
       for (int i=0; i<recordsL.size(); i++) {
         if (recordsL.get(i).getClass().equals(classType)) {
-          selectedV.addElement(recordsL.get(i));
+          selectedL.add(recordsL.get(i));
         }
       }
-      if (selectedV.size() > 0) {
-        records = (Record[]) Array.newInstance(classType, selectedV.size());
-        selectedV.toArray(records);
+      if (selectedL.size() > 0) {
+        records = (Record[]) Array.newInstance(classType, selectedL.size());
+        selectedL.toArray(records);
       }
     }
 
@@ -411,8 +411,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         // If action is from popup menu, prefill the To: field in the new message
         boolean fromPopup = isActionActivatedFromPopup(event);
 
-        Vector cRecsV = new Vector();
-        Vector uIDsV = new Vector();
+        ArrayList cRecsL = new ArrayList();
+        ArrayList uIDsL = new ArrayList();
 
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         Long userId = cache.getMyUserId();
@@ -423,9 +423,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
             for (int i=0; i<records.length; i++) {
               ContactRecord cRec = records[i];
               Long otherUserId = !userId.equals(cRec.contactWithId) ? cRec.contactWithId : cRec.ownerUserId;
-              if (!uIDsV.contains(otherUserId)) {
-                uIDsV.addElement(otherUserId);
-                cRecsV.addElement(cRec);
+              if (!uIDsL.contains(otherUserId)) {
+                uIDsL.add(otherUserId);
+                cRecsL.add(cRec);
               }
             }
           }
@@ -434,13 +434,13 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         FolderPair addrBook = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
         if (addrBook != null) {
           FolderPair[] fPairs = new FolderPair[] { addrBook };
-          if (cRecsV.size() > 0) {
+          if (cRecsL.size() > 0) {
             Vector emailNicksV = new Vector();
             Vector emailStringRecordsV = new Vector();
-            for (int i=0; i<cRecsV.size(); i++) {
+            for (int i=0; i<cRecsL.size(); i++) {
               boolean batched = false;
-              ContactRecord cRec = (ContactRecord) cRecsV.elementAt(i);
-              Long otherUID = (Long) uIDsV.elementAt(i);
+              ContactRecord cRec = (ContactRecord) cRecsL.get(i);
+              Long otherUID = (Long) uIDsL.get(i);
               String emailAddress = "";
               String fullName = userId.equals(cRec.ownerUserId) ? cRec.getOwnerNote() : cRec.getOtherNote();
               UserRecord uRec = cache.getUserRecord(otherUID);
@@ -559,12 +559,12 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           ColumnHeaderData data = recordTableModel.getColumnHeaderData();
           recordTableModel.updateHeaderDataFrom(getJSortedTable());
           Integer[] viewSeq = data.getRawColumnViewableSequence();
-          Vector viewSeqV = new Vector(Arrays.asList(viewSeq));
-          if (viewSeqV.contains(new Integer(0))) {
+          ArrayList viewSeqL = new ArrayList(Arrays.asList(viewSeq));
+          if (viewSeqL.contains(new Integer(0))) {
             // its already viewable - noop
           } else {
-            viewSeqV.insertElementAt(new Integer(0), 0);
-            Integer[] viewSeqNew = (Integer[]) ArrayUtils.toArray(viewSeqV, Integer.class);
+            viewSeqL.add(0, new Integer(0));
+            Integer[] viewSeqNew = (Integer[]) ArrayUtils.toArray(viewSeqL, Integer.class);
             data.data[ColumnHeaderData.I_VIEWABLE_SEQUENCE] = viewSeqNew;
             getTableModel().updateHeaderDataFromTo(null, getJSortedTable());
           }
@@ -579,10 +579,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           ColumnHeaderData data = recordTableModel.getColumnHeaderData();
           recordTableModel.updateHeaderDataFrom(getJSortedTable());
           Integer[] viewSeq = data.getRawColumnViewableSequence();
-          Vector viewSeqV = new Vector(Arrays.asList(viewSeq));
-          if (viewSeqV.contains(new Integer(0))) {
-            viewSeqV.remove(new Integer(0));
-            Integer[] viewSeqNew = (Integer[]) ArrayUtils.toArray(viewSeqV, Integer.class);
+          ArrayList viewSeqL = new ArrayList(Arrays.asList(viewSeq));
+          if (viewSeqL.contains(new Integer(0))) {
+            viewSeqL.remove(new Integer(0));
+            Integer[] viewSeqNew = (Integer[]) ArrayUtils.toArray(viewSeqL, Integer.class);
             data.data[ColumnHeaderData.I_VIEWABLE_SEQUENCE] = viewSeqNew;
             getTableModel().updateHeaderDataFromTo(null, getJSortedTable());
           } else {
@@ -671,21 +671,21 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
   private String getEmailAddrs(Record[] invEmlRecs) {
     StringBuffer invEmailsSB = new StringBuffer();
-    Vector emailsLowerV = new Vector();
-    Vector emailsOrigV = new Vector();
+    ArrayList emailsLowerL = new ArrayList();
+    ArrayList emailsOrigL = new ArrayList();
     InvEmlRecord[] invEmls = (InvEmlRecord[]) ArrayUtils.gatherAllOfType(invEmlRecs, InvEmlRecord.class);
     if (invEmls != null && invEmls.length > 0) {
       for (int i=0; i<invEmls.length; i++) {
         String addr = invEmls[i].emailAddr;
-        if (!emailsLowerV.contains(addr.toLowerCase())) {
-          emailsLowerV.addElement(addr.toLowerCase());
-          emailsOrigV.addElement(addr);
+        if (!emailsLowerL.contains(addr.toLowerCase())) {
+          emailsLowerL.add(addr.toLowerCase());
+          emailsOrigL.add(addr);
         }
       }
-      for (int i=0; i<emailsOrigV.size(); i++) {
+      for (int i=0; i<emailsOrigL.size(); i++) {
         if (invEmailsSB.length() > 0)
           invEmailsSB.append(", ");
-        invEmailsSB.append(emailsOrigV.elementAt(i).toString());
+        invEmailsSB.append(emailsOrigL.get(i).toString());
       }
     }
     return invEmailsSB.toString();

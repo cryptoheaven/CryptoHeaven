@@ -144,8 +144,8 @@ public class HTTP_Socket extends Socket {
       dumpSocket();
       final Socket[] socketReturnBuf = new Socket[1];
       final boolean[] socketTimeout = new boolean[1];
-      Thread th = new Thread("Socket Creator") {
-        public void run() {
+      Thread th = new ThreadTraced("Socket Creator") {
+        public void runTraced() {
           try {
             //System.out.print("Making socket to " + proxyHost + ":" + proxyPort + "... ");
             Socket s = new Socket(proxyHost, proxyPort);

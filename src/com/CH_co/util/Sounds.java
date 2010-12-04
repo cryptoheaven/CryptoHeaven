@@ -12,6 +12,7 @@
 
 package com.CH_co.util;
 
+import com.CH_co.trace.ThreadTraced;
 import java.net.URL;
 
 /** 
@@ -40,6 +41,7 @@ public class Sounds extends Object {
   private static boolean soundSuppressed = false;
 
   private static Class soundsPlayerImpl;
+  private static final Object dispatchMonitor = new Object();
 
   public static final int DIALOG_ERROR;
   public static final int DIALOG_WARN;
@@ -57,7 +59,7 @@ public class Sounds extends Object {
 
   private static final String clipNames[];
   private static final long clipPlayStamps[];
-  private static long MIN_CLIP_TIME_APART = 1000;
+  private static long MIN_CLIP_TIME_APART = 999;
 
 
   static {
@@ -118,21 +120,37 @@ public class Sounds extends Object {
     return soundSuppressed;
   }
 
-  public static void playAsynchronous(int audioClipIndex) {
+  public static void playAsynchronous(final int audioClipIndex) {
     if (!DEBUG__SUPPRESS_ALL_SOUNDS && !soundSuppressed && soundsPlayerImpl != null) {
       boolean isSoundEnabled = Boolean.valueOf(GlobalProperties.getProperty(SOUND_ENABLEMENT_PROPERTY, "true")).booleanValue();
       if (isSoundEnabled) {
-        try {
-          long now = System.currentTimeMillis();
-          long lastPlayed = clipPlayStamps[audioClipIndex];
-          long expired = lastPlayed + MIN_CLIP_TIME_APART;
-          if (expired < now || lastPlayed > now) {
-            clipPlayStamps[audioClipIndex] = now;
-            SoundsPlayerI soundsPlayer = (SoundsPlayerI) soundsPlayerImpl.newInstance();
-            soundsPlayer.play(audioClipIndex);
+        Thread th = new ThreadTraced("Asynch Sound Dispatcher") {
+          public void runTraced() {
+            try {
+              // Pospone Update clip as it maybe overwritten by Window-Popup clip
+              if (audioClipIndex == UPDATE_CLIP) {
+                try { Thread.sleep(100); } catch (InterruptedException e) { }
+              }
+              // synchronize to avoid dispatching multiple clip players at the same time will possibly the same clip
+              synchronized (dispatchMonitor) {
+                long now = System.currentTimeMillis();
+                long lastPlayed = clipPlayStamps[audioClipIndex];
+                long expired = lastPlayed + MIN_CLIP_TIME_APART;
+                if (expired < now || lastPlayed > now) {
+                  clipPlayStamps[audioClipIndex] = now;
+                  // if window-slide-popup, also mark this time for update-clip as we don't want them to overlap and slider sound should take presedence
+                  if (audioClipIndex == WINDOW_POPUP)
+                    clipPlayStamps[UPDATE_CLIP] = now;
+                  SoundsPlayerI soundsPlayer = (SoundsPlayerI) soundsPlayerImpl.newInstance();
+                  soundsPlayer.play(audioClipIndex);
+                }
+              }
+            } catch (Throwable t) {
+            }
           }
-        } catch (Throwable t) {
-        }
+        };
+        th.setDaemon(true);
+        th.start();
       }
     }
   }

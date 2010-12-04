@@ -18,6 +18,7 @@ import com.CH_cl.service.ops.*;
 
 import com.CH_co.monitor.*;
 import com.CH_co.service.records.*;
+import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
@@ -30,13 +31,13 @@ import com.CH_gui.list.*;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.msgs.*;
+import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.util.*;
 
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
-import java.text.DateFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -47,7 +48,7 @@ import javax.swing.event.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -55,7 +56,7 @@ import javax.swing.event.*;
  *
  * <b>$Revision: 1.34 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public abstract class RecordActionTable extends RecordTableScrollPane implements ActionProducerI, DisposableObj {
 
@@ -66,15 +67,17 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   private boolean enabledFolderNewItemsNotify = true; // enabled by default.
 
   // For listening on folder updates so we can act when new stuff comes.
-  private FolderListener folderListener; 
+  private FolderListener folderListener;
   // For listening on contact updates so we can visually notify users.
   private ContactListener contactListener;
   // Keep history of update counts per folders to see in appropriate act on updates.
   private Hashtable folderUpdateHistoryHT;
-  // When users go offline, issue tokens for the dialogs to suppress multiple dialogs 
-  // for a single contact, before the shown dialog is dismissed.
-  // NON-STATIC!! because we want one dialog per each chat table inside a frame.
-  private SingleTokenArbiter offlineDialogArbiter;
+//  // When users go offline, issue tokens for the dialogs to suppress multiple dialogs
+//  // for a single contact, before the shown dialog is dismissed.
+//  // NON-STATIC!! because we want one dialog per each chat table inside a frame.
+//  private SingleTokenArbiter offlineDialogArbiter;
+  // STATIC because we want common notification per user for all chat windows
+  private static SingleTokenArbiter offlineDialogArbiter;
 
   private HashSet dropTargetHS = new HashSet();
   private HashSet componentsForDNDHS = new HashSet();
@@ -142,7 +145,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     // Register folder listener to act on folder updates (expand branches where new items become available).
-    this.folderListener = new FolderListener(); 
+    this.folderListener = new FolderListener();
     cache.addFolderRecordListener(folderListener);
     // Register contact listener to act on updates for visual notification purposes.
     this.contactListener = new ContactListener();
@@ -665,25 +668,39 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
               }
 
               if (chattingFolders != null && chattingFolders.length > 0) {
-                boolean includeNonOneToOne = true;
-                FolderPair[] chatFolderPairs = FolderOps.getAllChatFolderPairsFromCache(cRec, chattingFolders, includeNonOneToOne);
+                FolderPair[] chatFolderPairs = FolderOps.getAllChatFolderPairsFromCache(cRec, chattingFolders);
                 if (chatFolderPairs != null && chatFolderPairs.length > 0) {
                   for (int k=0; k<chatFolderPairs.length; k++) {
                     Window w = SwingUtilities.windowForComponent(RecordActionTable.this);
                     // If this chat table is showing in a frame...
                     if (w instanceof JActionFrame) {
-                      if (offlineDialogArbiter == null) offlineDialogArbiter = new SingleTokenArbiter();
 
-                      // About to show or suppress popup
-                      Object key = cRec.contactWithId;
-                      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_User_Offline");
-                      String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_User_{0}_has_left_the_chat_area_and_went_Offline."), new Object[] {userName});
-                      String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date());
-                      String body = date + "\n" + msg;
-                      MessageDialog.showDialog(offlineDialogArbiter, key, RecordActionTable.this, body, title, NotificationCenter.INFORMATION_MESSAGE);
-
-                      // Only one notify per contact that goes offline.
-                      break;
+                      boolean notifyEnabled = (cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0; // disable bit is blank
+                      if (notifyEnabled) {
+                        // About to show or arbiter-skip popup
+                        if (offlineDialogArbiter == null) offlineDialogArbiter = new SingleTokenArbiter();
+                        final Object key = "offline"+cRec.contactWithId;
+                        final String msgUserName = userName;
+                        Thread th = new ThreadTraced("Offline Popup Notifier") {
+                          public void run() {
+                            Object token = new Object();
+                            if (offlineDialogArbiter.putToken(key, token)) {
+                              String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_{0}_left_the_chat_area_and_went_Offline."), new Object[] {msgUserName});
+                              PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/StatusOffline16.png\" height=\"16\" width=\"16\">&nbsp;"+msg, true);
+                              Sounds.playAsynchronous(Sounds.OFFLINE);
+                              try {
+                                // wait for other chat scrolling events for the same user to skip over this arbiter
+                                Thread.sleep(1000);
+                              } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                              }
+                              offlineDialogArbiter.removeToken(key, token);
+                            }
+                          }
+                        };
+                        th.setDaemon(true);
+                        th.start();
+                      } // end notifyWithSound
                     }
                   } // end if for 'k'
                 }
@@ -705,34 +722,67 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
               }
             }
           }
+          // popup slider for user "online" notification
+          if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED && ContactRecord.isOnlineStatus(cRec.status)) {
+            boolean notifyEnabled = (cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0; // disable bit is blank
+            if (notifyEnabled) {
+              // About to show or arbiter-skip popup
+              if (offlineDialogArbiter == null) offlineDialogArbiter = new SingleTokenArbiter();
+              final Object key = "online"+cRec.contactWithId;
+              final String msgUserName = userName;
+              final int imageCode = ContactRecUtil.getStatusIconCode(cRec.status, cRec.ownerUserId);
+              Thread th = new ThreadTraced("Online Popup Notifier") {
+                public void runTraced() {
+                  Object token = new Object();
+                  if (offlineDialogArbiter.putToken(key, token)) {
+                    String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {msgUserName});
+                    String iconStr = ImageNums.getImageName(imageCode) + ".png";
+                    PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/"+iconStr+"\" height=\"16\" width=\"16\">&nbsp;"+msg, true);
+                    try {
+                      // wait for other chat scrolling events for the same user to skip over this arbiter
+                      Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                      ex.printStackTrace();
+                    }
+                    offlineDialogArbiter.removeToken(key, token);
+                  }
+                }
+              };
+              th.setDaemon(true);
+              th.start();
+            } // end notifyWithSound
+          }
           // Make an exception for MsgTableStarterFrame to show the notifications
           if (!contactInvolved && SwingUtilities.windowForComponent(RecordActionTable.this) instanceof MsgTableStarterFrame)
             contactInvolved = true;
           if (contactInvolved && cRec.previousStatus != null) {
-            // Window title visual notifications
-            Window w = SwingUtilities.windowForComponent(RecordActionTable.this);
-            if (w instanceof JActionFrame) {
-              JActionFrame frame = (JActionFrame) w;
-              String msg = null;
-              if (ContactRecord.isOnlineStatus(cRec.previousStatus) &&
-                  cRec.status.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED) {
-                    msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_went_offline."), new Object[] {userName});
-              } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED &&
-                  ContactRecord.isOnlineStatus(cRec.status)) {
-                    msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {userName});
-              } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_INITIATED &&
-                  cRec.status.shortValue() == ContactRecord.STATUS_ACCEPTED) {
-                    msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_accepted."), new Object[] {userName});
-              } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_INITIATED &&
-                  cRec.status.shortValue() == ContactRecord.STATUS_DECLINED) {
-                    msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_declined."), new Object[] {userName});
-              }
-              if (msg != null) {
-                String userStr = ListRenderer.getRenderedText(FetchedDataCache.getSingleInstance().getUserRecord());
-                frame.triggerVisualUpdateNotificationAnim(msg, userStr + " :: ", null, 7000);
-                Stats.setStatus(msg);
-              }
-            } // end if in JActionFrame
+            boolean notifyEnabled = (cRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0; // disable bit is blank
+            if (notifyEnabled) {
+              // Window title visual notifications
+              Window w = SwingUtilities.windowForComponent(RecordActionTable.this);
+              if (w instanceof JActionFrame) {
+                JActionFrame frame = (JActionFrame) w;
+                String msg = null;
+                if (ContactRecord.isOnlineStatus(cRec.previousStatus) &&
+                    cRec.status.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED) {
+                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_went_offline."), new Object[] {userName});
+                } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED &&
+                    ContactRecord.isOnlineStatus(cRec.status)) {
+                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {userName});
+                } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_INITIATED &&
+                    cRec.status.shortValue() == ContactRecord.STATUS_ACCEPTED) {
+                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_accepted."), new Object[] {userName});
+                } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_INITIATED &&
+                    cRec.status.shortValue() == ContactRecord.STATUS_DECLINED) {
+                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_declined."), new Object[] {userName});
+                }
+                if (msg != null) {
+                  String userStr = ListRenderer.getRenderedText(FetchedDataCache.getSingleInstance().getUserRecord());
+                  frame.triggerVisualUpdateNotificationAnim(msg, userStr + " :: ", null, 7000);
+                  Stats.setStatus(msg);
+                }
+              } // end if in JActionFrame
+            } // end notifyEnabled
           } // end if contact involved
         } // end if notification capable contact
       } // end for 'i' all contact records

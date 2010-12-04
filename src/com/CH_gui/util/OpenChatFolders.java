@@ -32,6 +32,9 @@ public class OpenChatFolders {
   // When update comes to the chatting folder, keep track of open Chat Frames or chat Components
   private static final MultiHashtable openChatFolders = new MultiHashtable(); // use synchronized version of this class
 
+  public static Component getOpenChatFolder(Long folderId) {
+    return (Component) openChatFolders.get(folderId);
+  }
   public static Collection getOpenChatFolders(Long folderId) {
     return openChatFolders.getAll(folderId);
   }

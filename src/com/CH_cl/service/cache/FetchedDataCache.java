@@ -12,9 +12,6 @@
 
 package com.CH_cl.service.cache;
 
-import java.security.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
@@ -24,8 +21,12 @@ import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.security.*;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -510,7 +511,7 @@ public class FetchedDataCache extends Object {
       fireFolderRecordUpdated(records, RecordEvent.REMOVE);
 
       // remove all shares that belong to those folders
-      FolderShareRecord[] removingShares = (FolderShareRecord[]) getFolderShareRecordsForFolders(allToRemove);
+      FolderShareRecord[] removingShares = (FolderShareRecord[]) getFolderShareRecordsForFolders(RecordUtils.getIDs(allToRemove));
       removeFolderShareRecords(removingShares);
       //removeFoldersAndChildrenFolderRecords(records);
     }
@@ -1272,6 +1273,21 @@ public class FetchedDataCache extends Object {
     return shareRecords;
   }
 
+  /**
+   * @return all children of the parents specified.
+   */
+  public synchronized FolderShareRecord[] getFolderShareRecordsForFolders(Long[] folderIDs) {
+    ArrayList sharesL = new ArrayList();
+    folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs, Long.class);
+    for (int i=0; i<folderIDs.length; i++) {
+      Collection sharesForFolderV = folderShareRecordMap_byFldId.getAll(folderIDs[i]);
+      if (sharesForFolderV != null) {
+        sharesL.addAll(sharesForFolderV);
+      }
+    }
+    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesL, FolderShareRecord.class);
+    return shareRecords;
+  }
 
   /**
    * @return FolderShareRecords from cache for a given userId EXCLUDING shares accessed through group memberships
@@ -1288,23 +1304,6 @@ public class FetchedDataCache extends Object {
           if (shareRecord.isOwnedByUser())
             sharesL.add(shareRecord);
         }
-      }
-    }
-    FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesL, FolderShareRecord.class);
-    return shareRecords;
-  }
-
-
-  /**
-   * @return all children of the parents specified.
-   */
-  public synchronized FolderShareRecord[] getFolderShareRecordsForFolders(FolderRecord[] folderRecords) {
-    ArrayList sharesL = new ArrayList();
-    folderRecords = (FolderRecord[]) ArrayUtils.removeDuplicates(folderRecords, FolderRecord.class);
-    for (int i=0; i<folderRecords.length; i++) {
-      Collection sharesForFolderV = folderShareRecordMap_byFldId.getAll(folderRecords[i].folderId);
-      if (sharesForFolderV != null) {
-        sharesL.addAll(sharesForFolderV);
       }
     }
     FolderShareRecord[] shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(sharesL, FolderShareRecord.class);
@@ -1903,8 +1902,8 @@ public class FetchedDataCache extends Object {
       // After notification is done, make previous status equal current status,
       // so that late unnecessary notification are not triggered when managing contacts.
       final ContactRecord[] recs = records;
-      Thread th = new Thread("Contact Status delayed setter") {
-        public void run() {
+      Thread th = new ThreadTraced("Contact Status delayed setter") {
+        public void runTraced() {
           try { Thread.sleep(3000); } catch (Throwable t) { }
           for (int i=0; recs!=null && i<recs.length; i++) {
             if (recs[i] != null)
@@ -1952,7 +1951,7 @@ public class FetchedDataCache extends Object {
         if (oldRec != null &&
                 !ContactRecord.isOnlineStatus(oldRec.status) &&
                 myUserId.equals(oldRec.ownerUserId) &&
-                (oldRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_ONLINE_NOTIFY) == 0
+                (oldRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0
                 )
         {
           Sounds.playAsynchronous(Sounds.ONLINE);

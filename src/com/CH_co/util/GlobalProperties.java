@@ -214,8 +214,13 @@ public class GlobalProperties extends Object {
   // build 580 New actions: Add Star, Remove Star, removed coloured flags leaving only the red flags
   // build 582 Login failed message with guessed handle choices and direct email to handle retry
   // build 584 StatRecords get another flag FLAG_MARKED_NEW to distinguish genuinely new items and those marked as new, simplified folder category names and 1-click category expand
+  // build 586 Autoscrolling by listening for the scroll bar adjustements.
+  // build 588 Changed sound effects
+  // build 590 Auto-scroll to bottom when already at bottom and view is resizing
+  // build 592 Chat slide-up change
+  // build 594 Window Popup sound change
 
-  public static final short PROGRAM_BUILD_NUMBER = 584;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 594;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.3f;

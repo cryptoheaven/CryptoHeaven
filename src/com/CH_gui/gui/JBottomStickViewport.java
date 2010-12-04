@@ -12,10 +12,10 @@
 
 package com.CH_gui.gui;
 
+import com.CH_co.trace.Trace;
+
 import java.awt.*;
 import javax.swing.*;
-
-import com.CH_co.trace.Trace;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

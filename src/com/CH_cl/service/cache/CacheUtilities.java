@@ -12,8 +12,6 @@
 
 package com.CH_cl.service.cache;
 
-import java.util.*;
-
 import com.CH_cl.service.records.*;
 import com.CH_cl.service.records.filters.*;
 
@@ -22,6 +20,8 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -291,4 +291,46 @@ public class CacheUtilities extends Object {
     return (MsgLinkRecord[]) ArrayUtils.toArray(mLinksFetchedL, MsgLinkRecord.class);
   }
 
+  /**
+   * @return All user IDs that have access to specified shares through share ownerships or groups
+   * Do not include related shares lookup
+   */
+  public static Long[] findAccessUsers(FolderShareRecord[] shares) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUtilities.class, "findAccessUsers(con, FolderShareRecord[] shares)");
+    if (trace != null) trace.args(shares);
+    HashSet uIDsSet = new HashSet();
+    HashSet gIDsSet = new HashSet();
+    findAccessUsers(shares, uIDsSet, gIDsSet);
+    Long[] userIDs = new Long[uIDsSet.size()];
+    uIDsSet.toArray(userIDs);
+    if (trace != null) trace.exit(CacheUtilities.class, userIDs);
+    return userIDs;
+  }
+  private static void findAccessUsers(FolderShareRecord[] shares, Set uIDsSet, Set gIDsSet) {
+    Long[] uIDs = FolderShareRecord.getOwnerUserIDs(shares);
+    if (uIDs != null) {
+      uIDsSet.addAll(Arrays.asList(uIDs));
+    }
+    Long[] gIDs = FolderShareRecord.getOwnerGroupIDs(shares);
+    if (gIDs != null) {
+      // find related shares of groups not already processed to avoid infinite recurrsion
+      ArrayList gIDsL = null;
+      for (int i=0; i<gIDs.length; i++) {
+        if (gIDsSet.add(gIDs[i])) {
+          if (gIDsL == null) gIDsL = new ArrayList();
+          gIDsL.add(gIDs[i]);
+        }
+      }
+      // for all groups not already processed, find accessors
+      if (gIDsL != null && gIDsL.size() > 0) {
+        gIDs = new Long[gIDsL.size()];
+        gIDsL.toArray(gIDs);
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        FolderShareRecord[] groupShares = cache.getFolderShareRecordsForFolders(gIDs);
+        if (groupShares != null) {
+          findAccessUsers(groupShares, uIDsSet, gIDsSet);
+        }
+      }
+    }
+  }
 }

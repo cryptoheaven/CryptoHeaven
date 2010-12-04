@@ -12,11 +12,6 @@
 
 package com.CH_gui.chatTable;
 
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 
@@ -32,6 +27,11 @@ import com.CH_gui.msgTable.MsgActionTable;
 import com.CH_gui.msgs.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.RecordTableModel;
+
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.table.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
