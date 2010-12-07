@@ -163,7 +163,7 @@ public class AccountOptionPermitChecks extends Object {
     flags |= jSecureReplyLink.isSelected() ? 0 : UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS; // inverted meaning of checkbox
     flags |= jUseEnterKeyChatSend.isSelected() ? UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES : 0;
     flags |= jAutoUpdates.isSelected() ? 0 : UserRecord.FLAG_DISABLE_AUTO_UPDATES;
-    flags |= jUserOffline.isSelected() ? UserRecord.FLAG_USER_OFFLINE_POPUP : 0;
+    flags |= jUserOffline.isSelected() ? UserRecord.FLAG_USER_ONLINE_STATUS_POPUP : 0;
     flags |= jKeyOnServer.isSelected() ? UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER : 0;
     flags |= jFolderDelete.isSelected() ? UserRecord.FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE : 0;
     flags |= jPasswordReset.isSelected() ? UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY : 0;
@@ -180,7 +180,7 @@ public class AccountOptionPermitChecks extends Object {
       flags |= jSecureReplyLinkUpdate.isSelected() ? 0 : UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS__NO_UPDATE;
       flags |= jUseEnterKeyChatSendUpdate.isSelected() ? 0 : UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_UPDATE;
       flags |= jAutoUpdatesUpdate.isSelected() ? 0 : UserRecord.FLAG_DISABLE_AUTO_UPDATES__NO_UPDATE;
-      flags |= jUserOfflineUpdate.isSelected() ? 0 : UserRecord.FLAG_USER_OFFLINE_POPUP__NO_UPDATE;
+      flags |= jUserOfflineUpdate.isSelected() ? 0 : UserRecord.FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE;
       flags |= jKeyOnServerUpdate.isSelected() ? 0 : UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE;
       flags |= jFolderDeleteUpdate.isSelected() ? 0 : UserRecord.FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE__NO_UPDATE;
       flags |= jPasswordResetUpdate.isSelected() ? 0 : UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY__NO_UPDATE;
@@ -204,7 +204,7 @@ public class AccountOptionPermitChecks extends Object {
       flags |= jSecureReplyLinkGrant.isSelected() ? 0 : UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS__NO_GRANT;
       flags |= jUseEnterKeyChatSendGrant.isSelected() ? 0 : UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_GRANT;
       flags |= jAutoUpdatesGrant.isSelected() ? 0 : UserRecord.FLAG_DISABLE_AUTO_UPDATES__NO_GRANT;
-      flags |= jUserOfflineGrant.isSelected() ? 0 : UserRecord.FLAG_USER_OFFLINE_POPUP__NO_GRANT;
+      flags |= jUserOfflineGrant.isSelected() ? 0 : UserRecord.FLAG_USER_ONLINE_STATUS_POPUP__NO_GRANT;
       flags |= jKeyOnServerGrant.isSelected() ? 0 : UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_GRANT;
       flags |= jFolderDeleteGrant.isSelected() ? 0 : UserRecord.FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE__NO_GRANT;
       flags |= jPasswordResetGrant.isSelected() ? 0 : UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY__NO_GRANT;
@@ -358,9 +358,9 @@ public class AccountOptionPermitChecks extends Object {
     addCheckBoxes(bottomPanel, includeUpdate, jSecureReplyLink, jSecureReplyLinkUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, true, checkBoxListener, posY);
     posY ++;
 
-    jUserOffline = new JMyCheckBox("Enable 'User Offline' pop-up notification during chat.");
+    jUserOffline = new JMyCheckBox("Enable online status pop-up notifications.");
     jUserOfflineUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USER_OFFLINE_POPUP, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USER_ONLINE_STATUS_POPUP, checkBoxListener, posY);
     posY ++;
 
     jUseEnterKeyChatSend = new JMyCheckBox("Use ENTER key to send messages during chat sessions.");
@@ -527,7 +527,7 @@ public class AccountOptionPermitChecks extends Object {
     updateCheckBox(jWarnExternal, jWarnExternalUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecords), UserRecord.EMAIL_WARN_EXTERNAL, false, isUpdatePermitsMode);
     updateCheckBox(jSwitchPreview, jSwitchPreviewUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecords), UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE, false, isUpdatePermitsMode);
     updateCheckBox(jAutoUpdates, jAutoUpdatesUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecords), UserRecord.FLAG_DISABLE_AUTO_UPDATES, true, isUpdatePermitsMode);
-    updateCheckBox(jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecords), UserRecord.FLAG_USER_OFFLINE_POPUP, false, isUpdatePermitsMode);
+    updateCheckBox(jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecords), UserRecord.FLAG_USER_ONLINE_STATUS_POPUP, false, isUpdatePermitsMode);
     updateCheckBox(jKeyOnServer, jKeyOnServerUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecords), UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER, false, isUpdatePermitsMode);
     updateCheckBox(jNotify, jNotifyUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecords), UserRecord.EMAIL_NOTIFY_YES, false, isUpdatePermitsMode);
     updateCheckBox(jNotifySubjectAddress, jNotifySubjectAddressUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecords), UserRecord.EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, false, isUpdatePermitsMode);

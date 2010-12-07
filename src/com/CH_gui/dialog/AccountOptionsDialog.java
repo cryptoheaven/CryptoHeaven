@@ -948,8 +948,8 @@ public class AccountOptionsDialog extends GeneralDialog {
         uRecC.notifyByEmail = (Short) Misc.setBitObj(!checks.jSwitchPreviewUpdate.isSelected(), uRecC.notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE__NO_UPDATE);
         uRecC.flags = (Long) Misc.setBitObj(!checks.jAutoUpdates.isSelected(), uRecC.flags, UserRecord.FLAG_DISABLE_AUTO_UPDATES); // inverted meaning of the checkbox
         uRecC.flags = (Long) Misc.setBitObj(!checks.jAutoUpdatesUpdate.isSelected(), uRecC.flags, UserRecord.FLAG_DISABLE_AUTO_UPDATES__NO_UPDATE);
-        uRecC.flags = (Long) Misc.setBitObj(checks.jUserOffline.isSelected(), uRecC.flags, UserRecord.FLAG_USER_OFFLINE_POPUP);
-        uRecC.flags = (Long) Misc.setBitObj(!checks.jUserOfflineUpdate.isSelected(), uRecC.flags, UserRecord.FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
+        uRecC.flags = (Long) Misc.setBitObj(checks.jUserOffline.isSelected(), uRecC.flags, UserRecord.FLAG_USER_ONLINE_STATUS_POPUP);
+        uRecC.flags = (Long) Misc.setBitObj(!checks.jUserOfflineUpdate.isSelected(), uRecC.flags, UserRecord.FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE);
         uRecC.flags = (Long) Misc.setBitObj(checks.jKeyOnServer.isSelected(), uRecC.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
         uRecC.flags = (Long) Misc.setBitObj(!checks.jKeyOnServerUpdate.isSelected(), uRecC.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE);
         uRecC.flags = (Long) Misc.setBitObj(checks.jPasswordReset.isSelected(), uRecC.flags, UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY);

@@ -219,12 +219,13 @@ public class GlobalProperties extends Object {
   // build 590 Auto-scroll to bottom when already at bottom and view is resizing
   // build 592 Chat slide-up change
   // build 594 Window Popup sound change
+  // build 596 Option to disable online status popup notifications
 
-  public static final short PROGRAM_BUILD_NUMBER = 594;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 596;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.3f;
-  public static final short PROGRAM_VERSION_MINOR = 0;
+  public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
   public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
 

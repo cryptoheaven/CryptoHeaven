@@ -101,9 +101,9 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
   public static final long FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION = 1L << 24;
   public static final long FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION__NO_UPDATE = 1L << 25;
   public static final long FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION__NO_GRANT = 1L << 26;
-  public static final long FLAG_USER_OFFLINE_POPUP = 1L << 27;
-  public static final long FLAG_USER_OFFLINE_POPUP__NO_UPDATE = 1L << 28;
-  public static final long FLAG_USER_OFFLINE_POPUP__NO_GRANT = 1L << 29;
+  public static final long FLAG_USER_ONLINE_STATUS_POPUP = 1L << 27;
+  public static final long FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE = 1L << 28;
+  public static final long FLAG_USER_ONLINE_STATUS_POPUP__NO_GRANT = 1L << 29;
   public static final long FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER = 1L << 30; // not used as a permission
   public static final long FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE = 1L << 31; 
   public static final long FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_GRANT = 1L << 32;
@@ -543,12 +543,12 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
         flags = FLAG_ENABLE_ACCOUNT_DELETE | 
                 // web accounts can change password, promos can't
                 (status == STATUS_WEB ? FLAG_ENABLE_PASSWORD_CHANGE : 0) | 
-                FLAG_USER_OFFLINE_POPUP | 
+                FLAG_USER_ONLINE_STATUS_POPUP |
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_MASK__NO_GRANT | 
                 FLAG_MASK__NO_UPDATE;
-        flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
+        flags = Misc.setBit(false, flags, FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_UPDATE);
         break;
       case STATUS_GUEST:
@@ -564,12 +564,12 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
         flags = FLAG_ENABLE_ACCOUNT_DELETE | 
                 FLAG_ENABLE_NICKNAME_CHANGE | 
                 FLAG_ENABLE_PASSWORD_CHANGE | 
-                FLAG_USER_OFFLINE_POPUP | 
+                FLAG_USER_ONLINE_STATUS_POPUP |
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_MASK__NO_GRANT | 
                 FLAG_MASK__NO_UPDATE;
-        flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
+        flags = Misc.setBit(false, flags, FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_UPDATE);
@@ -591,12 +591,12 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
                 FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION | 
                 FLAG_ENABLE_NICKNAME_CHANGE | 
                 FLAG_ENABLE_PASSWORD_CHANGE | 
-                FLAG_USER_OFFLINE_POPUP | 
+                FLAG_USER_ONLINE_STATUS_POPUP |
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE |
                 FLAG_MASK__NO_UPDATE;
-        flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
+        flags = Misc.setBit(false, flags, FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_UPDATE);
@@ -611,12 +611,12 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
                   ACC_SPAM_YES_INTER;
         flags = FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION | 
                 FLAG_ENABLE_PASSWORD_CHANGE | 
-                FLAG_USER_OFFLINE_POPUP | 
+                FLAG_USER_ONLINE_STATUS_POPUP |
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY |
                 FLAG_MASK__NO_UPDATE;
-        flags = Misc.setBit(false, flags, FLAG_USER_OFFLINE_POPUP__NO_UPDATE);
+        flags = Misc.setBit(false, flags, FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_DISABLE_AUTO_UPDATES__NO_UPDATE);
@@ -760,7 +760,7 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     getFlagInfo("Display a warning before sending unencrypted email", notifyByEmail, EMAIL_WARN_EXTERNAL, sb);
     getFlagInfo("Preview Rich Text email in Plain Text mode", notifyByEmail, EMAIL_MANUAL_SELECT_PREVIEW_MODE, sb);
     getFlagInfo("Disable auto updates", flags, FLAG_DISABLE_AUTO_UPDATES, sb);
-    getFlagInfo("User offline popup", flags, FLAG_USER_OFFLINE_POPUP, sb);
+    getFlagInfo("User offline popup", flags, FLAG_USER_ONLINE_STATUS_POPUP, sb);
     getFlagInfo("Store Key on server", flags, FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER, sb);
     getFlagInfo("Enable Password Reset and Key Recovery", flags, FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY, sb);
     getFlagInfo("Use enter key to send chat", flags, FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES, sb);
