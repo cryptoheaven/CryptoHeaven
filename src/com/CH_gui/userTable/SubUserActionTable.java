@@ -12,19 +12,12 @@
 
 package com.CH_gui.userTable;
 
-import com.CH_gui.util.ActionProducerI;
-import com.CH_gui.util.Images;
-import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import javax.swing.*;
-
 import com.CH_gui.action.*;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -33,6 +26,11 @@ import com.CH_cl.service.records.filters.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

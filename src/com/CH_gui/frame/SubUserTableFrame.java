@@ -12,19 +12,17 @@
 
 package com.CH_gui.frame;
 
-import com.CH_gui.util.MiscGui;
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
-
-import com.CH_co.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.actionGui.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.userTable.*;
+import com.CH_gui.util.*;
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

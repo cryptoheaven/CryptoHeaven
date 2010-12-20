@@ -656,7 +656,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     UserRecord[] myCurrentSubUsers = (UserRecord[]) RecordUtils.filter(cache.getUserRecords(), new SubUserFilter(myUser.userId, false, true));
     if (myCurrentSubUsers != null && myCurrentSubUsers.length + accountsV.size() > myUser.maxSubAccounts.shortValue()) {
       isValid = false;
-      sb.append("Your account is capable to manage "+myUser.maxSubAccounts+" user accounts in total.  Creation of all specified user accounts would exceed your quota.  To enable management of a larger group please upgrade your account.");
+      sb.append("Your subscription level is for "+(myUser.maxSubAccounts.shortValue()+1)+" user accounts in total, 1 administrative and "+myUser.maxSubAccounts+" managed.  Creation of all specified user accounts would exceed your quota.  To enable management of a larger group please upgrade your account.");
     }
 
     if (!isValid) {

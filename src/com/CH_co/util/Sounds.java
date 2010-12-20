@@ -49,6 +49,7 @@ public class Sounds extends Object {
   public static final int DIALOG_QUESTION;
 
   public static final int UPDATE_CLIP;
+  public static final int UPDATE_CLIP_CHAT;
   public static final int TRANSFER_DONE;
   public static final int ONLINE;
   public static final int OFFLINE;
@@ -64,8 +65,8 @@ public class Sounds extends Object {
 
   static {
     int i = 0;
-    clipNames = new String[12];
-    clipPlayStamps = new long[12];
+    clipNames = new String[13];
+    clipPlayStamps = new long[13];
 
     DIALOG_ERROR = i;
     clipNames[i] = "errorDialog.wav"; i++;
@@ -81,6 +82,9 @@ public class Sounds extends Object {
 
     UPDATE_CLIP = i;
     clipNames[i] = "updateClip.wav"; i++;
+
+    UPDATE_CLIP_CHAT = i;
+    clipNames[i] = "updateClipChat.wav"; i++;
 
     TRANSFER_DONE = i;
     clipNames[i] = "transferDone.wav"; i++;
@@ -127,8 +131,8 @@ public class Sounds extends Object {
         Thread th = new ThreadTraced("Asynch Sound Dispatcher") {
           public void runTraced() {
             try {
-              // Pospone Update clip as it maybe overwritten by Window-Popup clip
-              if (audioClipIndex == UPDATE_CLIP) {
+              // Pospone Chat Update clip as it maybe overwritten by Window-Popup clip
+              if (audioClipIndex == UPDATE_CLIP_CHAT) {
                 try { Thread.sleep(100); } catch (InterruptedException e) { }
               }
               // synchronize to avoid dispatching multiple clip players at the same time will possibly the same clip
@@ -138,9 +142,14 @@ public class Sounds extends Object {
                 long expired = lastPlayed + MIN_CLIP_TIME_APART;
                 if (expired < now || lastPlayed > now) {
                   clipPlayStamps[audioClipIndex] = now;
-                  // if window-slide-popup, also mark this time for update-clip as we don't want them to overlap and slider sound should take presedence
+                  // if window-slide-popup, also mark this time for chat-update-clip as we don't want them to overlap and slider sound should take presedence
                   if (audioClipIndex == WINDOW_POPUP)
+                    clipPlayStamps[UPDATE_CLIP_CHAT] = now;
+                  // if any update clip, then mark time for all other update clips to prevent sound overlaps
+                  if (audioClipIndex == UPDATE_CLIP || audioClipIndex == UPDATE_CLIP_CHAT) {
                     clipPlayStamps[UPDATE_CLIP] = now;
+                    clipPlayStamps[UPDATE_CLIP_CHAT] = now;
+                  }
                   SoundsPlayerI soundsPlayer = (SoundsPlayerI) soundsPlayerImpl.newInstance();
                   soundsPlayer.play(audioClipIndex);
                 }

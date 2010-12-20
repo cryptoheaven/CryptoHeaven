@@ -12,11 +12,11 @@
 
 package com.CH_co.service.records;
 
-import java.sql.Timestamp;
-import java.util.*;
-
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -441,7 +441,10 @@ public class FolderRecord extends Record {
     int oldNum = numOfUpdates;
     numOfUpdates = num;
     if (num > oldNum && !suppressSound) {
-      Sounds.playAsynchronous(Sounds.UPDATE_CLIP);
+      if (isChatting())
+        Sounds.playAsynchronous(Sounds.UPDATE_CLIP_CHAT);
+      else
+        Sounds.playAsynchronous(Sounds.UPDATE_CLIP);
     }
     invalidateCachedValues();
   }
@@ -539,14 +542,14 @@ public class FolderRecord extends Record {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderRecord.class, "FolderRecord[] folderRecords");
     if (trace != null) trace.args(folderRecords);
 
-    Vector parentIDsV = new Vector();
+    ArrayList parentIDsL = new ArrayList();
     if (folderRecords != null) {
       for (int i=0; i<folderRecords.length; i++) {
-        if (parentIDsV.contains(folderRecords[i].parentFolderId) == false)
-          parentIDsV.addElement(folderRecords[i].parentFolderId);
+        if (parentIDsL.contains(folderRecords[i].parentFolderId) == false)
+          parentIDsL.add(folderRecords[i].parentFolderId);
       }
     }
-    Long[] parentIDs = (Long[]) ArrayUtils.toArray(parentIDsV, Long.class);
+    Long[] parentIDs = (Long[]) ArrayUtils.toArray(parentIDsL, Long.class);
 
     if (trace != null) trace.exit(FolderRecord.class, parentIDs);
     return parentIDs;

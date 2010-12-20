@@ -220,8 +220,9 @@ public class GlobalProperties extends Object {
   // build 592 Chat slide-up change
   // build 594 Window Popup sound change
   // build 596 Option to disable online status popup notifications
+  // build 598 Different sound for new mail and new chat message, changes for user account limit quotas wording
 
-  public static final short PROGRAM_BUILD_NUMBER = 596;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 598;  // even
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.3f;

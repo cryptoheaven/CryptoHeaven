@@ -189,7 +189,13 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
       panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_Accounts_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      JLabel jAccountsLimit = new JMyLabel(userRecord.maxSubAccounts.shortValue() == UserRecord.UNLIMITED_AMOUNT ? "Unlimited" : userRecord.maxSubAccounts.toString());
+      JLabel jAccountsLimit = new JMyLabel();
+      if (userRecord.maxSubAccounts.shortValue() == UserRecord.UNLIMITED_AMOUNT)
+        jAccountsLimit.setText("Unlimited");
+      else if (userRecord.maxSubAccounts.shortValue() == 0)
+        jAccountsLimit.setText("single account");
+      else
+        jAccountsLimit.setText((userRecord.maxSubAccounts.shortValue() + 1) + " in total (1 administrative and "+userRecord.maxSubAccounts+" managed)");
       panel.add(jAccountsLimit, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;

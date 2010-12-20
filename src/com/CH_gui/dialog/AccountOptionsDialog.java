@@ -280,7 +280,7 @@ public class AccountOptionsDialog extends GeneralDialog {
             }
 
             if (jPanelQuotas.jAccountsUsed != null) {
-              jPanelQuotas.jAccountsUsed.setText(""+accountsUsedF);
+              jPanelQuotas.jAccountsUsed.setText((accountsUsedF.shortValue() + 1) + " in total (1 administrative and "+accountsUsedF.shortValue()+" managed)"); // +1 for admin
             }
 
             // update checkboxes
