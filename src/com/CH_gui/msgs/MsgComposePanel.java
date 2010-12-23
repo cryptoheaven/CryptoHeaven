@@ -2983,7 +2983,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           if (w instanceof JFrame)
             ((JFrame) w).getTitle();
           String message = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "Please provide both name and email address." : "Please provide at least the subject or body for your message.";
-          MessageDialog.showWarningDialog(w, message, title, false);
+          MessageDialog.showWarningDialog(w, new JMyLabel(message), title, false);
           veto = true;
         } else if (msgComponents.getAudioCapturePanel().anyCapturedAndNotAttached()) {
           String title = "Audio Recording Not Attached";

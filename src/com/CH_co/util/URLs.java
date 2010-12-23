@@ -270,7 +270,7 @@ public class URLs extends Object {
 
     WELCOME_EMAIL_SUBJECT = i;
     customizationKeys[i] = "WELCOME_EMAIL_SUBJECT";
-    customizationStrings[i] = null; i++;
+    customizationStrings[i] = "Welcome to " + customizationStrings[SERVICE_SOFTWARE_NAME]; i++;
 
     WELCOME_EMAIL_BODY = i;
     customizationKeys[i] = "WELCOME_EMAIL_BODY";

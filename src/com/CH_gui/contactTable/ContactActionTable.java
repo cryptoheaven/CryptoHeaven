@@ -42,6 +42,7 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.dnd.*;
 import java.awt.event.*;
@@ -782,14 +783,20 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
         String messageText = null;
         if (isChat) {
-          messageText = com.CH_gui.lang.Lang.rb.getString("msg_Chat_session_requires_at_least_one_active_contact._Would_you_like_to_invite_your_Friends_and_Associates?");
+          messageText = com.CH_gui.lang.Lang.rb.getString("msg_Chat_session_requires_at_least_one_active_contact.");
         } else {
-          messageText = com.CH_gui.lang.Lang.rb.getString("msg_Shared_Space_requires_at_least_one_active_contact._Would_you_like_to_invite_your_Friends_and_Associates?");
+          messageText = com.CH_gui.lang.Lang.rb.getString("msg_Shared_Space_requires_at_least_one_active_contact.");
         }
-        boolean option = MessageDialog.showDialogYesNo(parent, messageText, title);
-        if (option == true) {
-          new FindUserFrame();
-        }
+        String questionText = com.CH_gui.lang.Lang.rb.getString("msg_Would_you_like_to_invite_your_Friends_and_Associates?");
+        JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        msgPanel.add(new JMyLabel(messageText));
+        msgPanel.add(new JMyLabel(questionText));
+        ActionListener yesAction = new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            new FindUserFrame();
+          }
+        };
+        MessageDialog.showDialogYesNo(parent, msgPanel, title, NotificationCenter.QUESTION_MESSAGE, false, yesAction, null);
       }
     }
     if (selectedRecords != null && selectedRecords.length > 0) {

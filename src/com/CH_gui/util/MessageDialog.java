@@ -94,13 +94,15 @@ public class MessageDialog extends Object {
   }
   public static JDialog showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal)");
-    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, true, null);
+    boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
+    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, sizeAboveMinimum, null);
     if (trace != null) trace.exit(MessageDialog.class, dialog);
     return dialog;
   }
   public static JDialog showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialog(Component parent, Component message, String title, int messageType, JButton[] buttons, ActionListener defaultButtonAction, boolean modal, boolean playSound, boolean sizeBelowMaximum)");
-    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, playSound, sizeBelowMaximum, true, null);
+    boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
+    JDialog dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, playSound, sizeBelowMaximum, sizeAboveMinimum, null);
     if (trace != null) trace.exit(MessageDialog.class, dialog);
     return dialog;
   }
@@ -302,7 +304,7 @@ public class MessageDialog extends Object {
         }
       });
       JButton[] buttons = new JButton[] { yes, no };
-      boolean sizeAboveMinimum = !(message instanceof JPanel);
+      boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
       showDialog(parent, message, title, messageType, buttons, 0, 1, null, modal, true, true, sizeAboveMinimum, null);
     }
 
@@ -316,6 +318,11 @@ public class MessageDialog extends Object {
     showDialog(parent, messageText, title, NotificationCenter.ERROR_MESSAGE, false);
   }
   /* Show error dialog with "OK" button */
+  public static void showErrorDialog(Component parent, Component message, String title, boolean modal) {
+    boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
+    showDialog(parent, message, title, NotificationCenter.ERROR_MESSAGE, null, -1, -1, null, modal, true, true, sizeAboveMinimum, null);
+  }
+  /* Show error dialog with "OK" button */
   public static void showErrorDialog(Component parent, String messageText, String title, boolean modal) {
     showDialog(parent, messageText, title, NotificationCenter.ERROR_MESSAGE, modal);
   }
@@ -327,9 +334,19 @@ public class MessageDialog extends Object {
   public static void showWarningDialog(Component parent, String messageText, String title, boolean modal) {
     showDialog(parent, messageText, title, NotificationCenter.WARNING_MESSAGE, modal);
   }
+  /* Show warning dialog with "OK" button */
+  public static void showWarningDialog(Component parent, Component message, String title, boolean modal) {
+    boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
+    showDialog(parent, message, title, NotificationCenter.WARNING_MESSAGE, null, -1, -1, null, modal, true, true, sizeAboveMinimum, null);
+  }
   /* Show info dialog with "OK" button */
   public static void showInfoDialog(Component parent, String messageText, String title) {
     showDialog(parent, messageText, title, NotificationCenter.INFORMATION_MESSAGE, false);
+  }
+  /* Show info dialog with "OK" button */
+  public static void showInfoDialog(Component parent, Component message, String title, boolean modal) {
+    boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
+    showDialog(parent, message, title, NotificationCenter.INFORMATION_MESSAGE, null, -1, -1, null, modal, true, true, sizeAboveMinimum, null);
   }
   /* Show info dialog with "OK" button */
   public static void showInfoDialog(Component parent, String messageText, String title, boolean modal) {
@@ -382,6 +399,7 @@ public class MessageDialog extends Object {
         textComp = textArea;
       }
       textComp.setEditable(false);
+      textComp.setBorder(new EmptyBorder(5, 5, 5, 5));
 
       try {
         if (trace != null) trace.data(30, "setting caret to position 0");

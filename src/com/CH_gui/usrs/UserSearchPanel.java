@@ -452,9 +452,24 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
           }
           runTraced(false);
         } else {
-          String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
-          String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
-          MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+          if (emailInvitationPanel != null && request.handle != null && request.handle.length() > 0) {
+            String line1 = "No user accounts found to match your search.";
+            String line2 = "Would you like to send an email invitation now?";
+            JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+            msgPanel.add(new JMyLabel(line1));
+            msgPanel.add(new JMyLabel(line2));
+            String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
+            ActionListener yesAction = new ActionListener() {
+              public void actionPerformed(ActionEvent e) {
+                emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION].actionPerformed(null);
+              }
+            };
+            MessageDialog.showDialogYesNo(UserSearchPanel.this, msgPanel, title, NotificationCenter.QUESTION_MESSAGE, false, yesAction, null);
+          } else {
+            String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
+            String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
+            MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+          }
         }
       }
     }

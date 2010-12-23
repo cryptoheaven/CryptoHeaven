@@ -308,7 +308,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
       // check if minimum number of answers is specified
       if (!error && countAnswers < initialRecoveryRecord.minAs.shortValue()) {
         error = true;
-        MessageDialog.showWarningDialog(PassRecoveryRecoverDialog.this, "You must specify at least " + initialRecoveryRecord.minAs + " answers to decrypt and recover your password.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"), false);
+        MessageDialog.showWarningDialog(PassRecoveryRecoverDialog.this, new JMyLabel("You must specify at least " + initialRecoveryRecord.minAs + " answers to decrypt and recover your password."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"), false);
       }
 
       if (!error) {
@@ -349,9 +349,9 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
               passPanel.add(letter, new GridBagConstraints(i, 0, 1, 1, 0, 0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(2, 2, 2, 2), 10, 10));
             }
-            JOptionPane.showMessageDialog(PassRecoveryRecoverDialog.this, mainPanel, "Password", JOptionPane.INFORMATION_MESSAGE);
+            MessageDialog.showInfoDialog(PassRecoveryRecoverDialog.this, mainPanel, "Password", true);
           } else {
-            MessageDialog.showErrorDialog(PassRecoveryRecoverDialog.this, "Could not decrypt password characters from information provided.", "Password Recovery Failed", true);
+            MessageDialog.showErrorDialog(PassRecoveryRecoverDialog.this, new JMyLabel("Could not decrypt password characters from information provided."), "Password Recovery Failed", true);
           }
         } else {
           //JOptionPane.showMessageDialog(PassRecoveryRecoverDialog.this, new JMyLabel("Could not fetch Password Recovery data."), "Password Recovery Failed", JOptionPane.ERROR_MESSAGE);

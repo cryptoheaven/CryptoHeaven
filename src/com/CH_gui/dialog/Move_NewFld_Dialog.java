@@ -503,7 +503,10 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
         chosenFolderPair = null;
       // if moving to root
       if (chosenFolderPair == null) {
-        MessageDialog.showErrorDialog(this, com.CH_gui.lang.Lang.rb.getString("msg_Root_folder_is_an_invalid_choice."), com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+        JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        msgPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Category_folder_is_an_invalid_choice.")));
+        msgPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Please_select_another_folder.")));
+        MessageDialog.showInfoDialog(this, msgPanel, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), false);
       } else {
         success = true;
       }

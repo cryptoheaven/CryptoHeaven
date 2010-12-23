@@ -43,10 +43,6 @@ public class GlobalProperties extends Object {
   private static final String SOFTWARE_NAME_EXT = "Client";
   public static final String PROGRAM_NAME = "CryptoHeavenClient";
 
-  public static final short PROGRAM_RELEASE_ALPHA = 1;
-  public static final short PROGRAM_RELEASE_BETA = 2;
-  public static final short PROGRAM_RELEASE_FINAL = 3;
-
   // build 86-124 are the Address Book editions
   // build 138 is stable Dec 2003 - Feb 2004
   // build 142 is Auto Responder edition
@@ -221,14 +217,21 @@ public class GlobalProperties extends Object {
   // build 594 Window Popup sound change
   // build 596 Option to disable online status popup notifications
   // build 598 Different sound for new mail and new chat message, changes for user account limit quotas wording
+  // build 600 Misc improvements geared towards usability for newly created accounts.
 
-  public static final short PROGRAM_BUILD_NUMBER = 598;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 600;  // even
+  public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.3f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 2;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
-  public static final short PROGRAM_RELEASE = PROGRAM_RELEASE_FINAL;
+
+  public static final short PROGRAM_RELEASE_ALPHA = 1;
+  public static final short PROGRAM_RELEASE_BETA = 2;
+  public static final short PROGRAM_RELEASE_FINAL = 3;
+
+  public static final short PROGRAM_RELEASE = IS_BETA ? PROGRAM_RELEASE_BETA : PROGRAM_RELEASE_FINAL;
 
   public static String PROGRAM_FULL_NAME = SOFTWARE_NAME + " " + SOFTWARE_NAME_EXT + " build " + PROGRAM_BUILD_NUMBER;
   public static String PROGRAM_BUILD_DATE; // read in from a file
