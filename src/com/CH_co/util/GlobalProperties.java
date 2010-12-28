@@ -219,8 +219,9 @@ public class GlobalProperties extends Object {
   // build 598 Different sound for new mail and new chat message, changes for user account limit quotas wording
   // build 600 Misc improvements geared towards usability for newly created accounts.
   // build 602 Server reports suggested number of child folders and adds seperate APIs for view based folder roots and child fetching
+  // build 604 Optimized folder fetching sequence by reducing number of server requests
 
-  public static final short PROGRAM_BUILD_NUMBER = 602;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 604;  // even
   public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!

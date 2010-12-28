@@ -162,11 +162,14 @@ public class Misc extends Object {
    * Tries to digest array objects and convert them element-by-element.
    * @return a representation of specified object as a string.
    */
-
   public static String objToStr(Object obj) {
+    int MAX_ITEMS_TO_LIST = 50;
+    return objToStr(obj, MAX_ITEMS_TO_LIST);
+  }
+  public static String objToStr(Object obj, int maxItemsToList) {
     if (obj == null) return "null";
     StringBuffer strB = new StringBuffer();
-    objToStr(obj, strB);
+    objToStr(obj, strB, maxItemsToList);
     return strB.toString();
   }
 
@@ -176,6 +179,10 @@ public class Misc extends Object {
    */
   public static void objToStr(Object obj, StringBuffer strB) {
     int MAX_ITEMS_TO_LIST = 50;
+    objToStr(obj, strB, MAX_ITEMS_TO_LIST);
+  }
+  public static void objToStr(Object obj, StringBuffer strB, int maxItemsToList) {
+    int MAX_ITEMS_TO_LIST = maxItemsToList;
     if (obj == null) {
       strB.append("null");
     } else {
@@ -184,7 +191,7 @@ public class Misc extends Object {
         int len = Array.getLength(obj);
         if (obj instanceof byte[]) {
           strB.append("BYTES[len="); strB.append(len); strB.append("](");
-          if (len > MAX_ITEMS_TO_LIST) {
+          if (MAX_ITEMS_TO_LIST != -1 && len > MAX_ITEMS_TO_LIST) {
             strB.append("too many to list");
           } else {
             strB.append(ArrayUtils.toString((byte[]) obj));
@@ -192,7 +199,7 @@ public class Misc extends Object {
           strB.append(')');
         } else {
           strB.append("ARRAY[len="); strB.append(len); strB.append("](");
-          if (len > MAX_ITEMS_TO_LIST) {
+          if (MAX_ITEMS_TO_LIST != -1 && len > MAX_ITEMS_TO_LIST) {
             strB.append("too many to list");
           } else {
             for (int i=0; i<len; i++) {
@@ -207,7 +214,7 @@ public class Misc extends Object {
         Vector v = (Vector) obj;
         int len = v.size();
         strB.append("Vector[len="); strB.append(len); strB.append("](");
-        if (len > MAX_ITEMS_TO_LIST) {
+        if (MAX_ITEMS_TO_LIST != -1 && len > MAX_ITEMS_TO_LIST) {
           strB.append("too many to list");
         } else {
           for (int i=0; i<len; i++) {
@@ -221,7 +228,7 @@ public class Misc extends Object {
         ArrayList al = (ArrayList) obj;
         int len = al.size();
         strB.append("ArrayList[len="); strB.append(len); strB.append("](");
-        if (len > MAX_ITEMS_TO_LIST) {
+        if (MAX_ITEMS_TO_LIST != -1 && len > MAX_ITEMS_TO_LIST) {
           strB.append("too many to list");
         } else {
           for (int i=0; i<len; i++) {
@@ -240,7 +247,7 @@ public class Misc extends Object {
         } else {
           strB.append(keys.size()); strB.append("](");
           int len = map.size();
-          if (len > MAX_ITEMS_TO_LIST) {
+          if (MAX_ITEMS_TO_LIST != -1 && len > MAX_ITEMS_TO_LIST) {
             strB.append("too many to list");
           } else {
             Iterator iter = keys.iterator();

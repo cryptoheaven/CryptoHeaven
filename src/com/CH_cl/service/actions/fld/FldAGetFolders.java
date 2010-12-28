@@ -200,10 +200,8 @@ public class FldAGetFolders extends ClientMessageAction {
 
     if (shareIDsHS != null && shareIDsHS.size() > 0) {
       Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsHS, Long.class);
+      // Fetching of shares will also return related folders to avoid potential loops if out of synch data between shares and folders
       SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 30000);
-      // also request an update to related folders to avoid potential loops if out of synch data between shares and folders
-      Long[] folderIDs = FolderShareRecord.getFolderIDs(cache.getFolderShareRecords(shareIDs));
-      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 30000);
     }
 
     if (userIDsHS != null && userIDsHS.size() > 0) {

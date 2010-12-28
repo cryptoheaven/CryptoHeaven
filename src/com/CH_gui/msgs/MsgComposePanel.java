@@ -785,7 +785,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             } else {
               new SendMessageRunner(new MsgSendInfoProviderI() {
                 public String[] getContent() {
-                  return new String[] { ">< ring >< ring ><", "" };
+                  return new String[] { "ring...", "" };
                 }
                 public Short getContentType() {
                   return new Short(MsgDataRecord.OBJ_TYPE_MSG);
@@ -806,7 +806,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                   return null;
                 }
                 public short getPriority() {
-                  return MsgDataRecord.IMPORTANCE_HIGH_PLAIN;
+                  return MsgDataRecord.IMPORTANCE_NORMAL_PLAIN;
                 }
                 public MsgLinkRecord getReplyToMsgLink() {
                   return null;
