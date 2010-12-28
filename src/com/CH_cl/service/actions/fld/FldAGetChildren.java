@@ -17,12 +17,13 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 
 import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.util.ArrayList;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -70,18 +71,25 @@ public class FldAGetChildren extends ClientMessageAction {
         foldersNotCashed = (FolderRecord[]) ArrayUtils.getDifference(folderRecords, foldersAlreadyCashed);
       FldAGetFolders.runAction(SIL, folderRecords, shareRecords);
       if (foldersNotCashed != null && foldersNotCashed.length > 0) {
-        Long[] folderIDs = RecordUtils.getIDs(foldersNotCashed);
-        final Long[][] folderIDsChunks = RecordUtils.divideIntoChunks(folderIDs, 100);
-        final int[] index = new int[] { 0 };
-        final Runnable[] nextJob = new Runnable[1];
-        nextJob[0] = new Runnable() {
-          public void run() {
-            index[0] ++;
-            if (index[0] < folderIDsChunks.length)
-              SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_CHILDREN, new Obj_IDList_Co(folderIDsChunks[index[0]])), 30000, nextJob[0], nextJob[0]);
-          }
-        };
-        SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_CHILDREN, new Obj_IDList_Co(folderIDsChunks[index[0]])), 30000, nextJob[0], nextJob[0]);
+        ArrayList foldersNotCashedWithChildrenL = new ArrayList();
+        for (int i=0; i < foldersNotCashed.length; i++) {
+          if (foldersNotCashed[i].numOfViewChildren == null || foldersNotCashed[i].numOfViewChildren.intValue() > 0) // unknown or > 0
+            foldersNotCashedWithChildrenL.add(foldersNotCashed[i]);
+        }
+        if (foldersNotCashedWithChildrenL.size() > 0) {
+          Long[] folderIDs = RecordUtils.getIDs(foldersNotCashedWithChildrenL);
+          final Long[][] folderIDsChunks = RecordUtils.divideIntoChunks(folderIDs, 100);
+          final int[] index = new int[] { 0 };
+          final Runnable[] nextJob = new Runnable[1];
+          nextJob[0] = new Runnable() {
+            public void run() {
+              index[0] ++;
+              if (index[0] < folderIDsChunks.length)
+                SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_CHILDREN, new Obj_IDList_Co(folderIDsChunks[index[0]])), 30000, nextJob[0], nextJob[0]);
+            }
+          };
+          SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_CHILDREN, new Obj_IDList_Co(folderIDsChunks[index[0]])), 30000, nextJob[0], nextJob[0]);
+        }
       }
     }
 

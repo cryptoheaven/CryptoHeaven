@@ -19,10 +19,11 @@ import com.CH_cl.service.engine.*;
 import com.CH_co.trace.Trace;
 
 import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
+
+import java.util.ArrayList;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -66,8 +67,15 @@ public class FldAGetRoots extends ClientMessageAction {
     FldAGetFolders.runAction(SIL, folderRecords, shareRecords);
 
     if (folderRecords != null && folderRecords.length > 0) {
-      Long[] folderIDs = RecordUtils.getIDs(folderRecords);
-      SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_CHILDREN, new Obj_IDList_Co(folderIDs)));
+      ArrayList foldersWithChildrenL = new ArrayList();
+      for (int i=0; i < folderRecords.length; i++) {
+        if (folderRecords[i].numOfViewChildren == null || folderRecords[i].numOfViewChildren.intValue() > 0) // unknown or > 0
+          foldersWithChildrenL.add(folderRecords[i]);
+      }
+      if (foldersWithChildrenL.size() > 0) {
+        Long[] folderIDs = RecordUtils.getIDs(foldersWithChildrenL);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_CHILDREN, new Obj_IDList_Co(folderIDs)));
+      }
     }
 
     if (trace != null) trace.exit(FldAGetRoots.class, null);

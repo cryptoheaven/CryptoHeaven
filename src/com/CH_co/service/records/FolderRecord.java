@@ -89,6 +89,8 @@ public class FolderRecord extends Record {
 
   // Cached folder object count
   public Long objectCount;
+  // Cached, or suggested, or probable number of child folders. Server reports this when retrieving a partial folder tree.
+  public Integer numOfViewChildren;
 
   /** Creates new FolderRecord */
   public FolderRecord() {
@@ -572,6 +574,7 @@ public class FolderRecord extends Record {
       if (record.numOfShares    != null) numOfShares    = record.numOfShares;
       if (record.dateCreated    != null) dateCreated    = record.dateCreated;
       if (record.dateUpdated    != null) dateUpdated    = record.dateUpdated;
+      if (record.numOfViewChildren != null) numOfViewChildren = record.numOfViewChildren;
     }
     else
       super.mergeError(updated);
@@ -595,6 +598,7 @@ public class FolderRecord extends Record {
       + ", dateUpdated="      + dateUpdated
       + ", private-local data >> "
       + ", numOfUpdates="     + numOfUpdates
+      + ", numOfViewChildren="+ numOfViewChildren
       + "]";
   }
 

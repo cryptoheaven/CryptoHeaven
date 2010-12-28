@@ -13,7 +13,6 @@
 package com.CH_co.service.msg.dataSets.fld;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.Misc;
@@ -83,6 +82,8 @@ public class Fld_Folders_Rp extends ProtocolMsgDataSet {
         dataOut.writeSmallint(folderRecords[i].numOfShares);
         dataOut.writeTimestamp(folderRecords[i].dateCreated);
         dataOut.writeTimestamp(folderRecords[i].dateUpdated);
+        if (clientBuild >= 602 && serverBuild >= 602)
+          dataOut.writeInteger(folderRecords[i].numOfViewChildren);
       }
     }
     // write shareRecords second
@@ -135,6 +136,8 @@ public class Fld_Folders_Rp extends ProtocolMsgDataSet {
         folderRecords[i].numOfShares = dataIn.readSmallint();
         folderRecords[i].dateCreated = dataIn.readTimestamp();
         folderRecords[i].dateUpdated = dataIn.readTimestamp();
+        if (clientBuild >= 602 && serverBuild >= 602)
+          folderRecords[i].numOfViewChildren = dataIn.readInteger();
       }
     }
 
