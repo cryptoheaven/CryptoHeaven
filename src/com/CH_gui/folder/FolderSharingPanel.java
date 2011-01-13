@@ -12,19 +12,6 @@
 
 package com.CH_gui.folder;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.cryptx.*;
@@ -36,11 +23,20 @@ import com.CH_co.util.*;
 
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.shareTable.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -185,7 +181,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     setLayout(new GridBagLayout());
 
     int posY = 0;
-    jShareIcon = new JMyLabel(Images.get(ImageNums.FOLDER_SHARED32));
+    jShareIcon = new JMyLabel(Images.get(ImageNums.FOLDER_SHARED48));
     add(jShareIcon, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jShareMsg = new JMyLabel();
@@ -588,7 +584,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     String labelText2 = com.CH_gui.lang.Lang.rb.getString("label_Input_Share_Name_here");
     if (folderType == FolderRecord.GROUP_FOLDER) {
       ShareTableModel.columnHeaderDatas[1].applyToTable(tablePane.getJSortedTable());
-      jShareIcon.setIcon(Images.get(ImageNums.PEOPLE32));
+      jShareIcon.setIcon(Images.get(ImageNums.PEOPLE48));
       if (jRadioInheritSharing != null)
         jRadioInheritSharing.setText(com.CH_gui.lang.Lang.rb.getString("radio_Inherit_membership_properties_from_parent_folder."));
       jRadioDoNotShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Do_not_share_this_group."));
@@ -597,7 +593,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
       labelText = labelText1;
     } else {
       ShareTableModel.columnHeaderDatas[0].applyToTable(tablePane.getJSortedTable());
-      jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED32));
+      jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED48));
       if (jRadioInheritSharing != null)
         jRadioInheritSharing.setText(com.CH_gui.lang.Lang.rb.getString("radio_Inherit_sharing_properties_from_parent_folder."));
       jRadioDoNotShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Do_not_share_this_folder."));
