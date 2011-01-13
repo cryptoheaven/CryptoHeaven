@@ -12,24 +12,12 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.event.*;
-import java.security.*;
-import java.sql.Timestamp;
-
-import javax.swing.*;
-import javax.swing.border.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
@@ -38,6 +26,14 @@ import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.security.*;
+import java.sql.Timestamp;
+
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -149,13 +145,18 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
         if (initialRecoveryRecord.isEnabledRecovery())
           fetchText = "Password Hint and Challenge questions retrieved on:";
         else
-          fetchText = "Attempt to retrieve you uninitialized Password Recovery settings was made on:";
+          fetchText = "Attempt to retrieve your Password Recovery settings was made on:";
         panel.add(new JMyLabel(fetchText), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 1, 5), 0, 0));
         posY ++;
         panel.add(new JMyLabel(Misc.getFormattedTimestamp(initialRecoveryRecord.lastFetched)), new GridBagConstraints(0, posY, 2, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 25, 5, 5), 0, 0));
         posY ++;
+        if (!initialRecoveryRecord.isEnabledRecovery()) {
+          panel.add(new JMyLabel("Your Password Recovery is disabled."), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 5, 5, 5), 0, 0));
+          posY ++;
+        }
       }
       if (initialRecoveryRecord.lastFailed != null && initialRecoveryRecord.lastFailed.compareTo(reportSince) > 0) {
         panel.add(new JMyLabel("Password Question and Answer challenge failed on:"), new GridBagConstraints(0, posY, 2, 1, 0, 0,
