@@ -191,7 +191,20 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     return actions[MESSAGE_ACTION];
   }
   public Action getDoubleClickAction() {
-    return withDoubleClickAction ? actions[MESSAGE_ACTION] : null;
+    Action action = null;
+    if (withDoubleClickAction) {
+      action = actions[MESSAGE_ACTION];
+      // if cases that single online contact is selected default to CHAT
+      Record[] selectedRecords = getSelectedRecords();
+      if (selectedRecords != null && selectedRecords.length == 1) {
+        if (selectedRecords[0] instanceof ContactRecord) {
+          if (((ContactRecord) selectedRecords[0]).isOnlineStatus()) {
+            action = actions[CHAT_ACTION];
+          }
+        }
+      }
+    }
+    return action;
   }
 
 
@@ -203,10 +216,12 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedMemberContacts()");
     List selectedRecsL = getSelectedRecordsL();
     List selectedMembersL = new ArrayList();
-    for (int i=0; i<selectedRecsL.size(); i++) {
-      Record rec = (Record) selectedRecsL.get(i);
-      if (rec instanceof MemberContactRecordI)
-        selectedMembersL.add(rec);
+    if (selectedRecsL != null) {
+      for (int i=0; i<selectedRecsL.size(); i++) {
+        Record rec = (Record) selectedRecsL.get(i);
+        if (rec instanceof MemberContactRecordI)
+          selectedMembersL.add(rec);
+      }
     }
     MemberContactRecordI[] records = (MemberContactRecordI[]) ArrayUtils.toArray(selectedMembersL, MemberContactRecordI.class);
     if (trace != null) trace.exit(ContactActionTable.class, records);
