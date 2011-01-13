@@ -248,10 +248,9 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   public List getSelectedRecordsL() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecords()");
 
-    ArrayList recordsL = null;
+    ArrayList recordsL = new ArrayList();
     if (jSTable != null && jSTable.getSelectedRowCount() > 0) {
       int[] selectedRows = jSTable.getSelectedRows();
-      recordsL = new ArrayList();
       for (int i=0; selectedRows!=null && i<selectedRows.length; i++) {
         Record rec = recordTableModel.getRowObject(jSTable.convertMyRowIndexToModel(selectedRows[i]));
         if (rec != null) {
