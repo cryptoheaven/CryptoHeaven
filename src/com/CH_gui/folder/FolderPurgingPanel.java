@@ -12,19 +12,18 @@
 
 package com.CH_gui.folder;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
 
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
