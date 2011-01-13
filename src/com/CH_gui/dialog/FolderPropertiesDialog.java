@@ -13,14 +13,6 @@
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import javax.swing.border.*;
-import javax.swing.*;
-import javax.swing.event.*;
-
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
@@ -37,9 +29,17 @@ import com.CH_gui.frame.MainFrame;
 import com.CH_gui.folder.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.ListRenderer;
+import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
-import com.CH_gui.service.records.RecordUtilsGui;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+import javax.swing.border.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -197,14 +197,17 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
     int imageNum = 0;
     if (folderPair.getFolderRecord().isGroupType())
-      imageNum = ImageNums.PEOPLE32;
+      imageNum = ImageNums.PEOPLE48;
     else
-      imageNum = ImageNums.FOLDER32;
+      imageNum = ImageNums.FOLDER48;
     int posY = 0;
-    panel.add(new JMyLabel(Images.get(imageNum)), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(Images.get(imageNum)), new GridBagConstraints(0, posY, 1, 2, 0, 0,
+          GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(1, posY, 2, 1, 10, 0,
+          GridBagConstraints.SOUTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(jFolderName, new GridBagConstraints(1, posY+1, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jFolderName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
-          GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
     posY ++;
 
 
