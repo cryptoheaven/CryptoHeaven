@@ -12,16 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.Images;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.border.*;
-import javax.swing.*;
-import javax.swing.event.*;
-
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 import com.CH_cl.service.actions.*;
@@ -39,7 +29,15 @@ import com.CH_gui.file.FileUtilities;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.border.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
