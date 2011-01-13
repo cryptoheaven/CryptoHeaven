@@ -267,22 +267,6 @@ public class FolderFilter extends AbstractRecordFilter implements RecordFilter {
         if (guiViewParentId != null)
           viewParentOk = keepViewParentIDsHS.contains(guiViewParentId);
       }
-//      // analize view parents as Category folders
-//      if (!viewParentOk) {
-//        if (fPair.isViewRoot()) {
-//          long parentId = 0;
-//          if (fRec.isFileType() || fRec.isLocalFileType()) {
-//            parentId = FolderRecord.CATEGORY_FILE_ID;
-//          } else if (fRec.isChatting()) {
-//            parentId = FolderRecord.CATEGORY_CHAT_ID;
-//          } else if (fRec.isMsgType()) {
-//            parentId = FolderRecord.CATEGORY_MAIL_ID;
-//          }
-//          if (parentId != 0) {
-//            viewParentOk = keepViewParentIDsHT.get(new Long(parentId)) != null;
-//          }
-//        }
-//      }
       if (!rootViewOk) rootViewOk = keepViewRootFolders.booleanValue() == fPair.isViewRoot();
     }
 
