@@ -140,8 +140,14 @@ public class PopupWindow extends JWindow implements MsgPopupListener {
   }
 
   public void addForScrolling(String htmlText, boolean suppressSound) {
+    addForScrolling(htmlText, suppressSound, null);
+  }
+  public void addForScrolling(String htmlText, boolean suppressSound, MouseListener clickListener) {
     if (htmlText != null && htmlText.length() > 0) {
-      addForScrolling(new HTML_ClickablePane(htmlText), suppressSound ? -1 : Sounds.WINDOW_POPUP);
+      HTML_ClickablePane pane = new HTML_ClickablePane(htmlText);
+      addForScrolling(pane, suppressSound ? -1 : Sounds.WINDOW_POPUP);
+      if (clickListener != null)
+        pane.addMouseListener(clickListener);
     }
   }
 
