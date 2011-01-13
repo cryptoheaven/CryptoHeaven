@@ -716,13 +716,23 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                 final Object key = "online"+cRec.contactWithId;
                 final String msgUserName = userName;
                 final int imageCode = ContactRecUtil.getStatusIconCode(cRec.status, cRec.ownerUserId);
+                final ContactRecord _cRec = cRec;
+                final boolean[] _isProcessed = new boolean[1];
                 Thread th = new ThreadTraced("Online Popup Notifier") {
                   public void runTraced() {
                     Object token = new Object();
                     if (offlineDialogArbiter.putToken(key, token)) {
                       String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {msgUserName});
                       String iconStr = ImageNums.getImageName(imageCode) + ".png";
-                      PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/"+iconStr+"\" height=\"16\" width=\"16\">&nbsp;"+msg, true);
+                      MouseListener clickListener = new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                          if (!_isProcessed[0]) {
+                            _isProcessed[0] = true;
+                            new ChatSessionCreator(_cRec).start();
+                          }
+                        }
+                      };
+                      PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/"+iconStr+"\" height=\"16\" width=\"16\">&nbsp;"+msg, true, clickListener);
                       try {
                         // wait for other chat scrolling events for the same user to skip over this arbiter
                         Thread.sleep(1000);
