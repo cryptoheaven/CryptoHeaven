@@ -515,6 +515,8 @@ public class FolderRecord extends Record {
       short[] sortOrder = new short[] {
         CATEGORY_MAIL_FOLDER,
         CATEGORY_FILE_FOLDER,
+        ADDRESS_FOLDER,
+        WHITELIST_FOLDER,
         CATEGORY_CHAT_FOLDER,
         CATEGORY_GROUP_FOLDER,
         MESSAGE_FOLDER,
@@ -522,8 +524,6 @@ public class FolderRecord extends Record {
         FILE_FOLDER,
         POSTING_FOLDER,
         CHATTING_FOLDER,
-        ADDRESS_FOLDER,
-        WHITELIST_FOLDER,
         GROUP_FOLDER,
         CONTACT_FOLDER,
         KEY_FOLDER,
