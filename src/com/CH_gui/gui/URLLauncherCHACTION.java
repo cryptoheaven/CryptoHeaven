@@ -12,24 +12,23 @@
 
 package com.CH_gui.gui;
 
+import com.CH_cl.service.cache.*;
+import com.CH_cl.service.ops.*;
+
+import com.CH_co.service.records.*;
+
+import com.CH_gui.actionGui.*;
+import com.CH_gui.frame.*;
+import com.CH_gui.menuing.*;
 import com.CH_gui.util.URLLauncher;
 import com.CH_gui.util.HTML_ClickablePane;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.actionGui.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.menuing.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -92,10 +91,10 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
             new LocalFileTableFrame("Browse");
           } else if (args.equalsIgnoreCase("My Files")) {
             new FileTableFrame(CacheUtilities.convertRecordToPair(cache.getFolderRecord(uRec.fileFolderId)));
-          } else if (args.equalsIgnoreCase("Address Book")) {
+          } else if (args.equalsIgnoreCase("Address Book") || args.equalsIgnoreCase("Address-Book")) {
             FolderPair fPair = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
             new AddressTableFrame(fPair);
-          } else if (args.equalsIgnoreCase("Allowed Senders")) {
+          } else if (args.equalsIgnoreCase("Allowed Senders") || args.equalsIgnoreCase("Allowed-Senders")) {
             FolderPair fPair = FolderOps.getOrCreateWhiteList(MainFrame.getServerInterfaceLayer());
             new WhiteListTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Drafts")) {
