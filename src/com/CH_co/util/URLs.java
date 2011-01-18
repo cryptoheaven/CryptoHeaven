@@ -58,6 +58,7 @@ public class URLs extends Object {
 
   public static int DEFAULT_SERVER_1;
   public static int DEFAULT_SERVER_2;
+  public static int DEFAULT_SERVER_3;
 
   public static int ACTIVATION_CODE_DEFAULT;
   public static int ACTIVATION_CODE_FIELD_REMOVED;
@@ -155,8 +156,8 @@ public class URLs extends Object {
   private static void loadDefaults() {
     int i = 0;
 
-    customizationKeys = new String[29];
-    customizationStrings = new String[29];
+    customizationKeys = new String[30];
+    customizationStrings = new String[30];
 
     SERVICE_COMMUNITY_NAME = i;
     customizationKeys[i] = "SERVICE_COMMUNITY_NAME";
@@ -211,6 +212,10 @@ public class URLs extends Object {
     DEFAULT_SERVER_2 = i;
     customizationKeys[i] = "DEFAULT_SERVER_2";
     customizationStrings[i] = "d1." + get(DOMAIN) + ":4383"; i++;
+
+    DEFAULT_SERVER_3 = i;
+    customizationKeys[i] = "DEFAULT_SERVER_3";
+    customizationStrings[i] = "http://d3." + get(DOMAIN); i++;
 
     ACTIVATION_CODE_DEFAULT = i;
     customizationKeys[i] = "ACTIVATION_CODE_DEFAULT";
