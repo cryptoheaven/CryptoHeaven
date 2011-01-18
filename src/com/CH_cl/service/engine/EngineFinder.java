@@ -12,12 +12,12 @@
 
 package com.CH_cl.service.engine;
 
+import com.CH_co.trace.*;
+import com.CH_co.util.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -52,9 +52,9 @@ public class EngineFinder extends Object {
     Object[][] hostsAndPorts = null;
     Object[][] oldEngineServers = null; // incase the server_list is not updated, this will provide some emergency recovery
 
-    Vector serversAndPortsV = new Vector();
+    ArrayList serversAndPortsL = new ArrayList();
 
-    serversAndPortsV.addElement(server);
+    serversAndPortsL.add(server);
 //System.out.println("1: server=" + Misc.objToStr(server));
     // Add past servers to the trial vectors.
     String serverListProperty = getServerListPropertyName(server);
@@ -63,16 +63,16 @@ public class EngineFinder extends Object {
       Object[][] additionalServers = getServers(serverListStr, true, false, 0, 0);
       if (additionalServers != null && additionalServers.length > 0) {
         for (int i=0; i<additionalServers.length; i++)
-          serversAndPortsV.addElement(additionalServers[i]);
+          serversAndPortsL.add(additionalServers[i]);
       }
     }
 //System.out.println("2: serversAndPortsV=" + Misc.objToStr(serversAndPortsV));
     // Loop through all of the HTTP servers and try fetching the current EngineServers.
     // First successful fetch is sufficient...
-    for (int i=0; i<serversAndPortsV.size(); i++) {
+    for (int i=0; i<serversAndPortsL.size(); i++) {
       Object[] httpServer = null;
       try {
-        httpServer = (Object[]) serversAndPortsV.elementAt(i);
+        httpServer = (Object[]) serversAndPortsL.get(i);
         int portNum = ((Integer)httpServer[1]).intValue();
         // Try the web to serve the list only if it is to ports 80, 8000, 8080
         if (portNum == 80 || portNum == 8000 || portNum == 8080) {
@@ -129,29 +129,29 @@ public class EngineFinder extends Object {
     if (hostsAndPorts == null) {
       if (trace != null) trace.data(200, "no host found!");
       // clear the http servers used for fetching lists
-      serversAndPortsV.clear();
+      serversAndPortsL.clear();
       // Add any old servers fetched from WEB server
       if (oldEngineServers != null) {
 //System.out.println("4a: oldEngineServers!=null");
         for (int i=0; i<oldEngineServers.length; i++) {
           Object[] toAddServerAndPort = oldEngineServers[i];
           boolean found = false;
-          for (int k=0; k<serversAndPortsV.size(); k++) {
-            Object[] serverAndPort = (Object[]) serversAndPortsV.elementAt(k);
+          for (int k=0; k<serversAndPortsL.size(); k++) {
+            Object[] serverAndPort = (Object[]) serversAndPortsL.get(k);
             if (serverAndPort[0].toString().equalsIgnoreCase(toAddServerAndPort[0].toString()) && serverAndPort[1].toString().equalsIgnoreCase(toAddServerAndPort[1].toString())) {
               found = true;
               break;
             }
           }
           if (!found) {
-            serversAndPortsV.addElement(toAddServerAndPort);
+            serversAndPortsL.add(toAddServerAndPort);
           }
         }
-        if (trace != null) trace.data(210, "After adding old servers fetched from WEB server", serversAndPortsV);
+        if (trace != null) trace.data(210, "After adding old servers fetched from WEB server", serversAndPortsL);
       }
       // if still no servers
       // Add past data servers to the return vector.
-      if (serversAndPortsV.size() == 0 && serverListStr != null && serverListStr.trim().length() > 0) {
+      if (serversAndPortsL.isEmpty() && serverListStr != null && serverListStr.trim().length() > 0) {
 //System.out.println("4b: Add past data servers to the return vector from list " + serverListStr);
         Object[][] additionalServers = getServers(serverListStr, false, true, 0, 0);
         if (additionalServers != null) {
@@ -159,8 +159,8 @@ public class EngineFinder extends Object {
           for (int i=0; i<additionalServers.length; i++) {
             Object[] toAddServerAndPort = additionalServers[i];
             boolean found = false;
-            for (int k=0; k<serversAndPortsV.size(); k++) {
-              Object[] serverAndPort = (Object[]) serversAndPortsV.elementAt(k);
+            for (int k=0; k<serversAndPortsL.size(); k++) {
+              Object[] serverAndPort = (Object[]) serversAndPortsL.get(k);
               if (serverAndPort[0].toString().equalsIgnoreCase(toAddServerAndPort[0].toString()) && serverAndPort[1].toString().equalsIgnoreCase(toAddServerAndPort[1].toString())) {
                 found = true;
                 break;
@@ -168,22 +168,22 @@ public class EngineFinder extends Object {
             }
             if (!found) {
 //System.out.println("4bbb: adding server " + Misc.objToStr(toAddServerAndPort));
-              serversAndPortsV.addElement(toAddServerAndPort);
+              serversAndPortsL.add(toAddServerAndPort);
             }
           }
         }
-        if (trace != null) trace.data(220, "After adding past data servers", serversAndPortsV);
+        if (trace != null) trace.data(220, "After adding past data servers", serversAndPortsL);
       }
       // if still no servers, then use the entered host and port
-      if (serversAndPortsV.size() == 0) {
+      if (serversAndPortsL.isEmpty()) {
         // add the passed in server as last resort
-        serversAndPortsV.addElement(server);
-        if (trace != null) trace.data(230, "After adding passed in server as last resort", serversAndPortsV);
+        serversAndPortsL.add(server);
+        if (trace != null) trace.data(230, "After adding passed in server as last resort", serversAndPortsL);
       }
       if (trace != null) trace.data(240, "making return structure...");
       // make return structure
-      Object[][] servers = new Object[serversAndPortsV.size()][];
-      serversAndPortsV.toArray(servers);
+      Object[][] servers = new Object[serversAndPortsL.size()][];
+      serversAndPortsL.toArray(servers);
       hostsAndPorts = servers;
     }
 //System.out.println("RETURN: "+Misc.objToStr(hostsAndPorts));
@@ -210,39 +210,50 @@ public class EngineFinder extends Object {
     if (trace != null) trace.args(minVer);
     if (trace != null) trace.args(minRel);
 
-    StringTokenizer st = new StringTokenizer(serverList, "|");
-    Vector serversV = null;
-    while (st.hasMoreTokens()) {
-      String serverDescription = st.nextToken();
-      StringTokenizer t = new StringTokenizer(serverDescription);
-      // Description has format: 'role' <role> 'ver' <version> 'rel' <release> 'host' <hostname> 'port' <port>
-      t.nextToken();
-      String role = t.nextToken();
-      t.nextToken();
-      float version = Float.parseFloat(t.nextToken());
-      t.nextToken();
-      int release = Integer.parseInt(t.nextToken());
-      t.nextToken();
-      String hostname = t.nextToken();
-      t.nextToken();
-      Integer port = Integer.valueOf(t.nextToken());
+    ArrayList serversL = null;
 
-      if (compareVersion(minVer, minRel, version, release) <= 0) {
-        if (httpServers && role.equals("HttpServer")) {
-          if (serversV == null) serversV = new Vector();
-          serversV.addElement(new Object[] { hostname, port });
-        }
-        if (engineServers && role.equals("EngineServer")) {
-          if (serversV == null) serversV = new Vector();
-          serversV.addElement(new Object[] { hostname, port });
-        }
+    if (serverList != null) {
+      try {
+        StringTokenizer st = new StringTokenizer(serverList, "|");
+        while (st.hasMoreTokens()) {
+          try {
+            String serverDescription = st.nextToken();
+            StringTokenizer t = new StringTokenizer(serverDescription);
+            // Description has format: 'role' <role> 'ver' <version> 'rel' <release> 'host' <hostname> 'port' <port>
+            t.nextToken();
+            String role = t.nextToken();
+            t.nextToken();
+            float version = Float.parseFloat(t.nextToken());
+            t.nextToken();
+            int release = Integer.parseInt(t.nextToken());
+            t.nextToken();
+            String hostname = t.nextToken();
+            t.nextToken();
+            Integer port = Integer.valueOf(t.nextToken());
+
+            if (compareVersion(minVer, minRel, version, release) <= 0) {
+              if (httpServers && role.equals("HttpServer")) {
+                if (serversL == null) serversL = new ArrayList();
+                serversL.add(new Object[] { hostname, port });
+              }
+              if (engineServers && role.equals("EngineServer")) {
+                if (serversL == null) serversL = new ArrayList();
+                serversL.add(new Object[] { hostname, port });
+              }
+            }
+          } catch (Exception eInner) {
+            if (trace != null) trace.exception(EngineFinder.class, 100, eInner);
+          }
+        } // end while
+      } catch (Exception eOuter) {
+        if (trace != null) trace.exception(EngineFinder.class, 200, eOuter);
       }
-    } // end while
+    }
 
     Object[][] servers = null;
-    if (serversV != null && serversV.size() > 0) {
-      servers = new Object[serversV.size()][];
-      serversV.toArray(servers);
+    if (serversL != null && serversL.size() > 0) {
+      servers = new Object[serversL.size()][];
+      serversL.toArray(servers);
     }
 
     if (trace != null) trace.exit(EngineFinder.class, servers);
