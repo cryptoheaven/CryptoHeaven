@@ -1081,6 +1081,7 @@ public class LoginFrame extends JFrame {
     // insert any default or PrivateLabel servers under the current selected item
     insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_1), 0, false);
     insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_2), 1, false);
+    insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_3), 2, false);
     initiateProxySettings();
 
 //    newEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
