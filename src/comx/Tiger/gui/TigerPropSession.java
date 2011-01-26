@@ -12,8 +12,8 @@
 
 package comx.Tiger.gui;
 
-import java.util.*;
 import comx.Tiger.ssce.*;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

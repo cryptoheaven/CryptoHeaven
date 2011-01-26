@@ -16,18 +16,18 @@ import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyTextArea;
 import com.CH_gui.gui.MyInsets;
+
+import com.CH_guiLib.gui.*;
+
+import comx.Tiger.ssce.*;
+import comx.Tiger.util.MessageBox;
+
 import java.awt.*;
 import java.util.Stack;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
-
-import com.CH_guiLib.gui.*;
-import com.CH_co.gui.*;
-
-import comx.Tiger.ssce.*;
-import comx.Tiger.util.MessageBox;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

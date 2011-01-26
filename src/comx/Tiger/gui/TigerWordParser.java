@@ -12,13 +12,10 @@
 
 package comx.Tiger.gui;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import java.util.NoSuchElementException;
-
-import comx.Tiger.util.UniCharacter;
 import comx.Tiger.ssce.*;
+
+import java.util.NoSuchElementException;
+import javax.swing.text.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

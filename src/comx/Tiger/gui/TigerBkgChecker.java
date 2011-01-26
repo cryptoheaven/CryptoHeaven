@@ -15,6 +15,10 @@ package comx.Tiger.gui;
 import comx.Tiger.ssce.*;
 import comx.Tiger.util.*;
 
+import com.CH_co.trace.Trace;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_guiLib.gui.JMyPopupMenu;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Enumeration;
@@ -23,10 +27,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.*;
-
-import com.CH_co.trace.Trace;
-import com.CH_gui.action.AbstractActionTraced;
-import com.CH_guiLib.gui.JMyPopupMenu;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

@@ -12,24 +12,19 @@
 
 package comx.Tiger.gui;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
-
 import com.CH_gui.gui.*;
+
 import com.CH_guiLib.gui.*;
 
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
-
 import comx.Tiger.ssce.*;
+
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

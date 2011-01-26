@@ -15,20 +15,18 @@ package comx.Tiger.gui;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.MyInsets;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Enumeration;
-import javax.swing.*;
-import javax.swing.event.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
 
 import com.CH_guiLib.gui.*;
 
 import comx.Tiger.ssce.*;
 import comx.Tiger.util.MessageBox;
 import comx.Tiger.util.Sort;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Enumeration;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010

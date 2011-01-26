@@ -12,9 +12,6 @@
 
 package comx.Tiger.gui;
 
-import java.io.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.service.records.UserSettingsRecord;
@@ -22,6 +19,9 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import comx.Tiger.ssce.*;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
