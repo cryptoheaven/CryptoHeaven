@@ -408,17 +408,17 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     posY ++;
 
     JScrollPane list = new JScrollPane(jSigList);
-    panel.add(list, new GridBagConstraints(1, posY, 2, 3, 0, 0, 
+    panel.add(list, new GridBagConstraints(1, posY, 2, 4, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 2, 5, 5), 0, 0));
     panel.add(jNew, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
     panel.add(jRemove, new GridBagConstraints(3, posY+1, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
     panel.add(jRename, new GridBagConstraints(3, posY+2, 1, 1, 0, 0, 
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
+    panel.add(jSetAsDefault, new GridBagConstraints(3, posY+3, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
-    //panel.add(jSetAsDefault, new GridBagConstraints(3, posY+3, 1, 1, 0, 0, 
-        //GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
-    posY += 3;
+    posY += 4;
 
     panel.add(makeDivider("Edit Signature"), new GridBagConstraints(0, posY, 4, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -428,10 +428,10 @@ public class AccountOptionsSignaturesPanel extends JPanel {
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 1), 0, 0));
     panel.add(jTypeHTML, new GridBagConstraints(0, posY+1, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 5, 1), 0, 0));
-    panel.add(sigTypeArea, new GridBagConstraints(1, posY, 2, 3, 10, 20, 
+    panel.add(sigTypeArea, new GridBagConstraints(1, posY, 3, 3, 10, 20,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 2, 2, 5), 0, 0));
-    panel.add(jSetAsDefault, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+//    panel.add(jSetAsDefault, new GridBagConstraints(3, posY, 1, 1, 0, 0,
+//        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jTypeFile, new GridBagConstraints(0, posY+3, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 5, 5, 1), 0, 0));
     panel.add(jFileField, new GridBagConstraints(1, posY+3, 2, 1, 10, 0, 
