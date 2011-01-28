@@ -12,24 +12,23 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
+import com.CH_co.util.CallbackI;
 
 import com.CH_gui.contactTable.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -37,7 +36,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -45,7 +44,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.23 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ContactSelectDialog extends GeneralDialog implements VisualsSavable {
 
@@ -66,6 +65,8 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
 
   private RecordSelectionListener recordSelectionListener ;
 
+  private CallbackI selectionCallback;
+
   /** Creates new ContactSelectDialog */
   public ContactSelectDialog(Dialog owner, boolean includeGroups) {
     this(owner, includeGroups, true);
@@ -83,7 +84,6 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     initialize(owner, includeGroups, show);
   }
   private void initialize(Component owner, boolean includeGroups, boolean show) {
-    setModal(true);
     JButton[] buttons = createButtons();
     JPanel panel = createMainPanel(includeGroups);
     init(owner, buttons, panel, DEFAULT_OK_INDEX, DEFAULT_CANCEL_INDEX, show);
@@ -117,15 +117,21 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     panel = new JPanel();
     panel.setLayout(new GridBagLayout());
 
-    contactTableLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_contact(s)"));
+    contactTableLabel = new JMyLabel("Select from your Contact List below:");
 
     int posY = 10;
-    panel.add(contactTableLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(contactTableLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
+    posY ++;
+    panel.add(new JMyLabel("To add to the list, type in an email address"), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
+    posY ++;
+    panel.add(new JMyLabel("or the member's name in the space below."), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     posY ++;
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    ContactRecord[] contacts = cache.getContactRecordsMyActive();
+    ContactRecord[] contacts = cache.getContactRecordsMyActive(true);
     FolderPair[] myGroups = null;
     if (includeGroups)
       myGroups = cache.getFolderPairsMyOfType(FolderRecord.GROUP_FOLDER, true);
@@ -136,17 +142,19 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
       folderFilter = new FolderFilter(FolderRecord.GROUP_FOLDER);
     else
       folderFilter = new FixedFilter(false);
-    RecordFilter filter = new MultiFilter(new RecordFilter[] { 
-      new ContactFilterCo(myUserRec != null ? myUserRec.contactFolderId : null, 
-                          new Short[] { new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED) },
+    RecordFilter filter = new MultiFilter(new RecordFilter[] {
+      new ContactFilterCo(myUserRec != null ? myUserRec.contactFolderId : null,
+                          new Short[] { new Short(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED), new Short(ContactRecord.STATUS_INITIATED) },
                           true, myUserRec != null ? myUserRec.userId : null),
       folderFilter }
     , MultiFilter.OR);
     ContactTableComponent contactTableComponent = new ContactTableComponent(initialRecords, filter, Template.get(Template.NONE), Template.get(Template.BACK_CONTACTS), false, true, true);
+    contactTableComponent.addTopContactBuildingPanel();
+    contactTableComponent.setAutoCreateWebAccounts(true);
     contactTable = contactTableComponent;
     recordSelectionListener = new RecordSelectionListener();
     contactTable.getActionTable().getJSortedTable().getSelectionModel().addListSelectionListener(recordSelectionListener);
-    panel.add(contactTable, new GridBagConstraints(0, posY, 1, 1, 10, 10, 
+    panel.add(contactTable, new GridBagConstraints(0, posY, 1, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 5, 5, 5), 0, 0));
 
     return panel;
@@ -158,7 +166,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
   public void addHeader(JComponent header, int posY, Insets insets) {
     if (posY >= 10)
       throw new IllegalArgumentException("posY too large");
-    panel.add(header, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    panel.add(header, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
   }
 
@@ -179,6 +187,10 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     jOk.setEnabled(recs != null && recs.length > 0);
   }
 
+  public void setSelectionCallback(CallbackI callback) {
+    selectionCallback = callback;
+  }
+
   private void pressedOK() {
     resultButton = new Integer(DEFAULT_OK_INDEX);
     Record[] selected = contactTable.getActionTable().getSelectedRecords();
@@ -189,6 +201,9 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     }
     selectedContacts = (ContactRecord[]) ((ContactActionTable) contactTable.getActionTable()).getSelectedInstancesOf(ContactRecord.class);
     selectedGroups = (FolderPair[]) ((ContactActionTable) contactTable.getActionTable()).getSelectedInstancesOf(FolderPair.class);
+    if (selectionCallback != null) {
+      selectionCallback.callback(selectedMemberContacts);
+    }
     closeDialog();
   }
 

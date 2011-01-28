@@ -37,17 +37,12 @@ import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
 import com.CH_gui.list.ListRenderer;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 /** 
@@ -451,8 +446,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         if (addrBook != null) {
           FolderPair[] fPairs = new FolderPair[] { addrBook };
           if (cRecsL.size() > 0) {
-            Vector emailNicksV = new Vector();
-            Vector emailStringRecordsV = new Vector();
+            ArrayList emailNicksL = new ArrayList();
+            ArrayList emailStringRecordsL = new ArrayList();
             for (int i=0; i<cRecsL.size(); i++) {
               boolean batched = false;
               ContactRecord cRec = (ContactRecord) cRecsL.get(i);
@@ -464,8 +459,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
                 String[] emailStrings = UserOps.getCachedDefaultEmail(uRec, false);
                 emailAddress = emailStrings != null ? emailStrings[2] : null;
                 if (emailAddress != null && emailAddress.length() > 0) {
-                  emailNicksV.addElement(fullName);
-                  emailStringRecordsV.addElement(emailAddress);
+                  emailNicksL.add(fullName);
+                  emailStringRecordsL.add(emailAddress);
                   batched = true;
                 }
               }
@@ -476,8 +471,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
                 new AddressFrame(fullName, fPairs, draftData);
               }
             }
-            if (emailStringRecordsV.size() > 0)
-              MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(ContactActionTable.this, emailNicksV, emailStringRecordsV, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
+            if (emailStringRecordsL.size() > 0)
+              MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(ContactActionTable.this, emailNicksL, emailStringRecordsL, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
           } else {
             new AddressFrame(fPairs);
           }
@@ -783,56 +778,41 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  public static void chatOrShareSpace(Component parent, MemberContactRecordI[] selectedRecords, boolean useSelected, boolean isChat, short folderType) {
+  public static void chatOrShareSpace(final Component parent, MemberContactRecordI[] selectedRecords, boolean useSelected, final boolean isChat, final short folderType) {
+    CallbackI selectionCallback = new CallbackI() {
+      public void callback(Object value) {
+        MemberContactRecordI[] selectedRecords = (MemberContactRecordI[]) value;
+        if (selectedRecords != null && selectedRecords.length > 0) {
+          boolean createSharedSpaceOk = true;
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+          Long userId = cache.getMyUserId();
+          for (int i=0; i<selectedRecords.length; i++) {
+            if (selectedRecords[i].getMemberType() == Record.RECORD_TYPE_CONTACT) {
+              ContactRecord cRec = (ContactRecord) selectedRecords[i];
+              if (!cRec.ownerUserId.equals(userId) || !cRec.isOfActiveType() || (cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) != 0) {
+                createSharedSpaceOk = false;
+              }
+            }
+          }
+          if (isChat) {
+            doChat(selectedRecords);
+          } else if (createSharedSpaceOk) {
+            doSharedSpace(parent, selectedRecords, folderType);
+          } else {
+            MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
+          }
+        }
+      }
+    };
     if (!useSelected || selectedRecords == null || selectedRecords.length == 0) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      ContactRecord[] contacts = cache.getContactRecordsMyActive();
-      if (contacts != null && contacts.length > 0) {
-        Window w = SwingUtilities.windowForComponent(parent);
-        if (w == null) w = MainFrame.getSingleInstance();
-        if (w instanceof Dialog)
-          selectedRecords = new ContactSelectDialog((Dialog) w, true).getSelectedMemberContacts();
-        else if (w instanceof Frame)
-          selectedRecords = new ContactSelectDialog((Frame) w, true).getSelectedMemberContacts();
-      } else {
-        String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
-        String messageText = null;
-        if (isChat) {
-          messageText = com.CH_gui.lang.Lang.rb.getString("msg_Chat_session_requires_at_least_one_active_contact.");
-        } else {
-          messageText = com.CH_gui.lang.Lang.rb.getString("msg_Shared_Space_requires_at_least_one_active_contact.");
-        }
-        String questionText = com.CH_gui.lang.Lang.rb.getString("msg_Would_you_like_to_invite_your_Friends_and_Associates?");
-        JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        msgPanel.add(new JMyLabel(messageText));
-        msgPanel.add(new JMyLabel(questionText));
-        ActionListener yesAction = new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            new FindUserFrame();
-          }
-        };
-        MessageDialog.showDialogYesNo(parent, msgPanel, title, NotificationCenter.QUESTION_MESSAGE, false, yesAction, null);
-      }
-    }
-    if (selectedRecords != null && selectedRecords.length > 0) {
-      boolean createSharedSpaceOk = true;
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      Long userId = cache.getMyUserId();
-      for (int i=0; i<selectedRecords.length; i++) {
-        if (selectedRecords[i].getMemberType() == Record.RECORD_TYPE_CONTACT) {
-          ContactRecord cRec = (ContactRecord) selectedRecords[i];
-          if (!cRec.ownerUserId.equals(userId) || !cRec.isOfActiveType() || (cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) != 0) {
-            createSharedSpaceOk = false;
-          }
-        }
-      }
-      if (isChat) {
-        doChat(selectedRecords);
-      } else if (createSharedSpaceOk) {
-        doSharedSpace(parent, selectedRecords, folderType);
-      } else {
-        MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
-      }
+      Window w = SwingUtilities.windowForComponent(parent);
+      if (w == null) w = MainFrame.getSingleInstance();
+      if (w instanceof Dialog)
+        new ContactSelectDialog((Dialog) w, true).setSelectionCallback(selectionCallback);
+      else if (w instanceof Frame)
+        new ContactSelectDialog((Frame) w, true).setSelectionCallback(selectionCallback);
+    } else {
+      selectionCallback.callback(selectedRecords);
     }
   }
 
@@ -928,7 +908,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
             if (cRec.ownerUserId.equals(userId) && ContactRecord.isOnlineStatus(status)) {
               //chatAnyUserOnline = true;
             }
-            if (cRec.ownerUserId.equals(userId) || status != ContactRecord.STATUS_INITIATED) {
+            if (cRec.ownerUserId.equals(userId) || !cRec.isOfInitiatedType()) {
               acceptDeclineOk = false;
             }
           } else {

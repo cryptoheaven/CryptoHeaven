@@ -100,7 +100,7 @@ public class CryptoHeaven extends Object {
       {"ToolBarModel."+com.CH_gui.userTable.UserActionTable.visualsClassKeyName+"_VS_Ver1", "Add to Contact List ...|600|Send Message ...|601|Separator|0|Invite Friends and Associates ...|1000|"},
       {"ToolBarModel."+com.CH_gui.addressBook.WhiteListTableComponent.visualsClassKeyName+"_VS", "New Message|729|New Address to Folder|700|Compose to Address(es) ...|707|Invite by Email|714|Edit ...|715|Separator|0|Move ...|702|Delete ...|703|Separator|0|Search|727|Print ...|723|"},
 
-      {"ServerList", URLs.get(URLs.DEFAULT_SERVER_1)+" "+URLs.get(URLs.DEFAULT_SERVER_2)},
+      {"ServerList", URLs.get(URLs.DEFAULT_SERVER_1)+" "+URLs.get(URLs.DEFAULT_SERVER_2)+" "+URLs.get(URLs.DEFAULT_SERVER_3)},
       {"ServerList_cryptoheaven.com_80", "role EngineServer ver 0 rel 0 host cryptoheaven.com port 82|role EngineServer ver 0 rel 0 host d1.cryptoheaven.com port 80|role EngineServer ver 0 rel 0 host cryptoheaven.com port 4383|role EngineServer ver 0 rel 0 host http://d3.cryptoheaven.com port 80|"},
 
       // Dialogs
@@ -130,11 +130,14 @@ public class CryptoHeaven extends Object {
       {com.CH_gui.frame.MessageFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 670 height 550 Location x 0 y 0"},
       {com.CH_gui.frame.MsgPreviewFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 700 height 575 Location x 0 y 0"},
       {com.CH_gui.frame.MsgTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 800 height 735 Location x 0 y 0"},
+      {com.CH_gui.frame.MsgTableStarterFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 600 height 600 Location x 0 y 0"},
       {com.CH_gui.frame.PostTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 770 height 735 Location x 0 y 0"},
       {com.CH_gui.frame.RecycleTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 770 height 535 Location x 0 y 0"},
       {com.CH_gui.frame.SubUserTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 800 height 365 Location x 0 y 0"},
       {com.CH_gui.frame.WhiteListTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 670 height 540 Location x 0 y 0"},
 
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.chatTable.ChatTableComponent.visualsClassKeyName+"_VS", "Divider location 500 -1 90 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.chatTable.ChatTableComponent4Frame.visualsClassKeyName+"_VS", "Divider location 300 -1 90 0"},
       {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgDraftsTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
       {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgInboxTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
       {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgSentTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
@@ -160,6 +163,8 @@ public class CryptoHeaven extends Object {
 //          {com.CH_gui.addressBook.AddressTableComponent.visualsClassKeyName+"_VS","Dimension width 700 height 205"},
 //          {com.CH_gui.addressBook.WhiteListTableComponent.visualsClassKeyName+"_VS","Dimension width 662 height 449"},
 //          {com.CH_gui.chatTable.ChatTableComponent.visualsClassKeyName+"_VS","Dimension width 700 height 339"},
+      // useful for starting from chat link, main frame starter frame should be sized to some minimum dimension
+      //{com.CH_gui.chatTable.ChatTableComponent4Frame.visualsClassKeyName+"_VS","Dimension width 510 height 500"},
 //          {com.CH_gui.contactTable.ContactTableComponent.visualsClassKeyName+"_VS","Dimension width 232 height 183"},
 //          {com.CH_gui.fileTable.FileTableComponent.visualsClassKeyName+"_VS","Dimension width 702 height 486"},
 //          {com.CH_gui.keyTable.KeyTableComponent.visualsClassKeyName+"_VS","Dimension width 702 height 486"},

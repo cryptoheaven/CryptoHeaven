@@ -59,11 +59,15 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
     if (trace != null) trace.exit(JActionFrameClosable.class);
   }
 
-  private void initActions() {
+  private synchronized void initActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrameClosable.class, "initActions()");
-    int leadingActionId = Actions.LEADING_ACTION_ID_ACTION_FRAME_CLOSABLE;
-    actions = new Action[1];
-    actions[CLOSE_ACTION] = new CloseAction(leadingActionId + CLOSE_ACTION);
+    if (this.actions == null) {
+      int leadingActionId = Actions.LEADING_ACTION_ID_ACTION_FRAME_CLOSABLE;
+      Action[] actions = new Action[1];
+      actions[CLOSE_ACTION] = new CloseAction(leadingActionId + CLOSE_ACTION);
+      // assign to global once all actions are initialized
+      this.actions = actions;
+    }
     if (trace != null) trace.exit(JActionFrameClosable.class);
   }
   public Action getCloseAction() {

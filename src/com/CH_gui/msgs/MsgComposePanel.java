@@ -156,9 +156,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
   private boolean sendMessageInProgress;  // while send message is in progress, disable input components
 
-  private Vector dropTargetV = new Vector();
-  private Vector componentsForDNDV = new Vector();
-  private Vector componentsForPopupV = new Vector();
+  private ArrayList dropTargetL = new ArrayList();
+  private ArrayList componentsForDNDL = new ArrayList();
+  private ArrayList componentsForPopupL = new ArrayList();
 
   private UndoManager undoMngr;
 
@@ -241,15 +241,15 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     }
   }
   private void addPopup(Component c) {
-    if (c != null && !componentsForPopupV.contains(c)) {
+    if (c != null && !componentsForPopupL.contains(c)) {
       c.addMouseListener(new PopupMouseAdapter(c, this));
-      componentsForPopupV.addElement(c);
+      componentsForPopupL.add(c);
     }
   }
   private void addDND(Component c) {
-    if (c != null && !componentsForDNDV.contains(c)) {
-      dropTargetV.addElement(new DropTarget(c, this));
-      componentsForDNDV.addElement(c);
+    if (c != null && !componentsForDNDL.contains(c)) {
+      dropTargetL.add(new DropTarget(c, this));
+      componentsForDNDL.add(c);
     }
   }
 
@@ -1215,10 +1215,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
    */
   private class SelectRecipientsAction extends AbstractActionTraced {
     public SelectRecipientsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.MAIL_RECIPIENTS16));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.ADDRESS_BOOK16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_Recipients,_this_can_be_users,_folders_or_posting_boards."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_RECIPIENTS24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_BOOK24));
       putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Address_Book"));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -1585,61 +1585,61 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkValidityOfRecipients(Record[][] selectedRecipients)");
     if (trace != null) trace.args(selectedRecipients);
     // check for contacts to have messaging enabled
-    Vector badContactsV = null;
+    ArrayList badContactsL = null;
     // check for address contacts to have a valid email address
-    Vector badAddressesV = null;
+    ArrayList badAddressesL = null;
     // check for invalid or inaccessible folders
-    Vector badFoldersV = null;
+    ArrayList badFoldersL = null;
     // put objects that pass in here
-    Vector[] filteredSelectedRecipientsV = new Vector[selectedRecipients.length];
+    ArrayList[] filteredSelectedRecipientsL = new ArrayList[selectedRecipients.length];
     for (int recipientType=TO; selectedRecipients.length>recipientType && recipientType<=BCC; recipientType++) {
-      filteredSelectedRecipientsV[recipientType] = new Vector();
+      filteredSelectedRecipientsL[recipientType] = new ArrayList();
       for (int i=0; selectedRecipients[recipientType] != null && i<selectedRecipients[recipientType].length; i++) {
         Record rec = selectedRecipients[recipientType][i];
         boolean invalid = false;
         if (rec instanceof ContactRecord) {
           ContactRecord cRec = (ContactRecord) rec;
           if ((cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_MESSAGING) != 0) {
-            if (badContactsV == null) badContactsV = new Vector();
-            if (!badContactsV.contains(rec))
-              badContactsV.addElement(rec);
+            if (badContactsL == null) badContactsL = new ArrayList();
+            if (!badContactsL.contains(rec))
+              badContactsL.add(rec);
             invalid = true;
           }
         } else if (rec instanceof MsgDataRecord) {
           MsgDataRecord mData = (MsgDataRecord) rec;
           if (mData.isTypeAddress() && (mData.email == null || mData.email.length() == 0)) {
-            if (badAddressesV == null) badAddressesV = new Vector();
-            if (!badAddressesV.contains(rec))
-              badAddressesV.addElement(rec);
+            if (badAddressesL == null) badAddressesL = new ArrayList();
+            if (!badAddressesL.contains(rec))
+              badAddressesL.add(rec);
             invalid = true;
           }
         } else if (rec instanceof FolderRecord) {
           FolderRecord fldRec = (FolderRecord) rec;
           FolderRecord fRec = cache.getFolderRecord(fldRec.folderId);
           if (fRec == null || cache.getFolderShareRecordMy(fRec.folderId, true) == null) {
-            if (badFoldersV == null) badFoldersV = new Vector();
-            if (!badFoldersV.contains(rec))
-              badFoldersV.addElement(rec);
+            if (badFoldersL == null) badFoldersL = new ArrayList();
+            if (!badFoldersL.contains(rec))
+              badFoldersL.add(rec);
             invalid = true;
           }
         }
         if (!invalid) {
-          filteredSelectedRecipientsV[recipientType].addElement(rec);
+          filteredSelectedRecipientsL[recipientType].add(rec);
         }
       }
     }
     StringBuffer errorSB = new StringBuffer();
-    appendInvalidRecipientErrorMsg(errorSB, badContactsV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
-    appendInvalidRecipientErrorMsg(errorSB, badAddressesV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
-    appendInvalidRecipientErrorMsg(errorSB, badFoldersV, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
+    appendInvalidRecipientErrorMsg(errorSB, badContactsL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
+    appendInvalidRecipientErrorMsg(errorSB, badAddressesL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
+    appendInvalidRecipientErrorMsg(errorSB, badFoldersL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
     if (errorSB.length() > 0) {
       String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
       MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, NotificationCenter.WARNING_MESSAGE, false);
     }
-    Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsV.length][];
+    Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsL.length][];
     for (int recipientType=0; recipientType<filteredSelectedRecipients.length; recipientType++) {
-      Record[] recipients = new Record[filteredSelectedRecipientsV[recipientType].size()];
-      filteredSelectedRecipientsV[recipientType].toArray(recipients);
+      Record[] recipients = new Record[filteredSelectedRecipientsL[recipientType].size()];
+      filteredSelectedRecipientsL[recipientType].toArray(recipients);
       filteredSelectedRecipients[recipientType] = recipients;
     }
     if (trace != null) trace.exit(MsgComposePanel.class, filteredSelectedRecipients);
@@ -1647,14 +1647,14 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
 
-  private static void appendInvalidRecipientErrorMsg(StringBuffer errorSB, Vector recsV, String msgPrefix) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "appendInvalidRecipientErrorMsg(StringBuffer errorSB, Vector recsV, String msgPrefix)");
-    if (trace != null) trace.args(errorSB, recsV, msgPrefix);
-    if (recsV != null) {
+  private static void appendInvalidRecipientErrorMsg(StringBuffer errorSB, ArrayList recsL, String msgPrefix) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "appendInvalidRecipientErrorMsg(StringBuffer errorSB, ArrayList recsL, String msgPrefix)");
+    if (trace != null) trace.args(errorSB, recsL, msgPrefix);
+    if (recsL != null) {
       StringBuffer sb = new StringBuffer();
-      for (int i=0; i<recsV.size(); i++) {
-        sb.append(ListRenderer.getRenderedText(recsV.elementAt(i)));
-        if (i<recsV.size()-1)
+      for (int i=0; i<recsL.size(); i++) {
+        sb.append(ListRenderer.getRenderedText(recsL.get(i)));
+        if (i<recsL.size()-1)
           sb.append(", ");
       }
       if (errorSB.length() > 0) errorSB.append("\n\n");
@@ -1677,8 +1677,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     if (trace != null) trace.args(convertNotHostedEmailsToWebAccounts);
 
     boolean anyConverted = false;
-    Vector unknownEmailsV = new Vector();
-    Vector unknownUserIDsV = new Vector();
+    ArrayList unknownEmailsV = new ArrayList();
+    ArrayList unknownUserIDsV = new ArrayList();
 
     if (trace != null) trace.data(10, "gather unknown email addresses");
 
@@ -1710,7 +1710,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           if (cache.getEmailRecord(addr) == null) {
             if (!unknownEmailsV.contains(addr)) {
               if (trace != null) trace.data(20, addr);
-              unknownEmailsV.addElement(addr);
+              unknownEmailsV.add(addr);
             }
           }
           // see if numeric, then prepare to fetch user's handle
@@ -1719,7 +1719,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             if (EmailRecord.isDomainEqual(URLs.getElements(URLs.DOMAIN_MAIL)[0], EmailRecord.getDomain(addr)) && cache.getUserRecord(uID) == null) {
               if (!unknownUserIDsV.contains(uID)) {
                 if (trace != null) trace.data(30, uID);
-                unknownUserIDsV.addElement(uID);
+                unknownUserIDsV.add(uID);
               }
             }
           } catch (Exception e) {
@@ -1730,7 +1730,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       if (rec instanceof UserRecord) {
         Long uID = ((UserRecord) rec).userId;
         if (cache.getUserRecord(uID) == null)
-          unknownUserIDsV.addElement(uID);
+          unknownUserIDsV.add(uID);
       }
     }
 
@@ -1893,15 +1893,15 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "addAttachment(File fileAttachment)");
     if (trace != null) trace.args(fileAttachment);
 
-    Vector attachmentsV = new Vector();
+    ArrayList attachmentsL = new ArrayList();
     if (selectedAttachments != null) {
       for (int i=0; i<selectedAttachments.length; i++) {
-        attachmentsV.addElement(selectedAttachments[i]);
+        attachmentsL.add(selectedAttachments[i]);
       }
     }
-    if (!attachmentsV.contains(fileAttachment))
-      attachmentsV.addElement(fileAttachment);
-    selectedAttachments = ArrayUtils.toArray(attachmentsV, Object.class);
+    if (!attachmentsL.contains(fileAttachment))
+      attachmentsL.add(fileAttachment);
+    selectedAttachments = ArrayUtils.toArray(attachmentsL, Object.class);
     setEnabledActions();
     setAttachmentsPanel();
 
@@ -1941,8 +1941,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   private void checkForUnknownRecipientsForAddressBookAdition_Threaded(Record[][] preConversionSelectedRecipients, Record[][] postConversionSelectedRecipients) {
-    Vector emailStringRecordsV = null;
-    Vector userRecordsV = null;
+    ArrayList emailStringRecordsL = null;
+    ArrayList userRecordsL = null;
     Record[][] recipients = null;
     for (int a=0; a<2; a++) {
       if (a == 0)
@@ -1960,33 +1960,33 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                   addr = ((EmailAddressRecord) rec).address.trim();
                 else if (rec instanceof InvEmlRecord)
                   addr = ((InvEmlRecord) rec).emailAddr.trim();
-                if (emailStringRecordsV == null) emailStringRecordsV = new Vector();
-                if (!emailStringRecordsV.contains(addr))
-                  emailStringRecordsV.addElement(addr);
+                if (emailStringRecordsL == null) emailStringRecordsL = new ArrayList();
+                if (!emailStringRecordsL.contains(addr))
+                  emailStringRecordsL.add(addr);
               } else if (rec instanceof UserRecord) {
                 UserRecord uRec = (UserRecord) rec;
-                if (userRecordsV == null) userRecordsV = new Vector();
-                if (!userRecordsV.contains(uRec))
-                  userRecordsV.addElement(uRec);
+                if (userRecordsL == null) userRecordsL = new ArrayList();
+                if (!userRecordsL.contains(uRec))
+                  userRecordsL.add(uRec);
               }
             }
           }
         }
       }
     }
-    if (emailStringRecordsV != null && emailStringRecordsV.size() > 0)
-      checkEmailAddressesForAddressBookAdition_Threaded(null, null, emailStringRecordsV, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
-    if (userRecordsV != null && userRecordsV.size() > 0)
-      checkUserRecordsForContactListAdition_Threaded(null, userRecordsV);
+    if (emailStringRecordsL != null && emailStringRecordsL.size() > 0)
+      checkEmailAddressesForAddressBookAdition_Threaded(null, null, emailStringRecordsL, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
+    if (userRecordsL != null && userRecordsL.size() > 0)
+      checkUserRecordsForContactListAdition_Threaded(null, userRecordsL);
   }
 
-  public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter) {
-    checkEmailAddressesForAddressBookAdition_Threaded(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, folderFilter, false, null, false);
+  public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final ArrayList emailNicksL, final ArrayList emailStringRecordsL, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter) {
+    checkEmailAddressesForAddressBookAdition_Threaded(parent, emailNicksL, emailStringRecordsL, displayNoNewAddressesDialog, folderFilter, false, null, false);
   }
-  public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final Vector emailNicksV, final Vector emailStringRecordsV, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter, final boolean forceAddAtOnce, final FolderPair toAddressBook, final boolean skipProgressBar) {
+  public static void checkEmailAddressesForAddressBookAdition_Threaded(final Component parent, final ArrayList emailNicksL, final ArrayList emailStringRecordsL, final boolean displayNoNewAddressesDialog, final RecordFilter folderFilter, final boolean forceAddAtOnce, final FolderPair toAddressBook, final boolean skipProgressBar) {
     Thread th = new ThreadTraced("Address Book Email Checker") {
       public void runTraced() {
-        checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, false, folderFilter, forceAddAtOnce, toAddressBook, skipProgressBar);
+        checkEmailAddressesForAddressBookAdition(parent, emailNicksL, emailStringRecordsL, displayNoNewAddressesDialog, false, folderFilter, forceAddAtOnce, toAddressBook, skipProgressBar);
       }
     };
     th.setDaemon(true);
@@ -1997,36 +1997,36 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
    * @return Vector of emailAddresses Strings which do not exist in the Address Books
    * xxx To-Do: enforce check in specified folder filter type
    */
-  public static Vector checkEmailAddressesForAddressBookAdition(Component parent, Vector emailNicksV, Vector emailStringRecordsV, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter) {
-    return checkEmailAddressesForAddressBookAdition(parent, emailNicksV, emailStringRecordsV, displayNoNewAddressesDialog, performCheckOnly, folderFilter, false, null, false);
+  public static ArrayList checkEmailAddressesForAddressBookAdition(Component parent, ArrayList emailNicksL, ArrayList emailStringRecordsL, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter) {
+    return checkEmailAddressesForAddressBookAdition(parent, emailNicksL, emailStringRecordsL, displayNoNewAddressesDialog, performCheckOnly, folderFilter, false, null, false);
   }
-  public static Vector checkEmailAddressesForAddressBookAdition(final Component parent, Vector emailNicksV, Vector emailStringRecordsV, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter, boolean forceAddAtOnce, final FolderPair toAddressBook, final boolean skipProgressBar) {
+  public static ArrayList checkEmailAddressesForAddressBookAdition(final Component parent, ArrayList emailNicksL, ArrayList emailStringRecordsL, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter, boolean forceAddAtOnce, final FolderPair toAddressBook, final boolean skipProgressBar) {
 
-    final Vector emailRecordsShortV = new Vector();
-    final Vector emailRecordsLowerV = new Vector();
-    final Vector emailRecordsOrigV = new Vector();
-    final Vector emailNicksOrigV = emailNicksV != null ? new Vector() : null;
+    final ArrayList emailRecordsShortL = new ArrayList();
+    final ArrayList emailRecordsLowerL = new ArrayList();
+    final ArrayList emailRecordsOrigL = new ArrayList();
+    final ArrayList emailNicksOrigL = emailNicksL != null ? new ArrayList() : null;
 
-    if (emailStringRecordsV.size() > 0) {
-      for (int i=0; i<emailStringRecordsV.size(); i++) {
-        String addrOrig = (String) emailStringRecordsV.elementAt(i);
+    if (emailStringRecordsL.size() > 0) {
+      for (int i=0; i<emailStringRecordsL.size(); i++) {
+        String addrOrig = (String) emailStringRecordsL.get(i);
         String[] addrs = EmailRecord.gatherAddresses(addrOrig);
         if (addrs != null && addrs.length > 0) {
           String addrShort = addrs[addrs.length-1].trim();
           String addrLower = addrShort.toLowerCase(Locale.US);
-          if (!emailRecordsLowerV.contains(addrLower)) {
-            if (emailNicksV != null) emailNicksOrigV.addElement(emailNicksV.elementAt(i));
-            emailRecordsShortV.addElement(addrShort);
-            emailRecordsLowerV.addElement(addrLower);
-            emailRecordsOrigV.addElement(addrOrig);
+          if (!emailRecordsLowerL.contains(addrLower)) {
+            if (emailNicksL != null) emailNicksOrigL.add(emailNicksL.get(i));
+            emailRecordsShortL.add(addrShort);
+            emailRecordsLowerL.add(addrLower);
+            emailRecordsOrigL.add(addrOrig);
           }
         }
       }
     }
 
     // check for hash of email address in cache between AddrHashRecords...
-    if (emailRecordsLowerV.size() > 0) {
-      eliminateCachedAddresses(folderFilter, emailNicksOrigV, emailRecordsShortV, emailRecordsLowerV, emailRecordsOrigV);
+    if (emailRecordsLowerL.size() > 0) {
+      eliminateCachedAddresses(folderFilter, emailNicksOrigL, emailRecordsShortL, emailRecordsLowerL, emailRecordsOrigL);
     }
 
     // check for emails address itself in cache between Address Records...
@@ -2089,30 +2089,30 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 //    } // end check for emails in cache
 
     // check for hashes on the server... only if it is not in the cache
-    if (emailRecordsLowerV.size() > 0) {
+    if (emailRecordsLowerL.size() > 0) {
       try {
-        Vector hashesV = null;
+        ArrayList hashesL = null;
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        for (int i=0; i<emailRecordsLowerV.size(); i++) {
-          byte[] hash = FetchedDataCache.getAddrHashForEmail((String) emailRecordsLowerV.elementAt(i));
+        for (int i=0; i<emailRecordsLowerL.size(); i++) {
+          byte[] hash = FetchedDataCache.getAddrHashForEmail((String) emailRecordsLowerL.get(i));
           if (hash != null) {
             // If hash not already in the cache, add it to be fetched unless it was already requested.
             // Allways fetch if NOT CHECK ONLY, this will ensure folderFilter is effective.
             if (!performCheckOnly || (cache.getAddrHashRecords(hash) == null && !cache.wasRequestedAddrHash(hash))) {
-              if (hashesV == null) hashesV = new Vector();
-              hashesV.addElement(hash);
+              if (hashesL == null) hashesL = new ArrayList();
+              hashesL.add(hash);
             }
           }
         }
-        if (hashesV != null) {
-          Obj_List_Co requestSet = new Obj_List_Co(hashesV);
+        if (hashesL != null) {
+          Obj_List_Co requestSet = new Obj_List_Co(hashesL);
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
           ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet), 30000, 3);
-          cache.addRequestedAddrHashes(hashesV);
+          cache.addRequestedAddrHashes(hashesL);
           DefaultReplyRunner.nonThreadedRun(SIL, reply);
           if (reply != null) {
             // look again in the cache for known hashes
-            eliminateCachedAddresses(folderFilter, emailNicksOrigV, emailRecordsShortV, emailRecordsLowerV, emailRecordsOrigV);
+            eliminateCachedAddresses(folderFilter, emailNicksOrigL, emailRecordsShortL, emailRecordsLowerL, emailRecordsOrigL);
           }
         }
       } catch (Throwable t) {
@@ -2124,21 +2124,21 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       final Component parentComp = parent != null ? parent : GeneralDialog.getDefaultParent();
 
       // ask in dialog if emails not found should be added to Address Book
-      if (emailRecordsOrigV.size() == 0 && displayNoNewAddressesDialog) {
+      if (emailRecordsOrigL.isEmpty() && displayNoNewAddressesDialog) {
         String messageText = "The specified email address(es) already exist in your Address Book.";
         String title = "Address already in Address Book";
         MessageDialog.showInfoDialog(parentComp, messageText, title, false);
-      } else if (emailRecordsOrigV.size() > 0) {
+      } else if (emailRecordsOrigL.size() > 0) {
         StringBuffer sb = new StringBuffer();
         sb.append("The following email addresses are not listed in your Address Book.  Would you like to add them now?\n\n");
-        for (int i=0; i<emailRecordsOrigV.size(); i++) {
-          sb.append(emailRecordsOrigV.elementAt(i));
-          if (i<emailRecordsOrigV.size()-1)
+        for (int i=0; i<emailRecordsOrigL.size(); i++) {
+          sb.append(emailRecordsOrigL.get(i));
+          if (i<emailRecordsOrigL.size()-1)
             sb.append("\n");
         }
 
         if (forceAddAtOnce) {
-          new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV, skipProgressBar).start();
+          new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerL, emailRecordsShortL, emailRecordsOrigL, emailNicksOrigL, skipProgressBar).start();
         } else {
           JButton[] buttons = new JButton[3];
           buttons[0] = new JButton("Add at Once");
@@ -2148,7 +2148,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           buttons[0].addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               dialog.dispose();
-              new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV, skipProgressBar).start();
+              new AddAtOnceThread("Add Address Runner", parentComp, toAddressBook, emailRecordsLowerL, emailRecordsShortL, emailRecordsOrigL, emailNicksOrigL, skipProgressBar).start();
             }
           });
           buttons[1].addActionListener(new ActionListener() {
@@ -2158,11 +2158,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
               if (addrBook == null) addrBook = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
               if (addrBook != null) {
                 FolderPair[] fPairs = new FolderPair[] { addrBook };
-                for (int i=0; i<emailRecordsLowerV.size(); i++) {
-                  String emailShort = (String) emailRecordsShortV.elementAt(i);
+                for (int i=0; i<emailRecordsLowerL.size(); i++) {
+                  String emailShort = (String) emailRecordsShortL.get(i);
                   //String emailLower = (String) emailRecordsLowerV.elementAt(i);
-                  String emailOrig = (String) emailRecordsOrigV.elementAt(i);
-                  String nick = (emailNicksOrigV != null) ? (String) emailNicksOrigV.elementAt(i) : EmailRecord.getPersonalOrNick(emailOrig);
+                  String emailOrig = (String) emailRecordsOrigL.get(i);
+                  String nick = (emailNicksOrigL != null) ? (String) emailNicksOrigL.get(i) : EmailRecord.getPersonalOrNick(emailOrig);
                   XMLElement draftData = ContactInfoPanel.getContent(new XMLElement[] {
                                               NamePanel.getContent(nick, null, null, null),
                                               EmailPanel.getContent(EmailPanel.getTypes(), new String[] { emailShort }, null, 0) });
@@ -2180,24 +2180,24 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       }
     }
 
-    return emailRecordsOrigV;
+    return emailRecordsOrigL;
   } // end checkForUnknownRecipientsForAddressBookAdition
 
   private static class AddAtOnceThread extends ThreadTraced {
 
     private Component parentComp;
     private FolderPair toAddressBook;
-    private Vector emailRecordsLowerV, emailRecordsShortV, emailRecordsOrigV, emailNicksOrigV;
+    private ArrayList emailRecordsLowerL, emailRecordsShortL, emailRecordsOrigL, emailNicksOrigL;
     private boolean skipProgressBar;
 
-    public AddAtOnceThread(String name, Component parentComp, FolderPair toAddressBook, Vector emailRecordsLowerV, Vector emailRecordsShortV, Vector emailRecordsOrigV, Vector emailNicksOrigV, boolean skipProgressBar) {
+    public AddAtOnceThread(String name, Component parentComp, FolderPair toAddressBook, ArrayList emailRecordsLowerL, ArrayList emailRecordsShortL, ArrayList emailRecordsOrigL, ArrayList emailNicksOrigL, boolean skipProgressBar) {
       super(name);
       this.parentComp = parentComp;
       this.toAddressBook = toAddressBook;
-      this.emailRecordsLowerV = emailRecordsLowerV;
-      this.emailRecordsShortV = emailRecordsShortV;
-      this.emailRecordsOrigV = emailRecordsOrigV;
-      this.emailNicksOrigV = emailNicksOrigV;
+      this.emailRecordsLowerL = emailRecordsLowerL;
+      this.emailRecordsShortL = emailRecordsShortL;
+      this.emailRecordsOrigL = emailRecordsOrigL;
+      this.emailNicksOrigL = emailNicksOrigL;
       this.skipProgressBar = skipProgressBar;
     }
     public void runTraced() {
@@ -2211,7 +2211,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         JProgressBar progressBar = null;
         GeneralDialog progressDialog = null;
         if (!skipProgressBar) {
-          progressBar = new JProgressBar(0, emailRecordsLowerV.size());
+          progressBar = new JProgressBar(0, emailRecordsLowerL.size());
           JPanel progressPanel = new JPanel();
           progressPanel.setLayout(new GridBagLayout());
           progressPanel.add(new JMyLabel("Addresses are being imported into your Address Book, please wait..."), new GridBagConstraints(0, 0, 1, 1, 10, 0,
@@ -2235,11 +2235,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             progressDialog = new GeneralDialog("Import in Progress...", buttons, -1, 0, progressPanel);
         }
 
-        for (int i=0; i<emailRecordsLowerV.size(); i++) {
-          String emailShort = (String) emailRecordsShortV.elementAt(i);
+        for (int i=0; i<emailRecordsLowerL.size(); i++) {
+          String emailShort = (String) emailRecordsShortL.get(i);
           //String emailLower = (String) emailRecordsLowerV.elementAt(i);
-          String emailOrig = (String) emailRecordsOrigV.elementAt(i);
-          String nick = (emailNicksOrigV != null) ? (String) emailNicksOrigV.elementAt(i) : EmailRecord.getPersonalOrNick(emailOrig);
+          String emailOrig = (String) emailRecordsOrigL.get(i);
+          String nick = (emailNicksOrigL != null) ? (String) emailNicksOrigL.get(i) : EmailRecord.getPersonalOrNick(emailOrig);
           XMLElement addressFull = ContactInfoPanel.getContent(new XMLElement[] {
                                           NamePanel.getContent(nick, null, null, null),
                                           EmailPanel.getContent(EmailPanel.getTypes(), new String[] { emailShort }, null, 0) });
@@ -2271,7 +2271,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
 
-  public static void eliminateCachedAddresses(RecordFilter folderFilter, Vector emailNicksOrigV, Vector emailRecordsShortV, Vector emailRecordsLowerV, Vector emailRecordsOrigV) {
+  public static void eliminateCachedAddresses(RecordFilter folderFilter, ArrayList emailNicksOrigL, ArrayList emailRecordsShortL, ArrayList emailRecordsLowerL, ArrayList emailRecordsOrigL) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long[] filteredMsgIDs = null;
     { // setup filter folder filter
@@ -2282,9 +2282,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         filteredMsgIDs = MsgLinkRecord.getMsgIDs(msgLinks);
       }
     }
-    for (int i=emailRecordsLowerV.size()-1; i>=0; i--) { // back to front to ommit problems with shrinking vectors
+    for (int i=emailRecordsLowerL.size()-1; i>=0; i--) { // back to front to ommit problems with shrinking vectors
       boolean found = false;
-      String eml = (String) emailRecordsLowerV.elementAt(i);
+      String eml = (String) emailRecordsLowerL.get(i);
       AddrHashRecord[] addrHashRecs = cache.getAddrHashRecords(eml);
       if (filteredMsgIDs == null) {
         found = addrHashRecs != null;
@@ -2300,47 +2300,47 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         }
       }
       if (found) {
-        if (emailNicksOrigV != null) emailNicksOrigV.removeElementAt(i);
-        emailRecordsShortV.removeElementAt(i);
-        emailRecordsLowerV.removeElementAt(i);
-        emailRecordsOrigV.removeElementAt(i);
+        if (emailNicksOrigL != null) emailNicksOrigL.remove(i);
+        emailRecordsShortL.remove(i);
+        emailRecordsLowerL.remove(i);
+        emailRecordsOrigL.remove(i);
       }
     }
   }
 
-  public static void checkUserRecordsForContactListAdition_Threaded(final Component parent, final Vector userRecordsV) {
+  public static void checkUserRecordsForContactListAdition_Threaded(final Component parent, final ArrayList userRecordsL) {
     Thread th = new ThreadTraced("Contact List User Checker") {
       public void runTraced() {
-        checkUserRecordsForContactListAdition(parent, userRecordsV);
+        checkUserRecordsForContactListAdition(parent, userRecordsL);
       }
     };
     th.setDaemon(true);
     th.start();
   }
 
-  public static void checkUserRecordsForContactListAdition(Component parent, Vector userRecordsV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkUserRecordsForContactListAdition(Component parent, Vector userRecordsV)");
-    if (trace != null) trace.args(userRecordsV);
+  public static void checkUserRecordsForContactListAdition(Component parent, ArrayList userRecordsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkUserRecordsForContactListAdition(Component parent, ArrayList userRecordsL)");
+    if (trace != null) trace.args(userRecordsL);
 
     final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     final ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-    Long[] userIDs = RecordUtils.getIDs(userRecordsV);
+    Long[] userIDs = RecordUtils.getIDs(userRecordsL);
     ContactRecord[] cRecs = cache.getContactRecordsForUsers(userIDs);
     Long[] contactWithIDs = ContactRecord.getContactWithUserIDs(cRecs, true);
-    final Vector usersToAddV = new Vector();
-    for (int i=0; i<userRecordsV.size(); i++) {
-      UserRecord uRec = (UserRecord) userRecordsV.elementAt(i);
+    final ArrayList usersToAddL = new ArrayList();
+    for (int i=0; i<userRecordsL.size(); i++) {
+      UserRecord uRec = (UserRecord) userRecordsL.get(i);
       if (ArrayUtils.find(contactWithIDs, uRec.userId) < 0) {
-        usersToAddV.addElement(uRec);
+        usersToAddL.add(uRec);
       }
     }
-    if (usersToAddV != null && usersToAddV.size() > 0) {
+    if (usersToAddL != null && usersToAddL.size() > 0) {
       StringBuffer sb = new StringBuffer();
       sb.append("The following users are not listed in your Contact List.  Would you like to add them now?\n\n");
-      for (int i=0; i<usersToAddV.size(); i++) {
-        UserRecord uRec = (UserRecord) usersToAddV.elementAt(i);
+      for (int i=0; i<usersToAddL.size(); i++) {
+        UserRecord uRec = (UserRecord) usersToAddL.get(i);
         sb.append(uRec.handle);
-        if (i<usersToAddV.size()-1)
+        if (i<usersToAddL.size()-1)
           sb.append("\n");
       }
 
@@ -2356,8 +2356,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           dialog.dispose();
           Thread th = new ThreadTraced("Contact Adding Thread") {
             public void runTraced() {
-              for (int i=0; i<usersToAddV.size(); i++) {
-                UserRecord uRec = (UserRecord) usersToAddV.elementAt(i);
+              for (int i=0; i<usersToAddL.size(); i++) {
+                UserRecord uRec = (UserRecord) usersToAddL.get(i);
                 Long contactWithId = uRec.userId;
                 // get user's key
                 KeyRecord otherKeyRec = cache.getKeyRecordForUser(contactWithId);
@@ -2402,9 +2402,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         public void actionPerformed(ActionEvent e) {
           dialog.dispose();
           if (window instanceof Dialog)
-            new InitiateContactDialog((Dialog) window, RecordUtils.getIDs(usersToAddV));
+            new InitiateContactDialog((Dialog) window, RecordUtils.getIDs(usersToAddL));
           else if (window instanceof Frame || window == null)
-            new InitiateContactDialog((Frame) window, RecordUtils.getIDs(usersToAddV));
+            new InitiateContactDialog((Frame) window, RecordUtils.getIDs(usersToAddL));
         }
       });
       buttons[2].addActionListener(new ActionListener() {
@@ -2667,15 +2667,15 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         event.acceptDrop(DnDConstants.ACTION_COPY);
         java.util.List fileList = (java.util.List) tr.getTransferData(DataFlavor.javaFileListFlavor);
         Iterator iterator = fileList.iterator();
-        Vector filesV = new Vector();
+        ArrayList filesL = new ArrayList();
         while (iterator.hasNext()) {
           File file = (File) iterator.next();
           if (file.isFile())
-            filesV.addElement(file);
+            filesL.add(file);
         }
-        if (filesV.size() > 0) {
-          File[] files = new File[filesV.size()];
-          filesV.toArray(files);
+        if (filesL.size() > 0) {
+          File[] files = new File[filesL.size()];
+          filesL.toArray(files);
           addAdditionalAttachments(files);
         }
       } else {
@@ -2708,9 +2708,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
    * Dispose the object and release resources to help in garbage collection.
    ************************************************************************/
   public void disposeObj() {
-    for (int i=0; i<dropTargetV.size(); i++) {
+    for (int i=0; i<dropTargetL.size(); i++) {
       try {
-        DropTarget target = (DropTarget) dropTargetV.elementAt(i);
+        DropTarget target = (DropTarget) dropTargetL.get(i);
         if (target != null) {
           Component c = target.getComponent();
           if (c != null)
@@ -2724,9 +2724,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       cache.removeMsgTypingListener(typingListener);
       typingListener = null;
     }
-    dropTargetV.clear();
-    componentsForDNDV.clear();
-    componentsForPopupV.clear();
+    dropTargetL.clear();
+    componentsForDNDL.clear();
+    componentsForPopupL.clear();
     msgComponents.disposeObj();
   } // end disposeObj
 

@@ -12,20 +12,17 @@
 
 package com.CH_gui.folder;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.MessageDialog;
-import javax.swing.*;
+import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
+
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
+import com.CH_guiLib.gui.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
-import com.CH_co.gui.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -33,7 +30,7 @@ import com.CH_guiLib.gui.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -41,7 +38,7 @@ import com.CH_guiLib.gui.*;
  *
  * <b>$Revision: 1.19 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderAttributesPanel extends JPanel {
 

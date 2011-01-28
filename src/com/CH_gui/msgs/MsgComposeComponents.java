@@ -520,7 +520,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // do for : TO, CC, BCC
       for (int recipientType=MsgComposePanel.TO; recipientType<MsgComposePanel.RECIPIENT_TYPES.length; recipientType++) {
         String label = recipientType==MsgComposePanel.TO ? "button_To" : ( recipientType==MsgComposePanel.CC ? "button_Cc" : "button_Bcc");
-        jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString(label), Images.get(ImageNums.MAIL_RECIPIENTS16));
+        jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString(label), Images.get(ImageNums.ADDRESS_BOOK16));
         jSelectRecipients[recipientType].setAlignmentX(JButton.LEFT_ALIGNMENT);
         jSelectRecipients[recipientType].setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
         jSelectRecipients[recipientType].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

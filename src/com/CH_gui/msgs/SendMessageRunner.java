@@ -12,11 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import java.awt.*;
-import java.io.*;
-import java.security.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
@@ -36,6 +31,11 @@ import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.util.MessageDialog;
+
+import java.awt.*;
+import java.io.*;
+import java.security.*;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -193,28 +193,28 @@ public class SendMessageRunner extends ThreadTraced {
           }
 
           // msgLink id parent array from which attachments are taken
-          Vector fromMsgLinkIDsV = new Vector();
+          ArrayList fromMsgLinkIDsL = new ArrayList();
           // share id array from which the attachments are taken and where parent attachment source messages reside
-          Vector fromShareIDsV = new Vector();
+          ArrayList fromShareIDsL = new ArrayList();
 
           // create message attachments
           if (selectedMsgAndPostAttachments != null && selectedMsgAndPostAttachments.length > 0) {
-            msgAttachments = prepareMsgAttachments(selectedMsgAndPostAttachments, symmetricAttachmentsKey, fromMsgLinkIDsV, fromShareIDsV);
+            msgAttachments = prepareMsgAttachments(selectedMsgAndPostAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
           }
 
           // create file attachments
           if (selectedFileAttachments != null && selectedFileAttachments.length > 0) {
-            fileAttachments = prepareFileAttachments(selectedFileAttachments, symmetricAttachmentsKey, fromMsgLinkIDsV, fromShareIDsV);
+            fileAttachments = prepareFileAttachments(selectedFileAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
           }
 
           // convert IDs vector to array of IDs
-          if (fromMsgLinkIDsV.size() > 0) {
-            fromMsgLinkIDs = new Long[fromMsgLinkIDsV.size()];
-            fromMsgLinkIDsV.toArray(fromMsgLinkIDs);
+          if (fromMsgLinkIDsL.size() > 0) {
+            fromMsgLinkIDs = new Long[fromMsgLinkIDsL.size()];
+            fromMsgLinkIDsL.toArray(fromMsgLinkIDs);
           }
-          if (fromShareIDsV.size() > 0) {
-            fromShareIDs = new Long[fromShareIDsV.size()];
-            fromShareIDsV.toArray(fromShareIDs);
+          if (fromShareIDsL.size() > 0) {
+            fromShareIDs = new Long[fromShareIDsL.size()];
+            fromShareIDsL.toArray(fromShareIDs);
           }
         }
 
@@ -398,7 +398,7 @@ public class SendMessageRunner extends ThreadTraced {
     if (trace != null) trace.args(recipientsSB);
 
     // create new Msg Link Records
-    Vector linkRecordsV = new Vector();
+    ArrayList linkRecordsL = new ArrayList();
 
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     FetchedDataCache cache = SIL.getFetchedDataCache();
@@ -417,7 +417,7 @@ public class SendMessageRunner extends ThreadTraced {
       // pass 1 is seal
       int FETCHING_KEYS_PASS = 0;
       int SEALING_MSGS_PASS = 1;
-      Vector userIDsWeNeedKeysV = new Vector();
+      ArrayList userIDsWeNeedKeysL = new ArrayList();
       for (int recipientType=0; recipientType<recipientsAll.length; recipientType++) {
         recipients = recipientsAll[recipientType];
         for (int i=0; recipients!=null && i<recipients.length; i++) {
@@ -451,32 +451,32 @@ public class SendMessageRunner extends ThreadTraced {
           // prepare Msg Link to be sent to a user
           if (toUserId != null) {
             KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
-            if (pass == FETCHING_KEYS_PASS && kRec == null && !userIDsWeNeedKeysV.contains(toUserId)) {
-              userIDsWeNeedKeysV.addElement(toUserId);
+            if (pass == FETCHING_KEYS_PASS && kRec == null && !userIDsWeNeedKeysL.contains(toUserId)) {
+              userIDsWeNeedKeysL.add(toUserId);
             } else if (pass == SEALING_MSGS_PASS) {
               linkRec.seal(kRec);
               toAdd = true;
             }
           } // end if
           if (pass == SEALING_MSGS_PASS && toAdd) {
-            linkRecordsV.addElement(linkRec);
+            linkRecordsL.add(linkRec);
           }
         } // end for
       }
-      if (pass == FETCHING_KEYS_PASS && userIDsWeNeedKeysV.size() > 0) {
-        Long[] uIDs = new Long[userIDsWeNeedKeysV.size()];
-        userIDsWeNeedKeysV.toArray(uIDs);
+      if (pass == FETCHING_KEYS_PASS && userIDsWeNeedKeysL.size() > 0) {
+        Long[] uIDs = new Long[userIDsWeNeedKeysL.size()];
+        userIDsWeNeedKeysL.toArray(uIDs);
         SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(uIDs)), 60000);
-        Vector missingKeysUIDsV = new Vector();
-        for (int i=0; i<userIDsWeNeedKeysV.size(); i++) {
-          Long uId = (Long) userIDsWeNeedKeysV.elementAt(i);
+        ArrayList missingKeysUIDsL = new ArrayList();
+        for (int i=0; i<userIDsWeNeedKeysL.size(); i++) {
+          Long uId = (Long) userIDsWeNeedKeysL.get(i);
           if (cache.getKeyRecordForUser(uId) == null)
-            missingKeysUIDsV.addElement(uId);
+            missingKeysUIDsL.add(uId);
         }
-        if (missingKeysUIDsV.size() > 0) {
+        if (missingKeysUIDsL.size() > 0) {
           StringBuffer sb = new StringBuffer("Message was not sent.  Encryption key could not be found for the following user IDs:\n\n");
-          for (int i=0; i<missingKeysUIDsV.size(); i++) {
-            sb.append(missingKeysUIDsV.elementAt(i));
+          for (int i=0; i<missingKeysUIDsL.size(); i++) {
+            sb.append(missingKeysUIDsL.get(i));
             sb.append("\n");
           }
           sb.append("\nPlease check your recipients list.");
@@ -487,9 +487,9 @@ public class SendMessageRunner extends ThreadTraced {
       }
     } // end for 2 passes
 
-    MsgLinkRecord[] mLinkRecs = new MsgLinkRecord[linkRecordsV.size()];
-    if (linkRecordsV.size() > 0) {
-      linkRecordsV.toArray(mLinkRecs);
+    MsgLinkRecord[] mLinkRecs = new MsgLinkRecord[linkRecordsL.size()];
+    if (linkRecordsL.size() > 0) {
+      linkRecordsL.toArray(mLinkRecs);
     }
 
     if (trace != null) trace.exit(SendMessageRunner.class, mLinkRecs);
@@ -537,8 +537,8 @@ public class SendMessageRunner extends ThreadTraced {
    * Clone and encrypt message links to create message attachments links.
    * Fills the share ID vector with involved shares from where the attachments are taken.
    */
-  private static MsgLinkRecord[] prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, Vector fromMsgLinkIDsV, Vector fromShareIDsV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, Vector fromMsgLinkIDsV, Vector fromShareIDsV)");
+  private static MsgLinkRecord[] prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsV, ArrayList fromShareIDsV) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL)");
     if (trace != null) trace.args(selectedMsgLinks, symmetricKey, fromMsgLinkIDsV, fromShareIDsV);
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -567,21 +567,21 @@ public class SendMessageRunner extends ThreadTraced {
     return msgAttachments;
   }
 
-  private static void addUniqueIdTo(Long id, Vector v) {
+  private static void addUniqueIdTo(Long id, ArrayList v) {
     if (!v.contains(id)) {
-      v.addElement(id);
+      v.add(id);
     }
   }
-  private static void addUniqueAttachmentIDsTo(Long ownerMsgId, Vector msgLinkIDsV, Vector shareIDsV) {
+  private static void addUniqueAttachmentIDsTo(Long ownerMsgId, ArrayList msgLinkIDsL, ArrayList shareIDsL) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     MsgLinkRecord[] ownerMsgLinks = cache.getMsgLinkRecordsForMsg(ownerMsgId);
     MsgLinkRecord ownerMsgLink = ownerMsgLinks != null && ownerMsgLinks.length > 0 ? ownerMsgLinks[0] : null;
     if (ownerMsgLink != null) {
-      addUniqueIdTo(ownerMsgLink.msgLinkId, msgLinkIDsV);
+      addUniqueIdTo(ownerMsgLink.msgLinkId, msgLinkIDsL);
       if (ownerMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
         FolderShareRecord shareRecord = cache.getFolderShareRecordMy(ownerMsgLink.ownerObjId, true);
         if (shareRecord != null) {
-          addUniqueIdTo(shareRecord.shareId, shareIDsV);
+          addUniqueIdTo(shareRecord.shareId, shareIDsL);
         }
       }
     }
@@ -592,9 +592,9 @@ public class SendMessageRunner extends ThreadTraced {
    * Clone and encrypt file links to create message attachment file links.
    * Fills the share ID vector with involved shares from where the attachments are taken.
    */
-  private static FileLinkRecord[] prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, Vector fromMsgLinkIDsV, Vector fromShareIDsV) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, Vector fromMsgLinkIDsV, Vector fromShareIDsV)");
-    if (trace != null) trace.args(selectedFileLinks, symmetricKey, fromMsgLinkIDsV, fromShareIDsV);
+  private static FileLinkRecord[] prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL)");
+    if (trace != null) trace.args(selectedFileLinks, symmetricKey, fromMsgLinkIDsL, fromShareIDsL);
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FileLinkRecord[] fileAttachments = (FileLinkRecord[]) RecordUtils.cloneRecords(selectedFileLinks);
@@ -608,10 +608,10 @@ public class SendMessageRunner extends ThreadTraced {
         // get shareId
         FolderShareRecord shareRecord = cache.getFolderShareRecordMy(fLink.ownerObjId, true);
         if (shareRecord != null) {
-          addUniqueIdTo(shareRecord.shareId, fromShareIDsV);
+          addUniqueIdTo(shareRecord.shareId, fromShareIDsL);
         }
       } else if (ownerObjType == Record.RECORD_TYPE_MESSAGE) {
-        addUniqueAttachmentIDsTo(fLink.ownerObjId, fromMsgLinkIDsV, fromShareIDsV);
+        addUniqueAttachmentIDsTo(fLink.ownerObjId, fromMsgLinkIDsL, fromShareIDsL);
       } else {
         throw new IllegalArgumentException("Don't know how to handle owner type " + ownerObjType);
       }

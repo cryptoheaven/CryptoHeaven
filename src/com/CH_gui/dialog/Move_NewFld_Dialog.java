@@ -118,6 +118,8 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private DocumentChangeListener documentChangeListener;
   private FolderTypeActionListener folderTypeActionListener;
 
+  private boolean isOkNextAction = false;
+
   /**
    * Creates new  Move_NewFld_Dialog for moving a single folder or creating a new folder.
    */
@@ -369,6 +371,14 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
       tabbedPane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_General"), createMainPanel());
       tabbedPane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Sharing"), folderSharingPanel);
       tabbedPane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Purging"), folderPurgingPanel);
+      tabbedPane.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent e) {
+          if (isOkNextAction && tabbedPane.getSelectedIndex() == 1) {
+            isOkNextAction = false;
+            okButton.setText(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+          }
+        }
+      });
       mainComponent = tabbedPane;
     }
     else
@@ -446,7 +456,12 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private JButton[] createButtons() {
 
     JButton[] buttons = new JButton[2];
-    okButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    if (isNewFolder) {
+      isOkNextAction = true;
+      okButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Next"));
+    } else {
+      okButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    }
     okButton.setDefaultCapable(true);
     okButton.addActionListener(new OKActionListener());
 
@@ -690,49 +705,55 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   /** Set the appropriate request and close the window **/
   private class OKActionListener implements ActionListener {
     public void actionPerformed (ActionEvent event) {
-      // seperate AWT Thread from any potention network request in set request methods
-      Thread th = new ThreadTraced("Folder Creator") {
-        public void runTraced() {
-          boolean canClose = false;
-          if (isChooseDestination) {
-            canClose = setChosenDestination();
-          } else if (isNewFolder) {
-            canClose = setNewFolderRequest();
-          } else {
-            canClose = setMoveFolderRequest();
-          }
-
-          if (canClose) {
-            Move_NewFld_Dialog.this.setVisible(false);
-            ClientMessageAction replyAction = null;
-            try {
-              if (!isChooseDestination) {
-                if (isNewFolder) {
-                  Fld_NewFld_Rq requestNew = getNewFolderRequest();
-                  if (requestNew != null) {
-                    MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_NEW_FOLDER, requestNew);
-                    replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
-                  }
-                } else {
-                  Obj_List_Co requestMove = getMoveFolderRequest();
-                  if (requestMove != null) {
-                    MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_MOVE_FOLDER, requestMove);
-                    replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
-                  }
-                }
-                DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyAction);
-              }
-            } catch (Throwable t) {
+      if (isOkNextAction) {
+        isOkNextAction = false;
+        okButton.setText(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+        tabbedPane.setSelectedIndex(1);
+      } else {
+        // seperate AWT Thread from any potention network request in set request methods
+        Thread th = new ThreadTraced("Folder Creator") {
+          public void runTraced() {
+            boolean canClose = false;
+            if (isChooseDestination) {
+              canClose = setChosenDestination();
+            } else if (isNewFolder) {
+              canClose = setNewFolderRequest();
+            } else {
+              canClose = setMoveFolderRequest();
             }
-            if (isChooseDestination || (replyAction != null && replyAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS))
-              closeDialog();
-            else
-              Move_NewFld_Dialog.this.setVisible(true);
-          } // end canClose
-        } // end run()
-      };
-      th.setDaemon(true);
-      th.start();
+
+            if (canClose) {
+              Move_NewFld_Dialog.this.setVisible(false);
+              ClientMessageAction replyAction = null;
+              try {
+                if (!isChooseDestination) {
+                  if (isNewFolder) {
+                    Fld_NewFld_Rq requestNew = getNewFolderRequest();
+                    if (requestNew != null) {
+                      MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_NEW_FOLDER, requestNew);
+                      replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
+                    }
+                  } else {
+                    Obj_List_Co requestMove = getMoveFolderRequest();
+                    if (requestMove != null) {
+                      MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_MOVE_FOLDER, requestMove);
+                      replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 30000);
+                    }
+                  }
+                  DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyAction);
+                }
+              } catch (Throwable t) {
+              }
+              if (isChooseDestination || (replyAction != null && replyAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS))
+                closeDialog();
+              else
+                Move_NewFld_Dialog.this.setVisible(true);
+            } // end canClose
+          } // end run()
+        };
+        th.setDaemon(true);
+        th.start();
+      }
     } // end actionPerformed()
   } // end class OKActionListener
 

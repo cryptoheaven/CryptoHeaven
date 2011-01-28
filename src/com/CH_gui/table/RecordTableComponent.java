@@ -15,9 +15,9 @@ package com.CH_gui.table;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.CacheUtilities;
-import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.engine.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.service.msg.*;
@@ -45,13 +45,10 @@ import com.CH_guiLib.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.event.*;
 

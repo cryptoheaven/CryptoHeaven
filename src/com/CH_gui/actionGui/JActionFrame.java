@@ -315,7 +315,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     contentPane.add(c, BorderLayout.CENTER);
   }
 
-  private void initActions() {
+  private synchronized void initActions() {
     int leadingActionId = Actions.LEADING_ACTION_ID_JACTION_FRAME;
 
     UIManager.LookAndFeelInfo looks[] = null;
@@ -336,26 +336,30 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         numActions ++;
     }
 
-    actions = new Action[numActions];
+    if (this.actions == null) {
+      Action[] actions = new Action[numActions];
 
-    int index = 0;
-    // Lets leave the tool tips exclusively for the main frame.
-    if ( !(this instanceof JActionFrameClosable) )
-      actions[index++] = new ToolTipsAction(leadingActionId);
+      int index = 0;
+      // Lets leave the tool tips exclusively for the main frame.
+      if ( !(this instanceof JActionFrameClosable) )
+        actions[index++] = new ToolTipsAction(leadingActionId);
 
-    if (isWithToolBars)
-      actions[index++] = new CustomizeToolsAction(leadingActionId+1);
+      if (isWithToolBars)
+        actions[index++] = new CustomizeToolsAction(leadingActionId+1);
 
-    if (ENABLE_MENU_CUSTOMIZATION_ACTION) {
-      if (menuTreeModel != null)
-        actions[index++] = new CustomizeMenuAction(leadingActionId+2);
-    }
-
-    if (ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS) {
-      ButtonGroup lookAndFeelGroup = new ButtonGroup();
-      for (int i=0, n=looks.length; i<n; i++) {
-        actions[numActions-1 -i] = new LookAndFeelAction(looks[i], leadingActionId+10+i, lookAndFeelGroup);
+      if (ENABLE_MENU_CUSTOMIZATION_ACTION) {
+        if (menuTreeModel != null)
+          actions[index++] = new CustomizeMenuAction(leadingActionId+2);
       }
+
+      if (ENABLE_LOOK_AND_FEEL_CHANGE_ACTIONS) {
+        ButtonGroup lookAndFeelGroup = new ButtonGroup();
+        for (int i=0, n=looks.length; i<n; i++) {
+          actions[numActions-1 -i] = new LookAndFeelAction(looks[i], leadingActionId+10+i, lookAndFeelGroup);
+        }
+      }
+      // assign to global once all actions are initialized
+      this.actions = actions;
     }
 
   }

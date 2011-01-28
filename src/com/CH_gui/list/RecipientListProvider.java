@@ -79,7 +79,7 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
     Record[] allRecords = null;
     Comparator comparator = new ListComparator();
 
-    Record[] allContactChoices = cache.getContactRecordsMyActive();
+    Record[] allContactChoices = cache.getContactRecordsMyActive(true);
     Arrays.sort(allContactChoices, comparator);
     allRecords = (Record[]) ArrayUtils.concatinate(allRecords, allContactChoices, Record.class);
 

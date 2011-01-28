@@ -98,6 +98,7 @@ public class Fifo extends Object implements FifoReaderI, FifoWriterI {
         th.setDaemon(true);
         th.start();
       } catch (Throwable t) {
+        // if there was a problem starting a thread, mark as completed to enable restart
         isProcessingFunctionRunning = false;
       }
     }

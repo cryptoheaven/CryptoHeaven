@@ -173,7 +173,7 @@ public class InviteByEmailDialog extends GeneralDialog {
   private void pressedSend() {
     boolean formatOk = RecipientsDialog.isEmailLineValid(jToText.getText());
     if (formatOk) {
-      doInvite(jToText.getText(), jBodyText.getText(), this);
+      doInvite(jToText.getText(), jBodyText.getText(), this, false);
     } else {
       String messageText = "Please enter a valid email address of the recipient(s).";
       String title = "Invalid email address";
@@ -181,7 +181,7 @@ public class InviteByEmailDialog extends GeneralDialog {
     }
   }
 
-  public static void doInvite(String emlAddresses, String personalMessage, final InviteByEmailDialog dialog) {
+  public static void doInvite(String emlAddresses, String personalMessage, final InviteByEmailDialog dialog, final boolean autoCreateWebAccounts) {
     if (dialog != null)
       dialog.setEnabledButtons(false);
 
@@ -190,8 +190,8 @@ public class InviteByEmailDialog extends GeneralDialog {
     //final String[] texts = Misc.getEmailInvitationText(personalMsg, null, FetchedDataCache.getSingleInstance().getUserRecord());
 
     // gather email addresses and nicks for adding to AddressBook
-    final Vector emailAddressesV = new Vector();
-    Vector emailNicksV = new Vector();
+    final ArrayList emailAddressesL = new ArrayList();
+    ArrayList emailNicksL = new ArrayList();
     if (emailAddresses != null) {
       StringTokenizer st = new StringTokenizer(emailAddresses, ",;:");
       while (st.hasMoreTokens()) {
@@ -205,23 +205,23 @@ public class InviteByEmailDialog extends GeneralDialog {
               addrFull = token;
             else
               addrFull = emls[i];
-            if (EmailRecord.findEmailAddress(emailAddressesV, addrFull) < 0) {
-              emailAddressesV.addElement(addrFull);
-              emailNicksV.addElement(EmailRecord.getPersonalOrNick(addrFull));
+            if (EmailRecord.findEmailAddress(emailAddressesL, addrFull) < 0) {
+              emailAddressesL.add(addrFull);
+              emailNicksL.add(EmailRecord.getPersonalOrNick(addrFull));
             }
           }
         }
       }
     }
 
-    boolean shouldSend = emailAddressesV.size() > 0;
+    boolean shouldSend = emailAddressesL.size() > 0;
     if (shouldSend) {
       Thread th = new ThreadTraced("Invitation Sender") {
         public void runTraced() {
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
 
           // Check if that email address already belongs to an existing user account, create a contact too
-          Object[] set = new Object[] { ArrayUtils.toArray(emailAddressesV, Object.class), Boolean.FALSE }; // do not auto-convert addresses to web-accounts
+          Object[] set = new Object[] { ArrayUtils.toArray(emailAddressesL, Object.class), new Boolean(autoCreateWebAccounts) };
           SIL.submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 60000);
           FetchedDataCache cache = SIL.getFetchedDataCache();
           UserRecord myUser = cache.getUserRecord();
@@ -230,8 +230,8 @@ public class InviteByEmailDialog extends GeneralDialog {
           BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
           String contactReason = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
 
-          for (int i=0; i<emailAddressesV.size(); i++) {
-            String emlAddr = (String) emailAddressesV.elementAt(i);
+          for (int i=0; i<emailAddressesL.size(); i++) {
+            String emlAddr = (String) emailAddressesL.get(i);
             EmailRecord emlRec = cache.getEmailRecord(emlAddr);
             if (emlRec != null) {
               Long contactWithId = emlRec.userId;
@@ -263,8 +263,8 @@ public class InviteByEmailDialog extends GeneralDialog {
           // Send invites by Email
           // skip if email already belongs to my active or declined contact
           StringBuffer filteredEmlAddressesSB = new StringBuffer();
-          for (int i=0; i<emailAddressesV.size(); i++) {
-            String emlAddr = (String) emailAddressesV.elementAt(i);
+          for (int i=0; i<emailAddressesL.size(); i++) {
+            String emlAddr = (String) emailAddressesL.get(i);
             EmailRecord emlRec = cache.getEmailRecord(emlAddr);
             if (emlRec != null) {
               Long contactWithId = emlRec.userId;
@@ -298,7 +298,7 @@ public class InviteByEmailDialog extends GeneralDialog {
       th.setDaemon(true);
       th.start();
       // Add-at-once the email addresses that we sent invites to.
-      MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(null, emailNicksV, emailAddressesV, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER), true, null, true);
+      MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(null, emailNicksL, emailAddressesL, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER), true, null, true);
     }
     if (!shouldSend) {
       if (dialog != null)

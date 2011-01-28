@@ -552,28 +552,36 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
 
-  private void initActions() {
+  /**
+   * Synchronization makes sure only single thread can initialize it, and
+   * that initialization can happen only once.
+   */
+  private synchronized void initActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "initActions()");
-    int leadingActionId = Actions.LEADING_ACTION_ID_MAIN_FRAME;
-    actions = new Action[18];
-    actions[EXIT_ACTION] = new ExitAction(leadingActionId + EXIT_ACTION);
-    actions[ABOUT_ACTION] = new AboutAction(leadingActionId + ABOUT_ACTION);
-    actions[CHANGE_PASS_ACTION] = new ChangePassAction(leadingActionId + CHANGE_PASS_ACTION);
-//    actions[CONNECTION_OPTIONS_ACTION] = new ConnectionOptionsAction(leadingActionId + CONNECTION_OPTIONS_ACTION);
-    actions[ACCOUNT_OPTIONS_ACTION] = new AccountOptionsAction(leadingActionId + ACCOUNT_OPTIONS_ACTION);
-    actions[URL__GENERAL_FAQ_ACTION] = new URLGeneralFAQAction(leadingActionId + URL__GENERAL_FAQ_ACTION);
-    actions[URL__QUICK_TOUR_ACTION] = new URLQuickTourAction(leadingActionId + URL__QUICK_TOUR_ACTION);
-    actions[URL__USERS_GUIDE_ACTION] = new URLUsersGuideAction(leadingActionId + URL__USERS_GUIDE_ACTION);
-    actions[CHANGE_USER_NAME] = new ChangeUserNameAction(leadingActionId + CHANGE_USER_NAME);
-    actions[SWITCH_IDENTITY] = new SwitchIdentityAction(leadingActionId + SWITCH_IDENTITY);
-    actions[MANAGE_SUB_ACCOUNTS] = new ManageSubAccountsAction(leadingActionId + MANAGE_SUB_ACCOUNTS);
-    actions[DELETE_MY_ACCOUNT] = new DeleteMyAccountAction(leadingActionId + DELETE_MY_ACCOUNT);
-    actions[IMPORT_ADDRESS_BOOK] = new ImportAddressBookAction(leadingActionId + IMPORT_ADDRESS_BOOK);
-    actions[URL__ACCOUNT_UPGRADE] = new URLAccountUpgradeAction(leadingActionId + URL__ACCOUNT_UPGRADE);
-    actions[MANAGE_WHITELIST] = new ManageWhiteListAction(leadingActionId + MANAGE_WHITELIST);
-    actions[SETUP_PASSWORD_RECOVERY] = new SetupPasswordRecovery(leadingActionId + SETUP_PASSWORD_RECOVERY);
-    actions[TRACE_DIAGNOSTICS_ACTION] = new TraceDiagnosticsAction(leadingActionId + TRACE_DIAGNOSTICS_ACTION);
-    actions[EMAIL_SUPPORT_ACTION] = new EmailSupportAction(leadingActionId + EMAIL_SUPPORT_ACTION);
+    if (this.actions == null) {
+      int leadingActionId = Actions.LEADING_ACTION_ID_MAIN_FRAME;
+      Action[] actions = new Action[18];
+      actions[EXIT_ACTION] = new ExitAction(leadingActionId + EXIT_ACTION);
+      actions[ABOUT_ACTION] = new AboutAction(leadingActionId + ABOUT_ACTION);
+      actions[CHANGE_PASS_ACTION] = new ChangePassAction(leadingActionId + CHANGE_PASS_ACTION);
+  //    actions[CONNECTION_OPTIONS_ACTION] = new ConnectionOptionsAction(leadingActionId + CONNECTION_OPTIONS_ACTION);
+      actions[ACCOUNT_OPTIONS_ACTION] = new AccountOptionsAction(leadingActionId + ACCOUNT_OPTIONS_ACTION);
+      actions[URL__GENERAL_FAQ_ACTION] = new URLGeneralFAQAction(leadingActionId + URL__GENERAL_FAQ_ACTION);
+      actions[URL__QUICK_TOUR_ACTION] = new URLQuickTourAction(leadingActionId + URL__QUICK_TOUR_ACTION);
+      actions[URL__USERS_GUIDE_ACTION] = new URLUsersGuideAction(leadingActionId + URL__USERS_GUIDE_ACTION);
+      actions[CHANGE_USER_NAME] = new ChangeUserNameAction(leadingActionId + CHANGE_USER_NAME);
+      actions[SWITCH_IDENTITY] = new SwitchIdentityAction(leadingActionId + SWITCH_IDENTITY);
+      actions[MANAGE_SUB_ACCOUNTS] = new ManageSubAccountsAction(leadingActionId + MANAGE_SUB_ACCOUNTS);
+      actions[DELETE_MY_ACCOUNT] = new DeleteMyAccountAction(leadingActionId + DELETE_MY_ACCOUNT);
+      actions[IMPORT_ADDRESS_BOOK] = new ImportAddressBookAction(leadingActionId + IMPORT_ADDRESS_BOOK);
+      actions[URL__ACCOUNT_UPGRADE] = new URLAccountUpgradeAction(leadingActionId + URL__ACCOUNT_UPGRADE);
+      actions[MANAGE_WHITELIST] = new ManageWhiteListAction(leadingActionId + MANAGE_WHITELIST);
+      actions[SETUP_PASSWORD_RECOVERY] = new SetupPasswordRecovery(leadingActionId + SETUP_PASSWORD_RECOVERY);
+      actions[TRACE_DIAGNOSTICS_ACTION] = new TraceDiagnosticsAction(leadingActionId + TRACE_DIAGNOSTICS_ACTION);
+      actions[EMAIL_SUPPORT_ACTION] = new EmailSupportAction(leadingActionId + EMAIL_SUPPORT_ACTION);
+      // assign to global once all actions are initialized
+      this.actions = actions;
+    }
     if (trace != null) trace.exit(MainFrame.class);
   }
 

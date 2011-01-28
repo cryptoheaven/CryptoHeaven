@@ -16,11 +16,13 @@ import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.*;
+import com.CH_cl.service.records.filters.ContactFilterCl;
 
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.fld.*;
 import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.service.records.filters.ContactFilterCo;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
@@ -198,6 +200,10 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     int imageNum = 0;
     if (folderPair.getFolderRecord().isGroupType())
       imageNum = ImageNums.PEOPLE48;
+    else if (folderPair.getFolderRecord().isAddressType())
+      imageNum = ImageNums.ADDRESS_BOOK48;
+    else if (folderPair.getFolderRecord().isChatting())
+      imageNum = ImageNums.CHAT_BUBBLE48;
     else
       imageNum = ImageNums.FOLDER48;
     int posY = 0;
@@ -365,8 +371,8 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     // see if anything changed with sharing of the folder, if so submit changes, else do not attempt to submit
     if (folderSharingPanel.canChange()) {
       FolderShareRecord[] existingShares = cache.getFolderShareRecordsForFolder(folderPair.getId());
-      Vector wantedSharesV = folderSharingPanel.gatherWantedShares();
-      FolderShareRecord[][] shareChanges = FolderShareOps.getFolderShareChanges(existingShares, wantedSharesV, folderPair);
+      ArrayList wantedSharesL = folderSharingPanel.gatherWantedShares();
+      FolderShareRecord[][] shareChanges = FolderShareOps.getFolderShareChanges(existingShares, wantedSharesL, folderPair);
       //System.out.println("shareChanges="+Misc.objToStr(shareChanges));
       if (shareChanges != null) {
         final FolderPair[] children = cache.getFolderPairsViewAllDescending(new FolderPair[] { folderPair }, false);
@@ -431,8 +437,8 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
 
             // commit removal of old shares
             FolderShareRecord[] existingShares = cache.getFolderShareRecordsForFolder(folderPairChanged.getId());
-            Vector wantedSharesV = folderSharingPanel.gatherWantedShares();
-            FolderShareRecord[][] shareChanges = FolderShareOps.getFolderShareChanges(existingShares, wantedSharesV, folderPairChanged);
+            ArrayList wantedSharesL = folderSharingPanel.gatherWantedShares();
+            FolderShareRecord[][] shareChanges = FolderShareOps.getFolderShareChanges(existingShares, wantedSharesL, folderPairChanged);
             if (shareChanges != null && shareChanges[0] != null && shareChanges[0].length > 0) {
               allSharesToRemoveV.addAll(Arrays.asList(shareChanges[0]));
             }
@@ -551,7 +557,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
             FolderShareRecord[] newShares = new FolderShareRecord[allSharesToAddV.size()];
             allSharesToAddV.toArray(newShares);
             Fld_AddShares_Rq request = new Fld_AddShares_Rq();
-            request.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
+            request.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive(true)));
             request.groupShareIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getFolderSharesMyForFolders(cache.getFolderGroupIDsMy(), true)));
             request.shareRecords = newShares;
             SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_ADD_FOLDER_SHARES, request));

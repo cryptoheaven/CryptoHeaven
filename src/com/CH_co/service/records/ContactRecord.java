@@ -137,6 +137,15 @@ public class ContactRecord extends Record implements MemberContactRecordI {
     return rc;
   }
 
+  public boolean isOfInitiatedType() {
+    boolean rc = false;
+    if (status != null) {
+      short s = status.shortValue();
+      rc = s == STATUS_INITIATED;
+    }
+    return rc;
+  }
+
   public void setEncOwnerNote   (BASymCipherBulk encOwnerNote   ) { this.encOwnerNote = encOwnerNote;     }
   public void setOtherKeyId     (Long otherKeyId                ) { this.otherKeyId = otherKeyId;         }
   public void setEncOtherSymKey (BAAsyCipherBlock encOtherSymKey) { this.encOtherSymKey = encOtherSymKey; }
@@ -422,6 +431,23 @@ public class ContactRecord extends Record implements MemberContactRecordI {
       ArrayList recsL = new ArrayList();
       for (int i=0; i<cRecs.length; i++) {
         if (status.equals(cRecs[i].status))
+          recsL.add(cRecs[i]);
+      }
+      recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);
+    }
+    return recs;
+  }
+
+  public static ContactRecord[] filterDesiredStatusRecords(ContactRecord[] cRecs, Short[] status) {
+    ContactRecord[] recs = null;
+    if (cRecs != null && cRecs.length > 0) {
+      HashSet statusHS = new HashSet();
+      for (int i=0; i<status.length; i++) {
+        statusHS.add(status[i]);
+      }
+      ArrayList recsL = new ArrayList();
+      for (int i=0; i<cRecs.length; i++) {
+        if (statusHS.contains(cRecs[i].status))
           recsL.add(cRecs[i]);
       }
       recs = (ContactRecord[]) ArrayUtils.toArray(recsL, ContactRecord.class);

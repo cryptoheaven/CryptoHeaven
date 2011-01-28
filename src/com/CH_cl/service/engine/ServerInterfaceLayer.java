@@ -12,23 +12,22 @@
 
 package com.CH_cl.service.engine;
 
-import java.util.*;
-import java.net.Socket;
-import java.io.IOException;
-import java.net.UnknownHostException;
-
-import com.CH_co.trace.*;
-import com.CH_co.monitor.*;
-import com.CH_co.queue.*;
-import com.CH_co.util.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 
+import com.CH_co.monitor.*;
+import com.CH_co.queue.*;
+import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.trace.*;
+import com.CH_co.util.*;
+
 import comx.HTTP_Socket.*;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -906,7 +905,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
           ServerInterfaceWorker worker = null;
           // roll through the valid hosts to attempt to create a connection
-          int maxWorkerTrials = hostsAndPorts.length;
+          // each unique server will get 2 connection trials before we bail out
+          int maxWorkerTrials = hostsAndPorts.length*2;
           for (int workerTrial=0; workerTrial<maxWorkerTrials; workerTrial++) {
             // Control throughput of trials as a safety mechanism for server connectivity
             if (burstableMonitorWorkerCreationTrials == null)
@@ -1564,7 +1564,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Causes that a Main Worker is designated or a submition is in progress.
+   * Causes that a Main Worker is designated or a submission is in progress.
    * If necessary, submits a Message Action to start Main Worker designation.
    * That message upon being picked up by some worker will grant a Main Worker
    * status when claimMainWorker() is called by that worker.
@@ -1636,8 +1636,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return true if there is a main worker which is persistant;
-   * Main Worker becomes persistant when it retrieves a NOTIFY reply from the server allowing it to become persistant.
+   * @return true if there is a main worker which is persistent;
+   * Main Worker becomes persistent when it retrieves a NOTIFY reply from the server allowing it to become persistent.
    */
   public boolean hasPersistantMainWorker() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "hasPersistantMainWorker()");

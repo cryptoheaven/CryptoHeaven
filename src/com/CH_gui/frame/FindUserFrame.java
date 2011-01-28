@@ -95,9 +95,9 @@ public class FindUserFrame extends JActionFrameClosable {
     JButton[] buttons = new JButton[3];
 
     buttons[0] = new JMyButton(userSearchPanel.userActionTable.getActions()[UserActionTable.INITIATE_ACTION]);
-    buttons[0].setText("Add ...");
+    buttons[0].setText("Add to Contacts");
     buttons[1] = new JMyButton(userSearchPanel.emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION]);
-    buttons[1].setText("Invite ...");
+    buttons[1].setText("Invite by Email");
     buttons[2] = new JMyButton(closeButtonText != null ? closeButtonText : com.CH_gui.lang.Lang.rb.getString("button_Close"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {

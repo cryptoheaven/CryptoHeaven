@@ -219,7 +219,7 @@ public class FolderOps extends Object {
     if (additionalShareCount > 0) {
       // Specify contact list users only if I am creating my own folder, else let server check those for the folder owner
       if (myUserId.equals(ownerUserId)) {
-        shareRequest.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
+        shareRequest.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive(true)));
         shareRequest.groupShareIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getFolderSharesMyForFolders(cache.getFolderGroupIDsMy(), true)));
       }
       shareRequest.shareRecords = additionalShares;

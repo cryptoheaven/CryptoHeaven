@@ -55,7 +55,7 @@ import javax.swing.text.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -63,7 +63,7 @@ import javax.swing.text.*;
  *
  * <b>$Revision: 1.59 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSelectionListener, MsgDataProviderI, VisualsSavable, DisposableObj {
 
@@ -215,7 +215,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
 
-  /** 
+  /**
    * Copy
    */
   private class CopyAction extends DefaultEditorKit.CopyAction {
@@ -231,7 +231,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     }
   }
 
-  /** 
+  /**
    * Select All
    */
   private class SelectAllAction extends AbstractActionTraced {
@@ -276,11 +276,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         if (contactInfo != null) {
           String nick = contactInfo[0];
           String email = contactInfo[1];
-          Vector emailNicksV = new Vector();
-          Vector emailStringRecordsV = new Vector();
-          emailNicksV.addElement(nick);
-          emailStringRecordsV.addElement(email);
-          MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksV, emailStringRecordsV, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
+          ArrayList emailNicksL = new ArrayList();
+          ArrayList emailStringRecordsL = new ArrayList();
+          emailNicksL.add(nick);
+          emailStringRecordsL.add(email);
+          MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksL, emailStringRecordsL, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
         }
       }
     });
@@ -387,11 +387,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             if (contactInfo != null) {
               String nick = contactInfo[0];
               String email = contactInfo[1];
-              Vector emailNicksV = new Vector();
-              Vector emailStringRecordsV = new Vector();
-              emailNicksV.addElement(nick);
-              emailStringRecordsV.addElement(email);
-              MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksV, emailStringRecordsV, false, new FolderFilter(FolderRecord.WHITELIST_FOLDER), true, whiteList, true);
+              ArrayList emailNicksL = new ArrayList();
+              ArrayList emailStringRecordsL = new ArrayList();
+              emailNicksL.add(nick);
+              emailStringRecordsL.add(email);
+              MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgPreviewPanel.this, emailNicksL, emailStringRecordsL, false, new FolderFilter(FolderRecord.WHITELIST_FOLDER), true, whiteList, true);
             }
           }
         };
@@ -458,15 +458,15 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
-    add(jLineFrom, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    add(jLineFrom, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
-    add(jLineReplyTo, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    add(jLineReplyTo, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
-    add(jLineRecipients, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    add(jLineRecipients, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
@@ -474,15 +474,15 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 //          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 //    posY ++;
 
-    add(jLineAttachments, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    add(jLineAttachments, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
-    add(jLineExpiration, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    add(jLineExpiration, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
-    add(jLinePassword, new GridBagConstraints(0, posY, 1, 1, 10, 0, 
+    add(jLinePassword, new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
@@ -500,26 +500,26 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
     JLabel jMinHeight1 = new JMyLabel(" ");
-    jLinePriority.add(jMinHeight1, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLinePriority.add(jMinHeight1, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jPriorityLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority"));
-    jLinePriority.add(jPriorityLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+    jLinePriority.add(jPriorityLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLinePriority.add(jPriority, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
+    jLinePriority.add(jPriority, new GridBagConstraints(2, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
 
 
     JLabel jMinHeight2 = new JMyLabel(" ");
-    jLineFrom.add(jMinHeight2, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLineFrom.add(jMinHeight2, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jFromLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_From"));
-    jLineFrom.add(jFromLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+    jLineFrom.add(jFromLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineFrom.add(jFromName, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+    jLineFrom.add(jFromName, new GridBagConstraints(2, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineFrom.add(jFromNameAddContact, new GridBagConstraints(3, 0, 1, 1, 1, 0, 
+    jLineFrom.add(jFromNameAddContact, new GridBagConstraints(3, 0, 1, 1, 1, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineFrom.add(new JLabel(), new GridBagConstraints(4, 0, 1, 1, 10, 0, 
+    jLineFrom.add(new JLabel(), new GridBagConstraints(4, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 //    jLineFrom.add(jNotSpam, new GridBagConstraints(5, 0, 1, 1, 0, 0,
 //          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
@@ -535,18 +535,18 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
 
     JLabel jMinHeight3 = new JMyLabel(" ");
-    jLineReplyTo.add(jMinHeight3, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLineReplyTo.add(jMinHeight3, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jReplyToLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reply_To"));
-    jLineReplyTo.add(jReplyToLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+    jLineReplyTo.add(jReplyToLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineReplyTo.add(jReplyTo, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
+    jLineReplyTo.add(jReplyTo, new GridBagConstraints(2, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
 
     JLabel jMinHeight4 = new JMyLabel(" ");
-    jLineRecipients.add(jMinHeight4, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLineRecipients.add(jMinHeight4, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    jLineRecipients.add(jRecipients, new GridBagConstraints(1, 0, 1, 1, 10, 0, 
+    jLineRecipients.add(jRecipients, new GridBagConstraints(1, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
 //    jLineRecipients.add(jFullView, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
 //          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
@@ -555,7 +555,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
     JLabel jMinHeight5 = new JMyLabel(" ");
-    jLineSubject.add(jMinHeight5, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLineSubject.add(jMinHeight5, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jLineSubject.add(jStar, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 3, 0, 3), 0, 0));
@@ -580,7 +580,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
     JLabel jMinHeight_att = new JMyLabel(" ");
-    jLineAttachments.add(jMinHeight_att, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLineAttachments.add(jMinHeight_att, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
 //    JLabel jAttachmentsLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Attachments"));
 //    jLineAttachments.add(jAttachmentsLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
@@ -590,17 +590,17 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
     JLabel jMinHeight6 = new JMyLabel(" ");
-    jLineExpiration.add(jMinHeight6, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLineExpiration.add(jMinHeight6, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jExpirationLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Expiry_Date"));
     jExpirationLabel.setFont(jExpirationLabel.getFont().deriveFont(Font.BOLD));
-    jLineExpiration.add(jExpirationLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+    jLineExpiration.add(jExpirationLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineExpiration.add(jExpiration, new GridBagConstraints(2, 0, 1, 1, 10, 0, 
+    jLineExpiration.add(jExpiration, new GridBagConstraints(2, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
 
     JLabel jMinHeight7 = new JMyLabel(" ");
-    jLinePassword.add(jMinHeight7, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    jLinePassword.add(jMinHeight7, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     JLabel jPasswordHintLabel = new JMyLabel("Question:");
     jPasswordHintLabel.setFont(jPasswordHintLabel.getFont().deriveFont(Font.BOLD));
@@ -608,15 +608,15 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jPasswordHintText.setFont(jPasswordHintText.getFont().deriveFont(Font.BOLD));
     JLabel jPasswordAnswerLabel = new JMyLabel("Answer:");
     jPasswordAnswerLabel.setFont(jPasswordAnswerLabel.getFont().deriveFont(Font.BOLD));
-    jLinePassword.add(jPasswordHintLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0, 
+    jLinePassword.add(jPasswordHintLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLinePassword.add(jPasswordHintText, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+    jLinePassword.add(jPasswordHintText, new GridBagConstraints(2, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 10), 0, 0));
-    jLinePassword.add(jPasswordAnswerLabel, new GridBagConstraints(3, 0, 1, 1, 0, 0, 
+    jLinePassword.add(jPasswordAnswerLabel, new GridBagConstraints(3, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLinePassword.add(jPasswordField, new GridBagConstraints(4, 0, 1, 1, 0, 0, 
+    jLinePassword.add(jPasswordField, new GridBagConstraints(4, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLinePassword.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0, 
+    jLinePassword.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
     JLabel sampleLabel = new JMyLabel("abcdefghijkl");
@@ -719,7 +719,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     } try {
       doLayout();
     } catch (Throwable t) {
-    } 
+    }
     if (trace != null) trace.exit(MsgPreviewPanel.class);
   }
   private void setHTMLMode(boolean isHtml) {
@@ -828,7 +828,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
   private void setRecipientsPanel(final MsgDataRecord dataRecord, final JPanel jRecipients, final JPanel jParentLineRecipients) {
-    // Since there is a problem when a frame shows up with this panel, 
+    // Since there is a problem when a frame shows up with this panel,
     // do this at the end of all AWT events after the frame is already shown.
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -842,7 +842,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         Record[] recipients = null;
         jRecipients.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        Vector labelsV = new Vector();
+        ArrayList labelsL = new ArrayList();
 
         for (int setIndex=0; objSets!=null && setIndex<objSets.length; setIndex++) {
           Record[] objs = objSets[setIndex];
@@ -861,7 +861,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             } else {
               headerLabel.setBorder(new EmptyBorder(0,5,0,3));
             }
-            labelsV.addElement(headerLabel);
+            labelsL.add(headerLabel);
 
             if (recipients != null) {
               for (int i=0; i<recipients.length; i++) {
@@ -869,7 +869,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 label.setText(ListRenderer.getRenderedText(recipients[i]));
                 label.setIcon(ListRenderer.getRenderedIcon(recipients[i]));
                 label.setIconTextGap(2);
-                labelsV.addElement(label);
+                labelsL.add(label);
               }
             }
           }
@@ -879,16 +879,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         JPanel panel = jRecipients;
         panel.setLayout(new GridBagLayout());
         int posX = 0;
-        for (posX=0; posX<labelsV.size(); posX++) {
-          JLabel label = (JLabel) labelsV.elementAt(posX);
-          panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+        for (posX=0; posX<labelsL.size(); posX++) {
+          JLabel label = (JLabel) labelsL.get(posX);
+          panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 5), 0, 0));
         }
         if (lineRecipientsVisibilityAllowed && jParentLineRecipients != null) {
-          jParentLineRecipients.setVisible(labelsV.size() > 0);
+          jParentLineRecipients.setVisible(labelsL.size() > 0);
         }
         // add horizontal filler
-        panel.add(new JLabel(), new GridBagConstraints(posX, 0, 1, 1, 10, 0, 
+        panel.add(new JLabel(), new GridBagConstraints(posX, 0, 1, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
         posX ++;
 
@@ -904,7 +904,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
   private void setAttachmentsButton() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsButton()");
-    if (msgDataRecord != null && msgDataRecord.attachedFiles != null && msgDataRecord.attachedMsgs != null && 
+    if (msgDataRecord != null && msgDataRecord.attachedFiles != null && msgDataRecord.attachedMsgs != null &&
         msgDataRecord.attachedFiles.shortValue() + msgDataRecord.attachedMsgs.shortValue() > 0) {
       if (!isAttachmentButton) {
         jAttachment.setVisible(true);
@@ -988,7 +988,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (attachments != null && attachments.length > 0) {
       jAttachments.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-      Vector labelsV = new Vector();
+      ArrayList labelsL = new ArrayList();
 
       for (int i=0; i<attachments.length; i++) {
         boolean skip = false;
@@ -1044,7 +1044,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           if (attachments[i] instanceof FileLinkRecord) {
             fileLink = (FileLinkRecord) attachments[i];
           }
-          
+
           JPanel panel = new JPanel();
           panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
           panel.add(label);
@@ -1233,12 +1233,12 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               });
             }
           }
-          
+
           panel.add(progress);
-          labelsV.addElement(panel);
+          labelsL.add(panel);
         }
       }
-      setFlowGridPanel(jAttachments, labelsV, 5, 4);
+      setFlowGridPanel(jAttachments, labelsL, 5, 4);
       visible = true;
     }
     jLineAttachments.setVisible(visible);
@@ -1248,7 +1248,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (trace != null) trace.exit(MsgPreviewPanel.class);
   }
 
-  private static void setFlowGridPanel(JPanel panel, Vector labelsV, int HORIZ_INSET_SPACE, int MAX_VISIBLE_ROWS) {
+  private static void setFlowGridPanel(JPanel panel, ArrayList labelsL, int HORIZ_INSET_SPACE, int MAX_VISIBLE_ROWS) {
     int VERT_GAP = 2;
     boolean flowMode = false; // don't use flow because even with scroll pane flow panel has difficulty moving components to next line
     boolean gridMode = true;
@@ -1259,26 +1259,26 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
     int totalPrefWidth = 0;
     // gather preferred width of all labels
-    for (int i=0; i<labelsV.size(); i++) {
-      totalPrefWidth += ((JComponent) labelsV.elementAt(i)).getPreferredSize().width + HORIZ_INSET_SPACE;
+    for (int i=0; i<labelsL.size(); i++) {
+      totalPrefWidth += ((JComponent) labelsL.get(i)).getPreferredSize().width + HORIZ_INSET_SPACE;
     }
-    int avgWidth = totalPrefWidth / labelsV.size();
+    int avgWidth = totalPrefWidth / labelsL.size();
 
     // See if all labels took too much space, if they did then use multi-row grid
     boolean isMultiRowMode = totalPrefWidth > panel.getSize().width;
     int MAX_COLUMNS = Math.max(1, (int) (panel.getSize().width / (avgWidth + avgWidth*0.25)));
-    int NUM_COLUMNS = Math.min(labelsV.size(), MAX_COLUMNS);
+    int NUM_COLUMNS = Math.min(labelsL.size(), MAX_COLUMNS);
 
     // set panel layout
     if (isMultiRowMode) {
       int rows = 0;
       if (gridMode) {
-        rows = (int) Math.ceil(((double) labelsV.size()) / ((double) MAX_COLUMNS));
+        rows = (int) Math.ceil(((double) labelsL.size()) / ((double) MAX_COLUMNS));
       } else if (flowMode) {
         rows = 1;
         int rowPrefWidth = 0;
-        for (int i=0; i<labelsV.size(); i++) {
-          int prefWidth = ((JComponent) labelsV.elementAt(i)).getPreferredSize().width + HORIZ_INSET_SPACE;
+        for (int i=0; i<labelsL.size(); i++) {
+          int prefWidth = ((JComponent) labelsL.get(i)).getPreferredSize().width + HORIZ_INSET_SPACE;
           rowPrefWidth += prefWidth;
           if (rowPrefWidth > panel.getSize().width) {
             rows ++;
@@ -1308,10 +1308,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     }
     // add elements to panel
     int posX = 0;
-    for (posX=0; posX<labelsV.size(); posX++) {
-      JComponent label = (JComponent) labelsV.elementAt(posX);
+    for (posX=0; posX<labelsL.size(); posX++) {
+      JComponent label = (JComponent) labelsL.get(posX);
       if (!isMultiRowMode && gridMode) {
-        panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0, 
+        panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, HORIZ_INSET_SPACE), 0, 0));
       } else {
         panel.add(label);
@@ -1319,7 +1319,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     }
     if (!isMultiRowMode && gridMode) {
       // add horizontal filler
-      panel.add(new JLabel(), new GridBagConstraints(posX, 0, 1, 1, 10, 0, 
+      panel.add(new JLabel(), new GridBagConstraints(posX, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     }
   }
@@ -1526,7 +1526,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       if (visuals == null) {
         // do nothing
       } else {
-        StringTokenizer st = new StringTokenizer(visuals);  
+        StringTokenizer st = new StringTokenizer(visuals);
         st.nextToken();
         st.nextToken();
         int width = Integer.parseInt(st.nextToken());
@@ -1568,7 +1568,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (dataListener != null) {
       FetchedDataCache.getSingleInstance().removeMsgDataRecordListener(dataListener);
       dataListener = null;
-    } 
+    }
     if (msgPreviewUpdateFifo != null) {
       msgPreviewUpdateFifo.clear();
       msgPreviewUpdateFifo.close();
@@ -1651,7 +1651,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           previewMsgData = cache.getMsgDataRecord(previewMsgLink.msgId);
-          if ((previewMsgLink.status.shortValue() & MsgLinkRecord.STATUS_FLAG__READ) == 0 || 
+          if ((previewMsgLink.status.shortValue() & MsgLinkRecord.STATUS_FLAG__READ) == 0 ||
               previewMsgData == null || previewMsgData.getEncText() == null)
           {
             // fetching can take a while so show the "Loading..." sign
@@ -1665,16 +1665,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         }
       }
 
-      Vector emailNicksV = new Vector();
-      Vector emailStringRecordsV = new Vector();
-      Vector emailRecordsOrigV = new Vector();
+      ArrayList emailNicksL = new ArrayList();
+      ArrayList emailStringRecordsL = new ArrayList();
+      ArrayList emailRecordsOrigL = new ArrayList();
       // if we are still pointing to the same message, then make sure we check address books before displaying Sender Information
       if (previewMsgLink != null && previewMsgLink == MsgPreviewPanel.this.msgLinkRecord) {
         try {
           if (previewMsgData != null) {
-            MsgActionTable.getEmailNickAndAddress(previewMsgData, emailNicksV, emailStringRecordsV, false);
-            if (emailStringRecordsV.size() > 0) {
-              emailRecordsOrigV = MsgComposePanel.checkEmailAddressesForAddressBookAdition(MsgPreviewPanel.this, emailNicksV, emailStringRecordsV, false, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
+            MsgActionTable.getEmailNickAndAddress(previewMsgData, emailNicksL, emailStringRecordsL, false);
+            if (emailStringRecordsL.size() > 0) {
+              emailRecordsOrigL = MsgComposePanel.checkEmailAddressesForAddressBookAdition(MsgPreviewPanel.this, emailNicksL, emailStringRecordsL, false, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
             }
           }
         } catch (Throwable t) {
@@ -1685,7 +1685,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       // if we are still pointing to the same message, then update
       if (previewMsgLink == MsgPreviewPanel.this.msgLinkRecord) {
         try {
-          javax.swing.SwingUtilities.invokeAndWait(new PreviewGUIUpdater(previewMsgLink, previewMsgData, emailNicksV, emailStringRecordsV, emailRecordsOrigV));
+          javax.swing.SwingUtilities.invokeAndWait(new PreviewGUIUpdater(previewMsgLink, previewMsgData, emailNicksL, emailStringRecordsL, emailRecordsOrigL));
         } catch (Throwable t) {
           if (trace != null) trace.exception(getClass(), 300, t);
         } finally {
@@ -1710,16 +1710,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private class PreviewGUIUpdater implements Runnable {
     MsgLinkRecord msgLink;
     MsgDataRecord msgData;
-    Vector emailNicksV;
-    Vector emailStringRecordsV;
-    Vector emailRecordsOrigV;
-    private PreviewGUIUpdater(MsgLinkRecord msgLink, MsgDataRecord msgData, Vector emailNicksV, Vector emailStringRecordsV, Vector emailRecordsOrigV) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PreviewGUIUpdater.class, "PreviewGUIUpdater(MsgLinkRecord msgLink, MsgDataRecord msgData, Vector emailNicksV, Vector emailStringRecordsV, Vector emailRecordsOrigV)");
+    ArrayList emailNicksL;
+    ArrayList emailStringRecordsL;
+    ArrayList emailRecordsOrigL;
+    private PreviewGUIUpdater(MsgLinkRecord msgLink, MsgDataRecord msgData, ArrayList emailNicksL, ArrayList emailStringRecordsL, ArrayList emailRecordsOrigL) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PreviewGUIUpdater.class, "PreviewGUIUpdater(MsgLinkRecord msgLink, MsgDataRecord msgData, ArrayList emailNicksL, ArrayList emailStringRecordsL, ArrayList emailRecordsOrigL)");
       this.msgLink = msgLink;
       this.msgData = msgData;
-      this.emailNicksV = emailNicksV;
-      this.emailStringRecordsV = emailStringRecordsV;
-      this.emailRecordsOrigV = emailRecordsOrigV;
+      this.emailNicksL = emailNicksL;
+      this.emailStringRecordsL = emailStringRecordsL;
+      this.emailRecordsOrigL = emailRecordsOrigL;
       if (trace != null) trace.exit(PreviewGUIUpdater.class);
     }
 
@@ -1736,7 +1736,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       // global try
       try {
         if (msgLink == null || msgData == null) {
-          msgDataRecord = null; // nullify the global view msg data 
+          msgDataRecord = null; // nullify the global view msg data
           jPriority.setIcon(null);
           jPriority.setText("");
           jFromName.setIcon(null);
@@ -1781,7 +1781,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             lastSplitOrientationMode = orientation;
           }
 
-          // assign a global view msg data 
+          // assign a global view msg data
           msgDataRecord = msgData;
 
           // create the Add Contact link if email address is not in the Address Books
@@ -1789,8 +1789,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           boolean addContactLinkVisible = false;
           jFromNameAddContact.setDescription(null);
           jNotSpam.setDescription(null);
-          if (emailRecordsOrigV.size() > 0) {
-            String[] contactInfo = new String[] { ""+emailNicksV.elementAt(0), ""+emailStringRecordsV.elementAt(0) };
+          if (emailRecordsOrigL.size() > 0) {
+            String[] contactInfo = new String[] { ""+emailNicksL.get(0), ""+emailStringRecordsL.get(0) };
             addContactLinkVisible = true;
             jFromNameAddContact.setDescription(contactInfo);
             //jNotSpam.setVisible(true); // visible for junk folder even if it has no email address (move operation is still active)
@@ -1872,7 +1872,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         } try {
           doLayout();
         } catch (Throwable t) {
-        } 
+        }
 
       // global catch
       } catch (Throwable t) {
@@ -1926,7 +1926,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
   /****************************************************************************/
-  /*        A c t i o n P r o d u c e r I                                  
+  /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
 
   /**
@@ -1976,7 +1976,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     */
   private class MsgDataListener implements MsgDataRecordListener {
     public void msgDataRecordUpdated(MsgDataRecordEvent event) {
-      // Exec on event thread 
+      // Exec on event thread
       javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
     }
   }

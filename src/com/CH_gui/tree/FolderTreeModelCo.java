@@ -275,7 +275,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
           parentNode = getRootFileNode();
         } else if (fRec.isChatting()) {
           parentNode = getRootChatNode();
-        } else if (fRec.isMsgType()) {
+        } else if (fRec.isMailType()) {
           parentNode = getRootMsgNode();
         } else if (fRec.isGroupType()) {
           parentNode = getRootGroupNode();
@@ -394,7 +394,7 @@ public class FolderTreeModelCo extends DefaultTreeModel {
               move = true;
             else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_CHAT_FOLDER && folder.isChatting())
               move = true;
-            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_MAIL_FOLDER && folder.isMsgType())
+            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_MAIL_FOLDER && folder.isMailType())
               move = true;
             else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_GROUP_FOLDER && folder.isGroupType())
               move = true;

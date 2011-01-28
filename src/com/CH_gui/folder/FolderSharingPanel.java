@@ -44,7 +44,7 @@ import javax.swing.event.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -52,7 +52,7 @@ import javax.swing.event.*;
  *
  * <b>$Revision: 1.29 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FolderSharingPanel extends JPanel implements DisposableObj {
 
@@ -96,8 +96,8 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
   private boolean shareNameChangedByTyping;
   private boolean shareDescChangedByTyping;
 
-  /** 
-   * Creates new FolderSharingPanel 
+  /**
+   * Creates new FolderSharingPanel
    * Folder Creation mode
    */
   public FolderSharingPanel(BASymmetricKey newFolderSymmetricKey, JTextField jShareNameSource, JTextArea jShareDescSource, MemberContactRecordI[] addContacts) {
@@ -112,8 +112,8 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
       addSharesForContacts(addContacts);
     }
   }
-  /** 
-   * Creates new FolderSharingPanel 
+  /**
+   * Creates new FolderSharingPanel
    * Folder Editing mode
    */
   public FolderSharingPanel(FolderPair folderPair) {
@@ -182,16 +182,16 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
 
     int posY = 0;
     jShareIcon = new JMyLabel(Images.get(ImageNums.FOLDER_SHARED48));
-    add(jShareIcon, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    add(jShareIcon, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jShareMsg = new JMyLabel();
-    add(jShareMsg, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    add(jShareMsg, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -202,7 +202,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
           radioPressedAction();
         }
       });
-      add(jRadioInheritSharing, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+      add(jRadioInheritSharing, new GridBagConstraints(0, posY, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 15, 0, 5), 0, 0));
       posY ++;
     }
@@ -217,7 +217,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
         radioPressedAction();
       }
     });
-    add(jRadioDoNotShare, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    add(jRadioDoNotShare, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, isFolderCreationMode ? new MyInsets(0, 15, 0, 5) : new MyInsets(5, 15, 0, 5), 0, 0));
     posY ++;
 
@@ -231,7 +231,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
         radioPressedAction();
       }
     });
-    add(jRadioDoShare, new GridBagConstraints(0, posY, 2, 1, 10, 0, 
+    add(jRadioDoShare, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 15, 0, 5), 0, 0));
     posY ++;
 
@@ -256,7 +256,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     JPanel jSharePanel = new JPanel();
     jSharePanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_gui.lang.Lang.rb.getString("title_Currently_Authorized_Users")));
     // dummy
-    add(jSharePanel, new GridBagConstraints(0, posY, 2, 1, 10, 10, 
+    add(jSharePanel, new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -274,25 +274,25 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
 //    }
     posY = 0;
     jShareLabel = new JMyLabel();
-    jSharePanel.add(jShareLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    jSharePanel.add(jShareLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jShareName = new JMyTextField();
 //    if (!isFolderCreationMode)
 //      jShareName.setText(folderPair.getMyName());
 //    else
 //      jShareName.setText(labelText);
-    jSharePanel.add(jShareName, new GridBagConstraints(1, posY, 1, 1, 10, 0, 
+    jSharePanel.add(jShareName, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    jSharePanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    jSharePanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jShareDesc = new JMyTextArea(3, 20);
     if (!isFolderCreationMode)
       jShareDesc.setText(folderPair.getFolderShareRecord().getFolderDesc());
     jShareDesc.setWrapStyleWord(true);
     jShareDesc.setLineWrap(true);
-    jSharePanel.add(new JScrollPane(jShareDesc), new GridBagConstraints(1, posY, 1, 3, 10, 5, 
+    jSharePanel.add(new JScrollPane(jShareDesc), new GridBagConstraints(1, posY, 1, 3, 10, 5,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     posY += 3;
 
@@ -308,7 +308,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
         setEnabledRemoveButton();
       }
     });
-    jSharePanel.add(tablePane, new GridBagConstraints(1, posY, 1, 3, 10, 20, 
+    jSharePanel.add(tablePane, new GridBagConstraints(1, posY, 1, 3, 10, 20,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     jAdd = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Add"));
     jAdd.addActionListener(new ActionListener() {
@@ -316,7 +316,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
         pressedAdd();
       }
     });
-    jSharePanel.add(jAdd, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    jSharePanel.add(jAdd, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -326,7 +326,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
         pressedRemove();
       }
     });
-    jSharePanel.add(jRemove, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+    jSharePanel.add(jRemove, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -422,8 +422,11 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderSharingPanel.class, "pressedAdd()");
 
     ContactSelectDialog d = new ContactSelectDialog((JDialog) SwingUtilities.windowForComponent(this), true);
-    MemberContactRecordI[] contacts = d.getSelectedMemberContacts();
-    addSharesForContacts(contacts);
+    d.setSelectionCallback(new CallbackI() {
+      public void callback(Object value) {
+        addSharesForContacts((MemberContactRecordI[]) value);
+      }
+    });
 
     if (trace != null) trace.exit(FolderSharingPanel.class);
   }
@@ -455,8 +458,8 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
 
     if (trace != null) trace.data(10, contacts);
     if (contacts != null && contacts.length > 0) {
-      Vector newSharesV = new Vector();
-      Vector userIDsToFetchV = new Vector();
+      ArrayList newSharesL = new ArrayList();
+      ArrayList userIDsToFetchL = new ArrayList();
       for (int i=0; i<contacts.length; i++) {
         if (trace != null) trace.data(11, i);
         int rowCount = shareTableModel.getRowCount();
@@ -506,24 +509,24 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
           else
             newShare.setSymmetricKey(newFolderSymmetricKey);
 
-          newSharesV.addElement(newShare);
+          newSharesL.add(newShare);
           // make sure we have that users record
           UserRecord uRec = cache.getUserRecord(newShare.ownerUserId);
           if (uRec == null) {
-            userIDsToFetchV.addElement(newShare.ownerUserId);
+            userIDsToFetchL.add(newShare.ownerUserId);
           }
 
         }
       }
-      if (newSharesV.size() > 0) {
-        FolderShareRecord[] shares = new FolderShareRecord[newSharesV.size()];
-        newSharesV.toArray(shares);
+      if (newSharesL.size() > 0) {
+        FolderShareRecord[] shares = new FolderShareRecord[newSharesL.size()];
+        newSharesL.toArray(shares);
         if (trace != null) trace.data(18, shares);
         shareTableModel.updateData(shares);
       }
-      if (userIDsToFetchV.size() > 0) {
-        Long[] userIDs = new Long[userIDsToFetchV.size()];
-        userIDsToFetchV.toArray(userIDs);
+      if (userIDsToFetchL.size() > 0) {
+        Long[] userIDs = new Long[userIDsToFetchL.size()];
+        userIDsToFetchL.toArray(userIDs);
         MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)));
       }
     }
@@ -563,7 +566,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     else if (isSharableType) {// && !isMySuperRoot)
       if (folderType == FolderRecord.GROUP_FOLDER)
         msg = com.CH_gui.lang.Lang.rb.getString("label_You_can_share_this_group_among_other_users_in_your_contact_list...");
-      else 
+      else
         msg = com.CH_gui.lang.Lang.rb.getString("label_You_can_share_this_folder_among_other_users_in_your_contact_list...");
 //    else if (isSharableType && isMySuperRoot)
 //      msg = com.CH_gui.lang.Lang.rb.getString("label_You_cannot_share_a_super_root_folder...");
@@ -593,7 +596,12 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
       labelText = labelText1;
     } else {
       ShareTableModel.columnHeaderDatas[0].applyToTable(tablePane.getJSortedTable());
-      jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED48));
+      if (FolderRecord.isAddressType(folderType))
+        jShareIcon.setIcon(Images.get(ImageNums.ADDRESS_BOOK_SHARED48));
+      else if(folderType == FolderRecord.CHATTING_FOLDER)
+        jShareIcon.setIcon(Images.get(ImageNums.CHAT_BUBBLE_SHARED48));
+      else
+        jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED48));
       if (jRadioInheritSharing != null)
         jRadioInheritSharing.setText(com.CH_gui.lang.Lang.rb.getString("radio_Inherit_sharing_properties_from_parent_folder."));
       jRadioDoNotShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Do_not_share_this_folder."));
@@ -621,21 +629,21 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     return canIRemove;
   }
 
-  public Vector gatherWantedShares() {
+  public ArrayList gatherWantedShares() {
     ArrayList sharesL = shareTableModel.getRowListForViewOnly();
-    Vector wantedSharesV = new Vector();
+    ArrayList wantedSharesL = new ArrayList();
     // clear wanted shares if Radio DO NOT SHARE is selected
     if (jRadioDoNotShare.isSelected()) {
       for (int i=0; i<sharesL.size(); i++) {
         FolderShareRecord share = (FolderShareRecord) sharesL.get(i);
         if (share.isOwnedBy(folderPair.getFolderRecord().ownerUserId, (Long[]) null)) {
-          wantedSharesV.addElement(share);
+          wantedSharesL.add(share);
         }
       }
     } else {
-      wantedSharesV.addAll(sharesL);
+      wantedSharesL.addAll(sharesL);
     }
-    return wantedSharesV;
+    return wantedSharesL;
   }
 
 

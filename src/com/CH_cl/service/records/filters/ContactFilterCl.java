@@ -79,7 +79,7 @@ public class ContactFilterCl extends AbstractRecordFilter implements RecordFilte
       keep = contact.ownerUserId.equals(myUserId) || contact.contactWithId.equals(myUserId);
       if (keep == true && keepIncoming != null && keepIncoming.booleanValue() == false) {
         if (!contact.ownerUserId.equals(myUserId)) {
-          if (contact.status == null || contact.status.shortValue() != ContactRecord.STATUS_INITIATED)
+          if (contact.status == null || !contact.isOfInitiatedType())
             keep = false;
         }
       }

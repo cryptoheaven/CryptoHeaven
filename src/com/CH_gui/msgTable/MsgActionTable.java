@@ -1220,18 +1220,18 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         Long[] msgIDs = MsgLinkRecord.getMsgIDs(msgLinks);
         MsgDataRecord[] msgDatas = cache.getMsgDataRecords(msgIDs);
-        Vector emailNicksV = new Vector();
-        Vector emailStringRecordsV = new Vector();
+        ArrayList emailNicksL = new ArrayList();
+        ArrayList emailStringRecordsL = new ArrayList();
         for (int i=0; i<msgDatas.length; i++) {
-          getEmailNickAndAddress(msgDatas[i], emailNicksV, emailStringRecordsV, true);
+          getEmailNickAndAddress(msgDatas[i], emailNicksL, emailStringRecordsL, true);
         }
-        if (emailStringRecordsV.size() > 0)
-          MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgActionTable.this, emailNicksV, emailStringRecordsV, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
+        if (emailStringRecordsL.size() > 0)
+          MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(MsgActionTable.this, emailNicksL, emailStringRecordsL, true, new FolderFilter(FolderRecord.ADDRESS_FOLDER));
       }
     }
   }
 
-  public static void getEmailNickAndAddress(MsgDataRecord msgData, Vector emailNicksV, Vector emailStringRecordsV, boolean showAddressFrameIfNoEmail) {
+  public static void getEmailNickAndAddress(MsgDataRecord msgData, ArrayList emailNicksL, ArrayList emailStringRecordsL, boolean showAddressFrameIfNoEmail) {
     String emailAddress = null;
     UserRecord senderUser = null;
     FolderPair addrBook = null;
@@ -1262,10 +1262,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     }
     if (emailAddress != null && emailAddress.length() > 0) {
       if (senderUser != null)
-        emailNicksV.addElement(senderUser.handle);
+        emailNicksL.add(senderUser.handle);
       else
-        emailNicksV.addElement(EmailRecord.getPersonalOrNick(emailAddress));
-      emailStringRecordsV.addElement(emailAddress);
+        emailNicksL.add(EmailRecord.getPersonalOrNick(emailAddress));
+      emailStringRecordsL.add(emailAddress);
     }
   }
 

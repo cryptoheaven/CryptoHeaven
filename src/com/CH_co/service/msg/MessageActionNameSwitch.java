@@ -254,6 +254,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.CNT_Q_ALTER_PERMITS), "Alter Contact Permissions" },
       // Alter Settings
       { new Integer(CommandCodes.CNT_Q_ALTER_SETTINGS), "Alter Contact Settings" },
+      // Accept Contacts Failure
+      { new Integer(CommandCodes.CNT_E_CONTACT_IS_NOT_ACCESSIBLE), "Contact is not accessible" },
 
 
       //====================================

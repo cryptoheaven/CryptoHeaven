@@ -26,6 +26,7 @@ import com.CH_co.trace.*;
 import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.HTML_utils;
 import com.CH_co.util.URLs;
+import javax.swing.text.html.parser.ParserDelegator;
 
 /**
  * <b>Copyright</b> &copy; 2001-2010
@@ -98,7 +99,16 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     if (htmlText.startsWith("<html>") && htmlText.endsWith("</html>")) {
       htmlText = htmlText.substring(6, htmlText.length()-7);
     }
-    setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + htmlText + "</body></html>");
+    try {
+      setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + htmlText + "</body></html>");
+    } catch (Exception e) {
+      ParserDelegator workaround = new ParserDelegator();
+      try {
+        setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + htmlText + "</body></html>");
+      } catch (Exception e2) {
+        if (trace != null) trace.exception(HTML_ClickablePane.class, 100, e2);
+      }
+    }
     init(true);
     if (trace != null) trace.exit(HTML_ClickablePane.class);
   }

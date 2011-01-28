@@ -750,11 +750,11 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
     public void actionPerformedTraced(ActionEvent event) {
       if (!UserGuiOps.isShowWebAccountRestrictionDialog(FolderActionTree.this)) {
-        TreePath[] selectedPaths = getSelectionPaths();
-        FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
-        if (selected != null && selected.length >= 1) {
+        final TreePath[] selectedPaths = getSelectionPaths();
+        FolderPair[] selectedPairs = getLastPathComponentFolderPairs(selectedPaths);
+        if (selectedPairs != null && selectedPairs.length >= 1) {
           ContactSelectDialog d = null;
-          Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
+          final Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
           if (w instanceof Dialog || w instanceof Frame) {
             if (w instanceof Dialog)
               d = new ContactSelectDialog((Dialog) w, false, false);
@@ -763,8 +763,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
 
             d.setTitle("Transfer Ownership");
 
-            JRadioButton jYourself = new JMyRadioButton("Take ownership of the selected folder(s), or", false);
-            JRadioButton jOther = new JMyRadioButton("Transfer ownership to selected contact", false);
+            final JRadioButton jYourself = new JMyRadioButton("Take ownership of the selected folder(s), or", false);
+            final JRadioButton jOther = new JMyRadioButton("Transfer ownership to selected contact", false);
 
             ButtonGroup group = new ButtonGroup();
             group.add(jYourself);
@@ -816,124 +816,130 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
             });
 
             d.pack();
+
+            CallbackI selectionCallback = new CallbackI() {
+              public void callback(Object value) {
+                FolderPair[] selected = getLastPathComponentFolderPairs(selectedPaths);
+                FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
+                Long toUserId = null;
+                //if (_d.getResultButton() != null && _d.getResultButton().intValue() == ContactSelectDialog.DEFAULT_OK_INDEX) {
+                  if (jYourself.isSelected()) {
+                    toUserId = cache.getMyUserId();
+                  } else if (jOther.isSelected()) {
+                    MemberContactRecordI[] selectedRecords = (MemberContactRecordI[]) value;
+                    if (selectedRecords != null && selectedRecords.length == 1) {
+                      toUserId = ((ContactRecord) selectedRecords[0]).contactWithId;
+                    }
+                  }
+                //}
+
+                // if a user was selected
+                if (toUserId != null) {
+                  final FolderPair[] children = cache.getFolderPairsViewAllDescending(selected, false);
+                  boolean runTransfer = true;
+                  if (children != null && children.length > 0) {
+                    String[] lines = new String[] {
+                        "You have chosen to make folder ownership changes.",
+                        "Do you want to apply this change to the selected folder(s) only, ",
+                        "or do you want to apply it to all subfolders as well?"
+                    };
+                    String[] choices = new String[] {
+                        "Apply changes to the selected folder(s) only",
+                        "Apply changes to the selected folder(s) and subfolders"
+                    };
+                    Insets[] insets = new Insets[] {
+                        new MyInsets(5, 5, 5, 5),
+                        new MyInsets(5, 5, 1, 5),
+                        new MyInsets(1, 5, 5, 5),
+                        new MyInsets(5, 25, 2, 5),
+                        new MyInsets(2, 25, 5, 5)
+                    };
+
+                    runTransfer = false;
+                    ChoiceDialog choiceDialog = null;
+                    if (w instanceof Dialog || w instanceof Frame) {
+                      if (w instanceof Dialog)
+                        choiceDialog = new ChoiceDialog((Dialog) w, "Confirm Ownership Changes", lines, choices, insets, 1);
+                      else
+                        choiceDialog = new ChoiceDialog((Frame) w, "Confirm Ownership Changes", lines, choices, insets, 1);
+
+                      Integer resultButton = choiceDialog.getResultButton();
+                      if (resultButton != null && resultButton.intValue() == ChoiceDialog.DEFAULT_OK_INDEX) {
+                        runTransfer = true;
+                        if (choiceDialog.getResultChoice().intValue() == 1) {
+                          selected = (FolderPair[]) ArrayUtils.concatinate(selected, children);
+                          selected = (FolderPair[]) ArrayUtils.removeDuplicates(selected);
+                        }
+                      }
+                    }
+                  }
+                  if (runTransfer) {
+                    Long[] folderIDs = RecordUtils.getIDs(selected);
+                    // See if we need to fetch any shares so that we can start determining which ones we need to create
+                    ArrayList shareIDsL = new ArrayList();
+                    for (int i=0; i<selected.length; i++) {
+                      FolderRecord fRec = selected[i].getFolderRecord();
+                      FolderShareRecord sRec = selected[i].getFolderShareRecord();
+                      short numOfShares = fRec.numOfShares.shortValue();
+                      FolderShareRecord[] sRecs = cache.getFolderShareRecordsForFolder(fRec.folderId);
+                      int sRecsLength = sRecs != null ? sRecs.length : 0;
+                      if (numOfShares > sRecsLength) {
+                        if (!shareIDsL.contains(sRec.shareId))
+                          shareIDsL.add(sRec.shareId);
+                      }
+                    }
+                    // Fetch any shares that are not in cache yet
+                    if (shareIDsL.size() > 0) {
+                      Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsL, Long.class);
+                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000);
+                    }
+                    // See if we need to create any additional shares
+                    ArrayList addSharesL = new ArrayList();
+                    //int fakeShareIdIndex = 0;
+                    for (int i=0; i<selected.length; i++) {
+                      FolderPair fPair = selected[i];
+                      FolderRecord fRec = selected[i].getFolderRecord();
+                      FolderShareRecord sRec = selected[i].getFolderShareRecord();
+                      FolderShareRecord[] sRecs = cache.getFolderShareRecordsForFolder(fRec.folderId);
+                      int sRecsLength = sRecs != null ? sRecs.length : 0;
+                      // Find share of the 'toUserId'
+                      FolderShareRecord toUserShare = null;
+                      for (int k=0; k<sRecsLength; k++) {
+                        if (sRecs[k].ownerUserId.equals(toUserId)) {
+                          toUserShare = sRecs[k];
+                          break;
+                        }
+                      }
+                      // If we need to create a share, do it now and seal it with user specific key
+                      if (toUserShare == null) {
+                        FolderShareRecord newShare = (FolderShareRecord) sRec.clone();
+                        newShare.setViewParentId(fPair.getFileViewParentId());
+                        newShare.ownerUserId = toUserId;
+                        newShare.ownerType = new Short(Record.RECORD_TYPE_USER);
+                        // Fetch public key for 'toUserId' if not already fetched
+                        KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
+                        if (kRec == null || kRec.plainPublicKey == null) {
+                          MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000);
+                          kRec = cache.getKeyRecordForUser(toUserId);
+                        }
+                        newShare.seal(kRec);
+                        addSharesL.add(newShare);
+                      }
+                    }
+                    // Send Ownership Transfer request
+                    Fld_AddShares_Rq addSharesRequest = new Fld_AddShares_Rq();
+                    if (addSharesL.size() > 0) {
+                      addSharesRequest.shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(addSharesL, FolderShareRecord.class);
+                    }
+                    addSharesRequest.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive(true)));
+                    MessageAction requestAction = new MessageAction(CommandCodes.FLD_Q_TRANSFER_OWNERSHIP, new Obj_List_Co(new Object[] { toUserId, folderIDs, addSharesRequest }));
+                    MainFrame.getServerInterfaceLayer().submitAndReturn(requestAction);
+                  }
+                }
+              }
+            }; // end of CallbackI
+            d.setSelectionCallback(selectionCallback);
             d.setVisible(true);
-
-            FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
-            Long toUserId = null;
-            if (d.getResultButton() != null && d.getResultButton().intValue() == ContactSelectDialog.DEFAULT_OK_INDEX) {
-              if (jYourself.isSelected()) {
-                toUserId = cache.getMyUserId();
-              } else if (jOther.isSelected()) {
-                ContactRecord[] selectedContacts = d.getSelectedContacts();
-                if (selectedContacts != null && selectedContacts.length == 1) {
-                  toUserId = selectedContacts[0].contactWithId;
-                }
-              }
-            }
-
-            // if a user was selected
-            if (toUserId != null) {
-              final FolderPair[] children = cache.getFolderPairsViewAllDescending(selected, false);
-              boolean runTransfer = true;
-              if (children != null && children.length > 0) {
-                String[] lines = new String[] {
-                    "You have chosen to make folder ownership changes.",
-                    "Do you want to apply this change to the selected folder(s) only, ",
-                    "or do you want to apply it to all subfolders as well?"
-                };
-                String[] choices = new String[] {
-                    "Apply changes to the selected folder(s) only",
-                    "Apply changes to the selected folder(s) and subfolders"
-                };
-                Insets[] insets = new Insets[] {
-                    new MyInsets(5, 5, 5, 5),
-                    new MyInsets(5, 5, 1, 5),
-                    new MyInsets(1, 5, 5, 5),
-                    new MyInsets(5, 25, 2, 5),
-                    new MyInsets(2, 25, 5, 5)
-                };
-
-                runTransfer = false;
-                ChoiceDialog choiceDialog = null;
-                if (w instanceof Dialog || w instanceof Frame) {
-                  if (w instanceof Dialog)
-                    choiceDialog = new ChoiceDialog((Dialog) w, "Confirm Ownership Changes", lines, choices, insets, 1);
-                  else
-                    choiceDialog = new ChoiceDialog((Frame) w, "Confirm Ownership Changes", lines, choices, insets, 1);
-
-                  Integer resultButton = choiceDialog.getResultButton();
-                  if (resultButton != null && resultButton.intValue() == ChoiceDialog.DEFAULT_OK_INDEX) {
-                    runTransfer = true;
-                    if (choiceDialog.getResultChoice().intValue() == 1) {
-                      selected = (FolderPair[]) ArrayUtils.concatinate(selected, children);
-                      selected = (FolderPair[]) ArrayUtils.removeDuplicates(selected);
-                    }
-                  }
-                }
-              }
-              if (runTransfer) {
-                Long[] folderIDs = RecordUtils.getIDs(selected);
-                // See if we need to fetch any shares so that we can start determining which ones we need to create
-                Vector shareIDsV = new Vector();
-                for (int i=0; i<selected.length; i++) {
-                  FolderRecord fRec = selected[i].getFolderRecord();
-                  FolderShareRecord sRec = selected[i].getFolderShareRecord();
-                  short numOfShares = fRec.numOfShares.shortValue();
-                  FolderShareRecord[] sRecs = cache.getFolderShareRecordsForFolder(fRec.folderId);
-                  int sRecsLength = sRecs != null ? sRecs.length : 0;
-                  if (numOfShares > sRecsLength) {
-                    if (!shareIDsV.contains(sRec.shareId))
-                      shareIDsV.addElement(sRec.shareId);
-                  }
-                }
-                // Fetch any shares that are not in cache yet
-                if (shareIDsV.size() > 0) {
-                  Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareIDsV, Long.class);
-                  MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareIDs)), 60000);
-                }
-                // See if we need to create any additional shares
-                ArrayList addSharesL = new ArrayList();
-                //int fakeShareIdIndex = 0;
-                for (int i=0; i<selected.length; i++) {
-                  FolderPair fPair = selected[i];
-                  FolderRecord fRec = selected[i].getFolderRecord();
-                  FolderShareRecord sRec = selected[i].getFolderShareRecord();
-                  FolderShareRecord[] sRecs = cache.getFolderShareRecordsForFolder(fRec.folderId);
-                  int sRecsLength = sRecs != null ? sRecs.length : 0;
-                  // Find share of the 'toUserId'
-                  FolderShareRecord toUserShare = null;
-                  for (int k=0; k<sRecsLength; k++) {
-                    if (sRecs[k].ownerUserId.equals(toUserId)) {
-                      toUserShare = sRecs[k];
-                      break;
-                    }
-                  }
-                  // If we need to create a share, do it now and seal it with user specific key
-                  if (toUserShare == null) {
-                    FolderShareRecord newShare = (FolderShareRecord) sRec.clone();
-                    newShare.setViewParentId(fPair.getFileViewParentId());
-                    newShare.ownerUserId = toUserId;
-                    newShare.ownerType = new Short(Record.RECORD_TYPE_USER);
-                    // Fetch public key for 'toUserId' if not already fetched
-                    KeyRecord kRec = cache.getKeyRecordForUser(toUserId);
-                    if (kRec == null || kRec.plainPublicKey == null) {
-                      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(toUserId)), 60000);
-                      kRec = cache.getKeyRecordForUser(toUserId);
-                    }
-                    newShare.seal(kRec);
-                    addSharesL.add(newShare);
-                  }
-                }
-                // Send Ownership Transfer request
-                Fld_AddShares_Rq addSharesRequest = new Fld_AddShares_Rq();
-                if (addSharesL.size() > 0) {
-                  addSharesRequest.shareRecords = (FolderShareRecord[]) ArrayUtils.toArray(addSharesL, FolderShareRecord.class);
-                }
-                addSharesRequest.contactIds = new Obj_IDList_Co(RecordUtils.getIDs(cache.getContactRecordsMyActive()));
-                MessageAction requestAction = new MessageAction(CommandCodes.FLD_Q_TRANSFER_OWNERSHIP, new Obj_List_Co(new Object[] { toUserId, folderIDs, addSharesRequest }));
-                MainFrame.getServerInterfaceLayer().submitAndReturn(requestAction);
-              }
-            }
           }
         }
       }

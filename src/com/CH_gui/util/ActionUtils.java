@@ -12,13 +12,13 @@
 
 package com.CH_gui.util;
 
-import java.awt.Component;
-import java.awt.Container;
-import javax.swing.*;
-import java.util.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
+
+import java.awt.Component;
+import java.awt.Container;
+import java.util.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2010
@@ -146,7 +146,11 @@ public class ActionUtils extends Object {
     ActionProducerI[] allProducers = getActionProducersRecursively(forComponent);
     if (allProducers != null && allProducers.length > 0) {
       for (int i=0; i<allProducers.length; i++) {
-        allProducers[i].setEnabledActions();
+        try {
+          allProducers[i].setEnabledActions();
+        } catch (Exception e) {
+          if (trace != null) trace.exception(ActionUtils.class, 100, e);
+        }
       }
     }
     if (trace != null) trace.exit(ActionUtils.class);

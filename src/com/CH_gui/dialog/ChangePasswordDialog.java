@@ -132,7 +132,7 @@ public class ChangePasswordDialog extends GeneralDialog {
 
     if (isSetMode) {
       JLabel warningLabel = new JMyLabel(Images.get(ImageNums.SHIELD32));
-      warningLabel.setText("<html>Your account is not password protected.  Please protect your account with a password to prevent unauthorized access.</html>");
+      warningLabel.setText("<html><body>Your account is not password protected.  Please protect your account with a password to prevent unauthorized access.</body></html>");
       warningLabel.setHorizontalAlignment(JLabel.LEFT);
       warningLabel.setVerticalTextPosition(JLabel.TOP);
       warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));

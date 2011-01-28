@@ -120,7 +120,9 @@ public class ImageNums extends Object {
 
   //public static final int FOLDER24;
   public static final int FOLDER32;
+  public static final int FOLDER48;
   public static final int FOLDER_SHARED32;
+  public static final int FOLDER_SHARED48;
   public static final int FOLDER_NEW16;
   public static final int FOLDER_NEW24;
   public static final int FOLDER_NEW_SHARED16;
@@ -249,8 +251,10 @@ public class ImageNums extends Object {
   public static final int MAIL_SEND_INVITE_16;
   public static final int MAIL_SEND_INVITE_24;
   public static final int MAIL_SEND_INVITE_32;
-  public static final int MAIL_RECIPIENTS16;
-  public static final int MAIL_RECIPIENTS24;
+  public static final int ADDRESS_BOOK16;
+  public static final int ADDRESS_BOOK24;
+  public static final int ADDRESS_BOOK48;
+  public static final int ADDRESS_BOOK_SHARED48;
   public static final int MAIL_COPY16;
   public static final int MAIL_COPY24;
   public static final int MAIL_DELETE16;
@@ -261,11 +265,14 @@ public class ImageNums extends Object {
   public static final int SAVE24;
   public static final int CHAT16;
   public static final int CHAT24;
+  public static final int CHAT_BUBBLE48;
+  public static final int CHAT_BUBBLE_SHARED48;
 
   public static final int PERSON_SMALL;
   public static final int PEOPLE16;
   public static final int PEOPLE24;
   public static final int PEOPLE32;
+  public static final int PEOPLE48;
   public static final int USER_FIND16;
   public static final int USER_FIND24;
   public static final int USER_FIND32;
@@ -477,7 +484,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[322+50]; // plus emotions
+    images = new String[329+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -716,8 +723,15 @@ public class ImageNums extends Object {
     FOLDER32 = i;
     images[i] = "Folder32"; i++;
 
+    FOLDER48 = i;
+    images[i] = "folder-48"; i++;
+
+
     FOLDER_SHARED32 = i;
     images[i] = "FolderShared32"; i++;
+
+    FOLDER_SHARED48 = i;
+    images[i] = "folder-shared-48"; i++;
 
     FOLDER_NEW16 = i;
     images[i] = "FolderNew16"; i++;
@@ -1047,11 +1061,18 @@ public class ImageNums extends Object {
     images[i] = "mail-send-invite32"; i++;
 
 
-    MAIL_RECIPIENTS16 = i;
+    ADDRESS_BOOK16 = i;
     images[i] = "AddressBook16"; i++;
 
-    MAIL_RECIPIENTS24 = i;
+    ADDRESS_BOOK24 = i;
     images[i] = "AddressBook24"; i++;
+
+    ADDRESS_BOOK48 = i;
+    images[i] = "address-book-48"; i++;
+
+    ADDRESS_BOOK_SHARED48 = i;
+    images[i] = "address-book-shared-48"; i++;
+
 
     MAIL_COPY16 = i;
     images[i] = "MailCopy16"; i++;
@@ -1083,6 +1104,11 @@ public class ImageNums extends Object {
     CHAT24 = i;
     images[i] = "Chat24"; i++;
 
+    CHAT_BUBBLE48 = i;
+    images[i] = "chat-bubble-48"; i++;
+
+    CHAT_BUBBLE_SHARED48 = i;
+    images[i] = "chat-bubble-shared-48"; i++;
 
     PERSON_SMALL = i;
     images[i] = "person-small"; i++;
@@ -1095,6 +1121,9 @@ public class ImageNums extends Object {
 
     PEOPLE32 = i;
     images[i] = "People32"; i++;
+
+    PEOPLE48 = i;
+    images[i] = "people-48"; i++;
 
 
     USER_FIND16 = i;

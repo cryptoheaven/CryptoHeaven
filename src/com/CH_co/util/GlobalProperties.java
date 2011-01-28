@@ -16,6 +16,7 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.trace.TraceProperties;
 
 import java.io.*;
+import java.security.MessageDigest;
 import java.util.*;
 
 /**
@@ -220,13 +221,16 @@ public class GlobalProperties extends Object {
   // build 600 Misc improvements geared towards usability for newly created accounts.
   // build 602 Server reports suggested number of child folders and adds seperate APIs for view based folder roots and child fetching
   // build 604 Optimized folder fetching sequence by reducing number of server requests
+  // build 606 Empty templates and new user sharing enhancements
+  // build 608 Implement properties consistency checking through hashing mechanism.
+  // build 610 Minor initial properties adjustment to fix window sizes for email pickup, chat message pickup.
 
-  public static final short PROGRAM_BUILD_NUMBER = 604;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 610;  // even
   public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.3f;
-  public static final short PROGRAM_VERSION_MINOR = 2;
+  public static final short PROGRAM_VERSION_MINOR = 4;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
@@ -269,7 +273,7 @@ public class GlobalProperties extends Object {
     try {
       is = new FileInputStream(it);
       ok = is != null;
-      properties.load(is);
+      load(is);
     } catch (Exception x1) {
       ok = false;
     } finally {
@@ -470,11 +474,13 @@ public class GlobalProperties extends Object {
 
   /** List all properties to the PrintStream <i>out</i>. */
   public static void list (PrintStream out) {
+    hashAdd();
     properties.list(out);
   }
 
   /** List all properties to the PrintWriter <i>out</i>. */
   public static void list (PrintWriter out) {
+    hashAdd();
     properties.list(out);
   }
 
@@ -485,8 +491,65 @@ public class GlobalProperties extends Object {
     return properties.propertyNames();
   }
 
-  // ********** storing is private *********
+  private static synchronized String hashGet() {
+    String hash = null;
+    Enumeration enm = properties.keys();
+    ArrayList keysL = new ArrayList();
+    while (enm.hasMoreElements()) {
+      String key = (String) enm.nextElement();
+      if (!key.equalsIgnoreCase("md5")) {
+        keysL.add(key);
+      }
+    }
+    String[] keys = new String[keysL.size()];
+    keysL.toArray(keys);
+    Arrays.sort(keys);
+    try {
+      MessageDigest md5 = MessageDigest.getInstance("MD5");
+      for (int i=0; i<keys.length; i++) {
+        String key = keys[i];
+        String value = properties.getProperty(key);
+        md5.update(key.getBytes());
+        md5.update(value.getBytes());
+      }
+      hash = ArrayUtils.toString(md5.digest());
+    } catch (Exception e) {
+    }
+    return hash;
+  }
+
+  private static synchronized void hashAdd() {
+    String hash = hashGet();
+    if (hash != null)
+      properties.setProperty("md5", hash);
+  }
+
+  private static synchronized boolean hashVerify() {
+    boolean hashOk = true;
+    String hash = hashGet();
+    if (hash != null) {
+      String oldHash = properties.getProperty("md5");
+      if (oldHash != null)
+        hashOk = hash.equals(oldHash);
+    }
+    return hashOk;
+  }
+
+  /**
+   * Loading is private because it needs to verify the current hash of all property values.
+   */
+  private static synchronized void load(InputStream is) throws IOException {
+    properties.load(is);
+    if (!hashVerify()) {
+      resetMyAndGlobalProperties(false);
+    }
+  }
+
+  /**
+   * Storing is private because it needs to update the current hash of all property values.
+   */
   private static synchronized void store (OutputStream out, String header) throws IOException {
+    hashAdd();
     properties.store(out, header);
   }
 

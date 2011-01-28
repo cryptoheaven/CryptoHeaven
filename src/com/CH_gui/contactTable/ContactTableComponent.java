@@ -64,6 +64,8 @@ public class ContactTableComponent extends RecordTableComponent {
   private JMyTextField jAddEmail;
   private String addEmailHint = " add email@address or user";
 
+  private boolean autoCreateWebAccounts;
+
   /** Creates new ContactTableComponent */
   /*
   public ContactTableComponent() {
@@ -185,6 +187,10 @@ public class ContactTableComponent extends RecordTableComponent {
     addUtilityComponent(combo);
   }
 
+  public void setAutoCreateWebAccounts(boolean isAutoCreateWebAccounts) {
+    autoCreateWebAccounts = isAutoCreateWebAccounts;
+  }
+
   private class AddEmailAddressAction extends AbstractActionTraced {
     public AddEmailAddressAction() {
       super("Add", Images.get(ImageNums.ADD14));
@@ -196,7 +202,7 @@ public class ContactTableComponent extends RecordTableComponent {
           text = "";
         String[] addresses = EmailRecord.gatherAddresses(text);
         if (addresses != null && addresses.length > 0) {
-          InviteByEmailDialog.doInvite(text, "", null);
+          InviteByEmailDialog.doInvite(text, "", null, autoCreateWebAccounts);
         } else {
           new FindUserFrame(com.CH_gui.lang.Lang.rb.getString("button_Close"), text);
         }

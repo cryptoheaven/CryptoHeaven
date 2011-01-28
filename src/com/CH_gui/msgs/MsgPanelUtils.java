@@ -84,19 +84,25 @@ public class MsgPanelUtils extends Object {
     if (trace != null) trace.args(includeWebUsers);
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    Long myUserId = cache.getMyUserId();
     Record familiarUser = null;
     if (recipientOk) {
-      ContactRecord cRec = cache.getContactRecordOwnerWith(cache.getMyUserId(), userId);
-      if (cRec != null && cRec.isOfActiveType())
+      ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, userId);
+      if (cRec != null && (cRec.isOfActiveTypeAnyState() || cRec.isOfInitiatedType()))
         familiarUser = cRec;
     }
     if (familiarUser == null && senderOk) {
-      ContactRecord cRec = cache.getContactRecordOwnerWith(userId, cache.getMyUserId());
-      if (cRec != null && cRec.isOfActiveType())
+      ContactRecord cRec = cache.getContactRecordOwnerWith(userId, myUserId);
+      if (cRec != null && cRec.isOfActiveTypeAnyState())
         familiarUser = cRec;
     }
     ContactRecord cRec = (ContactRecord) familiarUser;
-    if (cRec == null ||
+    if (cRec != null && cRec.isOfActiveTypeAnyState()) {
+      // good contact
+    } else if (cRec != null && cRec.ownerUserId.equals(myUserId) && cRec.isOfInitiatedType()) {
+      // Ok, my initiated contact has meaningful name.
+      // Owner check is necessary, because someone elses initiated contact with me doesn't have a meaningful name.
+    } else if (cRec == null ||
           // or not acknowledged, only acknowledged contacts have meaningful names...
           (!cRec.isOfActiveType() &&
            cRec.status != null && cRec.status.shortValue() != ContactRecord.STATUS_DECLINED_ACKNOWLEDGED)
