@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010 by CryptoHeaven Development Team,
+ * Copyright 2001-2011 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -26,7 +26,7 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2010
+ * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
