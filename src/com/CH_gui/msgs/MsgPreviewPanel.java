@@ -246,8 +246,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       jMessage.grabFocus();
       if (jMessage instanceof JTextComponent) {
         ((JTextComponent) jMessage).selectAll();
-      } else {
-        // TO-DO: cobra action...
       }
     }
   }
@@ -748,8 +746,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       }
       if (jMessage instanceof JTextComponent) {
         ((JTextComponent) jMessage).setCaretPosition(0);
-      } else {
-        // TO-DO: cobra component
       }
     }
 
@@ -766,24 +762,18 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       if (isHTML) {
         if (!msgDataRecord.isHtmlMail()) {
           jHTML.setText("Plain Text", LINK_BG_FOCUS_COLOR);
-//          jHTML.setText("Plain Text");
-//          jHTML.setBackground(LINK_BG_FOCUS_COLOR);
           if (!jHTML.isVisible()) jHTML.setVisible(true);
         } else {
           jHTML.setText("Plain Text");
-//          jHTML.setBackground(UIManager.getColor("Button.background"));
           boolean isPLAINpreferred = isDefaultToPLAINpreferred(msgDataRecord);
           if (jHTML.isVisible() != isPLAINpreferred) jHTML.setVisible(isPLAINpreferred);
         }
       } else {
         if (msgDataRecord.isHtmlMail()) {
           jHTML.setText("Rich Text", LINK_BG_FOCUS_COLOR);
-//          jHTML.setText("Rich Text");
-//          jHTML.setBackground(LINK_BG_FOCUS_COLOR);
           if (!jHTML.isVisible()) jHTML.setVisible(true);
         } else {
           jHTML.setText("Rich Text");
-//          jHTML.setBackground(UIManager.getColor("Button.background"));
           if (jHTML.isVisible()) jHTML.setVisible(false);
         }
       }
