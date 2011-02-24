@@ -400,7 +400,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (isSkippable) {
       confirmationProperty = "ConfirmationDialog-skip-"+messageType;
       try {
-        String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", true);
+        String confirmationPropertyValue = GlobalProperties.getProperty(confirmationProperty, "false", FetchedDataCache.getSingleInstance().getMyUserId());
         confirmationValue = Boolean.valueOf(confirmationPropertyValue).booleanValue();
       } catch (Throwable t) {
       }
@@ -435,7 +435,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       }
       option = MessageDialog.showDialogYesNo(parent, panel, title, messageType);
       if (isSkippable && itemQuestion.isSelected()) {
-        GlobalProperties.setProperty(confirmationProperty, "true", true);
+        GlobalProperties.setProperty(confirmationProperty, "true", FetchedDataCache.getSingleInstance().getMyUserId());
       }
     }
     return option;
@@ -802,7 +802,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           StringBuffer sb = new StringBuffer();
 
           sb.append("<html><body>");
-          sb.append("<font size='-1' face=" + HTML_utils.DEFAULT_FONTS_QUOTED + "><b>").append(ListRenderer.getRenderedText(model.getParentFolderPair())).append("</b></font>");
+          sb.append("<font size='-1'><b>").append(ListRenderer.getRenderedText(model.getParentFolderPair())).append("</b></font>");
           sb.append("<hr color=#000000 noshade size=2>");
           sb.append("<table cellpadding='0' cellspacing='0' border='0'>");
           sb.append("<tr>");
@@ -811,7 +811,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
             int modelCol = table.convertColumnIndexToModel(viewCol);
             int rawCol = chd.convertColumnToRawModel(modelCol);
             String headerName = chd.getRawColumnName(rawCol);
-            sb.append("<td NOWRAP align='left' valign='top'><font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>");
+            sb.append("<td NOWRAP align='left' valign='top'><font size='-1'><b>");
             sb.append(headerName != null && headerName.trim().length() > 0 ? Misc.encodePlainIntoHtml(headerName + "  ") : "&nbsp;");
             sb.append("</b></td>");
           }
@@ -894,7 +894,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
               else
                 sb.append("<td align='left' valign='top'>");
               // set cell font
-              sb.append("<font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">");
+              sb.append("<font size='-2'>");
               //set cell data
               if (s != null && s.trim().length() > 0) {
                 if (isHTMLformatted) {

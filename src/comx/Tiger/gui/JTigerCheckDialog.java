@@ -12,13 +12,10 @@
 
 package comx.Tiger.gui;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-
+import com.CH_gui.gui.*;
 import com.CH_guiLib.gui.*;
 
+import comx.tig.en.SingleTigerSession;
 import comx.Tiger.ssce.*;
 import comx.Tiger.util.MessageBox;
 

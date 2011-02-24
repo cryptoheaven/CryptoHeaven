@@ -12,21 +12,18 @@
 
 package com.CH_gui.menuing;
 
-import com.CH_gui.util.MiscGui;
-import java.awt.Component;
-import java.util.*;
-
-import javax.swing.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_gui.action.Actions;
 import com.CH_gui.actionGui.*;
-import com.CH_gui.table.*;
-
 import com.CH_gui.list.List_Viewable;
-import com.CH_gui.util.ActionUtils;
+import com.CH_gui.table.*;
+import com.CH_gui.util.*;
+
+import java.awt.Component;
+import java.util.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011

@@ -12,6 +12,10 @@
 
 package com.CH_gui.util;
 
+import com.CH_co.trace.*;
+import com.CH_co.util.BrowserLauncher;
+import com.CH_co.util.URLs;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -21,11 +25,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
-
-import com.CH_co.trace.*;
-import com.CH_co.util.BrowserLauncher;
-import com.CH_co.util.HTML_utils;
-import com.CH_co.util.URLs;
 import javax.swing.text.html.parser.ParserDelegator;
 
 /**
@@ -80,9 +79,10 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     setContentType("text/html");
     if (editorKit != null)
       setEditorKit(editorKit);
-    if (startURL != null) {
+    else
+      setEditorKit(new HTML_EditorKit());
+    if (startURL != null)
       setPage(startURL);
-    }
     init(false);
     if (trace != null) trace.exit(HTML_ClickablePane.class);
   }
@@ -96,15 +96,17 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     setContentType("text/html");
     if (editorKit != null)
       setEditorKit(editorKit);
+    else
+      setEditorKit(new HTML_EditorKit());
     if (htmlText.startsWith("<html>") && htmlText.endsWith("</html>")) {
       htmlText = htmlText.substring(6, htmlText.length()-7);
     }
     try {
-      setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + htmlText + "</body></html>");
+      setText("<html><body>" + htmlText + "</body></html>");
     } catch (Exception e) {
       ParserDelegator workaround = new ParserDelegator();
       try {
-        setText("<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" + htmlText + "</body></html>");
+        setText("<html><body>" + htmlText + "</body></html>");
       } catch (Exception e2) {
         if (trace != null) trace.exception(HTML_ClickablePane.class, 100, e2);
       }

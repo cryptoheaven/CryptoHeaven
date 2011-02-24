@@ -651,6 +651,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     } catch (Throwable t) { }
     // remove and dissasemble all window containers
     try {
+      setVisible(false);
       MiscGui.removeAllComponentsAndListeners(this);
     } catch (Throwable t) { }
 

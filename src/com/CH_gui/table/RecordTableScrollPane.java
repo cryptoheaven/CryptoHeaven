@@ -286,6 +286,33 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     return records;
   }
 
+  public void setSelectedRecords(Long[] recordIDs, Class classType, boolean scrollToVisible) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "setSelectedRecords(Long[] recordIDs, Class classType, boolean scrollToVisible)");
+
+    if (recordIDs != null) {
+      boolean firstSelected = false;
+      for (int i=0; i<recordIDs.length; i++) {
+        Long recId = recordIDs[i];
+        int row = recordTableModel.getRowForObject(recId, classType);
+        if (row > -1) {
+          int viewRow = jSTable.convertMyRowIndexToView(row);
+          if (viewRow > -1) {
+            if (!firstSelected) {
+              firstSelected = true;
+              jSTable.getSelectionModel().setSelectionInterval(viewRow, viewRow);
+              if (scrollToVisible)
+                jSTable.scrollRectToVisible(jSTable.getCellRect(viewRow, 0, true));
+            } else {
+              jSTable.getSelectionModel().addSelectionInterval(viewRow, viewRow);
+            }
+          }
+        }
+      }
+    }
+
+    if (trace != null) trace.exit(RecordTableScrollPane.class);
+  }
+
 
   public boolean advanceSelectionNext() {
     return advanceSelection(true, true, null, null, -1, false);

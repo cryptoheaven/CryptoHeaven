@@ -73,7 +73,7 @@ public class PopupWindowManager extends Object {
         // body could be null in rare connectivity/synchronization problems when client missed body fetch reply
         if (body != null) {
           String msgBody = (addSub ? ("<b>" + sub + "</b> ") : "") + body;
-          String htmlText = "<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='-1'>"
+          String htmlText = "<html><body><font size='-1'>"
                   + "<img src=\"images/" + ImageNums.getImageName(ImageNums.CHAT16) + ".png\" height=\"16\" width=\"16\">&nbsp;"
                   + Misc.encodePlainIntoHtml(user)
                   + ":&nbsp;"

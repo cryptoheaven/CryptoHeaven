@@ -20,6 +20,7 @@ import com.CH_guiLib.gui.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 
+import comx.tig.en.SingleTigerSession;
 import comx.Tiger.ssce.*;
 
 import java.awt.*;

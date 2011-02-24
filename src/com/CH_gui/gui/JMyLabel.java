@@ -46,8 +46,10 @@ public class JMyLabel extends JLabel {
 
   public JMyLabel(String text, float fontRelativeSize) {
     super(text);
-    Font font = getFont();
-    setFont(font.deriveFont((float) (font.getSize()+fontRelativeSize)));
+    if (fontRelativeSize != 0) {
+      Font font = getFont();
+      setFont(font.deriveFont((float) (font.getSize()+fontRelativeSize)));
+    }
   }
 
   /** Creates new JMyLabel */

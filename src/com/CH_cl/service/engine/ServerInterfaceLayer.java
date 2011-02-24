@@ -1266,10 +1266,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public synchronized void destroyServer() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "destroy()");
 
-    if (destroyed) {
-      if (trace != null) trace.exit(ServerInterfaceLayer.class);
-      return;
-    }
     destroyed = true;
 
     try {
@@ -1392,7 +1388,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (lastLoginMessageAction != null) {
       lastLoginMessageAction = null;
       try {
-        submitAndWait(new MessageAction(CommandCodes.USR_Q_LOGOUT), 3000);
+        if (workers.size() > 0)
+          submitAndWait(new MessageAction(CommandCodes.USR_Q_LOGOUT), 3000);
       } catch (Throwable t) {
       }
     }

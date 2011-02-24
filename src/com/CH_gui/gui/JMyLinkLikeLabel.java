@@ -39,6 +39,11 @@ public class JMyLinkLikeLabel extends JMyLabel {
   private Object description;
 
   /** Creates new JMyLinkLikeLabel */
+  public JMyLinkLikeLabel(String label) {
+    this(label, 0);
+  }
+
+  /** Creates new JMyLinkLikeLabel */
   public JMyLinkLikeLabel(String label, int fontRelativeSize) {
     super(label, (float) fontRelativeSize);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JMyLinkLikeLabel.class, "JMyLinkLikeLabel()");

@@ -14,15 +14,13 @@ package com.CH_gui.gui;
 
 import javax.swing.*;
 
-import com.CH_co.gui.*;
-
 /** 
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -30,7 +28,7 @@ import com.CH_co.gui.*;
  *
  * <b>$Revision: 1.3 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class JMyButtonNoFocus extends JMyButton {
 

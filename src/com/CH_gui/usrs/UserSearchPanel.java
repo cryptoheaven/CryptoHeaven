@@ -16,10 +16,10 @@ import com.CH_gui.actionGui.*;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
+import com.CH_gui.menuing.*;
 import com.CH_gui.table.*;
 import com.CH_gui.userTable.*;
 import com.CH_gui.util.*;
-import com.CH_gui.menuing.ToolBarModel;
 
 import com.CH_guiLib.gui.*;
 
@@ -33,12 +33,12 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -58,6 +58,7 @@ import java.util.*;
  */
 public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
+  private boolean suppressToolBar;
   private ServerInterfaceLayer SIL;
 
   JTextField jNickname;
@@ -86,14 +87,16 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       StringHighlighter.MATCH_STRING__CONTAINS;
 
   /** Creates new UserSearchPanel */
-  public UserSearchPanel(boolean withUserActions, boolean withInviteActions, String customSearchHeader, String searchString, boolean isPassRecoveryMode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSearchPanel.class, "UserSearchPanel(boolean withUserActions, boolean withInviteActions, String customSearchHeader, String searchString, boolean isPassRecoveryMode)");
+  public UserSearchPanel(boolean suppressToolBar, boolean withUserActions, boolean withInviteActions, String customSearchHeader, String searchString, boolean isPassRecoveryMode) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSearchPanel.class, "UserSearchPanel(boolean suppressToolBar, boolean withUserActions, boolean withInviteActions, String customSearchHeader, String searchString, boolean isPassRecoveryMode)");
+    if (trace != null) trace.args(suppressToolBar);
     if (trace != null) trace.args(withUserActions);
     if (trace != null) trace.args(withInviteActions);
     if (trace != null) trace.args(customSearchHeader);
     if (trace != null) trace.args(searchString);
     if (trace != null) trace.args(isPassRecoveryMode);
 
+    this.suppressToolBar = suppressToolBar;
     SIL = MainFrame.getServerInterfaceLayer();
     createPanel(withUserActions, withInviteActions, customSearchHeader, isPassRecoveryMode);
 
@@ -224,7 +227,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
     int posY = 0;
 
-    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && !isPassRecoveryMode) {
+    if (!suppressToolBar && !JActionFrame.ENABLE_FRAME_TOOLBARS && !isPassRecoveryMode) {
       JToolBar toolBar = initToolBarModel(MiscGui.getVisualsKeyName(userActionTable), null, userActionTable).getToolBar();
       mainPanel.add(toolBar, new GridBagConstraints(0, posY, 7, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
@@ -393,7 +396,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     return "User Search Toolbar";
   }
   public ToolBarModel initToolBarModel(String propertyKeyName, String toolBarName, Component sourceComponent) {
-    if (!JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
+    if (!suppressToolBar && !JActionFrame.ENABLE_FRAME_TOOLBARS && toolBarModel == null)
       toolBarModel = new ToolBarModel(propertyKeyName, toolBarName != null ? toolBarName : getToolBarTitle(), false);
     if (toolBarModel != null && sourceComponent != null)
       toolBarModel.addComponentActions(sourceComponent);

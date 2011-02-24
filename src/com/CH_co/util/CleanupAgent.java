@@ -57,6 +57,25 @@ public class CleanupAgent extends Thread {
   private long delayMillisFileCleanerAccumulator;
 
 
+  /**
+   * Start without file cleaner
+   */
+  public static void startSingleInstance(int mode, String[][] fileSpecs,
+          int delayMinutesFinalizationFirst, int delayMinutesFinalizationNext,
+          int delayMinutesGCFirst, int delayMinutesGCNext) {
+    synchronized (singleInstanceMonitor) {
+      if (singleInstance == null) {
+        singleInstance = new CleanupAgent(mode, fileSpecs,
+                delayMinutesFinalizationFirst, delayMinutesFinalizationNext,
+                delayMinutesGCFirst, delayMinutesGCNext,
+                0, 0);
+        singleInstance.start();
+      }
+    }
+  }
+  /**
+   * Start single instance with all functions
+   */
   public static void startSingleInstance(int mode, String[][] fileSpecs,
           int delayMinutesFinalizationFirst, int delayMinutesFinalizationNext,
           int delayMinutesGCFirst, int delayMinutesGCNext,
@@ -135,45 +154,48 @@ public class CleanupAgent extends Thread {
         // next cycle will use NEXT delay
         delayMillisGC = delayMillisGCNext;
       }
-      if (delayMillisFileCleanerAccumulator >= delayMillisFileCleaner && (mode & MODE_TEMP_FILE_CLEANER) != 0) {
-        delayMillisFileCleanerAccumulator -= delayMillisFileCleaner;
-        try {
-          String tempDirName = System.getProperty("java.io.tmpdir");
-          if (tempDirName != null && tempDirName.length() > 0) {
-            final File tempDir = new File(tempDirName);
-            File[] filesToDelete = tempDir.listFiles(new FilenameFilter() {
-              public boolean accept(File dir, String name) {
-                boolean dirOk = tempDir.equals(dir);
-                boolean nameOk = false;
-                if (dirOk) {
-                  for (int i=0; fileSpecs!=null && i<fileSpecs.length; i++) {
-                    String prefix = fileSpecs[i][0];
-                    String postfix = fileSpecs[i][1];
-                    if ((prefix != null && prefix.length() > 0) || (postfix != null && postfix.length() > 0)) {
-                      if ((prefix == null || name.startsWith(prefix)) && (postfix == null || name.endsWith(postfix))) {
-                        nameOk = true;
-                        break;
+      // if file cleaning enabled
+      if (delayMillisFileCleanerFirst > 0) {
+        if (delayMillisFileCleanerAccumulator >= delayMillisFileCleaner && (mode & MODE_TEMP_FILE_CLEANER) != 0) {
+          delayMillisFileCleanerAccumulator -= delayMillisFileCleaner;
+          try {
+            String tempDirName = System.getProperty("java.io.tmpdir");
+            if (tempDirName != null && tempDirName.length() > 0) {
+              final File tempDir = new File(tempDirName);
+              File[] filesToDelete = tempDir.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                  boolean dirOk = tempDir.equals(dir);
+                  boolean nameOk = false;
+                  if (dirOk) {
+                    for (int i=0; fileSpecs!=null && i<fileSpecs.length; i++) {
+                      String prefix = fileSpecs[i][0];
+                      String postfix = fileSpecs[i][1];
+                      if ((prefix != null && prefix.length() > 0) || (postfix != null && postfix.length() > 0)) {
+                        if ((prefix == null || name.startsWith(prefix)) && (postfix == null || name.endsWith(postfix))) {
+                          nameOk = true;
+                          break;
+                        }
                       }
                     }
                   }
+                  return dirOk && nameOk;
                 }
-                return dirOk && nameOk;
-              }
-            });
-            long now = System.currentTimeMillis();
-            long recentPast = now - delayMillisFileCleanerNext; // if the files are at least as the longer delay cycle
-            for (int i=0; filesToDelete!=null && i<filesToDelete.length; i++) {
-              File fileToDel = filesToDelete[i];
-              long lastModified = fileToDel.lastModified();
-              if (lastModified > 0 && lastModified < recentPast) {
-                try { wipeOrDelete(fileToDel); } catch (Throwable t) { }
+              });
+              long now = System.currentTimeMillis();
+              long recentPast = now - delayMillisFileCleanerNext; // if the files are at least as the longer delay cycle
+              for (int i=0; filesToDelete!=null && i<filesToDelete.length; i++) {
+                File fileToDel = filesToDelete[i];
+                long lastModified = fileToDel.lastModified();
+                if (lastModified > 0 && lastModified < recentPast) {
+                  try { wipeOrDelete(fileToDel); } catch (Throwable t) { }
+                }
               }
             }
-          }
-        } catch (Throwable t) { }
-        // next cycle will use NEXT delay
-        delayMillisFileCleaner = delayMillisFileCleanerNext;
-      }
+          } catch (Throwable t) { }
+          // next cycle will use NEXT delay
+          delayMillisFileCleaner = delayMillisFileCleanerNext;
+        }
+      } // end if enabled
     }
     // when thread exits, clean up the single instance so next one can be restarted
     synchronized (singleInstanceMonitor) {

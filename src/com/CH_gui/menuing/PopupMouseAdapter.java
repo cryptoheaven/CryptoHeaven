@@ -12,18 +12,19 @@
 
 package com.CH_gui.menuing;
 
-import com.CH_gui.util.ActionProducerI;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.lang.ref.*;
-import java.util.*;
-
 import com.CH_co.trace.Trace;
 
 import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.util.ActionProducerI;
+
 import comx.Tiger.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.lang.ref.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011

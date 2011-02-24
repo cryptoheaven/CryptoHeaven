@@ -398,8 +398,6 @@ public class ImageNums extends Object {
   public static final int HTML_IMAGE_FAILED;
   public static final int RESIZE_DRAG_SE; // South-East direction
 
-  public static final int EDITOR_PLAIN;
-  public static final int EDITOR_RICH;
   public static final int PENCIL16;
   public static final int RING_BELL;
   public static final int VOLUME16;
@@ -410,6 +408,44 @@ public class ImageNums extends Object {
   public static final int PAUSE16;
   public static final int PLAY_PAUSE16;
   public static final int STOP16;
+
+  public static final int EDITOR_ALIGN;
+  public static final int EDITOR_ATTACH;
+  public static final int EDITOR_BELL;
+  public static final int EDITOR_BOLD;
+  public static final int EDITOR_CENTER;
+  public static final int EDITOR_COLOR;
+  public static final int EDITOR_COPY_FORMATTING;
+  public static final int EDITOR_EMOTICONS;
+  public static final int EDITOR_FIND;
+  public static final int EDITOR_FONTS;
+  public static final int EDITOR_HIGHLIGHT;
+  public static final int EDITOR_IMAGE;
+  public static final int EDITOR_INDENT_D;
+  public static final int EDITOR_INDENT_I;
+  public static final int EDITOR_ITALIC;
+  public static final int EDITOR_LEFT;
+  public static final int EDITOR_LINK;
+  public static final int EDITOR_LIST_O;
+  public static final int EDITOR_LIST_U;
+  public static final int EDITOR_REPLACE;
+  public static final int EDITOR_RIGHT;
+  public static final int EDITOR_STRIKE;
+  public static final int EDITOR_SUBSCRIPT;
+  public static final int EDITOR_SUPERSCRIPT;
+  public static final int EDITOR_T_DELETE_CELL;
+  public static final int EDITOR_T_INSERT;
+  public static final int EDITOR_T_INSERT_COLUMN;
+  public static final int EDITOR_T_INSERT_ROW;
+  public static final int EDITOR_T_MERGE;
+  public static final int EDITOR_T_PROPERTIES;
+  public static final int EDITOR_T_PROPERTIES_CELL;
+  public static final int EDITOR_T_SELECT;
+  public static final int EDITOR_T_SELECT_CELL;
+  public static final int EDITOR_T_SELECT_COLUMN;
+  public static final int EDITOR_T_SELECT_ROW;
+  public static final int EDITOR_T_SPLIT;
+  public static final int EDITOR_UNDERLINE;
 
   // emotions
   public static final int EM_ARROW_LEFT;
@@ -484,7 +520,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[329+50]; // plus emotions
+    images = new String[364+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -1448,12 +1484,6 @@ public class ImageNums extends Object {
     images[i] = "resize-drag-se"; i++;
 
 
-    EDITOR_PLAIN = i;
-    images[i] = "editor-plain"; i++;
-
-    EDITOR_RICH = i;
-    images[i] = "editor-rich"; i++;
-
     PENCIL16 = i;
     images[i] = "pencil16"; i++;
 
@@ -1483,6 +1513,81 @@ public class ImageNums extends Object {
 
     STOP16 = i;
     images[i] = "Stop16"; i++;
+
+    EDITOR_ALIGN = i;
+    images[i] = "editor-align"; i++;
+    EDITOR_ATTACH = i;
+    images[i] = "editor-attach"; i++;
+    EDITOR_BELL = i;
+    images[i] = "editor-bell"; i++;
+    EDITOR_BOLD = i;
+    images[i] = "editor-bold"; i++;
+    EDITOR_CENTER = i;
+    images[i] = "editor-center"; i++;
+    EDITOR_COLOR = i;
+    images[i] = "editor-color"; i++;
+    EDITOR_COPY_FORMATTING = i;
+    images[i] = "editor-copy-formatting"; i++;
+    EDITOR_EMOTICONS = i;
+    images[i] = "editor-emoticons"; i++;
+    EDITOR_FIND = i;
+    images[i] = "editor-find"; i++;
+    EDITOR_FONTS = i;
+    images[i] = "editor-fonts"; i++;
+    EDITOR_HIGHLIGHT = i;
+    images[i] = "editor-highlight"; i++;
+    EDITOR_IMAGE = i;
+    images[i] = "editor-image"; i++;
+    EDITOR_INDENT_D = i;
+    images[i] = "editor-indent-d"; i++;
+    EDITOR_INDENT_I = i;
+    images[i] = "editor-indent-i"; i++;
+    EDITOR_ITALIC = i;
+    images[i] = "editor-italic"; i++;
+    EDITOR_LEFT = i;
+    images[i] = "editor-left"; i++;
+    EDITOR_LINK = i;
+    images[i] = "editor-link"; i++;
+    EDITOR_LIST_O = i;
+    images[i] = "editor-list-o"; i++;
+    EDITOR_LIST_U = i;
+    images[i] = "editor-list-u"; i++;
+    EDITOR_REPLACE = i;
+    images[i] = "editor-replace"; i++;
+    EDITOR_RIGHT = i;
+    images[i] = "editor-right"; i++;
+    EDITOR_STRIKE = i;
+    images[i] = "editor-strike"; i++;
+    EDITOR_SUBSCRIPT = i;
+    images[i] = "editor-subscript"; i++;
+    EDITOR_SUPERSCRIPT = i;
+    images[i] = "editor-superscript"; i++;
+    EDITOR_T_DELETE_CELL = i;
+    images[i] = "editor-t-delete-cell"; i++;
+    EDITOR_T_INSERT = i;
+    images[i] = "editor-t-insert"; i++;
+    EDITOR_T_INSERT_COLUMN = i;
+    images[i] = "editor-t-insert-column"; i++;
+    EDITOR_T_INSERT_ROW = i;
+    images[i] = "editor-t-insert-row"; i++;
+    EDITOR_T_MERGE = i;
+    images[i] = "editor-t-merge"; i++;
+    EDITOR_T_PROPERTIES = i;
+    images[i] = "editor-t-properties"; i++;
+    EDITOR_T_PROPERTIES_CELL = i;
+    images[i] = "editor-t-properties-cell"; i++;
+    EDITOR_T_SELECT = i;
+    images[i] = "editor-t-select"; i++;
+    EDITOR_T_SELECT_CELL = i;
+    images[i] = "editor-t-select-cell"; i++;
+    EDITOR_T_SELECT_COLUMN = i;
+    images[i] = "editor-t-select-column"; i++;
+    EDITOR_T_SELECT_ROW = i;
+    images[i] = "editor-t-select-row"; i++;
+    EDITOR_T_SPLIT = i;
+    images[i] = "editor-t-split"; i++;
+    EDITOR_UNDERLINE = i;
+    images[i] = "editor-underline"; i++;
 
     EM_ARROW_LEFT     = i;    images[i] = "emotions/arrow-left";     i++;
     EM_ARROW_RIGHT    = i;    images[i] = "emotions/arrow-right";    i++;

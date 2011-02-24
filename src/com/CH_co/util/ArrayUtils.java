@@ -563,6 +563,8 @@ public class ArrayUtils extends Object {
     return replaceKeyWords(str, sets, null, null);
   }
   public static String replaceKeyWords(String str, String[][] sets, String[] skipBeginTags, String[] skipEndTags) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "replaceKeyWords(String str, String[][] sets, String[] skipBeginTags, String[] skipEndTags)");
+
     int numOfSets = sets.length;
     char[] chars = null;
     for (int i=0; str!=null && i<numOfSets; i++) {
@@ -598,6 +600,8 @@ public class ArrayUtils extends Object {
         str = resultB.toString();
       } // end anyFound
     } // end for
+
+    if (trace != null) trace.exit(ArrayUtils.class);
     return str;
   }
   private static boolean isInsideSegment(String str, int start, String[] startTags, String[] endTags) {
@@ -646,7 +650,7 @@ public class ArrayUtils extends Object {
   /**
    * Replaces tags, using startTags and endTags specified, replace them with replacementTags.
    * To match startTags only, leave endTag "" empty string
-   * startTags and endTags allow for multiple sets to accomodate upper and lower case variations
+   * startTags and endTags allow for multiple sets to accommodate upper and lower case variations
    * For example: the following arguments will remove <HEAD> html tag and change "Hello" to "Hi"
     String str = "<html><head>Header</HEAD><body>Hello there</body></html>";
     String[][] startTags = new String[][] {

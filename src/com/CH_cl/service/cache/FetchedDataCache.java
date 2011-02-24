@@ -2048,6 +2048,25 @@ public class FetchedDataCache extends Object {
   /**
    * @return all My Active Contact Records.
    */
+  public synchronized ContactRecord[] getContactRecords(RecordFilter filter) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecords(RecordFilter filter)");
+
+    Iterator iter = contactRecordMap.values().iterator();
+    ArrayList contactsL = new ArrayList();
+    while (iter.hasNext()) {
+      ContactRecord cRec = (ContactRecord) iter.next();
+      if (filter.keep(cRec))
+        contactsL.add(cRec);
+    }
+    ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactsL, ContactRecord.class);
+
+    if (trace != null) trace.exit(FetchedDataCache.class, contacts);
+    return contacts;
+  }
+
+  /**
+   * @return all My Active Contact Records.
+   */
   public synchronized ContactRecord[] getContactRecordsMyActive(boolean includeInitiated) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecordsMyActive(boolean includeInitiated)");
 

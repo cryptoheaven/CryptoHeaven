@@ -12,25 +12,11 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-
-import com.CH_co.cryptx.*;
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.*;
 
-import com.CH_co.gui.*;
+import com.CH_co.cryptx.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.cnt.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -39,8 +25,18 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.*;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -72,7 +68,6 @@ public class InitiateContactDialog extends GeneralDialog {
   static final int DEFAULT_CANCEL_BUTTON = 1;
 
   Long[] contactWithIds;
-  Long shareId;
 
   ServerInterfaceLayer SIL;
   FetchedDataCache cache;
@@ -100,7 +95,6 @@ public class InitiateContactDialog extends GeneralDialog {
     this.contactWithIds = contactWithIds;
     this.SIL = MainFrame.getServerInterfaceLayer();
     this.cache = SIL.getFetchedDataCache();
-    this.shareId = cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId;
 
     JButton[] jButtons = createButtons();
     JPanel jPanel = createPanel();
@@ -237,11 +231,32 @@ public class InitiateContactDialog extends GeneralDialog {
   private void pressedOK() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "pressedOK()");
     closeDialog();
+    sendContactCreate_Threaded(jContactName != null ? jContactName.getText().trim() : null,  jContactReason.getText().trim(), contactWithIds, null);
+    if (trace != null) trace.exit(InitiateContactDialog.class);
+  }
 
+  public static void sendContactCreate_Threaded(final String name, final String reason, final Long[] contactWithIds, final CallbackI callback) {
     Thread th = new ThreadTraced("Initiate Contact -- Pressed OK Submitter") {
       public void runTraced() {
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        FetchedDataCache cache = SIL.getFetchedDataCache();
+        Long shareId = cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId;
         BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
 
+        // make sure we have all public keys of other users
+        ArrayList userIDsWithNoKeysL = new ArrayList();
+        for (int i=0; i<contactWithIds.length; i++) {
+          if (cache.getKeyRecordForUser(contactWithIds[i]) == null)
+            userIDsWithNoKeysL.add(contactWithIds[i]);
+        }
+        if (userIDsWithNoKeysL.size() > 0) {
+          Obj_IDList_Co request = new Obj_IDList_Co(userIDsWithNoKeysL);
+          MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
+          ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 60000);
+          DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
+        }
+
+        // send the Contact creation requests
         for (int i=0; i<contactWithIds.length; i++) {
           //1310 <shareId>   <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
 
@@ -252,19 +267,26 @@ public class InitiateContactDialog extends GeneralDialog {
           request.shareId = shareId;
           request.contactRecord = new ContactRecord();
           request.contactRecord.contactWithId = contactWithId;
-          request.contactRecord.setOwnerNote(jContactName != null && jContactName.getText().trim().length() > 0 ? jContactName.getText().trim() : cache.getUserRecord(contactWithId).handle);
-          request.contactRecord.setOtherNote(jContactReason.getText().trim());
+          request.contactRecord.setOwnerNote(name != null && name.trim().length() > 0 ? name.trim() : cache.getUserRecord(contactWithId).handle);
+          request.contactRecord.setOtherNote(reason.trim());
           request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
           request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
 
-          SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
+          // using the callback we must know when it is finished so use submit with fetch
+          if (callback != null) {
+            ClientMessageAction replyMsg = SIL.submitAndFetchReply(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request), 60000);
+            DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
+          } else {
+            SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
+          }
+        }
+        if (callback != null) {
+          callback.callback(contactWithIds);
         }
       }
     };
     th.setDaemon(true);
     th.start();
-
-    if (trace != null) trace.exit(InitiateContactDialog.class);
   }
 
   private void pressedCancel() {

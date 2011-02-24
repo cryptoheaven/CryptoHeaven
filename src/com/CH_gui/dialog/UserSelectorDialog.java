@@ -75,7 +75,7 @@ public class UserSelectorDialog extends GeneralDialog implements VisualsSavable,
 
   private void constructDialog(Component owner, String selectButtonText, String searchString) {
     this.selectButtonText = selectButtonText;
-    this.userSearchPanel = new UserSearchPanel(false, true, null, searchString, false);
+    this.userSearchPanel = new UserSearchPanel(true, false, true, null, searchString, false);
     this.recordSelectionListener = new RecordSelectionListener() {
       public void recordSelectionChanged(RecordSelectionEvent event) {
         setEnabledButtons();

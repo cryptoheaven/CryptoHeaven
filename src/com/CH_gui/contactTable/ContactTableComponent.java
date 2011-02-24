@@ -12,13 +12,6 @@
 
 package com.CH_gui.contactTable;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
@@ -38,8 +31,14 @@ import com.CH_gui.dialog.InviteByEmailDialog;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -115,13 +114,15 @@ public class ContactTableComponent extends RecordTableComponent {
     jAddEmail.setPreferredSize(new Dimension(100, 18));
     jAddEmail.setBackground(panelColor);
     jAddEmail.setBorder(new LineBorder(panelColor.darker(), 1));
-    jAddEmail.setUnfocusedEmptyText(addEmailHint);
+    jAddEmail.setBackgroundTextWhenEmpty(addEmailHint);
     final Action addAction = new AddEmailAddressAction();
     AbstractButton addButton = ActionUtilities.makeSmallComponentToolButton(addAction);
     jAddEmail.addKeyListener(new KeyAdapter() {
       public void keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER)
+        if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
           addAction.actionPerformed(null);
+          keyEvent.consume();
+        }
       }
     });
     addAddressPanel.add(jAddEmail, BorderLayout.CENTER);
@@ -204,7 +205,20 @@ public class ContactTableComponent extends RecordTableComponent {
         if (addresses != null && addresses.length > 0) {
           InviteByEmailDialog.doInvite(text, "", null, autoCreateWebAccounts);
         } else {
-          new FindUserFrame(com.CH_gui.lang.Lang.rb.getString("button_Close"), text);
+          new FindUserFrame(com.CH_gui.lang.Lang.rb.getString("button_Select"), com.CH_gui.lang.Lang.rb.getString("button_Close"), text, true).setContactCreateHotButtonCallback(new CallbackI() {
+            public void callback(Object value) {
+              Long[] contactWithIDs = (Long[]) value;
+              FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+              final Long[] contactIDs = RecordUtils.getIDs(cache.getContactRecords(new ContactFilterCo(new Long[] { cache.getMyUserId() }, contactWithIDs)));
+              // Delegate this selection to the GUI thread to give a chance for
+              // the asynchronous GUI updates to complete ahead of this selection.
+              SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                  getRecordTableScrollPane().setSelectedRecords(contactIDs, ContactRecord.class, true);
+                }
+              });
+            }
+          });
         }
         if (text.length() > 0)
           jAddEmail.setText("");

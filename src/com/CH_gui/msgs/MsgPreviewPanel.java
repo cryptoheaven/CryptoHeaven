@@ -114,13 +114,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private JLabel jPasswordHintText;
   private JTextField jPasswordField;
   private JComponent jMessage;
-  private JMyLinkLikeLabel jHTML;
-//  private JButton jHTML;
+  private JMyLinkLikeLabel jLoadImages;
+  private JPanel jImageFilterPanel;
   private JButton jAttachment;
   private boolean isAttachmentButton;
 
-  //private JEditorPane jHtmlMessage;
-  //private JTextArea jTextMessage;
   private JComponent jHtmlMessage;
   private JComponent jTextMessage;
   private JPanel textPanel;
@@ -147,6 +145,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private static final String STR_SELECT_A_SINGLE_ADDRESS = "<html><p align=\"left\">To view address details in this reading window, click on an address in the list.<br>To select more then one, hold Shift or Control key and click the desired addresses.</p></html>";
   private static final String STR_MSG_BODY_UNAVAILABLE = "<html><p align=\"left\">Message content is currently unavailable.  If this is a shared Inbox, folder owner <br>must access these messages before they will become available to other participants.</p></html>";
   private static final String STR_LOADING = "Loading...";
+  private static final String STR_IMAGES_SHOW = "Show Images";
+  private static final String STR_IMAGES_HIDE = "Hide Images";
+
   private boolean isWaitingForMsgBody;
   private String no_selected_msg_html;
 
@@ -296,21 +297,33 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jAttachments = new JPanel();
     jAttachments.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-    if (isHTML) {
-      jHTML = new JMyLinkLikeLabel("Plain Text", LINK_RELATIVE_FONT_SIZE);
-//      jHTML = new JMyButton("Plain Text");
-//      jHTML.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2)));
-    } else {
-      jHTML = new JMyLinkLikeLabel("Rich Text", LINK_RELATIVE_FONT_SIZE);
-//      jHTML = new JMyButton("Rich Text");
-//      jHTML.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2)));
-    }
-    jHTML.addMouseListener(new MouseAdapter() {
+    jLoadImages = new JMyLinkLikeLabel(STR_IMAGES_SHOW, LINK_RELATIVE_FONT_SIZE);
+    jLoadImages.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         e.consume();
-        pressedHTML();
+        pressedLoadHideImages();
       }
     });
+    jImageFilterPanel = new JPanel(new GridBagLayout());
+    jImageFilterPanel.setVisible(false);
+    jImageFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jImageFilterPanel.setLayout(new GridBagLayout());
+    jImageFilterPanel.add(new JMyLabel(" "), new GridBagConstraints(0, 0, 1, 1, 0, 0, // left justify spacer element used in From and To lines
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
+    jImageFilterPanel.add(new JMyLabel("Images are not displayed."), new GridBagConstraints(1, 0, 1, 1, 0, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 3, 3, 3), 0, 0));
+    JMyLinkLikeLabel jDisplayImages = new JMyLinkLikeLabel("Display images below.");
+    jDisplayImages.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        e.consume();
+        pressedLoadHideImages();
+      }
+    });
+    jImageFilterPanel.add(jDisplayImages, new GridBagConstraints(2, 0, 1, 1, 0, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 3, 3, 3), 0, 0));
+    jImageFilterPanel.add(new JLabel(), new GridBagConstraints(3, 0, 1, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+
 
     jAttachment = new JMyButtonNoFocus(Images.get(ImageNums.DETACH16));
     jAttachment.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -484,6 +497,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
 
+    add(jImageFilterPanel, new GridBagConstraints(0, posY, 4, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    posY ++;
+
     textScrollPane = new JScrollPane(jMessage);
     textScrollPane.setBorder(new EmptyBorder(0,0,0,0));
     textComponentPosY = posY;
@@ -494,7 +511,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       textPanel.add(jMessage, BorderLayout.CENTER);
     }
     add(textPanel, new GridBagConstraints(0, textComponentPosY, 4, 1, 10, 10,
-          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 1, 1, 1), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
 
     JLabel jMinHeight1 = new JMyLabel(" ");
@@ -569,7 +586,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineSubject.add(jFullView, new GridBagConstraints(6, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
-    jLineSubject.add(jHTML, new GridBagConstraints(7, 0, 1, 1, 0, 0,
+    jLineSubject.add(jLoadImages, new GridBagConstraints(7, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineSubject.add(jAttachment, new GridBagConstraints(8, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
@@ -636,7 +653,29 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     HTML_ClickablePane jHtmlMsg = null;
     JTextArea jTextMsg = null;
     if (forHTML) {
-      jHtmlMsg = new HTML_ClickablePane(no_selected_msg_html);
+      final HTML_EditorKit editorKit = new HTML_EditorKit();
+      editorKit.registerRemoteImageBlockedCallback(new CallbackI() {
+        public void callback(Object value) {
+          if (value instanceof Boolean) {
+            Boolean isBlocked = (Boolean) value;
+            if (isBlocked.booleanValue()) {
+              if (jLoadImages.isVisible())
+                jLoadImages.setVisible(false);
+              jLoadImages.setText(STR_IMAGES_SHOW, LINK_BG_FOCUS_COLOR);
+              if (!jImageFilterPanel.isVisible())
+                jImageFilterPanel.setVisible(true);
+            } else {
+              if (isDefaultToPLAINpreferred(msgDataRecord)) {
+                if (!jLoadImages.isVisible()) {
+                  jLoadImages.setText(STR_IMAGES_HIDE);
+                  jLoadImages.setVisible(true);
+                }
+              }
+            }
+          }
+        }
+      });
+      jHtmlMsg = new HTML_ClickablePane(no_selected_msg_html, editorKit);
       jHtmlMsg.setEditable(false);
     } else {
       jTextMsg = new JMyTextArea();
@@ -680,11 +719,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   private void updateExpandRestoreLabel() {
-//    URL url = null;
-//    try {
-//      url = new URL("http", "localhost", 80, LINK_INTERNAL+"toggleExpandRestore()");
-//    } catch (Throwable t) {
-//    }
     if (isFullView) {
       jFullView.setText("Restore view");
     } else {
@@ -692,13 +726,30 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     }
   }
 
-  private void pressedHTML() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "pressedHTML()");
+  private void pressedLoadHideImages() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "pressedLoadHideImages()");
 
-    boolean newHTMLstate = !isHTML;
+    boolean newHTMLstate = !isImageLoadEnabled();
     if (trace != null) trace.data(10, "newHTMLstate", newHTMLstate);
 
-    // Chan the display mode now... and send request for change on the server.
+    if (newHTMLstate) {
+      jLoadImages.setText(STR_IMAGES_HIDE);
+      jLoadImages.setVisible(true);
+      jImageFilterPanel.setVisible(false);
+    } else {
+      jLoadImages.setVisible(false);
+      jLoadImages.setText(STR_IMAGES_SHOW, LINK_BG_FOCUS_COLOR);
+      jImageFilterPanel.setVisible(true);
+    }
+
+    if (jHtmlMessage instanceof JEditorPane) {
+      EditorKit editorKit = ((JEditorPane) jHtmlMessage).getEditorKit();
+      if (editorKit instanceof HTML_EditorKit) {
+        ((HTML_EditorKit) editorKit).setDisplayRemoteImages(newHTMLstate);
+      }
+    }
+
+    // Change the display mode now... and send request for change on the server.
     // When fetching mail folders it may take to long for view to respond, so switch right away.
     setHTMLMode(newHTMLstate);
 
@@ -728,7 +779,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (isChange) {
       isHTML = isHtml;
       try {
-        updateHTMLModeIcon();
         if (isHTML) {
           jMessage = jHtmlMessage;
         } else {
@@ -736,8 +786,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         }
         if (jMessage instanceof JTextComponent) {
           ((JTextComponent) jMessage).setText("");
-//        } else if (jMessage instanceof HtmlPanel) {
-//          ((HtmlPanel) jMessage).clearDocument();
         }
         switchMessageArea(jMessage);
         setCurrentMessageText();
@@ -750,34 +798,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     }
 
     if (trace != null) trace.exit(MsgPreviewPanel.class);
-  }
-
-  private void updateHTMLModeIcon() {
-    boolean isMsgMode = false;
-    if (msgDataRecord != null)
-      isMsgMode = msgDataRecord.objType.shortValue() == MsgDataRecord.OBJ_TYPE_MSG;
-    if (!isMsgMode || msgDataRecord == null) {
-      jHTML.setVisible(false);
-    } else {
-      if (isHTML) {
-        if (!msgDataRecord.isHtmlMail()) {
-          jHTML.setText("Plain Text", LINK_BG_FOCUS_COLOR);
-          if (!jHTML.isVisible()) jHTML.setVisible(true);
-        } else {
-          jHTML.setText("Plain Text");
-          boolean isPLAINpreferred = isDefaultToPLAINpreferred(msgDataRecord);
-          if (jHTML.isVisible() != isPLAINpreferred) jHTML.setVisible(isPLAINpreferred);
-        }
-      } else {
-        if (msgDataRecord.isHtmlMail()) {
-          jHTML.setText("Rich Text", LINK_BG_FOCUS_COLOR);
-          if (!jHTML.isVisible()) jHTML.setVisible(true);
-        } else {
-          jHTML.setText("Rich Text");
-          if (jHTML.isVisible()) jHTML.setVisible(false);
-        }
-      }
-    }
   }
 
   private void switchMessageArea(Component newViewComponent) {
@@ -1374,7 +1394,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           setAttachmentsButton();
           setAttachmentsPanel(null, null, jAttachments, jLineAttachments);
         }
-        updateHTMLModeIcon();
       }
       // always break out of the loop as it is a single-pass-loop only
       break;
@@ -1745,6 +1764,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           //jNotSpam.setText("");
           jNotSpam.setVisible(false);
           jNotSpam.setDescription(null);
+          jLoadImages.setVisible(false);
+          jImageFilterPanel.setVisible(false);
           jExpiration.setIcon(null);
           jExpiration.setText("");
           jPasswordHintText.setText("None");
@@ -1758,7 +1779,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           boolean isSwitchingDataView = !msgData.equals(msgDataRecord);
           // If switching msg data, or the data has changed and gui needs to update in anyway
           boolean msgDataChanged = isSwitchingDataView ||
-                                   !msgData.equals(msgDataRecord) ||
                                    !msgData.isPrivilegedBodyAccess(cache.getMyUserId(), new Date()) || // in case the body got expired, update preview
                                    (isWaitingForMsgBody && msgData.getText() != null);
 
@@ -1847,8 +1867,28 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           boolean displayHtmlMode = !isDefaultToPLAINpreferred(msgLink, msgData);
 
           // update text only if content changed
-          if (isHTML != displayHtmlMode || msgDataChanged)
-            setCurrentMessageText(displayHtmlMode);
+          if (isHTML != displayHtmlMode || msgDataChanged) {
+            if (msgData.isHtml()) {
+              if (jHtmlMessage instanceof JEditorPane) {
+                EditorKit editorKit = ((JEditorPane) jHtmlMessage).getEditorKit();
+                if (editorKit instanceof HTML_EditorKit) {
+                  boolean isDisplayRemoteImages = displayHtmlMode;
+                  ((HTML_EditorKit) editorKit).setDisplayRemoteImages(isDisplayRemoteImages);
+                  if (isDisplayRemoteImages)
+                    jLoadImages.setText(STR_IMAGES_HIDE);
+                  else
+                    jLoadImages.setText(STR_IMAGES_SHOW);
+                }
+              }
+            }
+            if (isSwitchingDataView) {
+              if (jLoadImages.isVisible())
+                jLoadImages.setVisible(false);
+              if (jImageFilterPanel.isVisible())
+                jImageFilterPanel.setVisible(false);
+            }
+            setCurrentMessageText(msgData.isHtml());
+          }
           // see if a red flag needs to be "unset"
           if (isSwitchingDataView) {
             StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
@@ -1871,6 +1911,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       if (trace != null) trace.exit(PreviewGUIUpdater.class);
     } // end updatePreviewNow()
   } // end private class PreviewGUIUpdater
+
+  private boolean isImageLoadEnabled() {
+    return jLoadImages.getText().equals(STR_IMAGES_HIDE);
+  }
 
   /**
    * @param mData

@@ -958,7 +958,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
    * Send a request to fetch contacts for the current user from the server
    * if contacts were not fetched for yet, otherwise get them from cache
    */
-  public void fetchContacts() {
+  private void fetchContacts() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "fetchContacts()");
 
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
@@ -973,7 +973,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /**
    * Re-Add my groups to the cache so that listeners can grab them
    */
-  public void reAddGroupsToCache() {
+  private void reAddGroupsToCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "reAddGroupsToCache()");
 
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();

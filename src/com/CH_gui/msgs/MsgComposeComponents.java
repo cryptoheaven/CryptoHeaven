@@ -12,16 +12,6 @@
 
 package com.CH_gui.msgs;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.sql.Timestamp;
-import java.text.*;
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.*;
@@ -44,6 +34,16 @@ import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 import com.CH_guiLib.util.HTML_Ops;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.Timestamp;
+import java.text.*;
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.text.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -112,8 +112,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private JButton jAttach;
   private JLabel jReplyToLabel;
   private JLabel jReplyTo;
-//  private JMyLinkLikeLabel jHTML;
-  private JButton jHTML;
 //  private JMyLinkLikeLabel jShowBcc;
   private JButton jShowBcc;
   private boolean isShownBcc = false;
@@ -143,7 +141,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   public void focusMessageArea() {
-    msgTypeArea.getTextComponent().requestFocus();
+    msgTypeArea.focusMessageArea();
   }
 
   public JPanel getAttachmentsPanel() {
@@ -337,7 +335,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jStagedSecureCheck.setEnabled(enabled);
     if (msgTypeArea != null) {
       msgTypeArea.setEnabled(enabled);
-      msgTypeArea.setEditable(enabled);
     }
   }
 
@@ -345,6 +342,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (jSendCombo != null) {
       jSendCombo.setEnabledLabel(enabled);
     }
+  }
+
+  public void setMsgContent(String text, boolean isHtml) {
+    msgTypeArea.setContentText(text, isHtml, false, true);
   }
 
   public void setQuestion(String question) {
@@ -457,11 +458,12 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   private void initComponents() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "initComponents()");
-    String htmlPropertyPostfix = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "_addr" : (isChatComposePanel ? "_chat" : "_mail");
-    boolean defaultHTML = !isChatComposePanel;
-    //defaultHTML = false;
-    msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, isChatComposePanel, false, isChatComposePanel);
-    jHTML = msgTypeArea.getHTMLSwitchButton();
+    try {
+      msgTypeArea = new MsgTypeArea(objType, undoMngrI, isChatComposePanel, false, isChatComposePanel);
+    } catch (Exception e) {
+      // rarely creation of HTMLEditor fails with an Exception, retry once more...
+      msgTypeArea = new MsgTypeArea(objType, undoMngrI, isChatComposePanel, false, isChatComposePanel);
+    }
 //    jShowBcc = new JMyLinkLikeLabel("Show BCC", MsgPreviewPanel.LINK_RELATIVE_FONT_SIZE);
     jShowBcc = new JMyButtonNoFocus("Show BCC");
     jShowBcc.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
@@ -664,12 +666,16 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
       jSendCombo = new JMyListCombo(0, sendObjectsProvider, sendActionListener);
       jTyping = new JMyLabel("typing...");
+      jTyping.setBorder(new EmptyBorder(2,2,2,2));
       jTyping.setIcon(Images.get(ImageNums.PENCIL16));
       jTyping.setVisible(false);
+      jTyping.setOpaque(true);
+      jTyping.setBackground(Color.white);
+      jTyping.setFocusable(false);
 
-      jRing = new JMyButtonNoFocus(Images.get(ImageNums.RING_BELL));
+      jRing = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_BELL));
       jRing.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
-      jRing.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      //jRing.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
       jRing.setBorder(new EmptyBorder(2, 2, 2, 2));
       jRing.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
@@ -694,9 +700,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jAttachments.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
       jAttachments.setBorder(new EmptyBorder(0,0,0,0));
 
-      jAttach = new JMyButtonNoFocus(Images.get(ImageNums.ATTACH16));
+      jAttach = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_ATTACH));
       jAttach.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Attachments"));
-      jAttach.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      //jAttach.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
       jAttach.setBorder(new EmptyBorder(2, 2, 2, 2));
       jAttach.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
@@ -778,9 +784,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         if ((!isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToNew)) ||
             (isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToReFwd))
             ) {
-          String signatureText = MsgPanelUtils.getSigText(userSettingsRecord, isHTML());
+          boolean isHTML = isHTML();
+          String signatureText = MsgPanelUtils.getSigText(userSettingsRecord, isHTML);
           if (signatureText.trim().length() > 0) {
-            msgTypeArea.setContentText(signatureText, false, true);
+            msgTypeArea.setContentText(signatureText, isHTML, false, true);
           }
         }
       }
@@ -807,7 +814,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     enterKeyListener = new EnterKeyListener();
     msgTypeListener = new MsgTypeListener(msgTypeManagerI, isChatComposePanel);
     msgTypeArea.setEnterKeyListener(enterKeyListener);
-    msgTypeArea.addDocumentListener(msgTypeListener);
+    msgTypeArea.setDocumentListener(msgTypeListener);
     if (jSubject != null) {
       jSubject.getDocument().addDocumentListener(msgTypeListener);
     }
@@ -874,12 +881,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (!msgTypeArea.isSubjectGenerated()) {
       panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-      panel.add(jSubject, new GridBagConstraints(1, posY, 5, 1, 10, 0,
+      panel.add(jSubject, new GridBagConstraints(1, posY, 6, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
       //add(jAttach, new GridBagConstraints(4, posY, 1, 1, 0, 0,
             //GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 2, 0, 2), 0, 0));
-      panel.add(jHTML, new GridBagConstraints(6, posY, 1, 1, 0, 0,
-            GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 5), 0, 0));
       posY ++;
     }
 
@@ -947,6 +952,11 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     // most important components go first to be first in focus order
     panel.add(msgTypeArea, new GridBagConstraints(0, posY, 9, 1, 50, 50,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+    posY ++;
+    // this row is for notifications
+    panel.add(jTyping, new GridBagConstraints(0, posY, 9, 1, 10, 0,
+          GridBagConstraints.SOUTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+
 
     // put other components next in the focus order
     posY = 0;
@@ -954,26 +964,38 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 2), 0, 0));
     panel.add(jPriority, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 2, 2, 2), 0, 0));
-//    // "Copy to Sent"
-//    panel.add(jCopyToOutgoing, new GridBagConstraints(2, posY, 1, 1, 0, 0,
-//          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 20, 2, 0), 0, 0));
-//    panel.add(jOutgoing, new GridBagConstraints(3, posY, 1, 1, 0, 0,
-//          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 2), 0, 0));
-    // attach
-    panel.add(jAttach, new GridBagConstraints(4, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 20, 0, 0), 0, 0));
-    // ring
-    panel.add(jRing, new GridBagConstraints(5, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    // html
-    panel.add(jHTML, new GridBagConstraints(6, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
 
-    panel.add(jTyping, new GridBagConstraints(7, posY, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 20, 2, 2), 0, 0));
+//    // attach
+//    panel.add(jAttach, new GridBagConstraints(2, posY, 1, 1, 0, 0,
+//          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 20, 0, 0), 0, 0));
+
+    JComponent msgTypeToolBar = msgTypeArea.getToolBar();
+    msgTypeToolBar.add(jAttach);
+    // Separator before Ring
+    JPanel sep = new JPanel();
+    sep.setLayout(null);
+    sep.setBackground(sep.getBackground().darker());
+    sep.setMaximumSize(new Dimension(1, 50));
+    msgTypeToolBar.add(sep);
+    msgTypeToolBar.add(jRing);
+    if (msgTypeToolBar != null) {
+      panel.add(msgTypeToolBar, new GridBagConstraints(4, posY, 1, 1, 0, 0,
+            GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
+    }
+
+//    panel.add(jTyping, new GridBagConstraints(5, posY, 1, 1, 10, 0,
+//          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 2), 0, 0));
+
+    // stretcher
+    panel.add(new JLabel(), new GridBagConstraints(6, posY, 1, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+
+//    // ring
+//    panel.add(jRing, new GridBagConstraints(7, posY, 1, 1, 0, 0,
+//          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 1, 2, 1), 0, 0));
 
     panel.add(jSendCombo, new GridBagConstraints(8, posY, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 20, 2, 1), 0, 0));
+          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 1, 2, 1), 0, 0));
 
     posY ++;
 
@@ -1096,15 +1118,12 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     else if (isForward)
       setSubject(getSubjectForward(new Object[] { dataRecord }, 250));
 
-    String[] content = makeReplyToContent(quotedMsg, dataRecord, false, false, false);
+    String[] content = makeReplyToContent(quotedMsg, dataRecord, false, false, true);
 
     String text = null;
     if (content[0].equalsIgnoreCase("text/html")) {
-      // make sure we are in HTML mode
-      msgTypeArea.setHTML(true, false);
       String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, true) : "";
       if (signatureText.trim().length() > 0) {
-        signatureText += "<p></p>";
         signatureText = ArrayUtils.replaceKeyWords(signatureText,
             new String[][] {
               {"<BODY>", " "},
@@ -1118,9 +1137,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           });
       }
       text =
-          "<html><body face="+HTML_utils.DEFAULT_FONTS_QUOTED+"> " +
-          "<p> <br> </p> " +
+          "<html><body> " +
           (addSignature ? signatureText : "") +
+          "<br>" +
           "<table cellpadding='1' cellspacing='5' border='0'> " +
             "<tr>" +
               "<td align='left' valign='top' width='1' bgcolor='#666666'> " +
@@ -1132,11 +1151,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
               "</td> " +
             "</tr> " +
           "</table> " +
-          "<p> <br> </p> " +
+          "<br>" +
           "</body></html>";
+      msgTypeArea.setContentText(text, true, false, true);
     } else {
-      // make sure we are in PLAIN mode
-      msgTypeArea.setHTML(false, false);
       String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, false) : "";
       if (signatureText.trim().length() > 0) {
         signatureText += "\n\n";
@@ -1148,8 +1166,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           " \n" +
           content[1] + content[3] +
           "\n\n";
+      msgTypeArea.setContentText(text, false, false, true);
     }
-    msgTypeArea.setContentText(text, false, true);
 
     if (trace != null) trace.exit(MsgComposeComponents.class);
   }
@@ -1217,9 +1235,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       }
 
       boolean convertHTMLBodyToPlain = isForceConvertHTMLtoPLAIN;
-      if (!isForceConvertHTMLtoPLAIN) {
-        convertHTMLBodyToPlain = MsgPreviewPanel.isDefaultToPLAINpreferred(linkRecord, dataRecord);
-      }
+      // always reply in FULL IMAGE mode
+//      if (!isForceConvertHTMLtoPLAIN) {
+//        convertHTMLBodyToPlain = MsgPreviewPanel.isDefaultToPLAINpreferred(linkRecord, dataRecord);
+//      }
 
       String quotedSubject = dataRecord.isTypeMessage() ? dataRecord.getSubject() : dataRecord.name;
       String quotedMsgBody = dataRecord.isTypeMessage() ? dataRecord.getText() : dataRecord.addressBody;
@@ -1230,7 +1249,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, true, true);
         if (convertHTMLBodyToPlain) {
           String html = quotedMsgBody;
+          if (trace != null) trace.data(50, "extracting plain from html");
           String plain = MsgPanelUtils.extractPlainFromHtml(html);
+          if (trace != null) trace.data(51, "encoding plain into html");
           quotedMsgBody = Misc.encodePlainIntoHtml(plain);
         }
         content[2] = "text/html";
@@ -1238,6 +1259,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       } else {
         if (isForceOutputInHTMLBody) {
           // << comes in PLAIN
+          if (trace != null) trace.data(60, "extracting plain from html");
           quotedMsgBody = Misc.encodePlainIntoHtml(quotedMsgBody);
           content[2] = "text/html";
           // >> comes out converted to HTML
@@ -1250,15 +1272,16 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
       // additional conditioning...
       if (quotedMsgBody != null && quotedMsgBody.length() > 0 && dataRecord.isHtmlMail() && !convertHTMLBodyToPlain) {
-        quotedMsgBody = "<table>" + quotedMsgBody + "</table>";
+        // quotedMsgBody = "<table>" + quotedMsgBody + "</table>";
       } else if (quotedMsgBody == null) {
         quotedMsgBody = "";
       }
 
-      if (isForceOutputInHTMLPrintHeader || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
+      if (isForceOutputInHTMLPrintHeader || isForceOutputInHTMLBody || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
+        if (trace != null) trace.data(70, "making HTML header lines");
         content[0] = "text/html";
         content[1] =
-            (isForceOutputInHTMLPrintHeader ? "<font size='-1' face="+HTML_utils.DEFAULT_FONTS_QUOTED+"><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
+            (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") +
 
@@ -1273,41 +1296,27 @@ public class MsgComposeComponents extends Object implements DisposableObj {
             (isForceOutputInHTMLPrintHeader ? "</table>" : "");
 
         if (content[2].equalsIgnoreCase("text/html")) {
-          // condition formatting
-          quotedMsgBody = ArrayUtils.replaceKeyWords(quotedMsgBody,
-              new String[][] {
-                {"<P>", "<p>"},
-                {"</P>", "</p>"},
-                {"\n\r", " "},
-                {"\r\n", " "},
-                {"\r", " "},
-                {"\n", " "},
-                {"   ", " "},
-                {"   ", " "},
-                {"   ", " "},
-                {"   ", " "},
-                {"   ", " "},
-                {"  ", " "},
-                {"  ", " "},
-                {" <p>", "<p>"},
-                {" </p>", "</p>"},
-                {"<p> ", "<p>"},
-                {"</p> ", "</p>"},
-                {"<p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p></p><p></p><p></p>", "<p></p><p></p>"},
-                {"<p><p><p><p>", "<p><p>"},
-                {"<p><p><p><p>", "<p><p>"},
-                {"<p><p><p><p>", "<p><p>"},
-                {"<p><p><p><p>", "<p><p>"},
-                {"<p><p><p><p>", "<p><p>"},
-                {"<p><p><p>", "<p><p>"},
-                {"<p><p><p>", "<p><p>"},
-            }, new String[] { "<PRE>", "<pre>" }, new String[] { "</PRE>", "</pre>"} );
+          // condition formatting is a performance hit for complex messages -- removed
+//          if (trace != null) trace.data(100, "condition formatting start");
+//          quotedMsgBody = ArrayUtils.replaceKeyWords(quotedMsgBody,
+//              new String[][] {
+//                {"<P>", "<p>"},
+//                {"</P>", "</p>"},
+//                {"\n", " "},
+//                {"\r", " "},
+//                {"     ", " "},
+//                {"   ", " "},
+//                {"  ", " "},
+//                {" <p>", "<p>"},
+//                {" </p>", "</p>"},
+//                {"<p> ", "<p>"},
+//                {"</p> ", "</p>"},
+//                {"<p></p><p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
+//                {"<p></p><p></p><p></p>", "<p></p><p></p>"},
+//                {"<p><p><p><p><p>", "<p><p>"},
+//                {"<p><p><p>", "<p><p>"},
+//            }, new String[] { "<PRE>", "<pre>" }, new String[] { "</PRE>", "</pre>"} );
+//          if (trace != null) trace.data(101, "condition formatting done");
         }
         content[3] = quotedMsgBody;
       } else {
@@ -1330,9 +1339,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
     if (htmlText != null && htmlText.length() > 0) {
-      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" : "") +
+      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2'>" : "") +
               "<b>" + name + ": </b>" +
-              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2' face="+HTML_utils.DEFAULT_FONTS_QUOTED+">" : "") +
+              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2'>" : "") +
               htmlText +
               (isPrintHeader ? "</font></td></tr>" : "<br>");
     } else {
@@ -1475,8 +1484,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         if ((FetchedDataCache.getSingleInstance().getUserRecord().flags.longValue() & UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES) != 0) {
           event.consume();
           // only react to ENTER if there is any content of message
-          if (jSendCombo.isEnabledLabel())
+          if (jSendCombo.isEnabledLabel()) {
             pressedSendButton(new ActionEvent(event.getSource(), event.getID(), "ENTER"));
+          }
         }
       }
     }
@@ -1490,7 +1500,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   public void disposeObj() {
     // remove DocumentChangeListener
     if (msgTypeListener != null) {
-      msgTypeArea.removeDocumentListener(msgTypeListener);
+      msgTypeArea.setDocumentListener(null);
       if (jSubject != null) {
         jSubject.getDocument().removeDocumentListener(msgTypeListener);
       }
