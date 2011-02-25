@@ -36,8 +36,17 @@ import javax.swing.text.*;
  */
 public class HTML_EditorKit extends HTMLEditorKit {
 
+  private boolean alwaysUseCustomImageView = false;
   private boolean isDisplayRemoteImages = false;
   private CallbackI remoteImageBlockedCallback;
+
+  public HTML_EditorKit() {
+    super();
+  }
+  public HTML_EditorKit(boolean alwaysUseCustomImageView) {
+    super();
+    this.alwaysUseCustomImageView = alwaysUseCustomImageView;
+  }
 
   public void setDisplayRemoteImages(boolean enable) {
     isDisplayRemoteImages = enable;
@@ -61,30 +70,33 @@ public class HTML_EditorKit extends HTMLEditorKit {
         if (kind == HTML.Tag.IMG) {
           try {
             if (trace != null) trace.data(10, "Creating our HTML_ImageView");
-            //view = new HTML_ImageView(elem);
-            AttributeSet attribSet = elem.getAttributes();
-            Enumeration enm = attribSet.getAttributeNames();
-            while (enm.hasMoreElements()) {
-              Object attribName = enm.nextElement();
-              Object attrib = attribSet.getAttribute(attribName);
-              if (attribName instanceof HTML.Attribute && ((HTML.Attribute) attribName).equals(HTML.Attribute.SRC)) {
-                if (attrib instanceof String) {
-                  String aValue = (String) attrib;
-                  boolean isLocalBlocked = false;
-                  Boolean isRemoteBlocked = null;
-                  if (aValue.startsWith("cid:"))
-                    isLocalBlocked = true;
-                  else if(aValue.startsWith("http://") || aValue.startsWith("https://")) {
-                    if (isDisplayRemoteImages)
-                      isRemoteBlocked = Boolean.FALSE;
-                    else
-                      isRemoteBlocked = Boolean.TRUE;
-                  }
-                  if (isRemoteBlocked != null && remoteImageBlockedCallback != null) {
-                    remoteImageBlockedCallback.callback(isRemoteBlocked);
-                  }
-                  if (isLocalBlocked || (isRemoteBlocked != null && isRemoteBlocked.booleanValue())) {
-                    view = new javax.swing.text.ParagraphView(elem);
+            if (alwaysUseCustomImageView) {
+              view = new HTML_ImageView(elem);
+            } else {
+              AttributeSet attribSet = elem.getAttributes();
+              Enumeration enm = attribSet.getAttributeNames();
+              while (enm.hasMoreElements()) {
+                Object attribName = enm.nextElement();
+                Object attrib = attribSet.getAttribute(attribName);
+                if (attribName instanceof HTML.Attribute && ((HTML.Attribute) attribName).equals(HTML.Attribute.SRC)) {
+                  if (attrib instanceof String) {
+                    String aValue = (String) attrib;
+                    boolean isLocalBlocked = false;
+                    Boolean isRemoteBlocked = null;
+                    if (aValue.startsWith("cid:"))
+                      isLocalBlocked = true;
+                    else if (aValue.startsWith("http://") || aValue.startsWith("https://")) {
+                      if (isDisplayRemoteImages)
+                        isRemoteBlocked = Boolean.FALSE;
+                      else
+                        isRemoteBlocked = Boolean.TRUE;
+                    }
+                    if (isRemoteBlocked != null && remoteImageBlockedCallback != null) {
+                      remoteImageBlockedCallback.callback(isRemoteBlocked);
+                    }
+                    if (isLocalBlocked || (isRemoteBlocked != null && isRemoteBlocked.booleanValue())) {
+                      view = new javax.swing.text.ParagraphView(elem);
+                    }
                   }
                 }
               }

@@ -83,7 +83,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
 
   private HTML_ClickablePane makeHTMLRenderer(Component rendererContainer) {
     // our own image icon view to prevent dancing icons
-    HTML_ClickablePane htmlPane = new HTML_ClickablePane("", new HTML_EditorKit());
+    HTML_ClickablePane htmlPane = new HTML_ClickablePane("", new HTML_EditorKit(true));
     htmlPane.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
     htmlPane.setRendererContainer(rendererContainer);
     return htmlPane;

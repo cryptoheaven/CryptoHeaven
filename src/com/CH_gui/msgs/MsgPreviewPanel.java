@@ -746,12 +746,15 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       EditorKit editorKit = ((JEditorPane) jHtmlMessage).getEditorKit();
       if (editorKit instanceof HTML_EditorKit) {
         ((HTML_EditorKit) editorKit).setDisplayRemoteImages(newHTMLstate);
+        // reload the editor with new image settings
+        setCurrentMessageText();
       }
     }
 
-    // Change the display mode now... and send request for change on the server.
-    // When fetching mail folders it may take to long for view to respond, so switch right away.
-    setHTMLMode(newHTMLstate);
+    // Display mode does not change, it is in HTML
+//    // Change the display mode now... and send request for change on the server.
+//    // When fetching mail folders it may take to long for view to respond, so switch right away.
+//    setHTMLMode(newHTMLstate);
 
     // Change the message status on the server, when it comes back, our gui will adjust
     // Run update to the server and so we don't hold up the GUI, update the local cached copy right away.  This is done to make the GUI very responsive
