@@ -12,25 +12,11 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
-import java.awt.*;
-import java.awt.event.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.ops.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
@@ -40,6 +26,14 @@ import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+
+import java.awt.*;
+import java.awt.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -99,7 +93,7 @@ public class DeleteAccountDialog extends GeneralDialog {
     JPanel panel = createMainPanel();
     okButton.setEnabled(isInputValid());
 
-    super.init(parent, buttons, panel, new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_CANCEL_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
+    super.init(parent, buttons, panel, MiscGui.createLogoHeader(), DEFAULT_CANCEL_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
 
     if (trace != null) trace.exit(DeleteAccountDialog.class);
   }

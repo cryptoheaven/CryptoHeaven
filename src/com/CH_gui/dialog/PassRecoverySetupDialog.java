@@ -125,7 +125,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
     // Make sure all our components have proper enablement
     setEnabledInputs();
 
-    super.init(frame, buttons, new JScrollPane(passRecoveryPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_OK_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
+    super.init(frame, buttons, new JScrollPane(passRecoveryPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), MiscGui.createLogoHeader(), DEFAULT_OK_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
 
     if (trace != null) trace.exit(PassRecoverySetupDialog.class);
   }

@@ -12,9 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.engine.*;
 
@@ -25,6 +22,8 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 import com.CH_guiLib.gui.*;
 
 import java.awt.*;
@@ -88,7 +87,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
     JButton[] buttons = createButtons();
     JPanel passRecoveryPanel = createMainPanel(initialRecoveryRecord);
 
-    super.init(frame, buttons, passRecoveryPanel, new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_OK_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
+    super.init(frame, buttons, passRecoveryPanel, MiscGui.createLogoHeader(), DEFAULT_OK_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
     if (trace != null) trace.exit(PassRecoveryRecoverDialog.class);
   }
 

@@ -12,21 +12,18 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.JMyTextArea;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import java.io.*;
-
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+import javax.swing.*;
+import javax.swing.text.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -62,7 +59,7 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
     JButton[] buttons = createButtons();
     JPanel panel = createMainPanel();
 
-    super.init(parent, buttons, panel, new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_BUTTON_INDEX, DEFAULT_BUTTON_INDEX);
+    super.init(parent, buttons, panel, MiscGui.createLogoHeader(), DEFAULT_BUTTON_INDEX, DEFAULT_BUTTON_INDEX);
 
     if (trace != null) trace.exit(LicenseDialog.class);
   }

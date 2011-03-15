@@ -163,7 +163,7 @@ public class AccountOptionsDialog extends GeneralDialog {
       pane.setPreferredSize(new Dimension(maxDialogWidth, pane.getPreferredSize().height+16));
     }
 
-    super.init(parent, buttons, pane, new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_OK_INDEX, DEFAULT_CANCEL_INDEX);
+    super.init(parent, buttons, pane, MiscGui.createLogoHeader(), DEFAULT_OK_INDEX, DEFAULT_CANCEL_INDEX);
 
     setEnabledButtons();
     fetchData();
@@ -292,7 +292,7 @@ public class AccountOptionsDialog extends GeneralDialog {
             }
 
             SysOps.checkExpiry();
-            SysOps.checkQuotas();
+            SysOps.checkQuotas(storageUsedF, transferUsedF, accountsUsedF);
 
             // buttons enablement after fetch is done
             setEnabledButtons();
