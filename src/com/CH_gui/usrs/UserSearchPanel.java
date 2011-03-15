@@ -235,8 +235,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     }
 
     if (isPassRecoveryMode) {
-      JLabel logo = new JLabel(Images.get(ImageNums.LOGO_BANNER_MAIN));
-      mainPanel.add(logo, new GridBagConstraints(0, posY, 7, 1, 0, 0,
+       mainPanel.add(MiscGui.createLogoHeader(), new GridBagConstraints(0, posY, 7, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
