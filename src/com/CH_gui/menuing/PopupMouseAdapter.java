@@ -72,10 +72,8 @@ public class PopupMouseAdapter extends MouseAdapter {
           if (listener instanceof TigerBkgChecker) {
             TigerBkgChecker bgc = (TigerBkgChecker) listener;
             Point pt = new Point(mouseEvent.getX(), mouseEvent.getY());
-            if (bgc.isInMisspelledWord(pt)) {
-              mouseEvent.consume();
+            if (bgc.isInMisspelledWord(pt))
               jPopupSpell = bgc.createPopupMenu(mouseEvent.getX(), mouseEvent.getY(), 8, "Ignore All", "Add to Dictionary", "(no spelling suggestions)");
-            }
           }
         }
       }
@@ -86,11 +84,8 @@ public class PopupMouseAdapter extends MouseAdapter {
         ActionProducerI actionProducer = (ActionProducerI) actionProducerRef.get();
         if (registerFor != null && actionProducer != null) {
           Window window = SwingUtilities.windowForComponent(registerFor);
-          if (window instanceof JActionFrame) {
-            JActionFrame jActionFrame = (JActionFrame) window;
-            jPopupActions = jActionFrame.getMenuTreeModel().generatePopup(actionProducer.getActions());
-            mouseEvent.consume();
-          }
+          if (window instanceof JActionFrame)
+            jPopupActions = ((JActionFrame) window).getMenuTreeModel().generatePopup(actionProducer.getActions());
         }
       }
 
@@ -107,8 +102,10 @@ public class PopupMouseAdapter extends MouseAdapter {
         jPopup = jPopupActions;
       }
 
-      if (jPopup != null)
+      if (jPopup != null) {
+        mouseEvent.consume();
         jPopup.show((Component) mouseEvent.getSource(), mouseEvent.getX(), mouseEvent.getY());
+      }
 
     }
     if (trace != null) trace.exit(PopupMouseAdapter.class);

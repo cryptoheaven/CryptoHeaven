@@ -187,18 +187,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
   public Action getDoubleClickAction() {
     Action action = null;
-    if (withDoubleClickAction) {
+    if (withDoubleClickAction)
       action = actions[MESSAGE_ACTION];
-      // if cases that single online contact is selected default to CHAT
-      Record[] selectedRecords = getSelectedRecords();
-      if (selectedRecords != null && selectedRecords.length == 1) {
-        if (selectedRecords[0] instanceof ContactRecord) {
-          if (((ContactRecord) selectedRecords[0]).isOnlineStatus()) {
-            action = actions[CHAT_ACTION];
-          }
-        }
-      }
-    }
     return action;
   }
 

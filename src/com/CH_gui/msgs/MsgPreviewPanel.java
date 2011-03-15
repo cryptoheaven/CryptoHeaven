@@ -1618,9 +1618,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           content += "<p>" + Misc.encodePlainIntoHtml(contentParts[1]) + "</p>\n";
         }
         if (contentParts[2].equalsIgnoreCase("text/html")) {
-          content += "<p><font size='-2' face='Monospaced, Curier, Arial, Verdana, Helvetica, sans-serif'>" + contentParts[3] + "</font></p>";
+          content += "<p><font size='-1'>" + contentParts[3] + "</font></p>";
         } else {
-          content += "<p><font size='-2' face='Monospaced, Curier, Arial, Verdana, Helvetica, sans-serif'>" + Misc.encodePlainIntoHtml(contentParts[3]) + "</font></p>";
+          content += "<p><font size='-1'>" + Misc.encodePlainIntoHtml(contentParts[3]) + "</font></p>";
         }
         content += "</body></html>";
 

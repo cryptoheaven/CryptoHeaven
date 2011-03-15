@@ -131,6 +131,8 @@ public class UserOps extends Object {
 
     // Check if the encrypted private part of the key is stored remotely... if so we will need to send an update.
     String keyPropertyName = "Enc" + RSAPrivateKey.OBJECT_NAME + "_" + keyRecord.keyId;
+    String keyPropertyNameInfo = keyPropertyName+"_info";
+    String keyInfo = cache.getUserRecord().shortInfo();
     GlobalSubProperties keyProperties = new GlobalSubProperties(privateKeyFile, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
     String oldProperty = keyProperties.getProperty(keyPropertyName);
     boolean wasLocalKey = (oldProperty != null && oldProperty.length() > 0);
@@ -140,6 +142,7 @@ public class UserOps extends Object {
     if (storeKeyOnLocal) {
       try {
         keyProperties.setProperty(keyPropertyName, keyRecord.getEncPrivateKey().getHexContent());
+        keyProperties.setProperty(keyPropertyNameInfo, keyInfo);
         keyProperties.store();
         UsrALoginSecureSession.addPathToLastPrivKeyPaths(keyProperties.getPropertiesFullFileName());
         storedLocally = true;
@@ -172,6 +175,7 @@ public class UserOps extends Object {
     if (!error && storeKeyOnServer && wasLocalKey) {
       // delete the key from local storage...
       keyProperties.remove(keyPropertyName);
+      keyProperties.remove(keyPropertyNameInfo);
       keyProperties.store();
     } else if (error) {
       if (storeKeyOnServer && wasLocalKey) {
@@ -179,10 +183,12 @@ public class UserOps extends Object {
       } else if (storeKeyOnLocal && wasLocalKey) {
         // password change on local keys failed, restore local key storage
         keyProperties.setProperty(keyPropertyName, oldProperty);
+        keyProperties.setProperty(keyPropertyNameInfo, keyInfo);
         keyProperties.store();
       } else if (storeKeyOnLocal && !wasLocalKey && storedLocally) {
         // delete the key from local storage...
         keyProperties.remove(keyPropertyName);
+        keyProperties.remove(keyPropertyNameInfo);
         keyProperties.store();
       }
     }

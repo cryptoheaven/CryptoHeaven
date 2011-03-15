@@ -93,6 +93,7 @@ public class LoginFrame extends JFrame {
   /* Components that are placed in the mainPanel */
   private JLabel jLogo ;
 //  private JLabel switchModeLink ;
+  private JLabel jUsernameLabel ;
   private JTextField userName ;
 //  private JMyTextComboBox newEmail ;
 //  private JLabel newEmailLabel ;
@@ -108,7 +109,6 @@ public class LoginFrame extends JFrame {
   private JLabel serverLabel ;
   private JComboBox serverCombo ;
   private JLabel changeServerLabel ;
-  private JButton proxyButton ;
   private JLabel proxySettingsLabel ;
   private JLabel passwordConditionLabel ;
   private JLabel advancedLabel ;
@@ -191,19 +191,27 @@ public class LoginFrame extends JFrame {
     if (GeneralDialog.getDefaultParent() == null)
       GeneralDialog.setDefaultParent(this);
 
-    JButton[] buttons = createButtons();
+    jLogo = new JMyLabel(Images.get(ImageNums.LOGO_KEY_MAIN));
+    JComponent jLogoHeader = MiscGui.createLogoHeader(jLogo);
+
+    JButton[] buttons = createButtons(false);
     this.mainPanel = createMainPanel();
+    // add buttons panel indented the same amount as username field
+    Dimension usernameLabelDim = jUsernameLabel.getPreferredSize();
+    int usernameLabelWidth = usernameLabelDim.width;
+    int indentAmount = usernameLabelWidth + 5 + 5; // 5 + 5 are the indents between username label and field
+    this.mainPanel.add(MiscGui.createButtonPanel(buttons, new EmptyBorder(0,indentAmount,0,indentAmount), BorderLayout.CENTER), new GridBagConstraints(1, 50, 4, 1, 0, 0,
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 8, 5), 0, 0));
 
     JButton defaultButton = buttons[DEFAULT_BUTTON_INDEX];
     getRootPane().setDefaultButton(defaultButton);
 
-    getContentPane().add("North", jLogo);
+    getContentPane().add("North", jLogoHeader);
     if (getToolkit().getScreenSize().height >= 600) {
       getContentPane().add("Center", mainPanel);
     } else {
       getContentPane().add("Center", new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
     }
-    getContentPane().add("South", MiscGui.createButtonPanel(buttons));
 
     // connect 'X' window button to cancel
     addWindowListener(new WindowAdapter() {
@@ -288,13 +296,14 @@ public class LoginFrame extends JFrame {
     //serverCombo.setEditable(b);
     if (serverCombo != null)
       serverCombo.setEnabled(b);
-    //proxyButton.setEnabled(b);
     okButton.setEnabled(b);
-    cancelButton.setEnabled(b);
+    if (cancelButton != null)
+      cancelButton.setEnabled(b);
     if (advancedButton != null)
       advancedButton.setEnabled(b);
     rememberUserName.setEnabled(b);
-    switchModeButton.setEnabled(isNewAccountOptionEnabled && b);
+    if (switchModeButton != null)
+      switchModeButton.setEnabled(isNewAccountOptionEnabled && b);
     if (licenseButton != null)
       licenseButton.setEnabled(b);
     if (licenseCheck != null)
@@ -322,8 +331,10 @@ public class LoginFrame extends JFrame {
     passwordLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Password"));
     recoveryLabel.setText("Forgot your password?");
     recoveryLabel.setVisible(true);
-    switchModeButton.setText(com.CH_gui.lang.Lang.rb.getString("button_New_Account"));
-    switchModeButton.setEnabled(isNewAccountOptionEnabled);
+    if (switchModeButton != null) {
+      switchModeButton.setText(com.CH_gui.lang.Lang.rb.getString("button_New_Account"));
+      switchModeButton.setEnabled(isNewAccountOptionEnabled);
+    }
     okButton.setText(OK_BUTTON_LOGIN_MODE);
 
     jLogo.setIcon(Images.get(ImageNums.LOGO_KEY_MAIN));
@@ -372,7 +383,7 @@ public class LoginFrame extends JFrame {
   }
 
   /** Change dialog to Create New Account Dialog.
-    * Add "Retype password" amd "Enter email" fields plus labels
+    * Add "Retype password" and "Enter email" fields plus labels
     */
   private void changeModeToNewAccount() {
     if (passwordConditionLabel == null)
@@ -444,8 +455,10 @@ public class LoginFrame extends JFrame {
     recoveryLabel.setVisible(false);
     retypePassword.setText("");
     licenseCheck.setSelected(false);
-    switchModeButton.setText(com.CH_gui.lang.Lang.rb.getString("button_Switch_to_Login"));
-    switchModeButton.setEnabled(true);
+    if (switchModeButton != null) {
+      switchModeButton.setText(com.CH_gui.lang.Lang.rb.getString("button_Switch_to_Login"));
+      switchModeButton.setEnabled(true);
+    }
 
     okButton.setText(OK_BUTTON_NEW_ACCOUNT_MODE);
 
@@ -510,7 +523,7 @@ public class LoginFrame extends JFrame {
 
     // Password Length Warning
     mainPanel.add(passwordConditionLabel, new GridBagConstraints(1, 16, 4, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 1, 1, 1), 20, 20));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 20, 20));
 
     versionLabel.setVisible(false);
 
@@ -800,9 +813,6 @@ public class LoginFrame extends JFrame {
   private JPanel createMainPanel() {
     JPanel panel = new JPanel();
 
-    ImageIcon logo = Images.get(ImageNums.LOGO_KEY_MAIN);
-    jLogo = new JMyLabel(logo);
-
 //    switchModeLink = new JMyLinkLikeLabel("Sign up for a new account", -1);
 //    switchModeLink.addMouseListener(new MouseAdapter() {
 //      public void mouseClicked(MouseEvent event) {
@@ -879,7 +889,7 @@ public class LoginFrame extends JFrame {
     serverLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Server"));
     serverCombo = new JMyComboBox();
     serverCombo.setEditable(true);
-    proxySettingsLabel = new JMyLinkLikeLabel("Proxy settings", -1);
+    proxySettingsLabel = new JMyLinkLikeLabel("Proxy", -1);
     proxySettingsLabel.addMouseListener(new MouseAdapter() {
       JLabel jSocksProxyUsed = null;
       JTextField jSocksProxyAddress = null;
@@ -1131,7 +1141,8 @@ public class LoginFrame extends JFrame {
 //    mainPanel.add(switchModeLink, new GridBagConstraints(1, 0, 4, 1, 10, 0, 
 //        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
+    jUsernameLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username"));
+    panel.add(jUsernameLabel, new GridBagConstraints(1, 1, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 5, 5, 5), 0, 0));
 
     panel.add(userName, new GridBagConstraints(2, 1, 3, 1, 10, 0,
@@ -1157,9 +1168,6 @@ public class LoginFrame extends JFrame {
 
     panel.add(serverCombo, new GridBagConstraints(2, 9, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-
-//    mainPanel.add(proxyButton, new GridBagConstraints(3, 9, 1, 1, 0, 0, 
-//        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 0, 5, 5), 0, 0));
 
     panel.add(recoveryLabel, new GridBagConstraints(2, 10, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 5, 5), 0, 0));
@@ -1208,30 +1216,33 @@ public class LoginFrame extends JFrame {
   }
 
   /* Create three buttons: "Login", "Cancel" and "Create New Account */
-  private JButton[] createButtons() {
+  private JButton[] createButtons(boolean includeCancel) {
 
     boolean includeSwitchModeButton = !URLs.get(URLs.NEW_ACCOUNT_BUTTON).equalsIgnoreCase("remove");
     isNewAccountOptionEnabled = URLs.get(URLs.NEW_ACCOUNT_BUTTON).equalsIgnoreCase("enable");
 
-    JButton[] buttons = new JButton[includeSwitchModeButton ? 3 : 2];
+    ArrayList buttonsL = new ArrayList();
 
     okButton = new JMyButton(OK_BUTTON_LOGIN_MODE);
     okButton.setDefaultCapable(true);
     okButton.addActionListener(new OKActionListener());
-    buttons[0] = okButton;
-
-    // make the button even if it is not included to avoid some exceptions later on
-    switchModeButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_New_Account"));
-    switchModeButton.setEnabled(isNewAccountOptionEnabled);
+    buttonsL.add(okButton);
 
     if (includeSwitchModeButton) {
+      switchModeButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_New_Account"));
+      switchModeButton.setEnabled(isNewAccountOptionEnabled);
       switchModeButton.addActionListener(new NewAccountSignInActionListener());
-      buttons[1] = switchModeButton;
+      buttonsL.add(switchModeButton);
     }
 
-    cancelButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
-    cancelButton.addActionListener(new CancelActionListener());
-    buttons[includeSwitchModeButton ? 2 : 1] = cancelButton;
+    if (includeCancel) {
+      cancelButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+      cancelButton.addActionListener(new CancelActionListener());
+      buttonsL.add(cancelButton);
+    }
+
+    JButton[] buttons = new JButton[buttonsL.size()];
+    buttonsL.toArray(buttons);
 
     return buttons;
   }
@@ -1647,8 +1658,22 @@ public class LoginFrame extends JFrame {
   public void performConnect() {
     if (MainFrame.getServerInterfaceLayer() == null) {
       Object[] server = getServer();
-      Object[][] hostsAndPorts = EngineFinder.queryServerForHostsAndPorts(server);
-      MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true));
+      Object[][] hostsAndPorts = null;
+      try {
+        // this is a complex call that involves IO so wrap it in try-catch
+        hostsAndPorts = EngineFinder.queryServerForHostsAndPorts(server);
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+      try {
+        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_1));
+        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_2));
+        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_3));
+        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, false, URLs.get(URLs.DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1));
+        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true));
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
     }
   }
 

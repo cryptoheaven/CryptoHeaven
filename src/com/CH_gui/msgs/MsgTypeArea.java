@@ -22,10 +22,6 @@ import com.CH_gui.addressBook.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.util.*;
 
-// "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-import comx.tig.en.SingleTigerSession;
-import comx.Tiger.gui.*;
-
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.*;
@@ -35,8 +31,6 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.text.html.HTMLDocument;
-
-import sferyx.administration.editors.HTMLEditor;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -74,10 +68,6 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
 
   private boolean isChatMode;
 
-  // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-  private Object tigerBkgChecker = null;
-  //private TigerBkgChecker tigerBkgChecker = null;
-
   /** Creates new MsgTypeArea */
   public MsgTypeArea(short objType, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "MsgTypeArea(short objType, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode)");
@@ -86,32 +76,25 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     this.undoMngrI = undoMngrI;
     this.isChatMode = isChatMode;
 
-    init();
+    init(suppressSpellCheck);
 
     if (grabInitialFocus) {
       getTextComponent().addHierarchyListener(new InitialFocusRequestor());
     }
 
-    if (!suppressSpellCheck) {
-      // Create spell checker for the message
-      // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-      try {
-        tigerBkgChecker = new TigerBkgChecker(SingleTigerSession.getSingleInstance());
-        ((TigerBkgChecker)tigerBkgChecker).restart(getTextComponent());
-      } catch (Throwable t) {
-      }
-    }
+    // avoid super small sizing especially in chat entry panel
+    setMinimumSize(new Dimension(70, 70));
 
     if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
-  private void init() {
-    try { initComponents(); } catch (Throwable t) { t.printStackTrace(); }
+  private void init(boolean suppressSpellCheck) {
+    try { initComponents(suppressSpellCheck); } catch (Throwable t) { t.printStackTrace(); }
     try { addMyListeners(); } catch (Throwable t) { t.printStackTrace(); }
     try { initMainPanel(); } catch (Throwable t) { t.printStackTrace(); }
   }
 
-  private void initComponents() {
+  private void initComponents(boolean suppressSpellCheck) {
 
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       contactInfoPanel = new ContactInfoPanel(undoMngrI);
@@ -127,9 +110,9 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     myDocumentListener = new MyDocumentListener();
 
     if (isChatMode || objType == MsgDataRecord.OBJ_TYPE_ADDR || objType == -1)
-      jMessage = new MyHTMLEditor(true);
+      jMessage = new MyHTMLEditor(true, suppressSpellCheck);
     else
-      jMessage = new MyHTMLEditor(false);
+      jMessage = new MyHTMLEditor(false, suppressSpellCheck);
 
     if (undoMngrI != null)
       undoableEditListener = new MsgUndoableEditListener(undoMngrI);
@@ -429,6 +412,11 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
           }
           if (!isFormattedAvailable && isPlainAvailable) {
             jMessage.pastePlainTextFromClipboard(true);
+            e.consume();
+          } else if (isFormattedAvailable) {
+            jMessage.pasteFormattedTextFromClipboard();
+            // terminate any link at the end of pasted content
+            jMessage.insertContent("&nbsp;");
             e.consume();
           }
         }

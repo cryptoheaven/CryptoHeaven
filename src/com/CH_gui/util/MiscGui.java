@@ -20,6 +20,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -153,21 +154,38 @@ public class MiscGui extends Object {
   }
 
   public static JPanel createButtonPanel(JButton[] buttons) {
+    return createButtonPanel(buttons, null, null);
+  }
+  public static JPanel createButtonPanel(JButton[] buttons, Border border, Object constraints) {
     /* Add buttons so they are placed on the bottom right corner */
     JPanel buttonPanelBL = new JPanel(new BorderLayout());
+
     int cols = buttons.length;
     GridLayout grid = new GridLayout(1, cols);
     grid.setHgap(5);
     JPanel buttonPanel = new JPanel(grid);
-    EmptyBorder border = new EmptyBorder(5,5,5,5);
+    if (border == null)
+      border = new EmptyBorder(5,5,5,5);
     buttonPanel.setBorder(border);
 
     for (int i=0; i<cols; i++)
       if (buttons[i] != null)
         buttonPanel.add(buttons[i]);
 
-    buttonPanelBL.add(buttonPanel, BorderLayout.EAST);
+    buttonPanelBL.add(buttonPanel, constraints == null ? BorderLayout.EAST : constraints);
     return buttonPanelBL;
+  }
+
+  public static JComponent createLogoHeader() {
+    return createLogoHeader(null);
+  }
+  public static JComponent createLogoHeader(JLabel logo) {
+    if (logo == null)
+      logo = new JLabel(Images.get(ImageNums.LOGO_BANNER_MAIN));
+    JPanel logoHeader = new JPanel(new BorderLayout());
+    logoHeader.add(logo, BorderLayout.CENTER);
+    logoHeader.setBackground(Color.white);
+    return logoHeader;
   }
 
   public static void setSuggestedWindowLocation(Component owner, Window child) {

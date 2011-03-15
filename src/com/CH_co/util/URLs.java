@@ -56,6 +56,7 @@ public class URLs extends Object {
   public static int DOMAIN_WEB;
   public static int HOME_PAGE;
 
+  public static int DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1;
   public static int DEFAULT_SERVER_1;
   public static int DEFAULT_SERVER_2;
   public static int DEFAULT_SERVER_3;
@@ -156,8 +157,8 @@ public class URLs extends Object {
   private static void loadDefaults() {
     int i = 0;
 
-    customizationKeys = new String[30];
-    customizationStrings = new String[30];
+    customizationKeys = new String[31];
+    customizationStrings = new String[31];
 
     SERVICE_COMMUNITY_NAME = i;
     customizationKeys[i] = "SERVICE_COMMUNITY_NAME";
@@ -204,6 +205,10 @@ public class URLs extends Object {
     customizationKeys[i] = "HOME_PAGE";
     customizationStrings[i] = "http://" + get(DOMAIN_WEB); i++;
 
+
+    DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1 = i;
+    customizationKeys[i] = "DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1";
+    customizationStrings[i] = get(DOMAIN); i++;
 
     DEFAULT_SERVER_1 = i;
     customizationKeys[i] = "DEFAULT_SERVER_1";

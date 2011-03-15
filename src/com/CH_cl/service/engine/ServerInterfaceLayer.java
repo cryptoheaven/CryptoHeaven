@@ -318,8 +318,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return the Fetched Data Cach storage where all data is to be cached.
-   * There should be only one instance of this cach in the program runtime.
+   * @return the Fetched Data Cache storage where all data is to be cached.
+   * There should be only one instance of this cache in the program runtime.
    */
   public static FetchedDataCache getFetchedDataCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getFetchedDataCache()");

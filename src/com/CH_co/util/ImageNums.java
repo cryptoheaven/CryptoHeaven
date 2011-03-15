@@ -528,11 +528,11 @@ public class ImageNums extends Object {
      * First 4 indexed images are permanent and used in customizations.
      ******************************************************************/
     LOGO_KEY_MAIN = i;
-    images[i] = "LogoKey435_260"; i++;
+    images[i] = "logo-soft-435x100"; i++;
     LOGO_BANNER_MAIN = i;
-    images[i] = "LogoBanner435_80"; i++;
+    images[i] = "logo-soft-435x100"; i++;
     WINDOW_POPUP = i;
-    images[i] = "WindowPopup"; i++;
+    images[i] = "window-popup"; i++;
     FRAME_LOCK32 = i;
     images[i] = "FrameLock32"; i++;
     /******************************************************************

@@ -226,13 +226,16 @@ public class GlobalProperties extends Object {
   // build 612 Integration with Sferyx HTML Editor
   // build 614 Single click contact adding form inline ContactBuildingPanel
   // build 616 HTML type preview without loading images
+  // build 618 terminate pasted links in the HTML Editor
+  // build 620 Login screen facelift, right-click speller menu extension
+  // build 622 Addition of default servers for connectivity and removal of web only (data prohibited) servers
 
-  public static final short PROGRAM_BUILD_NUMBER = 616;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 622;  // even
   public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.4f;
-  public static final short PROGRAM_VERSION_MINOR = 0;
+  public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

@@ -86,11 +86,14 @@ public class SysOps {
   }
 
   public static void checkQuotas() {
+    checkQuotas(null, null, null);
+  }
+  public static void checkQuotas(Long storageUsedF, Long transferUsedF, Short subAccountsUsedF) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord uRec = cache.getUserRecord();
     if (uRec != null) {
       long transferLimit = uRec.transferLimit.longValue();
-      long transferUsed = uRec.transferUsed != null ? uRec.transferUsed.longValue() : 0;
+      long transferUsed = transferUsedF != null ? transferUsedF.longValue() : (uRec.transferUsed != null ? uRec.transferUsed.longValue() : 0);
 
       String msg = "";
       boolean error = false;
@@ -100,7 +103,7 @@ public class SysOps {
         error = true;
       } else if (uRec.isStorageAboveWarning()) {
         long storageLimit = uRec.storageLimit.longValue();
-        long storageUsed = uRec.storageUsed != null ? uRec.storageUsed.longValue() : 0;
+        long storageUsed = storageUsedF != null ? storageUsedF.longValue() : (uRec.storageUsed != null ? uRec.storageUsed.longValue() : 0);
         msg = "Your server storage space usage is within " + Misc.getFormattedSize(storageLimit-storageUsed, 4, 3) + " of the set limit. ";
         warning = true;
       }
@@ -112,6 +115,11 @@ public class SysOps {
       else if (transferLimit != UserRecord.UNLIMITED_AMOUNT && (transferLimit < transferUsed+(2*1024*1024) || transferLimit < transferUsed+(transferLimit*0.1))) {
         msg += "Your transfer bandwidth usage is within " + Misc.getFormattedSize(transferLimit-transferUsed, 4, 3) + " of the set limit. ";
         warning = true;
+      }
+
+      if (uRec.isBusinessMasterAccount() && subAccountsUsedF != null && uRec.maxSubAccounts.shortValue() < subAccountsUsedF.shortValue()) {
+        msg += "Your account is licensed to manage "+uRec.maxSubAccounts+" sub-accounts and you are managing "+subAccountsUsedF+"! ";
+        error = true;
       }
 
       String urlStr = "\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + uRec.userId + "\"";

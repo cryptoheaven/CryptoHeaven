@@ -39,12 +39,11 @@ import sferyx.administration.editors.HTMLEditor;
  */
 public class MyHTMLEditor extends HTMLEditor {
 
-  private static boolean ENABLE_SPELLER = true;
   private JComponent actionsPanel = null;
 
-  public MyHTMLEditor(boolean isSimplified) {
+  public MyHTMLEditor(boolean isSimplified, boolean suppressSpellCheck) {
     super(false, false, true, false, false, true);
-    if (ENABLE_SPELLER)
+    if (!suppressSpellCheck)
       enableSpeller(getInternalJEditorPane());
 
     setSingleParagraphSpacing(true);
@@ -332,11 +331,11 @@ public class MyHTMLEditor extends HTMLEditor {
     return sep;
   }
 
-  private static void enableSpeller(JTextComponent textComp) {
+  private void enableSpeller(JTextComponent textComp) {
     try {
       TigerBkgChecker tigerBkgChecker = new TigerBkgChecker(SingleTigerSession.getSingleInstance());
       ((TigerBkgChecker)tigerBkgChecker).restart(textComp);
-      textComp.addMouseListener(new TigerMouseAdapter());
+      textComp.addMouseListener(new TigerMouseAdapter(this));
     } catch (Exception e) {
     }
   }

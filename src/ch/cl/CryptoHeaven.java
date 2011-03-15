@@ -277,9 +277,10 @@ public class CryptoHeaven extends Object {
     if (!skipSplashScreen) {
       splashWindow = new JWindow();
       Container c = splashWindow.getContentPane();
-      JLabel splashImage = new JLabel();
-      splashImage.setIcon(Images.get(ImageNums.LOGO_KEY_MAIN));
+      ImageIcon image = Images.get(ImageNums.LOGO_KEY_MAIN);
+      JLabel splashImage = new JLabel(image);
       c.add(splashImage, BorderLayout.CENTER);
+      splashImage.setPreferredSize(new Dimension(image.getIconWidth()+2, image.getIconHeight()+2));
       splashWindow.pack();
       MiscGui.setSuggestedWindowLocation(null, splashWindow);
       splashWindow.setVisible(true);
