@@ -718,7 +718,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom) {
-            sb.append("<FONT COLOR=#9c2950>");
+            sb.append("<font color=\"#9c2950\">");
             sb.append("<strong>");
             sb.append(fromName);
             sb.append("</strong>");
@@ -748,7 +748,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddSent) {
-            sb.append("<FONT size='-2' COLOR=#777777>");
+            sb.append("<font size=\"-2\" color=\"#777777\">");
             if (toAddFrom)
               sb.append(' ');
             String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, false) : "";
@@ -758,7 +758,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom || toAddSent) {
-            sb.append("</FONT> ");
+            sb.append("</font> ");
             sb.append(MsgPanelUtils.HTML_FONT_END);
           }
 

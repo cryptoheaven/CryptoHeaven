@@ -438,7 +438,17 @@ public class URLs extends Object {
                         }
                       }
                       if (name != null && source != null) {
-                        replacementHT.put(name, source);
+                        // Private-label replacable images assign directly to avoid clashing names if some of them point to the same image.
+                        if (name.equalsIgnoreCase("LOGO_KEY_MAIN") || name.equalsIgnoreCase("LogoKey435_260"))
+                          ImageNums.setImageName(ImageNums.LOGO_KEY_MAIN, source);
+                        else if (name.equalsIgnoreCase("LOGO_BANNER_MAIN") || name.equalsIgnoreCase("LogoBanner435_80"))
+                          ImageNums.setImageName(ImageNums.LOGO_BANNER_MAIN, source);
+                        else if (name.equalsIgnoreCase("WINDOW_POPUP") || name.equalsIgnoreCase("WindowPopup"))
+                          ImageNums.setImageName(ImageNums.WINDOW_POPUP, source);
+                        else if (name.equalsIgnoreCase("FRAME_LOCK32") || name.equalsIgnoreCase("FrameLock32"))
+                          ImageNums.setImageName(ImageNums.FRAME_LOCK32, source);
+                        else
+                          replacementHT.put(name, source);
                       }
                     }
                   }

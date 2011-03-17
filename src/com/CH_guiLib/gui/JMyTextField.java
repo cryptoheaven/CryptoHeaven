@@ -115,7 +115,7 @@ public class JMyTextField extends JTextField {
   public void paint(Graphics g) {
     MiscGui.setPaintPrefs(g);
     super.paint(g);
-    if (backgroundText != null && getText().trim().isEmpty()) {
+    if (backgroundText != null && getText().trim().length() == 0) {
       g.setColor(hintColor);
       g.setFont(hintFont);
       g.drawString(backgroundText, 0, (int) (0.75 * getHeight()));

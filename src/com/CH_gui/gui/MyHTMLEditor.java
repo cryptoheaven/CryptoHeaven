@@ -307,6 +307,7 @@ public class MyHTMLEditor extends HTMLEditor {
 
   private static void initDelegatingButton(final AbstractButton button, String toolTip, int iconIndex, final AbstractButton[] delegateToButtons, final int delegateToIndex) {
     button.setBorder(new EmptyBorder(2,2,2,2));
+    button.setMargin(null); // make all the insets identical for toggle and regular buttons
     button.setToolTipText(toolTip);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {

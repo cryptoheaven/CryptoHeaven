@@ -31,6 +31,7 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.parser.ParserDelegator;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -89,9 +90,9 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
   }
 
   private void init(boolean suppressSpellCheck) {
-    try { initComponents(suppressSpellCheck); } catch (Throwable t) { t.printStackTrace(); }
-    try { addMyListeners(); } catch (Throwable t) { t.printStackTrace(); }
-    try { initMainPanel(); } catch (Throwable t) { t.printStackTrace(); }
+    initComponents(suppressSpellCheck);
+    addMyListeners();
+    initMainPanel();
   }
 
   private void initComponents(boolean suppressSpellCheck) {
@@ -109,6 +110,7 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     myKeyListener = new MyKeyListener();
     myDocumentListener = new MyDocumentListener();
 
+    ParserDelegator workaround = new ParserDelegator();
     if (isChatMode || objType == MsgDataRecord.OBJ_TYPE_ADDR || objType == -1)
       jMessage = new MyHTMLEditor(true, suppressSpellCheck);
     else
@@ -245,7 +247,7 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     boolean anyBody = jMessage.getPlainText().trim().length() > 0;
     if (!anyBody) {
       String content = jMessage.getContent();
-      if (content.contains("<img ") || content.contains("<IMG "))
+      if (content.indexOf("<img ") >= 0 || content.indexOf("<IMG ") >= 0)
         anyBody = true;
     }
     return anyBody;
