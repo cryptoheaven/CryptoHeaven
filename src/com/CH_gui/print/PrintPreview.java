@@ -254,9 +254,14 @@ public class PrintPreview extends JDialog {
         PagePreview pp = new PagePreview(w, h, img);
         preview.add(pp);
         pageIndex++;
-        //System.out.println("pageIndex="+pageIndex);
+        // don't print more than 100 pages to prevent OutOfMemoryErrors
+        if (pageIndex >= 100)
+          break;
       }
     } catch (PrinterException e) {
+      e.printStackTrace();
+      System.err.println("Printing error: "+e.toString());
+    } catch (OutOfMemoryError e) {
       e.printStackTrace();
       System.err.println("Printing error: "+e.toString());
     }

@@ -69,16 +69,16 @@ public class Sounds extends Object {
     clipPlayStamps = new long[13];
 
     DIALOG_ERROR = i;
-    clipNames[i] = "errorDialog.wav"; i++;
+    clipNames[i] = "dialog-error.wav"; i++;
 
     DIALOG_WARN = i;
-    clipNames[i] = "warnDialog.wav"; i++;
+    clipNames[i] = "dialog-notify.wav"; i++;
 
     DIALOG_INFO = i;
-    clipNames[i] = "infoDialog.wav"; i++;
+    clipNames[i] = "dialog-notify.wav"; i++;
 
     DIALOG_QUESTION = i;
-    clipNames[i] = "questionDialog.wav"; i++;
+    clipNames[i] = "dialog-notify.wav"; i++;
 
     UPDATE_CLIP = i;
     clipNames[i] = "updateClip.wav"; i++;

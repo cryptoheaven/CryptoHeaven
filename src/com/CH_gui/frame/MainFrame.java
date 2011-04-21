@@ -169,21 +169,18 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Called right after login completed.
    */
-  public void loginComplete(boolean success, LoginCoordinatorI loginCoordinator) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "loginComplete(boolean success, loginCoordinator)");
+  public void loginComplete(boolean success) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "loginComplete(boolean success)");
     if (trace != null) trace.args(success);
-    if (trace != null) trace.args(loginCoordinator);
 
     if (success) {
 
       if (!isInitializationsStarted) startPreloadingComponents_Threaded();
 
       if (trace != null) trace.data(10, "advance progress monitor, login is complete");
-      if (loginCoordinator != null) {
-        if (!loginCoordinator.getLoginProgMonitor().isAllDone()) {
-          loginCoordinator.getLoginProgMonitor().nextTask();
-          loginCoordinator.getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
-        }
+      if (!getLoginProgMonitor().isAllDone()) {
+        getLoginProgMonitor().nextTask();
+        getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
       }
 
       initScreen();
@@ -192,10 +189,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       // this.pack();
 
       if (trace != null) trace.data(20, "closing down the Login Progress Monitor");
-      if (loginCoordinator != null) {
-        loginCoordinator.getLoginProgMonitor().allDone();
-        loginCoordinator.setLoginProgMonitor(null);
-      }
+      getLoginProgMonitor().allDone();
+      setLoginProgMonitor(null);
 
       // All parent-less dialogs should go on top of the main window from now on.
       GeneralDialog.setDefaultParent(this);
@@ -269,9 +264,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderId)), 25000, 3);
           try { SwingUtilities.invokeAndWait(folderSelect2); } catch (Throwable t) { }
         }
-        if (loginCoordinator != null) {
-          loginCoordinator.readyForMainData();
-        }
+        readyForMainData();
       }
 
       // Make the frame visible in a GUI thread
@@ -1001,14 +994,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           try {
             SIL.destroyServer();
           } catch (Throwable t) {
-            if (trace != null) trace.exception(MainFrame.class, 200, t);
+            if (trace != null) trace.exception(getClass(), 200, t);
           }
           // Again to be rally sure since we had some complains about running
           // processes being left behind.
           try {
             SIL.destroyServer();
           } catch (Throwable t) {
-            if (trace != null) trace.exception(MainFrame.class, 300, t);
+            if (trace != null) trace.exception(getClass(), 300, t);
           }
           // If this is applet quitting, reset the gui flag in case it will re-initialize
           Misc.suppressAllGUI(false);

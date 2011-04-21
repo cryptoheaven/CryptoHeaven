@@ -120,6 +120,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /** Server host address and port number */
   private Object[][] hostsAndPorts;
   private int currentHostIndex;
+  private boolean currentHostShouldIncrement = false;
 
   /** When a worker fails, remember its type to try to delay next one of the same type being created.
    * Re-connection mechanizm spawns multiple threads trying to connect to different hosts/ports with
@@ -129,9 +130,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * Static variable because it is a property of our Internet provider connectivity, so must be global for all SILs.
    */
   private static Class penalizedSocketType;
-  private static final int DELAY_PENALIZED_CONNECTION_TYPE = 5000;
+  private static final int DELAY_PENALIZED_CONNECTION_TYPE = 2000;
   // always delay protocoled sockets just a tiny bit to allow plain Socket some advantage of being first to connect...
-  private static final int DELAY_PROTOCOLED_CONNECTION  = 1500;
+  private static final int DELAY_PROTOCOLED_CONNECTION  = 1000;
+  private static final int CONNECTION_TIMEOUT = 7000;
   private static final int MAX_CONNECTION_DELAY = Math.max(DELAY_PENALIZED_CONNECTION_TYPE, DELAY_PROTOCOLED_CONNECTION);
 
   /**
@@ -913,17 +915,28 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               burstableMonitorWorkerCreationTrials = new BurstableBucket(10, 1.0/5.0, true, 100); // max 10 trials in 5 seconds each at least 100ms apart
             burstableMonitorWorkerCreationTrials.passThrough();
 
+            if (trace != null) trace.data(11, "createWorker workerTrial="+workerTrial);
+
             int[] hostIndexesToTry = null;
             int hostIndexCompletedFirst = -1;
             try {
+              // First trial gives perference to previously working host,
+              // subsequest trials we'll look for a better and different working host.
+              // Incase that last tried host was destroyed due to communication error,
+              // then increment to next regardless if it is the first trial.
+              if (workerTrial > 0 || currentHostShouldIncrement) {
+                currentHostIndex = (currentHostIndex + 1) % hostsAndPorts.length;
+                currentHostShouldIncrement = false;
+              }
               String hostToTry = (String) hostsAndPorts[currentHostIndex][0];
+              if (trace != null) trace.data(15, "hostToTry", hostToTry);
 
               // If encountered 'protocoled' host, simultaneously try other non-protocoled host too.
               int alternateHostIndex = -1;
               if (hostToTry.indexOf("://") >= 0) {
                 // find next non-protocoled host/port
                 if (trace != null) trace.data(20, "find next non-protocoled host/port");
-                for (int k=0; k<maxWorkerTrials; k++) {
+                for (int k=0; k<hostsAndPorts.length; k++) {
                   int indexCandidate = (currentHostIndex+1+k) % hostsAndPorts.length;
                   String hostCandidate = (String) hostsAndPorts[indexCandidate][0];
                   if (hostCandidate.indexOf("://") < 0) {
@@ -938,7 +951,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               if (Socket.class.equals(penalizedSocketType) && hostToTry.indexOf("://") < 0) {
                 // find next protocoled host/port
                 if (trace != null) trace.data(30, "find next protocoled host/port");
-                for (int k=0; k<maxWorkerTrials; k++) {
+                for (int k=0; k<hostsAndPorts.length; k++) {
                   int indexCandidate = (currentHostIndex+1+k) % hostsAndPorts.length;
                   String hostCandidate = (String) hostsAndPorts[indexCandidate][0];
                   if (hostCandidate.indexOf("://") >= 0) {
@@ -962,7 +975,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               final Socket[][] socketBuffers = new Socket[hostIndexesToTry.length][1];
               Throwable[][] errorBuffers = new Throwable[hostIndexesToTry.length][1];
 
+              StringBuffer sbSocketInfo = new StringBuffer();
               for (int k=0; k<hostIndexesToTry.length; k++) {
+                sbSocketInfo.append("Socket host ").append(hostsAndPorts[hostIndexesToTry[k]][0]);
+                sbSocketInfo.append(" port ").append(hostsAndPorts[hostIndexesToTry[k]][1]).append(", ");
                 ths[k] = createSocket_Threaded((String) hostsAndPorts[hostIndexesToTry[k]][0],
                                                 ((Integer) hostsAndPorts[hostIndexesToTry[k]][1]).intValue(),
                                                 socketBuffers[k], errorBuffers[k]);
@@ -989,9 +1005,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 throw errorBuffers[joinedIndexFirst][0];
 
               Socket socket = socketBuffers[joinedIndexFirst][0];
-              if (trace != null) trace.data(60, "socket", socket);
+              if (trace != null) trace.data(60, "createWorker() attempted hosts and ports are", sbSocketInfo.toString());
+              if (trace != null) trace.data(61, "createWorker() created socket is", socket);
               if (socket != null) {
-                if (trace != null) trace.data(61, "socketType", socket.getClass());
+                if (trace != null) trace.data(62, "socketType", socket.getClass());
               }
 
               // Clear other sockets that might have been created too
@@ -1013,16 +1030,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
               if (socket != null) {
                 if (lastLoginMessageAction != null) {
-                  if (trace != null) trace.data(30, "restamp the auto-login message");
+                  if (trace != null) trace.data(70, "restamp the auto-login message");
                   lastLoginMessageAction = new MessageAction(lastLoginMessageAction.getActionCode(), lastLoginMessageAction.getMsgDataSet());
                 } else {
-                  if (trace != null) trace.data(31, "no auto-login message to restamp");
+                  if (trace != null) trace.data(71, "no auto-login message to restamp");
                 }
                 worker = new ServerInterfaceWorker(socket, this, this,
                                                    getReplyFifoWriterI(),
                                                    getRequestPriorityFifoReaderI(),
                                                    lastLoginMessageAction);
-                if (trace != null) trace.data(40, "ServerInterfaceWorker instantiated");
+                if (trace != null) trace.data(80, "ServerInterfaceWorker instantiated");
               }
 
               if (worker != null) {
@@ -1035,8 +1052,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 break;
               }
             } catch (Throwable t) {
-              // increment host index for next trial
-              currentHostIndex = (currentHostIndex + 1) % hostsAndPorts.length;
               if (trace != null) trace.exception(ServerInterfaceLayer.class, 70, t);
               String errMsg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server at " + hostsAndPorts[hostIndexCompletedFirst][0] + " on port " + hostsAndPorts[hostIndexCompletedFirst][1] + ".  "
                 + "Please verify your computer network and/or modem cables are plugged-in and your computer is currently connected to the Internet.  When you have established and verified your Internet connectivity, please try connecting to "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" again.  "
@@ -1053,7 +1068,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                   // Maybe we should retry if we have at least the main worker!
                   // throw new error if we have less than 2 workers (1 main, 1 heavy)
                   if (countAllWorkers == 0) {
-                    if (trace != null) trace.data(80, "Not enough workers to ignore connection problem!");
+                    if (trace != null) trace.data(90, "Not enough workers to ignore connection problem!");
                     throw new SILConnectionException(errMsg + "Input/Output error occurred.  The error message is: <br>" + t.getMessage());
                   }
                 }
@@ -1125,12 +1140,17 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private Thread createSocket_Threaded(final String hostName, final int portNumber, final Socket[] socketBuffer, final Throwable[] errorBuffer) {
     Thread th = new ThreadTraced("Socket Creator") {
       public void runTraced() {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "runTraced()");
+        if (trace != null) trace.args(hostName);
+        if (trace != null) trace.args(portNumber);
         try {
           Socket socket = createSocket(hostName, portNumber);
           socketBuffer[0] = socket;
         } catch (Throwable t) {
+          if (trace != null) trace.exception(getClass(), 100, t);
           errorBuffer[0] = t;
         }
+        if (trace != null) trace.exit(getClass(), socketBuffer[0]);
       }
     };
     th.setDaemon(true);
@@ -1142,7 +1162,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * @return newly created worker.
    */
   private Socket createSocket(final String hostName, final int portNumber) throws UnknownHostException, IOException {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "createSocket(String hostName, int portNumber, MessageAction loginMsgAction)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "createSocket(String hostName, int portNumber");
     if (trace != null) trace.args(hostName);
     if (trace != null) trace.args(portNumber);
 
@@ -1172,8 +1192,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 if (HTTP_Socket.class.equals(penalizedSocketType)) {
                   if (trace != null) trace.data(20, "sleep DELAY_PENALIZED_CONNECTION_TYPE", DELAY_PENALIZED_CONNECTION_TYPE);
                   Thread.sleep(DELAY_PENALIZED_CONNECTION_TYPE);
+                } else if (penalizedSocketType != null) {
+                  long partialDelay = DELAY_PROTOCOLED_CONNECTION / 3;
+                  if (trace != null) trace.data(21, "protocoled socket short sleep due to penalization of other type", partialDelay);
+                  Thread.sleep(partialDelay);
                 } else {
-                  if (trace != null) trace.data(21, "sleep DELAY_PROTOCOLED_CONNECTION", DELAY_PROTOCOLED_CONNECTION);
+                  if (trace != null) trace.data(22, "sleep DELAY_PROTOCOLED_CONNECTION", DELAY_PROTOCOLED_CONNECTION);
                   Thread.sleep(DELAY_PROTOCOLED_CONNECTION);
                 }
               } catch (InterruptedException x) {
@@ -1207,7 +1231,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
       // Wait for established connection reasonable amount of time.
       try {
-        socketConnector.join(20000+MAX_CONNECTION_DELAY);
+        socketConnector.join(CONNECTION_TIMEOUT+MAX_CONNECTION_DELAY);
       } catch (InterruptedException e) {
       }
 
@@ -1506,10 +1530,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         if (!cleanLogout && (System.currentTimeMillis()-worker.getSocketCreationStamp()) < 1000L * 60L * 3L) { // 3 minutes
           if (trace != null) trace.data(10, "assigning penalizedSocketType", workerSocketType);
           penalizedSocketType = workerSocketType;
+          currentHostShouldIncrement = true;
         } else if (workerSocketType.equals(penalizedSocketType)) {
           // if clean logout or connection failure after long time of being alive, clear out penalized Socket type
           if (trace != null) trace.data(11, "clearing penalizedSocketType");
           penalizedSocketType = null;
+          currentHostShouldIncrement = false;
         } else {
           if (trace != null) trace.data(12, "penalizedSocketType unchanged and equals", penalizedSocketType);
         }
@@ -1781,7 +1807,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             }
             if (trace != null) trace.data(57, "stamp cleanup done");
           } else {
-            if (trace != null) trace.data(60, "no one waiting for this reply, run it.");
+            if (trace != null) trace.data(60, "no one waiting for this reply, submit it to independent execution queue");
             // no one waiting for this reply, run it.
             // Running independent jobs by independent queue frees up the execution queue while
             // those jobs are being run, plus it ensures the FCFS order of independent jobs.

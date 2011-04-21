@@ -73,7 +73,7 @@ public class MainFrameStarter extends Object {
     } else {
       loginCoordinator.loginAttemptCloseCurrentSession();
       loginCoordinator.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
-      loginCoordinator.loginComplete(true, loginCoordinator);
+      loginCoordinator.loginComplete(true);
     }
     if (swingMemoryFootprintTestExitWhenMainScreenLoaded) {
       System.exit(0);
@@ -168,6 +168,10 @@ public class MainFrameStarter extends Object {
             LoginFrame.defaultPassword = args[i];
           } else if (args[i].equalsIgnoreCase("-password-blank")) {
             LoginFrame.defaultPassword = "";
+          } else if (args[i].equalsIgnoreCase("-server")) {
+            i ++;
+            String server = URLDecoder.decode(args[i]);
+            LoginFrame.defaultServer = server;
           } else if (args[i].equalsIgnoreCase("-signup")) {
             LoginFrame.defaultMode = LoginFrame.MODE_SIGNUP;
           } else if (args[i].equalsIgnoreCase("-signupEmail")) {
@@ -369,19 +373,16 @@ public class MainFrameStarter extends Object {
     public void loginAttemptCloseCurrentSession() {
     }
 
-    public void loginComplete(boolean success, final LoginCoordinatorI loginCoordinator) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StarterLoginCoordinator.class, "loginComplete(boolean success, loginCoordinator)");
+    public void loginComplete(boolean success) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StarterLoginCoordinator.class, "loginComplete(boolean success)");
       if (trace != null) trace.args(success);
-      if (trace != null) trace.args(loginCoordinator);
 
       final Frame[] mainStartupFrame = new Frame[1];
 
       if (success) {
         if (trace != null) trace.data(10, "advance progress monitor, login is complete");
-        if (loginCoordinator != null) {
-          loginCoordinator.getLoginProgMonitor().nextTask();
-          loginCoordinator.getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
-        }
+        getLoginProgMonitor().nextTask();
+        getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
 
         // Mark Active Status right away since the GUI timer is scheduled in intervals...
         // if user was disconnected in INACTIVE state, he should be marked active now...
@@ -434,19 +435,17 @@ public class MainFrameStarter extends Object {
             }
           }
           // fetch the rest of supporting data required for replies and other operations
-          loginCoordinator.readyForMainData();
+          readyForMainData();
         }
 
         if (trace != null) trace.data(20, "closing down the Login Progress Monitor");
-        if (loginCoordinator != null) {
-          loginCoordinator.getLoginProgMonitor().allDone();
-          loginCoordinator.setLoginProgMonitor(null);
-        }
+        getLoginProgMonitor().allDone();
+        setLoginProgMonitor(null);
 
         if (mainStartupFrame[0] == null) {
           MainFrame mainFrame = new MainFrame(null, null, null);
           mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
-          mainFrame.loginComplete(true, mainFrame);
+          mainFrame.loginComplete(true);
           mainStartupFrame[0] = mainFrame;
         } else {
           // check if password is set

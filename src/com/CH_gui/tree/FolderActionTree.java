@@ -1112,7 +1112,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
 
   public static void doEmptyAction(final FolderPair folderToEmpty, boolean includeSubTree, Component parent) {
     String title = com.CH_gui.lang.Lang.rb.getString("title_Delete_Confirmation");
-    String messageText = "<html>Are you sure you want to <b>permanently delete</b> items from the <br>following folder?  This action cannot be reversed.</html>";
+    String messageText = "<html>Are you sure you want to <b>permanently delete</b> items from <br>the following folder?  This action cannot be reversed.</html>";
     short folderType = folderToEmpty.getFolderRecord().folderType.shortValue();
     int messageType = folderType == FolderRecord.RECYCLE_FOLDER ? NotificationCenter.EMPTY_RECYCLE_FOLDER : NotificationCenter.EMPTY_SPAM_FOLDER;
     boolean confirmed = MsgActionTable.showConfirmationDialog(parent, title, messageText, new Record[] { folderToEmpty }, messageType, false);

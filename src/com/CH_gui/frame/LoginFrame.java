@@ -160,6 +160,7 @@ public class LoginFrame extends JFrame {
 
   private JWindow keyGenSplash = null;
 
+  public static String defaultServer;
   public static String defaultPassword;
   public static String defaultMode;
   public static String defaultSignupEmail;
@@ -217,7 +218,7 @@ public class LoginFrame extends JFrame {
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
         closeFrame();
-        LoginFrame.this.loginCoordinator.loginComplete(false, LoginFrame.this.loginCoordinator);
+        LoginFrame.this.loginCoordinator.loginComplete(false);
       }
     });
 
@@ -572,8 +573,8 @@ public class LoginFrame extends JFrame {
   /**
    * Private helper to fetch the server list as Vector of Strings.
    */
-  private static ArrayList getServerList() {
-    String serversStr = GlobalProperties.getProperty(PROPERTY_SERVER_LIST);
+  private ArrayList getServerList() {
+    String serversStr = defaultServer != null ? defaultServer : GlobalProperties.getProperty(PROPERTY_SERVER_LIST);
     ArrayList al = new ArrayList();
     StringTokenizer st = new StringTokenizer(serversStr);
     while (st.hasMoreTokens()) {
@@ -768,29 +769,31 @@ public class LoginFrame extends JFrame {
   private void putServerListAndProxySettings() {
     Object[] server = getServer();
     if (server != null) {
-      String serverStr = getServerStr(server);
-      StringBuffer serverListSB = new StringBuffer();
-      serverListSB.append(server[0].toString());
-      serverListSB.append(':');
-      serverListSB.append(server[1]);
-      serverListSB.append(' ');
+      if (defaultServer == null) {
+        String serverStr = getServerStr(server);
+        StringBuffer serverListSB = new StringBuffer();
+        serverListSB.append(server[0].toString());
+        serverListSB.append(':');
+        serverListSB.append(server[1]);
+        serverListSB.append(' ');
 
-      ArrayList serverList = getServerList();
-      for (int i=0; i<serverList.size(); i++) {
-        if (i>10)
-          break;
-        String item = (String) serverList.get(i);
-        if (!item.equals(serverStr)) {
-          server = Misc.parseHostAndPort(item);
-          if (server != null) {
-            serverListSB.append(server[0].toString());
-            serverListSB.append(':');
-            serverListSB.append(server[1]);
-            serverListSB.append(' ');
+        ArrayList serverList = getServerList();
+        for (int i=0; i<serverList.size(); i++) {
+          if (i>10)
+            break;
+          String item = (String) serverList.get(i);
+          if (!item.equals(serverStr)) {
+            server = Misc.parseHostAndPort(item);
+            if (server != null) {
+              serverListSB.append(server[0].toString());
+              serverListSB.append(':');
+              serverListSB.append(server[1]);
+              serverListSB.append(' ');
+            }
           }
         }
+        GlobalProperties.setProperty(PROPERTY_SERVER_LIST, serverListSB.toString());
       }
-      GlobalProperties.setProperty(PROPERTY_SERVER_LIST, serverListSB.toString());
 
       // Put the proxy config there too together with the server list.
       GlobalProperties.setProperty("ProxyUsed", proxyUsed.toString());
@@ -1089,9 +1092,11 @@ public class LoginFrame extends JFrame {
       }
     }
     // insert any default or PrivateLabel servers under the current selected item
-    insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_1), 0, false);
-    insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_2), 1, false);
-    insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_3), 2, false);
+    if (defaultServer == null) {
+      insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_1), 0, false);
+      insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_2), 1, false);
+      insertServerChoice(URLs.get(URLs.DEFAULT_SERVER_3), 2, false);
+    }
     initiateProxySettings();
 
 //    newEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
@@ -1327,7 +1332,7 @@ public class LoginFrame extends JFrame {
     newUser_request = null;
     login_request = null;
     closeFrame();
-    loginCoordinator.loginComplete(false, loginCoordinator);
+    loginCoordinator.loginComplete(false);
   }
 
 
@@ -1622,7 +1627,7 @@ public class LoginFrame extends JFrame {
         boolean isLoginSuccess = performLogin();
         if (isLoginSuccess) {
           LoginFrame.this.closeFrame();
-          loginCoordinator.loginComplete(true, loginCoordinator);
+          loginCoordinator.loginComplete(true);
         } else if (!isUsernameForRetry) {
           if (isUsernameInRetry) {
             setUsername(usernamePreRetry);
@@ -1666,10 +1671,12 @@ public class LoginFrame extends JFrame {
         t.printStackTrace();
       }
       try {
-        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_1));
-        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_2));
-        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_3));
-        hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, false, URLs.get(URLs.DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1));
+        if (defaultServer == null) {
+          hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_1));
+          hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_2));
+          hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_3));
+          hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, false, URLs.get(URLs.DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1));
+        }
         MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true));
       } catch (Throwable t) {
         t.printStackTrace();

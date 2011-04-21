@@ -34,7 +34,7 @@ public interface LoginCoordinatorI {
 
   public ProgMonitorI getLoginProgMonitor();
   public void loginAttemptCloseCurrentSession();
-  public void loginComplete(boolean isSuccess, LoginCoordinatorI loginCoordinator);
+  public void loginComplete(boolean isSuccess);
   public void readyForMainData();
   public void setLoginProgMonitor(ProgMonitorI progMonitor);
   public void startPreloadingComponents_Threaded();
