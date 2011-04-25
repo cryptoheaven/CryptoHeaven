@@ -12,6 +12,7 @@
 
 package comx.Tiger.gui;
 
+import comx.tig.en.SingleTigerSession;
 import comx.Tiger.ssce.*;
 import java.util.*;
 

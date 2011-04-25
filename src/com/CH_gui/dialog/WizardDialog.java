@@ -12,17 +12,15 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.GeneralDialog;
+import com.CH_co.trace.*;
+
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -77,7 +75,7 @@ public abstract class WizardDialog extends GeneralDialog {
     JComponent mainComp = createMainPanel();
     setEnabledButtons();
 
-    super.init(parent, buttons, mainComp, new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_FINISH_INDEX, DEFAULT_CANCEL_INDEX);
+    super.init(parent, buttons, mainComp, MiscGui.createLogoHeader(), DEFAULT_FINISH_INDEX, DEFAULT_CANCEL_INDEX);
 
     if (trace != null) trace.exit(WizardDialog.class);
   }

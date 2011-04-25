@@ -12,13 +12,13 @@
 
 package com.CH_gui.util;
 
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -28,11 +28,11 @@ import com.CH_co.util.*;
  *
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 
- /* Description: This a general dialog that containts a panel and buttons 
- * on the bottom-right corner of the dialog. 
+ /* Description: This a general dialog that containts a panel and buttons
+ * on the bottom-right corner of the dialog.
  */
 public class GeneralDialog extends JDialog {
 
@@ -187,7 +187,7 @@ public class GeneralDialog extends JDialog {
         setSize(Math.min(size.width, maxSize.width), Math.min(size.height, maxSize.height-50));
       if (trace != null) trace.data(81, "adjusting max size to fit screen... done.");
 
-      
+
       if (show) {
         if (trace != null) trace.data(90, "setting Visible...");
         this.setVisible(true);
@@ -208,7 +208,6 @@ public class GeneralDialog extends JDialog {
     if (isShowing())
       MiscGui.storeVisualsSavable(this);
     try {
-      setVisible(false);
       dispose();
     } catch (Throwable t) {
     }
@@ -221,6 +220,7 @@ public class GeneralDialog extends JDialog {
         escapeKeyListener = null;
         escapeButton = null;
       }
+      setVisible(false);
       MiscGui.removeAllComponentsAndListeners(this);
     } catch (Throwable t) {
     }
@@ -253,7 +253,7 @@ public class GeneralDialog extends JDialog {
       if (visuals == null) {
         pack();
       } else {
-        StringTokenizer st = new StringTokenizer(visuals);  
+        StringTokenizer st = new StringTokenizer(visuals);
         st.nextToken();
         st.nextToken();
         int width = Integer.parseInt(st.nextToken());

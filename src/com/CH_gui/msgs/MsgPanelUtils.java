@@ -607,8 +607,6 @@ public class MsgPanelUtils extends Object {
       if (isHTML && !skipHeaderClearing) {
         content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(content, true, true, true);
       }
-//    } else if (jMessage instanceof HtmlPanel) {
-//      ((HtmlPanel) jMessage).clearDocument();
     }
 
     // Remove old components/Views if any
@@ -756,13 +754,14 @@ public class MsgPanelUtils extends Object {
   }
 
   private static void setText(JComponent jMessage, String text) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setText(JComponent jMessage, String text)");
+    if (trace != null) trace.args(jMessage, text);
+
     if (jMessage instanceof JTextComponent) {
       ((JTextComponent) jMessage).setText(text);
-//    } else if (jMessage instanceof HtmlPanel) {
-//      HtmlPanel panel = (HtmlPanel) jMessage;
-//      SimpleHtmlRendererContext rcontext = new SimpleHtmlRendererContext(panel, new SimpleUserAgentContext());
-//      panel.setHtml(text, HTML_ClickablePane.getDefaultBase().toString(), rcontext);
     }
+
+    if (trace != null) trace.exit(MsgPanelUtils.class);
   }
 
   private static boolean ENABLE_DEBUG_MSG_PANE = false;
@@ -784,6 +783,10 @@ public class MsgPanelUtils extends Object {
   }
 
   public static String getSigText(UserSettingsRecord userSettingsRecord, boolean inHtmlMode) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getSigText(UserSettingsRecord userSettingsRecord, boolean inHtmlMode)");
+    if (trace != null) trace.args(userSettingsRecord);
+    if (trace != null) trace.args(inHtmlMode);
+
     boolean isHtmlMode = getSigType(userSettingsRecord).equals("text/html");
     String text = "";
     String defaultSig = userSettingsRecord.getDefaultSig();
@@ -836,31 +839,43 @@ public class MsgPanelUtils extends Object {
       text = "<p></p>" + text;
     else if (addSpaces && !inHtmlMode)
       text = "\n\n" + text;
+
+    if (trace != null) trace.exit(MsgPanelUtils.class, text);
     return text;
   }
 
   private static String getSigType(UserSettingsRecord userSettingsRecord) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getSigType(UserSettingsRecord userSettingsRecord)");
+    if (trace != null) trace.args(userSettingsRecord);
+
     String sigType = userSettingsRecord.getDefaultSigType();
+    String type = null;
     if (sigType == null) {
-      return "";
+      type = "";
     } else if (sigType.equalsIgnoreCase("text/html")) {
-      return "text/html";
+      type = "text/html";
     } else if (sigType.equalsIgnoreCase("text/plain")) {
-      return "text/plain";
+      type = "text/plain";
     } else if (sigType.equalsIgnoreCase("text/file")) {
       String fileName = userSettingsRecord.getDefaultSig().toLowerCase();
       if (fileName.endsWith(".htm") || fileName.endsWith(".html"))
-        return "text/html";
+        type = "text/html";
       else
-        return "text/plain";
+        type = "text/plain";
     } else {
-      return null;
+      type = null;
     }
+
+    if (trace != null) trace.exit(MsgPanelUtils.class, type);
+    return type;
   }
 
 
   private static final JEditorPane paneForPlainExtraction = new JEditorPane("text/html", "<html></html>");
   public static String extractPlainFromHtml(String html) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "extractPlainFromHtml(String html)");
+    if (trace != null) trace.args(html);
+
     String originalHtml = html;
     String text = "";
     synchronized (paneForPlainExtraction) {
@@ -935,6 +950,8 @@ public class MsgPanelUtils extends Object {
       } catch (Throwable t) {
       }
     }
+
+    if (trace != null) trace.exit(MsgPanelUtils.class, text);
     return text;
   }
 

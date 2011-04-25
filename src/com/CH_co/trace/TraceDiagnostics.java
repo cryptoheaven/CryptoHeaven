@@ -12,9 +12,7 @@
 
 package com.CH_co.trace;
 
-import com.CH_cl.service.cache.*;
 import com.CH_co.util.*;
-
 import java.util.*;
 
 /**
@@ -29,14 +27,14 @@ import java.util.*;
  */
 public class TraceDiagnostics {
 
-  public static void traceStart() {
+  public static void traceStart(Long userId) {
     String[][] props = new String[][] {
       {"TraceEnabled",                  "true"},
       {"Trace.*",                       "true"},
       {"Debug.Level.*",                 "10"},
       {"TraceBufferKB",                 "1"},
       {"OutputType",                    "file"},
-      {"OutputFilePrefix",              "BugReport-"+FetchedDataCache.getSingleInstance().getMyUserId()+"_"+Misc.getFormattedDateFileStr(new Date())},
+      {"OutputFilePrefix",              "BugReport-"+(userId != null ? userId+"-" : "")+Misc.getFormattedDateFileStr(new Date())},
       {"OutputFileUseUniqueID",         "false"},
       {"OutputFileExt",                 "txt"},
       {"OutputFileSizeMB",              "0"},

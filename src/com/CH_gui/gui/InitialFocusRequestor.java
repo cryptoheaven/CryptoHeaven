@@ -15,8 +15,6 @@ package com.CH_gui.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
-
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -24,7 +22,7 @@ import javax.swing.text.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -32,7 +30,7 @@ import javax.swing.text.*;
  *
  * <b>$Revision: 1.12 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class InitialFocusRequestor extends Object implements HierarchyListener {
 
@@ -46,26 +44,14 @@ public class InitialFocusRequestor extends Object implements HierarchyListener {
   public void hierarchyChanged(HierarchyEvent event) {
     final Component c = event.getComponent();
     long changeFlags = event.getChangeFlags();
-    if ((changeFlags & (HierarchyEvent.SHOWING_CHANGED | HierarchyEvent.DISPLAYABILITY_CHANGED)) != 0 && 
-        c != null && 
-        c.isShowing()) 
+    if ((changeFlags & (HierarchyEvent.SHOWING_CHANGED | HierarchyEvent.DISPLAYABILITY_CHANGED)) != 0 &&
+        c != null &&
+        c.isShowing())
     {
       c.removeHierarchyListener(this);
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          Thread.yield();
           c.requestFocus();
-          // In jre 1.3 there is a problem with text components not showing visible caret when windows initially shows, try to fix it with grabFocus()
-          if (c instanceof JComponent)
-            ((JComponent) c).grabFocus();
-          if (c instanceof JTextComponent) {
-            JTextComponent tC = (JTextComponent) c;
-            Caret caret = tC.getCaret();
-            if (caret != null) {
-              caret.setVisible(true);
-              caret.setSelectionVisible(true);
-            }
-          }
         }
       });
     }

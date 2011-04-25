@@ -718,7 +718,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom) {
-            sb.append("<FONT COLOR=#9c2950>");
+            sb.append("<font color=\"#9c2950\">");
             sb.append("<strong>");
             sb.append(fromName);
             sb.append("</strong>");
@@ -748,7 +748,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddSent) {
-            sb.append("<FONT size='-2' COLOR=#777777>");
+            sb.append("<font size=\"-2\" color=\"#777777\">");
             if (toAddFrom)
               sb.append(' ');
             String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, false) : "";
@@ -758,7 +758,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom || toAddSent) {
-            sb.append("</FONT> ");
+            sb.append("</font> ");
             sb.append(MsgPanelUtils.HTML_FONT_END);
           }
 
@@ -776,18 +776,8 @@ public class MsgTableModel extends RecordTableModel {
           if (messageText != null && messageText.length() > 0) {
             // prepare message text
             if (!isHTML) {
-              boolean textProcessed = false;
-              // check for short codes
-              if (messageText.length() == 4) {
-                String formated = MsgTypeArea.formatShortCode(messageText);
-                if (formated != null) {
-                  messageText = formated;
-                  textProcessed = true;
-                }
-              }
               // If it is a PLAIN mail, then convert special characters <>& characters to entities.
-              if (!textProcessed)
-                messageText = msgData.getEncodedHTMLData();
+              messageText = msgData.getEncodedHTMLData();
             } else {
               // move the BODY tag right after the HTML tag...
               messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true);

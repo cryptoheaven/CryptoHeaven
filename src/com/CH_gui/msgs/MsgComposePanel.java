@@ -49,6 +49,7 @@ import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 
+import comx.tig.en.SingleTigerSession;
 import comx.Tiger.gui.*;
 
 import java.awt.event.*;
@@ -226,24 +227,17 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     }
 
     Component[] components = MiscGui.getComponentsRecursively(this);
-    addPopupsAndDND(components);
+    addDND(components);
 
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
 
-  private void addPopupsAndDND(Component[] components) {
+  private void addDND(Component[] components) {
     if (components != null) {
       for (int i=0; i<components.length; i++) {
         Component c = components[i];
-        addPopup(c);
         addDND(c);
       }
-    }
-  }
-  private void addPopup(Component c) {
-    if (c != null && !componentsForPopupL.contains(c)) {
-      c.addMouseListener(new PopupMouseAdapter(c, this));
-      componentsForPopupL.add(c);
     }
   }
   private void addDND(Component c) {
@@ -583,8 +577,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     };
     MsgDataRecord dataRecord = cache.getMsgDataRecord(replyToMsg.msgId);
     if (dataRecord.getText() != null) {
+      if (trace != null) trace.data(10, "message text is available, will move to set reply content right away.");
       updateGUIthreadSafe.run();
     } else {
+      if (trace != null) trace.data(20, "message text is NOT available, will request message body then set reply content.");
       ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(replyToMsg);
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
@@ -675,17 +671,15 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     if (msgComponents != null) {
       if (msgComponents.getContentMode() == CONTENT_MODE_MAIL_HTML) {
         if (body.startsWith("<HTML>") || body.startsWith("<html>"))
-          msgComponents.getMsgTypeArea().setText(body);
+          msgComponents.setMsgContent(body, true);
         else
-          msgComponents.getMsgTypeArea().setText("<html><body><p>"+Misc.encodePlainIntoHtml(body)+"</p></body></html>");
+          msgComponents.setMsgContent("<html><body><p>"+Misc.encodePlainIntoHtml(body)+"</p></body></html>", true);
       } else if (msgComponents.getContentMode() == CONTENT_MODE_MAIL_PLAIN) {
-
         if (body.startsWith("<HTML>") || body.startsWith("<html>"))
-          msgComponents.getMsgTypeArea().setText(MsgPanelUtils.extractPlainFromHtml(body));
+          msgComponents.setMsgContent(MsgPanelUtils.extractPlainFromHtml(body), false);
         else
-          msgComponents.getMsgTypeArea().setText(body);
+          msgComponents.setMsgContent(body, false);
       }
-      msgComponents.getMsgTypeArea();
     }
   }
 

@@ -181,11 +181,11 @@ public class UsrALoginSecureSession extends ClientMessageAction {
           String message =
               "<html>Private Key to decrypt session keys is not available! " +
               "<p>" +
+              "Login cannot complete! " +
+              "<p>" +
               "Your key property file appears to be missing or corrupted.  " +
               "Could not find property field " + keyPropertyName + " to load your encrypted private key. " +
-              "The key property file scanned is: <br>" + keyPropertyFileName +
-              "<p>" +
-              "Login cannot complete!";
+              "The key property file scanned is: <br>" + keyPropertyFileName;
           throw new SecurityException(message);
         }
       }

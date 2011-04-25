@@ -57,8 +57,7 @@ public class AccountOptionsSignaturesPanel extends JPanel {
   private JButton jRemove;
   private JButton jRename;
   private JButton jSetAsDefault;
-  private JRadioButton jTypePlain;
-  private JRadioButton jTypeHTML;
+  private JRadioButton jTypeText;
   private JRadioButton jTypeFile;
   private MsgTypeArea sigTypeArea;
   private JTextField jFileField;
@@ -215,11 +214,10 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     jSetAsDefault = new JMyButton("Set as Default");
     jBrowse = new JMyButton("Browse ...");
 
-    jTypePlain = new JMyRadioButton("Text");
-    jTypeHTML = new JMyRadioButton("HTML");
+    jTypeText = new JMyRadioButton("Text");
     jTypeFile = new JMyRadioButton("File");
 
-    sigTypeArea = new MsgTypeArea("_sig", (short) -1, false, null, false, true, false);
+    sigTypeArea = new MsgTypeArea((short) -1, null, false, true, false);
     jFileField = new JMyTextField();
     sigTypeArea.setMaximumSize(new Dimension(350, 200));
   }
@@ -227,19 +225,13 @@ public class AccountOptionsSignaturesPanel extends JPanel {
 
   private void initializeComponents() {
     ButtonGroup group = new ButtonGroup();
-    jTypePlain.getModel().setGroup(group);
-    jTypeHTML.getModel().setGroup(group);
+    jTypeText.getModel().setGroup(group);
     jTypeFile.getModel().setGroup(group);
-    group.setSelected(jTypePlain.getModel(), true);
+    group.setSelected(jTypeText.getModel(), true);
 
-    jTypePlain.addActionListener(new ActionListener() {
+    jTypeText.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         pressedText();
-      }
-    });
-    jTypeHTML.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        pressedHTML();
       }
     });
     jTypeFile.addActionListener(new ActionListener() {
@@ -347,8 +339,7 @@ public class AccountOptionsSignaturesPanel extends JPanel {
         }
         if (newIndex >= 0) {
           jTypeFile.setEnabled(true);
-          jTypePlain.setEnabled(true);
-          jTypeHTML.setEnabled(true);
+          jTypeText.setEnabled(true);
           jRemove.setEnabled(true);
           jRename.setEnabled(true);
           jSetAsDefault.setEnabled(true);
@@ -358,21 +349,17 @@ public class AccountOptionsSignaturesPanel extends JPanel {
           if (data[1].equals("text/file")) {
             jTypeFile.setSelected(true);
             jFileField.setText(data[2]);
-            sigTypeArea.setContentText("", false, false);
+            sigTypeArea.clearMessageArea();
             pressedFile();
           } else {
             jFileField.setText("");
             if (data[1].equals("text/plain")) {
-              jTypePlain.setSelected(true);
-              sigTypeArea.setHTML(false, false);
-              sigTypeArea.setContentText(data[2], false, false);
-              pressedText();
+              sigTypeArea.setContentText(data[2], false, false, false);
             } else {
-              jTypeHTML.setSelected(true);
-              sigTypeArea.setHTML(true, false);
-              sigTypeArea.setContentText(data[2], false, false);
-              pressedHTML();
+              jTypeText.setSelected(true);
+              sigTypeArea.setContentText(data[2], true, false, false);
             }
+            pressedText();
           }
         } else {
           clearEditableFieldsAndDisable();
@@ -391,83 +378,64 @@ public class AccountOptionsSignaturesPanel extends JPanel {
 
     int posY = 0;
 
-    panel.add(makeDivider("Signature settings"), new GridBagConstraints(0, posY, 4, 1, 10, 0, 
+    panel.add(makeDivider("Signature settings"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(Images.get(ImageNums.SIGNATURE32)), new GridBagConstraints(0, posY, 1, 2, 0, 0, 
+    panel.add(new JMyLabel(Images.get(ImageNums.SIGNATURE32)), new GridBagConstraints(0, posY, 1, 2, 0, 0,
         GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 2), 0, 0));
-    panel.add(jAddSigToNew, new GridBagConstraints(1, posY, 3, 1, 10, 0, 
+    panel.add(jAddSigToNew, new GridBagConstraints(1, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 1, 5), 0, 0));
-    panel.add(jAddSigToRepFwd, new GridBagConstraints(1, posY+1, 3, 1, 10, 0, 
+    panel.add(jAddSigToRepFwd, new GridBagConstraints(1, posY+1, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 2, 5, 5), 0, 0));
     posY += 2;
 
-    panel.add(makeDivider("Signatures"), new GridBagConstraints(0, posY, 4, 1, 10, 0, 
+    panel.add(makeDivider("Signatures"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     JScrollPane list = new JScrollPane(jSigList);
     panel.add(list, new GridBagConstraints(1, posY, 2, 4, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 2, 5, 5), 0, 0));
-    panel.add(jNew, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
+    panel.add(jNew, new GridBagConstraints(3, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
-    panel.add(jRemove, new GridBagConstraints(3, posY+1, 1, 1, 0, 0, 
+    panel.add(jRemove, new GridBagConstraints(3, posY+1, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-    panel.add(jRename, new GridBagConstraints(3, posY+2, 1, 1, 0, 0, 
+    panel.add(jRename, new GridBagConstraints(3, posY+2, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
-    panel.add(jSetAsDefault, new GridBagConstraints(3, posY+3, 1, 1, 0, 0, 
+    panel.add(jSetAsDefault, new GridBagConstraints(3, posY+3, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
     posY += 4;
 
-    panel.add(makeDivider("Edit Signature"), new GridBagConstraints(0, posY, 4, 1, 10, 0, 
+    panel.add(makeDivider("Edit Signature"), new GridBagConstraints(0, posY, 4, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(jTypePlain, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 1), 0, 0));
-    panel.add(jTypeHTML, new GridBagConstraints(0, posY+1, 1, 1, 0, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 5, 1), 0, 0));
+    panel.add(jTypeText, new GridBagConstraints(0, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 1), 0, 0));
     panel.add(sigTypeArea, new GridBagConstraints(1, posY, 3, 3, 10, 20,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 2, 2, 5), 0, 0));
-//    panel.add(jSetAsDefault, new GridBagConstraints(3, posY, 1, 1, 0, 0,
-//        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(jTypeFile, new GridBagConstraints(0, posY+3, 1, 1, 0, 0, 
+    panel.add(jTypeFile, new GridBagConstraints(0, posY+3, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 5, 5, 1), 0, 0));
-    panel.add(jFileField, new GridBagConstraints(1, posY+3, 2, 1, 10, 0, 
+    panel.add(jFileField, new GridBagConstraints(1, posY+3, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 2, 5, 5), 0, 0));
-    panel.add(jBrowse, new GridBagConstraints(3, posY+3, 1, 1, 0, 0, 
+    panel.add(jBrowse, new GridBagConstraints(3, posY+3, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 5, 5), 0, 0));
     posY += 4;
   }
 
   private void pressedText() {
     boolean anySelected = jSigList.getSelectedIndex() >= 0;
-    sigTypeArea.setEditable(anySelected);
     sigTypeArea.setEnabled(anySelected);
     jFileField.setEditable(false);
     jFileField.setEnabled(false);
     jBrowse.setEnabled(false);
-    sigTypeArea.setHTML(false, true);
-    if (anySelected)
-      sigTypeArea.requestFocus();
-  }
-
-  private void pressedHTML() {
-    boolean anySelected = jSigList.getSelectedIndex() >= 0;
-    sigTypeArea.setEditable(anySelected);
-    sigTypeArea.setEnabled(anySelected);
-    jFileField.setEditable(false);
-    jFileField.setEnabled(false);
-    jBrowse.setEnabled(false);
-    sigTypeArea.setHTML(true, true);
     if (anySelected)
       sigTypeArea.requestFocus();
   }
 
   private void pressedFile() {
     boolean anySelected = jSigList.getSelectedIndex() >= 0;
-    sigTypeArea.setEditable(false);
     sigTypeArea.setEnabled(false);
     jFileField.setEditable(anySelected);
     jFileField.setEnabled(anySelected);
@@ -496,15 +464,13 @@ public class AccountOptionsSignaturesPanel extends JPanel {
 
   private void clearEditableFieldsAndDisable() {
     jTypeFile.setEnabled(false);
-    jTypePlain.setEnabled(false);
-    jTypeHTML.setEnabled(false);
+    jTypeText.setEnabled(false);
     jFileField.setText("");
     jFileField.setEnabled(false);
     jFileField.setEditable(false);
     jBrowse.setEnabled(false);
-    sigTypeArea.setContentText("", false, false);
+    sigTypeArea.clearMessageArea();
     sigTypeArea.setEnabled(false);
-    sigTypeArea.setEditable(false);
     jRemove.setEnabled(false);
     jRename.setEnabled(false);
     jSetAsDefault.setEnabled(false);
@@ -528,9 +494,9 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setBorder(new EmptyBorder(0, 0, 0, 0));
     panel.setLayout(new GridBagLayout());
-    panel.add(new JMyLabel(str), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(str), new GridBagConstraints(0, 0, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 5), 0, 0));
-    panel.add(new JSeparator(), new GridBagConstraints(1, 0, 1, 1, 10, 0, 
+    panel.add(new JSeparator(), new GridBagConstraints(1, 0, 1, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 5, 0, 0), 0, 0));
     return panel;
   }

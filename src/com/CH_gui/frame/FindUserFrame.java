@@ -12,18 +12,21 @@
 
 package com.CH_gui.frame;
 
-import javax.swing.*;
-import java.awt.event.*;
-import java.awt.*;
-
 import com.CH_gui.actionGui.*;
+import com.CH_gui.dialog.InitiateContactDialog;
 import com.CH_gui.gui.*;
 import com.CH_gui.usrs.*;
 import com.CH_gui.userTable.*;
 import com.CH_gui.util.*;
 
-import com.CH_co.service.records.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.service.records.RecordUtils;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.CallbackI;
+
+import java.awt.event.*;
+import java.awt.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -46,24 +49,27 @@ public class FindUserFrame extends JActionFrameClosable {
   private static final int DEFAULT_CANCEL_BUTTON_INDEX = 2;
 
   private UserSearchPanel userSearchPanel;
-  private String closeButtonText;
-  private UserRecord[] selectedUserRecords;
+  private String selectButtonCustomText;
+  private String closeButtonCustomText;
+  private boolean isSelectButtonHot;
 
-  private EscapeKeyListener escapeKeyListener;
-  private JButton escapeButton;
+  private CallbackI contactCreateHotButtonCallback;
 
   /** Creates new FindUserFrame */
   public FindUserFrame() {
-    this(com.CH_gui.lang.Lang.rb.getString("button_Close"), null);
+    this(null, null, null, false);
   }
 
   /** Creates new FindUserFrame */
-  public FindUserFrame(String closeButtonText, String searchString) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Find_Friends_and_Associates"), true, true);
+  public FindUserFrame(String selectButtonCustomText, String closeButtonCustomText, String searchString, boolean isSelectButtonHot) {
+    super(com.CH_gui.lang.Lang.rb.getString("title_Find_Friends_and_Associates"), false, false);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FindUserFrame.class, "FindUserFrame()");
 
-    this.closeButtonText = closeButtonText;
-    this.userSearchPanel = new UserSearchPanel(false, false, null, searchString, false);
+    this.selectButtonCustomText = selectButtonCustomText;
+    this.closeButtonCustomText = closeButtonCustomText;
+    this.isSelectButtonHot = isSelectButtonHot;
+
+    this.userSearchPanel = new UserSearchPanel(true, false, false, null, searchString, false);
     final JButton[] buttons = createButtons();
 
     JPanel mainPanel = new JPanel();
@@ -74,10 +80,6 @@ public class FindUserFrame extends JActionFrameClosable {
     this.getContentPane().add(mainPanel, BorderLayout.CENTER);
     this.getRootPane().setDefaultButton(userSearchPanel.getSearchButton());
 
-    escapeButton = buttons[DEFAULT_CANCEL_BUTTON_INDEX];
-    escapeKeyListener = new EscapeKeyListener();
-    this.addKeyListener(escapeKeyListener);
-
     // this JActionFrames doesn't save their own size like others do
     setSize(600, 600);
     setLocationRelativeTo(MainFrame.getSingleInstance());
@@ -87,23 +89,19 @@ public class FindUserFrame extends JActionFrameClosable {
     if (trace != null) trace.exit(FindUserFrame.class);
   }
 
-
   /**
    * @return the dialog 'Search' and 'Cancel' buttons
    */
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton(userSearchPanel.userActionTable.getActions()[UserActionTable.INITIATE_ACTION]);
-    buttons[0].setText("Add to Contacts");
+    buttons[0] = new JMyButton(isSelectButtonHot ? new ContactCreateAction() : userSearchPanel.userActionTable.getActions()[UserActionTable.INITIATE_ACTION]);
+    buttons[0].setText(selectButtonCustomText != null ? selectButtonCustomText : "Add to Contacts");
     buttons[1] = new JMyButton(userSearchPanel.emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION]);
     buttons[1].setText("Invite by Email");
-    buttons[2] = new JMyButton(closeButtonText != null ? closeButtonText : com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[2] = new JMyButton(closeButtonCustomText != null ? closeButtonCustomText : com.CH_gui.lang.Lang.rb.getString("button_Close"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
-        // cancel action
-        if (userSearchPanel != null)
-          selectedUserRecords = (UserRecord[]) userSearchPanel.getUserActionTable().getSelectedRecords();
         closeFrame();
       }
     });
@@ -115,36 +113,8 @@ public class FindUserFrame extends JActionFrameClosable {
     return buttons;
   }
 
-  /**
-   * @return User Records that were selected before the dialog was dismissed.
-   * This is mostly useless, as frames cannot be modal!
-   */
-  public UserRecord[] getSelectedUserRecords() {
-    return selectedUserRecords;
-  }
-
-
-  public void closeFrame() {
-    if (escapeKeyListener != null) {
-      this.removeKeyListener(escapeKeyListener);
-      escapeKeyListener = null;
-      escapeButton = null;
-    }
-    super.closeFrame();
-  }
-
-
-  /**
-   * Clicks a specified button when ESCAPE key click is detected.
-   */
-  private class EscapeKeyListener extends KeyAdapter {
-    public void keyPressed(KeyEvent event) {
-      if (event.getModifiers() == 0) {
-        if (event.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          escapeButton.doClick();
-        }
-      }
-    }
+  public void setContactCreateHotButtonCallback(CallbackI callback) {
+    this.contactCreateHotButtonCallback = callback;
   }
 
   /*******************************************************
@@ -158,5 +128,20 @@ public class FindUserFrame extends JActionFrameClosable {
     return null;
   }
   public void restoreVisuals(String visuals) {
+  }
+
+  /**
+   * Silent contact creation action.
+   */
+  private class ContactCreateAction extends AbstractAction {
+    public void actionPerformed(ActionEvent e) {
+      Long[] contactWithIds = RecordUtils.getIDs(userSearchPanel.userActionTable.getSelectedRecords());
+      if (contactWithIds != null && contactWithIds.length > 0) {
+        FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
+        String reason = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle});
+        InitiateContactDialog.sendContactCreate_Threaded(null, reason, contactWithIds, contactCreateHotButtonCallback);
+        closeFrame();
+      }
+    }
   }
 }

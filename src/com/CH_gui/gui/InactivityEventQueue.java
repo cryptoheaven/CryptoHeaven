@@ -12,10 +12,6 @@
 
 package com.CH_gui.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
@@ -25,8 +21,14 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_gui.util.MessageDialog;
 import com.CH_gui.frame.MainFrame;
-import comx.Tiger.gui.SingleTigerSession;
-import comx.Tiger.gui.TigerPropSession;
+
+import comx.tig.en.SingleTigerSession;
+import comx.Tiger.gui.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
 
 /**
  * <b>Copyright</b> &copy; 2001-2011

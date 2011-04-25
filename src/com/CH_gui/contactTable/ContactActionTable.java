@@ -187,18 +187,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
   public Action getDoubleClickAction() {
     Action action = null;
-    if (withDoubleClickAction) {
+    if (withDoubleClickAction)
       action = actions[MESSAGE_ACTION];
-      // if cases that single online contact is selected default to CHAT
-      Record[] selectedRecords = getSelectedRecords();
-      if (selectedRecords != null && selectedRecords.length == 1) {
-        if (selectedRecords[0] instanceof ContactRecord) {
-          if (((ContactRecord) selectedRecords[0]).isOnlineStatus()) {
-            action = actions[CHAT_ACTION];
-          }
-        }
-      }
-    }
     return action;
   }
 
@@ -958,7 +948,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
    * Send a request to fetch contacts for the current user from the server
    * if contacts were not fetched for yet, otherwise get them from cache
    */
-  public void fetchContacts() {
+  private void fetchContacts() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "fetchContacts()");
 
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
@@ -973,7 +963,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /**
    * Re-Add my groups to the cache so that listeners can grab them
    */
-  public void reAddGroupsToCache() {
+  private void reAddGroupsToCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "reAddGroupsToCache()");
 
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();

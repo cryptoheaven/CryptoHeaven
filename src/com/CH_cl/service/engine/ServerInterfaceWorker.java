@@ -140,13 +140,20 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     this.outgoingInterruptableActionsHM = new HashMap();
 
     this.reader = new ReaderThread("Worker Reader " + workerCount);
+    reader.setDaemon(true);
     reader.start();
 
     this.writer = new WriterThread("Worker Writer " + workerCount);
+    writer.setDaemon(true);
     writer.start();
 
     workerCount ++;
     workerCount %= Integer.MAX_VALUE-1;
+
+    // If manager was destroyed while we were connecting sockets or 
+    // creating worker, then destroy this worker right away.
+    if (workerManager.isDestroyed())
+      destroyWorker();
 
     if (trace != null) trace.exit(ServerInterfaceWorker.class);
   }
@@ -298,7 +305,6 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       super(threadName);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ReaderThread.class, "ReaderThread(String threadName)");
       if (trace != null) trace.args(threadName);
-      setDaemon(true);
       if (trace != null) trace.exit(ReaderThread.class);
     }
 
@@ -577,7 +583,6 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       super(threadName);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WriterThread.class, "WriterThread(String threadName)");
       if (trace != null) trace.args(threadName);
-      setDaemon(true);
       if (trace != null) trace.exit(WriterThread.class);
     }
 

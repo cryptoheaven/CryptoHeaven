@@ -20,6 +20,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -153,21 +154,38 @@ public class MiscGui extends Object {
   }
 
   public static JPanel createButtonPanel(JButton[] buttons) {
+    return createButtonPanel(buttons, null, null);
+  }
+  public static JPanel createButtonPanel(JButton[] buttons, Border border, Object constraints) {
     /* Add buttons so they are placed on the bottom right corner */
     JPanel buttonPanelBL = new JPanel(new BorderLayout());
+
     int cols = buttons.length;
     GridLayout grid = new GridLayout(1, cols);
     grid.setHgap(5);
     JPanel buttonPanel = new JPanel(grid);
-    EmptyBorder border = new EmptyBorder(5,5,5,5);
+    if (border == null)
+      border = new EmptyBorder(5,5,5,5);
     buttonPanel.setBorder(border);
 
     for (int i=0; i<cols; i++)
       if (buttons[i] != null)
         buttonPanel.add(buttons[i]);
 
-    buttonPanelBL.add(buttonPanel, BorderLayout.EAST);
+    buttonPanelBL.add(buttonPanel, constraints == null ? BorderLayout.EAST : constraints);
     return buttonPanelBL;
+  }
+
+  public static JComponent createLogoHeader() {
+    return createLogoHeader(null);
+  }
+  public static JComponent createLogoHeader(JLabel logo) {
+    if (logo == null)
+      logo = new JLabel(Images.get(ImageNums.LOGO_BANNER_MAIN));
+    JPanel logoHeader = new JPanel(new BorderLayout());
+    logoHeader.add(logo, BorderLayout.CENTER);
+    logoHeader.setBackground(Color.white);
+    return logoHeader;
   }
 
   public static void setSuggestedWindowLocation(Component owner, Window child) {
@@ -433,38 +451,17 @@ public class MiscGui extends Object {
   }
 
   /**
-   * Removes all components from the container 2 levels down.
-   * Also removes all components from given conteiner's containers.
-   */
-  /*
-  public static void removeAllComponents(Container cont) {
-    Component[] components = cont.getComponents();
-
-    Component comp;
-
-    for (int i=0; i<components.length; i++) {
-      comp = components[i];
-
-      if (comp != null) {
-        if (comp instanceof Container) {
-          removeAllComponents((Container) comp);
-        }
-
-        comp.transferFocus();
-        cont.remove(comp);
-      }
-    }
-  }
-   */
-
-
-  /**
    * Removes all components in the tree and their listeners.
    * Called to aid in garbage collection.
    */
   public static void removeAllComponentsAndListeners(Component c) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MiscGui.class, "removeAllComponentsAndListeners(Component c)");
     if (trace != null) trace.args(c);
+    try {
+      disposeRecur(c);
+    } catch (Throwable t) {
+      if (trace != null) trace.data(100, "small issue while disposing GUI");
+    }
     try {
       removeAllListenersRecur(c);
     } catch (Throwable t) {
@@ -476,6 +473,28 @@ public class MiscGui extends Object {
       if (trace != null) trace.data(300, "small issue while removing components");
     }
     if (trace != null) trace.exit(MiscGui.class);
+  }
+
+  private static void disposeRecur(Object obj) {
+    if (obj instanceof DisposableObj) {
+      try { ((DisposableObj) obj).disposeObj(); } catch (Throwable t) { }
+    }
+    if (obj instanceof ComponentContainerI) {
+      try { disposeRecur2(((ComponentContainerI) obj).getPotentiallyHiddenComponents()); } catch (Throwable t) { }
+    }
+    if (obj instanceof Container) {
+      try { disposeRecur2(((Container) obj).getComponents()); } catch (Throwable t) { }
+    }
+    if (obj instanceof MenuElement) {
+      try { disposeRecur2(((MenuElement) obj).getSubElements()); } catch (Throwable t) { }
+    }
+  }
+  private static void disposeRecur2(Object[] objs) {
+    if (objs != null) {
+      for (int i=0; i<objs.length; i++) {
+        disposeRecur(objs[i]);
+      }
+    }
   }
 
   private static void removeAllListenersRecur(Component c) {
@@ -513,8 +532,6 @@ public class MiscGui extends Object {
       } // end for
     }
   }
-
-
 
   private static void removeAllComponentsRecur(Component c) {
     try {
@@ -554,10 +571,11 @@ public class MiscGui extends Object {
               if (comp instanceof JTextComponent) {
                 componentHandled = true;
                 JTextComponent textComp = (JTextComponent) comp;
-                Keymap keymap = textComp.getKeymap();
-                textComp.setKeymap(null);
-                if (keymap != null)
-                  textComp.removeKeymap(keymap.getName());
+                // HTMLEditor has problems when key maps are removed
+//                Keymap keymap = textComp.getKeymap();
+//                textComp.setKeymap(null);
+//                if (keymap != null)
+//                  textComp.removeKeymap(keymap.getName());
                 textComp.setActionMap(null);
                 textComp.setAutoscrolls(false);
                 textComp.setBorder(null);
@@ -594,21 +612,27 @@ public class MiscGui extends Object {
             }
 
             if (componentHandled) {
-              // Remove component from its parent next (children get removed first, bottom-up order)
-              if (parent != null)
-                parent.remove(comp);
-
-              if (comp.isVisible())
-                comp.setVisible(false);
-              if (comp.hasFocus())
-                comp.transferFocus();
+              try {
+                // Remove component from its parent next (children get removed first, bottom-up order)
+                if (parent != null)
+                  parent.remove(comp);
+                if (comp.isVisible())
+                  comp.setVisible(false);
+              } catch (Throwable t) {
+                // noop
+              }
             }
           }
         }
       } // end for
     }
-    if (parent != null)
-      parent.removeAll();
+    if (parent != null) {
+      try {
+        parent.removeAll();
+      } catch (Throwable t) {
+        // noop
+      }
+    }
   }
 
 
@@ -639,19 +663,7 @@ public class MiscGui extends Object {
         }
         if (c instanceof Container) {
           Container menuContainer = (Container) c;
-          Component[] components = menuContainer.getComponents();
-          if (components != null) {
-            for (int i=0; i<components.length; i++) {
-              Component comp = components[i];
-              if (comp instanceof DisposableObj) {
-                ((DisposableObj) comp).disposeObj();
-              }
-            }
-          }
           menuContainer.removeAll();
-        }
-        if (c instanceof DisposableObj) {
-          ((DisposableObj) c).disposeObj();
         }
       }
     } catch (Throwable t) {
@@ -862,11 +874,6 @@ public class MiscGui extends Object {
         }
 
       } // end if JComponent
-
-      if (c instanceof DisposableObj) {
-        DisposableObj disposableObj = (DisposableObj) c;
-        disposableObj.disposeObj();
-      }
       /*
       if (c instanceof ActionProducerI) {
         ActionProducerI actionProducer = (ActionProducerI) c;

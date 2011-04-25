@@ -59,7 +59,7 @@ public class AboutDialog extends GeneralDialog implements VisualsSavable {
     if (GlobalProperties.PROGRAM_BUILD_DATE != null)
       setTitle(getTitle() + "  " + GlobalProperties.PROGRAM_BUILD_DATE);
 
-    super.init(frame, buttons, panel, new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), DEFAULT_BUTTON_INDEX, DEFAULT_BUTTON_INDEX);
+    super.init(frame, buttons, panel, MiscGui.createLogoHeader(), DEFAULT_BUTTON_INDEX, DEFAULT_BUTTON_INDEX);
 
     if (trace != null) trace.exit(AboutDialog.class);
   }

@@ -38,7 +38,7 @@ import java.util.*;
 public class EngineFinder extends Object {
 
   /**
-   * Queries the HTTP server for the list of application servers qurrently accessible.
+   * Queries the HTTP server for the list of application servers currently accessible.
    * Based on the current query return the best-version-matching list of servers that is available.
    * Update the GlobalProperties with the newest response to server locations.
    * When there are problems with connectivity to specified server, it will return last fetched list
@@ -133,20 +133,8 @@ public class EngineFinder extends Object {
       // Add any old servers fetched from WEB server
       if (oldEngineServers != null) {
 //System.out.println("4a: oldEngineServers!=null");
-        for (int i=0; i<oldEngineServers.length; i++) {
-          Object[] toAddServerAndPort = oldEngineServers[i];
-          boolean found = false;
-          for (int k=0; k<serversAndPortsL.size(); k++) {
-            Object[] serverAndPort = (Object[]) serversAndPortsL.get(k);
-            if (serverAndPort[0].toString().equalsIgnoreCase(toAddServerAndPort[0].toString()) && serverAndPort[1].toString().equalsIgnoreCase(toAddServerAndPort[1].toString())) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            serversAndPortsL.add(toAddServerAndPort);
-          }
-        }
+        for (int i=0; i<oldEngineServers.length; i++)
+          addOrRemoveServer(serversAndPortsL, true, oldEngineServers[i]);
         if (trace != null) trace.data(210, "After adding old servers fetched from WEB server", serversAndPortsL);
       }
       // if still no servers
@@ -156,21 +144,8 @@ public class EngineFinder extends Object {
         Object[][] additionalServers = getServers(serverListStr, false, true, 0, 0);
         if (additionalServers != null) {
 //System.out.println("4bb: additionalServers != null");
-          for (int i=0; i<additionalServers.length; i++) {
-            Object[] toAddServerAndPort = additionalServers[i];
-            boolean found = false;
-            for (int k=0; k<serversAndPortsL.size(); k++) {
-              Object[] serverAndPort = (Object[]) serversAndPortsL.get(k);
-              if (serverAndPort[0].toString().equalsIgnoreCase(toAddServerAndPort[0].toString()) && serverAndPort[1].toString().equalsIgnoreCase(toAddServerAndPort[1].toString())) {
-                found = true;
-                break;
-              }
-            }
-            if (!found) {
-//System.out.println("4bbb: adding server " + Misc.objToStr(toAddServerAndPort));
-              serversAndPortsL.add(toAddServerAndPort);
-            }
-          }
+          for (int i=0; i<additionalServers.length; i++)
+            addOrRemoveServer(serversAndPortsL, true, additionalServers[i]);
         }
         if (trace != null) trace.data(220, "After adding past data servers", serversAndPortsL);
       }
@@ -190,6 +165,45 @@ public class EngineFinder extends Object {
     if (trace != null) trace.data(300, "returning hostsAndPorts");
     if (trace != null) trace.exit(EngineFinder.class, hostsAndPorts);
     return hostsAndPorts;
+  }
+
+  /**
+   * Adds a specified server (ie "d3.cryptoheaven.com:4383") into the array of
+   * host:port object pairs, and returns new array with appended server at the end.
+   */
+  public static Object[][] addOrRemoveServer(Object[][] hostsAndPorts, boolean isAdd, String serverS) {
+    if (serverS != null && serverS.length() > 0) {
+      Object[] server = Misc.parseHostAndPort(serverS);
+      if (server != null) {
+        ArrayList hostsAndPortsL = new ArrayList();
+        if (hostsAndPorts != null && hostsAndPorts.length > 0)
+          hostsAndPortsL.addAll(Arrays.asList(hostsAndPorts));
+        EngineFinder.addOrRemoveServer(hostsAndPortsL, isAdd, server);
+        hostsAndPorts = new Object[hostsAndPortsL.size()][];
+        hostsAndPortsL.toArray(hostsAndPorts);
+      }
+    }
+    return hostsAndPorts;
+  }
+  private static void addOrRemoveServer(ArrayList serversAndPortsL, boolean isAdd, Object[] toAddServerAndPort) {
+    if (serversAndPortsL != null && toAddServerAndPort != null) {
+      boolean found = false;
+      for (int k=0; k<serversAndPortsL.size(); k++) {
+        Object[] serverAndPort = (Object[]) serversAndPortsL.get(k);
+        if (serverAndPort[0].toString().equalsIgnoreCase(toAddServerAndPort[0].toString()) && serverAndPort[1].toString().equalsIgnoreCase(toAddServerAndPort[1].toString())) {
+          found = true;
+          if (isAdd)
+            break;
+          else {
+            serversAndPortsL.remove(k);
+            k--;
+          }
+        }
+      }
+      if (isAdd && !found) {
+        serversAndPortsL.add(toAddServerAndPort);
+      }
+    }
   }
 
   private static URL getServerListURL(Object[] serverAndPort) throws MalformedURLException {
@@ -279,7 +293,7 @@ public class EngineFinder extends Object {
     return rc;
   }
 
-  public static String getServerListPropertyName(Object[] server) {
+  private static String getServerListPropertyName(Object[] server) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(EngineFinder.class, "getServerListPropertyName(Object[] server)");
     String propertyName = "ServerList_" + ((String)server[0]).toLowerCase() + "_" + server[1];
     if (trace != null) trace.exit(EngineFinder.class, propertyName);

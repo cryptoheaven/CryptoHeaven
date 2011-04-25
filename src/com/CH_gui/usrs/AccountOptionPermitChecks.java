@@ -329,7 +329,7 @@ public class AccountOptionPermitChecks extends Object {
     addCheckBoxes(bottomPanel, includeUpdate, jWarnExternal, jWarnExternalUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_WARN_EXTERNAL, checkBoxListener, posY);
     posY ++;
 
-    jSwitchPreview = new JMyCheckBox("Preview Rich Text email in Plain Text mode.");
+    jSwitchPreview = new JMyCheckBox("Enhance privacy by filtering out images from inbox emails.");
     jSwitchPreviewUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSwitchPreview, jSwitchPreviewUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE, checkBoxListener, posY);
     posY ++;

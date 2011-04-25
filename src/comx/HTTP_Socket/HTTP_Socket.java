@@ -44,15 +44,15 @@ public class HTTP_Socket extends Socket {
   private static int DEBUG_SOCKET_CREATE_SUCCESS_RATE = 3;
   private static int DEBUG_DROP_PACKETS_FREQUENCY = 50;
 
-  private static boolean ENABLE_SOCKET_CONNECTIONS = true;
+  private static boolean ENABLE_SOCKET_CONNECTIONS = false;
   private static boolean ENABLE_HTTP_CONNECTIONS = true;
   private static int MIN_TIME_SOCKET_REMAKE_DELAY = 2000;
   private static int MAX_TIME_SOCKET_REMAKE_DELAY = 4000;
 
-  private static int CONNECTION_HTTP_TIMEOUT = 15000;
-  private static int CONNECTION_SOCKET_TIMEOUT = 10000;
+  private static int CONNECTION_HTTP_TIMEOUT = 6000;
+  private static int CONNECTION_SOCKET_TIMEOUT = 5000;
 
-  private static int MAX_SEND_TRIES = 30;
+  private static int MAX_SEND_TRIES = 3;
   private static int TIME_DELAY_AFTER_FAILED_SEND_TRY = 1000;
 
   private static int MIN_TIME_TO_WAIT_TO_REQUEST_REPLY__HTTP = 50;
@@ -63,11 +63,11 @@ public class HTTP_Socket extends Socket {
   private static double TIME_TO_WAIT_POWER = 1.25;
   private static int NUMBER_OF_CONCURRENT_COMMUNICATION_THREADS = 2;
 
-  private static int MAX_URL_DATA_SIZE = 2*1024;
+  private static int MAX_URL_DATA_SIZE = 512; // used to be 2048 but had problems on setup: 3G modem -> router -> bridge
   private static int MAX_POST_DATA_SIZE = 32*1024;
 
   // file extensions to be used as random draw for GET and POST requests
-  private static String[] fileExts = new String[] { "asp", "jsp", "php", "cgi", "pl" };
+  private static String[] fileExts = new String[] { "asp", "jsp", "php", "cgi"};
 
   String proxyHost;
   int proxyPort;
@@ -111,9 +111,6 @@ public class HTTP_Socket extends Socket {
     if (trace != null) trace.args(host);
     if (trace != null) trace.args(port);
 
-    if (!ENABLE_SOCKET_CONNECTIONS)
-      System.out.println("Warning: HTTP_Socket has plain connectivity disabled.");
-
     this.proxyHost = proxyHost;
     this.proxyPort = proxyPort;
     this.host = host;
@@ -124,16 +121,21 @@ public class HTTP_Socket extends Socket {
   }
 
   private void dumpSocket() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTTP_Socket.class, "dumpSocket()");
     synchronized (socketMonitor) {
       if (socket != null) {
+        if (trace != null) trace.data(10, "dumping socket and closing streams ...");
         try { socketInput.close(); } catch (Throwable x) { }
         try { socketOutput.close(); } catch (Throwable x) { }
         try { socket.close(); } catch (Throwable x) { }
         socket = null;
         socketInput = null;
         socketOutput = null;
+      } else {
+        if (trace != null) trace.data(20, "socket is null, nothing to dump");
       }
     }
+    if (trace != null) trace.exit(HTTP_Socket.class);
   }
 
   private void makeSocket(final String proxyHost, final int proxyPort, long timeout) {
@@ -336,6 +338,7 @@ public class HTTP_Socket extends Socket {
           synchronized (recvFifo) {
             recvDS = (DataSet) recvFifo.remove();
             if (recvDS == null) {
+              if (trace != null) trace.data(10, "reciving packet is null, will wait for one to arrive");
               if (recvFifo.size() > 0) {
                 //System.out.println("recvDS is null but recvFifo.size()="+recvFifo.size()+" first id = " +((DataSet) recvFifo.peek()).sequenceId);
               }
@@ -350,6 +353,7 @@ public class HTTP_Socket extends Socket {
           }
           if (recvDS != null) {
             //System.out.println("recive: ds = " + ds);
+            if (trace != null) trace.data(20, "received packet, action is", recvDS.action);
             switch (recvDS.action) {
               case DataSet.ACTION_CONNECT_RP :
                 //xxx System.out.println("ACTION_CONNECT_RP");
@@ -414,20 +418,26 @@ public class HTTP_Socket extends Socket {
         while (!closed) {
           // slow down streams if there is a backlog
           synchronized (recvFifo) {
-            while (!closed && !closing && recvFifo.isAvailable(3))
+            while (!closed && !closing && recvFifo.isAvailable(3)) {
+              if (trace != null) trace.data(10, "'Sending' slowing down due to backlog in recvFifo");
               try { recvFifo.wait(1000); } catch (InterruptedException e) { }
+            }
           } // end synchronized slow down
           DataSet sendDS = null;
           synchronized (sendFifo) {
             if (socket != null) {
+              if (trace != null) trace.data(20, "grabbing sendDS from sendFifo");
               sendDS = (DataSet) sendFifo.remove();
               if (sendDS == null) {
+                if (trace != null) trace.data(30, "nothing grabbed, will wait");
                 if (sendFifo.size() > 0) {
                   //System.out.println("Sending: sendDS is null but sendFifo.size()="+sendFifo.size()+" first id = " +((DataSet) sendFifo.peek()).sequenceId);
                 }
                 try { sendFifo.wait(timeToWait); } catch (InterruptedException e) { }
                 // After we wake-up from waiting for data to send, see if any data became available...
                 sendDS = (DataSet) sendFifo.remove();
+              } else {
+                if (trace != null) trace.data(31, "grabbed a sendDS packet for sending");
               }
             }
           }
@@ -439,8 +449,10 @@ public class HTTP_Socket extends Socket {
           if (sendDS != null) {
             // make a cache of data before we try to send it
             sentCacheFifo.add(sendDS);
+            if (trace != null) trace.data(40, "packed added to sent cache before sending");
           }
           if (socket == null) {
+            if (trace != null) trace.data(50, "socket is null, remake one now");
             int socketRemakeDelay = MIN_TIME_SOCKET_REMAKE_DELAY + rnd.nextInt(MAX_TIME_SOCKET_REMAKE_DELAY - MIN_TIME_SOCKET_REMAKE_DELAY);
             try { Thread.sleep(socketRemakeDelay); } catch (InterruptedException e) { }
             makeSocket(proxyHost, proxyPort, CONNECTION_SOCKET_TIMEOUT);
@@ -468,6 +480,7 @@ public class HTTP_Socket extends Socket {
                 //System.out.println("SOCKET send " + sendDS.sequenceId);
               }
               String header = "SOCKET2"+DataSet.CRLF;
+              if (trace != null) trace.data(60, "writing packet header");
               dOut.write(header.getBytes());
               {
                 if (insertError) {
@@ -475,20 +488,23 @@ public class HTTP_Socket extends Socket {
                   throw new IOException("broken");
                 }
               }
+              if (trace != null) trace.data(61, "writing packet bytes");
               byte[] bytes = sendDS.toByteArray();
               dOut.writeInt(bytes.length);
               dOut.write(bytes);
               dOut.writeBytes(DataSet.CRLF);
               dOut.flush();
+              if (trace != null) trace.data(62, "writing packet flushed");
               adjustWaitTime_PostSend(null, hadSomethingToSay, false, false);
               lastSendTimestamp = System.currentTimeMillis();
             }
-          } catch (Throwable e) {
+          } catch (Exception e) {
+            if (trace != null) trace.data(200, "exception caught while operating on send socket");
+            if (trace != null) trace.data(201, sendDS.tryNumber+1 > MAX_SEND_TRIES ? "MAX TRIES REACHED - ABORT" : "WILL RETRY");
+            if (trace != null) trace.exception(Sending.class, 202, e);
             dumpSocket();
             sendDS.tryNumber ++;
-            //System.out.println("New SOCKET tryNumber = "+sendDS.tryNumber);
             if (sendDS.tryNumber > MAX_SEND_TRIES) {
-              if (trace != null) trace.exception(SendingAndReciving.class, 300, e);
               closed();
             } else {
               // wait set penalty time after failure
@@ -535,12 +551,15 @@ public class HTTP_Socket extends Socket {
         while (!closed) {
           // slow down streams if there is a backlog
           synchronized (recvFifo) {
-            while (!closed && !closing && recvFifo.isAvailable(3))
+            while (!closed && !closing && recvFifo.isAvailable(3)) {
+              if (trace != null) trace.data(10, "'Reciving' slowing down due to backlog in recvFifo");
               try { recvFifo.wait(1000); } catch (InterruptedException e) { }
+            }
           } // end synchronized slow down
           try {
             if (socket != null) {
               DataInputStream dataIn = socketInput;
+              if (trace != null) trace.data(20, "reading first integer from receive socket");
               int byteLength  = dataIn.readInt();
               byte[] bytes = new byte[byteLength];
               int countRead = 0;
@@ -552,6 +571,7 @@ public class HTTP_Socket extends Socket {
                 }
               }
               while ((countRead += dataIn.read(bytes, countRead, byteLength - countRead)) < byteLength) { }
+              if (trace != null) trace.data(30, "complete packet read from receive socket");
               DataSet replyDS = DataSet.toDataSet(bytes);
               //System.out.println("recived " + replyDS.getActionName());
               if (replyDS.isClientResponseRequired() && connected) {
@@ -573,12 +593,15 @@ public class HTTP_Socket extends Socket {
             } else {
               try { Thread.sleep(50); } catch (Throwable t) { }
             }
-          } catch (Throwable t) {
+          } catch (Exception e) {
+            if (trace != null) trace.data(200, "exception caught while operating on receive socket");
+            if (trace != null) trace.exception(Reciving.class, 201, e);
             dumpSocket();
           }
         } // end while ()
       } catch (Throwable t) {
         if (trace != null) trace.exception(Reciving.class, 400, t);
+        dumpSocket();
       }
       // No Reciving thread so essentially the socket is CLOSED!
       if (trace != null) trace.data(500, "Reciving completed, closed()");
@@ -669,9 +692,13 @@ public class HTTP_Socket extends Socket {
               // Adjust retry watermarks.
               DataSetCache.setDSWatermarks(sendDS, recvFifo);
               // choose method of sending data based on data size
-              boolean doPOST = sendDS.data != null && sendDS.data.length > MAX_URL_DATA_SIZE;
-              if (trace != null) trace.info(90, "doPOST", doPOST);
-              //System.out.println("doPOST "+ doPOST);
+              int dataLen = sendDS.data != null ? sendDS.data.length : -1;
+              boolean doPOST = dataLen > MAX_URL_DATA_SIZE;
+              if (trace != null) trace.info(90, "doPOST or doGET?", doPOST ? "doPOST" : "doGET", "dataLen="+dataLen);
+//              if (dataLen > 200) {
+//                System.out.println("=========================================================================================");
+//                System.out.println("sendDS.data.length "+ (sendDS.data != null ? ""+sendDS.data.length : "null"));
+//              }
               boolean insertError = DEBUG_ON__INSERT_RANDOM_ERRORS && rnd.nextInt(DEBUG_INSERT_RANDOM_ERROR_FREQUENCY) == 0;
               {
                 if (insertError) {
@@ -679,16 +706,16 @@ public class HTTP_Socket extends Socket {
                   throw new IOException("broken");
                 }
               }
-              URL url = null;
-              url = new URL("http", proxyHost, proxyPort, doPOST ? makeRandomPOSTPrefix() : makeRandomGETPrefix()+sendDS.toURLEncoded());
               URLConnection urlConn = null;
-              if (trace != null) trace.info(100, "url", url);
               //System.out.println("url "+url);
               if (doPOST) {
-                if (trace != null) trace.info(100, "" + new Date() + " POST " + sendDS.sequenceId + " " + sendDS.data.length);
+                URL url = new URL("http", proxyHost, proxyPort, makeRandomPOSTPrefix());
+                if (trace != null) trace.info(100, "url", url);
+                if (trace != null) trace.info(101, "" + new Date() + " POST " + sendDS.sequenceId + " " + sendDS.data.length);
                 //System.out.println("" + new Date() + " POST " + sendDS.sequenceId + " " + sendDS.data.length);
                 String boundary = MultiPartFormOutputStream.createBoundary();
                 urlConn = MultiPartFormOutputStream.createConnection(url);
+                //System.out.println("doPOST    urlC="+urlConn);
                 urlConn.setRequestProperty("Accept", "*/*");
                 urlConn.setRequestProperty("Content-Type", MultiPartFormOutputStream.getContentType(boundary));
                 // set some other request headers...
@@ -697,16 +724,27 @@ public class HTTP_Socket extends Socket {
                 // no need to connect cuz getOutputStream() does it
                 MultiPartFormOutputStream out = new MultiPartFormOutputStream(urlConn.getOutputStream(), boundary);
                 // write a text field element
-                out.writeField(makeRandomVarname(6), new String(sendDS.toBASE64()));
+                out.writeField(makeRandomVarname(6, 6), new String(sendDS.toBASE64()));
                 out.close();
               } else {
-                if (trace != null) trace.info(110, "" + new Date() + " GET " + sendDS.sequenceId + " " + (sendDS.data != null ? sendDS.data.length : 0));
-                //System.out.println("" + new Date() + " GET " + sendDS.sequenceId + " " + (sendDS.data != null ? sendDS.data.length : 0));
+                URL url = new URL("http", proxyHost, proxyPort, makeRandomGETPrefix()+sendDS.toURLEncoded());
+                if (trace != null) trace.info(110, "url", url);
+                if (trace != null) trace.info(111, "" + new Date() + " GET " + sendDS.sequenceId + " " + (sendDS.data != null ? sendDS.data.length : 0));
+//                if (dataLen > 200) {
+//                  System.out.println("query len "+url.getQuery().length());
+//                  System.out.println("getAuthority "+url.getAuthority());
+//                  System.out.println("getFile "+url.getFile());
+//                  System.out.println("getHost "+url.getHost());
+//                  System.out.println("getPath "+url.getPath());
+//                  System.out.println("getProtocol "+url.getProtocol());
+//                  System.out.println("getQuery "+url.getQuery());
+//                  System.out.println("getRef "+url.getRef());
+//                  System.out.println("getUserInfo "+url.getUserInfo());
+//                }
                 urlConn = url.openConnection();
                 urlConn.setUseCaches(false);
               }
               if (trace != null) trace.info(120, (((HttpURLConnection) urlConn).usingProxy() ? "Using" : "NOT using") + " proxy");
-              //System.out.println((((HttpURLConnection) urlConn).usingProxy() ? "Using" : "NOT using") + " proxy");
               Object content = urlConn.getContent();
               InputStream in = null;
               if (content instanceof InputStream)
@@ -752,6 +790,7 @@ public class HTTP_Socket extends Socket {
               //System.out.println("page="+page);
 
               DataSet replyDS = DataSet.toDataSet(page.toCharArray());
+              //System.out.println("replyDS   page="+replyDS.toURLEncoded());
               if (trace != null) trace.info(152, "replyDS constructed");
               //System.out.println("replyDS constructed");
               adjustWaitTime_PostSend(replyDS, hadSomethingToSay, true, false);
@@ -789,12 +828,13 @@ public class HTTP_Socket extends Socket {
                 }
               }
             }
-          } catch (Throwable e) {
+          } catch (Exception e) {
+            if (trace != null) trace.data(300, "exception caught while operating http socket commands");
+            if (trace != null) trace.exception(SendingAndReciving.class, 301, e);
             sendDS.tryNumber ++;
-            if (trace != null) trace.data(180, "New HTTP tryNumber = "+sendDS.tryNumber);
+            if (trace != null) trace.data(302, "New HTTP tryNumber = "+sendDS.tryNumber);
             //System.out.println("New HTTP tryNumber = "+sendDS.tryNumber);
             if (sendDS.tryNumber > MAX_SEND_TRIES) {
-              if (trace != null) trace.exception(SendingAndReciving.class, 300, e);
               closed();
             } else {
               // wait set penalty time after failure
@@ -859,9 +899,12 @@ public class HTTP_Socket extends Socket {
               if (sendFifo.size() > 0 || recvFifo.size() > 0) {
                 Thread.yield();
               }
+              if (trace != null) trace.data(10, "about to read first byte from send pipe input");
               int b = sendPipeIn.read();
               if (b >= 0) {
+                if (trace != null) trace.data(20, "got first byte");
                 int available = sendPipeIn.available();
+                if (trace != null) trace.data(30, "available bytes are", available);
                 if (available + 1 > MAX_POST_DATA_SIZE)
                   available = MAX_POST_DATA_SIZE - 1;
                 int byteLength = available+1; // 1 single byte 'b' was already read
@@ -875,9 +918,11 @@ public class HTTP_Socket extends Socket {
                 }
                 int countRead = 1; // single byte was already read
                 while ((countRead += sendPipeIn.read(bytes, countRead, byteLength - countRead)) < byteLength) { }
+                if (trace != null) trace.data(140, "finished reading packet bytes");
                 synchronized (sendFifo) {
                   // slow down if too many in the send queue
                   while (sendFifo.size() > 1 && !closed && !closing) {
+                    if (trace != null) trace.data(145, "slowing down since too many in send queue, namely", sendFifo.size());
                     try { sendFifo.wait(1000); } catch (InterruptedException e) { }
                   }
                   if (!closed) {
@@ -983,22 +1028,22 @@ public class HTTP_Socket extends Socket {
    * @return String to replace '/index.jsp?SESSIONID='
    */
   private static String makeRandomGETPrefix() {
-    return "/" + makeRandomVarname(rnd, 6) + "." + fileExts[rnd.nextInt(fileExts.length)] + "?" + makeRandomVarname(rnd, 6) + "=";
+    return "/" + makeRandomVarname(rnd, 8, 8) + "." + fileExts[rnd.nextInt(fileExts.length)] + "?" + makeRandomVarname(rnd, 6, 6) + "=";
   }
   /**
    * @return String to replace '/index.jsp'
    */
   private static String makeRandomPOSTPrefix() {
-    return "/" + makeRandomVarname(rnd, 6) + "." + fileExts[rnd.nextInt(fileExts.length)];
+    return "/" + makeRandomVarname(rnd, 8, 8) + "." + fileExts[rnd.nextInt(fileExts.length)];
   }
 
-  private static String makeRandomVarname(int maxLen) {
-    return makeRandomVarname(new Random(), maxLen);
+  private static String makeRandomVarname(int minLen, int maxLen) {
+    return makeRandomVarname(new Random(), minLen, maxLen);
   }
-  private static String makeRandomVarname(Random rnd, int maxLen) {
+  private static String makeRandomVarname(Random rnd, int minLen, int maxLen) {
     byte a = 'a';
     byte z = 'z';
-    int varChars = rnd.nextInt(maxLen) + 1;
+    int varChars = rnd.nextInt(maxLen-minLen+1) + minLen;
     byte[] varname = new byte[varChars];
     for (int i=0; i<varname.length; i++)
       varname[i] = (byte) (rnd.nextInt(z-a)+a);

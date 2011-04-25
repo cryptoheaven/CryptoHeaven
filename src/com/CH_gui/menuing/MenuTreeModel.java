@@ -12,22 +12,21 @@
 
 package com.CH_gui.menuing;
 
-import com.CH_gui.util.MiscGui;
-import java.util.*;
-
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.*;
-import javax.swing.tree.*;
-
 import com.CH_gui.action.Actions;
 import com.CH_gui.actionGui.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.util.MiscGui;
 import com.CH_guiLib.gui.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.tree.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -1536,6 +1535,7 @@ public class MenuTreeModel extends Object {
         menuItem = new JActionMenuItem(action);
       }
     }
+    menuItem.setMinimumSize(new Dimension(40, 40));
     menuActionItem.setGUIButton(menuItem);
 
     if (trace != null) trace.exit(MenuTreeModel.class, menuItem);

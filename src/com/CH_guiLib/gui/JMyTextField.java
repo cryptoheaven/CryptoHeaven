@@ -43,6 +43,7 @@ public class JMyTextField extends JTextField {
   private Font originalFont = null;
   private Font hintFont = null;
   private String hintText = null;
+  private String backgroundText = null;
 
   /** Creates new JMyTextField */
   public JMyTextField() {
@@ -68,12 +69,12 @@ public class JMyTextField extends JTextField {
     MiscGui.initKeyBindings(this);
   }
 
-  public void setUnfocusedEmptyText(String text) {
+  public void setUnfocusedTextWhenEmpty(String text) {
     JMyLabel dummyLabel = new JMyLabel();
     hintText = text;
     originalColor = getForeground();
-    hintColor = getBackground().darker();
     originalFont = dummyLabel.getFont();
+    hintColor = getBackground().darker();
     hintFont = originalFont.deriveFont(Font.ITALIC);
 
     addFocusListener(new FocusListener() {
@@ -101,9 +102,24 @@ public class JMyTextField extends JTextField {
     setCaretPosition(0);
   }
 
+  public void setBackgroundTextWhenEmpty(String text) {
+    JMyLabel dummyLabel = new JMyLabel();
+    hintText = text;
+    originalColor = getForeground();
+    originalFont = dummyLabel.getFont();
+    hintColor = getBackground().darker();
+    hintFont = originalFont.deriveFont(Font.ITALIC);
+    backgroundText = text;
+  }
+
   public void paint(Graphics g) {
     MiscGui.setPaintPrefs(g);
     super.paint(g);
+    if (backgroundText != null && getText().trim().length() == 0) {
+      g.setColor(hintColor);
+      g.setFont(hintFont);
+      g.drawString(backgroundText, 0, (int) (0.75 * getHeight()));
+    }
   }
 
 }
