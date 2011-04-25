@@ -14,7 +14,8 @@
 package com.CH_gui.table;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.records.filters.*;
@@ -197,6 +198,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     jTopPanel = new JPanel(new GridBagLayout());
     jFilterPanel = new JPanel(new GridBagLayout());
     jFilterPanel.setVisible(false);
+    //jFilterPanel.setBorder(new LineBorder(Color.darkGray, 1));
     jFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
     jFilterPanel.add(new JMyLabel("Look for:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));

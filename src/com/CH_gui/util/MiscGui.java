@@ -433,17 +433,38 @@ public class MiscGui extends Object {
   }
 
   /**
+   * Removes all components from the container 2 levels down.
+   * Also removes all components from given conteiner's containers.
+   */
+  /*
+  public static void removeAllComponents(Container cont) {
+    Component[] components = cont.getComponents();
+
+    Component comp;
+
+    for (int i=0; i<components.length; i++) {
+      comp = components[i];
+
+      if (comp != null) {
+        if (comp instanceof Container) {
+          removeAllComponents((Container) comp);
+        }
+
+        comp.transferFocus();
+        cont.remove(comp);
+      }
+    }
+  }
+   */
+
+
+  /**
    * Removes all components in the tree and their listeners.
    * Called to aid in garbage collection.
    */
   public static void removeAllComponentsAndListeners(Component c) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MiscGui.class, "removeAllComponentsAndListeners(Component c)");
     if (trace != null) trace.args(c);
-    try {
-      disposeRecur(c);
-    } catch (Throwable t) {
-      if (trace != null) trace.data(100, "small issue while disposing GUI");
-    }
     try {
       removeAllListenersRecur(c);
     } catch (Throwable t) {
@@ -455,28 +476,6 @@ public class MiscGui extends Object {
       if (trace != null) trace.data(300, "small issue while removing components");
     }
     if (trace != null) trace.exit(MiscGui.class);
-  }
-
-  private static void disposeRecur(Object obj) {
-    if (obj instanceof DisposableObj) {
-      try { ((DisposableObj) obj).disposeObj(); } catch (Throwable t) { }
-    }
-    if (obj instanceof ComponentContainerI) {
-      try { disposeRecur2(((ComponentContainerI) obj).getPotentiallyHiddenComponents()); } catch (Throwable t) { }
-    }
-    if (obj instanceof Container) {
-      try { disposeRecur2(((Container) obj).getComponents()); } catch (Throwable t) { }
-    }
-    if (obj instanceof MenuElement) {
-      try { disposeRecur2(((MenuElement) obj).getSubElements()); } catch (Throwable t) { }
-    }
-  }
-  private static void disposeRecur2(Object[] objs) {
-    if (objs != null) {
-      for (int i=0; i<objs.length; i++) {
-        disposeRecur(objs[i]);
-      }
-    }
   }
 
   private static void removeAllListenersRecur(Component c) {
@@ -514,6 +513,8 @@ public class MiscGui extends Object {
       } // end for
     }
   }
+
+
 
   private static void removeAllComponentsRecur(Component c) {
     try {
@@ -553,11 +554,10 @@ public class MiscGui extends Object {
               if (comp instanceof JTextComponent) {
                 componentHandled = true;
                 JTextComponent textComp = (JTextComponent) comp;
-                // HTMLEditor has problems when key maps are removed
-//                Keymap keymap = textComp.getKeymap();
-//                textComp.setKeymap(null);
-//                if (keymap != null)
-//                  textComp.removeKeymap(keymap.getName());
+                Keymap keymap = textComp.getKeymap();
+                textComp.setKeymap(null);
+                if (keymap != null)
+                  textComp.removeKeymap(keymap.getName());
                 textComp.setActionMap(null);
                 textComp.setAutoscrolls(false);
                 textComp.setBorder(null);
@@ -594,27 +594,21 @@ public class MiscGui extends Object {
             }
 
             if (componentHandled) {
-              try {
-                // Remove component from its parent next (children get removed first, bottom-up order)
-                if (parent != null)
-                  parent.remove(comp);
-                if (comp.isVisible())
-                  comp.setVisible(false);
-              } catch (Throwable t) {
-                // noop
-              }
+              // Remove component from its parent next (children get removed first, bottom-up order)
+              if (parent != null)
+                parent.remove(comp);
+
+              if (comp.isVisible())
+                comp.setVisible(false);
+              if (comp.hasFocus())
+                comp.transferFocus();
             }
           }
         }
       } // end for
     }
-    if (parent != null) {
-      try {
-        parent.removeAll();
-      } catch (Throwable t) {
-        // noop
-      }
-    }
+    if (parent != null)
+      parent.removeAll();
   }
 
 
@@ -645,7 +639,19 @@ public class MiscGui extends Object {
         }
         if (c instanceof Container) {
           Container menuContainer = (Container) c;
+          Component[] components = menuContainer.getComponents();
+          if (components != null) {
+            for (int i=0; i<components.length; i++) {
+              Component comp = components[i];
+              if (comp instanceof DisposableObj) {
+                ((DisposableObj) comp).disposeObj();
+              }
+            }
+          }
           menuContainer.removeAll();
+        }
+        if (c instanceof DisposableObj) {
+          ((DisposableObj) c).disposeObj();
         }
       }
     } catch (Throwable t) {
@@ -856,6 +862,11 @@ public class MiscGui extends Object {
         }
 
       } // end if JComponent
+
+      if (c instanceof DisposableObj) {
+        DisposableObj disposableObj = (DisposableObj) c;
+        disposableObj.disposeObj();
+      }
       /*
       if (c instanceof ActionProducerI) {
         ActionProducerI actionProducer = (ActionProducerI) c;

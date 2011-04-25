@@ -112,8 +112,6 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
         Window w = SwingUtilities.windowForComponent(UserActionTable.this);
         if (w instanceof Frame)
           new InitiateContactDialog((Frame) w, RecordUtils.getIDs(uRecs));
-        else if (w instanceof Dialog)
-          new InitiateContactDialog((Dialog) w, RecordUtils.getIDs(uRecs));
       }
     }
   }
@@ -164,7 +162,7 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
   /****************************************************************************/
 
 
-  /** @return all the actions that this objects produces.
+  /** @return all the acitons that this objects produces.
    */
   public Action[] getActions() {
     return actions;

@@ -196,7 +196,7 @@ public class MainFrameStarter extends Object {
             i++;
             String onOff = args[i];
             if (onOff.equalsIgnoreCase("on") || onOff.equalsIgnoreCase("true"))
-              TraceDiagnostics.traceStart(null);
+              TraceDiagnostics.traceStart();
             else if (onOff.equalsIgnoreCase("off") || onOff.equalsIgnoreCase("false"))
               TraceDiagnostics.traceStop();
           } else if (args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("/?") || args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("/help")) {

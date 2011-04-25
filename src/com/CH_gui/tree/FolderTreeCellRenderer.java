@@ -12,6 +12,7 @@
 
 package com.CH_gui.tree;
 
+import com.CH_gui.util.Images;
 import com.CH_cl.service.cache.*;
 
 import com.CH_co.trace.Trace;
@@ -20,10 +21,11 @@ import com.CH_co.util.*;
 import com.CH_co.service.records.*;
 
 import com.CH_gui.gui.*;
-import com.CH_gui.util.Images;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.Font;
+import javax.swing.Icon;
+import javax.swing.JTree;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -31,21 +33,24 @@ import javax.swing.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description:
- *  This class overrides the default renderer to manage the icons properly.
- *
+ * Class Description: 
+ *  This class overrides the default renderer to manage the icons properly.  
+ *  
  * Class Details:
  *  Icons used are taken from Icon Repository.
  *
  * <b>$Revision: 1.22 $</b>
  * @author  Marcin Kurzawa
- * @version
+ * @version 
  */
 public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
 
   /** Creates new FolderTreeCellRenderer */
   public FolderTreeCellRenderer() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeCellRenderer.class, "FolderTreeCellRenderer()");
+//    // This component uses smaller font
+//    Font font = new JLabel().getFont();
+//    setFont(font.deriveFont(font.getSize2D()-1));
     setLeafIcon(Images.get(ImageNums.FLD_CLOSED16));
     setOpenIcon(Images.get(ImageNums.FLD_CLOSED16));
     setClosedIcon(Images.get(ImageNums.FLD_CLOSED16));
@@ -62,7 +67,7 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
                                                 boolean selected,
                                                 boolean expanded,
                                                 boolean leaf, int row,
-                                                boolean hasFocus)
+                                                boolean hasFocus) 
   {
     super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
     setToolTipText(null);

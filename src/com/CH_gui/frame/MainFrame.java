@@ -40,8 +40,7 @@ import com.CH_gui.tree.*;
 import com.CH_gui.usrs.*;
 import com.CH_gui.util.*;
 
-// "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this line
-import comx.tig.en.SingleTigerSession;
+import comx.Tiger.gui.*; // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this line
 
 import java.awt.*;
 import java.awt.event.*;
@@ -344,8 +343,12 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           welcomeContactTableComponent = new ContactTableComponent4Frame(null, new FixedFilter(false), null, null, false, false, true);
 
           // Make the main panel
-          JSplitPane vSplit = new JMySplitPane(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d);
-          JSplitPane hSplit = new JMySplitPane(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.20d);
+          JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d);
+          vSplit.setOneTouchExpandable(false);
+          if (vSplit.getDividerSize() > 5) vSplit.setDividerSize(5);
+          JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.20d);
+          hSplit.setOneTouchExpandable(false);
+          if (hSplit.getDividerSize() > 5) hSplit.setDividerSize(5);
 
           // status bar
           statsBar = new StatsBar();
@@ -1002,13 +1005,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
             SIL.destroyServer();
           } catch (Throwable t) {
             if (trace != null) trace.exception(MainFrame.class, 200, t);
-          }
-          // Again to be rally sure since we had some complains about running
-          // processes being left behind.
-          try {
-            SIL.destroyServer();
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(MainFrame.class, 300, t);
           }
           // If this is applet quitting, reset the gui flag in case it will re-initialize
           Misc.suppressAllGUI(false);

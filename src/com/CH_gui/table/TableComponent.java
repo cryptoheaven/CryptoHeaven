@@ -882,7 +882,9 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
    * in the table.  Property name is used to store visuals about the split bar.
    */
   public static JSplitPane createSplitPane(String propertyName, int orientation, double resizeWeight) {
-    JSplitPane splitPane = new JMySplitPane(propertyName, orientation, resizeWeight);
+    JSplitPane splitPane = new JSplitPaneVS(propertyName, orientation, resizeWeight);
+    splitPane.setOneTouchExpandable(false);
+    if (splitPane.getDividerSize() > 5) splitPane.setDividerSize(5);
     return splitPane;
   }
   public static JSplitPane createSplitPane(String propertyName, RecordTableComponent recordTableComp, JComponent viewer, int orientation, double resizeWeight) {
@@ -893,8 +895,9 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       recordTableComp.getActionTable().addRecordSelectionListener((RecordSelectionListener) viewer);
     recordTableComp.setBorder(new EmptyBorder(0,0,0,0));
 
-    JSplitPane splitPane = new JMySplitPane(propertyName, orientation, recordTableComp, viewer, resizeWeight);
+    JSplitPane splitPane = new JSplitPaneVS(propertyName, orientation, recordTableComp, viewer, resizeWeight);
     splitPane.setOneTouchExpandable(false);
+    if (splitPane.getDividerSize() > 5) splitPane.setDividerSize(5);
 
     return splitPane;
   }

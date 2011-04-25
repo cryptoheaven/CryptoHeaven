@@ -13,9 +13,10 @@
 package com.CH_gui.gui;
 
 import com.CH_gui.util.MiscGui;
-
 import java.awt.*;
 import javax.swing.*;
+
+import com.CH_co.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011

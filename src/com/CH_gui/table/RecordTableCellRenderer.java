@@ -152,6 +152,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
     setDefaultToolTip(this, table, row, column);
     if (column > -1 && !isSubClassManagingRowColors()) {
       setDefaultBackground(this, row, isSelected);
+      setDefaultForeground(this, row, isSelected);
     }
 
     // avoid painting white background
@@ -222,6 +223,10 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
     if (bgColor != null) {
       c.setBackground(bgColor);
     }
+  }
+
+  public void setDefaultForeground(Component c, int row, boolean isSelected) {
+    c.setForeground(Color.black);
   }
 
   /**

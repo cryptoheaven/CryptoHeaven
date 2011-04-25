@@ -66,7 +66,7 @@ public class UserSelectPassRecoveryDialog extends GeneralDialog {
 
   private void constructDialog(Component owner, String selectButtonText, String searchString) {
     this.selectButtonText = selectButtonText;
-    userSearchPanel = new UserSearchPanel(true, false, false, "First find your account by username, email address, or ID.", searchString, true);
+    userSearchPanel = new UserSearchPanel(false, false, "First find your account by username, email address, or ID.", searchString, true);
     userSearchPanel.getUserActionTable().addRecordSelectionListener(new RecordSelectionListener() {
       public void recordSelectionChanged(RecordSelectionEvent event) {
         setEnabledButtons();

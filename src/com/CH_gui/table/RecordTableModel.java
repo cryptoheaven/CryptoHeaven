@@ -248,20 +248,11 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
    */
   public synchronized int getRowForObject(Long id) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "getRowForObject(Long id)");
-    int row = getRowForObject(id, null);
-    if (trace != null) trace.exit(RecordTableModel.class, row);
-    return row;
-  }
-  /**
-   * @return model row index for a given object ID, -1 if not found.
-   */
-  public synchronized int getRowForObject(Long id, Class classType) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "getRowForObject(Long id, Class classType)");
     if (trace != null) trace.args(id);
     int row = -1;
     for (int i=0; i<recordsL.size(); i++) {
       Record record = (Record) recordsL.get(i);
-      if (record.getId().equals(id) && (classType == null || classType.isInstance(record))) {
+      if (record.getId().equals(id)) {
         row = i;
         break;
       }

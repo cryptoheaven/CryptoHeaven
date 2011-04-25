@@ -13,7 +13,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.records.*;
 
 import com.CH_co.service.records.*;
@@ -88,7 +87,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
     jButtons[0] = new JMyButton("Start Diagnostics");
     jButtons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
-        TraceDiagnostics.traceStart(FetchedDataCache.getSingleInstance().getMyUserId());
+        TraceDiagnostics.traceStart();
       }
     });
     jStart = jButtons[0];

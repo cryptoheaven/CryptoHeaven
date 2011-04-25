@@ -12,14 +12,15 @@
 
 package com.CH_gui.gui;
 
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-import com.CH_gui.util.*;
-
+import com.CH_gui.util.VisualsSavable;
+import com.CH_gui.util.MiscGui;
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011

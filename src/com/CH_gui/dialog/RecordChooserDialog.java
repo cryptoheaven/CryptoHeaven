@@ -274,8 +274,16 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     jListPanel.add(jListPane, new GridBagConstraints(0, 2, 1, 1, 10, 10, 
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
-    hSplit = new JMySplitPane(getVisualsClassKeyName() + "_hSplit1", JSplitPane.HORIZONTAL_SPLIT, jTreePanel, jTablePanel, 0.0d);
-    hSplit2 = new JMySplitPane(getVisualsClassKeyName() + "_hSplit2", JSplitPane.HORIZONTAL_SPLIT, hSplit, jListPanel, 1.0d);
+
+    hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit1", JSplitPane.HORIZONTAL_SPLIT, jTreePanel, jTablePanel, 0.3d);
+    hSplit.setOneTouchExpandable(false);
+    if (hSplit.getDividerSize() > 5) hSplit.setDividerSize(5);
+    hSplit.setResizeWeight(0.0);
+    hSplit2 = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit2", JSplitPane.HORIZONTAL_SPLIT, hSplit, jListPanel, 0.8d);
+    hSplit2.setOneTouchExpandable(false);
+    if (hSplit2.getDividerSize() > 5) hSplit2.setDividerSize(5);
+    hSplit2.setResizeWeight(1.0);
+
 
     panel.setLayout(new GridBagLayout());
     panel.add(hSplit2, new GridBagConstraints(0, 0, 1, 1, 10, 10, 

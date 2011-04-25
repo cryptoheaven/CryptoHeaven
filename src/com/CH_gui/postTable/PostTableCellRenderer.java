@@ -174,6 +174,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
         bkColor = bkColor.darker();
       }
       renderer.setBackground(bkColor);
+      setDefaultForeground(renderer, row, isSelected);
     }
     // end of background color management
 

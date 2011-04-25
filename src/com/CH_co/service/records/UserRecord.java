@@ -487,67 +487,43 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     return child;
   }
 
-  public static void changeSettingsAndStatusToDefaults(UserRecord uRec, short newStatus) {
-    if (newStatus != STATUS_BUSINESS)
-      uRec.maxSubAccounts = new Short((short) 0);
-    if (newStatus != STATUS_BUSINESS_SUB) {
-      uRec.masterId = null;
-      uRec.parentId = null;
-    }
 
-    UserRecord u = UserRecord.getDefaultUserSettings(newStatus);
-
-    // Save Key-On-Server flag to maintain consistency with actual key location.
-    boolean keyOnServer = Misc.isBitSet(uRec.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
-
-    uRec.notifyByEmail = u.notifyByEmail;
-    uRec.acceptingSpam = u.acceptingSpam;
-    uRec.flags = u.flags;
-    uRec.status = u.status;
-
-    // Restore Key-On-Server flag
-    uRec.flags = (Long) Misc.setBitObj(keyOnServer, uRec.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
-    // Set Notify-by-Email when there is valid email address set.
-    boolean validEmailFormat = EmailRecord.gatherAddresses(uRec.emailAddress) != null;
-    uRec.notifyByEmail = new Short((short) Misc.setBit(validEmailFormat, uRec.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
+  /**
+   * Keep bits already granted, only upgrade permits if they are higher.
+   */
+  public static void upgradeUserSettingsAndStatus(UserRecord toUpgrade, short newStatus, Long newParentUserId, boolean keepOldPermits) {
+    UserRecord defUsr = getDefaultUserSettings(newStatus);
+    toUpgrade.notifyByEmail = new Short((short) upgradeUserSettingBits(toUpgrade.notifyByEmail, defUsr.notifyByEmail, keepOldPermits, EMAIL_MASK__NO_GRANT));
+    toUpgrade.acceptingSpam = new Short((short) upgradeUserSettingBits(toUpgrade.acceptingSpam, defUsr.acceptingSpam, keepOldPermits, ACC_SPAM_MASK__NO_GRANT));
+    // Do not change the Key-On-Server flag as it would create inconsistency with actual key location.
+    boolean keyOnServer = Misc.isBitSet(toUpgrade.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
+    toUpgrade.flags = new Long(upgradeUserSettingBits(toUpgrade.flags, defUsr.flags, keepOldPermits, FLAG_MASK__NO_GRANT));
+    toUpgrade.flags = (Long) Misc.setBitObj(keyOnServer, toUpgrade.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
+    // make sure that "Send notifications by email" are off when there is no email address set.
+    boolean validEmailFormat = EmailRecord.gatherAddresses(toUpgrade.emailAddress) != null;
+    toUpgrade.notifyByEmail = new Short((short) Misc.setBit(validEmailFormat, toUpgrade.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
+    toUpgrade.status = new Short(newStatus);
+    toUpgrade.parentId = newParentUserId;
+    toUpgrade.masterId = newParentUserId;
   }
+  private static long upgradeUserSettingBits(Number toUpgrade, Number higherLevel, boolean keepOptionsSame, long noGrantMask) {
+    long bits = 0;
+    if (toUpgrade != null)
+      bits = toUpgrade.longValue();
 
-//  /**
-//   * Keep bits already granted, only upgrade permits if they are higher.
-//   */
-//  public static void upgradeUserSettingsAndStatus(UserRecord toUpgrade, short newStatus, Long newParentUserId, boolean keepOldPermits) {
-//    UserRecord defUsr = getDefaultUserSettings(newStatus);
-//    toUpgrade.notifyByEmail = new Short((short) upgradeUserSettingBits(toUpgrade.notifyByEmail, defUsr.notifyByEmail, keepOldPermits, EMAIL_MASK__NO_GRANT));
-//    toUpgrade.acceptingSpam = new Short((short) upgradeUserSettingBits(toUpgrade.acceptingSpam, defUsr.acceptingSpam, keepOldPermits, ACC_SPAM_MASK__NO_GRANT));
-//    // Do not change the Key-On-Server flag as it would create inconsistency with actual key location.
-//    boolean keyOnServer = Misc.isBitSet(toUpgrade.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
-//    toUpgrade.flags = new Long(upgradeUserSettingBits(toUpgrade.flags, defUsr.flags, keepOldPermits, FLAG_MASK__NO_GRANT));
-//    toUpgrade.flags = (Long) Misc.setBitObj(keyOnServer, toUpgrade.flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
-//    // make sure that "Send notifications by email" are off when there is no email address set.
-//    boolean validEmailFormat = EmailRecord.gatherAddresses(toUpgrade.emailAddress) != null;
-//    toUpgrade.notifyByEmail = new Short((short) Misc.setBit(validEmailFormat, toUpgrade.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES));
-//    toUpgrade.status = new Short(newStatus);
-//    toUpgrade.parentId = newParentUserId;
-//    toUpgrade.masterId = newParentUserId;
-//  }
-//  private static long upgradeUserSettingBits(Number toUpgrade, Number higherLevel, boolean keepOptionsSame, long noGrantMask) {
-//    long bits = 0;
-//    if (toUpgrade != null)
-//      bits = toUpgrade.longValue();
-//
-//    long perms = higherLevel.longValue();
-//
-//    // leave bits as they are set
-//    long newPermitBits = bits & (noGrantMask >>> 2);
-//    if (!keepOptionsSame)
-//      newPermitBits = (perms) & (noGrantMask >>> 2);
-//    // remove some NO UPDATE bits
-//    long newNoUpdateBits = perms & (noGrantMask >>> 1);
-//    long newNoGrantBits = perms & (noGrantMask);
-//
-//    bits = newPermitBits | newNoUpdateBits | newNoGrantBits;
-//    return bits;
-//  }
+    long perms = higherLevel.longValue();
+
+    // leave bits as they are set
+    long newPermitBits = bits & (noGrantMask >>> 2);
+    if (!keepOptionsSame)
+      newPermitBits = (perms) & (noGrantMask >>> 2);
+    // remove some NO UPDATE bits
+    long newNoUpdateBits = perms & (noGrantMask >>> 1);
+    long newNoGrantBits = perms & (noGrantMask);
+
+    bits = newPermitBits | newNoUpdateBits | newNoGrantBits;
+    return bits;
+  }
 
   public static UserRecord getDefaultUserSettings(short status) {
     UserRecord uRec = new UserRecord();
@@ -585,15 +561,9 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
                   ACC_SPAM_YES_SSL_EMAIL | 
                   ACC_SPAM_YES_INTER | 
                   ACC_SPAM_MASK__NO_GRANT;
-        flags = FLAG_ENABLE_PASSWORD_CHANGE |
-                FLAG_ENABLE_NICKNAME_CHANGE |
-                FLAG_ENABLE_ACCOUNT_DELETE |
-                FLAG_ENABLE_GIVEN_CONTACTS_ALTER |
-                FLAG_ENABLE_GIVEN_CONTACTS_DELETE |
-                FLAG_ENABLE_GIVEN_EMAILS_ALTER |
-                FLAG_ENABLE_GIVEN_EMAILS_DELETE |
-                FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE |
-                FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION |
+        flags = FLAG_ENABLE_ACCOUNT_DELETE | 
+                FLAG_ENABLE_NICKNAME_CHANGE | 
+                FLAG_ENABLE_PASSWORD_CHANGE | 
                 FLAG_USER_ONLINE_STATUS_POPUP |
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
@@ -612,19 +582,19 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL |
                   ACC_SPAM_YES_INTER;
-        flags = FLAG_ENABLE_PASSWORD_CHANGE |
-                FLAG_ENABLE_NICKNAME_CHANGE |
-                FLAG_ENABLE_ACCOUNT_DELETE |
+        flags = FLAG_ENABLE_ACCOUNT_DELETE | 
                 FLAG_ENABLE_CREATING_SUBACCOUNTS__MASTER_CAPABLE | 
                 FLAG_ENABLE_GIVEN_CONTACTS_ALTER | 
                 FLAG_ENABLE_GIVEN_CONTACTS_DELETE | 
                 FLAG_ENABLE_GIVEN_EMAILS_ALTER | 
-                FLAG_ENABLE_GIVEN_EMAILS_DELETE |
-                FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE |
+                FLAG_ENABLE_GIVEN_EMAILS_DELETE | 
                 FLAG_ENABLE_MAKING_CONTACTS_OUTSIDE_ORGANIZATION | 
+                FLAG_ENABLE_NICKNAME_CHANGE | 
+                FLAG_ENABLE_PASSWORD_CHANGE | 
                 FLAG_USER_ONLINE_STATUS_POPUP |
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
+                FLAG_ENABLE_GIVEN_MASTER_FOLDERS_DELETE |
                 FLAG_MASK__NO_UPDATE;
         flags = Misc.setBit(false, flags, FLAG_USER_ONLINE_STATUS_POPUP__NO_UPDATE);
         flags = Misc.setBit(false, flags, FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER__NO_UPDATE);
@@ -788,7 +758,7 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     getFlagInfo("Accept encrypted external email", acceptingSpam, ACC_SPAM_YES_SSL_EMAIL, sb);
     getFlagInfo("Do not include secure reply link in external email", flags, FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, sb);
     getFlagInfo("Display a warning before sending unencrypted email", notifyByEmail, EMAIL_WARN_EXTERNAL, sb);
-    getFlagInfo("Enhance privacy by filtering out images from inbox emails.", notifyByEmail, EMAIL_MANUAL_SELECT_PREVIEW_MODE, sb);
+    getFlagInfo("Preview Rich Text email in Plain Text mode", notifyByEmail, EMAIL_MANUAL_SELECT_PREVIEW_MODE, sb);
     getFlagInfo("Disable auto updates", flags, FLAG_DISABLE_AUTO_UPDATES, sb);
     getFlagInfo("User offline popup", flags, FLAG_USER_ONLINE_STATUS_POPUP, sb);
     getFlagInfo("Store Key on server", flags, FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER, sb);

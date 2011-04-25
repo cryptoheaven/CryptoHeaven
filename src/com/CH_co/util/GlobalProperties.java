@@ -12,6 +12,7 @@
 
 package com.CH_co.util;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.trace.TraceProperties;
 
 import java.io.*;
@@ -223,17 +224,14 @@ public class GlobalProperties extends Object {
   // build 606 Empty templates and new user sharing enhancements
   // build 608 Implement properties consistency checking through hashing mechanism.
   // build 610 Minor initial properties adjustment to fix window sizes for email pickup, chat message pickup.
-  // build 612 Integration with Sferyx HTML Editor
-  // build 614 Single click contact adding form inline ContactBuildingPanel
-  // build 616 HTML type preview without loading images
 
-  public static final short PROGRAM_BUILD_NUMBER = 616;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 610;  // even
   public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.4f;
-  public static final short PROGRAM_VERSION_MINOR = 0;
-  public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
+  public static final float PROGRAM_VERSION = 3.3f;
+  public static final short PROGRAM_VERSION_MINOR = 4;
+  public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+"."+PROGRAM_VERSION_MINOR;
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
   public static final short PROGRAM_RELEASE_BETA = 2;
@@ -337,12 +335,12 @@ public class GlobalProperties extends Object {
   }
   private static void resetMyAndGlobalProperties(boolean insertResetFlagForNextLoad) {
     Enumeration keys = properties.keys();
-    //String myUserPropertyPrefix = getUserPropertyPrefix();
+    String myUserPropertyPrefix = getUserPropertyPrefix();
     String generalUserPropertyPrefix = getGeneralUserPropertyPrefix();
     ArrayList removeKeysL = new ArrayList();
     while (keys.hasMoreElements()) {
       String key = (String) keys.nextElement();
-      if (!key.startsWith(generalUserPropertyPrefix)) { // || key.startsWith(myUserPropertyPrefix)) {
+      if (!key.startsWith(generalUserPropertyPrefix) || key.startsWith(myUserPropertyPrefix)) {
         if (!key.startsWith("LastUserName") && !key.startsWith("EncRSAPrivateKey") && !key.startsWith("TempFiles"))
           removeKeysL.add(key);
       }
@@ -420,7 +418,7 @@ public class GlobalProperties extends Object {
 
   /** Get the value of a property for this key. */
   public static String getProperty (String key) {
-    return getProperty(key, null, null);
+    return getProperty(key, null, false);
   }
 
   /**
@@ -428,21 +426,21 @@ public class GlobalProperties extends Object {
    * <i>value</i> if the property was not set.
    */
   public static String getProperty (String key, String value) {
-    return getProperty(key, value, null);
+    return getProperty(key, value, false);
   }
-  public static String getProperty (String key, String value, Long userId) {
+  public static String getProperty (String key, String value, boolean isUserSensitive) {
     String property = value;
     if (key != null) {
-      if (userId != null) {
-        property = properties.getProperty(getUserPropertyPrefix(userId) + key, value);
+      if (isUserSensitive) {
+        property = properties.getProperty(getUserPropertyPrefix() + key, value);
       } else {
         property = properties.getProperty(key, value);
       }
     }
     return property;
   }
-  private static String getUserPropertyPrefix(Long userId) {
-    return getGeneralUserPropertyPrefix() + userId + "-";
+  private static String getUserPropertyPrefix() {
+    return getGeneralUserPropertyPrefix() + FetchedDataCache.getSingleInstance().getMyUserId() + "-";
   }
   private static String getGeneralUserPropertyPrefix() {
     return "UID-";
@@ -457,10 +455,10 @@ public class GlobalProperties extends Object {
   public static String setProperty(String key, String value) {
     return (String) properties.setProperty(key, value);
   }
-  public static String setProperty(String key, String value, Long userId) {
+  public static String setProperty(String key, String value, boolean isUserSensitive) {
     String property = null;
-    if (userId != null) {
-      property = (String) properties.setProperty(getUserPropertyPrefix(userId) + key, value);
+    if (isUserSensitive) {
+      property = (String) properties.setProperty(getUserPropertyPrefix() + key, value);
     } else {
       property = (String) properties.setProperty(key, value);
     }

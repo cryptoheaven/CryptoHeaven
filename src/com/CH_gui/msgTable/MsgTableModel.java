@@ -776,8 +776,18 @@ public class MsgTableModel extends RecordTableModel {
           if (messageText != null && messageText.length() > 0) {
             // prepare message text
             if (!isHTML) {
+              boolean textProcessed = false;
+              // check for short codes
+              if (messageText.length() == 4) {
+                String formated = MsgTypeArea.formatShortCode(messageText);
+                if (formated != null) {
+                  messageText = formated;
+                  textProcessed = true;
+                }
+              }
               // If it is a PLAIN mail, then convert special characters <>& characters to entities.
-              messageText = msgData.getEncodedHTMLData();
+              if (!textProcessed)
+                messageText = msgData.getEncodedHTMLData();
             } else {
               // move the BODY tag right after the HTML tag...
               messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true);
