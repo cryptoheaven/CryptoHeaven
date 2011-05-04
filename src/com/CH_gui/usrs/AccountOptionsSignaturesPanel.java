@@ -122,38 +122,6 @@ public class AccountOptionsSignaturesPanel extends JPanel {
       listDatasV.addElement(data);
     }
 
-//    if (xml != null && xml.getNameSafe().equalsIgnoreCase("signatures")) {
-//      jAddSigToNew.setSelected(("" + xml.getAttribute("sign_new")).equalsIgnoreCase("true"));
-//      jAddSigToRepFwd.setSelected(("" + xml.getAttribute("sign_re_fwd")).equalsIgnoreCase("true"));
-//      Vector sigsV = xml.getChildren();
-//      if (sigsV != null) {
-//        for (int i=0; i<sigsV.size(); i++) {
-//          XMLElement sig = (XMLElement) sigsV.elementAt(i);
-//          if (sig.getNameSafe().equalsIgnoreCase("sig")) {
-//            String isDefaultSig = "" + sig.getAttribute("default");
-//            if (isDefaultSig.equalsIgnoreCase("true"))
-//              defaultSig = i;
-//            String[] data = new String[3];
-//            Vector sigElementsV = sig.getChildren();
-//            for (int k=0; k<sigElementsV.size(); k++) {
-//              XMLElement element = (XMLElement) sigElementsV.elementAt(k);
-//              String elementName = element.getNameSafe();
-//              String elementValue = element.getContent();
-//              if (elementName.equalsIgnoreCase("name"))
-//                data[0] = elementValue;
-//              else if (elementName.equalsIgnoreCase("type"))
-//                data[1] = elementValue;
-//              else if (elementName.equalsIgnoreCase("value"))
-//                data[2] = elementValue;
-//            }
-//            //System.out.println("Adding element " + Misc.objToStr(data));
-//            listHeadersV.addElement(data[0]);
-//            listDatasV.addElement(data);
-//          }
-//        }
-//      }
-//    }
-    //System.out.println("default sig index=" + defaultSig);
     // set data back to model
     jSigList.setListData(listHeadersV);
     setDefaultSig(defaultSig);
@@ -217,7 +185,7 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     jTypeText = new JMyRadioButton("Text");
     jTypeFile = new JMyRadioButton("File");
 
-    sigTypeArea = new MsgTypeArea((short) -1, null, false, true, false);
+    sigTypeArea = new MsgTypeArea("_sig", (short) -1, true, null, false, true, false);
     jFileField = new JMyTextField();
     sigTypeArea.setMaximumSize(new Dimension(350, 200));
   }

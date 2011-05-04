@@ -233,13 +233,15 @@ public class GlobalProperties extends Object {
   // build 626 Updated dialog sounds
   // build 628 Connectivity fixes to disable sockets through HTTP tunnels because sockets are already used in direct engine connections
   // build 630 HTTP request size threshold for 'GET' style commands lowered as it had problems on 3G->router->bridge setups
+  // build 632 Rich/Plain text switch for message compose
+  // build 634 Default speller language choice enabled only when pc locale matches available dictionary, dictionary language setting restored from user settings
 
-  public static final short PROGRAM_BUILD_NUMBER = 630;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 634;  // even
   public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.4f;
-  public static final short PROGRAM_VERSION_MINOR = 4;
+  public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

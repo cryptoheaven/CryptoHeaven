@@ -15,12 +15,15 @@ package com.CH_gui.msgs;
 import com.CH_co.nanoxml.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.DisposableObj;
-import com.CH_co.util.Misc;
+import com.CH_co.util.*;
 
 import com.CH_gui.addressBook.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.util.*;
+
+// "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
+import comx.tig.en.*;
+import comx.Tiger.gui.*;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -49,7 +52,7 @@ import javax.swing.text.html.parser.ParserDelegator;
  * @author  Marcin Kurzawa
  * @version
  */
-public class MsgTypeArea extends JPanel implements DisposableObj {
+public class MsgTypeArea extends JPanel implements ComponentContainerI, DisposableObj {
 
   private UndoManagerI undoMngrI;
 
@@ -59,7 +62,11 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
 
   private JPanel jAttachments;
 
-  private MyHTMLEditor jMessage;
+  private JPanel jTextAreaPanel;
+  private JPanel jTextActionPanel;
+  private JComponent jMessage;
+  private JTextArea jTextMessage;
+  private MyHTMLEditor jHtmlMessage; // this could be either JEditorPane or Jaguar
 
   private DocumentListener myDocumentListener;
   private DocumentListener registeredDocumentListener;
@@ -67,54 +74,118 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
   private KeyListener registeredEnterKeyListener;
   private MsgUndoableEditListener undoableEditListener;
 
+  private JButton jHTML;
+
+  private boolean isHTML;
+  private String PROPERTY_NAME_isHTML_prefix = "MsgTypeArea" + "_isHTML";
+  private String PROPERTY_NAME_isHTML;
+
   private boolean isChatMode;
 
-  /** Creates new MsgTypeArea */
-  public MsgTypeArea(short objType, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "MsgTypeArea(short objType, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode)");
+  private String prevHtmlText, prevPlainText, setHtmlText, setPlainText;
 
+  // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
+  private Object tigerBkgChecker = null;
+
+  /** Creates new MsgTypeArea */
+  public MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode)");
+
+    PROPERTY_NAME_isHTML = PROPERTY_NAME_isHTML_prefix + htmlPropertyPostfix;
     this.objType = objType;
+    String isHTML_s = GlobalProperties.getProperty(PROPERTY_NAME_isHTML, ""+defaultHTML);
+    this.isHTML = isHTML_s.equalsIgnoreCase("true");
     this.undoMngrI = undoMngrI;
     this.isChatMode = isChatMode;
 
-    init(suppressSpellCheck);
+    init();
 
     if (grabInitialFocus) {
       getTextComponent().addHierarchyListener(new InitialFocusRequestor());
     }
 
+    if (!suppressSpellCheck) {
+    //if (isChatMode && !suppressSpellCheck) {
+      // Create spell checker for the message
+      // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
+      try {
+        tigerBkgChecker = new TigerBkgChecker(SingleTigerSession.getSingleInstance());
+        ((TigerBkgChecker) tigerBkgChecker).restart(getTextComponent());
+        jHtmlMessage.getInternalJEditorPane().addMouseListener(new TigerMouseAdapter(jHtmlMessage));
+        if (jTextMessage != null)
+          jTextMessage.addMouseListener(new TigerMouseAdapter(null));
+      } catch (Throwable t) {
+      }
+    }
     // avoid super small sizing especially in chat entry panel
     setMinimumSize(new Dimension(70, 70));
 
     if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
-  private void init(boolean suppressSpellCheck) {
-    initComponents(suppressSpellCheck);
+  private void init() {
+    initComponents();
     addMyListeners();
     initMainPanel();
   }
 
-  private void initComponents(boolean suppressSpellCheck) {
-
+  private void initComponents() {
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       contactInfoPanel = new ContactInfoPanel(undoMngrI);
     }
-
     if (isAttachmentPanelEmbeded()) {
       jAttachments = new JPanel();
       jAttachments.setLayout(new FlowLayout(FlowLayout.LEFT));
       jAttachments.setBorder(new EmptyBorder(0,0,0,0));
     }
 
+    jTextAreaPanel = new JPanel();
+    jTextAreaPanel.setLayout(new BorderLayout(0, 0));
+    jTextActionPanel = new JPanel();
+    jTextActionPanel.setLayout(new GridBagLayout());
+    jTextActionPanel.setVisible(isHTML);
+
+    ParserDelegator workaround = new ParserDelegator();
+
+    if (!isChatMode) {
+      if (isHTML)
+        jHTML = new JMyButtonNoFocus("Plain Text");
+      else
+        jHTML = new JMyButtonNoFocus("Rich Text");
+      jHTML.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2)));
+      jHTML.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+          e.consume();
+          pressedHTML(true);
+          focusMessageArea();
+        }
+      });
+      jTextMessage = new JMyTextArea();
+      jTextMessage.setAutoscrolls(true);
+      jTextMessage.setWrapStyleWord(true);
+      jTextMessage.setLineWrap(true);
+      jTextMessage.setEditable(true);
+      jTextMessage.setEnabled(true);
+      jTextMessage.setMargin(UIManager.getInsets("EditorPane.margin")); // matching to the corresponding HTML component
+      jTextMessage.addKeyListener(myKeyListener);
+
+      Font font = UIManager.getFont("Label.font");
+      font = font.deriveFont(Font.PLAIN, 14.0f);
+      jTextMessage.setFont(font);
+    }
+
     myKeyListener = new MyKeyListener();
     myDocumentListener = new MyDocumentListener();
 
-    ParserDelegator workaround = new ParserDelegator();
     if (isChatMode || objType == MsgDataRecord.OBJ_TYPE_ADDR || objType == -1)
-      jMessage = new MyHTMLEditor(true, suppressSpellCheck);
+      jHtmlMessage = new MyHTMLEditor(true, true);
     else
-      jMessage = new MyHTMLEditor(false, suppressSpellCheck);
+      jHtmlMessage = new MyHTMLEditor(false, true);
+
+    if (isHTML)
+      jMessage = jHtmlMessage;
+    else
+      jMessage = jTextMessage;
 
     if (undoMngrI != null)
       undoableEditListener = new MsgUndoableEditListener(undoMngrI);
@@ -140,18 +211,29 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Notes")), new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      add(jHTML, new GridBagConstraints(1, posY, 1, 1, 0, 0,
+          GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
 
     if (!isChatMode || objType == MsgDataRecord.OBJ_TYPE_ADDR || objType == -1) {
-      add(getToolBar(), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      jTextActionPanel.add(getToolBar(), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-      add(new JLabel(), new GridBagConstraints(1, posY, 1, 1, 10, 0,
+      jTextActionPanel.add(new JLabel(), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      add(jTextActionPanel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
+          GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
-    add(jMessage, new GridBagConstraints(0, posY, 2, 1, 10, 10,
+
+    add(jTextAreaPanel, new GridBagConstraints(0, posY, 2, 1, 10, 10,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+    posY ++;
+
+    if (jMessage instanceof JTextComponent)
+      jTextAreaPanel.add(new JScrollPane(jMessage), BorderLayout.CENTER);
+    else
+      jTextAreaPanel.add(jMessage, BorderLayout.CENTER);
   }
 
   private String getSubject() {
@@ -162,8 +244,12 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     return subject;
   }
 
+  public JButton getHTMLSwitchButton() {
+    return jHTML;
+  }
+
   public JComponent getToolBar() {
-    return jMessage.getActionsPanel();
+    return jHtmlMessage.getActionsPanel();
   }
 
   public String[] getContent() {
@@ -194,11 +280,15 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     return new String[] { subject, body };
   }
   public void setContentText(String text, boolean isHtml, boolean requestFocus, boolean caretOnTop) {
-    setContent(isHtml ? text : Misc.encodePlainIntoHtml(text));
+    if (isHTML && !isHtml)
+      text = Misc.encodePlainIntoHtml(text);
+    else if (!isHTML && isHtml)
+      text = MsgPanelUtils.extractPlainFromHtml(text);
+    setContent(text);
     if (caretOnTop)
       setCaretAtTheTop();
     if (requestFocus)
-      jMessage.requestFocus();
+      focusMessageArea();
   }
   public void setContent(MsgDataRecord msgData) {
     if (msgData.isTypeAddress()) {
@@ -206,9 +296,12 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
       // make sure we are in proper PLAIN/HTML mode
       if (msgData.addressNotes != null) {
         boolean isHtml = !msgData.addressNotes.getAttribute("type").equals("text/plain");
+        setHTML(isHtml);
         setContentText(msgData.addressNotes.getContent(), isHtml, false, true);
       }
     } else {
+      // make sure we are in proper PLAIN/HTML mode
+      setHTML(msgData.isHtmlMail());
       // set content
       setContentText(msgData.getText(), msgData.isHtmlMail(), false, true);
     }
@@ -218,23 +311,41 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
       contactInfoPanel.setContent(data);
     }
   }
-  private void setContent(String htmlBody) {
+  private void setContent(String body) {
+    if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).stop();
     removeMyListeners();
-    jMessage.setContent(htmlBody);
+    if (isHTML) {
+      jHtmlMessage.setContent(body);
+      setHtmlText = jHtmlMessage.getContent();
+    } else {
+      jTextMessage.setText(body);
+      setPlainText = jTextMessage.getText();
+    }
     addMyListeners();
-    HTML_ClickablePane.setBaseToDefault((HTMLDocument) jMessage.getInternalJEditorPane().getDocument());
+    HTML_ClickablePane.setBaseToDefault((HTMLDocument) jHtmlMessage.getInternalJEditorPane().getDocument());
+    if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).restart(getTextComponent());
   }
   private void addMyListeners() {
-    jMessage.getInternalJEditorPane().getDocument().addDocumentListener(myDocumentListener);
-    jMessage.getInternalJEditorPane().addKeyListener(myKeyListener);
+    addMyListeners(jHtmlMessage.getInternalJEditorPane());
+    if (jTextMessage != null)
+      addMyListeners(jTextMessage);
+  }
+  private void addMyListeners(JTextComponent textComp) {
+    textComp.getDocument().addDocumentListener(myDocumentListener);
+    textComp.addKeyListener(myKeyListener);
     if (undoableEditListener != null)
-      jMessage.getInternalJEditorPane().getDocument().addUndoableEditListener(undoableEditListener);
+      textComp.getDocument().addUndoableEditListener(undoableEditListener);
   }
   private void removeMyListeners() {
-    jMessage.getInternalJEditorPane().getDocument().removeDocumentListener(myDocumentListener);
-    jMessage.getInternalJEditorPane().removeKeyListener(myKeyListener);
+    removeMyListeners(jHtmlMessage.getInternalJEditorPane());
+    if (jTextMessage != null)
+      removeMyListeners(jTextMessage);
+  }
+  private void removeMyListeners(JTextComponent textComp) {
+    textComp.getDocument().removeDocumentListener(myDocumentListener);
+    textComp.removeKeyListener(myKeyListener);
     if (undoableEditListener != null)
-      jMessage.getInternalJEditorPane().getDocument().removeUndoableEditListener(undoableEditListener);
+      textComp.getDocument().removeUndoableEditListener(undoableEditListener);
   }
   public boolean isAnyContent() {
     boolean anyContent = isAnyBody();
@@ -244,11 +355,16 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     return anyContent;
   }
   private boolean isAnyBody() {
-    boolean anyBody = jMessage.getPlainText().trim().length() > 0;
-    if (!anyBody) {
-      String content = jMessage.getContent();
-      if (content.indexOf("<img ") >= 0 || content.indexOf("<IMG ") >= 0)
-        anyBody = true;
+    boolean anyBody = false;
+    if (isHTML) {
+      anyBody = jHtmlMessage.getPlainText().trim().length() > 0;
+      if (!anyBody) {
+        String content = jHtmlMessage.getContent();
+        if (content.indexOf("<img ") >= 0 || content.indexOf("<IMG ") >= 0)
+          anyBody = true;
+      }
+    } else {
+      anyBody = jTextMessage.getText().trim().length() > 0;
     }
     return anyBody;
   }
@@ -264,7 +380,11 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
   }
 
   public void setEnabled(boolean b) {
-    jMessage.setEnabled(b);
+    getTextComponent().setEnabled(b);
+  }
+  
+  public void setEditable(boolean b) {
+    getTextComponent().setEditable(b);
   }
 
   public JPanel getAttachmentsPanel() {
@@ -279,7 +399,12 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     short mode = 0;
     short type = getContentType().shortValue();
     if (type == MsgDataRecord.OBJ_TYPE_MSG) {
-      mode = MsgComposePanel.CONTENT_MODE_MAIL_HTML;
+      String textMode = getTextMode();
+      if (textMode.equalsIgnoreCase("text/plain")) {
+        mode = MsgComposePanel.CONTENT_MODE_MAIL_PLAIN;
+      } else if (textMode.equalsIgnoreCase("text/html")) {
+        mode = MsgComposePanel.CONTENT_MODE_MAIL_HTML;
+      }
     } else if (type == MsgDataRecord.OBJ_TYPE_ADDR) {
       mode = MsgComposePanel.CONTENT_MODE_ADDRESS_BOOK_ENTRY;
     }
@@ -287,7 +412,8 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
   }
 
   private String getTextMode() {
-    return "text/html";
+    String contentType = isHTML ? "text/html" : "text/plain";
+    return contentType;
   }
 
   public boolean isAttachmentPanelEmbeded() {
@@ -298,14 +424,89 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
   }
 
   public boolean isHTML() {
-    return true;
+    return isHTML;
+  }
+  public void setHTML(boolean modeIsHTML) {
+    if (isHTML != modeIsHTML) {
+      pressedHTML(false);
+    }
   }
 
   /**
    * @return current text component used in the message composition.
    */
   protected JTextComponent getTextComponent() {
-    return jMessage.getInternalJEditorPane();
+    JTextComponent textComp = null;
+    if (isHTML)
+      textComp = jHtmlMessage.getInternalJEditorPane();
+    else
+      textComp = jTextMessage;
+    return textComp;
+  }
+
+  private void pressedHTML(boolean isUserAction) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "pressedHTML()");
+
+    try {
+      if (trace != null) trace.data(10, "isHTML", isHTML);
+      JTextComponent textComp = getTextComponent();
+      boolean isEditable = textComp.isEditable();
+      boolean isEnabled = textComp.isEnabled();
+      String currentText = textComp.getText();
+
+      // after grabbing current text component and content, switch the view type
+      isHTML = !isHTML;
+      if (isUserAction)
+        GlobalProperties.setProperty(PROPERTY_NAME_isHTML, String.valueOf(isHTML));
+
+      if (isHTML) {
+        jMessage = jHtmlMessage;
+        //
+        if (isUserAction)
+          prevPlainText = currentText;
+        // if the Plain editor has no change since last setting, use the saved Html version to restore formatting
+        if (prevHtmlText != null && setPlainText != null && setPlainText.equals(currentText))
+          setContentText(prevHtmlText, true, false, true);
+        else
+          setContentText(currentText, false, false, true);
+        if (!isChatMode)
+          jHTML.setText("Plain Text");
+      } else {
+        jMessage = jTextMessage;
+        if (isUserAction)
+          prevHtmlText = currentText;
+        // if the Html editor has no change since last setting, use the saved Plain version to restore formatting
+        if (prevPlainText != null && setHtmlText != null && setHtmlText.equals(currentText))
+          setContentText(prevPlainText, false, false, true);
+        else
+          setContentText(currentText, true, false, true);
+        if (!isChatMode)
+          jHTML.setText("Rich Text");
+      }
+      textComp = getTextComponent();
+      textComp.setEnabled(isEnabled);
+      textComp.setEditable(isEditable);
+      switchMessageArea();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
+  }
+
+  private void switchMessageArea() {
+    jTextAreaPanel.removeAll();
+    if (jMessage instanceof JTextComponent)
+      jTextAreaPanel.add(new JScrollPane(jMessage), BorderLayout.CENTER);
+    else
+      jTextAreaPanel.add(jMessage, BorderLayout.CENTER);
+    jTextActionPanel.setVisible(isHTML);
+    revalidate();
+    repaint();
+    if (undoMngrI != null) {
+      undoMngrI.getUndoManager().discardAllEdits();
+      undoMngrI.setEnabledUndoAndRedo();
+    }
   }
 
   public void focusMessageArea() {
@@ -344,6 +545,11 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
     setContent("");
   }
 
+  public Component[] getPotentiallyHiddenComponents() {
+    Component[] components = new Component[] { jTextMessage, jHtmlMessage };
+    return components;
+  }
+
   /**
    * Strip down the HEAD tag
    */
@@ -368,6 +574,7 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
   }
 
   public void disposeObj() {
+    if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).stop();
     removeMyListeners();
     remove(jMessage);
   }
@@ -398,28 +605,30 @@ public class MsgTypeArea extends JPanel implements DisposableObj {
       }
       // workaround the buggy Ctrl-V paste, pasting multiple lines on plain text are pasted all in 1 line and this seems to fix that
       else if (code == KeyEvent.VK_V && e.isControlDown() && !e.isShiftDown() && !e.isAltDown() && !e.isAltGraphDown()) {
-        // check if we are forced to paste plain text, if so use the special call to create new lines
-        DataFlavor[] flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
-        if (flavors != null) {
-          boolean isFormattedAvailable = false;
-          boolean isPlainAvailable = false;
-          for (int i=0; i<flavors.length; i++) {
-            String mimeType = flavors[i].getMimeType();
-            if (mimeType.startsWith("text/html") || mimeType.startsWith("text/rtf"))
-              isFormattedAvailable = true;
-            else if (mimeType.startsWith("text/plain"))
-              isPlainAvailable = true;
-            if (isFormattedAvailable && isPlainAvailable)
-              break;
-          }
-          if (!isFormattedAvailable && isPlainAvailable) {
-            jMessage.pastePlainTextFromClipboard(true);
-            e.consume();
-          } else if (isFormattedAvailable) {
-            jMessage.pasteFormattedTextFromClipboard();
-            // terminate any link at the end of pasted content
-            jMessage.insertContent("&nbsp;");
-            e.consume();
+        if (isHTML) {
+          // check if we are forced to paste plain text, if so use the special call to create new lines
+          DataFlavor[] flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
+          if (flavors != null) {
+            boolean isFormattedAvailable = false;
+            boolean isPlainAvailable = false;
+            for (int i=0; i<flavors.length; i++) {
+              String mimeType = flavors[i].getMimeType();
+              if (mimeType.startsWith("text/html") || mimeType.startsWith("text/rtf"))
+                isFormattedAvailable = true;
+              else if (mimeType.startsWith("text/plain"))
+                isPlainAvailable = true;
+              if (isFormattedAvailable && isPlainAvailable)
+                break;
+            }
+            if (!isFormattedAvailable && isPlainAvailable) {
+              jHtmlMessage.pastePlainTextFromClipboard(true);
+              e.consume();
+            } else if (isFormattedAvailable) {
+              jHtmlMessage.pasteFormattedTextFromClipboard();
+              // terminate any link at the end of pasted content
+              jHtmlMessage.insertContent("&nbsp;");
+              e.consume();
+            }
           }
         }
       }

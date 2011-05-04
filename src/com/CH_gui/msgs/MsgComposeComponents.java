@@ -112,6 +112,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private JButton jAttach;
   private JLabel jReplyToLabel;
   private JLabel jReplyTo;
+//  private JMyLinkLikeLabel jHTML;
+  private JButton jHTML;
 //  private JMyLinkLikeLabel jShowBcc;
   private JButton jShowBcc;
   private boolean isShownBcc = false;
@@ -335,6 +337,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jStagedSecureCheck.setEnabled(enabled);
     if (msgTypeArea != null) {
       msgTypeArea.setEnabled(enabled);
+      msgTypeArea.setEditable(enabled);
     }
   }
 
@@ -458,12 +461,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   private void initComponents() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "initComponents()");
-    try {
-      msgTypeArea = new MsgTypeArea(objType, undoMngrI, isChatComposePanel, false, isChatComposePanel);
-    } catch (Exception e) {
-      // rarely creation of HTMLEditor fails with an Exception, retry once more...
-      msgTypeArea = new MsgTypeArea(objType, undoMngrI, isChatComposePanel, false, isChatComposePanel);
-    }
+    String htmlPropertyPostfix = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "_addr" : (isChatComposePanel ? "_chat" : "_mail");
+    boolean defaultHTML = true;
+    msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, isChatComposePanel, false, isChatComposePanel);
+    jHTML = msgTypeArea.getHTMLSwitchButton();
 //    jShowBcc = new JMyLinkLikeLabel("Show BCC", MsgPreviewPanel.LINK_RELATIVE_FONT_SIZE);
     jShowBcc = new JMyButtonNoFocus("Show BCC");
     jShowBcc.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
@@ -881,10 +882,12 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (!msgTypeArea.isSubjectGenerated()) {
       panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-      panel.add(jSubject, new GridBagConstraints(1, posY, 6, 1, 10, 0,
+      panel.add(jSubject, new GridBagConstraints(1, posY, 5, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
       //add(jAttach, new GridBagConstraints(4, posY, 1, 1, 0, 0,
             //GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(0, 2, 0, 2), 0, 0));
+      panel.add(jHTML, new GridBagConstraints(6, posY, 1, 1, 0, 0,
+            GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 5), 0, 0));
       posY ++;
     }
 
@@ -957,7 +960,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     panel.add(jTyping, new GridBagConstraints(0, posY, 9, 1, 10, 0,
           GridBagConstraints.SOUTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
-
     // put other components next in the focus order
     posY = 0;
     panel.add(jPriorityLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
@@ -990,10 +992,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     panel.add(new JLabel(), new GridBagConstraints(6, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
-//    // ring
-//    panel.add(jRing, new GridBagConstraints(7, posY, 1, 1, 0, 0,
-//          GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 1, 2, 1), 0, 0));
-
     panel.add(jSendCombo, new GridBagConstraints(8, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(2, 1, 2, 1), 0, 0));
 
@@ -1002,9 +1000,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     // this row was for TO: in mail mode
     posY ++;
 
-//    panel.add(jVoicemailLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0, 
+//    panel.add(jVoicemailLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
 //          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
-//    panel.add(jVoicemailPanel, new GridBagConstraints(1, posY, 6, 1, 10, 0, 
+//    panel.add(jVoicemailPanel, new GridBagConstraints(1, posY, 6, 1, 10, 0,
 //          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 5), 0, 0));
 //    posY ++;
 
@@ -1118,7 +1116,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     else if (isForward)
       setSubject(getSubjectForward(new Object[] { dataRecord }, 250));
 
-    String[] content = makeReplyToContent(quotedMsg, dataRecord, false, false, true);
+    String[] content = makeReplyToContent(quotedMsg, dataRecord, false, false, false);
 
     String text = null;
     if (content[0].equalsIgnoreCase("text/html")) {
@@ -1153,6 +1151,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           "</table> " +
           "<br>" +
           "</body></html>";
+      msgTypeArea.setHTML(true);
       msgTypeArea.setContentText(text, true, false, true);
     } else {
       String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, false) : "";
@@ -1166,6 +1165,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           " \n" +
           content[1] + content[3] +
           "\n\n";
+      msgTypeArea.setHTML(false);
       msgTypeArea.setContentText(text, false, false, true);
     }
 
@@ -1235,7 +1235,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       }
 
       boolean convertHTMLBodyToPlain = isForceConvertHTMLtoPLAIN;
-      // always reply in FULL IMAGE mode
 //      if (!isForceConvertHTMLtoPLAIN) {
 //        convertHTMLBodyToPlain = MsgPreviewPanel.isDefaultToPLAINpreferred(linkRecord, dataRecord);
 //      }
@@ -1484,9 +1483,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         if ((FetchedDataCache.getSingleInstance().getUserRecord().flags.longValue() & UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES) != 0) {
           event.consume();
           // only react to ENTER if there is any content of message
-          if (jSendCombo.isEnabledLabel()) {
+          if (jSendCombo.isEnabledLabel())
             pressedSendButton(new ActionEvent(event.getSource(), event.getID(), "ENTER"));
-          }
         }
       }
     }

@@ -881,26 +881,27 @@ public class MsgPanelUtils extends Object {
     synchronized (paneForPlainExtraction) {
       html = ArrayUtils.replaceKeyWords(html,
         new String[][] {
-          {"<P>", "<p>"},
-          {"<p>", "</DIV><P><DIV>"},
-          {"</P>", " "},
-          {"</p>", " "},
-          {"<BR>", "<br>"},
-          {"<br>", "</p><p>"},
+          {"<P>",    "</DIV><P><DIV>"},
+          {"<p>",    "</DIV><P><DIV>"},
+          {"</P>",   " "},
+          {"</p>",   " "},
+          {"<BR>",   "</p><p>"},
+          {"<br />", "</p><p>"},
+          {"<br>",   "</p><p>"},
       });
       String[][] startTags = new String[][] {
-        { "<style", "<STYLE" },
+        { "<style",  "<STYLE" },
         { "<script", "<SCRIPT" },
-        { "<map", "<MAP" },
-        { "<img", "<IMG" },
-        { "<td", "<TD"},
-        { "<table", "<TABLE"},
-        { "<input", "<INPUT"},
+        { "<map",    "<MAP" },
+        { "<img",    "<IMG" },
+        { "<td",     "<TD"},
+        { "<table",  "<TABLE"},
+        { "<input",  "<INPUT"},
       };
       String[][] endTags = new String[][] {
-        { "</style>", "</STYLE>" },
+        { "</style>",  "</STYLE>" },
         { "</script>", "</SCRIPT>" },
-        { "</map>", "</MAP>" },
+        { "</map>",    "</MAP>" },
         { ">" }, // end IMG
         { ">" }, // end TD
         { ">" }, // end TABLE
@@ -938,14 +939,14 @@ public class MsgPanelUtils extends Object {
         text = text.trim();
         text = ArrayUtils.replaceKeyWords(text,
           new String[][] {
-            {"        \n", "\n"},
-            {"    \n", "\n"},
-            {"  \n", "\n"},
-            {" \n", "\n"},
-            {"\n\n\n\n\n\n\n\n\n\n\n", "\n\n\n"},
-            {"\n\n\n\n\n\n\n", "\n\n\n"},
-            {"\n\n\n\n\n", "\n\n\n"},
-            {"\n\n\n\n", "\n\n\n"},
+            {"        \n",              "\n"},
+            {"    \n",                  "\n"},
+            {"  \n",                    "\n"},
+            {" \n",                     "\n"},
+            {"\n\n\n\n\n\n\n\n\n\n\n",  "\n\n\n"},
+            {"\n\n\n\n\n\n\n",          "\n\n\n"},
+            {"\n\n\n\n\n",              "\n\n\n"},
+            {"\n\n\n\n",                "\n\n\n"},
         });
       } catch (Throwable t) {
       }
@@ -954,24 +955,6 @@ public class MsgPanelUtils extends Object {
     if (trace != null) trace.exit(MsgPanelUtils.class, text);
     return text;
   }
-
-
-//  public static void setPreviewContent(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, JTextComponent messageViewer) {
-//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setPreviewContent(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, JTextComponent messageViewer)");
-//    if (trace != null) trace.args("content blanked");
-//    if (trace != null) trace.args(isHTMLview);
-//    if (trace != null) trace.args(convertHTMLtoPLAIN);
-//    if (trace != null) trace.args(skipHeaderClearing);
-//
-//    // if PLAIN text mode and HTML message, condition the text to eliminate the tags
-//    if (convertHTMLtoPLAIN) {
-//      content = MsgPanelUtils.extractPlainFromHtml(content);
-//    }
-//    MsgPanelUtils.setMessageContent(content, isHTMLview, messageViewer, skipHeaderClearing);
-//
-//    if (trace != null) trace.exit(MsgPanelUtils.class);
-//  }
-
 
   private static final HashMap previewContentHM = new HashMap();
   private static Thread previewContentSetter = null;

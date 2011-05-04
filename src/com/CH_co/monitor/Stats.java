@@ -51,6 +51,7 @@ public class Stats extends Object {
   protected static Long sizeBytes;
 
   private static long maxTransferRate;
+  private static Date initDate = new Date();
 
   protected static final Object monitor = new Object();
   private static ArrayList statsListeners = new ArrayList();
@@ -79,6 +80,9 @@ public class Stats extends Object {
   }
   public static Long getSizeBytes() {
     return sizeBytes;
+  }
+  public static Date getInitDate() {
+    return initDate;
   }
 
   public static ArrayList[] getStatsHistoryLists() {
@@ -152,47 +156,60 @@ public class Stats extends Object {
 
   public static void setPing(long ms) {
     synchronized (monitor) {
-      pingMS = new Long(ms);
-      for (int i=0; i<statsListeners.size(); i++) {
-        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
-        listener.setStatsPing(pingMS);
+      boolean updated = pingMS == null || pingMS.longValue() != ms;
+      if (updated) {
+        pingMS = new Long(ms);
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsPing(pingMS);
+        }
       }
     }
   }
 
   public static void setConnections(int connectionCount, int[] connectionTypeCounts) {
     synchronized (monitor) {
-      connectionsPlain = new Integer(connectionTypeCounts[0]);
-      connectionsHTML = new Integer(connectionTypeCounts[1]);
-      if (connectionCount > 0) {
-        onlineStatus = Boolean.TRUE;
-      } else {
-        onlineStatus = Boolean.FALSE;
-      }
-      for (int i=0; i<statsListeners.size(); i++) {
-        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
-        listener.setStatsConnections(connectionsPlain, connectionsHTML);
+      boolean updated = connectionsPlain == null || connectionsPlain.intValue() != connectionTypeCounts[0]
+              || connectionsHTML == null || connectionsHTML.intValue() != connectionTypeCounts[1];
+      if (updated) {
+        connectionsPlain = new Integer(connectionTypeCounts[0]);
+        connectionsHTML = new Integer(connectionTypeCounts[1]);
+        if (connectionCount > 0) {
+          onlineStatus = Boolean.TRUE;
+        } else {
+          onlineStatus = Boolean.FALSE;
+        }
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsConnections(connectionsPlain, connectionsHTML);
+        }
       }
     }
   }
 
   public static void setTransferRate(long bytesPerSecond) {
     synchronized (monitor) {
-      maxTransferRate = Math.max(maxTransferRate, bytesPerSecond);
-      transferRate = new Long(bytesPerSecond);
-      for (int i=0; i<statsListeners.size(); i++) {
-        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
-        listener.setStatsTransferRate(transferRate);
+      boolean updated = transferRate == null || transferRate.longValue() != bytesPerSecond;
+      if (updated) {
+        maxTransferRate = Math.max(maxTransferRate, bytesPerSecond);
+        transferRate = new Long(bytesPerSecond);
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsTransferRate(transferRate);
+        }
       }
     }
   }
 
   public static void setSizeBytes(long size) {
     synchronized (monitor) {
+      boolean updated = sizeBytes == null || sizeBytes.longValue() != size;
       sizeBytes = new Long(size);
-      for (int i=0; i<statsListeners.size(); i++) {
-        StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
-        listener.setStatsSizeBytes(sizeBytes);
+      if (updated) {
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsSizeBytes(sizeBytes);
+        }
       }
     }
   }

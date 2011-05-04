@@ -77,7 +77,7 @@ public class SingleTigerSession extends Object {
       { "Spanish", "es", "ES" }, 
       { "Swedish", "sv", "SE" }, 
     };
-  private static String defaultLanguageName = languageNameSets[0][0];
+  private static String defaultLanguageName = "";
   private static String[] languageNames;
   public static String[] languageNamesAvailable;
   private static String[][] languageFiles = 
@@ -271,7 +271,6 @@ public class SingleTigerSession extends Object {
 
     try {
       // load default language based on current locale
-      defaultLanguageName = languageNames[0];
       Locale locale = Locale.getDefault();
       String lang = locale.getLanguage();
       String country = locale.getCountry();
@@ -377,7 +376,10 @@ public class SingleTigerSession extends Object {
           setLanguageLexiconProperties(properties, properties.getProperty(PROPERTY__LANGUAGE_NAME));
           singleInstance = new TigerPropSession(properties);
           try {
-            TigerBkgChecker.backgroundCheckEnabled = Boolean.valueOf(properties.getProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, ""+TigerBkgChecker.backgroundCheckEnabled)).booleanValue();
+            if (defaultLanguageName != null && defaultLanguageName.length() > 0)
+              TigerBkgChecker.backgroundCheckEnabled = Boolean.valueOf(properties.getProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, ""+TigerBkgChecker.backgroundCheckEnabled)).booleanValue();
+            else
+              TigerBkgChecker.backgroundCheckEnabled = false;
             int countLanguageLexicons = countLanguageLexicons(singleInstance);
             if (countLanguageLexicons < 1) TigerBkgChecker.backgroundCheckEnabled = false;
           } catch (Throwable t) {

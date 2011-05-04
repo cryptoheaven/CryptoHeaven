@@ -93,6 +93,15 @@ public class SpeedLimiter extends Object {
     globalStatReseter.start();
   }
 
+  public static long getTotalByteCountRead() {
+    return totalByteCountRead;
+  }
+  public static long getTotalByteCountWritten() {
+    return totalByteCountWritten;
+  }
+  public static long getTotalByteCount() {
+    return totalByteCountRead+totalByteCountWritten;
+  }
 
   private static long sumMillis(LinkedList timeCountList, long currentDateMillis) {
     if (timeCountList.size() > 0)

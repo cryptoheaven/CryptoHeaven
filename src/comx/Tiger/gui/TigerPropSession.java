@@ -47,6 +47,16 @@ public class TigerPropSession extends PropSpellingSession {
   public void setOptionsFromProperties(Properties properties, String prefix) {
     super.setOptionsFromProperties(properties, prefix);
     try {
+      Properties sessionProperties = getProperties();
+      String initialLanguageChoice = sessionProperties.getProperty(SingleTigerSession.PROPERTY__LANGUAGE_NAME);
+      String newLanguageChoice = properties.getProperty(SingleTigerSession.PROPERTY__LANGUAGE_NAME);
+      if (newLanguageChoice != null) {
+        if (initialLanguageChoice == null || !initialLanguageChoice.equalsIgnoreCase(newLanguageChoice)) {
+          if (SingleTigerSession.loadLanguageLexicons(newLanguageChoice)) {
+            sessionProperties.setProperty(SingleTigerSession.PROPERTY__LANGUAGE_NAME, newLanguageChoice);
+          }
+        }
+      }
       TigerBkgChecker.backgroundCheckEnabled = Boolean.valueOf(properties.getProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, ""+TigerBkgChecker.backgroundCheckEnabled)).booleanValue();
       int countLanguageLexicons = SingleTigerSession.countLanguageLexicons(this);
       if (countLanguageLexicons < 1) TigerBkgChecker.backgroundCheckEnabled = false;
