@@ -630,6 +630,14 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
     if (trace != null) trace.exit(TigerBkgChecker.class);
   }
 
+  private void removeMisspelledWords() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TigerBkgChecker.class, "removeMisspelledWords()");
+    for (Enumeration e = misspelledWords.elements(); e.hasMoreElements();)
+      ((MisspelledWord) e.nextElement()).hide();
+    misspelledWords.clear();
+    if (trace != null) trace.exit(TigerBkgChecker.class);
+  }
+
   public void removeUpdate(final DocumentEvent ev) {
     if (TigerBkgChecker.backgroundCheckEnabled) {
       SwingUtilities.invokeLater(new Runnable() {
@@ -673,7 +681,6 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
     if (session.getLexicons() != null && session.getLexicons().length > 1) {
       component = textComp;
       caretPos = component.getCaret().getDot();
-      misspelledWords.clear();
       resume();
       recheckAll();
     }
@@ -700,14 +707,21 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
     if (trace != null) trace.exit(TigerBkgChecker.class);
   }
 
-  public synchronized void stop() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TigerBkgChecker.class, "stop()");
+  public synchronized void pause() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TigerBkgChecker.class, "pause()");
     if (component != null) {
       component.getDocument().removeDocumentListener(this);
       component.removeCaretListener(this);
       //component.removeMouseListener(this);
-      component = null;
     }
+    if (trace != null) trace.exit(TigerBkgChecker.class);
+  }
+
+  public synchronized void stop() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TigerBkgChecker.class, "stop()");
+    pause();
+    removeMisspelledWords();
+    component = null;
     if (trace != null) trace.exit(TigerBkgChecker.class);
   }
 
