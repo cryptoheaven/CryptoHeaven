@@ -70,7 +70,7 @@ public class FolderTree extends JTree implements DisposableObj {
   }
   /** Creates new FolderTree */
   public FolderTree(RecordFilter filter) {
-    this(new FolderTreeModelCl(filter));
+    this(new FolderTreeModelGui(filter));
   }
   /** Creates new FolderTree */
   public FolderTree(RecordFilter filter, FolderPair[] initialFolderPairs) {
@@ -79,16 +79,16 @@ public class FolderTree extends JTree implements DisposableObj {
 
   /** Creates new FolderTree */
   public FolderTree(FolderTreeNodeGui root) {
-    this(new FolderTreeModelCl(root));
+    this(new FolderTreeModelGui(root));
   }
 
   /** Creates new FolderTree */
   public FolderTree(FolderTreeNodeGui root, RecordFilter filter, FolderPair[] initialFolderPairs) {
-    this(new FolderTreeModelCl(root, filter, initialFolderPairs));
+    this(new FolderTreeModelGui(root, filter, initialFolderPairs));
   }
 
   /** Creates new FolderTree */
-  public FolderTree(FolderTreeModelCl treeModel) {
+  public FolderTree(FolderTreeModelGui treeModel) {
     super(treeModel);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTree.class, "FolderTree(FolderTreeNodeGui)");
     init();
@@ -124,8 +124,8 @@ public class FolderTree extends JTree implements DisposableObj {
     return rc;
   }
 
-  public FolderTreeModelCl getFolderTreeModel() {
-    return (FolderTreeModelCl) getModel();
+  public FolderTreeModelGui getFolderTreeModel() {
+    return (FolderTreeModelGui) getModel();
   }
 
   public void removeTreeSelectionListeners() {

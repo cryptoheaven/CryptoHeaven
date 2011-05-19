@@ -15,6 +15,7 @@ package com.CH_co.tree;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 
+import java.io.PrintWriter;
 import java.util.*;
 
 /** 
@@ -274,7 +275,7 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
           parentNode = root.getRootFileNode();
         } else if (fRec.isChatting()) {
           parentNode = root.getRootChatNode();
-        } else if (fRec.isMsgType()) {
+        } else if (fRec.isMailType()) {
           parentNode = root.getRootMsgNode();
         } else if (fRec.isGroupType()) {
           parentNode = root.getRootGroupNode();
@@ -350,10 +351,10 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     boolean anyMoved = false;
     anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
     if (!newParent.getFolderObject().getFolderRecord().isCategoryType()) {
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
+      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootFileNode(), root);
+      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootChatNode(), root);
+      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootMsgNode(), root);
+      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootGroupNode(), root);
     }
     return anyMoved;
   }
@@ -393,7 +394,7 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
               move = true;
             else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_CHAT_FOLDER && folder.isChatting())
               move = true;
-            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_MAIL_FOLDER && folder.isMsgType())
+            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_MAIL_FOLDER && folder.isMailType())
               move = true;
             else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_GROUP_FOLDER && folder.isGroupType())
               move = true;
@@ -411,7 +412,7 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
       FolderTreeNode node = (FolderTreeNode) nodesToMove.get(i);
       if (!node.isNodeDescendant(newParent)) {
         node.removeFromParent();
-        insertNodeInto(node, newParent, 0);
+        insertNodeInto(node, newParent, newParent.getInsertionIndex(node.getFolderObject()));
       } else {
         if (trace != null) trace.data(10, "WARNING: illegal node position -- structure change ignored!");
         if (trace != null) trace.data(11, "node (being moved)", node);
@@ -458,4 +459,25 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     return getRootNodeById(FolderRecord.CATEGORY_MAIL_ID);
   }
 
+  public static void printTree(FolderTreeNode root, PrintWriter out) {
+    Enumeration enm = root.preorderEnumeration();
+    while (enm.hasMoreElements()) {
+      FolderTreeNode node = (FolderTreeNode) enm.nextElement();
+      if (node != null) {
+        FolderPair pair = node.getFolderObject();
+        if (pair != null) {
+          StringBuilder sb = new StringBuilder();
+          int level = node.getLevel()-1;
+          for (int i=0; i<level; i++)
+            sb.append('-');
+          if (sb.length() > 0)
+            sb.append(' ');
+          sb.append(pair.getMyName());
+          out.println(sb.toString());
+        } else {
+          out.println("null pair");
+        }
+      }
+    }
+  }
 }

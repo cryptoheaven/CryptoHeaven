@@ -173,7 +173,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
     if (records != null) {
       tree.suppressSelection(true);
       FolderTreeSelectionExpansion selectionExpansion = FolderTreeSelectionExpansion.getData(tree);
-      FolderTreeModelCl treeModel = tree.getFolderTreeModel();
+      FolderTreeModelGui treeModel = tree.getFolderTreeModel();
       treeModel.addNodes(records);
       selectionExpansion.restoreData(tree);
       tree.suppressSelection(false);

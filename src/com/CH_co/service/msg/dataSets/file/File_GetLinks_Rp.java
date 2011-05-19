@@ -54,6 +54,7 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
   public Long ownerObjId;
   public Short fetchNumMax;
   public Timestamp timestamp;
+  public boolean anySkippedOver;
   public FileLinkRecord[] fileLinks;
   public Stats_Get_Rp stats_rp;
 
@@ -77,12 +78,13 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
       this.stats_rp = new Stats_Get_Rp(statRecords);
     if (trace != null) trace.exit(File_GetLinks_Rp.class);
   }
-  public File_GetLinks_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp, FileLinkRecord[] fileLinks, StatRecord[] statRecords) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "File_GetLinks_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp, FileLinkRecord[] fileLinks, StatRecord[] statRecords)");
+  public File_GetLinks_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp, boolean anySkippedOver, FileLinkRecord[] fileLinks, StatRecord[] statRecords) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_GetLinks_Rp.class, "File_GetLinks_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Timestamp timestamp, boolean anySkippedOver, FileLinkRecord[] fileLinks, StatRecord[] statRecords)");
     this.ownerObjType = ownerObjType;
     this.ownerObjId = ownerObjId;
     this.fetchNumMax = fetchNumMax;
     this.timestamp = timestamp;
+    this.anySkippedOver = anySkippedOver;
     this.fileLinks = fileLinks;
     if (statRecords != null && statRecords.length > 0)
       this.stats_rp = new Stats_Get_Rp(statRecords);
@@ -106,6 +108,8 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
       dataOut.writeSmallint(fetchNumMax);
       dataOut.writeTimestamp(timestamp);
     }
+    if (clientBuild >= 638 && serverBuild >= 638)
+      dataOut.writeBoolean(anySkippedOver);
 
     // write indicator
     if (fileLinks == null)
@@ -150,6 +154,8 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
       fetchNumMax = dataIn.readSmallint();
       timestamp = dataIn.readTimestamp();
     }
+    if (clientBuild >= 638 && serverBuild >= 638)
+      anySkippedOver = dataIn.readBoolean();
 
     // read indicator
     int indicator = dataIn.read();
@@ -190,9 +196,14 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
 
   public String toString() {
     return "[File_GetLinks_Rp"
-      + ": fileLinks=" + Misc.objToStr(fileLinks)
-      + ", stats_rp=" + stats_rp
-      + "]";
+        + ": ownerObjType="   + ownerObjType
+        + ", ownerObjId="     + ownerObjId
+        + ", fetchNumMax="    + fetchNumMax
+        + ", timestamp="      + timestamp
+        + ", anySkippedOver=" + anySkippedOver
+        + ", fileLinks="      + Misc.objToStr(fileLinks)
+        + ", stats_rp="       + stats_rp
+        + "]";
   }
 
   public String toStringLongFormat() {
@@ -202,9 +213,14 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
     }
 
     return "[File_GetLinks_Rp"
-      + "\n: fileLinks=" + recordsBuf.toString()
-      + "\n, stats_rp=" + stats_rp
-      + "]";
+        + ": ownerObjType="   + ownerObjType
+        + ", ownerObjId="     + ownerObjId
+        + ", fetchNumMax="    + fetchNumMax
+        + ", timestamp="      + timestamp
+        + ", anySkippedOver=" + anySkippedOver
+        + "\n, fileLinks=" + recordsBuf.toString()
+        + "\n, stats_rp=" + stats_rp
+        + "]";
   }
 
 }

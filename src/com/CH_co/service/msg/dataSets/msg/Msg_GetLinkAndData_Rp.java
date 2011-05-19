@@ -56,6 +56,7 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
   public Short fetchNumMax;
   public Short fetchNumNew;
   public Timestamp timestamp;
+  public boolean anySkippedOver;
   public MsgLinkRecord[] linkRecords;
   public MsgDataRecord[] dataRecords;
   public Stats_Get_Rp stats_rp;
@@ -85,14 +86,15 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
   }
 
   /** Creates new Msg_GetLinkAndData_Rp */
-  public Msg_GetLinkAndData_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Short fetchNumNew, Timestamp timestamp, MsgLinkRecord[] linkRecords,MsgDataRecord[] dataRecords) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Msg_GetLinkAndData_Rp.class, "Msg_GetLinkAndData_Rp(Short fetchNumMax, Short fetchNumNew, Timestamp timestamp, MsgLinkRecord[] linkRecords, MsgDataRecord[] dataRecords)");
+  public Msg_GetLinkAndData_Rp(Short ownerObjType, Long ownerObjId, Short fetchNumMax, Short fetchNumNew, Timestamp timestamp, boolean anySkippedOver, MsgLinkRecord[] linkRecords,MsgDataRecord[] dataRecords) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Msg_GetLinkAndData_Rp.class, "Msg_GetLinkAndData_Rp(Short fetchNumMax, Short fetchNumNew, Timestamp timestamp, boolean anySkippedOver, MsgLinkRecord[] linkRecords, MsgDataRecord[] dataRecords)");
     if (trace != null) trace.args(ownerObjType, ownerObjId, fetchNumMax, fetchNumNew, timestamp, linkRecords, dataRecords);
     this.ownerObjType = ownerObjType;
     this.ownerObjId = ownerObjId;
     this.fetchNumMax = fetchNumMax;
     this.fetchNumNew = fetchNumNew;
     this.timestamp = timestamp;
+    this.anySkippedOver = anySkippedOver;
     this.linkRecords = linkRecords;
     this.dataRecords = dataRecords;
     if (trace != null) trace.exit(Msg_GetLinkAndData_Rp.class);
@@ -129,6 +131,8 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
     dataOut.writeSmallint(fetchNumMax);
     dataOut.writeSmallint(fetchNumNew);
     dataOut.writeTimestamp(timestamp);
+    if (clientBuild >= 638 && serverBuild >= 638)
+      dataOut.writeBoolean(anySkippedOver);
 
     // write MsgLinkRecords first
     // write indicator
@@ -229,6 +233,8 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
     fetchNumMax = dataIn.readSmallint();
     fetchNumNew = dataIn.readSmallint();
     timestamp = dataIn.readTimestamp();
+    if (clientBuild >= 638 && serverBuild >= 638)
+      anySkippedOver = dataIn.readBoolean();
 
     // read MsgLinkRecords first
     // read indicator
@@ -310,14 +316,15 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
 
   public String toString() {
     return "[Msg_GetLinkAndData_Rp"
-        + ": ownerObjType=" + ownerObjType
-        + ", ownerObjId="   + ownerObjId
-        + ", fetchNumMax="  + fetchNumMax
-        + ", fetchNumNew="  + fetchNumNew
-        + ", timestamp="    + timestamp
-        + ", linkRecords="  + Misc.objToStr(linkRecords)
-        + ", dataRecords="  + Misc.objToStr(dataRecords)
-        + ", stats_rp="     + stats_rp
+        + ": ownerObjType="   + ownerObjType
+        + ", ownerObjId="     + ownerObjId
+        + ", fetchNumMax="    + fetchNumMax
+        + ", fetchNumNew="    + fetchNumNew
+        + ", timestamp="      + timestamp
+        + ", anySkippedOver=" + anySkippedOver
+        + ", linkRecords="    + Misc.objToStr(linkRecords)
+        + ", dataRecords="    + Misc.objToStr(dataRecords)
+        + ", stats_rp="       + stats_rp
         + "]";
   }
 

@@ -475,7 +475,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
     }
 
     FolderFilter filter = FolderFilter.NON_LOCAL_FOLDERS;
-    FolderTreeModelCl treeModel = new FolderTreeModelCl(filter);
+    FolderTreeModelGui treeModel = new FolderTreeModelGui(filter);
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
     FolderPair[] allFolderPairs = CacheUtilities.convertRecordsToPairs(allFolderRecords);
     allFolderPairs = (FolderPair[]) filter.filterInclude(allFolderPairs);

@@ -236,8 +236,10 @@ public class GlobalProperties extends Object {
   // build 632 Rich/Plain text switch for message compose
   // build 634 Default speller language choice enabled only when pc locale matches available dictionary, dictionary language setting restored from user settings
   // build 636 Email delivery fix for "Delivered-To:" envelope change, fix background checker sometimes messy zig-zag underlines
+  // build 638 Message list and File list fetching returns "anySkippedOver" flag
+  // build 640 FolderTreeModel(s) and FolderTreeNode(s) cleanup
 
-  public static final short PROGRAM_BUILD_NUMBER = 636;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 640;  // even
   public static final boolean IS_BETA = true;
 
   // These final values are used in other places during compilation... keep them final!

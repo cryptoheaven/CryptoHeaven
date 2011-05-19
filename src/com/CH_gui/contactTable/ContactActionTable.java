@@ -812,7 +812,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private static void doSharedSpace(Component parent, MemberContactRecordI[] contacts, short folderType) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
-    FolderTreeModelCl treeModel = null;
+    FolderTreeModelGui treeModel = null;
     FolderPair selectedFolderPair = null;
 
     MainFrame mainFrame = MainFrame.getSingleInstance();
@@ -825,7 +825,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       }
     }
     if (treeModel == null) {
-      treeModel = new FolderTreeModelCl();
+      treeModel = new FolderTreeModelGui();
       treeModel.addNodes(cache.getFolderPairs(new FixedFilter(true), true));
     }
     Window w = SwingUtilities.windowForComponent(parent);

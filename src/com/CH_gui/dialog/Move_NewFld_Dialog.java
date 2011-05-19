@@ -75,7 +75,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   public static final short DEFAULT_CHAT_PURGING_RECORD_NUM = 100; // For Chatting folders, by default purge records if more than 100;
   public static final int DEFAULT_CHAT_PURGING_RECORD_SECONDS = 0; // unlimited, old value was 60*60*24*7*8;  // For Chatting folders, by default purge records if older than 8 weeks;
 
-  FolderTreeModelCl treeModel = null;
+  FolderTreeModelGui treeModel = null;
   FolderPair        selectedFolderPair = null;
   FolderPair[]      forbidenFolderPairs;
   boolean           isNewFolder = false;
@@ -123,7 +123,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   /**
    * Creates new  Move_NewFld_Dialog for moving a single folder or creating a new folder.
    */
-  public Move_NewFld_Dialog(Dialog owner, FolderTreeModelCl treeModel, FolderPair selectedFolderPair, String title, boolean isNewFolder, short newFolderType, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
+  public Move_NewFld_Dialog(Dialog owner, FolderTreeModelGui treeModel, FolderPair selectedFolderPair, String title, boolean isNewFolder, short newFolderType, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
     super(owner, title);
     // if MOVE folder action
     if (!isNewFolder)
@@ -136,7 +136,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   /**
    * Creates new  Move_NewFld_Dialog for moving a single folder or creating a new folder.
    */
-  public Move_NewFld_Dialog(Frame owner, FolderTreeModelCl treeModel, FolderPair selectedFolderPair, String title, boolean isNewFolder, short newFolderType, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
+  public Move_NewFld_Dialog(Frame owner, FolderTreeModelGui treeModel, FolderPair selectedFolderPair, String title, boolean isNewFolder, short newFolderType, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
     super(owner, title);
     // if MOVE folder action
     if (!isNewFolder)
@@ -183,7 +183,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private void createMoveFilesDialog(Component owner, FolderPair[] folderPairs, FolderPair[] forbidenFolderPairs, FolderPair selectedFolderPair, String title, boolean isDescendantOk, FetchedDataCache cache) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Move_NewFld_Dialog.class, "createMoveFilesDialog()");
 
-    FolderTreeModelCl treeModel = new FolderTreeModelCl();
+    FolderTreeModelGui treeModel = new FolderTreeModelGui();
     treeModel.addNodes(folderPairs);
     this.isChooseDestination = true;
     this.isDescendantOk = isDescendantOk;
@@ -192,7 +192,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     constructDialog(owner, treeModel, selectedFolderPair, false, cache, null);
     if (trace != null) trace.exit(Move_NewFld_Dialog.class);
   }
-  private void constructDialog(Component owner, FolderTreeModelCl treeModel, FolderPair selectedFolderPair, boolean isNewFolder, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
+  private void constructDialog(Component owner, FolderTreeModelGui treeModel, FolderPair selectedFolderPair, boolean isNewFolder, FetchedDataCache cache, MemberContactRecordI[] addInitialContacts) {
     this.treeModel = treeModel;
     // Expand/select the tree to the first forbiden folder, if one is specified.
     if (selectedFolderPair == null)
@@ -335,7 +335,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
         filter = FolderFilter.NON_LOCAL_FOLDERS;
       }
     }
-    filteredTree = new FolderTree((FolderTreeModelCl) treeModel.createFilteredModel(filter, new FolderTreeModelCl()));
+    filteredTree = new FolderTree((FolderTreeModelGui) treeModel.createFilteredModel(filter, new FolderTreeModelGui()));
 
     MainFrame mainFrame = MainFrame.getSingleInstance();
     if (mainFrame != null) {
@@ -770,7 +770,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     public void actionPerformed (ActionEvent event) {
       if (MONO_FOLDERS) {
         short newType = getSelectedFolderType();
-        FolderTreeModelCl newModel = (FolderTreeModelCl) treeModel.createFilteredModel(new FolderFilter(newType), new FolderTreeModelCl());
+        FolderTreeModelGui newModel = (FolderTreeModelGui) treeModel.createFilteredModel(new FolderFilter(newType), new FolderTreeModelGui());
         filteredTree.setModel(newModel);
       }
       setFolderType(getSelectedFolderType());

@@ -98,18 +98,18 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
 
   /** Creates new FolderActionTree */
   public FolderActionTree() {
-    this(new FolderTreeModelCl());
+    this(new FolderTreeModelGui());
   }
   /** Creates new FolderActionTree */
   public FolderActionTree(RecordFilter filter) {
-    this(new FolderTreeModelCl(filter));
+    this(new FolderTreeModelGui(filter));
   }
   /** Creates new FolderActionTree */
   public FolderActionTree(RecordFilter filter, FolderPair[] initialFolderPairs) {
-    this(new FolderTreeModelCl(filter, initialFolderPairs));
+    this(new FolderTreeModelGui(filter, initialFolderPairs));
   }
   /** Creates new FolderActionTree */
-  public FolderActionTree(FolderTreeModelCl treeModel) {
+  public FolderActionTree(FolderTreeModelGui treeModel) {
     super(treeModel);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderActionTree.class, "FolderActionTree()");
 
@@ -331,7 +331,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     }
     public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
-      FolderTreeModelCl treeModel = (FolderTreeModelCl) FolderActionTree.this.getFolderTreeModel().createFilteredModel(FolderFilter.MOVE_FOLDER, new FolderTreeModelCl());
+      FolderTreeModelGui treeModel = (FolderTreeModelGui) FolderActionTree.this.getFolderTreeModel().createFilteredModel(FolderFilter.MOVE_FOLDER, new FolderTreeModelGui());
       if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, MainFrame.getServerInterfaceLayer().getFetchedDataCache(), null);
       else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, getLastSelectedPair(), com.CH_gui.lang.Lang.rb.getString("title_Move_Folder"), false, (short) 0, MainFrame.getServerInterfaceLayer().getFetchedDataCache(), null);
     }
@@ -1195,9 +1195,9 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         folderTree = folderPairs;
       }
       // Create a deapth-first logical order for the sub-tree
-      FolderTreeNode rootNode = new FolderTreeNode();
-      rootNode.addNodes(folderTree, true);
-      Enumeration enm = rootNode.depthFirstEnumeration();
+      FolderTreeModel subModel = new FolderTreeModel();
+      subModel.addNodes(folderTree, false);
+      Enumeration enm = subModel.getRootNode().depthFirstEnumeration();
       Vector protectedMasterFoldersV = null;
       while (enm.hasMoreElements()) {
         FolderTreeNode n = (FolderTreeNode) enm.nextElement();
@@ -1206,7 +1206,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           // Check that this folder is still available.
           // It might have dissapeared when server reply came back from previous deletion in the batch.
           Long folderId = fPair.getFolderRecord().getId();
-          if (cache.getFolderRecord(folderId) != null && FolderTreeNode.findNode(folderId, true, rootNode) != null) {
+          if (cache.getFolderRecord(folderId) != null && subModel.findNode(folderId, true) != null) {
 
             boolean canDelete = true;
             if (userRecord.isBusinessSubAccount() &&
@@ -1447,7 +1447,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       FolderRecord[] folderRecords = null;
       folderRecords = event.getFolderRecords();
       if (folderRecords != null) {
-        FolderTreeModelCl model = null;
+        FolderTreeModelGui model = null;
         for (int i=0; i<folderRecords.length; i++) {
           FolderRecord fRec = folderRecords[i];
           int updates = fRec.getUpdateCount();

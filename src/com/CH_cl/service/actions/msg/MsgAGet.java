@@ -69,6 +69,7 @@ public class MsgAGet extends ClientMessageAction {
     Short fetchNumMax = reply.fetchNumMax;
     Short fetchNumNew = reply.fetchNumNew;
     Timestamp timestamp = reply.timestamp;
+    boolean anySkippedOver = reply.anySkippedOver;
     MsgLinkRecord[] linkRecords = reply.linkRecords;
     MsgDataRecord[] dataRecords = reply.dataRecords;
     StatRecord[] statRecords = reply.stats_rp != null ? reply.stats_rp.stats : null;
@@ -170,11 +171,16 @@ public class MsgAGet extends ClientMessageAction {
       getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
 
-    // if this was a bulk fetch done in stages, gather Messages which exist in the cache but should be removed
+    // Gather messages for removal by looking for non-existing messages, this works in fetches done in stages because they return data in sorted sequencial batches.
     MsgLinkRecord[] toRemoveMsgLinks = null;
-    if (linkRecords != null && linkRecords.length > 0 && fetchNumMax != null && fetchNumNew != null) {
-      MsgLinkRecord[] priorMsgs = cache.getMsgLinkRecords(linkRecords[0].dateCreated, linkRecords[linkRecords.length-1].dateCreated, fetchingOwnerObjId, fetchingOwnerObjType);
-      toRemoveMsgLinks = (MsgLinkRecord[]) ArrayUtils.getDifference(priorMsgs, linkRecords);
+    if (!anySkippedOver && fetchNumMax != null && fetchNumNew != null) {
+      // TODO remove temp check below
+      // temporary check before we upgrade engines to build 638 or newer
+      if ((getClientContext().serverBuild < 638 && timestamp != null) || getClientContext().serverBuild >= 638)
+      if (linkRecords != null && linkRecords.length > 0) {
+        MsgLinkRecord[] priorMsgs = cache.getMsgLinkRecords(linkRecords[0].dateCreated, linkRecords[linkRecords.length-1].dateCreated, fetchingOwnerObjId, fetchingOwnerObjType);
+        toRemoveMsgLinks = (MsgLinkRecord[]) ArrayUtils.getDifference(priorMsgs, linkRecords);
+      }
     }
 
     // We need data Records in the cache before the message table can display contents.

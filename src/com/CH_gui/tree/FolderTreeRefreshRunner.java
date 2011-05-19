@@ -76,7 +76,7 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
         Object treeLock = fTree.getFolderTreeModel().getMonitor();
 
         FolderTreeSelectionExpansion selectionExpansion = null;
-        FolderTreeModelCl model = null;
+        FolderTreeModelGui model = null;
         FolderTreeNodeGui root = null;
         synchronized (treeLock) {
           // suppress consideration for selection changes by event processors...

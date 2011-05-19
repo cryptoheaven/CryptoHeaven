@@ -278,7 +278,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
     FolderRecord fRec = e.selectedFolderRecord;
     if (fRec != null) {
       FolderTree tree = folderTreeScrollPane.getFolderTree();
-      FolderTreeModelCl model = tree.getFolderTreeModel();
+      FolderTreeModelGui model = tree.getFolderTreeModel();
       TreePath path = model.getPathToRoot(fRec);
       if (path != null)
         tree.getSelectionModel().setSelectionPath(path);

@@ -9,16 +9,18 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Development Team.
  */
-package com.CH_gui.tree;
+
+package com.CH_cl.tree;
 
 import com.CH_cl.service.cache.FetchedDataCache;
-
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.tree.*;
+import com.CH_co.util.ArrayUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -26,66 +28,61 @@ import java.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description:
  *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.6 $</b>
  * @author  Marcin Kurzawa
  * @version
  */
-public class FolderTreeModelCl extends FolderTreeModelCo {
+public class FolderTreeModelCl extends FolderTreeModel {
 
   /** Creates new FolderTreeModelCl */
   public FolderTreeModelCl() {
-    this(new FolderTreeNodeGui());
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModel()");
+    super();
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl()");
     if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
   /** Creates new FolderTreeModelCl with specified folder filter. */
   public FolderTreeModelCl(RecordFilter filter) {
     super(filter);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl(FolderFilter folderFilter)");
+    if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
   /** Creates new FolderTreeModelCl with specified folder filter. */
   public FolderTreeModelCl(RecordFilter filter, FolderPair[] initialFolderPairs) {
     super(filter, initialFolderPairs);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl(FolderFilter folderFilter, FolderPair[] initialFolderPairs)");
+    if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
   /** Creates new FolderTreeModelCl */
-  public FolderTreeModelCl(FolderTreeNodeGui root) {
+  public FolderTreeModelCl(FolderTreeNode root) {
     super(root);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl(FolderTreeNode root)");
+    if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
   /** Creates new FolderTreeModelCl */
-  public FolderTreeModelCl(FolderTreeNodeGui root, RecordFilter filter, FolderPair[] initialFolderPairs) {
+  public FolderTreeModelCl(FolderTreeNode root, RecordFilter filter, FolderPair[] initialFolderPairs) {
     super(root, filter, initialFolderPairs);
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl(FolderTreeNode root, FolderFilter folderFilter, FolderPair[] initialFolderPairs)");
+    if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
-  /** @param folder is a FolderRecord that will be removed from this tree model
+    /** @param folder is a FolderRecord that will be removed from this tree model
    * <code> folder </code> cannnot be null
    * Note: only removal of FolderRecords is supported, and not FolderShares alone
    */
-  public synchronized void removeRecord(FolderRecord folder, boolean keepCacheResidantChildren) {
-    Trace trace = null;
-    if (Trace.DEBUG) {
-      trace = Trace.entry(FolderTreeModelCl.class, "removeNodeFromModel(FolderRecord, boolean keepCacheResidantChildren)");
-    }
-    if (trace != null) {
-      trace.args(folder);
-    }
-    if (trace != null) {
-      trace.args(keepCacheResidantChildren);
-    }
+  public synchronized boolean removeRecord(FolderRecord folder, boolean keepCacheResidantChildren) {
+    Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(FolderTreeModel.class, "removeNodeFromModel(FolderRecord, boolean keepCacheResidantChildren)");
+    if (trace != null) trace.args(folder);
+    if (trace != null) trace.args(keepCacheResidantChildren);
 
-    FolderTreeNodeGui nodeToRemove = findNode(folder.getId(), true);
+    FolderTreeNode nodeToRemove = findNode(folder.getId(), true);
 
     if (nodeToRemove != null) {
 
-      // Remember the children nodes which still exist in the cache, 
+      // Remember the children nodes which still exist in the cache,
       // if the 'keepCacheResidantChildren' flag is specified.
       ArrayList keepChildrenL = null;
       if (keepCacheResidantChildren) {
@@ -93,7 +90,7 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
         if (enm != null && enm.hasMoreElements()) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           while (enm.hasMoreElements()) {
-            FolderTreeNodeGui childNode = (FolderTreeNodeGui) enm.nextElement();
+            FolderTreeNode childNode = (FolderTreeNode) enm.nextElement();
             FolderPair fPair = childNode.getFolderObject();
             if (cache.getFolderRecord(fPair.getId()) != null) {
               if (keepChildrenL == null) keepChildrenL = new ArrayList();
@@ -112,8 +109,8 @@ public class FolderTreeModelCl extends FolderTreeModelCo {
       }
     }
 
-    if (trace != null) {
-      trace.exit(FolderTreeModelCl.class);
-    }
+    if (trace != null) trace.exit(FolderTreeModel.class, nodeToRemove != null);
+    return nodeToRemove != null;
   }
+
 }

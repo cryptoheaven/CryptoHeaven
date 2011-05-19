@@ -55,7 +55,7 @@ public class FolderTreeSelectionExpansion extends Object {
 
     FolderTreeSelectionExpansion newVisuals = new FolderTreeSelectionExpansion();
 
-    FolderTreeModelCl model = folderTree.getFolderTreeModel();
+    FolderTreeModelGui model = folderTree.getFolderTreeModel();
     FolderTreeNodeGui root = model.getRootNode();
     Enumeration enm = root.depthFirstEnumeration();
     while (enm.hasMoreElements()) {
@@ -82,7 +82,7 @@ public class FolderTreeSelectionExpansion extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeSelectionExpansion.class, "restoreData(FolderTree folderTree)");
     if (trace != null) trace.args(folderTree);
 
-    FolderTreeModelCl model = folderTree.getFolderTreeModel();
+    FolderTreeModelGui model = folderTree.getFolderTreeModel();
     for (int i=0; i<visibleFolderIDsV.size(); i++) {
       FolderTreeNodeGui node = model.findNode((Long) visibleFolderIDsV.elementAt(i), true);
       if (node != null) {
