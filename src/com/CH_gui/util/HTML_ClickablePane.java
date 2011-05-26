@@ -448,6 +448,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     }
     try {
       JFrame f = new JFrame("Test of HTML renderer on page " + args[0]);
+      f.getContentPane().setLayout(new BorderLayout());
       f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       boolean isURL = true;
       if (args.length >= 2) {
@@ -468,8 +469,10 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
         }
         bout.flush();
         fin.close();
-        f.getContentPane().add(new JScrollPane(new HTML_ClickablePane(new String(bout.toByteArray()))), "Center");
+        String content = new String(bout.toByteArray());
+        f.getContentPane().add(new JScrollPane(new HTML_ClickablePane(content)), BorderLayout.CENTER);
       }
+      f.getContentPane().add(new JLabel(args[0]), BorderLayout.SOUTH);
       f.setSize(300, 300);
       f.setVisible(true);
     } catch (Throwable t) {
