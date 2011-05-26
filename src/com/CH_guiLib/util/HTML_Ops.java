@@ -21,7 +21,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -29,7 +29,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.0 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class HTML_Ops {
 
@@ -42,16 +42,25 @@ public class HTML_Ops {
 
     if (htmlMessage != null) {
       if (isRemoveHead) {
-        int indexBodyStart = htmlMessage.indexOf("<body"); if (indexBodyStart < 0) indexBodyStart = htmlMessage.indexOf("<BODY");
-        int indexHeadEnd = htmlMessage.indexOf("</head"); if (indexHeadEnd < 0) indexHeadEnd = htmlMessage.indexOf("</HEAD");
-        if (indexBodyStart < indexHeadEnd) {
-          // skip HEAD cleanup because it seems that body is inside the HEAD tag
+        boolean isBodyPresent = htmlMessage.indexOf("<body") >= 0 || htmlMessage.indexOf("<BODY") >= 0;
+        String[][] startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
+        String[][] endTags = new String[][] {{ "</head>", "</HEAD>" }};
+        String trimmedHtmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+        if (isBodyPresent && trimmedHtmlMessage.indexOf("<body") < 0 && trimmedHtmlMessage.indexOf("<BODY") < 0) {
+          // keep original html message because trimming the 'head' somehow removed the 'body' which is not right
         } else {
-          String[][] startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
-          String[][] endTags = new String[][] {{ "</head>", "</HEAD>" }};
-          htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+          htmlMessage = trimmedHtmlMessage;
         }
       }
+
+      // noticed an email contained thousands of <v> and </v> tags which are invalid and crashed the client, so I removed them here
+      htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+        new String[][] {
+          {"<v>", ""},
+          {"<V>", ""},
+          {"</v>", ""},
+          {"</V>", ""},
+      });
 
       boolean removedLeadP = !isRemoveLeadP;
       if (!removedLeadP) {
@@ -92,20 +101,51 @@ public class HTML_Ops {
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
       }
 
-      {
-        String divStyleEmpty = "<div style='background-color:'>";
-        int iStart = htmlMessage.indexOf(divStyleEmpty);
-        while (iStart >= 0) {
-          String buf = "";
-          if (iStart > 0)
-            buf = htmlMessage.substring(0, iStart);
-          buf += "<div style='background-color:white'>";
-          if (iStart + divStyleEmpty.length() < htmlMessage.length())
-            buf += htmlMessage.substring(iStart + divStyleEmpty.length());
-          htmlMessage = buf;
-          iStart = htmlMessage.indexOf(divStyleEmpty);
-        }
-      }
+      // java renderer has trouble with empty 'background' stype and with #fff colors turning blue
+      if (htmlMessage.indexOf("background:") >= 0)
+        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+          new String[][] {
+                  { "background: #fff;", "background: #ffffff;" },
+                  { "background: #fff'", "background: #ffffff'" },
+                  { "background: #fff\"", "background: #ffffff\"" },
+                  { "background: #FFF;", "background: #ffffff;" },
+                  { "background: #FFF'", "background: #ffffff'" },
+                  { "background: #FFF\"", "background: #ffffff\"" },
+                  { "background:#fff;", "background: #ffffff;" },
+                  { "background:#fff'", "background: #ffffff'" },
+                  { "background:#fff\"", "background: #ffffff\"" },
+                  { "background:#FFF;", "background: #ffffff;" },
+                  { "background:#FFF'", "background: #ffffff'" },
+                  { "background:#FFF\"", "background: #ffffff\"" },
+                  { "background: ;", "background: #ffffff;" },
+                  { "background: '", "background: #ffffff'" },
+                  { "background: \"", "background: #ffffff\"" },
+                  { "background:;", "background: #ffffff;" },
+                  { "background:'", "background: #ffffff'" },
+                  { "background:\"", "background: #ffffff\"" },
+                }, new String[] { "<" }, new String[] { ">" }, true);
+      if (htmlMessage.indexOf("background-color:") >= 0)
+        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+          new String[][] {
+                  { "background-color: #fff;", "background-color: #ffffff;" },
+                  { "background-color: #fff'", "background-color: #ffffff'" },
+                  { "background-color: #fff\"", "background-color: #ffffff\"" },
+                  { "background-color: #FFF;", "background-color: #ffffff;" },
+                  { "background-color: #FFF'", "background-color: #ffffff'" },
+                  { "background-color: #FFF\"", "background-color: #ffffff\"" },
+                  { "background-color:#fff;", "background-color: #ffffff;" },
+                  { "background-color:#fff'", "background-color: #ffffff'" },
+                  { "background-color:#fff\"", "background-color: #ffffff\"" },
+                  { "background-color:#FFF;", "background-color: #ffffff;" },
+                  { "background-color:#FFF'", "background-color: #ffffff'" },
+                  { "background-color:#FFF\"", "background-color: #ffffff\"" },
+                  { "background-color: ;", "background-color: #ffffff;" },
+                  { "background-color: '", "background-color: #ffffff'" },
+                  { "background-color: \"", "background-color: #ffffff\"" },
+                  { "background-color:;", "background-color: #ffffff;" },
+                  { "background-color:'", "background-color: #ffffff'" },
+                  { "background-color:\"", "background-color: #ffffff\"" },
+                }, new String[] { "<" }, new String[] { ">" }, true);
     }
 
     String traceHTMLmsg = (htmlMessage != null && htmlMessage.length() < 255) ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null");
