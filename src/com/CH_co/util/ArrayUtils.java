@@ -560,10 +560,10 @@ public class ArrayUtils extends Object {
    * This method is performance optimized.
    */
   public static String replaceKeyWords(String str, String[][] sets) {
-    return replaceKeyWords(str, sets, null, null);
+    return replaceKeyWords(str, sets, null, null, false);
   }
-  public static String replaceKeyWords(String str, String[][] sets, String[] skipBeginTags, String[] skipEndTags) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "replaceKeyWords(String str, String[][] sets, String[] skipBeginTags, String[] skipEndTags)");
+  public static String replaceKeyWords(String str, String[][] sets, String[] beginTags, String[] endTags, boolean isInsideTagsInclusion) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "replaceKeyWords(String str, String[][] sets, String[] beginTags, String[] endTags, boolean isInsideTagsInclusion)");
 
     int numOfSets = sets.length;
     char[] chars = null;
@@ -574,7 +574,9 @@ public class ArrayUtils extends Object {
       StringBuffer resultB = new StringBuffer(str.length());
       boolean anyFound = false;
       while ((start = str.indexOf(set[0], oldStart)) >= 0) {
-        boolean isInsideSkipSegment = isInsideSegment(str, start, skipBeginTags, skipEndTags);
+        boolean isInsideReplacementRange = true;
+        if (beginTags != null || endTags != null)
+          isInsideReplacementRange = isInsideTagsInclusion == isInsideSegment(str, start, beginTags, endTags);
         anyFound = true;
         if (start > oldStart) {
           int len = start-oldStart;
@@ -582,7 +584,7 @@ public class ArrayUtils extends Object {
           str.getChars(oldStart, start, chars, 0);
           resultB.append(chars, 0, len);
         }
-        if (!isInsideSkipSegment)
+        if (isInsideReplacementRange)
           resultB.append(set[1]);
         else
           resultB.append(set[0]);
