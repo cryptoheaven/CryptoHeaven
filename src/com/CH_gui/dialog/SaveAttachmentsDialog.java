@@ -98,8 +98,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   private JButton jOpen;
   private JButton jDownload;
 
-  private static final String PROPERTY_NAME__MSG_DEST_FOLDER = SaveAttachmentsDialog.class.getName() + "_msgDestinationFolder";
-  private static final String PROPERTY_NAME__FILE_DEST_FOLDER = SaveAttachmentsDialog.class.getName() + "_fileDestinationFolder";
+  private static final String PROPERTY_NAME__MSG_DEST_FOLDER = "SaveAttachmentsDialog_msgDestinationFolder";
+  private static final String PROPERTY_NAME__FILE_DEST_FOLDER = "SaveAttachmentsDialog_fileDestinationFolder";
 
   private static final String FETCHING_ATTACHMENTS = com.CH_gui.lang.Lang.rb.getString("Fetching_Attachments...");
 
