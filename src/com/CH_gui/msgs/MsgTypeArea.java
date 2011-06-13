@@ -90,11 +90,19 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   /** Creates new MsgTypeArea */
   public MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode)");
+    if (trace != null) trace.args(htmlPropertyPostfix);
+    if (trace != null) trace.args(objType);
+    if (trace != null) trace.args(defaultHTML);
+    if (trace != null) trace.args(undoMngrI);
+    if (trace != null) trace.args(grabInitialFocus);
+    if (trace != null) trace.args(suppressSpellCheck);
+    if (trace != null) trace.args(isChatMode);
 
     PROPERTY_NAME_isHTML = PROPERTY_NAME_isHTML_prefix + htmlPropertyPostfix;
     this.objType = objType;
     String isHTML_s = GlobalProperties.getProperty(PROPERTY_NAME_isHTML, ""+defaultHTML);
-    this.isHTML = isHTML_s.equalsIgnoreCase("true");
+    // chat mode overwrites into HTML
+    this.isHTML = isChatMode || isHTML_s.equalsIgnoreCase("true");
     this.undoMngrI = undoMngrI;
     this.isChatMode = isChatMode;
 
@@ -124,12 +132,18 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   private void init() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "init()");
+
     initComponents();
     addMyListeners();
     initMainPanel();
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
   private void initComponents() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "initComponents()");
+
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       contactInfoPanel = new ContactInfoPanel(undoMngrI);
     }
@@ -182,16 +196,20 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
     else
       jHtmlMessage = new MyHTMLEditor(false, true);
 
-    if (isHTML)
+    if (isHTML || jTextMessage == null)
       jMessage = jHtmlMessage;
     else
       jMessage = jTextMessage;
 
     if (undoMngrI != null)
       undoableEditListener = new MsgUndoableEditListener(undoMngrI);
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
   private void initMainPanel() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "initMainPanel()");
+
     setLayout(new GridBagLayout());
 
     int posY = 0;
@@ -234,13 +252,19 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
       jTextAreaPanel.add(new JScrollPane(jMessage), BorderLayout.CENTER);
     else
       jTextAreaPanel.add(jMessage, BorderLayout.CENTER);
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
   private String getSubject() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "getSubject()");
+
     String subject = null;
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       subject = contactInfoPanel.getContentPreview().toString();
     }
+
+    if (trace != null) trace.exit(MsgTypeArea.class, subject);
     return subject;
   }
 
@@ -253,6 +277,8 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   public String[] getContent() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "getContent()");
+
     String subject = "";
     String body = "";
     try {
@@ -277,9 +303,19 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
       }
     } catch (Throwable t) {
     }
-    return new String[] { subject, body };
+    String[] content = new String[] { subject, body };
+
+    if (trace != null) trace.exit(MsgTypeArea.class, content);
+    return content;
   }
+
   public void setContentText(String text, boolean isHtml, boolean requestFocus, boolean caretOnTop) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "setContentText(String text, boolean isHtml, boolean requestFocus, boolean caretOnTop)");
+    if (trace != null) trace.args(text);
+    if (trace != null) trace.args(isHtml);
+    if (trace != null) trace.args(requestFocus);
+    if (trace != null) trace.args(caretOnTop);
+
     if (isHTML && !isHtml)
       text = Misc.encodePlainIntoHtml(text);
     else if (!isHTML && isHtml)
@@ -289,8 +325,14 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
       setCaretAtTheTop();
     if (requestFocus)
       focusMessageArea();
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   public void setContent(MsgDataRecord msgData) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "setContent(MsgDataRecord msgData)");
+    if (trace != null) trace.args(msgData);
+
     if (msgData.isTypeAddress()) {
       contactInfoPanel.setContent(msgData.parseAddressContent());
       // make sure we are in proper PLAIN/HTML mode
@@ -305,13 +347,25 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
       // set content
       setContentText(msgData.getText(), msgData.isHtmlMail(), false, true);
     }
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   public void setContent(XMLElement data) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "setContent(XMLElement data)");
+    if (trace != null) trace.args(data);
+
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       contactInfoPanel.setContent(data);
     }
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   private void setContent(String body) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "setContent(String body)");
+    if (trace != null) trace.args(body);
+
     if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).stop();
     removeMyListeners();
     if (isHTML) {
@@ -324,37 +378,69 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
     addMyListeners();
     HTML_ClickablePane.setBaseToDefault((HTMLDocument) jHtmlMessage.getInternalJEditorPane().getDocument());
     if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).restart(getTextComponent());
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   private void addMyListeners() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "addMyListeners()");
+
     addMyListeners(jHtmlMessage.getInternalJEditorPane());
     if (jTextMessage != null)
       addMyListeners(jTextMessage);
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   private void addMyListeners(JTextComponent textComp) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "addMyListeners(JTextComponent textComp)");
+    if (trace != null) trace.args(textComp);
+
     textComp.getDocument().addDocumentListener(myDocumentListener);
     textComp.addKeyListener(myKeyListener);
     if (undoableEditListener != null)
       textComp.getDocument().addUndoableEditListener(undoableEditListener);
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   private void removeMyListeners() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "removeMyListeners()");
+
     removeMyListeners(jHtmlMessage.getInternalJEditorPane());
     if (jTextMessage != null)
       removeMyListeners(jTextMessage);
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   private void removeMyListeners(JTextComponent textComp) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "removeMyListeners(JTextComponent textComp)");
+    if (trace != null) trace.args(textComp);
+
     textComp.getDocument().removeDocumentListener(myDocumentListener);
     textComp.removeKeyListener(myKeyListener);
     if (undoableEditListener != null)
       textComp.getDocument().removeUndoableEditListener(undoableEditListener);
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
+
   public boolean isAnyContent() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "isAnyContent()");
+
     boolean anyContent = isAnyBody();
     if (!anyContent && objType == MsgDataRecord.OBJ_TYPE_ADDR) {
       anyContent = contactInfoPanel.isAnyContent();
     }
+
+    if (trace != null) trace.exit(MsgTypeArea.class, anyContent);
     return anyContent;
   }
+
   private boolean isAnyBody() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "isAnyBody()");
+
     boolean anyBody = false;
     if (isHTML) {
       anyBody = jHtmlMessage.getPlainText().trim().length() > 0;
@@ -366,6 +452,8 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
     } else {
       anyBody = jTextMessage.getText().trim().length() > 0;
     }
+
+    if (trace != null) trace.exit(MsgTypeArea.class, anyBody);
     return anyBody;
   }
 
@@ -382,7 +470,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   public void setEnabled(boolean b) {
     getTextComponent().setEnabled(b);
   }
-  
+
   public void setEditable(boolean b) {
     getTextComponent().setEditable(b);
   }
@@ -514,6 +602,8 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   public void setCaretAtTheTop() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "setCaretAtTheTop()");
+
     JTextComponent textComp = getTextComponent();
     boolean caretSet = false;
     try {
@@ -539,10 +629,14 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
         }
       }
     }
+
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
   public void clearMessageArea() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "clearMessageArea()");
     setContent("");
+    if (trace != null) trace.exit(MsgTypeArea.class);
   }
 
   public Component[] getPotentiallyHiddenComponents() {
