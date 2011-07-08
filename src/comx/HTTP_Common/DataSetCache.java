@@ -12,6 +12,8 @@
 
 package comx.HTTP_Common;
 
+import java.util.Iterator;
+
 /**
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
@@ -39,6 +41,10 @@ public class DataSetCache extends Object {
     cache = new OrderedFifo();
   }
 
+  /**
+   * Adds the DataSet and its entire chain, one-by-one, each one separately with its own sequence ID
+   * @param ds
+   */
   public synchronized void add(DataSet ds) {
     if (ds != null) {
       cache.add(ds, ds.sequenceId);
@@ -92,7 +98,7 @@ public class DataSetCache extends Object {
       moveToSend(sendFifo, newSequenceIdAvailable);
     }
   }
-  
+
   private synchronized void moveToSend(OrderedFifo sendFifo, long hiIdToExclude) {
     boolean isDebug = false;
     if (hiIdToExclude > -1) {
@@ -115,6 +121,7 @@ public class DataSetCache extends Object {
 
   private synchronized void removeConfirmed(long processedId) {
     if (processedId > -1) {
+      //System.out.println("confirmed "+processedId);
       while (cache.size() > 0 && ((DataSet) cache.peek()).sequenceId <= processedId) {
         DataSet ds = (DataSet) cache.remove();
       }
@@ -125,13 +132,34 @@ public class DataSetCache extends Object {
     return cache.size();
   }
 
+  public synchronized int sizeBytes() {
+    Iterator iter = cache.iterator();
+    int totalSize = 0;
+    while (iter.hasNext()) {
+      DataSet dataSet = (DataSet) iter.next();
+      if (dataSet.data != null)
+        totalSize += dataSet.data.length;
+    }
+    return totalSize;
+  }
+
   public static void setDSWatermarks(DataSet sendDS, SequenceFifo recvFifo) {
     sendDS.responseSequenceIdProcessed = recvFifo.getLastRemovedSequence();
-    if (sendDS.sequenceId % DataSet.RETRY_PACKET_BATCH_SIZE == 0) {
+    if (sendDS.batchId % DataSet.RETRY_PACKET_BATCH_SIZE == 0) {
       DataSet peekDS = (DataSet) recvFifo.peek();
       sendDS.responseSequenceIdAvailable = peekDS != null ? peekDS.sequenceId : -1;
     }
     //System.out.println("                  watermarks " + sendDS.responseSequenceIdProcessed + " " + sendDS.responseSequenceIdAvailable + " " + Thread.currentThread().getName());
+  }
+
+  public synchronized void trimToCount(int maxCount) {
+    while (size() > maxCount)
+      cache.remove();
+  }
+
+  public synchronized void trimToSize(int maxBytes) {
+    while (sizeBytes() > maxBytes)
+      cache.remove();
   }
 
 }

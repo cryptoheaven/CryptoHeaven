@@ -62,6 +62,8 @@ public class DataSet {
   public String remoteHostAddr;
   public int remoteHostPort; // 4 bytes used
   public byte[] data; // send or receive data buffer
+  
+  public transient long batchId = 0; // server cumulates replies into batches and uses this to help in watermark-retries decisions
 
   public ArrayList chain; // attached chain of DataSets
   public long responseSequenceIdProcessed = -1;
@@ -112,6 +114,34 @@ public class DataSet {
     this.connectionId = connectionId;
     this.sequenceId = sequenceId;
     this.data = data;
+  }
+
+  public int getApproximatePacketLength() {
+    int length = 8+1;
+    switch (action) {
+      case ACTION_CONNECT_RQ :
+        length += remoteHostAddr.length();
+        length += 4;
+        break;
+      case ACTION_CONNECT_RP :
+      case ACTION_DISCONNECT :
+      case ACTION_PING :
+      case ACTION_PONG :
+      case ACTION_SEND_RECV :
+      case ACTION_SEND_RECV_ASYNCH :
+      case ACTION_NOT_CONNECTED :
+        length += 4;
+        if (action == ACTION_CONNECT_RP || action == ACTION_NOT_CONNECTED)
+          break;
+        length += 4;
+        if (action == ACTION_DISCONNECT)
+          break;
+        length += 1 + (data != null ? 4+data.length : 0);
+        length += 8;
+        length += 8;
+        break;
+    }
+    return length;
   }
 
   public String toURLEncoded() throws IOException {

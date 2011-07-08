@@ -183,7 +183,9 @@ public class MultiPartFormOutputStream {
     out.writeBytes(boundary);
     out.writeBytes(NEWLINE);
     // write content header
-    out.writeBytes("Content-Disposition: form-data; name=\"" + name + "\"");
+    out.writeBytes("Content-Disposition: form-data; name=\"");
+    out.writeBytes(name);
+    out.writeBytes("\"");
     out.writeBytes(NEWLINE);
     out.writeBytes(NEWLINE);
     // write content
@@ -251,10 +253,15 @@ public class MultiPartFormOutputStream {
     out.writeBytes(boundary);
     out.writeBytes(NEWLINE);
     // write content header
-    out.writeBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + fileName + "\"");
+    out.writeBytes("Content-Disposition: form-data; name=\"");
+    out.writeBytes(name);
+    out.writeBytes("\"; filename=\"");
+    out.writeBytes(fileName);
+    out.writeBytes("\"");
     out.writeBytes(NEWLINE);
     if(mimeType != null) {
-      out.writeBytes("Content-Type: " + mimeType);
+      out.writeBytes("Content-Type: ");
+      out.writeBytes(mimeType);
       out.writeBytes(NEWLINE);
     }
     out.writeBytes(NEWLINE);
@@ -298,7 +305,11 @@ public class MultiPartFormOutputStream {
     out.writeBytes(boundary);
     out.writeBytes(NEWLINE);
     // write content header
-    out.writeBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + fileName + "\"");
+    out.writeBytes("Content-Disposition: form-data; name=\"");
+    out.writeBytes(name);
+    out.writeBytes("\"; filename=\"");
+    out.writeBytes(fileName);
+    out.writeBytes("\"");
     out.writeBytes(NEWLINE);
     if(mimeType != null) {
       out.writeBytes("Content-Type: " + mimeType);

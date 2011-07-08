@@ -19,9 +19,9 @@ import java.util.Iterator;
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
+ * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -29,7 +29,7 @@ import java.util.Iterator;
  *
  * <b>$Revision: 1.4 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class SequenceFifo extends Object {
 
@@ -89,7 +89,7 @@ public class SequenceFifo extends Object {
     return rc;
   }
 
-  /** 
+  /**
    * @return the next object in the fifo having the next "remove sequence" number, null if no Object in sequence exists.
    */
   public synchronized Object remove() {
