@@ -136,6 +136,13 @@ public abstract class BA extends Object {
     blockContent = null;
   }
 
+  public static boolean isEmptyOrZero(BA ba) {
+    return ba == null || ba.size() == 0 || (ba.size() == 1 && ba.toByteArray()[0] == (byte) 0x0);
+  }
+  public static byte[] makeZeroMarker() {
+    return new byte[] { 0x0 };
+  }
+
   public int size() {
     return blockContent.length;
   }
