@@ -198,6 +198,8 @@ public class MessageActionNameSwitch extends Object {
 
       // New File
       { new Integer(CommandCodes.FILE_Q_NEW_FILES), "Create File" },
+      // New File Intent
+      { new Integer(CommandCodes.FILE_Q_NEW_FILE_STUDS), "New File Intent" },
       // Get Files
       { new Integer(CommandCodes.FILE_Q_GET_FILES), "Get File Listing" },
       { new Integer(CommandCodes.FILE_Q_GET_FILES_STAGED), "Get File Listing" },
