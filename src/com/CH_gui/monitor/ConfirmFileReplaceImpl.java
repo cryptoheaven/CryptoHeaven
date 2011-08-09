@@ -12,22 +12,20 @@
 
 package com.CH_gui.monitor;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.border.*;
-import javax.swing.*;
-import java.io.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.util.*;
 
 import com.CH_co.monitor.ConfirmFileReplaceI;
 import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
-import com.CH_gui.gui.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+import javax.swing.border.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011

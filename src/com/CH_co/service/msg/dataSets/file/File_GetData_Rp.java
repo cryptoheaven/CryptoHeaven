@@ -15,7 +15,6 @@ package com.CH_co.service.msg.dataSets.file;
 
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.Misc;
 import com.CH_co.trace.Trace;
 

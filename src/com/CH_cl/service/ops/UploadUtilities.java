@@ -52,7 +52,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
   public static Class lastReplyClass = null;
 
-  public static final String PROPERTY_NAME__LOCAL_FILE_SOURCE_DIR = UploadUtilities.class.getName() + "_localFileSourceDir";
+  public static final String PROPERTY_NAME__LOCAL_FILE_SOURCE_DIR = "UploadUtilities_localFileSourceDir";
 
 
   /**
@@ -251,7 +251,9 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     Class replyClass = null;
 
     File_NewFiles_Rq request = new File_NewFiles_Rq();
-    MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_NEW_FILES, request);
+    //int actionCode = GlobalProperties.PROGRAM_BUILD_NUMBER >= 644 ? CommandCodes.FILE_Q_NEW_FILE_STUDS : CommandCodes.FILE_Q_NEW_FILES;
+    int actionCode = CommandCodes.FILE_Q_NEW_FILES;
+    MessageAction msgAction = new MessageAction(actionCode, request);
     replyClass = runUploadFileBunch(files, msgAction, request, shareRecord.getSymmetricKey(),
                                     shareRecord.shareId, new Short(Record.RECORD_TYPE_SHARE), isThreadedRun, SIL);
 
@@ -347,9 +349,9 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     }
 
     /**
-     * @return the type of a response, usefull to detect error replies.
+     * @return the type of a response, useful to detect error replies.
      */
-    public static Class nonThreadedRun(MessageAction msgActionToSend, File_NewFiles_Rq request, BASymmetricKey parentSymmetricKey, ServerInterfaceLayer SIL) {
+    public static Class nonThreadedRun(final MessageAction msgActionToSend, File_NewFiles_Rq request, BASymmetricKey parentSymmetricKey, ServerInterfaceLayer SIL) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadRunner.class, "nonThreadedRun()");
 
       Class replyClass = null;
@@ -371,13 +373,13 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
         FileDataRecord[] dataRecords = request.fileDataRecords;
 
         // create a list of file names
-        String[] fileNames = new String[linkRecords.length];
-        for (int i=0; i<fileNames.length; i++) {
-          fileNames[i] = linkRecords[i].getFileName();
+        File[] files = new File[dataRecords.length];
+        for (int i=0; i<files.length; i++) {
+          files[i] = dataRecords[i].getPlainDataFile();
         }
 
         if (!Misc.isAllGUIsuppressed()) {
-          ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferUp(fileNames);
+          ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferUp(files);
           ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionToSend.getStamp());
         }
 
@@ -393,8 +395,15 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
           KeyRecord keyrec = cache.getKeyRecordMyCurrent();
 
-          // seal the data with file's symmetric key
-          dataRecord.seal(keyrec, symmetricKey, ProgMonitorPool.getProgMonitor(msgActionToSend.getStamp()));
+          if (msgActionToSend.getActionCode() == CommandCodes.FILE_Q_NEW_FILE_STUDS) {
+            // For now we'll only provide the signer's key ID as a token to identify the authorized user
+            // for "filling-in" the data at a later time.
+            dataRecord.setSigningKeyId(keyrec.keyId);
+            dataRecord.setEncSize(new Long(-1));
+          } else {
+            // seal the data with file's symmetric key
+            dataRecord.seal(keyrec, symmetricKey, ProgMonitorPool.getProgMonitor(msgActionToSend.getStamp()));
+          }
         }
 
         ClientMessageAction replyMsgAction = SIL.submitAndFetchReply(msgActionToSend);

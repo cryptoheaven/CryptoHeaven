@@ -279,6 +279,7 @@ public class CommandCodes extends Object {
 
   // New File
   public static final int FILE_Q_NEW_FILES = 1800;
+  public static final int FILE_Q_NEW_FILE_STUDS = 1801;
   public static final int FILE_A_GET_FILES = 10800;
 
   // Get Files

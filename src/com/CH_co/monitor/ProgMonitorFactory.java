@@ -118,7 +118,7 @@ public class ProgMonitorFactory {
     return monitor;
   }
 
-  public static ProgMonitorI newInstanceTransferUp(String[] tasks) {
+  public static ProgMonitorI newInstanceTransferUp(File[] tasks) {
     ProgMonitorI monitor = null;
     if (implTransfer != null) {
       try {

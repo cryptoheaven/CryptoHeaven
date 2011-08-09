@@ -73,6 +73,7 @@ public class FileDataRecord extends Record {
   public OutputStream fileDest; // either DataOutputStream2 or FileOutputStream
 
   public static final String TEMP_ENCRYPTED_FILE_PREFIX = "ch-tmp-enc-";
+  public static final String TEMP_ENCRYPTED_FILE_STUD_PREFIX = "ch-stud-enc-";
   public static final String TEMP_PLAIN_FILE_PREFIX = "ch-tmp-pln-";
 
   /** Creates new FileDataRecord */
@@ -168,7 +169,7 @@ public class FileDataRecord extends Record {
       }
 
       // move data from the digest input stream to GZIP file output stream
-      FileUtils.moveDataEOF(dFileIn, gzipOut, progressMonitor); 
+      FileUtils.moveDataEOF(dFileIn, gzipOut, progressMonitor);
       // FileUtils.moveData(new DataInputStream(dFileIn), gzipOut, plainDataFileLength, progressMonitor);
 
       if (progressMonitor != null) {
@@ -321,6 +322,14 @@ public class FileDataRecord extends Record {
         GlobalProperties.addTempFileToCleanup(destinationFile);
       }
 
+      if (progressMonitor != null) {
+        progressMonitor.setCurrentStatus("Decrypting and Uncompressing File ...");
+        progressMonitor.setFileNameSource(getEncDataFile().getAbsolutePath());
+        progressMonitor.setFileNameDestination(destinationFile != null ? destinationFile.getAbsolutePath() : "");
+        progressMonitor.setTransferSize(originalSize.longValue());
+        progressMonitor.nextTask();
+      }
+
       if (destinationFile != null) {
 
         encFileIn = new FileInputStream(encDataFile);
@@ -342,14 +351,6 @@ public class FileDataRecord extends Record {
         BufferedOutputStream bufFileOut = new BufferedOutputStream(fileOut, 1024*32);
         DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, new SHA256());
         //DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, MessageDigest.getInstance("SHA-1"));
-
-        if (progressMonitor != null) {
-          progressMonitor.setCurrentStatus("Decrypting and Uncompressing File ...");
-          progressMonitor.setFileNameSource(getEncDataFile().getAbsolutePath());
-          progressMonitor.setFileNameDestination(destinationFile.getAbsolutePath());
-          progressMonitor.setTransferSize(originalSize.longValue());
-          progressMonitor.nextTask();
-        }
 
         // move data from the GZIP input to file output
         //FileUtils.moveDataEOF(gzipIn, dFileOut, progressMonitor); // <== bad because BlockCipherInputStream DOES NOT support EOF marker
@@ -508,16 +509,24 @@ public class FileDataRecord extends Record {
 
     try { 
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(symmetricKey);
-      BASymPlainBulk tempOrigDataDigest = symCipher.bulkDecrypt(encOrigDataDigest);
-      BASymPlainBulk tempSignedOrigDigest = symCipher.bulkDecrypt(encSignedOrigDigest);
-      BASymPlainBulk tempEncDataDigest = symCipher.bulkDecrypt(encEncDataDigest);
-
-      origDataDigest = new BADigestBlock(tempOrigDataDigest.toByteArray());
-      signedOrigDigest = new BAAsyCipherBlock(tempSignedOrigDigest.toByteArray());
-      encDataDigest = new BADigestBlock(tempEncDataDigest.toByteArray());
+      BASymPlainBulk tempOrigDataDigest = null;
+      if (!BA.isEmptyOrZero(encOrigDataDigest)) {
+        tempOrigDataDigest = symCipher.bulkDecrypt(encOrigDataDigest);
+        origDataDigest = new BADigestBlock(tempOrigDataDigest.toByteArray());
+      }
+      BASymPlainBulk tempSignedOrigDigest = null;
+      if (!BA.isEmptyOrZero(encSignedOrigDigest)) {
+        tempSignedOrigDigest = symCipher.bulkDecrypt(encSignedOrigDigest);
+        signedOrigDigest = new BAAsyCipherBlock(tempSignedOrigDigest.toByteArray());
+      }
+      BASymPlainBulk tempEncDataDigest = null;
+      if (!BA.isEmptyOrZero(encEncDataDigest)) {
+        tempEncDataDigest = symCipher.bulkDecrypt(encEncDataDigest);
+        encDataDigest = new BADigestBlock(tempEncDataDigest.toByteArray());
+      }
 
       // verify the plain data digest
-      if (verifyingKeyRecord != null) {
+      if (verifyingKeyRecord != null && signedOrigDigest != null) {
         BAAsyPlainBlock verifiedPlainDigest = signedOrigDigest.verifySignature(verifyingKeyRecord.plainPublicKey);
         if (trace != null) trace.data(60, "verifiedPlainDigest", ArrayUtils.toString(verifiedPlainDigest.toByteArray()));
         isVerifiedPlainDigest = verifiedPlainDigest.equals(origDataDigest);

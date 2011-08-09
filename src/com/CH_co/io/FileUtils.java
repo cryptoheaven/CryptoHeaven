@@ -12,11 +12,11 @@
 
 package com.CH_co.io;
 
-import java.io.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.monitor.*;
 import com.CH_co.util.*;
+
+import java.io.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -24,7 +24,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -32,7 +32,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.19 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileUtils extends Object {
 
@@ -43,6 +43,14 @@ public class FileUtils extends Object {
 
   public static long readFileLength(DataInputStream in) throws IOException {
     return in.readLong();
+  }
+
+  public static void writePartLength(DataOutputStream out, int filePartLength) throws IOException {
+    out.writeInt(filePartLength);
+  }
+
+  public static int readPartLength(DataInputStream in) throws IOException {
+    return in.readInt();
   }
 
   /**
@@ -114,11 +122,11 @@ public class FileUtils extends Object {
 
 
   /**
-   * Serializes the contents of specified file into an output stream 
+   * Serializes the contents of specified file into an output stream
    * without closing the output stream.
    */
   public static void serializeFile(File file, DataOutputStream2 out, ProgMonitorI progressMonitor) throws IOException {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "serializeFile(File, DataOutputStream)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "serializeFile(File file, DataOutputStream2 out, ProgMonitorI progressMonitor");
 
     // check file argument for null
     if (file == null) throw new IllegalArgumentException("File argument cannot be null.");
@@ -191,46 +199,6 @@ public class FileUtils extends Object {
   }
 
 
-
-  /**
-   * Reads bytes from input stream until EOF and writes them to a newly created file.
-   * If the originally written file had 0 bytes, a new File will be created with 0 bytes.
-   */
-  public static File streamToFile(String newFilePrefix, InputStream in, ProgMonitorI progressMonitor) throws IOException {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "streamToFile(String, DataInputStream)");
-    if (trace != null) trace.args(newFilePrefix);
-
-    File tempFile = null;
-    FileOutputStream fileOut = null;
-
-    try {
-      tempFile = File.createTempFile(newFilePrefix, null);
-      fileOut = new FileOutputStream(tempFile);
-
-      moveDataEOF(in, fileOut, progressMonitor);
-
-      fileOut.close();
-    } catch (IOException ioEx) {
-      if (trace != null) trace.exception(FileUtils.class, 100, ioEx);
-
-      try {
-        if (fileOut != null)
-          fileOut.close();
-      } catch (Throwable th) { }
-      try {
-        if (tempFile != null)
-          CleanupAgent.wipeOrDelete(tempFile);
-      } catch (Throwable th) { }
-
-      throw ioEx;
-    }
-
-    if (trace != null) trace.exit(FileUtils.class);
-    return tempFile;
-  }
-
-
-
   /**
    * Moves specified number of bytes from an InputStream to an OutputStream.
    * Flushes the output stream and does not close any of the streams.
@@ -239,7 +207,7 @@ public class FileUtils extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, OutputStream, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
-    // 32 Kb at a time
+    // 4 KB at a time
     byte[] buf = new byte[1024*4];
 
     // number of full turns
@@ -269,11 +237,12 @@ public class FileUtils extends Object {
     out.flush();
     if (trace != null) trace.exit(FileUtils.class);
   }
+
   public static void moveData(DataInputStream in, DataOutput out, long dataLength, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, DataOutput, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
-    // 32 Kb at a time
+    // 4 KB at a time
     byte[] buf = new byte[1024*4];
 
     // number of full turns
@@ -310,7 +279,7 @@ public class FileUtils extends Object {
   public static void moveDataEOF(InputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(InputStream, OutputStream, ProgMonitor progressMonitor)");
 
-     // 32 Kb at a time
+     // 4 KB at a time
     byte[] buf = new byte[1024*4];
     int bytesRead = 0;
 
@@ -321,10 +290,10 @@ public class FileUtils extends Object {
       if (bytesRead > 0) {
         // not EOF
         // This can be a long operation, yield to others
-        Thread.yield(); Thread.yield(); Thread.yield();
+        Thread.yield();
         out.write(buf, 0, bytesRead);
 
-        if (progressMonitor != null) 
+        if (progressMonitor != null)
           progressMonitor.addBytes(bytesRead);
       }
     } // end while
@@ -340,7 +309,7 @@ public class FileUtils extends Object {
   public static void moveDataEOF(Reader in, Writer out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(Reader, Writer, ProgMonitor progressMonitor)");
 
-     // 32 Kb at a time
+     // 4 KB at a time
     char[] buf = new char[1024*4];
     int charsRead = 0;
 
@@ -354,8 +323,50 @@ public class FileUtils extends Object {
         Thread.yield(); Thread.yield(); Thread.yield();
         out.write(buf, 0, charsRead);
 
-        if (progressMonitor != null) 
+        if (progressMonitor != null)
           progressMonitor.addBytes(charsRead);
+      }
+    } // end while
+    out.flush();
+    if (trace != null) trace.exit(FileUtils.class);
+  }
+
+  /**
+   * Moves bytes from an InputStream to an OutputStream until EOF is reached.
+   * Moves bytes in batches as data becomes available.
+   * Flushes the output stream and does not close any of the streams.
+   */
+  public static void moveDataStreamEOF(File fileIn, InputStream in, DataOutputStream out, ProgMonitorI progressMonitor) throws IOException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataStreamEOF(File, InputStream, DataOutputStream, ProgMonitor progressMonitor)");
+
+     // 4 KB at a time
+    byte[] buf = new byte[1024*4];
+    int bytesRead = 0;
+    long totalRead = 0;
+
+    // while not EOF
+    while (bytesRead != -1) {
+      bytesRead = in.read(buf);
+      if (bytesRead > 0) {
+        totalRead += bytesRead;
+        // fileIn maybe growing as we are transfering data from it..., adjust the progress monitor to current value of file size
+        if (progressMonitor != null) {
+          long fileLength = fileIn.length();
+          System.out.println("fileLength="+fileLength);
+          progressMonitor.updateTransferSize(fileLength);
+        }
+        // not EOF
+        // This can be a long operation, yield to others
+        Thread.yield();
+        writePartLength(out, bytesRead);
+        System.out.println("bytesRead="+bytesRead+", total="+totalRead);
+        out.write(buf, 0, bytesRead);
+        if (progressMonitor != null)
+          progressMonitor.addBytes(bytesRead);
+      }
+      // properly terminate the stream to release the reader
+      if (bytesRead == -1) {
+        writePartLength(out, -1);
       }
     } // end while
     out.flush();

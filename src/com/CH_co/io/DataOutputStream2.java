@@ -12,13 +12,13 @@
 
 package com.CH_co.io;
 
-import java.io.*;
-import java.util.Date;
-import java.sql.Timestamp;
-
-import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.cryptx.BA;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.util.Misc;
+
+import java.io.*;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -180,4 +180,14 @@ public class DataOutputStream2 extends DataOutputStream {
     }
     FileUtils.moveData(fileIn, (OutputStream) this, partLength, null);
   }
+
+  public void writeFileStream(File file, InputStream in, ProgMonitorI progressMonitor) throws IOException {
+    byte nullIndicator = (byte) ((file != null) ? 0 : -1);
+    writeByte(nullIndicator);
+
+    // final file size is unknown as it maybe appended during transfer, will send continuous stream in pieces
+    if (nullIndicator == 0)
+      FileUtils.moveDataStreamEOF(file, in, (DataOutputStream) this, progressMonitor);
+  }
+
 }

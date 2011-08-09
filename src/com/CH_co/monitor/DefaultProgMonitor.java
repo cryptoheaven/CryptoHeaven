@@ -315,8 +315,20 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(DefaultProgMonitor.class);
   }
+  public long getTransferred() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "getTransferred()");
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(DefaultProgMonitor.class, -1);
+    return -1;
+  }
   public void setTransferSize(long size) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "setTransferSize(long size)");
+    if (trace != null) trace.args(size);
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(DefaultProgMonitor.class);
+  }
+  public void updateTransferSize(long size) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "updateTransferSize(long size)");
     if (trace != null) trace.args(size);
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(DefaultProgMonitor.class);

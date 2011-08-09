@@ -530,14 +530,27 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     jNotes[2].setText(fileName);
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
+  public long getTransferred() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "getTransferred()");
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class, totalBytes);
+    return totalBytes;
+  }
   public void setTransferSize(long size) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setTransferSize(long size)");
     if (trace != null) trace.args(size);
     if (trace != null) trace.data(10, name);
     jProgressBar.setMinimum(0);
     jProgressBar.setMaximum((int) (size/100));
-
     resetStats(size);
+    updateStats(System.currentTimeMillis(), 5);
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
+  }
+  public void updateTransferSize(long size) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "updateTransferSize(long size)");
+    if (trace != null) trace.args(size);
+    if (trace != null) trace.data(10, name);
+    jProgressBar.setMaximum((int) (size/100));
     updateStats(System.currentTimeMillis(), 5);
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }

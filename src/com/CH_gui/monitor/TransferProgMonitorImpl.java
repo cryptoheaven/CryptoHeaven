@@ -12,14 +12,8 @@
 
 package com.CH_gui.monitor;
 
-import javax.swing.*;
-
-import java.awt.event.*;
-import java.awt.*;
-import java.io.*;
-import java.util.LinkedList;
-
 import com.CH_cl.service.cache.*;
+import com.CH_cl.service.ops.DownloadUtilities;
 
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.MessageActionNameSwitch;
@@ -30,13 +24,20 @@ import com.CH_co.util.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.util.*;
 
+import java.awt.event.*;
+import java.awt.*;
+import java.io.*;
+import java.util.LinkedList;
+
+import javax.swing.*;
+
 /** 
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -44,16 +45,24 @@ import com.CH_gui.util.*;
  *
  * <b>$Revision: 1.20 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public final class TransferProgMonitorImpl extends JFrame implements ProgMonitorTransferI {
+
+  private static boolean ENABLE_NOTE_FROM = false;
+  private static boolean ENABLE_NOTE_TO = false;
+
+  private static int NOTE_FROM_INDEX = 1;
+  private static int NOTE_TO_INDEX = 2;
 
   private String title;
 
   private JLabel jImageLabel;
 
+  private Object[] tasks;
   private JCheckBox[] jCheckTasks;
-  private JLabel jStatus;
+  private JLabel jStatus1;
+  private JLabel jStatus2;
   private JProgressBar jProgressBar;
   private JLabel[] jNoteHeadings;
   private JLabel[] jNotes;
@@ -91,7 +100,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
   }
 
   /** Initialized new TransferProgMonitorImpl */
-  private void init(String title, String[] tasks, String[] noteHeadings, String[] notes,
+  private void init(String title, Object[] tasks, String[] noteHeadings, String[] notes,
                int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)
   {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "init(String title, String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax, int monitoringType, boolean suppressTransferSoundsAndAutoClose)");
@@ -113,6 +122,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
 
 
     this.title = title;
+    this.tasks = tasks;
     this.monitoringType = monitoringType;
     this.suppressTransferSoundsAndAutoClose = suppressTransferSoundsAndAutoClose;
 
@@ -132,9 +142,9 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     pack();
     // make it a bit wider
     Dimension prefDim = getPreferredSize();
-    setSize(prefDim.width + 260, prefDim.height + 20);
+    setSize(prefDim.width + 150, prefDim.height + 20);
     setLocation(MiscGui.getSuggestedSpreadedWindowLocation(this));
-    
+
     // delay visibility of this frame in case it will close super fast
     Thread th = new ThreadTraced("Delayed Visibility of TransferProgMonitor") {
       public void runTraced() {
@@ -153,7 +163,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
   }
 
 
-  /** 
+  /**
    * File Download/Open
    */
   public void init(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose) {
@@ -162,7 +172,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(isDownload);
     if (trace != null) trace.args(suppressTransferSoundsAndAutoClose);
     init(isDownload ? "File Download" : "File Open", tasks,
-              new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" }, 
+              new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" },
               new String[] { " ... ", " ... ", " ... ", " ... " },
               0, 100, isDownload ? MONITORING_DOWNLOAD : MONITORING_OPEN, suppressTransferSoundsAndAutoClose
               );
@@ -171,17 +181,21 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
-  /** 
+  /**
    * File Upload
    */
-  public void init(String[] tasks) {
+  public void init(File[] tasks) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "init(String[] tasks)");
     if (trace != null) trace.args(tasks);
     init("File Upload", tasks,
-              new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" }, 
+              new String[] { "Estimated Time:", "From:", "To:", "Transfer Rate:" },
               new String[] { " ... ", " ... ", " ... ", " ... " },
               0, 100, MONITORING_UPLOAD, false
               );
+    if (tasks != null && tasks.length > 0) {
+      jStatus2.setText(tasks[0].getAbsolutePath());
+      jStatus2.setVisible(true);
+    }
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
@@ -189,6 +203,10 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
   public void setDestinationDir(File destDir) {
     this.destDir = destDir;
     jOpenFolderButton.setEnabled(destDir != null);
+    if (destDir != null && !destDir.equals(DownloadUtilities.getDefaultTempDir())) {
+      jStatus2.setText(destDir.getAbsolutePath());
+      jStatus2.setVisible(true);
+    }
   }
 
 
@@ -197,7 +215,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
   }
 
 
-  private void initPanelComponents(String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax) {
+  private void initPanelComponents(Object[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "initPanelComponents(String[] tasks, String[] noteHeadings, String[] notes, int initProgBarMin, int initProgBarMax)");
     if (trace != null) trace.args(tasks, noteHeadings, notes);
     if (trace != null) trace.args(initProgBarMin);
@@ -213,13 +231,16 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
 
     jCheckTasks = new JCheckBox[tasks.length];
     for (int i=0; i < tasks.length; i++) {
-      jCheckTasks[i] = new JMyCheckBox(tasks[i]);
+      String task = tasks[i] instanceof File ? ((File) tasks[i]).getName() : tasks[i].toString();
+      jCheckTasks[i] = new JMyCheckBox(task);
       MiscGui.setPlainFont(jCheckTasks[i]);
       jCheckTasks[i].setEnabled(false);
       jCheckTasks[i].setSelected(false);
     }
 
-    jStatus = new JMyLabel("Status:");
+    jStatus1 = new JMyLabel("Status:");
+    jStatus2 = new JMyLabel("");
+    jStatus2.setVisible(false);
 
     jProgressBar = new JProgressBar();
     jProgressBar.setMinimum(initProgBarMin);
@@ -229,11 +250,15 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     for (int i=0; i<noteHeadings.length; i++) {
       jNoteHeadings[i] = new JMyLabel(noteHeadings[i]);
     }
+    jNoteHeadings[NOTE_FROM_INDEX].setVisible(ENABLE_NOTE_FROM);
+    jNoteHeadings[NOTE_TO_INDEX].setVisible(ENABLE_NOTE_TO);
 
     jNotes = new JLabel[notes.length];
     for (int i=0; i<notes.length; i++) {
       jNotes[i] = new JMyLabel(notes[i]);
     }
+    jNotes[NOTE_FROM_INDEX].setVisible(ENABLE_NOTE_FROM);
+    jNotes[NOTE_TO_INDEX].setVisible(ENABLE_NOTE_TO);
 
     if (monitoringType != MONITORING_OPEN && !suppressTransferSoundsAndAutoClose) {
       if (monitoringType == MONITORING_UPLOAD) {
@@ -328,7 +353,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     panel.setLayout(new GridBagLayout());
 
     Insets insetFive = new MyInsets(5, 5, 5, 5);
-    Insets insetNote = new MyInsets(0, 5, 0, 5);
+    Insets insetNote = new MyInsets(2, 5, 2, 5);
 
     /* Add all tasks as check boxes */
     int index = 0;
@@ -342,12 +367,12 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     }
 
     for ( ; index < jCheckTasks.length; index++) {
-      panel.add(jCheckTasks[index], new GridBagConstraints(gridX, index, gridWidth, 1, 10, 0, 
+      panel.add(jCheckTasks[index], new GridBagConstraints(gridX, index, gridWidth, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     }
 
     /*
-    panel.add(createCheckPane(), new GridBagConstraints(gridX, index, gridWidth, 1, 10, 10, 
+    panel.add(createCheckPane(), new GridBagConstraints(gridX, index, gridWidth, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, insetNote, 0, 0));
     */
 
@@ -356,16 +381,20 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
 
     // insert icon
     if (jImageLabel != null) {
-      panel.add(jImageLabel, new GridBagConstraints(0, 0, 1, index, 0, 0, 
+      panel.add(jImageLabel, new GridBagConstraints(0, 0, 1, index, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     }
 
     /* Add other info such as time left, transfer rate, ... */
-    panel.add(jStatus, new GridBagConstraints(0, index, 2, 1, 10, 0, 
-        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
+    panel.add(jStatus1, new GridBagConstraints(0, index, 2, 1, 10, 0,
+        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     index ++;
 
-    panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+    panel.add(jStatus2, new GridBagConstraints(0, index, 2, 1, 10, 0,
+        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
+    index ++;
+
+    panel.add(jProgressBar, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
     index++;
 
@@ -375,23 +404,23 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
       if (jNotes[k].getText().length() == 0)
         hSpaces = 2;
 
-      panel.add(jNoteHeadings[k], new GridBagConstraints(0, index+k, hSpaces, 1, 0, 0, 
+      panel.add(jNoteHeadings[k], new GridBagConstraints(0, index+k, hSpaces, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     }
     for (m=0; m<jNotes.length; m++) {
-      panel.add(jNotes[m], new GridBagConstraints(1, index+m, 1, 1, 10, 0, 
+      panel.add(jNotes[m], new GridBagConstraints(1, index+m, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetNote, 0, 0));
     }
-    index += k > m ? k : m; 
+    index += k > m ? k : m;
 
     if (jCloseOnDone != null) {
-      panel.add(jCloseOnDone, new GridBagConstraints(0, index, 2, 1, 10, 0, 
+      panel.add(jCloseOnDone, new GridBagConstraints(0, index, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insetFive, 0, 0));
       index ++;
     }
 
     // filler
-    panel.add(new JMyLabel(), new GridBagConstraints(0, index, 2, 1, 10, 10, 
+    panel.add(new JMyLabel(), new GridBagConstraints(0, index, 2, 1, 10, 10,
       GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
 
     return panel;
@@ -638,7 +667,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setCurrentStatus(String currentStatus)");
     if (trace != null) trace.args(currentStatus);
     if (trace != null) trace.data(10, name);
-    jStatus.setText(currentStatus);
+    jStatus1.setText(currentStatus);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void setFileNameSource(String fileName) {
@@ -655,14 +684,27 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     jNotes[2].setText(fileName);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
+  public long getTransferred() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "getTransferred()");
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class, totalBytes);
+    return totalBytes;
+  }
   public void setTransferSize(long size) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setTransferSize(long size)");
     if (trace != null) trace.args(size);
     if (trace != null) trace.data(10, name);
     jProgressBar.setMinimum(0);
     jProgressBar.setMaximum((int) (size/100));
-
     resetStats(size);
+    updateStats(System.currentTimeMillis(), 5);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
+  }
+  public void updateTransferSize(long size) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "updateTransferSize(long size)");
+    if (trace != null) trace.args(size);
+    if (trace != null) trace.data(10, name);
+    jProgressBar.setMaximum((int) (size/100));
     updateStats(System.currentTimeMillis(), 5);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
@@ -702,11 +744,17 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     else {
       if (monitoringType == MONITORING_UPLOAD)
         jImageLabel.setIcon(Images.get(ImageNums.ANIM_TRANSFER));
-      else if (monitoringType == MONITORING_DOWNLOAD || monitoringType == MONITORING_OPEN) 
+      else if (monitoringType == MONITORING_DOWNLOAD || monitoringType == MONITORING_OPEN)
         jImageLabel.setIcon(Images.get(ImageNums.ANIM_LOCK));
 
       currentTask = -1;
       nextTask();
+    }
+    if (monitoringType == MONITORING_DOWNLOAD && destDir != null && !destDir.equals(DownloadUtilities.getDefaultTempDir()) && jStatus2.isVisible()) {
+      jStatus2.setText(destDir.getAbsolutePath() + File.separator + jCheckTasks[currentTask].getText());
+    }
+    if (monitoringType == MONITORING_UPLOAD && jStatus2.isVisible()) {
+      jStatus2.setText(((File) tasks[currentTask]).getAbsolutePath());
     }
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   } // end nextTask()

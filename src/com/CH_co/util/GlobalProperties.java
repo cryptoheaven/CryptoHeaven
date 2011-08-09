@@ -238,13 +238,16 @@ public class GlobalProperties extends Object {
   // build 636 Email delivery fix for "Delivered-To:" envelope change, fix background checker sometimes messy zig-zag underlines
   // build 638 Message list and File list fetching returns "anySkippedOver" flag
   // build 640 FolderTreeModel(s) and FolderTreeNode(s) cleanup
+  // build 640 HTTP Socket overhaul to try eliminating the memory leak
+  // build 642 File upload/download transfer progress upgrades
+//  // build 644 File data transfer overhaul to allow interrupted transfers to resume and concurrent downloads of uploads in progress.
 
-  public static final short PROGRAM_BUILD_NUMBER = 640;  // even
-  public static final boolean IS_BETA = true;
+  public static final short PROGRAM_BUILD_NUMBER = 642;  // even
+  public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.4f;
-  public static final short PROGRAM_VERSION_MINOR = 5;
+  public static final short PROGRAM_VERSION_MINOR = 6;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

@@ -27,7 +27,7 @@ import java.io.IOException;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -35,18 +35,20 @@ import java.io.IOException;
  *
  * <b>$Revision: 1.9 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class File_NewFiles_Rq extends ProtocolMsgDataSet {
 
-  // <numberOfFiles> { 
+  // <isFileStudRequest>
+  // <numberOfFiles> {
   //    <ownerObjId> <ownerObjType> <encFileType> <encFileName> <encFileDesc> <encSymmetricKey> <origSize> <status>
-  //    <encOrigDataDigest> <encSignedOrigDigest> <encEncDataDigest> <signingKeyId> <encSize> <encDataFile> 
+  //    <encOrigDataDigest> <encSignedOrigDigest> <encEncDataDigest> <signingKeyId> <encSize> <encDataFile>
   //    }+
 
   // owner object types are defined in com.CH_co.service.records.Record
   public FileLinkRecord[] fileLinks;
   public FileDataRecord[] fileDataRecords;
+  public boolean isFileStudRequest;
 
   /** Creates new File_NewFiles_Rq */
   public File_NewFiles_Rq() {
@@ -65,8 +67,14 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
       progressMonitor.setCurrentStatus("New File(s) Request ...");
       dataOut.write(1);
 
+      if (clientBuild >= 644 && serverBuild >= 644) {
+        isFileStudRequest = fileDataRecords.length > 0
+                && fileDataRecords[0].getEncSize() != null
+                && fileDataRecords[0].getEncSize().longValue() == -1;
+        dataOut.writeBoolean(isFileStudRequest);
+      }
       int length = fileLinks.length;
-      
+
       // check if both arrays have the same number of elements
       if (length != fileDataRecords.length)
         throw new IllegalArgumentException("Arrays are of different length.");
@@ -90,7 +98,7 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
         dataOut.writeBytes(fileDataRecords[i].getEncEncDataDigest());
         dataOut.writeLongObj(fileDataRecords[i].getSigningKeyId());
         dataOut.writeLongObj(fileDataRecords[i].getEncSize());
-        dataOut.writeFile(fileDataRecords[i].getEncDataFile(), progressMonitor);
+        dataOut.writeFile(isFileStudRequest ? null : fileDataRecords[i].getEncDataFile(), progressMonitor);
       }
     }
 
@@ -107,40 +115,26 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
       fileDataRecords = new FileDataRecord[0];
     }
     else {
+      if (clientBuild >= 644 && serverBuild >= 644)
+        isFileStudRequest = dataIn.readBoolean();
       short numOfElements = dataIn.readShort();
-      
+
       fileLinks = new FileLinkRecord[numOfElements];
       fileDataRecords = new FileDataRecord[numOfElements];
-/*
-      for (int i=0; i<numOfElements; i++) {
-        
-        // read in the file link variables
-        fileLinks[i] = new FileLinkRecord();
-        fileLinks[i].ownerObjId = dataIn.readLongObj();
-        fileLinks[i].ownerObjType = dataIn.readSmallint();
-        fileLinks[i].setEncFileType(new BASymCipherBulk(dataIn.readBytes()));
-        fileLinks[i].setEncFileName(new BASymCipherBulk(dataIn.readBytes()));
-        fileLinks[i].setEncSymmetricKey(new BASymCipherBulk(dataIn.readBytes()));
-        fileLinks[i].origSize = dataIn.readLongObj();
-        if (clientBuild >= 580 && serverBuild >= 580)
-          fileLinks[i].status = dataIn.readSmallint();
 
-        // read in the file data record variables
-        fileDataRecords[i] = new FileDataRecord();
-        fileDataRecords[i].setOrigDataDigest(new BADigestBlock(dataIn.readBytes()));
-        fileDataRecords[i].setSignedOrigDigest(new BAAsyCipherBlock(dataIn.readBytes()));
-        fileDataRecords[i].setEncDataDigest(new BADigestBlock(dataIn.readBytes()));
-        fileDataRecords[i].setSignedEncDigest(new BAAsyCipherBlock(dataIn.readBytes()));
-        fileDataRecords[i].setSigningKeyId(dataIn.readLongObj());
-        fileDataRecords[i].setEncSize(dataIn.readLongObj());
-        fileDataRecords[i].setEncDataFile(dataIn.readFile(progressMonitor));
+      // If we are reading a stud, read the entire packet right away,
+      // there will be no streaming parts to read in later.. nullifies the source stream.
+      if (isFileStudRequest) {
+        for (int i=0; i<fileLinks.length; i++) {
+          partialInitFromStream(dataIn, i, clientBuild, serverBuild);
+          fileDataRecords[i].fileSource = null;
+        }
       }
-*/
     }
     if (trace != null) trace.exit(File_NewFiles_Rq.class);
   } // end initFromStream()
 
-  
+
   /** Initializes 'this' object from a stream. */
   public void partialInitFromStream(DataInputStream2 dataIn, int index, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(File_NewFiles_Rq.class, "partialInitFromStream(DataInputStream2 dataIn, int index, short clientBuild, short serverBuild)");
@@ -177,6 +171,10 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
     return "[File_NewFiles_Rq"
       + ": fileLinks=" + Misc.objToStr(fileLinks)
       + ": fileDataRecords=" + Misc.objToStr(fileDataRecords)
+      + ": isFileStudRequest=" + (fileDataRecords != null
+                                && fileDataRecords.length > 0
+                                && fileDataRecords[0].getEncSize() != null
+                                && fileDataRecords[0].getEncSize().longValue() == -1)
       + "]";
   }
 

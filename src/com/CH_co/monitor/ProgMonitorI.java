@@ -18,7 +18,7 @@ package com.CH_co.monitor;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -26,7 +26,7 @@ package com.CH_co.monitor;
  *
  * <b>$Revision: 1.13 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public interface ProgMonitorI {
 
@@ -60,13 +60,15 @@ public interface ProgMonitorI {
   public void setFileNameSource(String fileName);
   public void setFileNameDestination(String fileName);
 
+  public long getTransferred();
   public void setTransferSize(long size);
+  public void updateTransferSize(long size);
   public void addBytes(long bytes);
   public void doneTransfer();
 
   public void nextTask(String task);
   public void appendLine(String info);
-  
+
   public void nextTask();
   public void allDone();
   public void jobKilled();

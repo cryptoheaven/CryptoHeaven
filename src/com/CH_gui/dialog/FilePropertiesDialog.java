@@ -549,12 +549,16 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
             }
           }
 
-          //long size = fileData.getEncSize().longValue();
-          long size = fileData.recordSize.longValue();
-          String oSize = Misc.getFormattedSize(size, 3, 2);
-          if (size >= 1000)
-            oSize += " (" + Misc.getFormattedSize(size, 10, 10) + ")";
-          jSizeOnDisk.setText(oSize);
+          long encSize = fileData.getEncSize().longValue();
+          if (encSize < 0) {
+            jSizeOnDisk.setText("Upload incomplete.");
+          } else {
+            long recSize = fileData.recordSize.longValue();
+            String oSize = Misc.getFormattedSize(recSize, 3, 2);
+            if (recSize >= 1000)
+              oSize += " (" + Misc.getFormattedSize(recSize, 10, 10) + ")";
+            jSizeOnDisk.setText(oSize);
+          }
           jDataCreated.setText(Misc.getFormattedTimestamp(fileData.fileCreated));
           jDataUpdated.setText(Misc.getFormattedTimestamp(fileData.fileUpdated));
 
@@ -586,8 +590,14 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
             jVerifyOK.setIcon(Images.get(ImageNums.PRIORITY_HIGH_SMALL));
           }
 
-          jDataOriginalDigest.setText(fileData.getOrigDataDigest().getHexContent());
-          jDataEncryptedDigest.setText(fileData.getEncDataDigest().getHexContent());
+          if (fileData.getOrigDataDigest() != null)
+            jDataOriginalDigest.setText(fileData.getOrigDataDigest().getHexContent());
+          else
+            jDataOriginalDigest.setText("Digest not available while file upload is incomplete.");
+          if (fileData.getEncDataDigest() != null)
+            jDataEncryptedDigest.setText(fileData.getEncDataDigest().getHexContent());
+          else
+            jDataEncryptedDigest.setText("Digest not available while file upload is incomplete.");
         }
       }
     };

@@ -261,7 +261,12 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
   }
   public void setFileNameDestination(String fileName) {
   }
+  public long getTransferred() {
+    return -1;
+  }
   public void setTransferSize(long size) {
+  }
+  public void updateTransferSize(long size) {
   }
   public void addBytes(long bytes) {
   }

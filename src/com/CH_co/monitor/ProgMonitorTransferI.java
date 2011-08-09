@@ -36,6 +36,6 @@ public interface ProgMonitorTransferI extends ProgMonitorI {
   /**
    * File Upload
    */
-  public void init(String[] tasks);
+  public void init(File[] tasks);
 
 }
