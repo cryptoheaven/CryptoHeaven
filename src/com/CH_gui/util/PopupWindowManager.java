@@ -66,7 +66,7 @@ public class PopupWindowManager extends Object {
 
         String body = null;
         if (msgData.isHtml()) {
-          body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true);
+          body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true, true);
         } else {
           body = msgData.getEncodedHTMLData();
         }

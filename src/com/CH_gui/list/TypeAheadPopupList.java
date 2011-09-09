@@ -12,6 +12,9 @@
 
 package com.CH_gui.list;
 
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -19,9 +22,6 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
-
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -150,7 +150,7 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
           }
         }
       });
-      list.setCellRenderer(new ListRenderer(false, true, true, this));
+      list.setCellRenderer(new ListRenderer(false, true, true, false, this));
       fullListModel = new DefaultListModel();
       for (int i=0; i<objs.length; i++)
         fullListModel.addElement(objs[i]);

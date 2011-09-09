@@ -82,7 +82,12 @@ public class FileUtils extends Object {
       progressMonitor.setTransferSize(dataLength);
       progressMonitor.nextTask();
 
-      moveData(in, fileOut, dataLength, progressMonitor);
+      if (dataLength == -1) {
+        // use streaming new way of transfer without prior knowledge of final length;
+        readDataStreamEOF(in, fileOut, progressMonitor);
+      } else {
+        moveData(in, fileOut, dataLength, progressMonitor);
+      }
 
       progressMonitor.doneTransfer();
 
@@ -207,8 +212,8 @@ public class FileUtils extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, OutputStream, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
-    // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 8 KB at a time
+    byte[] buf = new byte[1024*8];
 
     // number of full turns
     long fullTurns = dataLength / buf.length;
@@ -218,7 +223,7 @@ public class FileUtils extends Object {
     for (int i=0; i<fullTurns; i++) {
       in.readFully(buf);
       // This can be a long operation, yield to others
-      Thread.yield(); Thread.yield(); Thread.yield();
+      Thread.yield();
       out.write(buf);
 
       if (progressMonitor != null)
@@ -227,7 +232,7 @@ public class FileUtils extends Object {
     if (remainder > 0) {
       in.readFully(buf, 0, remainder);
       // This can be a long operation, yield to others
-      Thread.yield(); Thread.yield(); Thread.yield();
+      Thread.yield();
       out.write(buf, 0, remainder);
 
       if (progressMonitor != null)
@@ -242,8 +247,8 @@ public class FileUtils extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, DataOutput, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
-    // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 8 KB at a time
+    byte[] buf = new byte[1024*8];
 
     // number of full turns
     long fullTurns = dataLength / buf.length;
@@ -253,7 +258,7 @@ public class FileUtils extends Object {
     for (int i=0; i<fullTurns; i++) {
       in.readFully(buf);
       // This can be a long operation, yield to others
-      Thread.yield(); Thread.yield(); Thread.yield();
+      Thread.yield();
       out.write(buf);
 
       if (progressMonitor != null)
@@ -262,7 +267,7 @@ public class FileUtils extends Object {
     if (remainder > 0) {
       in.readFully(buf, 0, remainder);
       // This can be a long operation, yield to others
-      Thread.yield(); Thread.yield(); Thread.yield();
+      Thread.yield();
       out.write(buf, 0, remainder);
 
       if (progressMonitor != null)
@@ -279,8 +284,8 @@ public class FileUtils extends Object {
   public static void moveDataEOF(InputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(InputStream, OutputStream, ProgMonitor progressMonitor)");
 
-     // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 8 KB at a time
+    byte[] buf = new byte[1024*8];
     int bytesRead = 0;
 
     // while not EOF
@@ -295,9 +300,13 @@ public class FileUtils extends Object {
 
         if (progressMonitor != null)
           progressMonitor.addBytes(bytesRead);
+      } else if (bytesRead == 0) {
+        // not EOF and no bytes?? wait a little
+        try { Thread.sleep(1); } catch (InterruptedException e) { }
       }
     } // end while
     out.flush();
+
     if (trace != null) trace.exit(FileUtils.class);
   }
 
@@ -309,8 +318,8 @@ public class FileUtils extends Object {
   public static void moveDataEOF(Reader in, Writer out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(Reader, Writer, ProgMonitor progressMonitor)");
 
-     // 4 KB at a time
-    char[] buf = new char[1024*4];
+    // 8 KB at a time
+    char[] buf = new char[1024*8];
     int charsRead = 0;
 
     // while not EOF
@@ -320,11 +329,14 @@ public class FileUtils extends Object {
       if (charsRead > 0) {
         // not EOF
         // This can be a long operation, yield to others
-        Thread.yield(); Thread.yield(); Thread.yield();
+        Thread.yield();
         out.write(buf, 0, charsRead);
 
         if (progressMonitor != null)
           progressMonitor.addBytes(charsRead);
+      } else if (charsRead == 0) {
+        // not EOF and no bytes?? wait a little
+        try { Thread.sleep(1); } catch (InterruptedException e) { }
       }
     } // end while
     out.flush();
@@ -339,8 +351,8 @@ public class FileUtils extends Object {
   public static void moveDataStreamEOF(File fileIn, InputStream in, DataOutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataStreamEOF(File, InputStream, DataOutputStream, ProgMonitor progressMonitor)");
 
-     // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 8 KB at a time
+    byte[] buf = new byte[1024*8];
     int bytesRead = 0;
     long totalRead = 0;
 
@@ -352,17 +364,18 @@ public class FileUtils extends Object {
         // fileIn maybe growing as we are transfering data from it..., adjust the progress monitor to current value of file size
         if (progressMonitor != null) {
           long fileLength = fileIn.length();
-          System.out.println("fileLength="+fileLength);
           progressMonitor.updateTransferSize(fileLength);
         }
         // not EOF
         // This can be a long operation, yield to others
         Thread.yield();
         writePartLength(out, bytesRead);
-        System.out.println("bytesRead="+bytesRead+", total="+totalRead);
         out.write(buf, 0, bytesRead);
         if (progressMonitor != null)
           progressMonitor.addBytes(bytesRead);
+      } else if (bytesRead == 0) {
+        // not EOF and no bytes?? wait a little
+        try { Thread.sleep(1); } catch (InterruptedException e) { }
       }
       // properly terminate the stream to release the reader
       if (bytesRead == -1) {
@@ -370,7 +383,33 @@ public class FileUtils extends Object {
       }
     } // end while
     out.flush();
+
     if (trace != null) trace.exit(FileUtils.class);
   }
 
+  /**
+   * Reads bytes written by moveDataStreamEOF and writes them to an output stream.
+   */
+  public static void readDataStreamEOF(DataInputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "readDataStreamEOF(DataInputStream in, OutputStream out, ProgMonitorI progressMonitor)");
+
+    byte[] buf = new byte[1024*8];
+    int currentPartDataOutstanding = 0;
+    while (currentPartDataOutstanding != -1) {
+      while (currentPartDataOutstanding == 0)
+        currentPartDataOutstanding = FileUtils.readPartLength(in);
+      // if -1 then EOF reached
+      if (currentPartDataOutstanding > 0) {
+        int toRead = Math.min(buf.length, currentPartDataOutstanding);
+        in.readFully(buf, 0, toRead);
+        currentPartDataOutstanding -= toRead;
+        out.write(buf, 0, toRead);
+        if (progressMonitor != null)
+          progressMonitor.addBytes(toRead);
+      }
+    }
+    out.flush();
+
+    if (trace != null) trace.exit(FileUtils.class);
+  }
 }

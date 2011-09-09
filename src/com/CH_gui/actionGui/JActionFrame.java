@@ -774,8 +774,10 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
           int state = Integer.parseInt(st.nextToken());
           st.nextToken();
           int xState = Integer.parseInt(st.nextToken());
-          setState(state);
-          setXState(xState);
+          if (state != ICONIFIED && xState != ICONIFIED) {
+            setState(state);
+            setXState(xState);
+          }
         }
       }
     } catch (Exception t) {

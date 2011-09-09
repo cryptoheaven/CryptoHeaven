@@ -254,7 +254,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       listModel.addElement(FETCHING_ATTACHMENTS);
       sendFetchAttachmentsRequest(paramParentMsgLinkRecords);
     }
-    jList.setCellRenderer(new ListRenderer(true, false, false));
+    jList.setCellRenderer(new ListRenderer(true, false, false, true));
     jList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(ListSelectionEvent event) {
         setEnabledButtons();

@@ -240,14 +240,14 @@ public class GlobalProperties extends Object {
   // build 640 FolderTreeModel(s) and FolderTreeNode(s) cleanup
   // build 640 HTTP Socket overhaul to try eliminating the memory leak
   // build 642 File upload/download transfer progress upgrades
-//  // build 644 File data transfer overhaul to allow interrupted transfers to resume and concurrent downloads of uploads in progress.
+  // build 644 File data transfer overhaul to allow interrupted uploads to resume.
 
-  public static final short PROGRAM_BUILD_NUMBER = 642;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 644;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.4f;
-  public static final short PROGRAM_VERSION_MINOR = 6;
+  public static final float PROGRAM_VERSION = 3.5f;
+  public static final short PROGRAM_VERSION_MINOR = 0;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
@@ -358,7 +358,10 @@ public class GlobalProperties extends Object {
     while (keys.hasMoreElements()) {
       String key = (String) keys.nextElement();
       if (!key.startsWith(generalUserPropertyPrefix)) { // || key.startsWith(myUserPropertyPrefix)) {
-        if (!key.startsWith("LastUserName") && !key.startsWith("EncRSAPrivateKey") && !key.startsWith("TempFiles"))
+        if (!key.startsWith("LastUserName") &&
+                !key.startsWith("EncRSAPrivateKey") &&
+                !key.startsWith("TempFiles") &&
+                !key.startsWith("file-lob-up"))
           removeKeysL.add(key);
       }
     }

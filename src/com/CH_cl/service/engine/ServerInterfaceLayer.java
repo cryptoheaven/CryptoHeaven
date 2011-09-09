@@ -14,6 +14,7 @@ package com.CH_cl.service.engine;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.FileLobUp;
 
 import com.CH_co.monitor.*;
 import com.CH_co.queue.*;
@@ -154,6 +155,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private BurstableBucket burstableMonitorWorkerCreationTrials;
   private BurstableBucket burstableMonitorWorkersExceptions;
 
+  /** Last created SIL, maybe invalid */
+  public static ServerInterfaceLayer lastSIL;
+
   /**
    * Creates new ServerInterfaceLayer
    * @param connectedSocket through which communication will take place
@@ -163,6 +167,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts);
     if (trace != null) trace.args(isClient);
+    this.lastSIL = this;
+    if (isClient)
+      FileLobUp.restoreState();
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
@@ -1604,8 +1611,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         }
       } // end synchronized
 
-      if (trace != null) trace.data(10, "submitNow", submitNow);
       if (submitNow) {
+        if (trace != null) trace.data(10, "main worker needed - submitting request");
         // Whichever worker picks it up, it should claim Main Worker and send it to the server to register for notifications.
         // Quietly add a NOTIFY message without having aditional workers created to serve it -- do not user submitAndReturn.
         // This message is only meant for already existing workers, otherwise we would have an infinite loop.
@@ -1613,7 +1620,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         enqueueProgMonitor(msgActionNotify);
         jobFifo.addJob(msgActionNotify);
         jobScanner.triggerCheckToServeNow();
+      } else {
+        if (trace != null) trace.data(20, "main worker exists");
       }
+    } else {
+      if (trace != null) trace.data(30, "SIL destroyed - check skipped");
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
@@ -1921,7 +1932,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     private void triggerCheckToServeNow() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "triggerCheckToServeNow()");
       synchronized (triggerMonitor) {
-        if (trace != null) trace.data(10, "notifying to serve now");
+        if (trace != null) trace.data(10, "calling notifyAll() on the waiting job monitor");
         triggeredMonitor = true;
         triggerMonitor.notifyAll();
       }

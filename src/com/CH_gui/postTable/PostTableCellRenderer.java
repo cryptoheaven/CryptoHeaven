@@ -12,25 +12,24 @@
 
 package com.CH_gui.postTable;
 
-import java.awt.*;
-import java.security.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
+import com.CH_gui.gui.*;
+import com.CH_gui.msgs.*;
+import com.CH_gui.msgTable.*;
+import com.CH_gui.sortedTable.*;
+import com.CH_gui.table.*;
+import com.CH_gui.util.*;
 
 import com.CH_cl.service.cache.FetchedDataCache;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.service.records.*;
 
-import com.CH_gui.gui.URLLauncherCHACTION;
-import com.CH_gui.gui.URLLauncherMAILTO;
-import com.CH_gui.msgs.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-import com.CH_gui.util.*;
+import java.awt.*;
+import java.security.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import javax.swing.text.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011

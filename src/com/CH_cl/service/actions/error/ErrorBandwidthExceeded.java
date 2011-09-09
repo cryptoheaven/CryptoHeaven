@@ -26,7 +26,7 @@ import com.CH_co.trace.Trace;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,7 +34,7 @@ import com.CH_co.trace.Trace;
  *
  * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ErrorBandwidthExceeded extends ClientMessageAction {
 
@@ -44,7 +44,7 @@ public class ErrorBandwidthExceeded extends ClientMessageAction {
     if (trace != null) trace.exit(ErrorBandwidthExceeded.class);
   }
 
-  /** 
+  /**
    * The action handler performs all actions related to the received message (reply),
    * and optionally returns a request Message.  If there is no request, null is returned.
    */
@@ -55,10 +55,13 @@ public class ErrorBandwidthExceeded extends ClientMessageAction {
     if (pm != null)
       pm.jobKilled();
 
-    Str_Rp reply = (Str_Rp) getMsgDataSet();
-    String title = "Bandwidth Limit Exceeded";
-    String msg = reply.message;
-    NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+    // Check individual action GUI suppression, global flag will be checked by NotificationCenter
+    if (isGUIsuppressed) {
+      Str_Rp reply = (Str_Rp) getMsgDataSet();
+      String title = "Bandwidth Limit Exceeded";
+      String msg = reply.message;
+      NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+    }
 
     if (trace != null) trace.exit(ErrorBandwidthExceeded.class, null);
     return null;

@@ -23,6 +23,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.fld.*;
+import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
@@ -251,8 +252,8 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     Class replyClass = null;
 
     File_NewFiles_Rq request = new File_NewFiles_Rq();
-    //int actionCode = GlobalProperties.PROGRAM_BUILD_NUMBER >= 644 ? CommandCodes.FILE_Q_NEW_FILE_STUDS : CommandCodes.FILE_Q_NEW_FILES;
-    int actionCode = CommandCodes.FILE_Q_NEW_FILES;
+    int actionCode = GlobalProperties.PROGRAM_BUILD_NUMBER >= 644 ? CommandCodes.FILE_Q_NEW_FILE_STUDS : CommandCodes.FILE_Q_NEW_FILES;
+    //int actionCode = CommandCodes.FILE_Q_NEW_FILES;
     MessageAction msgAction = new MessageAction(actionCode, request);
     replyClass = runUploadFileBunch(files, msgAction, request, shareRecord.getSymmetricKey(),
                                     shareRecord.shareId, new Short(Record.RECORD_TYPE_SHARE), isThreadedRun, SIL);
@@ -378,7 +379,19 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           files[i] = dataRecords[i].getPlainDataFile();
         }
 
-        if (!Misc.isAllGUIsuppressed()) {
+        boolean useStuds = false;
+        // If we are making new Message without external email request, use the STUD method and fill-in the data later on.
+        if (GlobalProperties.PROGRAM_BUILD_NUMBER >= 644) { // older builds don't use STUDs
+          if (msgActionToSend.getActionCode() == CommandCodes.MSG_Q_NEW) {
+            Msg_New_Rq msgRequest = (Msg_New_Rq) msgActionToSend.getMsgDataSet();
+            // if all internal msg then ok for studs
+            useStuds = msgRequest.symmetricKey == null;
+          } else if (msgActionToSend.getActionCode() == CommandCodes.FILE_Q_NEW_FILE_STUDS) {
+            useStuds = true;
+          }
+        }
+
+        if (!Misc.isAllGUIsuppressed() && !useStuds) {
           ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferUp(files);
           ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionToSend.getStamp());
         }
@@ -395,7 +408,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
 
           KeyRecord keyrec = cache.getKeyRecordMyCurrent();
 
-          if (msgActionToSend.getActionCode() == CommandCodes.FILE_Q_NEW_FILE_STUDS) {
+          if (useStuds) {
             // For now we'll only provide the signer's key ID as a token to identify the authorized user
             // for "filling-in" the data at a later time.
             dataRecord.setSigningKeyId(keyrec.keyId);
@@ -406,9 +419,60 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           }
         }
 
-        ClientMessageAction replyMsgAction = SIL.submitAndFetchReply(msgActionToSend);
+        if (trace != null) trace.data(50, "submitting new request in UploadUtilities");
+        ClientMessageAction replyMsgAction = null;
+        if (useStuds) // only fast non-streaming action is eligible for retry
+          replyMsgAction = SIL.submitAndFetchReply(msgActionToSend, 60000, 3);
+        else // longer streaming actions are not retriable - must wait forever
+          replyMsgAction = SIL.submitAndFetchReply(msgActionToSend);
+        if (trace != null) trace.data(51, "got reply to new request in UploadUtilities");
+
         replyClass = replyMsgAction.getClass();
         DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction);
+
+        // If making studs, submit items for upload to fill-in the studs.
+        if (useStuds && replyMsgAction.getActionCode() == CommandCodes.FILE_A_GET_FILES) {
+          FileLinkRecord[] links = ((File_GetLinks_Rp) replyMsgAction.getMsgDataSet()).fileLinks;
+          for (int i=0; i<links.length; i++) {
+            // merge info from returned links and submited data records
+            FileLinkRecord link = links[i];
+            FileDataRecord data = dataRecords[i];
+            if (!link.getSymmetricKey().equals(linkRecords[i].getSymmetricKey()))
+              throw new IllegalStateException("Encryption key does not match!");
+            new FileLobUp(data.getPlainDataFile(), link, data.getSigningKeyId(), 0);
+          }
+        } else if (useStuds && replyMsgAction.getActionCode() == CommandCodes.MSG_A_GET) {
+          Msg_GetLinkAndData_Rp msgReply = ((Msg_GetLinkAndData_Rp) replyMsgAction.getMsgDataSet());
+          MsgDataRecord[] msgDatas = msgReply.dataRecords;
+          String err = "";
+          for (int i=0; i<msgDatas.length; i++) {
+            MsgDataRecord msgData = msgDatas[i];
+            MsgLinkRecord msgLink = cache.getMsgLinkRecordsForMsg(msgData.msgId)[0];
+            FileLinkRecord[] fileLinks = FileLinkOps.getOrFetchFileLinksByOwner(SIL, msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
+            for (int k=0; k<fileLinks.length; k++) {
+              // merge info from returned links and submited data records
+              FileLinkRecord link = fileLinks[k];
+              // find matching link from local ones that we know we sent
+              int dataIndex = -1;
+              for (int z=0; z<linkRecords.length; z++) {
+                if (linkRecords[z].getEncSymmetricKey().equals(link.getEncSymmetricKey())) {
+                  dataIndex = z;
+                  break;
+                }
+              }
+              // Only incomplete files should cause an error, but only after we upload the ones that we can...
+              // Completed file links that are not found locally are probably remote file attachments.
+              if (dataIndex == -1 && link.isIncomplete())
+                err += link.getFileName() + "\n";
+              else if (dataIndex >= 0) {
+                FileDataRecord data = dataRecords[dataIndex];
+                new FileLobUp(data.getPlainDataFile(), link, data.getSigningKeyId(), 0);
+              }
+            }
+          }
+          if (err != null && err.length() > 0)
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Attachment Error", "Could not attach the following files. \n\n"+err);
+        }
       } catch (Throwable t) {
         if (trace != null) trace.exception(UploadRunner.class, 100, t);
       } finally {

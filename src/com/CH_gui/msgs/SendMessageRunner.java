@@ -107,8 +107,25 @@ public class SendMessageRunner extends ThreadTraced {
     try {
       UserRecord myUserRecord = cache.getUserRecord();
 
+      // Any message sent needs to be copied to sent folder unless it is posted in folders like chat/posting.
+      // This is important for msgs with local file attachments because user needs to have access link to newly created
+      // message to be able to upload its content.  Otherwise server would reject the upload.
+      boolean isAnyRecipientFolder = false;
+      for (int i=0; i<selectedRecipients.length; i++) {
+        Record[] recipients = selectedRecipients[i];
+        for (int j=0; j<recipients.length; j++) {
+          if (recipients[j] instanceof FolderPair) {
+            isAnyRecipientFolder = true;
+            break;
+          }
+        }
+        if (isAnyRecipientFolder)
+          break;
+      }
+      boolean shouldCopyToSent = !isAnyRecipientFolder || msgSendInfoProvider.isCopyToOutgoing();
+
       boolean isSavingAsDraft = msgSendInfoProvider.isSavingAsDraft();
-      if (!isSavingAsDraft && msgSendInfoProvider.isCopyToOutgoing()) {
+      if (!isSavingAsDraft && shouldCopyToSent) {
         selectedRecipients[BCC] = addOutgoingToRecipients(selectedRecipients[BCC]);
       }
 
@@ -173,10 +190,10 @@ public class SendMessageRunner extends ThreadTraced {
       }
       Component parent = msgSendInfoProvider instanceof Component ? (Component) msgSendInfoProvider : (Component) null;
       // create Msg Link Records
-      Object[] errorBuffer = new Object[1];
-      MsgLinkRecord[] linkRecords = prepareMsgLinkRecords(selectedRecipients, symmetricKey, isSavingAsDraft, recipientsSB, parent, errorBuffer);
+      Object[] errBuffer = new Object[1];
+      MsgLinkRecord[] linkRecords = prepareMsgLinkRecords(selectedRecipients, symmetricKey, isSavingAsDraft, recipientsSB, parent, errBuffer);
 
-      if (errorBuffer[0] == null) {
+      if (errBuffer[0] == null) {
 
         MsgDataRecord dataRecord = null;
         Long[] fromMsgLinkIDs = null;
@@ -303,7 +320,7 @@ public class SendMessageRunner extends ThreadTraced {
         else {
           if (trace != null) trace.data(100, "send the new message request");
           // send the new message request
-          ClientMessageAction reply = SIL.submitAndFetchReply(sendMsgAction, 5*60000);
+          ClientMessageAction reply = SIL.submitAndFetchReply(sendMsgAction, 60000, 3);
           if (trace != null) trace.data(110, "got back reply from new message request");
           // run reply...
           if (reply != null) {
@@ -391,8 +408,8 @@ public class SendMessageRunner extends ThreadTraced {
    * @param isSavingAsDraft If in draft mode then use user's default draft folder as recipient, and output original recipient list in the StringBuffer
    * @param recipientsSB Buffer for original recipient list when in draft mode
    */
-  public static MsgLinkRecord[] prepareMsgLinkRecords(Record[][] recipientsAll, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Component parent, Object[] errorBuffer) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgLinkRecords(Record[][] recipientsAll, Record[] recipientsCC, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Object[] errorBuffer)");
+  public static MsgLinkRecord[] prepareMsgLinkRecords(Record[][] recipientsAll, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Component parent, Object[] errBuffer) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgLinkRecords(Record[][] recipientsAll, Record[] recipientsCC, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Object[] errBuffer)");
     if (trace != null) trace.args(recipientsAll, symmetricKey);
     if (trace != null) trace.args(isSavingAsDraft);
     if (trace != null) trace.args(recipientsSB);
@@ -481,7 +498,7 @@ public class SendMessageRunner extends ThreadTraced {
           }
           sb.append("\nPlease check your recipients list.");
           MessageDialog.showErrorDialog(parent, sb.toString(), "Message not sent", true);
-          if (errorBuffer != null) errorBuffer[0] = "error";
+          if (errBuffer != null) errBuffer[0] = "error";
           break;
         }
       }

@@ -46,6 +46,7 @@ import comx.tig.en.SingleTigerSession;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import javax.swing.*;
@@ -1005,7 +1006,29 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   private void exitAction() {
-    exitAction(this);
+    // check for active transfers
+    ArrayList activeUps = FileLobUp.getStateSessions();
+    if (activeUps != null && activeUps.size() > 0) {
+      Runnable yes = new Runnable() {
+        public void run() {
+          exitAction(MainFrame.this);
+        }
+      };
+      Runnable no = new Runnable() {
+        public void run() {
+          // no-op
+        }
+      };
+      StringBuffer sb = new StringBuffer();
+      for (int i=0; i<activeUps.size(); i++) {
+        Object[] state = (Object[]) activeUps.get(i);
+        sb.append(state[0]);
+        sb.append("<br>");
+      }
+      NotificationCenter.showYesNo(NotificationCenter.WARNING_MESSAGE, "Recent file transfers are incomplete!", "<html>Exit and terminate current file transfers?<br><br>Incomplete file transfers are:<br>"+sb.toString()+"<br>Transfers will resume upon your next login.</html>", false, yes, no);
+    } else {
+      exitAction(this);
+    }
   }
   public static void exitAction(JActionFrame actionFrame) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "exitAction()");
@@ -1018,6 +1041,10 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           actionFrame.saveFrameProperties();
         }
 
+        // Make sure we have file transfer settings saved even in the event of "clearing local settings"
+        FileLobUp.saveState();
+
+        // Store properties to disk.
         GlobalProperties.store();
 
         if (actionFrame != null) {

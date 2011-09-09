@@ -12,15 +12,14 @@
 
 package com.CH_co.queue;
 
-import java.util.Iterator;
-
-import com.CH_co.trace.Trace;
-
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
+
+import java.util.Iterator;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -28,7 +27,7 @@ import com.CH_co.service.records.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -36,7 +35,7 @@ import com.CH_co.service.records.*;
  *
  * <b>$Revision: 1.5 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class PriorityJobFifo extends PriorityFifo {
 
@@ -68,11 +67,11 @@ public class PriorityJobFifo extends PriorityFifo {
   }
 
   public static boolean isJobLogin(int code) {
-    return code == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || 
+    return code == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
            code == CommandCodes.SYSENG_Q_LOGIN;
   }
   public static boolean isJobForRetry(MessageAction msgAction) {
-    return msgAction != null && !msgAction.areRetriesExceeded() && 
+    return msgAction != null && !msgAction.areRetriesExceeded() &&
            !PriorityJobFifo.isJobLogin(msgAction.getActionCode()) &&
            msgAction.getActionCode() != CommandCodes.SYS_Q_PING &&
            getJobType(msgAction) != JOB_TYPE_HEAVY;
@@ -96,6 +95,7 @@ public class PriorityJobFifo extends PriorityFifo {
           break;
         case CommandCodes.FILE_Q_GET_FILES_DATA :
         case CommandCodes.FILE_Q_NEW_FILES :
+        case CommandCodes.FILE_Q_UPLOAD_CONTENT :
           priority = PRIORITY_LOWEST;
           // try to establish if file is small to make the priority NORMAL
           try {
@@ -111,6 +111,13 @@ public class PriorityJobFifo extends PriorityFifo {
               long sizeSum = FileDataRecord.getFileEncSizeSum(request.fileDataRecords);
               if (sizeSum < getMaxFileSizeForMainConnection()) {
                 priority = MAIN_WORKER_LOW_PRIORITY;
+              }
+            } else if (code == CommandCodes.FILE_Q_UPLOAD_CONTENT) {
+              // if transferred file is small then also LOW PRIORITY
+              File_Transfer_Co request = (File_Transfer_Co) msgAction.getMsgDataSet();
+              if (request.plainFileLength != null) {
+                if (request.plainFileLength.longValue() < getMaxFileSizeForMainConnection())
+                  priority = MAIN_WORKER_LOW_PRIORITY;
               }
             }
           } catch (Throwable t) {
@@ -153,16 +160,15 @@ public class PriorityJobFifo extends PriorityFifo {
 
     int code = msgAction.getActionCode();
     int jobType = -1;
-    if (code != CommandCodes.MSG_Q_NEW) {
-      jobType = getJobType(msgAction.getActionCode());
-    }
-    // else check if a message has attachments..., if so, threat it as JOB_TYPE_HEAVY;
-    else {
+    if (code == CommandCodes.MSG_Q_NEW) {
+      // if a message has attachments..., if so, threat it as JOB_TYPE_HEAVY;
       Msg_New_Rq request = (Msg_New_Rq) msgAction.getMsgDataSet();
-      if (request.localFiles == null)
+      if (request.localFiles == null || request.localFiles.isFileStudRequest)
         jobType = getJobType(code);
       else
         jobType = JOB_TYPE_HEAVY;
+    } else {
+      jobType = getJobType(msgAction.getActionCode());
     }
 
     if (trace != null) trace.exit(PriorityJobFifo.class, jobType);

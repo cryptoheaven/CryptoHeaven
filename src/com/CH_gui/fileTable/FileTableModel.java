@@ -242,7 +242,13 @@ public class FileTableModel extends RecordTableModel {
           break;
         case 1: value = fileLink.getFileName();
           break;
-        case 2: value = fileLink.getFileType();
+        case 2:
+          if (fileLink.isAborted())
+            value = "Upload Aborted by User!";
+          else if(fileLink.isIncomplete())
+            value = "Pending Data Upload...";
+          else
+            value = fileLink.getFileType();
           break;
         case 3: value = fileLink.origSize;
           break;

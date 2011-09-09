@@ -37,17 +37,20 @@ public class ErrorMessageAction extends ClientMessageAction {
       and optionally returns a request Message.  If there is no request, null is returned.
   */
   public MessageAction runAction() {
-    Str_Rp dataSet = (Str_Rp) getMsgDataSet();
-    if (dataSet.message != null && dataSet.message.length() > 0) {
-      if (dataSet.message.startsWith("System Notice: ")) {
-        String title = "System Notice";
-        String msg = dataSet.message.substring("System Notice: ".length());
-        NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, msg);
-      }
-      else {
-        String title = "Error Dialog";
-        String msg = "<html> Operation did not complete successfully. <p>" + dataSet.message;
-        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+    // Check individual action GUI suppression, global flag will be checked by NotificationCenter
+    if (!isGUIsuppressed) {
+      Str_Rp dataSet = (Str_Rp) getMsgDataSet();
+      if (dataSet.message != null && dataSet.message.length() > 0) {
+        if (dataSet.message.startsWith("System Notice: ")) {
+          String title = "System Notice";
+          String msg = dataSet.message.substring("System Notice: ".length());
+          NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, msg);
+        }
+        else {
+          String title = "Error Dialog";
+          String msg = "<html> Operation did not complete successfully. <p>" + dataSet.message;
+          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+        }
       }
     }
     return null;

@@ -70,11 +70,19 @@ public class DefaultReplyRunner extends ThreadTraced {
     if (trace != null) trace.exit(DefaultReplyRunner.class);
   }
 
-  /** Same as run() but without clearing thread trace stack. */
   public static void nonThreadedRun(ServerInterfaceLayer serverInterfaceLayer, ClientMessageAction msgAction) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultReplyRunner.class, "nonThreadedRun(ServerInterfaceLayer serverInterfaceLayer, ClientMessageAction msgAction)");
+    nonThreadedRun(serverInterfaceLayer, msgAction, false);
+  }
+  /** Same as run() but without clearing thread trace stack. */
+  public static void nonThreadedRun(ServerInterfaceLayer serverInterfaceLayer, ClientMessageAction msgAction, boolean suppressAnyErrMsg) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultReplyRunner.class, "nonThreadedRun(ServerInterfaceLayer serverInterfaceLayer, ClientMessageAction msgAction, boolean suppressAnyErrMsg)");
     if (trace != null) trace.args(serverInterfaceLayer);
     if (trace != null) trace.args(msgAction);
+    if (trace != null) trace.args(suppressAnyErrMsg);
+
+    // Only set the suppression flag if requested, do not overwrite previous flag with 'false'.
+    if (suppressAnyErrMsg && msgAction != null)
+      msgAction.isGUIsuppressed = true;
 
     MessageAction reply = runAction(msgAction);
 

@@ -605,7 +605,7 @@ public class MsgPanelUtils extends Object {
         if (trace != null) trace.exception(MsgPanelUtils.class, -10, t);
       }
       if (isHTML && !skipHeaderClearing) {
-        content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(content, true, true, true);
+        content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(content, true, true, true, true);
       }
     }
 
@@ -826,7 +826,7 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (isHtmlMode) {
-      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, true, false, false);
+      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, true, false, false, true);
     }
     boolean addSpaces = text.trim().length() > 0;
     if (inHtmlMode != isHtmlMode) {

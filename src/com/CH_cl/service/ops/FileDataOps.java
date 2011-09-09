@@ -14,6 +14,7 @@ package com.CH_cl.service.ops;
 
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.cryptx.BA;
 import com.CH_co.monitor.Stats;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
@@ -65,7 +66,16 @@ public class FileDataOps {
 
     boolean doFetching = false;
     if (actionCode == CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES) {
-      doFetching = fData == null;
+      // If data attributes are incomplete, then fetch them
+      if (fData == null)
+        doFetching = true;
+      else {
+        if (fData.getEncSize() == null || fData.getEncSize().longValue() == -1 ||
+                BA.isEmptyOrZero(fData.getEncOrigDataDigest()) ||
+                BA.isEmptyOrZero(fData.getEncSignedOrigDigest()) ||
+                BA.isEmptyOrZero(fData.getEncEncDataDigest()))
+          doFetching = true;
+      }
     } else if (actionCode == CommandCodes.FILE_Q_GET_FILES_DATA) {
       File encFile = fData.getEncDataFile();
       File plnFile = fData.getPlainDataFile();

@@ -33,12 +33,13 @@ import com.CH_co.util.*;
  */
 public class HTML_Ops {
 
-  public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap)");
+  public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment)");
     if (trace != null) trace.args(htmlMessage != null && htmlMessage.length() < 255 ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null"));
     if (trace != null) trace.args(isRemoveHead);
     if (trace != null) trace.args(isRemoveLeadP);
     if (trace != null) trace.args(isRemoveMap);
+    if (trace != null) trace.args(isRemoveComment);
 
     if (htmlMessage != null) {
       if (isRemoveHead) {
@@ -91,6 +92,12 @@ public class HTML_Ops {
       if (isRemoveMap) {
         String[][] startTags = new String[][] {{ "<map", "<MAP" }};
         String[][] endTags = new String[][] {{ "</map>", "</MAP>" }};
+        htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+      }
+
+      if (isRemoveComment) {
+        String[][] startTags = new String[][] {{ "<!--" }};
+        String[][] endTags = new String[][] {{ "-->" }};
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
       }
 

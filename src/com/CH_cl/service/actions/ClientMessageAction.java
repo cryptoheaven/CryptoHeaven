@@ -36,6 +36,8 @@ import com.CH_cl.service.cache.FetchedDataCache;
  */
 public abstract class ClientMessageAction extends MessageAction {
 
+  public boolean isGUIsuppressed = false;
+
   /** The ServerInterfaceLayer through which this message arrived. */
   private ServerInterfaceLayer serverInterfaceLayer;
 

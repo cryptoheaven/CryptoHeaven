@@ -12,14 +12,12 @@
 
 package com.CH_gui.list;
 
-import java.awt.Component;
-import java.io.File;
-import javax.swing.*;
-
 import com.CH_gui.action.Actions;
 import com.CH_gui.menuing.MenuActionItem;
 import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_gui.tree.FolderTree;
+import com.CH_gui.util.*;
 
 import com.CH_guiLib.gui.*;
 
@@ -29,17 +27,19 @@ import com.CH_cl.service.records.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.util.*;
+
+import java.awt.Component;
+import java.io.File;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p>  
+ * </a><br>All rights reserved.<p>
  *
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class ListRenderer implements ListCellRenderer, Cloneable {
 
@@ -49,6 +49,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   private boolean withFileSizes;
   private boolean withFolderParticipants;
   private boolean withFullEmailAddresses;
+  private boolean withUploadPendingNote;
   private StringHighlighterI stringHighlighter;
 
   private boolean suppressSelectionRendering;
@@ -56,12 +57,16 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   public ListRenderer() {
   }
   public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses) {
-    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, null);
+    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, false, null);
   }
-  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, StringHighlighterI stringHighlighter) {
+  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote) {
+    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, withUploadPendingNote, null);
+  }
+  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, StringHighlighterI stringHighlighter) {
     this.withFileSizes = withFileSizes;
     this.withFolderParticipants = withFolderParticipants;
     this.withFullEmailAddresses = withFullEmailAddresses;
+    this.withUploadPendingNote = withUploadPendingNote;
     this.stringHighlighter = stringHighlighter;
   }
 
@@ -76,6 +81,9 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   }
   public boolean isWithFullEmailAddresses() {
     return withFullEmailAddresses;
+  }
+  public boolean isWithUploadPendingNote() {
+    return withUploadPendingNote;
   }
   public void setStringHighlighter(StringHighlighterI stringHighlighter) {
     this.stringHighlighter = stringHighlighter;
@@ -92,16 +100,25 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   public void setWithFullEmailAddresses(boolean withFullEmailAddresses) {
     this.withFullEmailAddresses = withFullEmailAddresses;
   }
+  public void setWithUploadPendingNote(boolean withUploadPendingNote) {
+    this.withUploadPendingNote = withUploadPendingNote;
+  }
   public String getRenderedTextApplySettings(Object value) {
-    return getRenderedText(value, withFileSizes, withFolderParticipants, withFullEmailAddresses, stringHighlighter);
+    return getRenderedText(value, withFileSizes, withFolderParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
   }
   public static String getRenderedText(Object value) {
-    return getRenderedText(value, false, false, false, null);
+    return getRenderedText(value, false, false, false, false, null);
   }
   public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFullEmailAddress) {
-    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFullEmailAddress, null);
+    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFullEmailAddress, false, null);
   }
   public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFullEmailAddress, StringHighlighterI stringHighlighter) {
+    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFullEmailAddress, false, stringHighlighter);
+  }
+  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
+    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFullEmailAddress, includeUploadPendingNote, null);
+  }
+  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote, StringHighlighterI stringHighlighter) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ListRenderer.class, "getRenderedText()");
     String label = null;
 
@@ -117,7 +134,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     else if (value instanceof AbstractButton) {
       AbstractButton v = (AbstractButton) value;
       label = v.getText();
-    } 
+    }
     else if (value instanceof JSeparator) {
       label = MenuActionItem.STR_SEPARATOR;
     }
@@ -138,8 +155,11 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     else if (value instanceof FileLinkRecord) {
       FileLinkRecord fLink = (FileLinkRecord) value;
       label = fLink.getFileName();
-      if (includeFileSizes)
-        label += "   (" + Misc.getFormattedSize(fLink.origSize.longValue(), 4, 3) + ")";
+      if (includeFileSizes) {
+        label += "   (" + Misc.getFormattedSize(fLink.origSize.longValue(), 4, 3) + (includeUploadPendingNote ? (fLink.isAborted() ? " Upload Aborded..." : (fLink.isIncomplete() ? " Upload Pending..." : "")) : "") + ")";
+      } else if (includeUploadPendingNote) {
+        label += "   " + (fLink.isAborted()? "(Upload Aborded)" : (fLink.isIncomplete() ? "(Upload Pending...)" : ""));
+      }
     }
     else if (value instanceof MsgLinkRecord || value instanceof MsgDataRecord) {
       MsgDataRecord mData = null;
@@ -157,7 +177,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
               subject = "Body: " + MsgPanelUtils.extractPlainFromHtml(mData.getText());
               if (subject.length() > 40)
                 subject = subject.substring(0, 40) + " ...";
-              subject = ArrayUtils.replaceKeyWords(subject, 
+              subject = ArrayUtils.replaceKeyWords(subject,
                 new String[][] {
                   {"\n\r", " "},
                   {"\r\n", " "},
@@ -272,7 +292,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     else if (value instanceof AbstractButton) {
       AbstractButton v = (AbstractButton) value;
       icon = v.getIcon();
-    } 
+    }
     else if (value instanceof JSeparator) {
     }
     else if (value instanceof MsgLinkRecord) {
@@ -280,7 +300,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
       if (mData != null) {
-        if (mData.isTypeAddress()) 
+        if (mData.isTypeAddress())
           icon = Images.get(ImageNums.ADDRESS16);
       }
       if (icon == null && mLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
@@ -327,7 +347,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     Icon icon = null;
     String toolTip = null;
 
-    label = getRenderedText(value, withFileSizes, withFolderParticipants, withFullEmailAddresses, stringHighlighter);
+    label = getRenderedText(value, withFileSizes, withFolderParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
     icon = getRenderedIcon(value);
 
     // get tool tip

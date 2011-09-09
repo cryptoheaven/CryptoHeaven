@@ -55,10 +55,13 @@ public class ErrorAccountExpired extends ClientMessageAction {
     if (pm != null)
       pm.jobKilled();
 
-    Str_Rp reply = (Str_Rp) getMsgDataSet();
-    String title = "Account Expired";
-    String msg = reply.message;
-    NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+    // Check individual action GUI suppression, global flag will be checked by NotificationCenter
+    if (isGUIsuppressed) {
+      Str_Rp reply = (Str_Rp) getMsgDataSet();
+      String title = "Account Expired";
+      String msg = reply.message;
+      NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+    }
 
     if (trace != null) trace.exit(ErrorAccountExpired.class, null);
     return null;

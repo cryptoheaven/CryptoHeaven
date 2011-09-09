@@ -282,6 +282,21 @@ public class CommandCodes extends Object {
   public static final int FILE_Q_NEW_FILE_STUDS = 1801;
   public static final int FILE_A_GET_FILES = 10800;
 
+  // Query upload progress
+  public static final int FILE_Q_GET_PROGRESS = 1802;
+
+  // Upload file content bytes
+  public static final int FILE_Q_UPLOAD_CONTENT = 1803;
+  public static final int FILE_A_UPLOAD_COMPLETED = 10803;
+
+  // Update digests - typicaly after or during upload
+  public static final int FILE_Q_UPDATE_DIGESTS = 1804;
+
+  // Upload Aborted -- changes FileList status and keeps signatures but removes LOBs
+  public static final int FILE_Q_UPLOAD_ABORT = 1805;
+  // Upload Reset -- removes signatures and LOBs in preparation for UPLOAD restart
+  public static final int FILE_Q_UPLOAD_RESET = 1806;
+
   // Get Files
   public static final int FILE_Q_GET_FILES = 1810;
   public static final int FILE_Q_GET_FILES_STAGED = 1811;
@@ -293,6 +308,7 @@ public class CommandCodes extends Object {
 
   // Get File Data Attributes
   public static final int FILE_Q_GET_FILES_DATA_ATTRIBUTES = 1820;
+  public static final int FILE_Q_GET_FILE_DATA_ATTRIBUTES = 1821;
   public static final int FILE_A_GET_FILES_DATA_ATTRIBUTES = 10820;
 
   // Get File Data
@@ -546,7 +562,7 @@ public class CommandCodes extends Object {
   public static boolean isFileTransferCode(int code) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CommandCodes.class, "isFileTransferCode(int code)");
     if (trace != null) trace.args(code);
-    boolean rc = (code == FILE_Q_NEW_FILES || code == FILE_A_GET_FILES_DATA || code == FILE_Q_GET_FILES_DATA);
+    boolean rc = (code == FILE_Q_NEW_FILES || code == FILE_A_GET_FILES_DATA || code == FILE_Q_GET_FILES_DATA || code == FILE_Q_UPLOAD_CONTENT);
     if (trace != null) trace.exit(CommandCodes.class, rc);
     return rc;
   }
@@ -554,7 +570,7 @@ public class CommandCodes extends Object {
   public static boolean isStreamingIncomingMessage(int code) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CommandCodes.class, "isStreamingIncomingMessage(int code)");
     if (trace != null) trace.args(code);
-    boolean rc = (code == FILE_Q_NEW_FILES);
+    boolean rc = (code == FILE_Q_NEW_FILES || code == FILE_Q_UPLOAD_CONTENT);
     if (trace != null) trace.exit(CommandCodes.class, rc);
     return rc;
   }

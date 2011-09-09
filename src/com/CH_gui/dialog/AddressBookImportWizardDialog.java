@@ -234,7 +234,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
                 if (interrupted) break;
                 // synchronize every 5 addresses
                 if (countProcessed % 5 == 0)
-                  SIL.submitAndWait(action, 120000);
+                  SIL.submitAndWait(action, 60000, 3);
                 else
                   SIL.submitAndReturn(action);
               } else {

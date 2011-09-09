@@ -73,7 +73,6 @@ public class FileDataRecord extends Record {
   public OutputStream fileDest; // either DataOutputStream2 or FileOutputStream
 
   public static final String TEMP_ENCRYPTED_FILE_PREFIX = "ch-tmp-enc-";
-  public static final String TEMP_ENCRYPTED_FILE_STUD_PREFIX = "ch-stud-enc-";
   public static final String TEMP_PLAIN_FILE_PREFIX = "ch-tmp-pln-";
 
   /** Creates new FileDataRecord */
@@ -350,7 +349,6 @@ public class FileDataRecord extends Record {
         destinationFileCreated = true;
         BufferedOutputStream bufFileOut = new BufferedOutputStream(fileOut, 1024*32);
         DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, new SHA256());
-        //DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, MessageDigest.getInstance("SHA-1"));
 
         // move data from the GZIP input to file output
         //FileUtils.moveDataEOF(gzipIn, dFileOut, progressMonitor); // <== bad because BlockCipherInputStream DOES NOT support EOF marker
@@ -376,27 +374,24 @@ public class FileDataRecord extends Record {
         byte[] plainDigest = dFileOut.getMessageDigest().digest();
         if (trace != null) trace.data(40, "plainDigest", ArrayUtils.toString(plainDigest));
 
-
         // unseal the attributes and verify the signatures
         unSeal(verifyingKeyRecord, symmetricKey);
 
-
         // verify the plain data digest
         BAAsyPlainBlock verifiedPlainDigest = null;
-        if (verifyingKeyRecord != null) {
+        if (signedOrigDigest != null && verifyingKeyRecord != null) {
           verifiedPlainDigest = signedOrigDigest.verifySignature(verifyingKeyRecord.plainPublicKey);
           if (trace != null) trace.data(60, "verifiedPlainDigest", ArrayUtils.toString(verifiedPlainDigest.toByteArray()));
         }
 
-
         String errorMsg = "";
         //if (!Arrays.equals(encDigest, verifiedEncDigest.toByteArray()) || !Arrays.equals(plainDigest, verifiedPlainDigest.toByteArray())) {
-        if (!Arrays.equals(encDigest, encDataDigest.toByteArray()))
+        if (encDataDigest != null && !Arrays.equals(encDigest, encDataDigest.toByteArray()))
         {
           errorMsg += "\n  Computed Encrypted Data Digest : " + ArrayUtils.toString(encDigest) +
                       "\n  Expected Encrypted Data Digest : " + ArrayUtils.toString(encDataDigest.toByteArray());
         }
-        if (!Arrays.equals(plainDigest, origDataDigest.toByteArray())) {
+        if (origDataDigest != null && !Arrays.equals(plainDigest, origDataDigest.toByteArray())) {
           errorMsg += "\n  Computed Plain Data Digest : " + ArrayUtils.toString(plainDigest) +
                       "\n  Expected Plain Data Digest : " + ArrayUtils.toString(origDataDigest.toByteArray());
         }
@@ -408,7 +403,7 @@ public class FileDataRecord extends Record {
                       "\n" + errorMsg;
         }
         String keyMsg = "";
-        if (!origDataDigest.equals(verifiedPlainDigest)) {
+        if (origDataDigest != null && !origDataDigest.equals(verifiedPlainDigest)) {
           String keyErrorMsg = null;
           boolean skipErrorMsg = false;
           keyErrorMsg += "\n" +
@@ -463,11 +458,12 @@ public class FileDataRecord extends Record {
       } // end if destinationFile != null
 
     } catch (Throwable t) {
+      t.printStackTrace();
       if (trace != null) trace.exception(FileDataRecord.class, 100, t);
 
       // cleanup encrypted and plain file that may be partial
       try {
-        if (encFileIn != null) 
+        if (encFileIn != null)
           encFileIn.close();
       } catch (Throwable th) { }
       try {
@@ -478,7 +474,7 @@ public class FileDataRecord extends Record {
       } catch (Throwable th) { }
 
       try {
-        if (fileOut != null) 
+        if (fileOut != null)
           fileOut.close();
       } catch (Throwable th) { }
       try {
@@ -507,7 +503,7 @@ public class FileDataRecord extends Record {
     if (trace != null) trace.args(verifyingKeyRecord);
     if (trace != null) trace.args(symmetricKey);
 
-    try { 
+    try {
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(symmetricKey);
       BASymPlainBulk tempOrigDataDigest = null;
       if (!BA.isEmptyOrZero(encOrigDataDigest)) {
@@ -587,7 +583,7 @@ public class FileDataRecord extends Record {
       if (record.recordSize        != null) recordSize       = record.recordSize;
 
       // After fetching, it is unSealed and later on merged into the cache,
-      // so copy the unSealed flag too, but don't reset it if fetched data 
+      // so copy the unSealed flag too, but don't reset it if fetched data
       // was not unSealed and cached copy might be already unSealed.
       if (updated.isUnSealed())
         setUnSealed(true);

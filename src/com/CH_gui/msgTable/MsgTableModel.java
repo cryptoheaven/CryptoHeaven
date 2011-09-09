@@ -12,22 +12,6 @@
 
 package com.CH_gui.msgTable;
 
-import java.util.*;
-import java.sql.Timestamp;
-
-import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
 import com.CH_gui.addressBook.*;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.list.*;
@@ -37,6 +21,23 @@ import com.CH_gui.table.*;
 import com.CH_gui.postTable.PostTableCellRenderer;
 
 import com.CH_guiLib.util.HTML_Ops;
+
+import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.ops.*;
+import com.CH_cl.service.records.*;
+import com.CH_cl.service.records.filters.*;
+
+import com.CH_co.monitor.*;
+import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.*;
+import com.CH_co.util.*;
+import com.CH_co.trace.Trace;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -208,8 +209,8 @@ public class MsgTableModel extends RecordTableModel {
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 85), new Integer(120), new Integer(320), TIMESTAMP_PRS, new Integer( 60), new Integer( 60), new Integer( 60), TIMESTAMP_PRS, TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 95), new Integer( 60), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
           { new Integer(16), new Integer(16), new Integer(16), new Integer(250), new Integer(400), new Integer(  0), TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(120), TIMESTAMP_MAX, TIMESTAMP_MAX, TIMESTAMP_MAX, new Integer(120), new Integer(120), new Integer(16), null, null, null, new Integer(130), new Integer(16) },
           { new Integer(16), new Integer(16), new Integer(16), new Integer( 60), new Integer( 70), new Integer( 90), TIMESTAMP_MIN, new Integer( 50), new Integer( 50), new Integer( 50), TIMESTAMP_MIN, TIMESTAMP_MIN, TIMESTAMP_MIN, new Integer( 52), new Integer( 50), new Integer(16), null, null, null, new Integer(120), new Integer(16) },
-          { new Integer(3), new Integer(2), new Integer(0), new Integer(1), new Integer(5), new Integer(6) }, // current list columns
-          { new Integer(3), new Integer(2), new Integer(0), new Integer(1), new Integer(5), new Integer(6) }, // wide list columns
+          { new Integer(3), new Integer(2), new Integer(0), new Integer(5), new Integer(6) }, // current list columns
+          { new Integer(3), new Integer(2), new Integer(0), new Integer(5), new Integer(6) }, // wide list columns
           { }, // no short list
           { new Integer(-106) }
         }),
@@ -743,7 +744,33 @@ public class MsgTableModel extends RecordTableModel {
               }
             }
             if (numOfAttachments > 0) {
-              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.ATTACH_14x12) + ".png\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"12\"/></a>");
+              String linkNames = "";
+              String summary = "(";
+              FileLinkRecord[] fLinks = cache.getFileLinkRecordsOwnerAndType(msgData.msgId, new Short(Record.RECORD_TYPE_MESSAGE));
+              if (fLinks != null && fLinks.length > 0) {
+                for (int i=0; i<fLinks.length; i++) {
+                  if (linkNames.length() > 0)
+                    linkNames += "<br>";
+                  linkNames += ListRenderer.getRenderedText(fLinks[i], true, false, false, true);
+                }
+              } else {
+                FileLinkOps.addToLinkFetchQueue(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
+              }
+              MsgLinkRecord[] mLinks = cache.getMsgLinkRecordsOwnerAndType(msgData.msgId, new Short(Record.RECORD_TYPE_MESSAGE));
+              if (mLinks != null && mLinks.length > 0) {
+                for (int i=0; i<mLinks.length; i++) {
+                  if (linkNames.length() > 0)
+                    linkNames += "<br>";
+                  linkNames += ListRenderer.getRenderedText(mLinks[i], true, false, false, true);
+                }
+              } else {
+                MsgLinkOps.addToLinkFetchQueue(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
+              }
+              String strLinked = numOfAttachments == 1 ? linkNames : "("+numOfAttachments+" items)";
+              String strNotLinked = numOfAttachments == 1 ? "" : " "+linkNames+"<br>";
+              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.ATTACH_14x12) + ".png\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"12\"/>"+strLinked+"</a><br>"+strNotLinked);
+              if (linkNames.length() > 0)
+                sb.append(" ");
             }
           }
 
@@ -780,7 +807,7 @@ public class MsgTableModel extends RecordTableModel {
               messageText = msgData.getEncodedHTMLData();
             } else {
               // move the BODY tag right after the HTML tag...
-              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true);
+              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true, true);
               int iBody1 = messageText.indexOf("<body");
               if (iBody1 < 0)
                 iBody1 = messageText.indexOf("<BODY");
@@ -873,19 +900,23 @@ public class MsgTableModel extends RecordTableModel {
         // if refreshing and folder previously fetched, remove message links from the cache, leave the message data records
         if (force && fetchedIds.contains(shareId)) {
           int rowCount = getRowCount();
-          Vector linksToRemove = new Vector();
+          ArrayList linksToRemoveL = new ArrayList();
           for (int row=0; row<rowCount; row++) {
             Record rec = getRowObjectNoTrace(row);
             if (rec instanceof MsgLinkRecord) {
-              linksToRemove.addElement(rec);
+              linksToRemoveL.add(rec);
             }
           }
-          if (linksToRemove.size() > 0) {
-            MsgLinkRecord[] mRecs = new MsgLinkRecord[linksToRemove.size()];
-            linksToRemove.toArray(mRecs);
+          if (linksToRemoveL.size() > 0) {
+            MsgLinkRecord[] mRecs = new MsgLinkRecord[linksToRemoveL.size()];
+            linksToRemoveL.toArray(mRecs);
             fetchedIds.remove(shareId);
             fetchedIdsFull.remove(shareId);
+            Long[] ownerMsgIDs = MsgLinkRecord.getMsgIDs(mRecs);
             cache.removeMsgLinkRecords(mRecs);
+            // also remove any attachment Msg and File links as they can be refetched and rendering refreshed.
+            cache.removeFileLinkRecords(cache.getFileLinkRecordsOwnersAndType(ownerMsgIDs, new Short(Record.RECORD_TYPE_MESSAGE)));
+            cache.removeMsgLinkRecords(cache.getMsgLinkRecordsOwnersAndType(ownerMsgIDs, new Short(Record.RECORD_TYPE_MESSAGE)));
           }
         }
 

@@ -139,6 +139,8 @@ public class ClientActionSwitch extends CommonActionSwitch {
       // *** File Commands ***
       // =====================
 
+      // Upload file content bytes
+      { new Integer(CommandCodes.FILE_A_UPLOAD_COMPLETED), FileAUploadCompleted.class.getName() },
       // New File
       // Get Files
       // Move Files

@@ -509,27 +509,37 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (historyTimeElapsed > 0)
       currentTransferRate = (long) (historyBytesElapsed / (historyTimeElapsed / 1000.0));
 
-    jNotes[3].setText(Misc.getFormattedSize(currentTransferRate, 4, 3) + "/sec (" +
-                      Misc.getFormattedSize(totalBytes, 4, 3) + " of " + Misc.getFormattedSize(totalTransferSize, 4, 3) + ")");
-
-
-    // now, update estimated time with respect to passed time and current transfer rate
-    long bytesToGo = totalTransferSize - totalBytes;
-    bytesToGo = bytesToGo >= 0 ? bytesToGo : 0; // never negative
+    String transferRate = "";
+    if (totalTransferSize == -1) {
+      transferRate = Misc.getFormattedSize(currentTransferRate, 4, 3) + "/sec (" +
+                     Misc.getFormattedSize(totalBytes, 4, 3) + " transferred so far.)";
+    } else {
+      transferRate = Misc.getFormattedSize(currentTransferRate, 4, 3) + "/sec (" +
+                     Misc.getFormattedSize(totalBytes, 4, 3) + " of " + Misc.getFormattedSize(totalTransferSize, 4, 3) + ")";
+    }
+    jNotes[3].setText(transferRate);
 
     // in (seconds)
     long totalTimeElapsed = (long) ((currentDateMillis - transferStartDateMillis) / 1000.0);
     totalTimeElapsed = totalTimeElapsed >= 0 ? totalTimeElapsed : 0; // never negative
 
-    // in (seconds)
-    long timeToGo = 0;
-    if (currentTransferRate > 0)
-      timeToGo = (long) ( ((double) bytesToGo) / ((double) currentTransferRate) );
+    String estimate = "";
+    if (totalTransferSize == -1)
+      estimate = "Cannot estimate, " + Misc.getFormattedTime(totalTimeElapsed) + " elapsed so far.";
+    else {
+      // now, update estimated time with respect to passed time and current transfer rate
+      long bytesToGo = totalTransferSize - totalBytes;
+      bytesToGo = bytesToGo >= 0 ? bytesToGo : 0; // never negative
 
-    // in (seconds)
-    long totalTime = (long) (totalTimeElapsed + timeToGo);
+      // in (seconds)
+      long timeToGo = 0;
+      if (currentTransferRate > 0)
+        timeToGo = (long) ( ((double) bytesToGo) / ((double) currentTransferRate) );
 
-    String estimate = Misc.getFormattedTime(timeToGo) + " (" + Misc.getFormattedTime(totalTimeElapsed) + " of " + Misc.getFormattedTime(totalTime) + ")";
+      // in (seconds)
+      long totalTime = (long) (totalTimeElapsed + timeToGo);
+      estimate = Misc.getFormattedTime(timeToGo) + " (" + Misc.getFormattedTime(totalTimeElapsed) + " of " + Misc.getFormattedTime(totalTime) + ")";
+    }
     jNotes[0].setText(estimate);
 
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
@@ -698,6 +708,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     jProgressBar.setMaximum((int) (size/100));
     resetStats(size);
     updateStats(System.currentTimeMillis(), 5);
+    jProgressBar.setVisible(size != -1);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void updateTransferSize(long size) {

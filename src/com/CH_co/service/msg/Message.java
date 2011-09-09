@@ -185,14 +185,9 @@ public class Message extends Object {
     ProtocolMsgDataSet msgDataSet = null;
     // only one thread should be reading a message at a time
     synchronized(in) {
+      if (trace != null) trace.data(10, "about to read protocolMsgDataSetType");
       int protocolMsgDataSetType = in.readInt();
-
-
-      // communications debug
-      //in.readBytes();
-
-
-      if (trace != null) trace.data(10, "type", protocolMsgDataSetType);
+      if (trace != null) trace.data(11, "type", protocolMsgDataSetType);
       // Get the specific instance of ProtocolMsgDataSet.
       msgDataSet = getProtocolMsgDataSetInstance(protocolMsgDataSetType);
 

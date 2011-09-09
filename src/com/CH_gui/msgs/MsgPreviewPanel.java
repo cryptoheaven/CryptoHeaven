@@ -964,7 +964,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           if (trace != null) trace.exception(getClass(), 100, t);
         }
         if (_msgLink != null  && numOfAttachments > 0) {
-          attachments = AttachmentFetcherPopup.fetchAttachments(new MsgLinkRecord[] { _msgLink });
+          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+          FileLinkRecord[] fLinkAtts = FileLinkOps.getOrFetchFileLinksByOwner(SIL, _msgLink.msgLinkId, _msgLink.msgId, Record.RECORD_TYPE_MESSAGE);
+          MsgLinkRecord[] mLinkAtts = MsgLinkOps.getOrFetchMsgLinksByOwner(SIL, _msgLink.msgLinkId, _msgLink.msgId, Record.RECORD_TYPE_MESSAGE);
+          attachments = (Record[]) ArrayUtils.concatinate(fLinkAtts, mLinkAtts, Record.class);
           try {
             final Record[] _attachments = attachments;
             javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
@@ -1064,7 +1067,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           final JLabel progress = new JMyLabel("", (float) LINK_RELATIVE_FONT_SIZE);
           progress.setBorder(new EmptyBorder(0,2,0,0));
           if (fileLink != null) {
-            progress.setText(Misc.getFormattedSize(fileLink.origSize, 3, 2));
+            progress.setText(Misc.getFormattedSize(fileLink.origSize, 3, 2) + (fileLink.isAborted() ? " (Upload Aborted)" : (fileLink.isIncomplete() ? " (Upload Pending...)": "")));
           }
 
           if (fileLink != null && (FileLauncher.isAudioWaveFilename(fileLink.getFileName()) || FileLauncher.isImageFilename(fileLink.getFileName()))) {

@@ -12,10 +12,11 @@
 
 package com.CH_co.util;
 
-import java.util.*;
-import java.lang.reflect.Array;
-
 import com.CH_co.trace.Trace;
+
+import java.io.*;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -156,6 +157,43 @@ public class ArrayUtils extends Object {
       b2 = (int) (ch2-HEX_DIGITS[10] + 10);
     }
     return (int) ((b1 << 4) | b2);
+  }
+
+  /**
+   * Serialization of objects into String.
+   * @param o
+   * @return
+   */
+  public static String objToStr(Object o) {
+    byte[] bytes = null;
+    try {
+      ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+      ObjectOutputStream oOut = new ObjectOutputStream(bOut);
+      oOut.writeObject(o);
+      oOut.flush();
+      bOut.flush();
+      bytes = bOut.toByteArray();
+      oOut.close();
+    } catch (Throwable t) {
+    }
+    return toString(bytes);
+  }
+  /**
+   * Un-Serialization of String into Object.
+   * @param s
+   * @return
+   */
+  public static Object strToObj(String s) {
+    Object obj = null;
+    try {
+      byte[] bytes = toByteArray(s);
+      ByteArrayInputStream bIn = new ByteArrayInputStream(bytes);
+      ObjectInputStream oIn = new ObjectInputStream(bIn);
+      obj = oIn.readObject();
+      oIn.close();
+    } catch (Throwable t) {
+    }
+    return obj;
   }
 
   /**

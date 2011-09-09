@@ -400,6 +400,10 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
             msgActionCode == CommandCodes.STAT_A_GET ||
             msgActionCode == CommandCodes.FLD_Q_RED_FLAG_COUNT ||
             msgActionCode == CommandCodes.FLD_A_RED_FLAG_COUNT ||
+            msgActionCode == CommandCodes.FILE_Q_GET_PROGRESS ||
+            msgActionCode == CommandCodes.FILE_Q_UPLOAD_CONTENT ||
+            msgActionCode == CommandCodes.FILE_A_UPLOAD_COMPLETED ||
+            msgActionCode == CommandCodes.FILE_Q_UPDATE_DIGESTS ||
             msgActionCode == CommandCodes.MSG_Q_TYPING ||
             msgActionCode == CommandCodes.MSG_A_TYPING ||
             msgActionCode == CommandCodes.USR_Q_CHANGE_ONLINE_STATUS ||

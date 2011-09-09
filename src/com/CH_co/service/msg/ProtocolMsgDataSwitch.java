@@ -97,6 +97,7 @@ public class ProtocolMsgDataSwitch extends Object {
     {File_NewFiles_Rq.class.getName(), new Integer(131)},
     {File_Rename_Rq.class.getName(), new Integer(132)},
     {File_GetFiles_Rq.class.getName(), new Integer(133)},
+    {File_Transfer_Co.class.getName(), new Integer(134)},
 
     {Key_KeyIDs_Rq.class.getName(), new Integer(140)},
     {Key_NewPair_Rq.class.getName(), new Integer(141)},

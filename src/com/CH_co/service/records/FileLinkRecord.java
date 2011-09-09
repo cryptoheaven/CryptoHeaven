@@ -12,13 +12,13 @@
 
 package com.CH_co.service.records;
 
-import java.sql.Timestamp;
-import java.util.Vector;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_co.cryptx.*;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -26,7 +26,7 @@ import com.CH_co.cryptx.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -34,12 +34,14 @@ import com.CH_co.cryptx.*;
  *
  * <b>$Revision: 1.26 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
   public static final short STATUS_FLAG__DEFAULT = 0;
   public static final short STATUS_FLAG__STARRED = 32;
+  public static final short STATUS_FLAG__UPLOAD_INCOMPLETE = 64;
+  public static final short STATUS_FLAG__UPLOAD_ABORTED = 128;
 
   public Long fileLinkId;
   public Long fileId;
@@ -66,8 +68,8 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     if (trace != null) trace.exit(FileLinkRecord.class);
   }
 
-  public Long getId() { 
-    return fileLinkId;  
+  public Long getId() {
+    return fileLinkId;
   }
 
   public int getIcon() {
@@ -92,6 +94,20 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     status = (Short) Misc.setBitObj(setStar, status != null ? status : new Short(STATUS_FLAG__DEFAULT), STATUS_FLAG__STARRED);
   }
 
+  public boolean isIncomplete() {
+    return status != null && (status.shortValue() & STATUS_FLAG__UPLOAD_INCOMPLETE) != 0;
+  }
+  public void markIncomplete(boolean setFlag) {
+    status = (Short) Misc.setBitObj(setFlag, status != null ? status : new Short(STATUS_FLAG__DEFAULT), STATUS_FLAG__UPLOAD_INCOMPLETE);
+  }
+
+  public boolean isAborted() {
+    return status != null && (status.shortValue() & STATUS_FLAG__UPLOAD_ABORTED) != 0;
+  }
+  public void markAborted(boolean setFlag) {
+    status = (Short) Misc.setBitObj(setFlag, status != null ? status : new Short(STATUS_FLAG__DEFAULT), STATUS_FLAG__UPLOAD_ABORTED);
+  }
+
   public void setEncFileType      (BASymCipherBulk encFileType)     { this.encFileType = encFileType;         }
   public void setEncFileName      (BASymCipherBulk encFileName)     { this.encFileName = encFileName;         }
   public void setEncFileDesc      (BASymCipherBulk encFileDesc)     { this.encFileDesc = encFileDesc;         }
@@ -113,8 +129,8 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
 
   /**
-   * Seals the <code> fileType, fileName, symmetricKey </code> 
-   * into <code> encFileType, encFileName, encSymmetricKey </code> 
+   * Seals the <code> fileType, fileName, symmetricKey </code>
+   * into <code> encFileType, encFileName, encSymmetricKey </code>
    * using the sealant object which is the owner object's symmetric key.
    * @param owner's symmetric key
    */
@@ -172,7 +188,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
   }
 
   /**
-   * Unseals the <code> encFileType, encFileName, encSymmetricKey </code> 
+   * Unseals the <code> encFileType, encFileName, encSymmetricKey </code>
    * into <code> fileType, fileName, symmetricKey </code> .
    * using the unSealant object which is the owner object's symmetric key.
    * @param owner's symmetric key
@@ -185,7 +201,7 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
       // decipher the symmetric key with which file data in encrypted
       BASymmetricKey tempSymmetricKey = new BASymmetricKey(new SymmetricBulkCipher(unsealingKey).bulkDecrypt(encSymmetricKey));
 
-      // decipher file name and file type 
+      // decipher file name and file type
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(tempSymmetricKey);
       String tempFileType = symCipher.bulkDecrypt(encFileType).toByteStr();
       String tempFileName = symCipher.bulkDecrypt(encFileName).toByteStr();
@@ -215,16 +231,16 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
     Long[] ownerObjIDs = null;
     if (fileLinks != null) {
-      Vector fileLinksV = null;
+      ArrayList fileLinksL = null;
       for (int i=0; i<fileLinks.length; i++) {
         if (fileLinks[i].ownerObjType.shortValue() == ownerType) {
           Long id = fileLinks[i].ownerObjId;
-          if (fileLinksV == null) fileLinksV = new Vector();
-          if (!fileLinksV.contains(id))
-            fileLinksV.addElement(id);
+          if (fileLinksL == null) fileLinksL = new ArrayList();
+          if (!fileLinksL.contains(id))
+            fileLinksL.add(id);
         }
       }
-      ownerObjIDs = (Long[]) ArrayUtils.toArray(fileLinksV, Long.class);
+      ownerObjIDs = (Long[]) ArrayUtils.toArray(fileLinksL, Long.class);
     }
 
     if (trace != null) trace.exit(FileLinkRecord.class, ownerObjIDs);
@@ -286,9 +302,9 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
       if (record.fileName          != null) fileName         = record.fileName;
       if (record.fileDesc          != null) fileDesc         = record.fileDesc;
       if (record.symmetricKey      != null) symmetricKey     = record.symmetricKey;
-      
+
       // After fetching, it is unSealed and later on merged into the cache,
-      // so copy the unSealed flag too, but don't reset it if fetched data 
+      // so copy the unSealed flag too, but don't reset it if fetched data
       // was not unSealed and cached copy might be already unSealed.
       if (updated.isUnSealed())
         setUnSealed(true);

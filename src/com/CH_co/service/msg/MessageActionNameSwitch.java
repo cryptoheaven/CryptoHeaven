@@ -12,10 +12,10 @@
 
 package com.CH_co.service.msg;
 
-import java.util.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
+
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -23,7 +23,7 @@ import com.CH_co.util.Misc;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -31,7 +31,7 @@ import com.CH_co.util.Misc;
  *
  * <b>$Revision: 1.44 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MessageActionNameSwitch extends Object {
 
@@ -116,13 +116,13 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.EML_Q_GET), "Get Email Address" },
       // Get Available Domains
       { new Integer(CommandCodes.EML_Q_GET_DOMAINS), "Get Available Email Domains" },
-      // Create Emails 
+      // Create Emails
       { new Integer(CommandCodes.EML_Q_CREATE), "Create Email Address" },
-      // Alter Emails 
+      // Alter Emails
       { new Integer(CommandCodes.EML_Q_ALTER), "Alter Email Address" },
-      // Manage Emails 
+      // Manage Emails
       { new Integer(CommandCodes.EML_Q_MANAGE), "Manage Email Addresses" },
-      // Remove Emails 
+      // Remove Emails
       { new Integer(CommandCodes.EML_Q_REMOVE), "Remove Email Address" },
       // Check for availability of Email Address
       { new Integer(CommandCodes.EML_Q_CHECK_AVAIL), "Check Availability" },
@@ -200,6 +200,16 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FILE_Q_NEW_FILES), "Create File" },
       // New File Intent
       { new Integer(CommandCodes.FILE_Q_NEW_FILE_STUDS), "New File Intent" },
+      // Query upload progress
+      { new Integer(CommandCodes.FILE_Q_GET_PROGRESS), "File Progress" },
+      // Upload file content bytes
+      { new Integer(CommandCodes.FILE_Q_UPLOAD_CONTENT), "File Content" },
+      // Update digests - typicaly after or during upload
+      { new Integer(CommandCodes.FILE_Q_UPDATE_DIGESTS), "Update File Signatures" },
+      // Upload Abort
+      { new Integer(CommandCodes.FILE_Q_UPLOAD_ABORT), "Upload Aborted" },
+      // Upload Reset
+      { new Integer(CommandCodes.FILE_Q_UPLOAD_RESET), "Upload Reset" },
       // Get Files
       { new Integer(CommandCodes.FILE_Q_GET_FILES), "Get File Listing" },
       { new Integer(CommandCodes.FILE_Q_GET_FILES_STAGED), "Get File Listing" },
@@ -207,7 +217,9 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FILE_Q_GET_MSG_FILE_ATTACHMENTS), "Get Message File Attachment(s)" },
       // Get File Data Attributes
       { new Integer(CommandCodes.FILE_Q_GET_FILES_DATA_ATTRIBUTES), "Get File Attributes" },
-      // Get File Data 
+      // Get File Data Attributes
+      { new Integer(CommandCodes.FILE_Q_GET_FILE_DATA_ATTRIBUTES), "Get File Attributes" },
+      // Get File Data
       { new Integer(CommandCodes.FILE_Q_GET_FILES_DATA), "Get File Data" },
       // Remove Files
       { new Integer(CommandCodes.FILE_Q_REMOVE_FILES), "Remove File(s)" },
@@ -371,7 +383,7 @@ public class MessageActionNameSwitch extends Object {
       // Login Secure Session
       { new Integer(CommandCodes.USR_A_LOGIN_SECURE_SESSION), "Open Secure Channel" },
 
-      // Login failed -- 
+      // Login failed --
       { new Integer(CommandCodes.USR_E_HANDLE_PASSWORD_COMBO_DNE), "User Handle-Password pair does not exist" },
       { new Integer(CommandCodes.USR_E_USER_LOCKED_OUT), "User Locked Out" },
       { new Integer(CommandCodes.USR_E_LOGIN_FAILED), "Login Failed" },
@@ -453,6 +465,8 @@ public class MessageActionNameSwitch extends Object {
       // *** File Commands ***
       // =====================
 
+      // Upload file content bytes
+      { new Integer(CommandCodes.FILE_A_UPLOAD_COMPLETED), "Content Completed" },
       // New File
       // Get Files
       // Move Files
@@ -460,7 +474,7 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FILE_A_GET_FILES), "Get File List" },
       // Get File Data Attributes
       { new Integer(CommandCodes.FILE_A_GET_FILES_DATA_ATTRIBUTES), "Get File Attributes" },
-      // Get File Data 
+      // Get File Data
       { new Integer(CommandCodes.FILE_A_GET_FILES_DATA), "Get File Data" },
       // Remove Files
       { new Integer(CommandCodes.FILE_A_REMOVE_FILES), "Remove File(s)" },
@@ -522,7 +536,7 @@ public class MessageActionNameSwitch extends Object {
 
       // System Commands
       { new Integer(CommandCodes.SYS_A_PONG), "Keep Alive" },
-      // No-op, sometimes used to release the Writer-Reader worker pair 
+      // No-op, sometimes used to release the Writer-Reader worker pair
       // when no reply to a request is available.
       { new Integer(CommandCodes.SYS_A_NOOP), "Confirmation" },
       // Display a message to user
@@ -588,7 +602,7 @@ public class MessageActionNameSwitch extends Object {
     int index = Arrays.binarySearch(actionInfoNames, new Integer(code), codeComparator);
     if (index >= 0)
       actionInfoName = (String) actionInfoNames[index][1];
-    else 
+    else
       actionInfoName = "Internet connection quality is poor. Please retry in a little while, code="+code+".";
 
     if (actionInfoName.startsWith("com.CH_")) {

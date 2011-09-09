@@ -98,7 +98,8 @@ public class File_NewFiles_Rq extends ProtocolMsgDataSet {
         dataOut.writeBytes(fileDataRecords[i].getEncEncDataDigest());
         dataOut.writeLongObj(fileDataRecords[i].getSigningKeyId());
         dataOut.writeLongObj(fileDataRecords[i].getEncSize());
-        dataOut.writeFile(isFileStudRequest ? null : fileDataRecords[i].getEncDataFile(), progressMonitor);
+        if (!isFileStudRequest)
+          dataOut.writeFile(fileDataRecords[i].getEncDataFile(), progressMonitor);
       }
     }
 

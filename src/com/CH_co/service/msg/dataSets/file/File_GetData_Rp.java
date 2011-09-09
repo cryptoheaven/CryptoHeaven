@@ -12,18 +12,14 @@
 
 package com.CH_co.service.msg.dataSets.file;
 
-
-import java.io.IOException;
-
-import com.CH_co.util.Misc;
-import com.CH_co.trace.Trace;
-
-import com.CH_co.io.DataInputStream2; 
-import com.CH_co.io.DataOutputStream2;
+import com.CH_co.io.*;
+import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
 
-import com.CH_co.monitor.ProgMonitorI;
+import java.io.IOException;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -31,7 +27,7 @@ import com.CH_co.monitor.ProgMonitorI;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -39,17 +35,20 @@ import com.CH_co.monitor.ProgMonitorI;
  *
  * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class File_GetData_Rp extends ProtocolMsgDataSet {
 
-  // <numberOfFiles> { 
-  //      <fileLinkId> <fileId> <encOrigDataDigest> <encSignedOrigDigest> <encEncDataDigest>  
+  // <numberOfFiles> {
+  //      <fileLinkId> <fileId> <encOrigDataDigest> <encSignedOrigDigest> <encEncDataDigest>
   //      <signingKeyId> <fileCreated> <fileUpdated> <encSize> <encDataFile>
   //      }*
 
   public Long[] fileLinkIds;
   public FileDataRecord[] fileDataRecords;
+  public Long errFileId;
+  public Long errFileLinkId;
+  public boolean errIsPermanent;
 
   /** Creates new File_GetData_Rp */
   public File_GetData_Rp() {
@@ -77,7 +76,7 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
   } // end writeToStream()
 
 
-  /** 
+  /**
    * Partially writes out 'this' object to a stream.
    * Used when writing files straight from the database connection to the stream.
    * Writes all attributes except for the file itself
@@ -88,9 +87,12 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
 
     if (index == 0) {
       // write indicator
-      if (fileDataRecords == null)
+      if (fileDataRecords == null) {
         dataOut.write(0);
-      else {
+        dataOut.writeLongObj(errFileId);
+        dataOut.writeLongObj(errFileLinkId);
+        dataOut.writeBoolean(errIsPermanent);
+      } else {
         dataOut.write(1);
 
         int length = fileLinkIds.length;
@@ -101,17 +103,17 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
       }
     }
 
-    dataOut.writeLongObj(fileLinkIds[index]);
-    dataOut.writeLongObj(fileDataRecords[index].fileId);
-    dataOut.writeBytes(fileDataRecords[index].getEncOrigDataDigest());
-    dataOut.writeBytes(fileDataRecords[index].getEncSignedOrigDigest());
-    dataOut.writeBytes(fileDataRecords[index].getEncEncDataDigest());
-    dataOut.writeLongObj(fileDataRecords[index].getSigningKeyId());
-    dataOut.writeTimestamp(fileDataRecords[index].fileCreated);
-    dataOut.writeTimestamp(fileDataRecords[index].fileUpdated);
-
-    Long fileSizeObj = fileDataRecords[index].getEncSize();
-    dataOut.writeLongObj(fileSizeObj);
+    if (fileDataRecords != null) {
+      dataOut.writeLongObj(fileLinkIds[index]);
+      dataOut.writeLongObj(fileDataRecords[index].fileId);
+      dataOut.writeBytes(fileDataRecords[index].getEncOrigDataDigest());
+      dataOut.writeBytes(fileDataRecords[index].getEncSignedOrigDigest());
+      dataOut.writeBytes(fileDataRecords[index].getEncEncDataDigest());
+      dataOut.writeLongObj(fileDataRecords[index].getSigningKeyId());
+      dataOut.writeTimestamp(fileDataRecords[index].fileCreated);
+      dataOut.writeTimestamp(fileDataRecords[index].fileUpdated);
+      dataOut.writeLongObj(fileDataRecords[index].getEncSize());
+    }
 
     if (trace != null) trace.exit(File_GetData_Rp.class);
   } // end partialWriteToStream()
@@ -124,9 +126,12 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
 
     // read indicator
     int indicator = dataIn.read();
-    if (indicator == 0)
+    if (indicator == 0) {
       fileDataRecords = new FileDataRecord[0];
-    else {
+      errFileId = dataIn.readLongObj();
+      errFileLinkId = dataIn.readLongObj();
+      errIsPermanent = dataIn.readBoolean();
+    } else {
       int length = dataIn.readShort();
       fileLinkIds = new Long[length];
       fileDataRecords = new FileDataRecord[length];
@@ -157,6 +162,9 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
     return "[File_GetData_Rp"
       + ": fileLinkIds=" + Misc.objToStr(fileLinkIds)
       + ", fileDataRecords=" + Misc.objToStr(fileDataRecords)
+      + ", errFileId=" + errFileId
+      + ", errFileLinkId=" + errFileLinkId
+      + ", errIsPermanent=" + errIsPermanent
       + "]";
   }
 
@@ -169,6 +177,9 @@ public class File_GetData_Rp extends ProtocolMsgDataSet {
     return "[File_GetData_Rp"
       + "\n: fileLinkIds=" + Misc.objToStr(fileLinkIds)
       + "\n, fileDataRecords=" + recordsBuf.toString()
+      + "\n, errFileId=" + errFileId
+      + "\n, errFileLinkId=" + errFileLinkId
+      + "\n, errIsPermanent=" + errIsPermanent
       + "]";
   }
 

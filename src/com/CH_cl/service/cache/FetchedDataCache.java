@@ -78,6 +78,7 @@ public class FetchedDataCache extends Object {
   private MultiHashMap folderShareRecordMap_byFldId;
   private MultiHashMap folderShareRecordMap_byOwnerId;
   private Map fileLinkRecordMap;
+  private MultiHashMap fileLinkRecordMap_byFileId; // key is the fileId
   private Map fileDataRecordMap;
   private Map invEmlRecordMap;
   private Map keyRecordMap;
@@ -130,6 +131,7 @@ public class FetchedDataCache extends Object {
     folderShareRecordMap_byFldId = new MultiHashMap(true);
     folderShareRecordMap_byOwnerId = new MultiHashMap(true);
     fileLinkRecordMap = new HashMap();
+    fileLinkRecordMap_byFileId = new MultiHashMap(true);
     fileDataRecordMap = new HashMap();
     invEmlRecordMap = new HashMap();
     keyRecordMap = new HashMap();
@@ -172,6 +174,7 @@ public class FetchedDataCache extends Object {
       encodedPassword = null;
 
       fileLinkRecordMap.clear();
+      fileLinkRecordMap_byFileId.clear();
       fileDataRecordMap.clear();
       msgLinkRecordMap.clear();
       msgLinkRecordMap_byMsgId.clear();
@@ -1462,14 +1465,21 @@ public class FetchedDataCache extends Object {
             case Record.RECORD_TYPE_MESSAGE:
               // any password protected message has the key
               MsgDataRecord msgDataRecord = getMsgDataRecord(fLink.ownerObjId);
+              MsgLinkRecord[] msgLinkRecords = null;
               if (msgDataRecord.bodyPassHash != null) {
                 unsealingKey = msgDataRecord.getSymmetricBodyKey();
               } else {
                 // any message link has a symmetric key for the message data and attached files
-                MsgLinkRecord[] msgLinkRecords = getMsgLinkRecordsForMsg(fLink.ownerObjId);
+                msgLinkRecords = getMsgLinkRecordsForMsg(fLink.ownerObjId);
                 if (msgLinkRecords != null && msgLinkRecords.length > 0)
                   unsealingKey = msgLinkRecords[0].getSymmetricKey();
               }
+              // clear parent message rendering cache as it might need to be updated with new attachments
+              if (msgLinkRecords == null)
+                msgLinkRecords = getMsgLinkRecordsForMsg(fLink.ownerObjId);
+              MsgLinkRecord.clearPostRenderingCache(msgLinkRecords);
+              // re-inject the parent message into cache to trigger listener updates
+              addMsgLinkRecords(msgLinkRecords);
               break;
             default:
               throw new IllegalArgumentException("Not supported: ownerObjType=" + ownerObjType);
@@ -1480,6 +1490,7 @@ public class FetchedDataCache extends Object {
         } // end for
 
         records = (FileLinkRecord[]) RecordUtils.merge(fileLinkRecordMap, records);
+        for (int i=0; i<records.length; i++) fileLinkRecordMap_byFileId.put(records[i].fileId, records[i]);
       } // end synchronized
       fireFileLinkRecordUpdated(records, RecordEvent.SET);
 
@@ -1500,6 +1511,10 @@ public class FetchedDataCache extends Object {
     if (records != null && records.length > 0) {
       synchronized (this) {
         records = (FileLinkRecord[]) RecordUtils.remove(fileLinkRecordMap, records);
+        if (records != null) {
+          // for removed links remove them from secondary hashtable
+          for (int i=0; i<records.length; i++) fileLinkRecordMap_byFileId.remove(records[i].fileId, records[i]);
+        }
       }
       fireFileLinkRecordUpdated(records, RecordEvent.REMOVE);
 
@@ -1578,6 +1593,20 @@ public class FetchedDataCache extends Object {
     // find the corresponding folderId
     Long folderId = getFolderShareRecord(shareId).folderId;
     return getFileLinkRecordsOwnerAndType(folderId, new Short(Record.RECORD_TYPE_FOLDER));
+  }
+
+  /**
+   * @return all cached links for a given fileId
+   */
+  public synchronized FileLinkRecord[] getFileLinkRecordsForFile(Long fileId) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFileLinkRecordsForFile(Long fileId)");
+    if (trace != null) trace.args(fileId);
+
+    Collection linksL = fileLinkRecordMap_byFileId.getAll(fileId);
+    FileLinkRecord[] links = (FileLinkRecord[]) ArrayUtils.toArray(linksL, FileLinkRecord.class);
+
+    if (trace != null) trace.exit(FetchedDataCache.class, links);
+    return links;
   }
 
   /**
@@ -2181,14 +2210,19 @@ public class FetchedDataCache extends Object {
           } else if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
             // any password protected message has the key
             MsgDataRecord msgDataRecord = getMsgDataRecord(link.ownerObjId);
+            MsgLinkRecord[] msgLinkRecords = null;
             if (msgDataRecord.bodyPassHash != null) {
               link.unSeal(msgDataRecord.getSymmetricBodyKey());
             } else {
               // any message link has a symmetric key for the message data and attached files
-              MsgLinkRecord[] lRecs = getMsgLinkRecordsForMsg(link.ownerObjId);
-              if (lRecs != null && lRecs.length > 0)
-                link.unSeal(lRecs[0].getSymmetricKey());
+              msgLinkRecords = getMsgLinkRecordsForMsg(link.ownerObjId);
+              if (msgLinkRecords != null && msgLinkRecords.length > 0)
+                link.unSeal(msgLinkRecords[0].getSymmetricKey());
             }
+            // clear parent message rendering cache as it might need to be updated with new attachments
+            if (msgLinkRecords == null)
+              msgLinkRecords = getMsgLinkRecordsForMsg(link.ownerObjId);
+            MsgLinkRecord.clearPostRenderingCache(msgLinkRecords);
           }
         }
       } catch (Throwable t) {

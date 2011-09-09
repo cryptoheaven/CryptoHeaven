@@ -456,7 +456,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               MessageAction mAction = (MessageAction) iter.next();
               InterruptMessageAction interruptAction = new InterruptMessageAction(mAction);
               interruptAction.setClientContext(sessionContext);
-              replyFifoWriterI.add(interruptAction);
+              if (!workerManager.isDestroyed()) // prevent adding interrupt jobs if we were destroyed and are cleaning up...
+                replyFifoWriterI.add(interruptAction);
             }
           } catch (Throwable t) {
             // catch all to allow the rest of the cleanup
@@ -555,7 +556,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               dataIn.wait(60000);
             } catch (InterruptedException e) {
             }
-            if (trace != null) trace.data(55, "Woke up from waiting for secured streams or unlock upon login error.");
+            if (trace != null) trace.data(55, "Woke up from waiting for secured streams or unlock upon login failure.");
             workerManager.workerLoginComplete(ServerInterfaceWorker.this, loginSuccessful);
           }
         } // end synchronized
@@ -967,7 +968,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           } catch (InterruptedException e) {
             if (trace != null) trace.data(45, "We got an Interrupt Exception -- this is OK, quit waiting now.");
           }
-          if (trace != null) trace.data(50, "Woke up from waiting for secured streams or unlock upon login error.");
+          if (trace != null) trace.data(50, "Woke up from waiting for secured streams or unlock upon login failure.");
         } // end synchronized
 
       } // end if synchronized request-reply action

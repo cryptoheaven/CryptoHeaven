@@ -178,16 +178,23 @@ public class DataOutputStream2 extends DataOutputStream {
       writeByte(nullIndicator);
       FileUtils.writeFileLength(this, fileSize);
     }
-    FileUtils.moveData(fileIn, (OutputStream) this, partLength, null);
+    if (fileSize >= 0) {
+      FileUtils.moveData(fileIn, (OutputStream) this, partLength, null);
+    } else {
+      FileUtils.writePartLength(this, (int) partLength);
+      FileUtils.moveData(fileIn, (OutputStream) this, partLength, null);
+    }
   }
 
   public void writeFileStream(File file, InputStream in, ProgMonitorI progressMonitor) throws IOException {
-    byte nullIndicator = (byte) ((file != null) ? 0 : -1);
+    byte nullIndicator = (byte) ((in != null) ? 0 : -1);
     writeByte(nullIndicator);
 
     // final file size is unknown as it maybe appended during transfer, will send continuous stream in pieces
-    if (nullIndicator == 0)
+    if (nullIndicator == 0) {
+      FileUtils.writeFileLength(this, -1);
       FileUtils.moveDataStreamEOF(file, in, (DataOutputStream) this, progressMonitor);
+    }
   }
 
 }

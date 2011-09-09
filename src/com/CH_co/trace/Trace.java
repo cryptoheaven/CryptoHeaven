@@ -345,15 +345,18 @@ public class Trace extends Object {
     }
   }
   private void tracePoint(int level, int tracePoint, Object obj) {
-    tracePoint(level, tracePoint, obj, null, null, 1);
+    tracePoint(level, tracePoint, obj, null, null, null, 1);
   }
   private void tracePoint(int level, int tracePoint, Object obj1, Object obj2) {
-    tracePoint(level, tracePoint, obj1, obj2, null, 2);
+    tracePoint(level, tracePoint, obj1, obj2, null, null, 2);
   }
   private void tracePoint(int level, int tracePoint, Object obj1, Object obj2, Object obj3) {
-    tracePoint(level, tracePoint, obj1, obj2, obj3, 3);
+    tracePoint(level, tracePoint, obj1, obj2, obj3, null, 3);
   }
-  private void tracePoint(int level, int tracePoint, Object obj1, Object obj2, Object obj3, int numObjs) {
+  private void tracePoint(int level, int tracePoint, Object obj1, Object obj2, Object obj3, Object obj4) {
+    tracePoint(level, tracePoint, obj1, obj2, obj3, obj4, 4);
+  }
+  private void tracePoint(int level, int tracePoint, Object obj1, Object obj2, Object obj3, Object obj4, int numObjs) {
     synchronized (staticMonitor) {
       if (debugLevelBelow(level)) return;
       switch (numObjs) {
@@ -367,6 +370,9 @@ public class Trace extends Object {
           break;
         case 3:
           addLine(getHeading(level) + " " + tracePoint + ": " + objToStr(obj1) + ", " + objToStr(obj2) + ", " + objToStr(obj3));
+          break;
+        case 4:
+          addLine(getHeading(level) + " " + tracePoint + ": " + objToStr(obj1) + ", " + objToStr(obj2) + ", " + objToStr(obj3) + ", " + objToStr(obj4));
           break;
       }
     }
@@ -397,6 +403,10 @@ public class Trace extends Object {
   public void info(int tracePoint, Object obj1, Object obj2, Object obj3) {
     if (this == dumpingTrace) return;
     tracePoint(INFO, tracePoint, obj1, obj2, obj3);
+  }
+  public void info(int tracePoint, Object obj1, Object obj2, Object obj3, Object obj4) {
+    if (this == dumpingTrace) return;
+    tracePoint(INFO, tracePoint, obj1, obj2, obj3, obj4);
   }
 
 
@@ -431,6 +441,10 @@ public class Trace extends Object {
   public void data(int tracePoint, Object obj1, Object obj2, Object obj3) {
     if (this == dumpingTrace) return;
     tracePoint(DATA, tracePoint, obj1, obj2, obj3);
+  }
+  public void data(int tracePoint, Object obj1, Object obj2, Object obj3, Object obj4) {
+    if (this == dumpingTrace) return;
+    tracePoint(DATA, tracePoint, obj1, obj2, obj3, obj4);
   }
 
 

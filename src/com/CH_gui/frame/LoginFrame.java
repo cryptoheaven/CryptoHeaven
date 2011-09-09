@@ -65,6 +65,9 @@ import javax.swing.text.*;
  */
 public class LoginFrame extends JFrame {
 
+  private static final boolean ENABLE_PASSWORD_LENGTH_NOTE = false;
+  private static final boolean ENABLE_PASSWORD_NON_RECOVERY_WARNING = true;
+
   protected static final String PROPERTY_USER_NAME = "LastUserName";
   private static final String PROPERTY_USER_NAME_LIST = "LastUserNameList";
   private static final String PROPERTY_SERVER_LIST = "ServerList";
@@ -114,7 +117,7 @@ public class LoginFrame extends JFrame {
   private JLabel advancedLabel ;
   private JButton advancedButton ;
   private JLabel accountCodeLabel ;
-  private JTextField accountCode ;
+  private JMyTextField accountCode ;
   private JCheckBox rememberUserName ;
   private JLabel versionLabel ;
   private JLabel licenseConditionLabel ;
@@ -360,7 +363,8 @@ public class LoginFrame extends JFrame {
 
 //    mainPanel.remove(newEmailLabel);
 //    mainPanel.remove(newEmail);
-    mainPanel.remove(passwordConditionLabel);
+    if (passwordConditionLabel != null)
+      mainPanel.remove(passwordConditionLabel);
     mainPanel.remove(reTypeLabel);
     mainPanel.remove(retypePassword);
     mainPanel.remove(currentEmailLabel);
@@ -421,6 +425,7 @@ public class LoginFrame extends JFrame {
     }
     if (accountCode == null) {
       accountCode = new JMyTextField();
+      accountCode.setBackgroundTextWhenEmpty(" leave empty for a free account with ads");
       accountCode.setText(URLs.get(URLs.ACTIVATION_CODE_DEFAULT));
     }
     if (expectedTime == null)
@@ -523,8 +528,10 @@ public class LoginFrame extends JFrame {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
 
     // Password Length Warning
-    mainPanel.add(passwordConditionLabel, new GridBagConstraints(1, 16, 4, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 20, 20));
+    if (passwordConditionLabel != null) {
+      mainPanel.add(passwordConditionLabel, new GridBagConstraints(1, 16, 4, 1, 10, 0,
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 20, 20));
+    }
 
     versionLabel.setVisible(false);
 
@@ -562,11 +569,20 @@ public class LoginFrame extends JFrame {
 
 
   public static JLabel getPasswordHint() {
-    JLabel warningLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password_length_recommendation..."));
-    warningLabel.setIcon(Images.get(ImageNums.SHIELD32));
-    warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
-    warningLabel.setHorizontalAlignment(JLabel.LEFT);
-    warningLabel.setVerticalTextPosition(JLabel.TOP);
+    JLabel warningLabel = null;
+    if (ENABLE_PASSWORD_LENGTH_NOTE && ENABLE_PASSWORD_NON_RECOVERY_WARNING)
+      throw new IllegalStateException("Please use one warning note only!");
+    if (ENABLE_PASSWORD_LENGTH_NOTE) {
+      warningLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password_length_recommendation..."));
+    } else if (ENABLE_PASSWORD_NON_RECOVERY_WARNING) {
+      warningLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password_non-recovery_warning..."));
+    }
+    if (warningLabel != null) {
+      warningLabel.setIcon(Images.get(ImageNums.SHIELD32));
+      warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
+      warningLabel.setHorizontalAlignment(JLabel.LEFT);
+      warningLabel.setVerticalTextPosition(JLabel.TOP);
+    }
     return warningLabel;
   }
 

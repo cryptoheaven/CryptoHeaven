@@ -1623,9 +1623,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       }
     }
     StringBuffer errorSB = new StringBuffer();
-    appendInvalidRecipientErrorMsg(errorSB, badContactsL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
-    appendInvalidRecipientErrorMsg(errorSB, badAddressesL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
-    appendInvalidRecipientErrorMsg(errorSB, badFoldersL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
+    appendInvalidRecipientErrMsg(errorSB, badContactsL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
+    appendInvalidRecipientErrMsg(errorSB, badAddressesL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
+    appendInvalidRecipientErrMsg(errorSB, badFoldersL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
     if (errorSB.length() > 0) {
       String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
       MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, NotificationCenter.WARNING_MESSAGE, false);
@@ -1641,9 +1641,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
 
-  private static void appendInvalidRecipientErrorMsg(StringBuffer errorSB, ArrayList recsL, String msgPrefix) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "appendInvalidRecipientErrorMsg(StringBuffer errorSB, ArrayList recsL, String msgPrefix)");
-    if (trace != null) trace.args(errorSB, recsL, msgPrefix);
+  private static void appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix)");
+    if (trace != null) trace.args(errSB, recsL, msgPrefix);
     if (recsL != null) {
       StringBuffer sb = new StringBuffer();
       for (int i=0; i<recsL.size(); i++) {
@@ -1651,10 +1651,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         if (i<recsL.size()-1)
           sb.append(", ");
       }
-      if (errorSB.length() > 0) errorSB.append("\n\n");
-      errorSB.append(msgPrefix);
-      errorSB.append("\n\n");
-      errorSB.append(sb.toString());
+      if (errSB.length() > 0) errSB.append("\n\n");
+      errSB.append(msgPrefix);
+      errSB.append("\n\n");
+      errSB.append(sb.toString());
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -2251,7 +2251,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           if (interrupted[0]) break;
           // synchronize every 5 addresses
           if (countProcessed % 5 == 0)
-            SIL.submitAndWait(action, 120000);
+            SIL.submitAndWait(action, 60000, 3);
           else
             SIL.submitAndReturn(action);
           if (progressBar != null)

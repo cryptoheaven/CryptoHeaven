@@ -257,12 +257,16 @@ public class RecycleTableModel extends RecordTableModel {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
     if (msgData != null) {
-      sb.add(msgData.getSubject());
-
-      if (includeMsgBody) {
-        String text = msgData.getText();
-        if (text != null)
-          sb.add(text);
+      // searching chat msgs should also include attachment listing -- use cached string
+      if (includeMsgBody && msgLink.getPostRenderingCache() != null)
+        sb.add(msgLink.getPostRenderingCache());
+      else {
+        sb.add(msgData.getSubject());
+        if (includeMsgBody) {
+          String text = msgData.getText();
+          if (text != null)
+            sb.add(text);
+        }
       }
 
       String fromEmailAddress = msgData.getFromEmailAddress();
@@ -307,7 +311,13 @@ public class RecycleTableModel extends RecordTableModel {
           break;
         case 1: value = fileLink.getFileName();
           break;
-        case 3: value = fileLink.getFileType();
+        case 3: 
+          if (fileLink.isAborted())
+            value = "Upload Aborted by User!";
+          else if(fileLink.isIncomplete())
+            value = "Pending Data Upload...";
+          else
+            value = fileLink.getFileType();
           break;
         case 4: value = fileLink.origSize;
           break;

@@ -18,13 +18,12 @@ import com.CH_cl.service.ops.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
 import com.CH_co.service.msg.*;
 import com.CH_co.service.records.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
 
 import java.io.File;
 
@@ -69,57 +68,73 @@ public class FileAGetFilesData extends ClientMessageAction {
     File_GetData_Rp reply = (File_GetData_Rp) getMsgDataSet();
     Long[] fileLinkIds = reply.fileLinkIds;
     FileDataRecord[] fileDataRecords = reply.fileDataRecords;
+    Long errFileId = reply.errFileId;
+    Long errFileLinkId = reply.errFileLinkId;
+    boolean errIsPermanent = reply.errIsPermanent;
 
-    // data cache for fetching required keys
-    FetchedDataCache cache = getFetchedDataCache();
+    if (errFileId != null) {
+      FetchedDataCache cache = getFetchedDataCache();
+      if (errIsPermanent)
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Download Aborted", "File is not available for downloading, because the original upload was permanently aborted!\n\n"+cache.getFileLinkRecord(errFileLinkId).getFileName());
+      else
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Download Aborted", "File is currently not available for downloading, because the original upload has not finished.  Please try again later.\n\n"+cache.getFileLinkRecord(errFileLinkId).getFileName());
+    } else {
+      // data cache for fetching required keys
+      FetchedDataCache cache = getFetchedDataCache();
 
-    ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(getStamp());
+      ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(getStamp());
 
-    for (int i=0; i<fileDataRecords.length; i++) {
+      for (int i=0; i<fileDataRecords.length; i++) {
+        FileDataRecord fileDataRecord = fileDataRecords[i];
 
-      // get the file link for this data record which contains the symmetricKey
-      FileLinkRecord fileLinkRecord = cache.getFileLinkRecord(fileLinkIds[i]);
-      // get the veryfying key
-      Long keyId = fileDataRecords[i].getSigningKeyId();
-      KeyRecord verifyingKeyRecord = cache.getKeyRecord(keyId);
+        // get the file link for this data record which contains the symmetricKey
+        FileLinkRecord fileLinkRecord = cache.getFileLinkRecord(fileLinkIds[i]);
+        // get the veryfying key
+        Long keyId = fileDataRecord.getSigningKeyId();
+        KeyRecord verifyingKeyRecord = cache.getKeyRecord(keyId);
 
-      if (verifyingKeyRecord == null) {
-        // we need to fetch the verifying key before we can unseal!
-        getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 120000);
-        verifyingKeyRecord = cache.getKeyRecord(keyId);
-      }
+        if (verifyingKeyRecord == null) {
+          // we need to fetch the verifying key before we can unseal!
+          getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 120000);
+          verifyingKeyRecord = cache.getKeyRecord(keyId);
+        }
 
-      try {
-        BASymmetricKey symmetricKey = fileLinkRecord.getSymmetricKey();
-        if (symmetricKey == null)
-          throw new IllegalStateException("File symmetric key is not available.");
-        // un-seal the data record -- create the plain version of encrypted file and verify signatures
-        Boolean isDefaultTempDir = destinationDirectory != null && destinationDirectory.equals(DownloadUtilities.getDefaultTempDir()) ? Boolean.TRUE : Boolean.FALSE;
-        fileDataRecords[i].unSeal(verifyingKeyRecord, symmetricKey,
-                                  destinationDirectory, isDefaultTempDir, fileLinkRecord.getFileName(),
-                                  progressMonitor, fileLinkRecord.origSize);
-        StatOps.markOldIfNeeded(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
-      } catch (Throwable t) {
-        // Failure of one of the files, should not affect the other when processing a few of them here.
-        if (trace != null) trace.exception(FileAGetFilesData.class, 100, t);
+        // We'll need completed data attributes before we can unseal!
+        FileDataRecord fileData = FileDataOps.getOrFetchFileDataAttr(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, fileDataRecord.fileId);
+        fileDataRecord.merge(fileData);
 
-        // show error dialog
-        if (isCancelled() || progressMonitor.isCancelled()) {
-          // Just ignore the error as operation was cancelled by the user.
-          // Just incase it was a streaming reply, set the message as canceled for others to see.
-          setCancelled();
-        } else {
-          String msg = "Exception message is : " + t.getMessage() +
-                       "\n\nError occurred while decrypting and decompressing of file : " + fileLinkRecord.getFileName() +
-                       "\nThe attempted destination directory was : " + destinationDirectory.getAbsolutePath() +
-                       "\nThe private key for digest verification is : " + verifyingKeyRecord.verboseInfo() +
-                       "\nThe symmetric key for decryption of the file is : " + (fileLinkRecord.getSymmetricKey() != null ? fileLinkRecord.getSymmetricKey().verboseInfo() : null);
-          String title = "Error Dialog";
-          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+        try {
+          BASymmetricKey symmetricKey = fileLinkRecord.getSymmetricKey();
+          if (symmetricKey == null)
+            throw new IllegalStateException("File symmetric key is not available.");
+          // un-seal the data record -- create the plain version of encrypted file and verify signatures
+          Boolean isDefaultTempDir = destinationDirectory != null && destinationDirectory.equals(DownloadUtilities.getDefaultTempDir()) ? Boolean.TRUE : Boolean.FALSE;
+          fileDataRecord.unSeal(verifyingKeyRecord, symmetricKey,
+                                    destinationDirectory, isDefaultTempDir, fileLinkRecord.getFileName(),
+                                    progressMonitor, fileLinkRecord.origSize);
+          StatOps.markOldIfNeeded(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+        } catch (Throwable t) {
+          // Failure of one of the files, should not affect the other when processing a few of them here.
+          if (trace != null) trace.exception(FileAGetFilesData.class, 100, t);
+
+          // show error dialog
+          if (isCancelled() || progressMonitor.isCancelled()) {
+            // Just ignore the error as operation was cancelled by the user.
+            // Just incase it was a streaming reply, set the message as canceled for others to see.
+            setCancelled();
+          } else {
+            String msg = "Exception message is : " + t.getMessage() +
+                         "\n\nError occurred while decrypting and decompressing of file : " + fileLinkRecord.getFileName() +
+                         "\nThe attempted destination directory was : " + destinationDirectory.getAbsolutePath() +
+                         "\nThe private key for digest verification is : " + verifyingKeyRecord.verboseInfo() +
+                         "\nThe symmetric key for decryption of the file is : " + (fileLinkRecord.getSymmetricKey() != null ? fileLinkRecord.getSymmetricKey().verboseInfo() : null);
+            String title = "Error Dialog";
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+          }
         }
       }
+      cache.addFileDataRecords(fileDataRecords);
     }
-    cache.addFileDataRecords(fileDataRecords);
 
     if (trace != null) trace.exit(FileAGetFilesData.class, null);
     return null;

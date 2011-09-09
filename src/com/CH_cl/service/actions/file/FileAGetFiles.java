@@ -76,15 +76,15 @@ public class FileAGetFiles extends ClientMessageAction {
     // Share might have been created and not successfuly delivered.
 
     // Gather all necessary folders for incoming file links.
-    Vector folderIDsV = null;
+    ArrayList folderIDsL = null;
     for (int i=0; i<fileLinks.length; i++) {
       FileLinkRecord fLink = fileLinks[i];
       switch (fLink.ownerObjType.shortValue()) {
         case Record.RECORD_TYPE_FOLDER:
           if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
           if (cache.getFolderShareRecordMy(fLink.ownerObjId, groupIDsSet) == null) {
-            if (folderIDsV == null) folderIDsV = new Vector();
-            folderIDsV.addElement(fLink.ownerObjId);
+            if (folderIDsL == null) folderIDsL = new ArrayList();
+            folderIDsL.add(fLink.ownerObjId);
           }
           break;
         case Record.RECORD_TYPE_MESSAGE:
@@ -95,8 +95,8 @@ public class FileAGetFiles extends ClientMessageAction {
           throw new IllegalArgumentException("Not supported: ownerObjType=" + fLink.ownerObjType);
       }
     }
-    if (folderIDsV != null && folderIDsV.size() > 0) {
-      Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsV, Long.class);
+    if (folderIDsL != null && folderIDsL.size() > 0) {
+      Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
       getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
@@ -111,28 +111,28 @@ public class FileAGetFiles extends ClientMessageAction {
 
     // Gather all File Links that we don't have stat records for, and fetch the stats
     {
-      Vector shareIDsV = null;
-      Vector objLinkIDsV = null;
+      ArrayList shareIDsL = null;
+      ArrayList objLinkIDsL = null;
       for (int i=0; i<fileLinks.length; i++) {
         FileLinkRecord link = fileLinks[i];
         if (cache.getStatRecord(link.fileLinkId, FetchedDataCache.STAT_TYPE_FILE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
             FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
-            if (shareIDsV == null) shareIDsV = new Vector();
-            if (objLinkIDsV == null) objLinkIDsV = new Vector();
-            if (!shareIDsV.contains(share.shareId))
-              shareIDsV.addElement(share.shareId);
-            if (!objLinkIDsV.contains(link.fileLinkId))
-              objLinkIDsV.addElement(link.fileLinkId);
+            if (shareIDsL == null) shareIDsL = new ArrayList();
+            if (objLinkIDsL == null) objLinkIDsL = new ArrayList();
+            if (!shareIDsL.contains(share.shareId))
+              shareIDsL.add(share.shareId);
+            if (!objLinkIDsL.contains(link.fileLinkId))
+              objLinkIDsL.add(link.fileLinkId);
           }
         }
       }
-      if (shareIDsV != null && shareIDsV.size() > 0 && objLinkIDsV != null && objLinkIDsV.size() > 0) {
-        Long[] shareIDs = new Long[shareIDsV.size()];
-        shareIDsV.toArray(shareIDs);
-        Long[] objLinkIDs = new Long[objLinkIDsV.size()];
-        objLinkIDsV.toArray(objLinkIDs);
+      if (shareIDsL != null && shareIDsL.size() > 0 && objLinkIDsL != null && objLinkIDsL.size() > 0) {
+        Long[] shareIDs = new Long[shareIDsL.size()];
+        shareIDsL.toArray(shareIDs);
+        Long[] objLinkIDs = new Long[objLinkIDsL.size()];
+        objLinkIDsL.toArray(objLinkIDs);
 
         Stats_Get_Rq request = new Stats_Get_Rq();
         request.statsForObjType = new Short(Record.RECORD_TYPE_FILE_LINK);

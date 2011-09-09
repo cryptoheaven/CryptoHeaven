@@ -550,13 +550,13 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
           }
 
           long encSize = fileData.getEncSize().longValue();
-          if (encSize < 0) {
+          if (encSize < 0 || fileData.recordSize.longValue() <= 0) {
             jSizeOnDisk.setText("Upload incomplete.");
           } else {
-            long recSize = fileData.recordSize.longValue();
-            String oSize = Misc.getFormattedSize(recSize, 3, 2);
-            if (recSize >= 1000)
-              oSize += " (" + Misc.getFormattedSize(recSize, 10, 10) + ")";
+            long encSizeWithHeaders = encSize + 512;
+            String oSize = Misc.getFormattedSize(encSizeWithHeaders, 3, 2);
+            if (encSizeWithHeaders >= 1000)
+              oSize += " (" + Misc.getFormattedSize(encSizeWithHeaders, 10, 10) + ")";
             jSizeOnDisk.setText(oSize);
           }
           jDataCreated.setText(Misc.getFormattedTimestamp(fileData.fileCreated));

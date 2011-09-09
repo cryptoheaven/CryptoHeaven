@@ -12,9 +12,10 @@
 
 package com.CH_gui.list;
 
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_gui.gui.*;
+
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
@@ -25,10 +26,6 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -772,8 +769,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     setBorder(BorderFactory.createEtchedBorder());
     setLayout(new GridBagLayout());
 
-    initSource(new ListRenderer(false, true, true, this));
-    initDest(new ListRenderer(false, true, true, null));
+    initSource(new ListRenderer(false, true, true, false, this));
+    initDest(new ListRenderer(false, true, true, false, null));
 
     addButton = new JMyButton(ADD_BUTTON_LABEL);
     removeButton = new JMyButton(REMOVE_BUTTON_LABEL);
