@@ -560,14 +560,15 @@ public class MsgPanelUtils extends Object {
    * visually but made displayable.
    */
   public static boolean setMessageContent(String content, boolean isHTML, JComponent jMessage) {
-    return setMessageContent(content, isHTML, jMessage, false, false);
+    return setMessageContent(content, isHTML, jMessage, false, true, false);
   }
-  public static boolean setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing, boolean skipCaretPlacement) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing, boolean skipCaretPlacement)");
+  public static boolean setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing, boolean skipRemoteLoadingCleaning, boolean skipCaretPlacement) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setMessageContent(String content, boolean isHTML, JComponent jMessage, boolean skipHeaderClearing, boolean skipRemoteLoadingCleaning, boolean skipCaretPlacement)");
     if (trace != null) trace.args(content == null || content.length() < 255 ? content : "too long length="+content.length());
     if (trace != null) trace.args(isHTML);
     if (trace != null) trace.args(jMessage);
     if (trace != null) trace.args(skipHeaderClearing);
+    if (trace != null) trace.args(skipRemoteLoadingCleaning);
     if (trace != null) trace.args(skipCaretPlacement);
 
     boolean displayedOk = false;
@@ -605,7 +606,8 @@ public class MsgPanelUtils extends Object {
         if (trace != null) trace.exception(MsgPanelUtils.class, -10, t);
       }
       if (isHTML && !skipHeaderClearing) {
-        content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(content, true, true, true, true);
+        boolean isRemoveRemoteLoading = !skipRemoteLoadingCleaning;
+        content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(content, true, true, true, true, true, isRemoveRemoteLoading);
       }
     }
 
@@ -826,7 +828,7 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (isHtmlMode) {
-      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, true, false, false, true);
+      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, true, true, false, false, true, false);
     }
     boolean addSpaces = text.trim().length() > 0;
     if (inHtmlMode != isHtmlMode) {
@@ -959,14 +961,15 @@ public class MsgPanelUtils extends Object {
   private static final HashMap previewContentHM = new HashMap();
   private static Thread previewContentSetter = null;
   private static final Object previewContentSetterMonitor = new Object(); // synchronizes lazy initialization
-  public static void setPreviewContent_Threaded(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, JComponent messageViewer) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setPreviewContent_Threaded(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, JComponent messageViewer)");
+  public static void setPreviewContent_Threaded(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, boolean skipRemoteLoadingCleaning, JComponent messageViewer) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "setPreviewContent_Threaded(String content, boolean isHTMLview, boolean convertHTMLtoPLAIN, boolean skipHeaderClearing, boolean skipRemoteLoadingCleaning, JComponent messageViewer)");
     if (trace != null) trace.args("content blanked");
     if (trace != null) trace.args(isHTMLview);
     if (trace != null) trace.args(convertHTMLtoPLAIN);
     if (trace != null) trace.args(skipHeaderClearing);
+    if (trace != null) trace.args(skipRemoteLoadingCleaning);
 
-    Object[] data = new Object[] { content, Boolean.valueOf(isHTMLview), Boolean.valueOf(convertHTMLtoPLAIN), Boolean.valueOf(skipHeaderClearing), messageViewer };
+    Object[] data = new Object[] { content, Boolean.valueOf(isHTMLview), Boolean.valueOf(convertHTMLtoPLAIN), Boolean.valueOf(skipHeaderClearing), Boolean.valueOf(skipRemoteLoadingCleaning), messageViewer };
     synchronized (previewContentHM) {
       previewContentHM.put(messageViewer, data);
       previewContentHM.notifyAll();
@@ -1003,7 +1006,8 @@ public class MsgPanelUtils extends Object {
                   final boolean isHTMLview = ((Boolean) data[1]).booleanValue();
                   final boolean convertHTMLtoPLAIN = ((Boolean) data[2]).booleanValue();
                   final boolean skipHeaderClearing = ((Boolean) data[3]).booleanValue();
-                  final JComponent messageViewer = (JComponent) data[4];
+                  final boolean skipRemoteLoadingCleaning = ((Boolean) data[4]).booleanValue();
+                  final JComponent messageViewer = (JComponent) data[5];
                   // if PLAIN text mode and HTML message, condition the text to eliminate the tags
                   if (convertHTMLtoPLAIN) {
                     content[0] = MsgPanelUtils.extractPlainFromHtml(content[0]);
@@ -1013,16 +1017,19 @@ public class MsgPanelUtils extends Object {
                     SwingUtilities.invokeAndWait(new Runnable() {
                       public void run() {
                         try {
-                          MsgPanelUtils.setMessageContent(content[0], isHTMLview, messageViewer, skipHeaderClearing, false);
+                          MsgPanelUtils.setMessageContent(content[0], isHTMLview, messageViewer, skipHeaderClearing, skipRemoteLoadingCleaning, false);
                         } catch (Throwable t) {
+                          t.printStackTrace();
                         }
                       }
                     });
                   } catch (InterruptedException x) {
+                    x.printStackTrace();
                   }
                 }
               } catch (Throwable t) {
                 // just incase so the while loop goes forever
+                t.printStackTrace();
               }
             } // end while
             // when thread exits, cleanup static data so it can be reinitialized

@@ -33,15 +33,24 @@ import com.CH_co.util.*;
  */
 public class HTML_Ops {
 
-  public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment)");
+  public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment, boolean isRemoveRemoteLoading) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment, boolean isRemoveRemoteLoading)");
     if (trace != null) trace.args(htmlMessage != null && htmlMessage.length() < 255 ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null"));
+    if (trace != null) trace.args(isRemoveStyles);
     if (trace != null) trace.args(isRemoveHead);
     if (trace != null) trace.args(isRemoveLeadP);
     if (trace != null) trace.args(isRemoveMap);
     if (trace != null) trace.args(isRemoveComment);
+    if (trace != null) trace.args(isRemoveRemoteLoading);
 
     if (htmlMessage != null) {
+
+      if (isRemoveStyles) {
+        String[][] startTags = new String[][] {{ "<style", "<STYLE" }};
+        String[][] endTags = new String[][] {{ "</style>", "</STYLE>" }};
+        htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+      }
+
       if (isRemoveHead) {
         boolean isBodyPresent = htmlMessage.indexOf("<body") >= 0 || htmlMessage.indexOf("<BODY") >= 0;
         String[][] startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
@@ -99,6 +108,20 @@ public class HTML_Ops {
         String[][] startTags = new String[][] {{ "<!--" }};
         String[][] endTags = new String[][] {{ "-->" }};
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+      }
+
+      // removes loading of resources through styles
+      // <td style="background-image:url(http://img.en25.com/eloquaimages/clients/Tridel/{7c789a68-f648-42f2-aa2f-47a92ab8dbc8}_av2_nowavailable_bg_410.jpg);background-repeat:no-repeat;" width="410" align="left" valign="top">
+      if (isRemoveRemoteLoading) {
+        if (htmlMessage.indexOf("url(") >= 0 || htmlMessage.indexOf("URL(") >= 0)
+        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+          new String[][] {
+                  // make it not-loadable, comment out the url
+                  { ":url(", ":urlx(" },
+                  { ": url(", ": urlx(" },
+                  { ":URL(", ":URLX(" },
+                  { ": URL(", ": URLX(" },
+                }, new String[] { "<" }, new String[] { ">" }, true);
       }
 
       {

@@ -1245,7 +1245,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // << comes in HTML
       if (dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         // clear any styles in the header
-        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, true, true, true);
+        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, true, true, true, true, false);
         if (convertHTMLBodyToPlain) {
           String html = quotedMsgBody;
           if (trace != null) trace.data(50, "extracting plain from html");

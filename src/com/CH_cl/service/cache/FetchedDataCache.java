@@ -1663,10 +1663,6 @@ public class FetchedDataCache extends Object {
         records = (FileDataRecord[]) RecordUtils.merge(fileDataRecordMap, records);
       }
       //fireFileDataRecordUpdated(records, RecordEvent.SET);
-      // temporary enc files should be expired now, plain files are already created.
-      for (int i=0; i<records.length; i++) {
-        records[i].cleanupEncFile();
-      }
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);

@@ -265,6 +265,10 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       // from Toolbar button
       fromMenu = false;
       fromPopup = false;
+    } else if (source instanceof HTML_ClickablePane) {
+      // from HTML document / template
+      fromMenu = false;
+      fromPopup = false;
     } else {
       Object prev = null;
       while (source != null && (source instanceof JPopupMenu || source instanceof JMenuItem)) {
@@ -687,7 +691,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                             Object token = new Object();
                             if (offlineDialogArbiter.putToken(key, token)) {
                               String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_{0}_left_the_chat_area_and_went_Offline."), new Object[] {msgUserName});
-                              PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/StatusOffline16.png\" height=\"16\" width=\"16\">&nbsp;"+msg, true);
+                              PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/"+ImageNums.getImageName(ImageNums.STATUS_OFFLINE16)+"\" height=\"16\" width=\"16\">&nbsp;"+msg, true);
                               Sounds.playAsynchronous(Sounds.OFFLINE);
                               try {
                                 // wait for other chat scrolling events for the same user to skip over this arbiter
@@ -723,7 +727,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                     Object token = new Object();
                     if (offlineDialogArbiter.putToken(key, token)) {
                       String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {msgUserName});
-                      String iconStr = ImageNums.getImageName(imageCode) + ".png";
+                      String iconStr = ImageNums.getImageName(imageCode);
                       MouseListener clickListener = new MouseAdapter() {
                         public void mouseClicked(MouseEvent e) {
                           if (!_isProcessed[0]) {

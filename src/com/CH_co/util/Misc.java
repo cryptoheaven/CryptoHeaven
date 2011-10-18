@@ -15,7 +15,7 @@ package com.CH_co.util;
 import com.CH_co.unicode.*;
 
 import java.io.*;
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 import java.net.*;
 import java.text.*;
 import java.util.*;
@@ -35,6 +35,7 @@ public class Misc extends Object {
   public static boolean DEBUG_ON_MINIMIZE_STATIC_MEMORY_BUFFERS = false;
 
   private static DisposableObj systemExitObj;
+  private static boolean isRunningFromJNLP = false;
 
   // Used for gui suppression.
   private static boolean guiSuppressed = false;
@@ -72,6 +73,25 @@ public class Misc extends Object {
   }
   public static boolean isRunningFromApplet() {
     return systemExitObj != null && systemExitObj instanceof AppletTypeI;
+  }
+
+  public static void setIsRunningFromJNLP() {
+    try {
+      Class c = Class.forName("javax.jnlp.ServiceManager");
+      if (c != null) {
+        Method m = c.getMethod("lookup", new Class[] { String.class });
+        if (m != null) {
+          Object o = m.invoke(null, new Object[] { "javax.jnlp.DownloadService" });
+          if (o != null)
+            isRunningFromJNLP = true;
+        }
+      }
+    } catch (Throwable t) {
+    }
+  }
+
+  public static boolean isRunningFromJNLP() {
+    return isRunningFromJNLP;
   }
 
   public static void killSocket(Socket socket) {

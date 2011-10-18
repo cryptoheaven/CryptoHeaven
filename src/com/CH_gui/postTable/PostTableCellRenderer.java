@@ -225,7 +225,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       editor.setBorder(RecordTableCellRenderer.getIndentedBorder(0, false));
 
       // Set contents of the message area
-      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true, true);
+      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true, true, true);
       //xx-xx editor.setText(value.toString());
 
 //      editor.setPreferredWidthLimit(usableColumnWidth);

@@ -98,9 +98,9 @@ public class Images extends Object {
             } else {
               fileName = "images/" + name;
               location = URLs.getResourceURL(fileName);
-              if (location == null)
+              if (location == null && name.indexOf('.') < 0)
                 location = URLs.getResourceURL(fileName + ".png");
-              if (location == null)
+              if (location == null && name.indexOf('.') < 0)
                 location = URLs.getResourceURL(fileName + ".gif");
             }
           }
@@ -153,12 +153,12 @@ public class Images extends Object {
       javax.swing.JFrame frameL = new javax.swing.JFrame("All Available Icons - Large");
       java.awt.Container cL = frameL.getContentPane();
       javax.swing.JPanel panelL = new javax.swing.JPanel();
-      panelL.setLayout(new java.awt.GridLayout(5, 3));
+      panelL.setLayout(new java.awt.GridLayout(8, 3));
       //panelL.setLayout(new java.awt.FlowLayout());
       for (int i=0; i<ImageNums.NUMBER_OF_IMAGES; i++) {
         ImageIcon icon = get(i);
         if (icon != null) {
-          if ((icon.getIconHeight() > 32 || icon.getIconWidth() > 32) && icon.getIconWidth() < 200) {
+          if ((icon.getIconHeight() > 32 || icon.getIconWidth() > 32) && icon.getIconWidth() < 900) {
             javax.swing.JLabel item = new javax.swing.JLabel(ImageNums.getImageName(i), icon, javax.swing.JLabel.LEFT);
             item.setVerticalTextPosition(javax.swing.JLabel.CENTER);
             panelL.add(item);
@@ -185,6 +185,10 @@ public class Images extends Object {
             panel.add(item);
           }
         } else {
+          javax.swing.JLabel item = new javax.swing.JLabel(ImageNums.getImageName(i)+" NULL", javax.swing.JLabel.LEFT);
+          item.setForeground(Color.red);
+          item.setVerticalTextPosition(javax.swing.JLabel.CENTER);
+          panel.add(item);
           System.out.println("Null icon " + i + " " + ImageNums.getImageName(i));
         }
       }

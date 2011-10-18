@@ -39,8 +39,8 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj, Applet
   private CryptoHeavenApplet applet;
   private JLabel jTitle;
 
-  private String strLoaded = "CryptoHeaven Web Edition loaded";
-  private String strDone = "CryptoHeaven Web Edition done.";
+  private String strLoaded = "Secure Web Edition loaded";
+  private String strDone = "Secure Web Edition done.";
 
   /** Creates new CryptoHeavenApplet */
   public CryptoHeavenApplet() {

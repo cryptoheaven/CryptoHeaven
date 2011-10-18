@@ -330,7 +330,6 @@ public class ImageNums extends Object {
   public static final int ANIM_GLOBE16;
   public static final int ANIM_KEY;
   public static final int ANIM_LOCK;
-//  public static final int ANIM_PHONE;
   public static final int ANIM_TRANSFER;
 
   public static final int ANIM_TRANSFER_STOP;
@@ -528,1117 +527,1115 @@ public class ImageNums extends Object {
      * First 4 indexed images are permanent and used in customizations.
      ******************************************************************/
     LOGO_KEY_MAIN = i;
-    images[i] = "logo-soft-435x100"; i++;
+    images[i] = "logo-soft-435x100.png"; i++;
     LOGO_BANNER_MAIN = i;
-    images[i] = "logo-soft-435x100"; i++;
+    images[i] = "logo-soft-435x100.png"; i++;
     WINDOW_POPUP = i;
-    images[i] = "window-popup"; i++;
+    images[i] = "window-popup.png"; i++;
     FRAME_LOCK32 = i;
-    images[i] = "FrameLock32"; i++;
+    images[i] = "FrameLock32.png"; i++;
     /******************************************************************
      * First 4 indexed images are permanent and used in customizations.
      ******************************************************************/
 
 
     KEYBOARD = i;
-    images[i] = "keyboard"; i++;
+    images[i] = "keyboard.png"; i++;
 
     KEY_LENGTH32 = i;
-    images[i] = "KeyLength32"; i++;
+    images[i] = "KeyLength32.png"; i++;
 
     PRIME_CERTEINTY32 = i;
-    images[i] = "PrimeCerteinty32"; i++;
+    images[i] = "PrimeCerteinty32.png"; i++;
 
     STORE_REMOTE32 = i;
-    images[i] = "StoreRemote32"; i++;
+    images[i] = "StoreRemote32.png"; i++;
 
     TRANSPARENT16 = i;
-    images[i] = "Transparent16"; i++;
+    images[i] = "Transparent16.gif"; i++;
 
     //WAIT16 = i;
-    //images[i] = "Wait16"; i++;
+    //images[i] = "Wait16.png"; i++;
 
     STOPWATCH16 = i;
-    images[i] = "Stopwatch16"; i++;
+    images[i] = "Stopwatch16.png"; i++;
 
     STOPWATCH_ALERT16 = i;
-    images[i] = "StopwatchAlert16"; i++;
+    images[i] = "StopwatchAlert16.png"; i++;
 
     STOPWATCH_ALERT24 = i;
-    images[i] = "StopwatchAlert24"; i++;
+    images[i] = "StopwatchAlert24.png"; i++;
 
     STOPWATCH_WARN16 = i;
-    images[i] = "StopwatchWarn16"; i++;
+    images[i] = "StopwatchWarn16.png"; i++;
 
     WARNING16 = i;
-    images[i] = "Warning16"; i++;
+    images[i] = "Warning16.png"; i++;
 
 
     MY_COMPUTER16 = i;
-    images[i] = "MyComputer16"; i++;
+    images[i] = "MyComputer16.png"; i++;
 
     SHARE_HAND_L = i;
-    images[i] = "ShareHand_L"; i++;
+    images[i] = "ShareHand_L.gif"; i++;
 
     FLD_ADDR_OPEN16 = i;
-    images[i] = "FldAddrOpen16"; i++;
+    images[i] = "FldAddrOpen16.gif"; i++;
 
     FLD_ADDR_CLOSED16 = i;
-    images[i] = "FldAddrClosed16"; i++;
+    images[i] = "FldAddrClosed16.gif"; i++;
 
     FLD_ADDR_OPEN_SHARED16 = i;
-    images[i] = "FldAddrOpen16"; i++;
-    //images[i] = "FldAddrOpenShared16"; i++;
+    images[i] = "FldAddrOpen16.gif"; i++;
+    //images[i] = "FldAddrOpenShared16.png"; i++;
 
     FLD_ADDR_CLOSED_SHARED16 = i;
-    images[i] = "FldAddrClosed16"; i++;
-    //images[i] = "FldAddrClosedShared16"; i++;
+    images[i] = "FldAddrClosed16.gif"; i++;
+    //images[i] = "FldAddrClosedShared16.png"; i++;
 
     FLD_ADDR_CLOSED_SHARED24 = i;
-    images[i] = "FldAddrClosedShared24"; i++;
+    images[i] = "FldAddrClosedShared24.png"; i++;
 
     FLD_CHAT16 = i;
-    images[i] = "Chat16"; i++;
+    images[i] = "Chat16.png"; i++;
 
     FLD_CHAT_OPEN16 = i;
-    images[i] = "FldChatClosed16"; i++;
+    images[i] = "FldChatClosed16.png"; i++;
 
     FLD_CHAT_CLOSED16 = i;
-    images[i] = "FldChatClosed16"; i++;
+    images[i] = "FldChatClosed16.png"; i++;
 
     FLD_CHAT_CLOSED_SHARED16 = i;
-    images[i] = "FldChatClosed16"; i++;
+    images[i] = "FldChatClosed16.png"; i++;
 
     FLD_CHAT_CLOSED_SHARED24 = i;
-    images[i] = "FldChatClosedShared24"; i++;
+    images[i] = "FldChatClosedShared24.png"; i++;
 
     FLD_CNT_OPEN16 = i;
-    images[i] = "FldCntOpen16"; i++;
+    images[i] = "FldCntOpen16.png"; i++;
 
     FLD_CNT_CLOSED16 = i;
-    images[i] = "FldCntClosed16"; i++;
+    images[i] = "FldCntClosed16.png"; i++;
 
     FLD_FILES16 = i;
-    images[i] = "FldFiles16"; i++;
+    images[i] = "FldFiles16.png"; i++;
 
     FLD_GROUPS16 = i;
-    images[i] = "FldGroups16"; i++;
+    images[i] = "FldGroups16.png"; i++;
 
     FLD_KEY_OPEN16 = i;
-    images[i] = "FldKeyOpen16"; i++;
+    images[i] = "FldKeyOpen16.png"; i++;
 
     FLD_KEY_CLOSED16 = i;
-    images[i] = "FldKeyClosed16"; i++;
+    images[i] = "FldKeyClosed16.png"; i++;
 
 
     FLD_MAIL18_12 = i;
-    images[i] = "FldMail18_12"; i++;
+    images[i] = "FldMail18_12.gif"; i++;
 
 
     FLD_MAIL_OPEN16 = i;
-    images[i] = "FldMailOpen16"; i++;
+    images[i] = "FldMailOpen16.png"; i++;
 
     FLD_MAIL_CLOSED16 = i;
-    images[i] = "FldMailClosed16"; i++;
+    images[i] = "FldMailClosed16.png"; i++;
 
     FLD_MAIL_OPEN_SHARED16 = i;
-    images[i] = "FldMailOpen16"; i++;
+    images[i] = "FldMailOpen16.png"; i++;
 
     FLD_MAIL_CLOSED_SHARED16 = i;
-    images[i] = "FldMailClosed16"; i++;
+    images[i] = "FldMailClosed16.png"; i++;
 
 
     FLD_MAIL_DRAFT_OPEN16 = i;
-    images[i] = "FldMailDraftOpen16"; i++;
+    images[i] = "FldMailDraftOpen16.png"; i++;
 
     FLD_MAIL_DRAFT_CLOSED16 = i;
-    images[i] = "FldMailDraftClosed16"; i++;
+    images[i] = "FldMailDraftClosed16.png"; i++;
 
     FLD_MAIL_DRAFT_OPEN_SHARED16 = i;
-    images[i] = "FldMailDraftOpen16"; i++;
+    images[i] = "FldMailDraftOpen16.png"; i++;
 
     FLD_MAIL_DRAFT_CLOSED_SHARED16 = i;
-    images[i] = "FldMailDraftClosed16"; i++;
+    images[i] = "FldMailDraftClosed16.png"; i++;
 
 
     FLD_MAIL_INBOX_OPEN16 = i;
-    images[i] = "FldMailInboxOpen16"; i++;
+    images[i] = "FldMailInboxOpen16.png"; i++;
 
     FLD_MAIL_INBOX_CLOSED16 = i;
-    images[i] = "FldMailInboxClosed16"; i++;
+    images[i] = "FldMailInboxClosed16.png"; i++;
 
     FLD_MAIL_INBOX_OPEN_SHARED16 = i;
-    images[i] = "FldMailInboxOpen16"; i++;
+    images[i] = "FldMailInboxOpen16.png"; i++;
 
     FLD_MAIL_INBOX_CLOSED_SHARED16 = i;
-    images[i] = "FldMailInboxClosed16"; i++;
+    images[i] = "FldMailInboxClosed16.png"; i++;
 
 
     FLD_MAIL_JUNK_OPEN16 = i;
-    images[i] = "FldMailJunkOpen16"; i++;
+    images[i] = "FldMailJunkOpen16.png"; i++;
 
     FLD_MAIL_JUNK_CLOSED16 = i;
-    images[i] = "FldMailJunkClosed16"; i++;
+    images[i] = "FldMailJunkClosed16.png"; i++;
 
     FLD_MAIL_JUNK_OPEN_SHARED16 = i;
-    images[i] = "FldMailJunkOpen16"; i++;
+    images[i] = "FldMailJunkOpen16.png"; i++;
 
     FLD_MAIL_JUNK_CLOSED_SHARED16 = i;
-    images[i] = "FldMailJunkClosed16"; i++;
+    images[i] = "FldMailJunkClosed16.png"; i++;
 
 
     FLD_MAIL_SENT_OPEN16 = i;
-    images[i] = "FldMailSentOpen16"; i++;
+    images[i] = "FldMailSentOpen16.png"; i++;
 
     FLD_MAIL_SENT_CLOSED16 = i;
-    images[i] = "FldMailSentClosed16"; i++;
+    images[i] = "FldMailSentClosed16.png"; i++;
 
     FLD_MAIL_SENT_OPEN_SHARED16 = i;
-    images[i] = "FldMailSentOpen16"; i++;
+    images[i] = "FldMailSentOpen16.png"; i++;
 
     FLD_MAIL_SENT_CLOSED_SHARED16 = i;
-    images[i] = "FldMailSentClosed16"; i++;
+    images[i] = "FldMailSentClosed16.png"; i++;
 
 
     FLD_MAIL_POST_OPEN16 = i;
-    images[i] = "FldMailPostOpen16"; i++;
+    images[i] = "FldMailPostOpen16.png"; i++;
 
     FLD_MAIL_POST_CLOSED16 = i;
-    images[i] = "FldMailPostClosed16"; i++;
+    images[i] = "FldMailPostClosed16.png"; i++;
 
     FLD_MAIL_POST_OPEN_SHARED16 = i;
-    images[i] = "FldMailPostOpen16"; i++;
+    images[i] = "FldMailPostOpen16.png"; i++;
 
     FLD_MAIL_POST_CLOSED_SHARED16 = i;
-    images[i] = "FldMailPostClosed16"; i++;
+    images[i] = "FldMailPostClosed16.png"; i++;
 
 
     FLD_CLEAR16 = i;
-    images[i] = "FldClear16"; i++;
+    images[i] = "FldClear16.png"; i++;
 
     FLD_CLEAR48 = i;
-    images[i] = "FldClear48"; i++;
+    images[i] = "FldClear48.png"; i++;
 
     FLD_RECYCLE_CLEAR16 = i;
-    images[i] = "FldRecycleClear16"; i++;
+    images[i] = "FldRecycleClear16.png"; i++;
 
     FLD_RECYCLE_CLEAR24 = i;
-    images[i] = "FldRecycleClear24"; i++;
+    images[i] = "FldRecycleClear24.png"; i++;
 
     FLD_RECYCLE48 = i;
-    images[i] = "FldRecycle48"; i++;
+    images[i] = "FldRecycle48.png"; i++;
 
     FLD_RECYCLE_CLEAR48 = i;
-    images[i] = "FldRecycleClear48"; i++;
+    images[i] = "FldRecycleClear48.png"; i++;
 
     FLD_RECYCLE_EMPTY16 = i;
-    images[i] = "FldRecycleEmpty16"; i++;
+    images[i] = "FldRecycleEmpty16.png"; i++;
 
     FLD_RECYCLE_EMPTY_SHARED16 = i;
-    images[i] = "FldRecycleEmpty16"; i++;
+    images[i] = "FldRecycleEmpty16.png"; i++;
 
     FLD_OPEN16 = i;
-    images[i] = "FldOpen16"; i++;
+    images[i] = "FldOpen16.png"; i++;
 
     FLD_CLOSED16 = i;
-    images[i] = "FldClosed16"; i++;
+    images[i] = "FldClosed16.png"; i++;
 
     FLD_OPEN_SHARED16 = i;
-    images[i] = "FldOpen16"; i++;
+    images[i] = "FldOpen16.png"; i++;
 
     FLD_CLOSED_SHARED16 = i;
-    images[i] = "FldClosed16"; i++;
-    //images[i] = "FldClosedShared16"; i++; // special pre-rendered version for MiscGui types
+    images[i] = "FldClosed16.png"; i++;
+    //images[i] = "FldClosedShared16.png"; i++; // special pre-rendered version for MiscGui types
 
     FLD_CLOSED_SHARED24 = i;
-    images[i] = "FldClosedShared24"; i++;
+    images[i] = "FldClosedShared24.png"; i++;
 
     //FOLDER24 = i;
-    //images[i] = "Folder24"; i++;
+    //images[i] = "Folder24.png"; i++;
 
     FOLDER32 = i;
-    images[i] = "Folder32"; i++;
+    images[i] = "Folder32.png"; i++;
 
     FOLDER48 = i;
-    images[i] = "folder-48"; i++;
+    images[i] = "folder-48.png"; i++;
 
 
     FOLDER_SHARED32 = i;
-    images[i] = "FolderShared32"; i++;
+    images[i] = "FolderShared32.png"; i++;
 
     FOLDER_SHARED48 = i;
-    images[i] = "folder-shared-48"; i++;
+    images[i] = "folder-shared-48.png"; i++;
 
     FOLDER_NEW16 = i;
-    images[i] = "FolderNew16"; i++;
+    images[i] = "FolderNew16.png"; i++;
 
     FOLDER_NEW24 = i;
-    images[i] = "FolderNew24"; i++;
+    images[i] = "FolderNew24.png"; i++;
 
     FOLDER_NEW_SHARED16 = i;
-    images[i] = "FolderNew16"; i++;
-    //images[i] = "FolderNewShared16"; i++;
+    images[i] = "FolderNew16.png"; i++;
+    //images[i] = "FolderNewShared16.png"; i++;
 
     FOLDER_NEW_SHARED24 = i;
-    images[i] = "FolderNewShared24"; i++;
+    images[i] = "FolderNewShared24.png"; i++;
 
     FOLDER_MOVE16 = i;
-    images[i] = "FolderMove16"; i++;
+    images[i] = "FolderMove16.png"; i++;
 
     FOLDER_MOVE24 = i;
-    images[i] = "FolderMove24"; i++;
+    images[i] = "FolderMove24.png"; i++;
 
     FOLDER_DELETE16 = i;
-    images[i] = "FolderDelete16"; i++;
+    images[i] = "FolderDelete16.png"; i++;
 
     FOLDER_DELETE24 = i;
-    images[i] = "FolderDelete24"; i++;
+    images[i] = "FolderDelete24.png"; i++;
 
     FILE_TYPE_OTHER = i;
-    images[i] = "file_type_other"; i++;
+    images[i] = "file_type_other.png"; i++;
 
 
     CLONE_ADDR16 = i;
-    images[i] = "CloneAddr16"; i++;
+    images[i] = "CloneAddr16.png"; i++;
     CLONE_ADDR24 = i;
-    images[i] = "CloneAddr24"; i++;
+    images[i] = "CloneAddr24.png"; i++;
     CLONE_FILE16 = i;
-    images[i] = "CloneFile16"; i++;
+    images[i] = "CloneFile16.png"; i++;
     CLONE_FILE24 = i;
-    images[i] = "CloneFile24"; i++;
+    images[i] = "CloneFile24.png"; i++;
     CLONE_FOLDER16 = i;
-    images[i] = "CloneFolder16"; i++;
+    images[i] = "CloneFolder16.png"; i++;
     CLONE_FOLDER24 = i;
-    images[i] = "CloneFolder24"; i++;
+    images[i] = "CloneFolder24.png"; i++;
     CLONE_GROUP16 = i;
-    images[i] = "CloneGroup16"; i++;
+    images[i] = "CloneGroup16.png"; i++;
     CLONE_GROUP24 = i;
-    images[i] = "CloneGroup24"; i++;
+    images[i] = "CloneGroup24.png"; i++;
     CLONE_MSG16 = i;
-    images[i] = "CloneMsg16"; i++;
+    images[i] = "CloneMsg16.png"; i++;
     CLONE_MSG24 = i;
-    images[i] = "CloneMsg24"; i++;
+    images[i] = "CloneMsg24.png"; i++;
     CLONE_CONTACT16 = i;
-    images[i] = "CloneContact16"; i++;
+    images[i] = "CloneContact16.png"; i++;
     CLONE_CONTACT24 = i;
-    images[i] = "CloneContact24"; i++;
+    images[i] = "CloneContact24.png"; i++;
     CLONE16 = i;
-    images[i] = "Clone16"; i++;
+    images[i] = "Clone16.png"; i++;
     CLONE24 = i;
-    images[i] = "Clone24"; i++;
+    images[i] = "Clone24.png"; i++;
 
 
     SPLIT_LEFT_RIGHT16 = i;
-    images[i] = "SplitLeftRight16"; i++;
+    images[i] = "SplitLeftRight16.gif"; i++;
     SPLIT_TOP_BOTTOM16 = i;
-    images[i] = "SplitTopBottom16"; i++;
+    images[i] = "SplitTopBottom16.gif"; i++;
 
 
     ARROW_LEFT16 = i;
-    images[i] = "ArrowLeft16"; i++;
+    images[i] = "ArrowLeft16.png"; i++;
     ARROW_LEFT24 = i;
-    images[i] = "ArrowLeft24"; i++;
+    images[i] = "ArrowLeft24.png"; i++;
     ARROW_RIGHT16 = i;
-    images[i] = "ArrowRight16"; i++;
+    images[i] = "ArrowRight16.png"; i++;
     ARROW_DOUBLE16 = i;
-    images[i] = "ArrowDouble16"; i++;
+    images[i] = "ArrowDouble16.png"; i++;
     ARROW_DOUBLE24 = i;
-    images[i] = "ArrowDouble24"; i++;
+    images[i] = "ArrowDouble24.png"; i++;
 
     HANDSHAKE16 = i;
-    images[i] = "Handshake16"; i++;
+    images[i] = "Handshake16.png"; i++;
 
     HANDSHAKE24 = i;
-    images[i] = "Handshake24"; i++;
+    images[i] = "Handshake24.png"; i++;
 
 
     REPLY16 = i;
-    images[i] = "Reply16"; i++;
+    images[i] = "Reply16.png"; i++;
 
     REPLY24 = i;
-    images[i] = "Reply24"; i++;
+    images[i] = "Reply24.png"; i++;
 
     REPLY_TO_ALL16 = i;
-    images[i] = "ReplyToAll16"; i++;
+    images[i] = "ReplyToAll16.png"; i++;
 
     REPLY_TO_ALL24 = i;
-    images[i] = "ReplyToAll24"; i++;
+    images[i] = "ReplyToAll24.png"; i++;
 
     REPLY_TO_MSG16 = i;
-    images[i] = "ReplyToMsg16"; i++;
+    images[i] = "ReplyToMsg16.png"; i++;
 
     REPLY_TO_MSG24 = i;
-    images[i] = "ReplyToMsg24"; i++;
+    images[i] = "ReplyToMsg24.png"; i++;
 
     REPLY_ARROW16 = i;
-    images[i] = "ReplyArrow16"; i++;
+    images[i] = "ReplyArrow16.gif"; i++;
 
     FORWARD16 = i;
-    images[i] = "Forward16"; i++;
+    images[i] = "Forward16.png"; i++;
 
     FORWARD24 = i;
-    images[i] = "Forward24"; i++;
+    images[i] = "Forward24.png"; i++;
 
     FORWARD_FILE16 = i;
-    images[i] = "ForwardFile16"; i++;
+    images[i] = "ForwardFile16.png"; i++;
 
     FORWARD_FILE24 = i;
-    images[i] = "ForwardFile24"; i++;
+    images[i] = "ForwardFile24.png"; i++;
 
 
     //PRINT = i;
-    //images[i] = "print"; i++;
+    //images[i] = "print.png"; i++;
 
 
     PRIORITY_HIGH_SMALL = i;
-    images[i] = "priority-high-small"; i++;
+    images[i] = "priority-high-small.png"; i++;
 
     PRIORITY_LOW_SMALL = i;
-    images[i] = "priority-low-small"; i++;
+    images[i] = "priority-low-small.png"; i++;
 
     PRIORITY_HIGH_12 = i;
-    images[i] = "priority-high-12"; i++;
+    images[i] = "priority-high-12.png"; i++;
 
     PRIORITY_LOW_12 = i;
-    images[i] = "priority-low-12"; i++;
+    images[i] = "priority-low-12.png"; i++;
 
     PRIORITY_SMALL = i;
-    images[i] = "priority-small"; i++;
+    images[i] = "priority-small.png"; i++;
 
     LOCK_CLOSED_BLACK_SMALL = i;
-    images[i] = "lock-closed-black-small"; i++;
+    images[i] = "lock-closed-black-small.png"; i++;
 
     LOCK_CLOSED_SMALL = i;
-    images[i] = "lock-closed-small"; i++;
+    images[i] = "lock-closed-small.png"; i++;
 
     LOCK_CLOSED_WEB_SMALL = i;
-    images[i] = "lock-closed-web-small"; i++;
+    images[i] = "lock-closed-web-small.png"; i++;
 
     LOCK_OPEN_SMALL = i;
-    images[i] = "lock-open-small"; i++;
+    images[i] = "lock-open-small.png"; i++;
 
     LOCK_OPEN_WEB_SMALL = i;
-    images[i] = "lock-open-web-small"; i++;
+    images[i] = "lock-open-web-small.png"; i++;
 
     FLAG_BLANK_DOUBLE_SMALL = i;
-    images[i] = "flag-blank-double-small"; i++;
+    images[i] = "flag-blank-double-small.png"; i++;
 
     FLAG_BLANK_DOUBLE_TOOL = i;
-    images[i] = "flag-blank-double-tool"; i++;
+    images[i] = "flag-blank-double-tool.png"; i++;
 
     FLAG_BLANK_SMALL = i;
-    images[i] = "flag-blank-small"; i++;
+    images[i] = "flag-blank-small.png"; i++;
 
     FLAG_BLANK_TOOL = i;
-    images[i] = "flag-blank-tool"; i++;
+    images[i] = "flag-blank-tool.png"; i++;
 
     FLAG_GRAY_SMALL = i;
-    images[i] = "flag-gray-small"; i++;
+    images[i] = "flag-gray-small.png"; i++;
 
     FLAG_RED_SMALL = i;
-    images[i] = "flag-red-small"; i++;
+    images[i] = "flag-red-small.png"; i++;
 
     FLAG_RED_TOOL = i;
-    images[i] = "flag-red-tool"; i++;
+    images[i] = "flag-red-tool.png"; i++;
 
     STAR_BRIGHT = i;
-    images[i] = "star-bright"; i++;
+    images[i] = "star-bright.png"; i++;
 
     STAR_BRIGHTER = i;
-    images[i] = "star-brighter"; i++;
+    images[i] = "star-brighter.png"; i++;
 
     STAR_WIRE = i;
-    images[i] = "star-wire"; i++;
+    images[i] = "star-wire.png"; i++;
 
 
     TRACE_HISTORY12_13 = i;
-    images[i] = "TraceHist12_13"; i++;
+    images[i] = "TraceHist12_13.gif"; i++;
 
     TRACE_HISTORY13= i;
-    images[i] = "TraceHist13"; i++;
+    images[i] = "TraceHist13.gif"; i++;
 
     TRACE_PRIVILEGE12_13 = i;
-    images[i] = "TracePriv12_13"; i++;
+    images[i] = "TracePriv12_13.gif"; i++;
 
     TRACE_PRIVILEGE13= i;
-    images[i] = "TracePriv13"; i++;
+    images[i] = "TracePriv13.gif"; i++;
 
 
     DELETE16 = i;
-    images[i] = "Delete16"; i++;
+    images[i] = "Delete16.png"; i++;
 
     DELETE24 = i;
-    images[i] = "Delete24"; i++;
+    images[i] = "Delete24.png"; i++;
 
     ADD14 = i;
-    images[i] = "add14"; i++;
+    images[i] = "add14.png"; i++;
 
     GO16 = i;
-    images[i] = "Go16"; i++;
+    images[i] = "Go16.png"; i++;
 
     X15 = i;
-    images[i] = "X15"; i++;
+    images[i] = "X15.gif"; i++;
 
     GO_NEXT16 = i;
-    images[i] = "GoNext16"; i++;
+    images[i] = "GoNext16.png"; i++;
     GO_NEXT24 = i;
-    images[i] = "GoNext24"; i++;
+    images[i] = "GoNext24.png"; i++;
     GO_PREV16 = i;
-    images[i] = "GoPrev16"; i++;
+    images[i] = "GoPrev16.png"; i++;
     GO_PREV24 = i;
-    images[i] = "GoPrev24"; i++;
+    images[i] = "GoPrev24.png"; i++;
 
     EMAIL_SYMBOL_SMALL = i;
-    images[i] = "email-symbol-small"; i++;
+    images[i] = "email-symbol-small.png"; i++;
 
 
     PRINT16 = i;
-    images[i] = "Print16"; i++;
+    images[i] = "Print16.png"; i++;
 
     PRINT24 = i;
-    images[i] = "Print24"; i++;
+    images[i] = "Print24.png"; i++;
 
     TOOLS16 = i;
-    images[i] = "Tools16"; i++;
+    images[i] = "Tools16.png"; i++;
 
     TOOLS24 = i;
-    images[i] = "Tools24"; i++;
+    images[i] = "Tools24.png"; i++;
 
     TOOLS_FIX16 = i;
-    images[i] = "ToolsFix16"; i++;
+    images[i] = "ToolsFix16.png"; i++;
 
     TOOLS_FIX32 = i;
-    images[i] = "ToolsFix32"; i++;
+    images[i] = "ToolsFix32.png"; i++;
 
     ATTACH16 = i;
-    images[i] = "attach-small"; i++;
+    images[i] = "attach-small.png"; i++;
 
     ATTACH_14x12 = i;
-    images[i] = "attach-14x12"; i++;
+    images[i] = "attach-14x12.png"; i++;
 
     ATTACH24 = i;
-    images[i] = "Attach24"; i++;
+    images[i] = "Attach24.png"; i++;
 
     ATTACH_SMALL = i;
-    images[i] = "attach-small-black"; i++;
+    images[i] = "attach-small-black.png"; i++;
 
     DETACH16 = i;
-    images[i] = "Detach16"; i++;
+    images[i] = "Detach16.png"; i++;
 
     DETACH24 = i;
-    images[i] = "Detach24"; i++;
+    images[i] = "Detach24.png"; i++;
 
 
     KEY16 = i;
-    images[i] = "key16"; i++;
+    images[i] = "key16.png"; i++;
 
     SEAL8_15 = i;
-    images[i] = "Seal8_15"; i++;
+    images[i] = "Seal8_15.gif"; i++;
 
 
     MAIL_CERT32 = i;
-    images[i] = "MailCert32"; i++;
+    images[i] = "MailCert32.png"; i++;
 
     MAIL_UNREAD16 = i;
-    images[i] = "MailUnread16"; i++;
+    images[i] = "MailUnread16.png"; i++;
 
     MAIL_READ16 = i;
-    images[i] = "MailRead16"; i++;
+    images[i] = "MailRead16.png"; i++;
 
     MAIL_RPY16 = i;
-    images[i] = "MailRpy16"; i++;
+    images[i] = "MailRpy16.png"; i++;
 
     MAIL_RPYFWD16 = i;
-    images[i] = "MailRpyFwd16"; i++;
+    images[i] = "MailRpyFwd16.png"; i++;
 
     MAIL_FWD16 = i;
-    images[i] = "MailFwd16"; i++;
+    images[i] = "MailFwd16.png"; i++;
 
     MAIL_COMPOSE16 = i;
-    images[i] = "ComposeMail16"; i++;
+    images[i] = "ComposeMail16.png"; i++;
 
     MAIL_COMPOSE24 = i;
-    images[i] = "ComposeMail24"; i++;
+    images[i] = "ComposeMail24.png"; i++;
 
     MAIL_COMPOSE_FROM_DRAFT16 = i;
-    images[i] = "ComposeMailFromDraft16"; i++;
+    images[i] = "ComposeMailFromDraft16.png"; i++;
 
     MAIL_COMPOSE_FROM_DRAFT24 = i;
-    images[i] = "ComposeMailFromDraft24"; i++;
+    images[i] = "ComposeMailFromDraft24.png"; i++;
 
     MAIL_COMPOSE_TO_FOLDER16 = i;
-    images[i] = "ComposeMailToFolder16"; i++;
+    images[i] = "ComposeMailToFolder16.png"; i++;
 
     MAIL_COMPOSE_TO_FOLDER24 = i;
-    images[i] = "ComposeMailToFolder24"; i++;
+    images[i] = "ComposeMailToFolder24.png"; i++;
 
     MAIL_COMPOSE_TO_MEMBER16 = i;
-    images[i] = "ComposeMailToMember16"; i++;
+    images[i] = "ComposeMailToMember16.png"; i++;
 
     MAIL_COMPOSE_TO_MEMBER24 = i;
-    images[i] = "ComposeMailToMember24"; i++;
+    images[i] = "ComposeMailToMember24.png"; i++;
 
     MAIL_SEND16 = i;
-    //images[i] = "mail_send16"; i++;
-    images[i] = "SendMail16"; i++;
+    //images[i] = "mail_send16.png"; i++;
+    images[i] = "SendMail16.png"; i++;
 
     MAIL_SEND24 = i;
-    //images[i] = "mail_send24"; i++;
-    images[i] = "SendMail24"; i++;
+    //images[i] = "mail_send24.png"; i++;
+    images[i] = "SendMail24.png"; i++;
 
 
     MAIL_SEND_INVITE_16 = i;
-    images[i] = "mail-send-invite16"; i++;
+    images[i] = "mail-send-invite16.png"; i++;
 
     MAIL_SEND_INVITE_24 = i;
-    images[i] = "mail-send-invite24"; i++;
+    images[i] = "mail-send-invite24.png"; i++;
 
     MAIL_SEND_INVITE_32 = i;
-    images[i] = "mail-send-invite32"; i++;
+    images[i] = "mail-send-invite32.png"; i++;
 
 
     ADDRESS_BOOK16 = i;
-    images[i] = "AddressBook16"; i++;
+    images[i] = "AddressBook16.png"; i++;
 
     ADDRESS_BOOK24 = i;
-    images[i] = "AddressBook24"; i++;
+    images[i] = "AddressBook24.png"; i++;
 
     ADDRESS_BOOK48 = i;
-    images[i] = "address-book-48"; i++;
+    images[i] = "address-book-48.png"; i++;
 
     ADDRESS_BOOK_SHARED48 = i;
-    images[i] = "address-book-shared-48"; i++;
+    images[i] = "address-book-shared-48.png"; i++;
 
 
     MAIL_COPY16 = i;
-    images[i] = "MailCopy16"; i++;
+    images[i] = "MailCopy16.gif"; i++;
 
     MAIL_COPY24 = i;
-    images[i] = "MailCopy24"; i++;
+    images[i] = "MailCopy24.gif"; i++;
 
     MAIL_DELETE16 = i;
-    images[i] = "MailDelete16"; i++;
+    images[i] = "MailDelete16.png"; i++;
 
     MAIL_DELETE24 = i;
-    images[i] = "MailDelete24"; i++;
+    images[i] = "MailDelete24.png"; i++;
 
     MAIL_MOVE16 = i;
-    images[i] = "MailMove16"; i++;
+    images[i] = "MailMove16.png"; i++;
 
     MAIL_MOVE24 = i;
-    images[i] = "MailMove24"; i++;
+    images[i] = "MailMove24.png"; i++;
 
     SAVE16 = i;
-    images[i] = "Save16"; i++;
+    images[i] = "Save16.png"; i++;
 
     SAVE24 = i;
-    images[i] = "Save24"; i++;
+    images[i] = "Save24.png"; i++;
 
     CHAT16 = i;
-    images[i] = "Chat16"; i++;
+    images[i] = "Chat16.png"; i++;
 
     CHAT24 = i;
-    images[i] = "Chat24"; i++;
+    images[i] = "Chat24.png"; i++;
 
     CHAT_BUBBLE48 = i;
-    images[i] = "chat-bubble-48"; i++;
+    images[i] = "chat-bubble-48.png"; i++;
 
     CHAT_BUBBLE_SHARED48 = i;
-    images[i] = "chat-bubble-shared-48"; i++;
+    images[i] = "chat-bubble-shared-48.png"; i++;
 
     PERSON_SMALL = i;
-    images[i] = "person-small"; i++;
+    images[i] = "person-small.png"; i++;
 
     PEOPLE16 = i;
-    images[i] = "People16"; i++;
+    images[i] = "People16.png"; i++;
 
     PEOPLE24 = i;
-    images[i] = "People24"; i++;
+    images[i] = "People24.png"; i++;
 
     PEOPLE32 = i;
-    images[i] = "People32"; i++;
+    images[i] = "People32.png"; i++;
 
     PEOPLE48 = i;
-    images[i] = "people-48"; i++;
+    images[i] = "people-48.png"; i++;
 
 
     USER_FIND16 = i;
-    images[i] = "UserFind16"; i++;
+    images[i] = "UserFind16.png"; i++;
 
     USER_FIND24 = i;
-    images[i] = "UserFind24"; i++;
+    images[i] = "UserFind24.png"; i++;
 
     USER_FIND32 = i;
-    images[i] = "UserFind32"; i++;
+    images[i] = "UserFind32.png"; i++;
 
     USER_NEW16 = i;
-    images[i] = "UserNew16"; i++;
+    images[i] = "UserNew16.png"; i++;
 
     USER_NEW24 = i;
-    images[i] = "UserNew24"; i++;
+    images[i] = "UserNew24.png"; i++;
 
     USER_EDIT16 = i;
-    images[i] = "UserEdit16"; i++;
+    images[i] = "UserEdit16.png"; i++;
 
     USER_EDIT24 = i;
-    images[i] = "UserEdit24"; i++;
+    images[i] = "UserEdit24.png"; i++;
 
     USER_ACTIVATE16 = i;
-    images[i] = "UserActivate16"; i++;
+    images[i] = "UserActivate16.png"; i++;
 
     USER_ACTIVATE24 = i;
-    images[i] = "UserActivate24"; i++;
+    images[i] = "UserActivate24.png"; i++;
 
     USER_PASS_RESET16 = i;
-    images[i] = "UserPassReset16"; i++;
+    images[i] = "UserPassReset16.png"; i++;
 
     USER_PASS_RESET24 = i;
-    images[i] = "UserPassReset24"; i++;
+    images[i] = "UserPassReset24.png"; i++;
 
     USER_DELETE16 = i;
-    images[i] = "UserDelete16"; i++;
+    images[i] = "UserDelete16.png"; i++;
 
     USER_DELETE24 = i;
-    images[i] = "UserDelete24"; i++;
+    images[i] = "UserDelete24.png"; i++;
 
     USER_MANAGE16 = i;
-    images[i] = "UserManage16"; i++;
+    images[i] = "UserManage16.png"; i++;
 
     USER_MANAGE24 = i;
-    images[i] = "UserManage24"; i++;
+    images[i] = "UserManage24.png"; i++;
 
 
     ADDRESS16 = i;
-    images[i] = "Address16"; i++;
+    images[i] = "Address16.png"; i++;
 
     ADDRESS32 = i;
-    images[i] = "Address32"; i++;
+    images[i] = "Address32.gif"; i++;
 
     ADDRESS_ADD16 = i;
-    images[i] = "AddressAdd16"; i++;
+    images[i] = "AddressAdd16.png"; i++;
 
     ADDRESS_ADD24 = i;
-    images[i] = "AddressAdd24"; i++;
+    images[i] = "AddressAdd24.png"; i++;
 
     ADDRESS_COPY16 = i;
-    images[i] = "AddressCopy16"; i++;
+    images[i] = "AddressCopy16.png"; i++;
 
     ADDRESS_COPY24 = i;
-    images[i] = "AddressCopy24"; i++;
+    images[i] = "AddressCopy24.png"; i++;
 
     ADDRESS_DELETE16 = i;
-    images[i] = "AddressDelete16"; i++;
+    images[i] = "AddressDelete16.png"; i++;
 
     ADDRESS_DELETE24 = i;
-    images[i] = "AddressDelete24"; i++;
+    images[i] = "AddressDelete24.png"; i++;
 
     ADDRESS_EDIT16 = i;
-    images[i] = "AddressEdit16"; i++;
+    images[i] = "AddressEdit16.png"; i++;
 
     ADDRESS_EDIT24 = i;
-    images[i] = "AddressEdit24"; i++;
+    images[i] = "AddressEdit24.png"; i++;
 
     ADDRESS_MOVE16 = i;
-    images[i] = "AddressMove16"; i++;
+    images[i] = "AddressMove16.png"; i++;
 
     ADDRESS_MOVE24 = i;
-    images[i] = "AddressMove24"; i++;
+    images[i] = "AddressMove24.png"; i++;
 
     ADDRESS_SAVE16 = i;
-    images[i] = "AddressSave16"; i++;
+    images[i] = "AddressSave16.gif"; i++;
 
     ADDRESS_SAVE24 = i;
-    images[i] = "AddressSave24"; i++;
+    images[i] = "AddressSave24.gif"; i++;
 
     CONTACT16 = i;
-    images[i] = "Contact16"; i++;
+    images[i] = "Contact16.png"; i++;
 
     CONTACT32 = i;
-    images[i] = "Contact32"; i++;
+    images[i] = "Contact32.gif"; i++;
 
     CONTACT_ADD16 = i;
-    images[i] = "ContactAdd16"; i++;
+    images[i] = "ContactAdd16.png"; i++;
 
     CONTACT_ADD24 = i;
-    images[i] = "ContactAdd24"; i++;
+    images[i] = "ContactAdd24.png"; i++;
 
     CONTACT_CHECK16 = i;
-    images[i] = "ContactCheck16"; i++;
+    images[i] = "ContactCheck16.png"; i++;
 
     CONTACT_CHECK24 = i;
-    images[i] = "ContactCheck24"; i++;
+    images[i] = "ContactCheck24.png"; i++;
 
     CONTACT_DELETE16 = i;
-    images[i] = "ContactDelete16"; i++;
+    images[i] = "ContactDelete16.png"; i++;
 
     CONTACT_DELETE24 = i;
-    images[i] = "ContactDelete24"; i++;
+    images[i] = "ContactDelete24.png"; i++;
 
     CONTACT_NEW32 = i;
-    images[i] = "ContactNew32"; i++;
+    images[i] = "ContactNew32.gif"; i++;
 
     GROUP_ADD16 = i;
-    images[i] = "GroupAdd16"; i++;
+    images[i] = "GroupAdd16.png"; i++;
 
     GROUP_ADD24 = i;
-    images[i] = "GroupAdd24"; i++;
+    images[i] = "GroupAdd24.png"; i++;
 
     MEMBER_ADD16 = i;
-    images[i] = "MemberAdd16"; i++;
+    images[i] = "MemberAdd16.png"; i++;
 
     MEMBER_ADD24 = i;
-    images[i] = "MemberAdd24"; i++;
+    images[i] = "MemberAdd24.png"; i++;
 
 
     POSTING16 = i;
-    images[i] = "Posting16"; i++;
+    images[i] = "Posting16.png"; i++;
 
     POSTING_CERT32 = i;
-    images[i] = "PostingCert32"; i++;
+    images[i] = "PostingCert32.png"; i++;
 
     ARROW_DROP_DOWN_5_3 = i;
-    images[i] = "ArrowDropDown_5_3"; i++;
+    images[i] = "ArrowDropDown_5_3.gif"; i++;
 
     ORDER_ASCENDING = i;
-    images[i] = "order_ascending"; i++;
+    images[i] = "order_ascending.png"; i++;
     ORDER_ASCENDING2 = i;
-    images[i] = "order_ascending2"; i++;
+    images[i] = "order_ascending2.png"; i++;
 
     ORDER_DESCENDING = i;
-    images[i] = "order_descending"; i++;
+    images[i] = "order_descending.png"; i++;
     ORDER_DESCENDING2 = i;
-    images[i] = "order_descending2"; i++;
+    images[i] = "order_descending2.png"; i++;
 
     INFO16 = i;
-    images[i] = "Info16"; i++;
+    images[i] = "Info16.png"; i++;
 
     ANIM_GLOBE_FIRST16 = i;
-    images[i] = "AnimGlobeFirst16"; i++;
+    images[i] = "AnimGlobeFirst16.png"; i++;
     ANIM_GLOBE16 = i;
-    images[i] = "AnimGlobe16"; i++;
+    images[i] = "AnimGlobe16.gif"; i++;
     ANIM_KEY = i;
-    images[i] = "anim_key"; i++;
+    images[i] = "anim_key.gif"; i++;
     ANIM_LOCK = i;
-    images[i] = "anim_lock"; i++;
-//    ANIM_PHONE = i;
-//    images[i] = "anim_phone"; i++;
+    images[i] = "anim_lock.gif"; i++;
     ANIM_TRANSFER = i;
-    images[i] = "anim_transfer"; i++;
+    images[i] = "anim_transfer.gif"; i++;
     ANIM_TRANSFER_STOP = i;
-    images[i] = "anim_transfer_stop"; i++;
+    images[i] = "anim_transfer_stop.gif"; i++;
     LOCK_OPENED = i;
-    images[i] = "lock_opened"; i++;
+    images[i] = "lock_opened.gif"; i++;
 
     PERSON32 = i;
-    images[i] = "Person32"; i++;
+    images[i] = "Person32.png"; i++;
     HOME32 = i;
-    images[i] = "Home32"; i++;
+    images[i] = "Home32.gif"; i++;
     PHONE32 = i;
-    images[i] = "Phone32"; i++;
+    images[i] = "Phone32.gif"; i++;
     MAIL32 = i;
-    images[i] = "Mail32"; i++;
+    images[i] = "Mail32.png"; i++;
     WEB32 = i;
-    images[i] = "Web32"; i++;
+    images[i] = "Web32.png"; i++;
 
 
     STATUS_AWAY16 = i;
-    images[i] = "StatusAway16"; i++;
+    images[i] = "StatusAway16.png"; i++;
     STATUS_DND16 = i;
-    images[i] = "StatusDND16"; i++;
+    images[i] = "StatusDND16.png"; i++;
     STATUS_INVISIBLE16 = i;
-    images[i] = "StatusOffline16"; i++;
+    images[i] = "StatusOffline16.png"; i++;
     STATUS_NA16 = i;
-    images[i] = "StatusNA16"; i++;
+    images[i] = "StatusNA16.png"; i++;
     STATUS_OFFLINE16 = i;
-    images[i] = "StatusOffline16"; i++;
+    images[i] = "StatusOffline16.png"; i++;
     STATUS_ONLINE16 = i;
-    images[i] = "StatusOnline16"; i++;
+    images[i] = "StatusOnline16.png"; i++;
     STATUS_QUESTION16 = i;
-    images[i] = "StatusQuestion16"; i++;
+    images[i] = "StatusQuestion16.png"; i++;
     STATUS_WAITING16 = i;
-    images[i] = "StatusWaiting16"; i++;
+    images[i] = "StatusWaiting16.png"; i++;
     LIGHT_ON_SMALL = i;
-    images[i] = "light-on-small"; i++;
+    images[i] = "light-on-small.png"; i++;
     LIGHT_ON_12 = i;
-    images[i] = "light-on-12"; i++;
+    images[i] = "light-on-12.png"; i++;
     LIGHT_OFF_SMALL = i;
-    images[i] = "light-off-small"; i++;
+    images[i] = "light-off-small.png"; i++;
     LIGHT_GREEN_SMALL = i;
-    images[i] = "light-green-small"; i++;
+    images[i] = "light-green-small.png"; i++;
     LIGHT_X_SMALL = i;
-    images[i] = "light-x-small"; i++;
+    images[i] = "light-x-small.png"; i++;
 
     FILE32 = i; // little modification of ADD24
-    images[i] = "File32"; i++;
+    images[i] = "File32.png"; i++;
 
     FILE_LOCKED32 = i; // little modification of ADD24
-    images[i] = "FileLocked32"; i++;
+    images[i] = "FileLocked32.png"; i++;
 
     FILE_MOVE16 = i;
-    images[i] = "FileMove16"; i++;
+    images[i] = "FileMove16.png"; i++;
 
     FILE_MOVE24 = i;
-    images[i] = "FileMove24"; i++;
+    images[i] = "FileMove24.png"; i++;
 
     FILE_REMOVE16 = i;
-    images[i] = "FileRemove16"; i++;
+    images[i] = "FileRemove16.png"; i++;
 
     FILE_REMOVE24 = i;
-    images[i] = "FileRemove24"; i++;
+    images[i] = "FileRemove24.png"; i++;
 
     FILE_REMOVE48 = i;
-    images[i] = "FileRemove48"; i++;
+    images[i] = "FileRemove48.png"; i++;
 
     FILE_REPLACE32 = i;
-    images[i] = "FileReplace32"; i++;
+    images[i] = "FileReplace32.png"; i++;
 
     IMPORT_FILE16 = i;
-    images[i] = "ImportFile16"; i++;
+    images[i] = "ImportFile16.png"; i++;
 
     IMPORT_FILE24 = i;
-    images[i] = "ImportFile24"; i++;
+    images[i] = "ImportFile24.png"; i++;
 
     IMPORT_FOLDER16 = i;
-    images[i] = "ImportFolder16"; i++;
+    images[i] = "ImportFolder16.png"; i++;
 
     IMPORT_FOLDER24 = i;
-    images[i] = "ImportFolder24"; i++;
+    images[i] = "ImportFolder24.png"; i++;
 
 
     SELECT_ALL16 = i;
-    images[i] = "SelectAll16"; i++;
+    images[i] = "SelectAll16.gif"; i++;
 
     COPY16 = i;
-    images[i] = "Copy16"; i++;
+    images[i] = "Copy16.png"; i++;
 
     COPY24 = i;
-    images[i] = "Copy24"; i++;
+    images[i] = "Copy24.png"; i++;
 
     CUT16 = i;
-    images[i] = "Cut16"; i++;
+    images[i] = "Cut16.png"; i++;
 
     CUT24 = i;
-    images[i] = "Cut24"; i++;
+    images[i] = "Cut24.png"; i++;
 
     EXPORT16 = i;
-    images[i] = "Export16"; i++;
+    images[i] = "Export16.png"; i++;
 
     EXPORT24 = i;
-    images[i] = "Export24"; i++;
+    images[i] = "Export24.png"; i++;
 
 
     FIND16 = i;
-    images[i] = "Find16"; i++;
+    images[i] = "Find16.png"; i++;
 
     FIND24 = i;
-    images[i] = "Find24"; i++;
+    images[i] = "Find24.png"; i++;
 
 
     PASTE16 = i;
-    images[i] = "Paste16"; i++;
+    images[i] = "Paste16.png"; i++;
 
     PASTE24 = i;
-    images[i] = "Paste24"; i++;
+    images[i] = "Paste24.png"; i++;
 
     SPELL16 = i;
-    images[i] = "SpellCheck16"; i++;
+    images[i] = "SpellCheck16.png"; i++;
 
     SPELL24 = i;
-    images[i] = "SpellCheck24"; i++;
+    images[i] = "SpellCheck24.png"; i++;
 
     UNDO16 = i;
-    images[i] = "Undo16"; i++;
+    images[i] = "Undo16.png"; i++;
 
     UNDO24 = i;
-    images[i] = "Undo24"; i++;
+    images[i] = "Undo24.png"; i++;
 
     REDO16 = i;
-    images[i] = "Redo16"; i++;
+    images[i] = "Redo16.png"; i++;
 
     REDO24 = i;
-    images[i] = "Redo24"; i++;
+    images[i] = "Redo24.png"; i++;
 
     REFRESH16 = i;
-    images[i] = "Refresh16"; i++;
+    images[i] = "Refresh16.png"; i++;
 
     REFRESH24 = i;
-    images[i] = "Refresh24"; i++;
+    images[i] = "Refresh24.png"; i++;
 
 
     AUTO_RESPONDER32 = i;
-    images[i] = "auto-responder-32"; i++;
+    images[i] = "auto-responder-32.png"; i++;
 
     SIGNATURE32 = i;
-    images[i] = "Signature32"; i++;
+    images[i] = "Signature32.png"; i++;
 
     SHIELD32 = i;
-    images[i] = "Shield32"; i++;
+    images[i] = "Shield32.gif"; i++;
 
     HTML_IMAGE_DELAYED = i;
-    images[i] = "image-delayed"; i++;
+    images[i] = "image-delayed.gif"; i++;
 
     HTML_IMAGE_FAILED = i;
-    images[i] = "image-failed"; i++;
+    images[i] = "image-failed.gif"; i++;
 
     RESIZE_DRAG_SE = i;
-    images[i] = "resize-drag-se"; i++;
+    images[i] = "resize-drag-se.gif"; i++;
 
 
     PENCIL16 = i;
-    images[i] = "pencil16"; i++;
+    images[i] = "pencil16.png"; i++;
 
     RING_BELL = i;
-    images[i] = "Bell16"; i++;
+    images[i] = "Bell16.png"; i++;
 
     VOLUME16 = i;
-    images[i] = "Volume16"; i++;
+    images[i] = "Volume16.gif"; i++;
 
     VOLUME24 = i;
-    images[i] = "Volume24"; i++;
+    images[i] = "Volume24.gif"; i++;
 
     RECORD16 = i;
-    images[i] = "Record16"; i++;
+    images[i] = "Record16.gif"; i++;
 
     RECORD24 = i;
-    images[i] = "Record24"; i++;
+    images[i] = "Record24.gif"; i++;
 
     PLAY16 = i;
-    images[i] = "Play16"; i++;
+    images[i] = "Play16.gif"; i++;
 
     PAUSE16 = i;
-    images[i] = "Pause16"; i++;
+    images[i] = "Pause16.gif"; i++;
 
     PLAY_PAUSE16 = i;
-    images[i] = "PlayPause16"; i++;
+    images[i] = "PlayPause16.gif"; i++;
 
     STOP16 = i;
-    images[i] = "Stop16"; i++;
+    images[i] = "Stop16.gif"; i++;
 
     EDITOR_ALIGN = i;
-    images[i] = "editor-align"; i++;
+    images[i] = "editor-align.png"; i++;
     EDITOR_ATTACH = i;
-    images[i] = "editor-attach"; i++;
+    images[i] = "editor-attach.png"; i++;
     EDITOR_BELL = i;
-    images[i] = "editor-bell"; i++;
+    images[i] = "editor-bell.png"; i++;
     EDITOR_BOLD = i;
-    images[i] = "editor-bold"; i++;
+    images[i] = "editor-bold.png"; i++;
     EDITOR_CENTER = i;
-    images[i] = "editor-center"; i++;
+    images[i] = "editor-center.png"; i++;
     EDITOR_COLOR = i;
-    images[i] = "editor-color"; i++;
+    images[i] = "editor-color.png"; i++;
     EDITOR_COPY_FORMATTING = i;
-    images[i] = "editor-copy-formatting"; i++;
+    images[i] = "editor-copy-formatting.png"; i++;
     EDITOR_EMOTICONS = i;
-    images[i] = "editor-emoticons"; i++;
+    images[i] = "editor-emoticons.png"; i++;
     EDITOR_FIND = i;
-    images[i] = "editor-find"; i++;
+    images[i] = "editor-find.png"; i++;
     EDITOR_FONTS = i;
-    images[i] = "editor-fonts"; i++;
+    images[i] = "editor-fonts.png"; i++;
     EDITOR_HIGHLIGHT = i;
-    images[i] = "editor-highlight"; i++;
+    images[i] = "editor-highlight.png"; i++;
     EDITOR_IMAGE = i;
-    images[i] = "editor-image"; i++;
+    images[i] = "editor-image.png"; i++;
     EDITOR_INDENT_D = i;
-    images[i] = "editor-indent-d"; i++;
+    images[i] = "editor-indent-d.png"; i++;
     EDITOR_INDENT_I = i;
-    images[i] = "editor-indent-i"; i++;
+    images[i] = "editor-indent-i.png"; i++;
     EDITOR_ITALIC = i;
-    images[i] = "editor-italic"; i++;
+    images[i] = "editor-italic.png"; i++;
     EDITOR_LEFT = i;
-    images[i] = "editor-left"; i++;
+    images[i] = "editor-left.png"; i++;
     EDITOR_LINK = i;
-    images[i] = "editor-link"; i++;
+    images[i] = "editor-link.png"; i++;
     EDITOR_LIST_O = i;
-    images[i] = "editor-list-o"; i++;
+    images[i] = "editor-list-o.png"; i++;
     EDITOR_LIST_U = i;
-    images[i] = "editor-list-u"; i++;
+    images[i] = "editor-list-u.png"; i++;
     EDITOR_REPLACE = i;
-    images[i] = "editor-replace"; i++;
+    images[i] = "editor-replace.png"; i++;
     EDITOR_RIGHT = i;
-    images[i] = "editor-right"; i++;
+    images[i] = "editor-right.png"; i++;
     EDITOR_STRIKE = i;
-    images[i] = "editor-strike"; i++;
+    images[i] = "editor-strike.png"; i++;
     EDITOR_SUBSCRIPT = i;
-    images[i] = "editor-subscript"; i++;
+    images[i] = "editor-subscript.png"; i++;
     EDITOR_SUPERSCRIPT = i;
-    images[i] = "editor-superscript"; i++;
+    images[i] = "editor-superscript.png"; i++;
     EDITOR_T_DELETE_CELL = i;
-    images[i] = "editor-t-delete-cell"; i++;
+    images[i] = "editor-t-delete-cell.png"; i++;
     EDITOR_T_INSERT = i;
-    images[i] = "editor-t-insert"; i++;
+    images[i] = "editor-t-insert.png"; i++;
     EDITOR_T_INSERT_COLUMN = i;
-    images[i] = "editor-t-insert-column"; i++;
+    images[i] = "editor-t-insert-column.png"; i++;
     EDITOR_T_INSERT_ROW = i;
-    images[i] = "editor-t-insert-row"; i++;
+    images[i] = "editor-t-insert-row.png"; i++;
     EDITOR_T_MERGE = i;
-    images[i] = "editor-t-merge"; i++;
+    images[i] = "editor-t-merge.png"; i++;
     EDITOR_T_PROPERTIES = i;
-    images[i] = "editor-t-properties"; i++;
+    images[i] = "editor-t-properties.png"; i++;
     EDITOR_T_PROPERTIES_CELL = i;
-    images[i] = "editor-t-properties-cell"; i++;
+    images[i] = "editor-t-properties-cell.png"; i++;
     EDITOR_T_SELECT = i;
-    images[i] = "editor-t-select"; i++;
+    images[i] = "editor-t-select.png"; i++;
     EDITOR_T_SELECT_CELL = i;
-    images[i] = "editor-t-select-cell"; i++;
+    images[i] = "editor-t-select-cell.png"; i++;
     EDITOR_T_SELECT_COLUMN = i;
-    images[i] = "editor-t-select-column"; i++;
+    images[i] = "editor-t-select-column.png"; i++;
     EDITOR_T_SELECT_ROW = i;
-    images[i] = "editor-t-select-row"; i++;
+    images[i] = "editor-t-select-row.png"; i++;
     EDITOR_T_SPLIT = i;
-    images[i] = "editor-t-split"; i++;
+    images[i] = "editor-t-split.png"; i++;
     EDITOR_UNDERLINE = i;
-    images[i] = "editor-underline"; i++;
+    images[i] = "editor-underline.png"; i++;
 
-    EM_ARROW_LEFT     = i;    images[i] = "emotions/arrow-left";     i++;
-    EM_ARROW_RIGHT    = i;    images[i] = "emotions/arrow-right";    i++;
-    EM_BALL           = i;    images[i] = "emotions/ball";           i++;
-    EM_BAT            = i;    images[i] = "emotions/bat";            i++;
-    EM_BEER           = i;    images[i] = "emotions/beer";           i++;
-    EM_BUDDY          = i;    images[i] = "emotions/buddy";          i++;
-    EM_CAMERA         = i;    images[i] = "emotions/camera";         i++;
-    EM_CAR            = i;    images[i] = "emotions/car";            i++;
-    EM_COCTAIL        = i;    images[i] = "emotions/coctail";        i++;
-    EM_COFFEE         = i;    images[i] = "emotions/coffee";         i++;
-    EM_FACE_ANGRY     = i;    images[i] = "emotions/face-angry";     i++;
-    EM_FACE_TEETH     = i;    images[i] = "emotions/face-teeth";     i++;
-    EM_FACE_CONFUSED  = i;    images[i] = "emotions/face-confused";  i++;
-    EM_FACE_CRY       = i;    images[i] = "emotions/face-cry";       i++;
-    EM_FACE_DEVIL     = i;    images[i] = "emotions/face-devil";     i++;
-    EM_FACE_DONT_TELL = i;    images[i] = "emotions/face-dont-tell"; i++;
-    EM_FACE_NERD      = i;    images[i] = "emotions/face-nerd";      i++;
-    EM_FACE_RED       = i;    images[i] = "emotions/face-red";       i++;
-    EM_FACE_SAD       = i;    images[i] = "emotions/face-sad";       i++;
-    EM_FACE_SARCASTIC = i;    images[i] = "emotions/face-sarcastic"; i++;
-    EM_FACE_SECRET    = i;    images[i] = "emotions/face-secret";    i++;
-    EM_FACE_SHADES    = i;    images[i] = "emotions/face-shades";    i++;
-    EM_FACE_SICK      = i;    images[i] = "emotions/face-sick";      i++;
-    EM_FACE_SMILE1    = i;    images[i] = "emotions/face-smile1";    i++;
-    EM_FACE_SMILE2    = i;    images[i] = "emotions/face-smile2";    i++;
-    EM_FACE_SMILE3    = i;    images[i] = "emotions/face-smile3";    i++;
-    EM_FACE_STRAIGHT  = i;    images[i] = "emotions/face-straight";  i++;
-    EM_FACE_SURPRISED = i;    images[i] = "emotions/face-surprised"; i++;
-    EM_FACE_THINKING  = i;    images[i] = "emotions/face-thinking";  i++;
-    EM_FACE_WEE       = i;    images[i] = "emotions/face-wee";       i++;
-    EM_FLAG_GREEN     = i;    images[i] = "emotions/flag-green";     i++;
-    EM_FLAG_RED       = i;    images[i] = "emotions/flag-red";       i++;
-    EM_GIFT           = i;    images[i] = "emotions/gift";           i++;
-    EM_HEAD_DUMB      = i;    images[i] = "emotions/head-dumb";      i++;
-    EM_HEAD_TALK      = i;    images[i] = "emotions/head-talk";      i++;
-    EM_HEART          = i;    images[i] = "emotions/heart";          i++;
-    EM_HEARTBREAK     = i;    images[i] = "emotions/heartbreak";     i++;
-    EM_KISS           = i;    images[i] = "emotions/kiss";           i++;
-    EM_LETTER         = i;    images[i] = "emotions/letter";         i++;
-    EM_MAIL           = i;    images[i] = "emotions/mail";           i++;
-    EM_MEN            = i;    images[i] = "emotions/men";            i++;
-    EM_PALMS          = i;    images[i] = "emotions/palms";          i++;
-    EM_PARTY          = i;    images[i] = "emotions/party";          i++;
-    EM_PHONE          = i;    images[i] = "emotions/phone";          i++;
-    EM_PIZZA          = i;    images[i] = "emotions/pizza";          i++;
-    EM_PLAIN          = i;    images[i] = "emotions/plain";          i++;
-    EM_ROSE           = i;    images[i] = "emotions/rose";           i++;
-    EM_THUMB_DOWN     = i;    images[i] = "emotions/thumb-down";     i++;
-    EM_THUMB_UP       = i;    images[i] = "emotions/thumb-up";       i++;
-    EM_WOMAN          = i;    images[i] = "emotions/woman";          i++;
+    EM_ARROW_LEFT     = i;    images[i] = "emotions/arrow-left.gif";     i++;
+    EM_ARROW_RIGHT    = i;    images[i] = "emotions/arrow-right.gif";    i++;
+    EM_BALL           = i;    images[i] = "emotions/ball.gif";           i++;
+    EM_BAT            = i;    images[i] = "emotions/bat.gif";            i++;
+    EM_BEER           = i;    images[i] = "emotions/beer.gif";           i++;
+    EM_BUDDY          = i;    images[i] = "emotions/buddy.gif";          i++;
+    EM_CAMERA         = i;    images[i] = "emotions/camera.gif";         i++;
+    EM_CAR            = i;    images[i] = "emotions/car.gif";            i++;
+    EM_COCTAIL        = i;    images[i] = "emotions/coctail.gif";        i++;
+    EM_COFFEE         = i;    images[i] = "emotions/coffee.gif";         i++;
+    EM_FACE_ANGRY     = i;    images[i] = "emotions/face-angry.gif";     i++;
+    EM_FACE_TEETH     = i;    images[i] = "emotions/face-teeth.gif";     i++;
+    EM_FACE_CONFUSED  = i;    images[i] = "emotions/face-confused.gif";  i++;
+    EM_FACE_CRY       = i;    images[i] = "emotions/face-cry.gif";       i++;
+    EM_FACE_DEVIL     = i;    images[i] = "emotions/face-devil.gif";     i++;
+    EM_FACE_DONT_TELL = i;    images[i] = "emotions/face-dont-tell.gif"; i++;
+    EM_FACE_NERD      = i;    images[i] = "emotions/face-nerd.gif";      i++;
+    EM_FACE_RED       = i;    images[i] = "emotions/face-red.gif";       i++;
+    EM_FACE_SAD       = i;    images[i] = "emotions/face-sad.gif";       i++;
+    EM_FACE_SARCASTIC = i;    images[i] = "emotions/face-sarcastic.gif"; i++;
+    EM_FACE_SECRET    = i;    images[i] = "emotions/face-secret.gif";    i++;
+    EM_FACE_SHADES    = i;    images[i] = "emotions/face-shades.gif";    i++;
+    EM_FACE_SICK      = i;    images[i] = "emotions/face-sick.gif";      i++;
+    EM_FACE_SMILE1    = i;    images[i] = "emotions/face-smile1.gif";    i++;
+    EM_FACE_SMILE2    = i;    images[i] = "emotions/face-smile2.gif";    i++;
+    EM_FACE_SMILE3    = i;    images[i] = "emotions/face-smile3.gif";    i++;
+    EM_FACE_STRAIGHT  = i;    images[i] = "emotions/face-straight.gif";  i++;
+    EM_FACE_SURPRISED = i;    images[i] = "emotions/face-surprised.gif"; i++;
+    EM_FACE_THINKING  = i;    images[i] = "emotions/face-thinking.gif";  i++;
+    EM_FACE_WEE       = i;    images[i] = "emotions/face-wee.gif";       i++;
+    EM_FLAG_GREEN     = i;    images[i] = "emotions/flag-green.gif";     i++;
+    EM_FLAG_RED       = i;    images[i] = "emotions/flag-red.gif";       i++;
+    EM_GIFT           = i;    images[i] = "emotions/gift.gif";           i++;
+    EM_HEAD_DUMB      = i;    images[i] = "emotions/head-dumb.gif";      i++;
+    EM_HEAD_TALK      = i;    images[i] = "emotions/head-talk.gif";      i++;
+    EM_HEART          = i;    images[i] = "emotions/heart.gif";          i++;
+    EM_HEARTBREAK     = i;    images[i] = "emotions/heartbreak.gif";     i++;
+    EM_KISS           = i;    images[i] = "emotions/kiss.gif";           i++;
+    EM_LETTER         = i;    images[i] = "emotions/letter.gif";         i++;
+    EM_MAIL           = i;    images[i] = "emotions/mail.gif";           i++;
+    EM_MEN            = i;    images[i] = "emotions/men.gif";            i++;
+    EM_PALMS          = i;    images[i] = "emotions/palms.gif";          i++;
+    EM_PARTY          = i;    images[i] = "emotions/party.gif";          i++;
+    EM_PHONE          = i;    images[i] = "emotions/phone.gif";          i++;
+    EM_PIZZA          = i;    images[i] = "emotions/pizza.gif";          i++;
+    EM_PLAIN          = i;    images[i] = "emotions/plain.gif";          i++;
+    EM_ROSE           = i;    images[i] = "emotions/rose.gif";           i++;
+    EM_THUMB_DOWN     = i;    images[i] = "emotions/thumb-down.gif";     i++;
+    EM_THUMB_UP       = i;    images[i] = "emotions/thumb-up.gif";       i++;
+    EM_WOMAN          = i;    images[i] = "emotions/woman.gif";          i++;
 
     NUMBER_OF_IMAGES = i;
 

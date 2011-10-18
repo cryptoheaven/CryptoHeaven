@@ -351,7 +351,7 @@ public class MyHTMLEditor extends HTMLEditor {
         Integer indexI = cPanel.getMainCompIndex();
         if (indexI != null) {
           int imageIndex = com.CH_co.util.ImageNums.getEmoticonCodes()[indexI.intValue()];
-          String imageName = "images/" + com.CH_co.util.ImageNums.getImageName(imageIndex) + ".gif";
+          String imageName = "images/" + com.CH_co.util.ImageNums.getImageName(imageIndex);
           try {
             editor.insertImage(imageName);
           } catch (Exception e) {

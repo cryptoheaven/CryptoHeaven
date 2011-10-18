@@ -320,7 +320,7 @@ public class SendMessageRunner extends ThreadTraced {
         else {
           if (trace != null) trace.data(100, "send the new message request");
           // send the new message request
-          ClientMessageAction reply = SIL.submitAndFetchReply(sendMsgAction, 60000, 3);
+          ClientMessageAction reply = SIL.submitAndFetchReply(sendMsgAction, 120000, 1);
           if (trace != null) trace.data(110, "got back reply from new message request");
           // run reply...
           if (reply != null) {

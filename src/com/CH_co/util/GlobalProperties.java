@@ -241,8 +241,9 @@ public class GlobalProperties extends Object {
   // build 640 HTTP Socket overhaul to try eliminating the memory leak
   // build 642 File upload/download transfer progress upgrades
   // build 644 File data transfer overhaul to allow interrupted uploads to resume.
+  // build 646 Fixes occasional download enc-file-size-zero bug, msg preview removal of styles and background images, faster applet resource loading
 
-  public static final short PROGRAM_BUILD_NUMBER = 644;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 646;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

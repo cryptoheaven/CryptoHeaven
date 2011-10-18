@@ -195,6 +195,8 @@ public class CryptoHeaven extends Object {
   }
 
   public static void main(String[] args) {
+    Misc.setIsRunningFromJNLP();
+
     // Controls of private label load
     boolean privateLabelLoaded = false;
     boolean skipSplashScreen = false;

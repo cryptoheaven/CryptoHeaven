@@ -12,25 +12,24 @@
 
 package com.CH_gui.fileTable;
 
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-
-import java.util.*;
-import java.util.List;
-import java.io.*;
-
-import javax.swing.ListSelectionModel;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
+import com.CH_cl.service.records.filters.FileFilter;
 
 import com.CH_gui.frame.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
+
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.datatransfer.*;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+import javax.swing.ListSelectionModel;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -38,7 +37,7 @@ import com.CH_gui.table.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -46,7 +45,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.14 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class FileDND_DropTargetListener extends Object implements DropTargetListener {
 
@@ -174,7 +173,9 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
         event.acceptDrop(DnDConstants.ACTION_MOVE);
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderPair moveToPair = CacheUtilities.convertRecordToPair(uploadShareRec);
-        fileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, cache.getFileLinkRecords(fileRecs.fileRecordIDs[1]), CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(fileRecs.fileRecordIDs[0])));
+        FileLinkRecord[] fLinks = cache.getFileLinkRecords(fileRecs.fileRecordIDs[1]);
+        FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
+        fileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(fileRecs.fileRecordIDs[0])));
         event.getDropTargetContext().dropComplete(true);
       }
 

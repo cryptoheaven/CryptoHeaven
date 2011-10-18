@@ -12,21 +12,13 @@
 
 package com.CH_gui.recycleTable;
 
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-
-import java.util.*;
-import java.util.List;
-import java.io.*;
-
-import javax.swing.ListSelectionModel;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
 
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
+import com.CH_cl.service.records.filters.FileFilter;
+import com.CH_co.service.records.filters.MsgFilter;
 
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
@@ -34,13 +26,21 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.table.*;
 
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.datatransfer.*;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+import javax.swing.ListSelectionModel;
+
 /** 
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -48,7 +48,7 @@ import com.CH_gui.table.*;
  *
  * <b>$Revision: 1.1 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class RecycleDND_DropTargetListener extends Object implements DropTargetListener {
 
@@ -171,8 +171,14 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
         event.acceptDrop(DnDConstants.ACTION_MOVE);
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderPair moveToPair = CacheUtilities.convertRecordToPair(uploadShareRec);
-        FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, cache.getFileLinkRecords(transferRecs.recycleRecordIDs[1]), CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
-        MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, moveToPair, cache.getMsgLinkRecords(transferRecs.recycleRecordIDs[2]));
+        // move Files and Folders
+        FileLinkRecord[] fLinks = cache.getFileLinkRecords(transferRecs.recycleRecordIDs[1]);
+        FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
+        FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
+        // move Msgs
+        MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(transferRecs.recycleRecordIDs[2]);
+        MsgLinkRecord[] mLinksFiltered = (MsgLinkRecord[]) new MsgFilter(Record.RECORD_TYPE_FOLDER, moveToPair.getId()).filterExclude(mLinks);
+        MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, moveToPair, mLinksFiltered);
         event.getDropTargetContext().dropComplete(true);
       }
 

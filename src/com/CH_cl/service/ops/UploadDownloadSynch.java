@@ -16,17 +16,17 @@ package com.CH_cl.service.ops;
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Development Team.
- * </a><br>All rights reserved.<p> 
- * 
+ * </a><br>All rights reserved.<p>
+ *
  * Allows a specified number of threads enter a critical section.
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class UploadDownloadSynch extends Object {
 
   private static Object monitor = new Object();
   private static int synchCount = 0;
-  
+
   public static void entry(int maxCount) {
     // limit number of entries
     synchronized (monitor) {
@@ -38,7 +38,7 @@ public class UploadDownloadSynch extends Object {
       synchCount ++;
     }
   }
-  
+
   public static void exit() {
     synchronized (monitor) {
       synchCount --;

@@ -12,12 +12,10 @@
 
 package com.CH_co.service.records.filters;
 
-import java.lang.reflect.*;
-import java.util.*;
-
 import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+
+import java.util.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -25,7 +23,7 @@ import com.CH_co.util.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -33,7 +31,7 @@ import com.CH_co.util.*;
  *
  * <b>$Revision: 1.8 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 abstract public class AbstractRecordFilter extends Object implements RecordFilter {
 
@@ -47,14 +45,14 @@ abstract public class AbstractRecordFilter extends Object implements RecordFilte
     return filter(recs, false);
   }
   private Record[] filter(Record[] recs, boolean isKeep) {
-    Vector recsV = new Vector();
+    ArrayList recsL = new ArrayList();
     Record[] keepRecs = null;
     if (recs != null) {
       for (int i=0; i<recs.length; i++) {
         if (keep(recs[i]) == isKeep)
-          recsV.addElement(recs[i]);
+          recsL.add(recs[i]);
       }
-      keepRecs = (Record[]) ArrayUtils.toArray(recsV, recs.getClass().getComponentType());
+      keepRecs = (Record[]) ArrayUtils.toArray(recsL, recs.getClass().getComponentType());
     }
     return keepRecs;
   }

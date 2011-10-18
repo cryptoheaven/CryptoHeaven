@@ -75,7 +75,7 @@ public class JSortedTable extends JTable implements DisposableObj {
     if (trace != null) trace.args(sorter);
 
     // Cause JTable to initialize to use variable row heights.
-    setRowHeight(18);
+    setRowHeight(19);
     setRowHeight(1, getRowHeight()+2);
     setBackground(Color.white);
     setBorder(new EmptyBorder(0,0,0,0));

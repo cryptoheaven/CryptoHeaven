@@ -12,22 +12,21 @@
 
 package com.CH_gui.msgTable;
 
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-
-import java.util.*;
-import java.util.List;
-import java.io.*;
-
-import com.CH_co.trace.Trace;
-import com.CH_co.service.records.*;
 import com.CH_cl.service.cache.*;
-
+import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.tree.*;
+
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.datatransfer.*;
+import java.io.*;
+import java.util.*;
+import java.util.List;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -35,7 +34,7 @@ import com.CH_gui.tree.*;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -43,7 +42,7 @@ import com.CH_gui.tree.*;
  *
  * <b>$Revision: 1.10 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class MsgDND_DropTargetListener extends Object implements DropTargetListener {
 
@@ -82,7 +81,7 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
           event.acceptDrag(DnDConstants.ACTION_COPY);
       } else if (event.isDataFlavorSupported(FolderDND_Transferable.FOLDER_RECORD_FLAVOR)) {
         event.rejectDrag();
-      } else if ( event.isDataFlavorSupported(FileDND_Transferable.FILE_RECORD_FLAVOR) || 
+      } else if ( event.isDataFlavorSupported(FileDND_Transferable.FILE_RECORD_FLAVOR) ||
                 event.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
         event.acceptDrag(DnDConstants.ACTION_COPY);
       else
@@ -137,7 +136,7 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
             FileLinkRecord[] fLinks = cache.getFileLinkRecords(data.fileRecordIDs[1]);
             new MessageFrame(new Record[] { parentFolderPair }, fLinks);
           }
-          else 
+          else
             event.rejectDrop();
         }
       }
@@ -155,7 +154,8 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         AddrDND_TransferableData data = (AddrDND_TransferableData) tr.getTransferData(AddrDND_Transferable.ADDR_RECORD_FLAVOR);
         MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(data.msgLinkIDs);
-        MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(isMove, parentFolderPair, mLinks);
+        MsgLinkRecord[] mLinksFiltered = (MsgLinkRecord[]) new MsgFilter(Record.RECORD_TYPE_FOLDER, parentFolderPair.getId()).filterExclude(mLinks);
+        MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(isMove, parentFolderPair, mLinksFiltered);
       }
 
       // Move or Copy Messages
@@ -171,7 +171,8 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgDND_TransferableData data = (MsgDND_TransferableData) tr.getTransferData(MsgDND_Transferable.MSG_RECORD_FLAVOR);
         MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(data.msgLinkIDs);
-        MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(isMove, parentFolderPair, mLinks);
+        MsgLinkRecord[] mLinksFiltered = (MsgLinkRecord[]) new MsgFilter(Record.RECORD_TYPE_FOLDER, parentFolderPair.getId()).filterExclude(mLinks);
+        MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(isMove, parentFolderPair, mLinksFiltered);
       } else {
         event.rejectDrop();
       }

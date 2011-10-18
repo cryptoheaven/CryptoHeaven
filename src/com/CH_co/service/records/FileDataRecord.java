@@ -442,11 +442,7 @@ public class FileDataRecord extends Record {
           String title = "File Integrity Check FAILED";
           Runnable yesRunnable = new Runnable() {
             public void run() {
-              // cleanup encrypted and plain file that may be partial
-              if (encDataFile != null) {
-                CleanupAgent.wipeOrDelete(encDataFile);
-                encDataFile = null;
-              }
+              // cleanup plain file that may be partial
               if (plainDataFile != null) {
                 CleanupAgent.wipeOrDelete(plainDataFile);
                 plainDataFile = null;
@@ -455,24 +451,24 @@ public class FileDataRecord extends Record {
           };
           NotificationCenter.showYesNo(NotificationCenter.ERROR_MESSAGE, title, errorMsg, true, yesRunnable, null);
         }
+
+        // cleanup the enc file as it will be useless because plain file was created
+        cleanupEncFile();
+
       } // end if destinationFile != null
 
     } catch (Throwable t) {
       t.printStackTrace();
       if (trace != null) trace.exception(FileDataRecord.class, 100, t);
 
-      // cleanup encrypted and plain file that may be partial
+      // cleanup encrypted file
       try {
         if (encFileIn != null)
           encFileIn.close();
       } catch (Throwable th) { }
-      try {
-        if (encDataFile != null) {
-          CleanupAgent.wipeOrDelete(encDataFile);
-          encDataFile = null;
-        }
-      } catch (Throwable th) { }
+      cleanupEncFile();
 
+      // cleanup plain file that may be partial
       try {
         if (fileOut != null)
           fileOut.close();
@@ -639,6 +635,7 @@ public class FileDataRecord extends Record {
     try {
       if (encDataFile != null) {
         CleanupAgent.wipeOrDelete(encDataFile);
+        encDataFile = null;
       }
     } catch (Throwable t) { }
   }
@@ -650,6 +647,7 @@ public class FileDataRecord extends Record {
       if (plainDataFile != null) {
         if (autoRemovePlainFile) {
           CleanupAgent.wipeOrDelete(plainDataFile);
+          plainDataFile = null;
         }
       }
     } catch (Throwable t) { }

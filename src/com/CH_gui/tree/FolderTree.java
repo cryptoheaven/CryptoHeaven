@@ -103,7 +103,7 @@ public class FolderTree extends JTree implements DisposableObj {
     this.setScrollsOnExpand(true);
     this.setEditable(false);
     this.setLargeModel(true);
-    this.setRowHeight(18);
+    this.setRowHeight(19);
 
     // Do not display the root of the tree
     setRootVisible(false);

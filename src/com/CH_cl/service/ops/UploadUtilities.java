@@ -422,7 +422,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
         if (trace != null) trace.data(50, "submitting new request in UploadUtilities");
         ClientMessageAction replyMsgAction = null;
         if (useStuds) // only fast non-streaming action is eligible for retry
-          replyMsgAction = SIL.submitAndFetchReply(msgActionToSend, 60000, 3);
+          replyMsgAction = SIL.submitAndFetchReply(msgActionToSend, 120000, 1);
         else // longer streaming actions are not retriable - must wait forever
           replyMsgAction = SIL.submitAndFetchReply(msgActionToSend);
         if (trace != null) trace.data(51, "got reply to new request in UploadUtilities");

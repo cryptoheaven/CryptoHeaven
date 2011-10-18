@@ -610,7 +610,7 @@ public class MsgDataRecord extends Record {
     int impPlain = importance.shortValue() & IMPORTANCE_PLAIN_MASK;
     boolean isPlain = impPlain != 0;
     String imgName = ImageNums.getImageName(ImageNums.STOPWATCH_ALERT16);
-    String imgStr = isPlain ? "" : "<img src=\"images/"+imgName+".png\" align=\"center\">";
+    String imgStr = isPlain ? "" : "<img src=\"images/"+imgName+"\" align=\"center\">";
     String accessStr = "";
     String dateStr = "";
     if (encText != null && encText.size() > 0 && getTextBody() == null && bodyPassHash != null) {

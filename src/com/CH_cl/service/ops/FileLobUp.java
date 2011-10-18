@@ -279,44 +279,52 @@ public class FileLobUp {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           Object token = new Object();
           if (arbiter.putToken(arbiterKeyUpload, token)) {
-            // Hook into cache to listen for any possible deletions so we can interrupt uploads.
-            FetchedDataCache cache = ServerInterfaceLayer.lastSIL.getFetchedDataCache();
-            fileListener = new FileListener();
-            msgListener = new MsgListener();
-            cache.addFileLinkRecordListener(fileListener);
-            cache.addMsgLinkRecordListener(msgListener);
-            isUploadInProgress = true;
-            boolean isRetry = false;
-            while (!isUploaded) {
-              try {
-                if (DEBUG_CONSOLE) System.out.println("doUpload: trigger for "+plainDataFile);
-                if (trace != null) trace.data(10, "doUpload: trigger", plainDataFile);
-                // If retrying start from unknown byte count.
-                if (ServerInterfaceLayer.lastSIL.isLoggedIn())
-                  isUploaded = doUpload(isRetry ? -1 : startFromByte);
-              } catch (Throwable t) {
-                if (DEBUG_CONSOLE) t.printStackTrace();
-                if (trace != null) trace.exception(getClass(), 100, t);
-              } finally {
-                if (isUploaded) {
-                  if (DEBUG_CONSOLE) System.out.println("doUpload: completion in triggerUploading()");
-                  if (trace != null) trace.data(110, "doUpload: trigger completed", plainDataFile);
-                  isUploadInProgress = false;
-                  arbiter.removeToken(arbiterKeyUpload, token);
-                } else {
-                  if (DEBUG_CONSOLE) System.out.println("doUpload: trigger will retry for "+plainDataFile);
-                  if (trace != null) trace.data(120, "doUpload: trigger will retry", plainDataFile);
-                  isRetry = true;
-                  // Any exception or failure should hit this delay.
-                  if (trace != null) trace.data(200, "waiting to retry in triggerUploading()", plainDataFile);
-                  try { Thread.sleep(3000); } catch (InterruptedException interX) { }
-                  if (trace != null) trace.data(201, "woke up from waiting to retry in triggerUploading()", plainDataFile);
+            // limit number of running upload threads
+            FileLobUpSynch.entry(3);
+            FetchedDataCache cache = null;
+            try {
+              // Hook into cache to listen for any possible deletions so we can interrupt uploads.
+              cache = ServerInterfaceLayer.lastSIL.getFetchedDataCache();
+              fileListener = new FileListener();
+              msgListener = new MsgListener();
+              cache.addFileLinkRecordListener(fileListener);
+              cache.addMsgLinkRecordListener(msgListener);
+              isUploadInProgress = true;
+              boolean isRetry = false;
+              while (!isUploaded) {
+                try {
+                  if (DEBUG_CONSOLE) System.out.println("doUpload: trigger for "+plainDataFile);
+                  if (trace != null) trace.data(10, "doUpload: trigger", plainDataFile);
+                  // If retrying start from unknown byte count.
+                  if (ServerInterfaceLayer.lastSIL.isLoggedIn())
+                    isUploaded = doUpload(isRetry ? -1 : startFromByte);
+                } catch (Throwable t) {
+                  if (DEBUG_CONSOLE) t.printStackTrace();
+                  if (trace != null) trace.exception(getClass(), 100, t);
+                } finally {
+                  if (isUploaded) {
+                    if (DEBUG_CONSOLE) System.out.println("doUpload: completion in triggerUploading()");
+                    if (trace != null) trace.data(110, "doUpload: trigger completed", plainDataFile);
+                    isUploadInProgress = false;
+                    arbiter.removeToken(arbiterKeyUpload, token);
+                  } else {
+                    if (DEBUG_CONSOLE) System.out.println("doUpload: trigger will retry for "+plainDataFile);
+                    if (trace != null) trace.data(120, "doUpload: trigger will retry", plainDataFile);
+                    isRetry = true;
+                    // Any exception or failure should hit this delay.
+                    if (trace != null) trace.data(200, "waiting to retry in triggerUploading()", plainDataFile);
+                    try { Thread.sleep(3000); } catch (InterruptedException interX) { }
+                    if (trace != null) trace.data(201, "woke up from waiting to retry in triggerUploading()", plainDataFile);
+                  }
                 }
               }
+            } finally {
+              // mark thread exit
+              FileLobUpSynch.exit();
+              // remove cache listeners after upload exits
+              try { cache.removeFileLinkRecordListener(fileListener); } catch (Throwable t) { }
+              try { cache.removeMsgLinkRecordListener(msgListener); } catch (Throwable t) { }
             }
-            // remove cache listeners after upload exits
-            cache.removeFileLinkRecordListener(fileListener);
-            cache.removeMsgLinkRecordListener(msgListener);
           }
           if (trace != null) trace.exit(getClass());
         }

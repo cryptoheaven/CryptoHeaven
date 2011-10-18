@@ -115,6 +115,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private JTextField jPasswordField;
   private JComponent jMessage;
   private JMyLinkLikeLabel jLoadImages;
+  private JMyLinkLikeLabel jDisplayImages;
   private JPanel jImageFilterPanel;
   private JButton jAttachment;
   private boolean isAttachmentButton;
@@ -312,13 +313,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jImageFilterPanel.add(new JMyLabel("Images are not displayed."), new GridBagConstraints(1, 0, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 3, 3, 3), 0, 0));
-    JMyLinkLikeLabel jDisplayImages = new JMyLinkLikeLabel("Display images below.");
+    jDisplayImages = new JMyLinkLikeLabel("Display images below.");
     jDisplayImages.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         e.consume();
         pressedLoadHideImages();
       }
     });
+    jDisplayImages.setVisible(!Misc.isRunningFromApplet() && !Misc.isRunningFromJNLP());
     jImageFilterPanel.add(jDisplayImages, new GridBagConstraints(2, 0, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 3, 3, 3), 0, 0));
     jImageFilterPanel.add(new JLabel(), new GridBagConstraints(3, 0, 1, 1, 10, 0,
@@ -1360,6 +1362,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       } else {
         if (msgDataRecord != null) {
           boolean skipHeaderClearing = false;
+          boolean skipRemoteLoadingCleaning = isImageLoadEnabled();
           String text = "";
           if (msgDataRecord.isTypeMessage()) {
             text = msgDataRecord.getText();
@@ -1392,9 +1395,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           } else {
             isWaitingForMsgBody = false;
           }
-          MsgPanelUtils.setPreviewContent_Threaded(text, isHTML, convertHTMLtoPLAIN, skipHeaderClearing, jMessage);
+          MsgPanelUtils.setPreviewContent_Threaded(text, isHTML, convertHTMLtoPLAIN, skipHeaderClearing, skipRemoteLoadingCleaning, jMessage);
         } else {
-          MsgPanelUtils.setPreviewContent_Threaded(msgLinkRecord == null ? no_selected_msg_html : STR_LOADING, isHTML, false, true, jMessage);
+          MsgPanelUtils.setPreviewContent_Threaded(msgLinkRecord == null ? no_selected_msg_html : STR_LOADING, isHTML, false, true, true, jMessage);
           // Clear panels and make them original size.
           setRecipientsPanel(null, jRecipients, jLineRecipients);
           setAttachmentsButton();
@@ -1878,7 +1881,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               if (jHtmlMessage instanceof JEditorPane) {
                 EditorKit editorKit = ((JEditorPane) jHtmlMessage).getEditorKit();
                 if (editorKit instanceof HTML_EditorKit) {
-                  boolean isDisplayRemoteImages = displayHtmlMode;
+                  boolean isDisplayRemoteImages = displayHtmlMode && !Misc.isRunningFromApplet() && !Misc.isRunningFromJNLP();
                   ((HTML_EditorKit) editorKit).setDisplayRemoteImages(isDisplayRemoteImages);
                   if (isDisplayRemoteImages)
                     jLoadImages.setText(STR_IMAGES_HIDE);
@@ -2014,8 +2017,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     */
   private class MsgLinkListener implements MsgLinkRecordListener {
     public void msgLinkRecordUpdated(MsgLinkRecordEvent event) {
-      // Exec on event thread to avoid potential GUI deadlocks
-      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
+      msgRecordUpdated(event);
     }
   }
 
@@ -2024,52 +2026,47 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     */
   private class MsgDataListener implements MsgDataRecordListener {
     public void msgDataRecordUpdated(MsgDataRecordEvent event) {
-      // Exec on event thread
-      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
+      msgRecordUpdated(event);
     }
   }
 
-  private class MsgGUIUpdater implements Runnable {
-    private RecordEvent event;
-    public MsgGUIUpdater(RecordEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(RecordEvent event)");
-      this.event = event;
-      if (trace != null) trace.exit(MsgGUIUpdater.class);
-    }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
+  /**
+   * Notify of updated record, no not modify GUI objects directly to avoid deadlocks.
+   * @param event
+   */
+  private void msgRecordUpdated(RecordEvent event) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "msgRecordUpdated(RecordEvent event)");
+    if (trace != null) trace.args(event);
 
-      if (event instanceof MsgLinkRecordEvent) {
-        Record[] recs = event.getRecords();
-        Record ourRec = null;
-        for (int i=0; i<recs.length; i++) {
-          if (ourMsgFilter != null && ourMsgFilter.keep(recs[i])) {
-            ourRec = recs[i];
-            break;
-          }
+    if (event instanceof MsgLinkRecordEvent) {
+      Record[] recs = event.getRecords();
+      Record ourRec = null;
+      for (int i=0; i<recs.length; i++) {
+        if (ourMsgFilter != null && ourMsgFilter.keep(recs[i])) {
+          ourRec = recs[i];
+          break;
         }
-        if (ourRec != null) {
-          initData(FetchedDataCache.getSingleInstance().getMsgLinkRecord(ourRec.getId()));
-        }
-      } else if (event instanceof MsgDataRecordEvent) {
-        // and changes to Address Records may affect the view...
-        // only for message views, exclude address book view
-        if (msgDataRecord != null && msgDataRecord.isTypeMessage()) {
-          if (event.getEventType() == RecordEvent.SET) {
-            Record[] records = event.getRecords();
-            for (int i=0; i<records.length; i++) {
-              if (((MsgDataRecord) records[i]).isTypeAddress()) {
-                addToMsgPreviewUpdateQueue(msgLinkRecord);
-                break;
-              }
+      }
+      if (ourRec != null) {
+        initData(FetchedDataCache.getSingleInstance().getMsgLinkRecord(ourRec.getId()));
+      }
+    } else if (event instanceof MsgDataRecordEvent) {
+      // and changes to Address Records may affect the view...
+      // only for message views, exclude address book view
+      if (msgDataRecord != null && msgDataRecord.isTypeMessage()) {
+        if (event.getEventType() == RecordEvent.SET) {
+          Record[] records = event.getRecords();
+          for (int i=0; i<records.length; i++) {
+            if (((MsgDataRecord) records[i]).isTypeAddress()) {
+              addToMsgPreviewUpdateQueue(msgLinkRecord);
+              break;
             }
           }
         }
       }
-
-      // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
-      if (trace != null) trace.exit(MsgGUIUpdater.class);
     }
+
+    if (trace != null) trace.exit(MsgPreviewPanel.class);
   }
 
   private synchronized void addToMsgPreviewUpdateQueue(MsgLinkRecord msgLinkRecord) {

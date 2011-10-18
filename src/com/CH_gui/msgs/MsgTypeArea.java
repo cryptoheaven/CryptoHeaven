@@ -714,14 +714,14 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
               if (isFormattedAvailable && isPlainAvailable)
                 break;
             }
-            if (!isFormattedAvailable && isPlainAvailable) {
+              if (!isFormattedAvailable && isPlainAvailable) {
               jHtmlMessage.pastePlainTextFromClipboard(true);
-              e.consume();
-            } else if (isFormattedAvailable) {
+                e.consume();
+              } else if (isFormattedAvailable) {
               jHtmlMessage.pasteFormattedTextFromClipboard();
-              // terminate any link at the end of pasted content
+                // terminate any link at the end of pasted content
               jHtmlMessage.insertContent("&nbsp;");
-              e.consume();
+                e.consume();
             }
           }
         }
