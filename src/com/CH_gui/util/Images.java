@@ -18,9 +18,8 @@ import com.CH_co.util.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Iterator;
+import java.net.*;
+import java.util.*;
 
 import javax.swing.ImageIcon;
 

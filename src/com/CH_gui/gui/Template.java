@@ -12,16 +12,13 @@
 
 package com.CH_gui.gui;
 
-import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_co.util.URLs;
+import com.CH_gui.util.HTML_ClickablePane;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.net.URL;
 import java.util.HashMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -29,7 +26,7 @@ import javax.swing.JPanel;
  * CryptoHeaven Development Team.
  * </a><br>All rights reserved.<p>
  *
- * Class Description: 
+ * Class Description:
  *
  *
  * Class Details:
@@ -37,7 +34,7 @@ import javax.swing.JPanel;
  *
  * <b>$Revision: 1.20 $</b>
  * @author  Marcin Kurzawa
- * @version 
+ * @version
  */
 public class Template extends Object {
 
@@ -73,15 +70,15 @@ public class Template extends Object {
 
   static {
     int i = 0;
-    templates = new String[23]; 
+    templates = new String[23];
 
-    BACK_CONTACTS = i; 
+    BACK_CONTACTS = i;
     templates[i] = "back-contacts.html"; i++;
 
-    BACK_GROUP = i; 
+    BACK_GROUP = i;
     templates[i] = "back-group.html"; i++;
 
-    BACK_FILES = i; 
+    BACK_FILES = i;
     templates[i] = "back-files.html"; i++;
 
     CATEGORY_MAIL = i;
@@ -96,52 +93,52 @@ public class Template extends Object {
     CATEGORY_GROUP = i;
     templates[i] = "category-group.html"; i++;
 
-    EMPTY_ADDRESSES = i; 
+    EMPTY_ADDRESSES = i;
     templates[i] = "empty-addresses.html"; i++;
 
-    EMPTY_WHITELIST = i; 
+    EMPTY_WHITELIST = i;
     templates[i] = "empty-whitelist.html"; i++;
 
-    EMPTY_CHAT = i; 
+    EMPTY_CHAT = i;
     templates[i] = "empty-chat.html"; i++;
 
-    EMPTY_CONTACTS = i; 
+    EMPTY_CONTACTS = i;
     templates[i] = "empty-contacts.html"; i++;
 
-    EMPTY_GROUP = i; 
+    EMPTY_GROUP = i;
     templates[i] = "empty-group.html"; i++;
 
-    EMPTY_FILES = i; 
+    EMPTY_FILES = i;
     templates[i] = "empty-files.html"; i++;
 
-    EMPTY_MAIL = i; 
+    EMPTY_MAIL = i;
     templates[i] = "empty-mail.html"; i++;
 
-    EMPTY_MAIL_SENT = i; 
+    EMPTY_MAIL_SENT = i;
     templates[i] = "empty-mail-sent.html"; i++;
 
-    EMPTY_MAIL_SPAM = i; 
+    EMPTY_MAIL_SPAM = i;
     templates[i] = "empty-mail-spam.html"; i++;
 
-    EMPTY_MAIL_DRAFTS = i; 
+    EMPTY_MAIL_DRAFTS = i;
     templates[i] = "empty-mail-drafts.html"; i++;
 
-    EMPTY_POSTINGS = i; 
+    EMPTY_POSTINGS = i;
     templates[i] = "empty-postings.html"; i++;
 
-    EMPTY_RECYCLE = i; 
+    EMPTY_RECYCLE = i;
     templates[i] = "empty-recycle.html"; i++;
 
-    EMPTY_USER_ACCOUNTS = i; 
+    EMPTY_USER_ACCOUNTS = i;
     templates[i] = "empty-users"; i++; // NULL - not implemented - no such file
 
     FILTER_NO_RESULTS = i;
     templates[i] = "filter-no-results.html"; i++;
 
-    KEY_GEN = i; 
+    KEY_GEN = i;
     templates[i] = "key-gen.html"; i++;
 
-    NONE = i; 
+    NONE = i;
     templates[i] = "none"; // NULL - not implemented - no such file
 
   }
@@ -183,9 +180,11 @@ public class Template extends Object {
           String fileName = "templates/" + templateName;
           location = URLs.getResourceURL(fileName);
         }
-        HTML_ClickablePane htmlPane = HTML_ClickablePane.createNewAndLoading(location);
-        htmlPane.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
-        pane = htmlPane;
+        if (location != null) {
+          HTML_ClickablePane htmlPane = HTML_ClickablePane.createNewAndLoading(location);
+          htmlPane.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
+          pane = htmlPane;
+        }
       } catch (Throwable t) {
       }
     }
@@ -197,11 +196,11 @@ public class Template extends Object {
         pTop.setBackground(Color.white);
         pLeft.setBackground(Color.white);
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.add(pTop, new GridBagConstraints(0, 0, 2, 1, 10, 10, 
+        panel.add(pTop, new GridBagConstraints(0, 0, 2, 1, 10, 10,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-        panel.add(pLeft, new GridBagConstraints(0, 1, 1, 1, 10, 0, 
+        panel.add(pLeft, new GridBagConstraints(0, 1, 1, 1, 10, 0,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-        panel.add(pane, new GridBagConstraints(1, 1, 1, 1, 0, 0, 
+        panel.add(pane, new GridBagConstraints(1, 1, 1, 1, 0, 0,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
         jTemplate = panel;
       } else {

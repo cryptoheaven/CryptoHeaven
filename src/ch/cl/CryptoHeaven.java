@@ -277,15 +277,19 @@ public class CryptoHeaven extends Object {
 
     JWindow splashWindow = null;
     if (!skipSplashScreen) {
-      splashWindow = new JWindow();
-      Container c = splashWindow.getContentPane();
       ImageIcon image = Images.get(ImageNums.LOGO_KEY_MAIN);
-      JLabel splashImage = new JLabel(image);
-      c.add(splashImage, BorderLayout.CENTER);
-      splashImage.setPreferredSize(new Dimension(image.getIconWidth()+2, image.getIconHeight()+2));
-      splashWindow.pack();
-      MiscGui.setSuggestedWindowLocation(null, splashWindow);
-      splashWindow.setVisible(true);
+      // If for any reason there is no logo defined in private label customization, 
+      // then skip the splash screen and allow the application to load.
+      if (image != null) {
+        splashWindow = new JWindow();
+        Container c = splashWindow.getContentPane();
+        JLabel splashImage = new JLabel(image);
+        c.add(splashImage, BorderLayout.CENTER);
+        splashImage.setPreferredSize(new Dimension(image.getIconWidth()+2, image.getIconHeight()+2));
+        splashWindow.pack();
+        MiscGui.setSuggestedWindowLocation(null, splashWindow);
+        splashWindow.setVisible(true);
+      }
     }
 
     // After splash screen is shown, continue with rest of initializations.
