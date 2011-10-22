@@ -65,6 +65,7 @@ import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
+import javax.swing.text.html.*;
 import javax.swing.undo.*;
 
 /** 
@@ -808,6 +809,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                 public Object[] getSelectedAttachments() {
                   return null;
                 }
+                public Object[] getInlineAttachments() {
+                  return null;
+                }
+                public Object[] getSelectedAndInlineAttachments() {
+                  return null;
+                }
                 public Record[][] getSelectedRecipients() {
                   return MsgComposePanel.this.getSelectedRecipients();
                 }
@@ -930,9 +937,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
             // Check if any attachments, to see if we should force the external-email-no-attachments warning
             boolean anyAttachments = false;
-            if (selectedAttachments != null && selectedAttachments.length > 0) {
+            Object[] allAttachments = getSelectedAndInlineAttachments();
+            if (allAttachments != null && allAttachments.length > 0) {
               anyAttachments = true;
             }
+
             // Check if any external email addresses
             boolean anyEmailAddresses = false;
             if (emailAddresses != null && emailAddresses.length > 0) {
@@ -2864,6 +2873,33 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
   public Object[] getSelectedAttachments() {
     return selectedAttachments;
+  }
+  public Object[] getInlineAttachments() {
+    File[] inlineAttachments = null;
+    ArrayList inlineAttachmentsL = null;
+    JTextComponent component = msgComponents.getMsgTypeArea();
+    Document doc = component.getDocument();
+    if (doc instanceof HTMLDocument) {
+      HTMLDocument htmlDoc = (HTMLDocument) doc;
+      for (HTMLDocument.Iterator iterator = htmlDoc.getIterator(HTML.Tag.IMG); iterator.isValid(); iterator.next()) {
+        AttributeSet attributes = iterator.getAttributes();
+        String srcString = (String) attributes.getAttribute(HTML.Attribute.SRC);
+        if (srcString != null) {
+          if (srcString.startsWith("file:/"))
+            srcString = srcString.substring("file:/".length());
+          File file = new File(srcString);
+          if (file.exists()) {
+            if (inlineAttachmentsL == null) inlineAttachmentsL = new ArrayList();
+            inlineAttachmentsL.add(file);
+          }
+        }
+      }
+      inlineAttachments = (File[]) ArrayUtils.toArray(inlineAttachmentsL, File.class);
+    }
+    return inlineAttachments;
+  }
+  public Object[] getSelectedAndInlineAttachments() {
+    return ArrayUtils.concatinate(getSelectedAttachments(), getInlineAttachments(), Object.class);
   }
 
   public MsgLinkRecord getReplyToMsgLink() {

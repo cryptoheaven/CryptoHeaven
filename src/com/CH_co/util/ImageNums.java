@@ -1472,10 +1472,10 @@ public class ImageNums extends Object {
     images[i] = "Shield32.gif"; i++;
 
     HTML_IMAGE_DELAYED = i;
-    images[i] = "image-delayed.gif"; i++;
+    images[i] = "image-delayed.png"; i++;
 
     HTML_IMAGE_FAILED = i;
-    images[i] = "image-failed.gif"; i++;
+    images[i] = "image-failed.png"; i++;
 
     RESIZE_DRAG_SE = i;
     images[i] = "resize-drag-se.gif"; i++;

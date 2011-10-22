@@ -43,6 +43,8 @@ public interface MsgSendInfoProviderI {
   public short getPriority();
   public MsgLinkRecord getReplyToMsgLink();
   public Object[] getSelectedAttachments();
+  public Object[] getInlineAttachments();
+  public Object[] getSelectedAndInlineAttachments();
   public Record[][] getSelectedRecipients();
   public Record[] getSelectedRecipients(short type);
 

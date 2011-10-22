@@ -242,13 +242,14 @@ public class GlobalProperties extends Object {
   // build 642 File upload/download transfer progress upgrades
   // build 644 File data transfer overhaul to allow interrupted uploads to resume.
   // build 646 Fixes occasional download enc-file-size-zero bug, msg preview removal of styles and background images, faster applet resource loading
+  // build 648 Image pasted in to HTML editor gets uploaded as attachment
 
-  public static final short PROGRAM_BUILD_NUMBER = 646;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 648;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.5f;
-  public static final short PROGRAM_VERSION_MINOR = 0;
+  public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

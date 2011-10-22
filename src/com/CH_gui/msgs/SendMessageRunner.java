@@ -62,8 +62,8 @@ public class SendMessageRunner extends ThreadTraced {
   private MsgSendInfoProviderI msgSendInfoProvider;
 
   private Record[][] selectedRecipients;
-  private Object[] selectedAttachments;
-  private FileLinkRecord[] selectedFileAttachments;
+  private Object[] selectedAndInlineAttachments;
+  private FileLinkRecord[] selectedAndInlineFileAttachments;
   private MsgLinkRecord[] selectedMsgAndPostAttachments;
   private File[] selectedLocalFileAttachments;
 
@@ -77,16 +77,16 @@ public class SendMessageRunner extends ThreadTraced {
     this.msgSendInfoProvider = msgSendInfoProvider;
 
     selectedRecipients = msgSendInfoProvider.getSelectedRecipients();
-    selectedAttachments = msgSendInfoProvider.getSelectedAttachments();
+    selectedAndInlineAttachments = msgSendInfoProvider.getSelectedAndInlineAttachments();
 
     if (trace != null) trace.data(40, selectedRecipients);
-    if (trace != null) trace.data(41, selectedAttachments);
+    if (trace != null) trace.data(41, selectedAndInlineAttachments);
 
-    selectedFileAttachments = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selectedAttachments, FileLinkRecord.class);
-    selectedMsgAndPostAttachments = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selectedAttachments, MsgLinkRecord.class);
-    selectedLocalFileAttachments = (File[]) ArrayUtils.gatherAllOfType(selectedAttachments, File.class);
+    selectedAndInlineFileAttachments = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selectedAndInlineAttachments, FileLinkRecord.class);
+    selectedMsgAndPostAttachments = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selectedAndInlineAttachments, MsgLinkRecord.class);
+    selectedLocalFileAttachments = (File[]) ArrayUtils.gatherAllOfType(selectedAndInlineAttachments, File.class);
 
-    if (trace != null) trace.data(50, selectedFileAttachments);
+    if (trace != null) trace.data(50, selectedAndInlineFileAttachments);
     if (trace != null) trace.data(51, selectedMsgAndPostAttachments);
     if (trace != null) trace.data(52, selectedLocalFileAttachments);
 
@@ -220,8 +220,8 @@ public class SendMessageRunner extends ThreadTraced {
           }
 
           // create file attachments
-          if (selectedFileAttachments != null && selectedFileAttachments.length > 0) {
-            fileAttachments = prepareFileAttachments(selectedFileAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
+          if (selectedAndInlineFileAttachments != null && selectedAndInlineFileAttachments.length > 0) {
+            fileAttachments = prepareFileAttachments(selectedAndInlineFileAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
           }
 
           // convert IDs vector to array of IDs
@@ -243,7 +243,7 @@ public class SendMessageRunner extends ThreadTraced {
           EmailAddressRecord[] emailAddresses = (EmailAddressRecord[]) ArrayUtils.gatherAllOfType(recipientsAll, EmailAddressRecord.class);
           if (emailAddresses != null && emailAddresses.length > 0) {
             // Check if any attachments, if so then skip them for external recipients.
-            if (selectedAttachments != null && selectedAttachments.length > 0) {
+            if (selectedAndInlineAttachments != null && selectedAndInlineAttachments.length > 0) {
               regularEmailWithAttachments = true;
             }
 

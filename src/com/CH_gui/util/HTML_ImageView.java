@@ -55,8 +55,8 @@ public class HTML_ImageView extends View implements ImageObserver, MouseListener
   static final String IMAGE_CACHE_PROPERTY = "imageCache";
 
   // Height/width to use before we know the real size:
-  private static final int DEFAULT_WIDTH = 24;
-  private static final int DEFAULT_HEIGHT = 24;
+  private static final int DEFAULT_WIDTH = 16;
+  private static final int DEFAULT_HEIGHT = 16;
   private static final int DEFAULT_BORDER = 1;
   private static final int DEFAULT_EDIT_BORDER = 1;
 
