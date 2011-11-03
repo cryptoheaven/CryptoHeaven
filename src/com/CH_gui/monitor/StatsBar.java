@@ -12,9 +12,9 @@
 
 package com.CH_gui.monitor;
 
+import com.CH_cl.service.ops.FileLobUp;
 import com.CH_co.monitor.*;
 import com.CH_co.util.*;
-
 import com.CH_gui.gui.*;
 import com.CH_gui.util.*;
 
@@ -23,6 +23,7 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.*;
 
 /**
@@ -38,6 +39,7 @@ import javax.swing.border.*;
 public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
 
   private JLabel jLastStatus;
+  private long lastStatusStamp;
   private JLabel jPing;
   private JLabel jOnlineStatus;
   private JLabel jConnections;
@@ -58,6 +60,15 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
     jConnections = new JMyLabel();
     jTransferRate = new JMyLabel();
     jSize = new JMyLabel();
+
+    // setup a timer to cleanup the status info line
+    Timer timer = new Timer(1000, new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (Math.abs(System.currentTimeMillis() - lastStatusStamp) > 30000)
+          setStatsLastStatus("");
+      }
+    });
+    timer.start(); 
 
     JPanel jStatusBar = this;
     jStatusBar.setLayout(new GridBagLayout());
@@ -141,7 +152,7 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
     jLastStatus.setHorizontalAlignment(JLabel.LEFT);
     jLastStatus.setIcon(Images.get(ImageNums.ANIM_GLOBE_FIRST16));
 
-    jLastStatus.setToolTipText("Last reported client-server request-reply status.");
+    jLastStatus.setToolTipText("Last reported status.");
     jPing.setToolTipText("Network Delay");
     jOnlineStatus.setToolTipText("Indicates client online/offline status");
     jConnections.setToolTipText("Number of open connections to the server.");
@@ -237,6 +248,7 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
 
   public void setStatsLastStatus(String status) {
     jLastStatus.setText(status);
+    lastStatusStamp = System.currentTimeMillis();
   }
 
   public void setStatsPing(Long pingMS) {
@@ -277,6 +289,19 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
       jTransferRate.setIcon(Images.get(ImageNums.LIGHT_OFF_SMALL));
       jTransferRate.setText(null);
     }
+    // update upload summary info
+    String summary = FileLobUp.getSummary();
+    if (summary != null)
+      setStatsLastStatus(summary);
+    else {
+      String status = getStatusLabel().getText();
+      if (status != null && status.startsWith("Uploading"))
+        setStatsLastStatus("");
+    }
+  }
+  public void setStatsTransferRateIn(Long transferRate) {
+  }
+  public void setStatsTransferRateOut(Long transferRate) {
   }
 
   public void disposeObj() {
@@ -292,10 +317,17 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
       textArea.setEditable(false);
       JScrollPane textPane = new JScrollPane(textArea);
       StringBuffer sb = new StringBuffer();
-      ArrayList moversTraceL = Stats.getGlobeMoversTraceL();
-      if (moversTraceL != null && moversTraceL.size() > 0) {
-        sb.append("Spinning Globe\n");
-      }
+//      ArrayList moversTraceL = Stats.getGlobeMoversTraceL();
+//      if (moversTraceL != null && moversTraceL.size() > 0) {
+//        sb.append("Spinning Globe\n");
+//      }
+      String upSummary = FileLobUp.getSummary();
+      if (upSummary != null)
+        sb.append(upSummary).append("\n");
+      String upProgress = FileLobUp.getProgress();
+      if (upProgress != null)
+        sb.append(upProgress).append("\n");
+
       ArrayList[] historyLists = Stats.getStatsHistoryLists();
       Iterator iterS = historyLists[0].iterator();
       Iterator iterD = historyLists[1].iterator();
@@ -310,12 +342,12 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
         sb.append("   ");
         sb.append(nextStatus);
       }
-      if (moversTraceL != null && moversTraceL.size() > 0) {
-        sb.append("\n\nSpinning Globe traces:\n");
-        for (int i=0; i<moversTraceL.size(); i++) {
-          sb.append("\nRunning Action: " + moversTraceL.get(i));
-        }
-      }
+//      if (moversTraceL != null && moversTraceL.size() > 0) {
+//        sb.append("\n\nSpinning Globe traces:\n");
+//        for (int i=0; i<moversTraceL.size(); i++) {
+//          sb.append("\nRunning Action: ").append(moversTraceL.get(i));
+//        }
+//      }
       textArea.setText(sb.toString());
       textArea.setCaretPosition(0);
       popup.add(textPane);

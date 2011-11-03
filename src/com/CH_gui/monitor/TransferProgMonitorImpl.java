@@ -16,7 +16,6 @@ import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.DownloadUtilities;
 
 import com.CH_co.monitor.*;
-import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
@@ -566,7 +565,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.moveGlobe(this);
-    Stats.setStatus("New transfer request... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+//    Stats.setStatus("New transfer request... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void dequeue(int actionCode, long stamp) {
@@ -574,7 +573,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Preparing to transfer ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    //Stats.setStatus("Preparing to transfer ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startSend(int actionCode, long stamp) {
@@ -582,14 +581,13 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    //Stats.moveGlobe(this); // moving globe in enqueue()
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startSendAction(String actionName) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Sending request ... [" + actionName + "]");
+    //Stats.setStatus("Sending request ... [" + actionName + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startSendData(String dataName) {
@@ -603,7 +601,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Waiting for reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    //Stats.setStatus("Waiting for reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneSendAction(String actionName) {
@@ -623,7 +621,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Receiving reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    //Stats.setStatus("Receiving reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void startReceiveAction(String actionName) {
@@ -643,7 +641,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Reply received. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    //Stats.setStatus("Reply received. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneReceiveAction(String actionName) {
@@ -662,14 +660,14 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "startExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Executing reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    //Stats.setStatus("Executing reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public void doneExecution(int actionCode) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "doneExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Action completed. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+//    Stats.setStatus("Action completed. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     Stats.stopGlobe(this);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }

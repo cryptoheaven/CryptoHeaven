@@ -57,11 +57,11 @@ public class NotificationCenter {
       }
     }
   }
-  public static void showYesNo(int type, String title, String msg, boolean defaultChoice, Runnable yes, Runnable no) {
+  public static void showYesNo(int type, String title, String msg, boolean defaultYes, Runnable yes, Runnable no) {
     if (implNotificationCenterI != null) {
       try {
         NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
-        impl.showYesNo(type, title, msg, yes, no);
+        impl.showYesNo(type, title, msg, defaultYes, yes, no);
       } catch (Throwable t) {
       }
     }

@@ -2883,14 +2883,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       HTMLDocument htmlDoc = (HTMLDocument) doc;
       for (HTMLDocument.Iterator iterator = htmlDoc.getIterator(HTML.Tag.IMG); iterator.isValid(); iterator.next()) {
         AttributeSet attributes = iterator.getAttributes();
-        String srcString = (String) attributes.getAttribute(HTML.Attribute.SRC);
-        if (srcString != null) {
-          if (srcString.startsWith("file:/"))
-            srcString = srcString.substring("file:/".length());
-          File file = new File(srcString);
-          if (file.exists()) {
-            if (inlineAttachmentsL == null) inlineAttachmentsL = new ArrayList();
-            inlineAttachmentsL.add(file);
+        if (attributes != null) {
+          String srcString = (String) attributes.getAttribute(HTML.Attribute.SRC);
+          if (srcString != null) {
+            if (srcString.startsWith("file:/"))
+              srcString = srcString.substring("file:/".length());
+            File file = new File(srcString);
+            if (file.exists()) {
+              if (inlineAttachmentsL == null) inlineAttachmentsL = new ArrayList();
+              inlineAttachmentsL.add(file);
+            }
           }
         }
       }

@@ -1009,23 +1009,33 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     // check for active transfers
     ArrayList activeUps = FileLobUp.getStateSessions();
     if (activeUps != null && activeUps.size() > 0) {
-      Runnable yes = new Runnable() {
+      Runnable yes = new NamedRunnable("Suspend Uploads and Exit") {
         public void run() {
           exitAction(MainFrame.this);
         }
       };
-      Runnable no = new Runnable() {
+      Runnable no = new NamedRunnable("Continue Uploading") {
         public void run() {
-          // no-op
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              // minimize the window
+              try {
+                MainFrame.this.setState(JFrame.ICONIFIED);
+              } catch (Throwable t) {
+              }
+            }
+          }); // end Runnable class
         }
       };
-      StringBuffer sb = new StringBuffer();
-      for (int i=0; i<activeUps.size(); i++) {
-        Object[] state = (Object[]) activeUps.get(i);
-        sb.append(state[0]);
-        sb.append("<br>");
-      }
-      NotificationCenter.showYesNo(NotificationCenter.WARNING_MESSAGE, "Recent file transfers are incomplete!", "<html>Exit and terminate current file transfers?<br><br>Incomplete file transfers are:<br>"+sb.toString()+"<br>Transfers will resume upon your next login.</html>", false, yes, no);
+      String summary = FileLobUp.getSummary();
+      String progress = FileLobUp.getProgress();
+      NotificationCenter.showYesNo(NotificationCenter.WARNING_MESSAGE, 
+              "Recent file transfers are incomplete!", 
+              "<html>Exit and terminate current file transfers?<br>"
+              +"Transfers will resume upon your next login.<br><br>"
+              +(summary != null ? summary+"<br><br>" : "")
+              +(progress != null ? "Incomplete file transfers are:<br>"+Misc.encodePlainIntoHtml(progress) : ""),
+              false, yes, no);
     } else {
       exitAction(this);
     }

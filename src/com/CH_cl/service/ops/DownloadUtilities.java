@@ -637,15 +637,10 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     public void runTraced() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadFileRunner.class, "DownloadFileRunner.runTraced()");
 
-      int maxHeavyWorkers = SIL.getMaxHeavyWorkerCount();
-      int maxThreadsInSynchronizedBlock = maxHeavyWorkers;
-      if (maxHeavyWorkers < 1)
-        maxThreadsInSynchronizedBlock = 1;
-
       ClientMessageAction replyAction = null;
 
       // limit number of entries
-      UploadDownloadSynch.entry(maxThreadsInSynchronizedBlock);
+      UploadDownloadSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
       try {
         // number of visible progress monitors are limited to the number of active transfer connections too
         ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferDown(fileNames, destDir, files, !openAfterDownload, suppressDownloadSoundsAndAutoClose);

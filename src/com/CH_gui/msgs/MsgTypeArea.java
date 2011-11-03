@@ -290,6 +290,23 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
           body = removeHEADtag(body);
         }
       }
+      // remove pasted images and replace them by [file name]
+      {
+        final String sTag = "<img src=\"file:";
+        final String eTag = "/>";
+        String[][] startTags = new String[][] {{ sTag }};
+        String[][] endTags = new String[][] {{ eTag }};
+        CallbackReturnI callback = new CallbackReturnI() {
+          public Object callback(Object value) {
+            String str = (String) value;
+            int start = str.indexOf(sTag) + sTag.length();
+            int end = str.lastIndexOf(eTag);
+            String part = str.substring(start, end);
+            return " [" + part.substring(part.lastIndexOf('/')+1, part.lastIndexOf('"')) + "] ";
+          }
+        };
+        body = ArrayUtils.removeTags(body, startTags, endTags, new Object[] { callback });
+      }
       if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
         XMLElement content = contactInfoPanel.getContent();
         if (isAnyBody()) {

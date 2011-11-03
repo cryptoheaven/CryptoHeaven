@@ -44,6 +44,7 @@ public class MessageAction extends Message implements Cancellable {
 
   private int actionCode;
   private long uniqueStamp;
+  private static final Object stampMonitor = new Object();
   private static long lastUniqueTimeStamp;
   private static int stampSubNumber;
   private static int stampSubNumberMax = 1000;
@@ -136,21 +137,23 @@ public class MessageAction extends Message implements Cancellable {
   private static long nextStamp() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "nextStamp()");
     long returnStamp = 0;
-    long nextUniqueTimeStamp = System.currentTimeMillis();
-    if (nextUniqueTimeStamp != lastUniqueTimeStamp) {
-      stampSubNumber = 0;
-    } else {
-      stampSubNumber ++;
-      if (stampSubNumber >= stampSubNumberMax) {
+    synchronized (stampMonitor) {
+      long nextUniqueTimeStamp = System.currentTimeMillis();
+      if (nextUniqueTimeStamp != lastUniqueTimeStamp) {
         stampSubNumber = 0;
-        while (nextUniqueTimeStamp == lastUniqueTimeStamp) {
-          try { Thread.sleep(1); } catch (InterruptedException e) { }
-          nextUniqueTimeStamp = System.currentTimeMillis();
+      } else {
+        stampSubNumber ++;
+        if (stampSubNumber >= stampSubNumberMax) {
+          stampSubNumber = 0;
+          while (nextUniqueTimeStamp == lastUniqueTimeStamp) {
+            try { Thread.sleep(1); } catch (InterruptedException e) { }
+            nextUniqueTimeStamp = System.currentTimeMillis();
+          }
         }
       }
+      lastUniqueTimeStamp = nextUniqueTimeStamp;
+      returnStamp = nextUniqueTimeStamp*stampSubNumberMax + stampSubNumber;
     }
-    lastUniqueTimeStamp = nextUniqueTimeStamp;
-    returnStamp = nextUniqueTimeStamp*stampSubNumberMax + stampSubNumber;
     if (trace != null) trace.exit(MessageAction.class, returnStamp);
     return returnStamp;
   }

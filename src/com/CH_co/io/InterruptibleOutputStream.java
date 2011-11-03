@@ -12,8 +12,7 @@
 
 package com.CH_co.io;
 
-import java.io.OutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import com.CH_co.monitor.Interruptible;
 
@@ -38,20 +37,17 @@ public class InterruptibleOutputStream extends OutputStream implements Interrupt
 
 
   public void write(int b) throws IOException {
-    if (interrupted)
-      throw new InterruptedIOException("IO was interrupted.");
+    if (interrupted) throw new InterruptedIOException("IO was interrupted.");
     out.write(b);
   }
 
   public void write(byte[] b) throws IOException {
-    if (interrupted)
-      throw new InterruptedIOException("IO was interrupted.");
+    if (interrupted) throw new InterruptedIOException("IO was interrupted.");
     out.write(b);
   }
 
   public void write(byte[] b, int off, int len) throws IOException {
-    if (interrupted)
-      throw new InterruptedIOException("IO was interrupted.");
+    if (interrupted) throw new InterruptedIOException("IO was interrupted.");
     out.write(b, off, len);
   }
 
@@ -64,7 +60,7 @@ public class InterruptibleOutputStream extends OutputStream implements Interrupt
   }  
 
   /**
-   * Interruptable interface method.
+   * Interruptible interface method.
    */
   public void interrupt() {
     interrupted = true;

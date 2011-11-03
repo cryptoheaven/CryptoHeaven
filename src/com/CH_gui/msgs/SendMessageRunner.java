@@ -84,7 +84,7 @@ public class SendMessageRunner extends ThreadTraced {
 
     selectedAndInlineFileAttachments = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selectedAndInlineAttachments, FileLinkRecord.class);
     selectedMsgAndPostAttachments = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selectedAndInlineAttachments, MsgLinkRecord.class);
-    selectedLocalFileAttachments = (File[]) ArrayUtils.gatherAllOfType(selectedAndInlineAttachments, File.class);
+    selectedLocalFileAttachments = (File[]) ArrayUtils.gatherAllOfInstance(selectedAndInlineAttachments, File.class);
 
     if (trace != null) trace.data(50, selectedAndInlineFileAttachments);
     if (trace != null) trace.data(51, selectedMsgAndPostAttachments);
@@ -278,7 +278,6 @@ public class SendMessageRunner extends ThreadTraced {
               }
               priority = new Short(msgSendInfoProvider.getPriority());
             }
-
             emailRequest.objs = new Object[] { addresses, subject, contentType, body, recipientTypes, priority };
           } else {
             // Send plain subject so that recipient can be notified that he has a new message about so-and-so.

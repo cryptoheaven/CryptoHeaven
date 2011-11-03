@@ -222,10 +222,10 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     if (trace != null) trace.args(isThreadedRun);
 
     if (files != null && files.length > 0) {
-      // divide File[] into chunks of 10;
+      // divide File[] into chunks of 100;
       int count = 0;
       while (count < files.length) {
-        int bunch = Math.min(10, files.length-count);
+        int bunch = Math.min(100, files.length-count);
         File[] fileBunch = new File[bunch];
         for (int i=0; i<bunch; i++) {
           fileBunch[i] = files[count+i];
@@ -361,13 +361,8 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       // Try creating the upload worker concurrently with sealing to minimize connection delay.
       SIL.ensureAtLeastOneAdditionalWorker_SpawnThread();
 
-      int maxHeavyWorkers = SIL.getMaxHeavyWorkerCount();
-      int maxThreadsInSynchronizedBlock = maxHeavyWorkers;
-      if (maxHeavyWorkers < 1)
-        maxThreadsInSynchronizedBlock = 1;
-
       // limit number of entries
-      UploadDownloadSynch.entry(maxThreadsInSynchronizedBlock);
+      UploadDownloadSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
 
       try {
         FileLinkRecord[] linkRecords = request.fileLinks;
@@ -434,11 +429,14 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
         if (useStuds && replyMsgAction.getActionCode() == CommandCodes.FILE_A_GET_FILES) {
           FileLinkRecord[] links = ((File_GetLinks_Rp) replyMsgAction.getMsgDataSet()).fileLinks;
           for (int i=0; i<links.length; i++) {
-            // merge info from returned links and submited data records
+            // Merge info from returned links and submited data records.
+            // Use enc version of key because if file has a Q&A, sym key may not be available now.
             FileLinkRecord link = links[i];
             FileDataRecord data = dataRecords[i];
-            if (!link.getSymmetricKey().equals(linkRecords[i].getSymmetricKey()))
+            if (!link.getEncSymmetricKey().equals(linkRecords[i].getEncSymmetricKey()))
               throw new IllegalStateException("Encryption key does not match!");
+            // If file is protected with Q&A, use our local copy of sym key as fetched file link may not have it decrypted yet.
+            link.setSymmetricKey(linkRecords[i].getSymmetricKey());
             new FileLobUp(data.getPlainDataFile(), link, data.getSigningKeyId(), 0);
           }
         } else if (useStuds && replyMsgAction.getActionCode() == CommandCodes.MSG_A_GET) {
@@ -448,15 +446,18 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           for (int i=0; i<msgDatas.length; i++) {
             MsgDataRecord msgData = msgDatas[i];
             MsgLinkRecord msgLink = cache.getMsgLinkRecordsForMsg(msgData.msgId)[0];
-            FileLinkRecord[] fileLinks = FileLinkOps.getOrFetchFileLinksByOwner(SIL, msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
-            for (int k=0; k<fileLinks.length; k++) {
-              // merge info from returned links and submited data records
-              FileLinkRecord link = fileLinks[k];
+            FileLinkRecord[] links = FileLinkOps.getOrFetchFileLinksByOwner(SIL, msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
+            for (int k=0; k<links.length; k++) {
+              // Merge info from returned links and submited data records.
+              // Use enc version of key because if file has a Q&A, sym key may not be available now.
+              FileLinkRecord link = links[k];
               // find matching link from local ones that we know we sent
               int dataIndex = -1;
               for (int z=0; z<linkRecords.length; z++) {
-                if (linkRecords[z].getEncSymmetricKey().equals(link.getEncSymmetricKey())) {
+                if (link.getEncSymmetricKey().equals(linkRecords[z].getEncSymmetricKey())) {
                   dataIndex = z;
+                  // If file is protected with Q&A, use our local copy of sym key as fetched file link may not have it decrypted yet.
+                  link.setSymmetricKey(linkRecords[z].getSymmetricKey());
                   break;
                 }
               }

@@ -84,10 +84,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private int connectionRetryCount = 0;
 
   // main connection never transfer heavy jobs (files) unless they are not so big
-  public static final long DEFAULT_MAX_FILE_SIZE_FOR_MAIN_CONNECTION = 50 * 1024;
+  public static final long DEFAULT_MAX_FILE_SIZE_FOR_MAIN_CONNECTION = 10 * 1024;
 
   // The maximum number of connections to the server that we may establish.
-  public static final int DEFAULT_MAX_CONNECTION_COUNT = 3;
+  public static final int DEFAULT_MAX_CONNECTION_COUNT = 4;
 
   private int maxConnectionCount = DEFAULT_MAX_CONNECTION_COUNT;
   public static final String PROPERTY_NAME_MAX_CONNECTION_COUNT = "ServerInterfaceLayer" + "_maxConnCount";

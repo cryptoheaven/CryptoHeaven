@@ -290,7 +290,6 @@ public class FileUtils extends Object {
 
     // while not EOF
     while (bytesRead != -1) {
-
       bytesRead = in.read(buf);
       if (bytesRead > 0) {
         // not EOF

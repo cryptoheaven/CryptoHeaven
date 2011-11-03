@@ -240,7 +240,7 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
     setCurrentStatus("Executing: " + actionName + " ... ");
     progressValue ++;
     jProgressBar.setValue(progressValue);
-    Stats.setStatus("Executing reply ... [" + actionName + "]");
+//    Stats.setStatus("Executing reply ... [" + actionName + "]");
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
   public void doneExecution(int actionCode) {
@@ -250,7 +250,7 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
     setCurrentStatus("Executing: " + actionName + " ... done.");
     progressValue ++;
     jProgressBar.setValue(progressValue);
-    Stats.setStatus("Action completed. [" + actionName + "]");
+//    Stats.setStatus("Action completed. [" + actionName + "]");
     Stats.stopGlobe(this);
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }

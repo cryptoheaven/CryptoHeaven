@@ -12,6 +12,8 @@
 
 package com.CH_co.io;
 
+import com.CH_co.monitor.Interruptible;
+
 import java.io.*;
 import java.util.*;
 
@@ -24,9 +26,10 @@ import java.util.*;
  * @author  Marcin Kurzawa
  * @version
  */
-public class SpeedLimitedInputStream extends InputStream {
+public class SpeedLimitedInputStream extends InputStream implements Interruptible {
 
   private InputStream in;
+  boolean interrupted;
   private long maxRate; // -1 to disable tracking and enforcement, 0 to enable tracking but disable enforcement
 
   private LinkedList timeCountL = new LinkedList();
@@ -77,18 +80,24 @@ public class SpeedLimitedInputStream extends InputStream {
   }
 
   public int read() throws IOException {
+    if (interrupted)
+      throw new InterruptedIOException("IO was interrupted.");
     int byteRead = in.read();
     checkSlowDown(1);
     return byteRead;
   }
 
   public int read(byte[] b) throws IOException {
+    if (interrupted)
+      throw new InterruptedIOException("IO was interrupted.");
     int numRead = in.read(b);
     checkSlowDown(numRead);
     return numRead;
   }
 
   public int read(byte[] b, int off, int len) throws IOException {
+    if (interrupted)
+      throw new InterruptedIOException("IO was interrupted.");
     int numRead = in.read(b, off, len);
     checkSlowDown(numRead);
     return numRead;
@@ -96,6 +105,10 @@ public class SpeedLimitedInputStream extends InputStream {
 
   public void close() throws IOException {
     in.close();
+  }
+
+  public void interrupt() {
+    interrupted = true;
   }
 
 }

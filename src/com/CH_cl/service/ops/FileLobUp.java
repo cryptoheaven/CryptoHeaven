@@ -20,13 +20,19 @@ import com.CH_cl.service.engine.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
+import com.CH_co.monitor.Interruptible;
+import com.CH_co.monitor.ProgMonitorFactory;
 import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.Stats;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+
+import com.CH_gui.monitor.JournalProgMonitorImpl;
+import com.CH_gui.util.TempFile;
 
 import java.io.*;
 import java.security.*;
@@ -52,6 +58,9 @@ public class FileLobUp {
   private String arbiterKeySeal = "SEAL";
   private String arbiterKeyUpload = "UPLOAD";
 
+  private static JournalProgMonitorImpl progJournal = null;
+  private static final Object progMonitor = new Object();
+
   private File plainDataFile;
   private Long plainDataFileLength;
   private FileLinkRecord fileLink;
@@ -69,9 +78,9 @@ public class FileLobUp {
 
   private File encDataFile;
   private Long encSize;
-  private Object encFileMonitor;
+  private final Object encFileMonitor = new Object();
 
-  private InterruptibleInputStream interruptibleEncStream;
+  private FileAppendingInputStream fileAppendingInputStream;
   private FileListener fileListener;
   private MsgListener msgListener;
 
@@ -81,23 +90,30 @@ public class FileLobUp {
   private boolean isUploaded;
   private boolean isUploadInProgress;
   private boolean isInterrupted;
+  private String interruptedMsg;
   private Object interruptMonitor = new Object();
 
-  private static Object stateMonitor = new Object();
+  private static final Object stateMonitor = new Object();
   private static ArrayList stateLocalL = null;
   private static ArrayList stateDriveL = null;
+  private static ArrayList workersL = null;
 
   public FileLobUp(File plainLocalFile, FileLinkRecord link, Long signingKeyId, long startFromByte) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "FileLobUp(File plainLocalFile, FileLinkRecord link, Long signingKeyId, long startFromByte)");
+    if (trace != null) trace.args(plainLocalFile, link, signingKeyId);
+    if (trace != null) trace.args(startFromByte);
     this.plainDataFile = plainLocalFile;
     this.fileLink = link;
     this.signingKeyId = signingKeyId;
     this.arbiter = new SingleTokenArbiter();
-    this.encFileMonitor = new Object();
     addStateSession();
     triggerUploading(startFromByte);
+    if (trace != null) trace.exit(FileLobUp.class);
   }
 
   private FileLobUp(String plainLocalFile, Long fileLinkId, Long fileId, byte[] linkSymKey, Long signingKeyId, String encFile, byte[] encDigest) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "FileLobUp(String plainLocalFile, Long fileLinkId, Long fileId, byte[] linkSymKey, Long signingKeyId, String encFile, byte[] encDigest)");
+    if (trace != null) trace.args(plainLocalFile, fileLinkId, fileId, linkSymKey, signingKeyId, encFile, encDigest);
     this.plainDataFile = new File(plainLocalFile);
     this.fileLink = new FileLinkRecord();
     this.fileLink.fileLinkId = fileLinkId;
@@ -112,18 +128,20 @@ public class FileLobUp {
       }
     }
     this.arbiter = new SingleTokenArbiter();
-    this.encFileMonitor = new Object();
     triggerUploading(-1);
+    if (trace != null) trace.exit(FileLobUp.class);
   }
 
   private void addStateSession() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "addStateSession()");
-    Object[] state = new Object[] { plainDataFile.getAbsolutePath(), fileLink.fileLinkId, fileLink.fileId, fileLink.getSymmetricKey().toByteArray(), signingKeyId, null, null };
+    Object[] state = new Object[] { plainDataFile.getAbsolutePath(), fileLink.fileLinkId, fileLink.fileId, fileLink.getSymmetricKey().toByteArray(), signingKeyId, null, null, null, null, null };
     synchronized (stateMonitor) {
       if (stateLocalL == null) stateLocalL = new ArrayList();
       if (stateDriveL == null) stateDriveL = new ArrayList();
+      if (workersL == null) workersL = new ArrayList();
       stateLocalL.add(state);
       stateDriveL.add(state);
+      workersL.add(this);
       saveAndStoreState();
     }
     if (trace != null) trace.exit(FileLobUp.class);
@@ -137,6 +155,12 @@ public class FileLobUp {
         Object[] st = (Object[]) stateLocalL.get(i);
         if (st[1].equals(fileLink.fileLinkId)) {
           state = st;
+          // update current progress
+          if (state.length > 9) {
+            state[7] = getMonitorUploadCounter();
+            state[8] = getMonitorUploadSize();
+            state[9] = getMonitorUploadOrigSize();
+          }
           break;
         }
       }
@@ -149,8 +173,13 @@ public class FileLobUp {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "getStateSessions()");
     ArrayList list = null;
     synchronized (stateMonitor) {
-      if (stateLocalL != null)
-        list = (ArrayList) stateLocalL.clone();
+      if (workersL != null) {
+        list = new ArrayList();
+        for (int i=0; i<workersL.size(); i++) {
+          FileLobUp worker = (FileLobUp) workersL.get(i);
+          list.add(worker.getState());
+        }
+      }
     }
     if (trace != null) trace.exit(FileLobUp.class, list);
     return list;
@@ -166,6 +195,7 @@ public class FileLobUp {
           Object[] state = (Object[]) stateLocalL.get(i);
           if (state[1].equals(fileLink.fileLinkId)) {
             stateLocalL.remove(i);
+            workersL.remove(i);
             break;
           }
         }
@@ -191,15 +221,17 @@ public class FileLobUp {
       if (state != null && state.length() > 0) {
         try {
           stateLocalL = (ArrayList) ArrayUtils.strToObj(state);
+          workersL = new ArrayList();
           // Important to keep single copy of states because we are editing them too.
           // Important to keep them in seperate instances of lists because they will change independently.
           stateDriveL = new ArrayList(stateLocalL);
           for (int i=0; i<stateLocalL.size(); i++) {
             Object[] set = (Object[]) stateLocalL.get(i);
-            new FileLobUp((String) set[0], (Long) set[1], (Long) set[2], (byte[]) set[3], (Long) set[4], (String) set[5], (byte[]) set[6]);
+            FileLobUp worker = new FileLobUp((String) set[0], (Long) set[1], (Long) set[2], (byte[]) set[3], (Long) set[4], (String) set[5], (byte[]) set[6]);
+            workersL.add(worker);
           }
         } catch (Throwable t) {
-          if (DEBUG_CONSOLE) t.printStackTrace();
+          if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
           GlobalProperties.setProperty(PROPERTY_NAME, "");
         }
       }
@@ -236,6 +268,7 @@ public class FileLobUp {
   }
 
   private void triggerEncryption() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "triggerEncryption()");
     if (!isSealed || !isSigned) {
       Thread th = new ThreadTraced(new Runnable() {
         public void run() {
@@ -250,13 +283,13 @@ public class FileLobUp {
                 else if (ServerInterfaceLayer.lastSIL.isLoggedIn())
                   isCompleted = doEncryption(ServerInterfaceLayer.lastSIL);
               } catch (Throwable t) {
-                if (DEBUG_CONSOLE) t.printStackTrace();
+                if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
                 if (trace != null) trace.exception(getClass(), 100, t);
               } finally {
                 if (isCompleted) {
                   arbiter.removeToken(arbiterKeySeal, token);
-                } else {
-                  // Any exception or failure should hit this delay.
+                } else if (!isInterrupted) {
+                  // Any exception or failure should hit this delay before retrying.
                   if (trace != null) trace.data(200, "waiting to retry in triggerEncryption()");
                   try { Thread.sleep(3000); } catch (InterruptedException interX) { }
                   if (trace != null) trace.data(201, "woke up from waiting to retry in triggerEncryption()");
@@ -270,17 +303,18 @@ public class FileLobUp {
       th.setDaemon(true);
       th.start();
     }
+    if (trace != null) trace.exit(FileLobUp.class);
   }
 
   private void triggerUploading(final long startFromByte) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "triggerUploading()");
+    if (trace != null) trace.args(startFromByte);
     if (!isUploaded && !isUploadInProgress) {
       Thread th = new ThreadTraced(new Runnable() {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           Object token = new Object();
           if (arbiter.putToken(arbiterKeyUpload, token)) {
-            // limit number of running upload threads
-            FileLobUpSynch.entry(3);
             FetchedDataCache cache = null;
             try {
               // Hook into cache to listen for any possible deletions so we can interrupt uploads.
@@ -299,7 +333,7 @@ public class FileLobUp {
                   if (ServerInterfaceLayer.lastSIL.isLoggedIn())
                     isUploaded = doUpload(isRetry ? -1 : startFromByte);
                 } catch (Throwable t) {
-                  if (DEBUG_CONSOLE) t.printStackTrace();
+                  if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
                   if (trace != null) trace.exception(getClass(), 100, t);
                 } finally {
                   if (isUploaded) {
@@ -319,8 +353,6 @@ public class FileLobUp {
                 }
               }
             } finally {
-              // mark thread exit
-              FileLobUpSynch.exit();
               // remove cache listeners after upload exits
               try { cache.removeFileLinkRecordListener(fileListener); } catch (Throwable t) { }
               try { cache.removeMsgLinkRecordListener(msgListener); } catch (Throwable t) { }
@@ -332,9 +364,10 @@ public class FileLobUp {
       th.setDaemon(true);
       th.start();
     }
+    if (trace != null) trace.exit(FileLobUp.class);
   }
 
-  private InputStream getEncStream() throws FileNotFoundException {
+  private FileAppendingInputStream getEncStream() throws FileNotFoundException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "getEncStream()");
     // wait until the stream becomes available
     synchronized (encFileMonitor) {
@@ -352,7 +385,7 @@ public class FileLobUp {
     }
     if (trace != null) trace.data(50, "FileLobUp.getEncStream(): encDataFile is", encDataFile);
     if (trace != null) trace.data(51, "FileLobUp.getEncStream(): encDataFile.exists() returns", encDataFile != null ? ""+encDataFile.exists() : "null");
-    InputStream in = new FileAppendingInputStream(encDataFile);
+    FileAppendingInputStream in = new FileAppendingInputStream(encDataFile);
     if (trace != null) trace.exit(FileLobUp.class, in);
     return in;
   }
@@ -498,6 +531,9 @@ public class FileLobUp {
             if (trace != null) trace.data(31, "doUpload: aborting un-authorized file", plainDataFile);
             ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_UPLOAD_ABORT, new Obj_IDPair_Co(fileLink.fileLinkId, fileLink.fileId)));
             DefaultReplyRunner.nonThreadedRun(SIL, reply, true);
+            String strAbort = "Upload ABORTED: "+plainDataFile.getName()+" - remote file not available.";
+            Stats.setStatus(strAbort);
+            addProgressJournalText(strAbort);
           }
         } else {
           if (trace != null) trace.data(35, "doUpload: progress check FAILED", plainDataFile, fileLink.fileLinkId, fileLink.fileId);
@@ -533,14 +569,19 @@ public class FileLobUp {
         if (trace != null) trace.data(40, "doUpload: going into encryption", plainDataFile);
         triggerEncryption();
         if (trace != null) trace.data(50, "doUpload: getting encrypted data stream", plainDataFile);
-        InputStream encStream = null;
+        fileAppendingInputStream = null;
+        DigestInputStream dEncStream = null;
         try {
-          encStream = getEncStream();
+          FileLobUpSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
+          // check for interrupt, maybe it got interrupted while we were waiting for entry to this throttled code
+          if (isInterrupted)
+            throw new IllegalStateException("Upload already interrupted.");
+          fileAppendingInputStream = getEncStream();
           // any failed verification will reset 'isSigned' and we have to start from byte ZERO -- isSigned may have changed during seal()
           if (verifEncDataDigest != null && !isSigned)
             startFromByte = 0;
-          interruptibleEncStream = new InterruptibleInputStream(encStream);
-          DigestInputStream dEncStream = new DigestInputStream(interruptibleEncStream, new SHA256());
+          fileAppendingInputStream.setByteCounter(startFromByte);
+          dEncStream = new DigestInputStream(fileAppendingInputStream, new SHA256());
           if (trace != null) trace.data(51, "doUpload: got encrypted data stream for "+plainDataFile+" fileLinkId="+fileLink.fileLinkId+" fileId="+fileLink.fileId+" starting point is "+startFromByte);
           if (DEBUG_CONSOLE) System.out.println("doUpload: got encrypted data stream for "+plainDataFile+" fileLinkId="+fileLink.fileLinkId+" fileId="+fileLink.fileId+" starting point is "+startFromByte);
           if (startFromByte > 0) {
@@ -559,6 +600,7 @@ public class FileLobUp {
           // CONGESTION is possible if two clients upload the same file!
           DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction, true);
           if (replyMsgAction != null && replyMsgAction.getActionCode() == CommandCodes.FILE_A_UPLOAD_COMPLETED) {
+            Stats.setStatus("File uploaded: "+plainDataFile.getName());
             if (DEBUG_CONSOLE) System.out.println("doUpload: upload finished for "+plainDataFile);
             if (trace != null) trace.data(80, "doUpload: upload completed ok", plainDataFile);
             isCompletedTransfer = true;
@@ -585,17 +627,23 @@ public class FileLobUp {
             }
           }
         } catch (Throwable t) {
-          if (DEBUG_CONSOLE) t.printStackTrace();
+          if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
           if (trace != null) trace.exception(FileLobUp.class, 88, t);
         } finally {
+          FileLobUpSynch.exit();
           // close the stream after we returned from upload -- this will make the temp file deletable and socket source stream terminated
-          try { if (encStream != null) encStream.close(); } catch (Throwable t) { }
-          try { if (interruptibleEncStream != null) interruptibleEncStream.close(); } catch (Throwable t) { }
+          try { if (fileAppendingInputStream != null) fileAppendingInputStream.close(); } catch (Throwable t) { }
+          try { if (dEncStream != null) dEncStream.close(); } catch (Throwable t) { }
         }
         if (!isCompletedTransfer && isInterrupted) {
           if (trace != null) trace.data(89, "doUpload: aborting interrupted upload", plainDataFile);
           ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_UPLOAD_ABORT, new Obj_IDPair_Co(fileLink.fileLinkId, fileLink.fileId)));
           DefaultReplyRunner.nonThreadedRun(SIL, reply, true);
+          String strAbort = "Upload ABORTED: "+plainDataFile.getName();
+          if (interruptedMsg != null)
+            strAbort += interruptedMsg;
+          Stats.setStatus(strAbort);
+          addProgressJournalText(strAbort);
         }
       } // end more bytes need transferring
       // remove the completed upload from saved states
@@ -603,7 +651,7 @@ public class FileLobUp {
         if (DEBUG_CONSOLE) System.out.println("doUpload: completion and cleanup or !authorized for "+plainDataFile);
         if (trace != null) trace.data(90, "doUpload: removing upload state session from properties", plainDataFile);
         removeStateSession(true);
-        cleanupEncFile();
+        cleanupFiles();
       }
     }
     boolean isDone = notOriginator || authorizationFailed || (isCompletedTransfer && isSigned) || isInterrupted;
@@ -631,11 +679,14 @@ public class FileLobUp {
       if (DEBUG_CONSOLE) System.out.println("seal: sealing "+plainDataFile+" total length is "+plainDataFileLength);
       FileInputStream fileIn = new FileInputStream(plainDataFile);
 
-      // progress interruptible stream
-      InterruptibleInputStream interIn = new InterruptibleInputStream(fileIn);
-      if (progressMonitor != null) progressMonitor.setInterrupt(interIn);
-
-      dFileIn = new DigestInputStream(interIn, new SHA256());
+      if (progressMonitor == null) {
+        dFileIn = new DigestInputStream(fileIn, new SHA256());
+      } else {
+        // progress interruptible stream
+        InterruptibleInputStream interIn = new InterruptibleInputStream(fileIn);
+        progressMonitor.setInterrupt(interIn);
+        dFileIn = new DigestInputStream(interIn, new SHA256());
+      }
 
       // create a temporary file for the encrypted data
       tempFile = File.createTempFile(FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null);
@@ -674,7 +725,6 @@ public class FileLobUp {
       }
 
       dFileIn.close();
-      interIn.close();
       fileIn.close();
 
       gzipOut.finish();
@@ -728,7 +778,7 @@ public class FileLobUp {
       if (DEBUG_CONSOLE) System.out.println("seal: sealing concluded "+plainDataFile+" total encSize="+encSize+" "+encDataFile.getAbsolutePath());
       if (trace != null) trace.data(90, "sealing concluded with encSize=", plainDataFile, encSize, encDataFile);
     } catch (Throwable t) {
-      if (DEBUG_CONSOLE) t.printStackTrace();
+      if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
       if (trace != null) trace.exception(FileLobUp.class, 100, t);
 
       // update the job status to KILLED
@@ -759,7 +809,7 @@ public class FileLobUp {
       } catch (Throwable th) { }
 
       if (t instanceof FileNotFoundException)
-        interrupt();
+        interrupt(" - local file not available.");
 
       throw new IllegalStateException(t.getMessage());
     } finally {
@@ -774,6 +824,162 @@ public class FileLobUp {
       try { CleanupAgent.wipeOrDelete(encDataFile); } catch (Throwable t) { }
       encDataFile = null;
     }
+  }
+
+  private void cleanupFiles() {
+    cleanupEncFile();
+    if (plainDataFile instanceof TempFile) {
+      ((TempFile) plainDataFile).cleanup();
+    }
+  }
+
+  public Long getMonitorUploadCounter() {
+    Long counter = null;
+    if (fileAppendingInputStream != null) {
+      try { counter = new Long(fileAppendingInputStream.getByteCounter()); } catch (Throwable t) { }
+    }
+    return counter;
+  }
+
+  public Long getMonitorUploadSize() {
+    Long size = null;
+    if (encDataFile != null) {
+      try { size = new Long(encDataFile.length()); } catch (Throwable t) { }
+    }
+    return size;
+  }
+
+  public Long getMonitorUploadOrigSize() {
+    Long size = null;
+    if (plainDataFile != null) {
+      try { size = new Long(plainDataFile.length()); } catch (Throwable t) { }
+    }
+    return size;
+  }
+
+  public static String getProgress() {
+    String progress = null;
+    ArrayList activeUps = FileLobUp.getStateSessions();
+    if (activeUps != null && activeUps.size() > 0) {
+      StringBuffer sb = new StringBuffer();
+      for (int i=0; i<activeUps.size(); i++) {
+        Object[] state = (Object[]) activeUps.get(i);
+        sb.append(state[0]);
+        Long counter = (Long) state[7];
+        Long size = (Long) state[8];
+        Long origSize = (Long) state[9];
+        if (counter != null && counter.longValue() > 0) {
+          if (size != null && size.longValue() > 0) {
+            int percentX10 = (int) (1000 * counter.doubleValue() / size.doubleValue());
+            double percent = (double) percentX10 / 10.0;
+            sb.append("\n   progress: ").append(percent).append("% of ").append(size != null ? Misc.getFormattedSize(size, 3, 3) : "-");
+          } else {
+            sb.append("\n   progress: ").append(counter != null ? Misc.getFormattedSize(counter, 3, 3) : "-").append(" of ").append(size != null ? Misc.getFormattedSize(size, 3, 3) : "-");
+          }
+        }
+        sb.append("\n");
+      }
+      progress = sb.toString();
+    }
+    return progress;
+  }
+  public static String getSummary() {
+    String summary = null;
+    ArrayList activeUps = getStateSessions();
+    if (activeUps != null && activeUps.size() > 0) {
+      long totalRemaining = 0;
+      for (int i=0; i<activeUps.size(); i++) {
+        Object[] state = (Object[]) activeUps.get(i);
+        Long counter = (Long) state[7];
+        Long fileSize = (Long) state[8];
+        Long origFileSize = (Long) state[9];
+        if (fileSize != null || origFileSize != null) {
+          totalRemaining += (fileSize != null ? fileSize.longValue() : origFileSize.longValue()) - (counter != null ? counter.longValue() : 0);
+        }
+      }
+      Long uploadRate = Stats.getTransferRateOut();
+      String estimate = "";
+      if (uploadRate != null && uploadRate.longValue() > 0) {
+        long seconds = totalRemaining / uploadRate.longValue();
+        // Add 10% incase pipes slow down a little so we don't dissapoint the user when it takes longer.
+        seconds += seconds / 10;
+        // Round up to next tier definded in seconds
+        boolean rounded = false;
+        int[] rounder = new int[] { 5,10,15,30,45,60,90,120,180,240,300,420,600,720,900,1200,1500,1800,2400,3000,3600,4500,5400,6300,7200,9000,10800 };
+        for (int i=0; i<rounder.length; i++) {
+          if (seconds < rounder[i]) {
+            seconds = rounder[i];
+            rounded = true;
+            break;
+          }
+        }
+        if (!rounded) // round to next full hour
+          seconds = (seconds / 3600) * 3600 + 3600;
+        long minutes = seconds / 60;
+        long hr = minutes / 60;
+        seconds %= 60;
+        estimate = "Uploading: ";
+        if (hr > 0) {
+          estimate += hr + " hr ";
+          if (hr <= 2 && minutes > 0)
+            estimate += minutes + " min ";
+        } else if (minutes > 0) {
+          estimate += minutes + " min ";
+          if (minutes <= 2 && seconds > 0)
+            estimate += seconds + " sec ";
+        } else {
+          estimate += seconds + " sec ";
+        }
+        estimate += "remaining with " + activeUps.size() + (activeUps.size() > 1 ? " files" : " file") + " and " + Misc.getFormattedSize(totalRemaining, 3, 3);
+      }
+      summary = estimate;
+    }
+    return summary;
+  }
+
+  private static void addProgressJournalText(String str) {
+    synchronized (progMonitor) {
+      if (progJournal == null)
+        progJournal = (JournalProgMonitorImpl) ProgMonitorFactory.newInstanceJournal("Upload ABORTED");
+      if (!progJournal.isVisible()) {
+        Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
+        progJournal.setVisible(true);
+      }
+      progJournal.addProgress(str+"\n");
+      progJournal.setEnabledClose(true);
+    }
+  }
+
+  /**
+   * Checks with the engine if we still have UPLOAD privilege to it,
+   * if not then interrupts the UPLOAD.
+   */
+  private void checkFileAccessForInterrupt(final ServerInterfaceLayer SIL) {
+    Thread th = new ThreadTraced(new Runnable() {
+      public void run() {
+        synchronized (interruptMonitor) {
+          if (!isInterrupted) {
+            ClientMessageAction replyMsgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_GET_PROGRESS, new Obj_ID_Rq(fileLink.fileLinkId)));
+            DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction, true);
+            if (replyMsgAction instanceof SysANoop) {
+              Obj_List_Co set = (Obj_List_Co) replyMsgAction.getMsgDataSet();
+              Boolean isSuccess = (Boolean) set.objs[0];
+              if (!isSuccess.booleanValue())
+                interrupt(" - remote file not available.");
+            }
+          }
+        }
+      }
+    }, "FileAccessInterruptChecker");
+    th.setDaemon(true);
+    th.start();
+  }
+
+  private void interrupt(String msg) {
+    isInterrupted = true;
+    interruptedMsg = msg;
+    try { fileAppendingInputStream.interrupt(); } catch (Throwable t) { }
+    try { fileAppendingInputStream.close(); } catch (Throwable t) { }
   }
 
   private class FileListener implements FileLinkRecordListener {
@@ -830,43 +1036,15 @@ public class FileLobUp {
     }
   }
 
-  /**
-   * Checks with the engine if we still have UPLOAD privilege to it,
-   * if not then interrupts the UPLOAD.
-   */
-  private void checkFileAccessForInterrupt(final ServerInterfaceLayer SIL) {
-    Thread th = new ThreadTraced(new Runnable() {
-      public void run() {
-        synchronized (interruptMonitor) {
-          if (!isInterrupted) {
-            ClientMessageAction replyMsgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_GET_PROGRESS, new Obj_ID_Rq(fileLink.fileLinkId)));
-            DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction, true);
-            if (replyMsgAction instanceof SysANoop) {
-              Obj_List_Co set = (Obj_List_Co) replyMsgAction.getMsgDataSet();
-              Boolean isSuccess = (Boolean) set.objs[0];
-              if (!isSuccess.booleanValue())
-                interrupt();
-            }
-          }
-        }
-      }
-    }, "FileAccessInterruptChecker");
-    th.setDaemon(true);
-    th.start();
-  }
-
-  private void interrupt() {
-    isInterrupted = true;
-    try { interruptibleEncStream.interrupt(); } catch (Throwable t) { }
-    try { interruptibleEncStream.close(); } catch (Throwable t) { }
-  }
-
-  private class FileAppendingInputStream extends FileInputStream {
+  private class FileAppendingInputStream extends FileInputStream implements Interruptible {
+    private long byteCounter = 0;
+    private boolean interrupted;
     public FileAppendingInputStream(File file) throws FileNotFoundException {
       super(file);
     }
     public int read() throws IOException {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAppendingInputStream.class, "read()");
+      if (interrupted) throw new InterruptedIOException("IO was interrupted.");
       int b = -1;
       while (true) {
         b = super.read();
@@ -878,13 +1056,16 @@ public class FileLobUp {
           break;
         }
       }
+      if (b >= 0) byteCounter ++;
       if (trace != null) trace.exit(FileAppendingInputStream.class, b);
       return b;
     }
     public int read(byte[] b) throws IOException {
+      if (interrupted) throw new InterruptedIOException("IO was interrupted.");
       return read(b, 0, b.length);
     }
     public int read(byte[] b, int off, int len) throws IOException {
+      if (interrupted) throw new InterruptedIOException("IO was interrupted.");
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAppendingInputStream.class, "read(byte[] b, int off, int len)");
       int count = -1;
       while (true) {
@@ -902,8 +1083,21 @@ public class FileLobUp {
           break;
         }
       }
+      if (count > 0) byteCounter += count;
       if (trace != null) trace.exit(FileAppendingInputStream.class, count);
       return count;
     }
-  }
+
+    public void interrupt() {
+      interrupted = true;
+    }
+
+    public long getByteCounter() {
+      return byteCounter;
+    }
+
+    public void setByteCounter(long counterValue) {
+      byteCounter = counterValue;
+    }
+  } // end class FileAppendingInputStream
 }

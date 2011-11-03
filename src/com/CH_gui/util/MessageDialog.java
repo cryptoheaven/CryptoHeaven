@@ -235,39 +235,49 @@ public class MessageDialog extends Object {
    * @return true if user clicks Yes, false for No .
    */
   public static boolean showDialogYesNo(Component parent, String messageText, String title) {
-    return showDialogYesNo(parent, messageText, title, NotificationCenter.QUESTION_MESSAGE);
+    return showDialogYesNo(parent, messageText, title, NotificationCenter.QUESTION_MESSAGE, null, null, true);
   }
   public static boolean showDialogYesNo(Component parent, String messageText, String title, int messageType) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialogYesNo(Component parent, String messageText, String title, int messageType)");
+    return showDialogYesNo(parent, messageText, title, messageType, null, null, true);
+  }
+  public static boolean showDialogYesNo(Component parent, String messageText, String title, int messageType, String strYes, String strNo, boolean highlightButtonYes) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialogYesNo(Component parent, String messageText, String title, int messageType, String strYes, String strNo, boolean highlightButtonYes)");
     if (trace != null) trace.args(parent, messageText, title);
     if (trace != null) trace.args(messageType);
+    if (trace != null) trace.args(strYes, strNo);
+    if (trace != null) trace.args(highlightButtonYes);
 
     boolean rc = false;
     if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
       Component message = prepareMessage(messageText);
-      rc = showDialogYesNo(parent, message, title, messageType);
+      rc = showDialogYesNo(parent, message, title, messageType, true, strYes, strNo, highlightButtonYes, null, null);
     }
 
     if (trace != null) trace.exit(MessageDialog.class, rc);
     return rc;
   }
   public static boolean showDialogYesNo(Component parent, Component message, String title) {
-    return showDialogYesNo(parent, message, title, NotificationCenter.QUESTION_MESSAGE);
+    return showDialogYesNo(parent, message, title, NotificationCenter.QUESTION_MESSAGE, true, null, null, true, null, null);
   }
   public static boolean showDialogYesNo(Component parent, Component message, String title, int messageType) {
-    return showDialogYesNo(parent, message, title, messageType, true, null, null);
+    return showDialogYesNo(parent, message, title, messageType, true, null, null, true, null, null);
   }
   public static boolean showDialogYesNo(Component parent, Component message, String title, int messageType, boolean modal, final ActionListener yesAction, final ActionListener noAction) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialogYesNo(Component parent, Component message, String titlepublic static boolean showDialogYesNo(Component parent, Component message, String title, int messageType, boolean modal, final ActionListener yesAction, final ActionListener noAction)");
+    return showDialogYesNo(parent, message, title, messageType, modal, null, null, true, yesAction, noAction);
+  }
+  public static boolean showDialogYesNo(Component parent, Component message, String title, int messageType, boolean modal, String strYes, String strNo, boolean highlightButtonYes, final ActionListener yesAction, final ActionListener noAction) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "showDialogYesNo(Component parent, Component message, String titlepublic static boolean showDialogYesNo(Component parent, Component message, String title, int messageType, boolean modal, String strYes, String strNo, boolean highlightButtonYes, final ActionListener yesAction, final ActionListener noAction)");
     if (trace != null) trace.args(parent, message, title);
     if (trace != null) trace.args(messageType);
     if (trace != null) trace.args(modal);
+    if (trace != null) trace.args(strYes, strNo);
+    if (trace != null) trace.args(highlightButtonYes);
     if (trace != null) trace.args(yesAction, noAction);
 
     final boolean[] option = new boolean[1];
 
     if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
-      JButton yes = new JMyButton("Yes");
+      JButton yes = new JMyButton(strYes == null ? "Yes" : strYes);
       yes.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent event) {
           option[0] = true;
@@ -292,7 +302,7 @@ public class MessageDialog extends Object {
           }
         }
       });
-      JButton no = new JMyButton("No");
+      JButton no = new JMyButton(strNo == null ? "No" : strNo);
       no.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent event) {
           option[0] = false;
@@ -305,7 +315,7 @@ public class MessageDialog extends Object {
       });
       JButton[] buttons = new JButton[] { yes, no };
       boolean sizeAboveMinimum = !(message instanceof JPanel || message instanceof JLabel);
-      showDialog(parent, message, title, messageType, buttons, 0, 1, null, modal, true, true, sizeAboveMinimum, null);
+      showDialog(parent, message, title, messageType, buttons, highlightButtonYes ? 0 : 1, 1, null, modal, true, true, sizeAboveMinimum, null);
     }
 
     if (trace != null) trace.exit(MessageDialog.class, option[0]);

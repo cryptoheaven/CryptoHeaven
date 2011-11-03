@@ -49,10 +49,16 @@ public class NotificationShowerImpl implements NotificationShowerI {
     });
   }
 
-  public void showYesNo(final int type, final String title, final String msg, final Runnable yes, final Runnable no) {
+  public void showYesNo(final int type, final String title, final String msg, final boolean highlightButtonYes, final Runnable yes, final Runnable no) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        boolean rc = MessageDialog.showDialogYesNo(null, msg, title, type);
+        String strYes = null;
+        String strNo = null;
+        if (yes instanceof NamedRunnable)
+          strYes = ((NamedRunnable) yes).getName();
+        if (no instanceof NamedRunnable)
+          strNo = ((NamedRunnable) no).getName();
+        boolean rc = MessageDialog.showDialogYesNo(null, msg, title, type, strYes, strNo, highlightButtonYes);
         if (rc) {
           if (yes != null)
             yes.run();

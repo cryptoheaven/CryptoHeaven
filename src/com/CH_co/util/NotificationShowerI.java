@@ -26,6 +26,6 @@ public interface NotificationShowerI {
 
   public void show(int type, String title, String msg);
   public void show(final SingleTokenArbiter arbiter, final Object key, int type, String title, String msg);
-  public void showYesNo(int type, String title, String msg, Runnable yes, Runnable no);
+  public void showYesNo(int type, String title, String msg, boolean highlightButtonYes, Runnable yes, Runnable no);
 
 }

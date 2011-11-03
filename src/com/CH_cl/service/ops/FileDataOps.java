@@ -123,7 +123,7 @@ public class FileDataOps {
 
       MessageAction msgAction = new MessageAction(actionCode, request);
 
-      if (actionCode == CommandCodes.FILE_Q_GET_FILES_DATA && fData.getEncSize().longValue() > getMaxFileSizeForMainConnection()) {
+      if (actionCode == CommandCodes.FILE_Q_GET_FILES_DATA && fData.getEncSize().longValue() > getMaxFileDownSizeForMainConnection()) {
         Thread th = new DownloadUtilities.DownloadFileRunner(msgAction, null, new FileLinkRecord[] { fLink }, new String[] { fLink.getFileName() }, SIL, false, false);
         th.start();
         // wait for completion...
@@ -140,8 +140,8 @@ public class FileDataOps {
     return fData;
   }
 
-  private static long getMaxFileSizeForMainConnection() {
-    long maxTransferProportional = Stats.getMaxTransferRate()*5; // 5 seconds worth of transfer
+  private static long getMaxFileDownSizeForMainConnection() {
+    long maxTransferProportional = Stats.getMaxTransferRateIn()*1; // 1 seconds worth of download
     long maxSize = Math.max(maxTransferProportional, ServerInterfaceLayer.DEFAULT_MAX_FILE_SIZE_FOR_MAIN_CONNECTION);
     return maxSize;
   }

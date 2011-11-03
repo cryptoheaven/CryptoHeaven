@@ -2,15 +2,18 @@
  * Copyright 2001-2011 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
- *
+ * 
  * This software is the confidential and proprietary information
  * of CryptoHeaven Development Team ("Confidential Information").  You
  * shall not disclose such Confidential Information and shall use
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Development Team.
  */
+package com.CH_gui.util;
 
-package com.CH_co.monitor;
+import com.CH_co.util.*;
+
+import java.io.File;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -22,25 +25,20 @@ package com.CH_co.monitor;
  * @author  Marcin Kurzawa
  * @version
  */
-public class DefaultProgMonitorJournal implements ProgMonitorJournalI {
+public class TempFile extends File {
 
-  public void dispose() {
+  public TempFile(File parentDir, String childName) {
+    super(parentDir, childName);
+    deleteOnExit();
+    GlobalProperties.addTempFileToCleanup(this);
   }
 
-  public void init(String title) {
+  public void cleanup() {
+    try { CleanupAgent.wipeOrDelete(this); } catch (Throwable t) { }
   }
 
-  public void addProgress(String text) {
+  protected void finalize() throws Throwable {
+    cleanup();
+    super.finalize();
   }
-
-  public void setEnabledClose(boolean b) {
-  }
-
-  public void setVisible(boolean b) {
-  }
-
-  public boolean isVisible() {
-    return false;
-  }
-
 }

@@ -37,7 +37,7 @@ public class Stats extends Object {
 
   protected static final LinkedList statusHistoryL = new LinkedList();
   protected static final LinkedList statusHistoryDatesL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
-  private static final int MAX_HISTORY_SIZE = 100;
+  private static final int MAX_HISTORY_SIZE = 500;
 
   private static HashMap globeMoversTraceHM = new HashMap(); // for debug, stack traces of our Movers
 
@@ -48,9 +48,13 @@ public class Stats extends Object {
   protected static Integer connectionsPlain;
   protected static Integer connectionsHTML;
   protected static Long transferRate;
+  protected static Long transferRateIn;
+  protected static Long transferRateOut;
   protected static Long sizeBytes;
 
   private static long maxTransferRate;
+  private static long maxTransferRateIn;
+  private static long maxTransferRateOut;
   private static Date initDate = new Date();
 
   protected static final Object monitor = new Object();
@@ -75,8 +79,20 @@ public class Stats extends Object {
   public static Long getTransferRate() {
     return transferRate;
   }
+  public static Long getTransferRateIn() {
+    return transferRateIn;
+  }
+  public static Long getTransferRateOut() {
+    return transferRateOut;
+  }
   public static long getMaxTransferRate() {
     return maxTransferRate;
+  }
+  public static long getMaxTransferRateIn() {
+    return maxTransferRateIn;
+  }
+  public static long getMaxTransferRateOut() {
+    return maxTransferRateOut;
   }
   public static Long getSizeBytes() {
     return sizeBytes;
@@ -196,6 +212,32 @@ public class Stats extends Object {
         for (int i=0; i<statsListeners.size(); i++) {
           StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
           listener.setStatsTransferRate(transferRate);
+        }
+      }
+    }
+  }
+  public static void setTransferRateIn(long bytesPerSecond) {
+    synchronized (monitor) {
+      boolean updated = transferRateIn == null || transferRateIn.longValue() != bytesPerSecond;
+      if (updated) {
+        maxTransferRateIn = Math.max(maxTransferRateIn, bytesPerSecond);
+        transferRateIn = new Long(bytesPerSecond);
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsTransferRateIn(transferRateIn);
+        }
+      }
+    }
+  }
+  public static void setTransferRateOut(long bytesPerSecond) {
+    synchronized (monitor) {
+      boolean updated = transferRateOut == null || transferRateOut.longValue() != bytesPerSecond;
+      if (updated) {
+        maxTransferRateOut = Math.max(maxTransferRateOut, bytesPerSecond);
+        transferRateOut = new Long(bytesPerSecond);
+        for (int i=0; i<statsListeners.size(); i++) {
+          StatsListenerI listener = (StatsListenerI) statsListeners.get(i);
+          listener.setStatsTransferRateOut(transferRateOut);
         }
       }
     }

@@ -13,6 +13,7 @@
 package com.CH_gui.monitor;
 
 import com.CH_co.monitor.*;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.*;
 
@@ -32,42 +33,42 @@ import javax.swing.*;
  */
 public class JournalProgMonitorImpl implements ProgMonitorJournalI {
 
-  private JDialog exportProgress = null;
-  private JTextArea exportArea = null;
+  private JDialog dialog = null;
+  private JTextArea textArea = null;
   private JButton closeButton = null;
 
   /**
    * No argument constructor for the Factory instantiation.
    */
   public JournalProgMonitorImpl() {
-    exportProgress = new JDialog();
-    exportProgress.setSize(600, 300);
-    exportArea = new JTextArea();
-    exportArea.setEditable(false);
+    dialog = new JDialog(MainFrame.getSingleInstance());
+    dialog.setSize(600, 300);
+    textArea = new JTextArea();
+    textArea.setEditable(false);
     closeButton = new JButton("Close");
     closeButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        exportArea.setText("");
-        exportProgress.setVisible(false);
+        textArea.setText("");
+        dialog.setVisible(false);
       }
     });
-    Container cont = exportProgress.getContentPane();
+    Container cont = dialog.getContentPane();
     cont.setLayout(new GridBagLayout());
-    cont.add(new JScrollPane(exportArea), new GridBagConstraints(0, 0, 1, 1, 10, 10,
+    cont.add(new JScrollPane(textArea), new GridBagConstraints(0, 0, 1, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
     cont.add(closeButton, new GridBagConstraints(0, 1, 1, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
   }
 
   public void init(String title) {
-    exportProgress.setTitle(title);
+    dialog.setTitle(title);
   }
 
   public void addProgress(String text) {
-    if (exportProgress.isVisible()) {
-      exportArea.append(text);
+    if (dialog.isVisible()) {
+      textArea.append(text);
       if (text.endsWith("\n")) {
-        exportArea.setCaretPosition(exportArea.getText().length());
+        textArea.setCaretPosition(textArea.getText().length());
       }
     }
   }
@@ -78,17 +79,21 @@ public class JournalProgMonitorImpl implements ProgMonitorJournalI {
 
   public void setVisible(boolean b) {
     if (!b) {
-      exportProgress.setVisible(false);
-      exportArea.setText(null);
-    } else if (!exportProgress.isVisible()) {
-      MiscGui.setSuggestedWindowLocation(GeneralDialog.getDefaultParent(), exportProgress);
-      exportArea.setText(null);
-      exportProgress.setVisible(true);
+      dialog.setVisible(false);
+      textArea.setText(null);
+    } else if (!dialog.isVisible()) {
+      MiscGui.setSuggestedWindowLocation(GeneralDialog.getDefaultParent(), dialog);
+      textArea.setText(null);
+      dialog.setVisible(true);
     }
   }
 
+  public boolean isVisible() {
+    return dialog.isVisible();
+  }
+
   public void dispose() {
-    exportProgress.dispose();
+    dialog.dispose();
   }
 
 }

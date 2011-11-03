@@ -19,7 +19,6 @@ import java.awt.*;
 import java.util.LinkedList;
 
 import com.CH_co.monitor.*;
-import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
@@ -410,7 +409,6 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startSendAction(String actionName)");
     if (trace != null) trace.args(actionName);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Sending request ... [" + actionName + "]");
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startSendData(String dataName) {
@@ -424,7 +422,6 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Waiting for reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneSendAction(String actionName) {
@@ -444,7 +441,6 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Receiving reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void startReceiveAction(String actionName) {
@@ -464,7 +460,6 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Reply received. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneReceiveAction(String actionName) {
@@ -483,14 +478,12 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "startExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Executing reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public void doneExecution(int actionCode) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
-    Stats.setStatus("Action completed. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     Stats.stopGlobe(this);
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }

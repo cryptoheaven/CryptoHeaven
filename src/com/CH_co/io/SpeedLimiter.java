@@ -51,12 +51,17 @@ public class SpeedLimiter extends Object {
   private static long totalByteCountRead;
   private static long totalByteCountWritten;
 
-  private static final LinkedList inboundTimeCountL = new LinkedList();
-  private static final LinkedList outboundTimeCountL = new LinkedList();
-  private static final LinkedList globalTimeCountL = new LinkedList();
-
-  private static long lastTransferUpdateDateMillis;
-  private static long lastTransferUpdateRate;
+  private static final LinkedList timeCountL = new LinkedList();
+  private static final LinkedList timeCountInL = new LinkedList();
+  private static final LinkedList timeCountOutL = new LinkedList();
+  
+  private static long lastUpdateRate;
+  private static long lastUpdateRateIn;
+  private static long lastUpdateRateOut;
+  
+  private static long lastUpdateStamp;
+  private static long lastUpdateStampIn;
+  private static long lastUpdateStampOut;
 
   public static final String PROPERTY_NAME_GLOBAL_IN_RATE = "SpeedLimiter_globalInRate";
   public static final String PROPERTY_NAME_GLOBAL_OUT_RATE = "SpeedLimiter_globalOutRate";
@@ -184,20 +189,18 @@ public class SpeedLimiter extends Object {
 
   public static void moreBytesRead(int additionalBytes) {
     totalByteCountRead += additionalBytes;
-    if (globalInRate > 0) {
-      moreBytesSlowDown(additionalBytes, inboundTimeCountL, globalInRate);
-    }
+    moreBytesSlowDown(additionalBytes, timeCountInL, globalInRate);
+    updateTransferStatsIn();
     moreBytesGlobal(additionalBytes);
   }
   public static void moreBytesWritten(int additionalBytes) {
     totalByteCountWritten += additionalBytes;
-    if (globalOutRate > 0) {
-      moreBytesSlowDown(additionalBytes, outboundTimeCountL, globalOutRate);
-    }
+    moreBytesSlowDown(additionalBytes, timeCountOutL, globalOutRate);
+    updateTransferStatsOut();
     moreBytesGlobal(additionalBytes);
   }
   private static void moreBytesGlobal(int additionalBytes) {
-    moreBytesSlowDown(additionalBytes, globalTimeCountL, globalCombinedRate);
+    moreBytesSlowDown(additionalBytes, timeCountL, globalCombinedRate);
     updateTransferRateStats();
   }
 
@@ -205,22 +208,64 @@ public class SpeedLimiter extends Object {
    * Updates user displayable total throughput label.
    */
   private static void updateTransferRateStats() {
-    synchronized (globalTimeCountL) {
+    synchronized (timeCountL) {
       long currentDateMillis = System.currentTimeMillis();
-      long elapsedMillis = sumMillis(globalTimeCountL, currentDateMillis);
-      long totalBytes = sumBytes(globalTimeCountL);
+      long elapsedMillis = sumMillis(timeCountL, currentDateMillis);
+      long totalBytes = sumBytes(timeCountL);
       // avoid division by 0
       long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
 
       // Update when rate changes more than 30% or is 1 second since last update has passed.
-      // Don't update if the global counter has started less than 200 ms ago
-      if (elapsedMillis > 200) {
-        if (byteRate > (lastTransferUpdateRate * 1.3) || byteRate < (lastTransferUpdateRate / 1.3) ||
-            currentDateMillis - lastTransferUpdateDateMillis > 1000)
+      // Don't update if the global counter has started less than 600 ms ago
+      if (elapsedMillis > 600) {
+        if (byteRate > (lastUpdateRate * 1.3) || byteRate < (lastUpdateRate / 1.3) ||
+            currentDateMillis - lastUpdateStamp > 1000)
         {
           Stats.setTransferRate(byteRate);
-          lastTransferUpdateRate = byteRate;
-          lastTransferUpdateDateMillis = currentDateMillis;
+          lastUpdateRate = byteRate;
+          lastUpdateStamp = currentDateMillis;
+        }
+      }
+    }
+  }
+  private static void updateTransferStatsIn() {
+    synchronized (timeCountInL) {
+      long currentDateMillis = System.currentTimeMillis();
+      long elapsedMillis = sumMillis(timeCountInL, currentDateMillis);
+      long totalBytes = sumBytes(timeCountInL);
+      // avoid division by 0
+      long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
+
+      // Update when rate changes more than 30% or is 1 second since last update has passed.
+      // Don't update if the global counter has started less than 600 ms ago
+      if (elapsedMillis > 600) {
+        if (byteRate > (lastUpdateRateIn * 1.3) || byteRate < (lastUpdateRateIn / 1.3) ||
+            currentDateMillis - lastUpdateStampIn > 1000)
+        {
+          Stats.setTransferRateIn(byteRate);
+          lastUpdateRateIn = byteRate;
+          lastUpdateStampIn = currentDateMillis;
+        }
+      }
+    }
+  }
+  private static void updateTransferStatsOut() {
+    synchronized (timeCountOutL) {
+      long currentDateMillis = System.currentTimeMillis();
+      long elapsedMillis = sumMillis(timeCountOutL, currentDateMillis);
+      long totalBytes = sumBytes(timeCountOutL);
+      // avoid division by 0
+      long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
+
+      // Update when rate changes more than 30% or is 1 second since last update has passed.
+      // Don't update if the global counter has started less than 600 ms ago
+      if (elapsedMillis > 600) {
+        if (byteRate > (lastUpdateRateOut * 1.3) || byteRate < (lastUpdateRateOut / 1.3) ||
+            currentDateMillis - lastUpdateStampOut > 1000)
+        {
+          Stats.setTransferRateOut(byteRate);
+          lastUpdateRateOut = byteRate;
+          lastUpdateStampOut = currentDateMillis;
         }
       }
     }

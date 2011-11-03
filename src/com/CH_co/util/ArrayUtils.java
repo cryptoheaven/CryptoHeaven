@@ -706,12 +706,12 @@ public class ArrayUtils extends Object {
         "Hi",
       };
    */
-  public static String removeTags(String str, String[][] startTags, String[][] endTags, String[] replacementTags) {
+  public static String removeTags(String str, String[][] startTags, String[][] endTags, Object[] replacementTags) {
     char[] chars = null;
     for (int x=0; x<startTags.length; x++) {
       String[] startTag = startTags[x];
       String[] endTag = endTags[x];
-      String replacementTag = replacementTags != null ? replacementTags[x] : null;
+      Object replacementTag = replacementTags != null ? replacementTags[x] : null;
       int iStart = 0;
       int iEnd = 0;
       int oldStart = 0;
@@ -754,8 +754,14 @@ public class ArrayUtils extends Object {
             str.getChars(oldStart, iStart, chars, 0);
             resultB.append(chars, 0, len);
           }
-          if (replacementTag != null)
-            resultB.append(replacementTag);
+          if (replacementTag != null) {
+            if (replacementTag instanceof CallbackReturnI) {
+              String strBeingReplaced = str.substring(iStart, iEnd + endTag[endTagIndex].length());
+              resultB.append(((CallbackReturnI) replacementTag).callback(strBeingReplaced));
+            } else {
+              resultB.append(replacementTag);
+            }
+          }
           oldStart = iEnd + endTag[endTagIndex].length();
         } else {
           break;

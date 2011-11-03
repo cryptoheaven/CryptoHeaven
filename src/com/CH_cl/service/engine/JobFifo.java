@@ -53,8 +53,14 @@ public class JobFifo extends PriorityJobFifo {
     return sizeSum;
   }
 
-  public long getMaxFileSizeForMainConnection() {
-    long maxTransferProportional = Stats.getMaxTransferRate()*5; // 5 seconds worth of transfer
+  public long getMaxFileDownSizeForMainConnection() {
+    long maxTransferProportional = Stats.getMaxTransferRateIn()*1; // 1 second worth of download
+    long maxSize = Math.max(maxTransferProportional, ServerInterfaceLayer.DEFAULT_MAX_FILE_SIZE_FOR_MAIN_CONNECTION);
+    return maxSize;
+  }
+
+  public long getMaxFileUpSizeForMainConnection() {
+    long maxTransferProportional = Stats.getMaxTransferRateOut()*1; // 1 second worth of upload
     long maxSize = Math.max(maxTransferProportional, ServerInterfaceLayer.DEFAULT_MAX_FILE_SIZE_FOR_MAIN_CONNECTION);
     return maxSize;
   }

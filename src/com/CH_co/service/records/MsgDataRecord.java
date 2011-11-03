@@ -302,9 +302,7 @@ public class MsgDataRecord extends Record {
 
       if (trace != null) trace.data(10, "Signing message ...");
       AsymmetricBlockCipher asyCipher = new AsymmetricBlockCipher();
-      Stats.setStatus("Signing new message ... ");
       BAAsyCipherBlock tempSignedDigest = asyCipher.signBlock(signingPrivKey.getPrivateKey(), msgHash);
-      Stats.setStatus("Signing new message ... done.");
       BASymCipherBulk tempEncSignedDigest = symCipher.bulkEncrypt(tempSignedDigest);
       if (trace != null) trace.data(11, "Signing message ... done.");
 

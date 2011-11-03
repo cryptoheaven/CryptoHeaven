@@ -425,7 +425,7 @@ public class LoginFrame extends JFrame {
     }
     if (accountCode == null) {
       accountCode = new JMyTextField();
-      accountCode.setBackgroundTextWhenEmpty(" leave empty for a free account with ads");
+      //accountCode.setBackgroundTextWhenEmpty(" leave empty for a free account with ads");
       accountCode.setText(URLs.get(URLs.ACTIVATION_CODE_DEFAULT));
     }
     if (expectedTime == null)
@@ -1644,6 +1644,7 @@ public class LoginFrame extends JFrame {
         if (isLoginSuccess) {
           LoginFrame.this.closeFrame();
           loginCoordinator.loginComplete(true);
+          Stats.setStatus("Welcome "+FetchedDataCache.getSingleInstance().getUserRecord().handle);
         } else if (!isUsernameForRetry) {
           if (isUsernameInRetry) {
             setUsername(usernamePreRetry);

@@ -15,6 +15,7 @@ package com.CH_gui.util;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
+import com.CH_gui.gui.InitialFocusRequestor;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -130,6 +131,9 @@ public class GeneralDialog extends JDialog {
       if (default_index >= 0) {
         if (trace != null) trace.data(10, "setting default button...");
         JButton defaultButton = buttons[default_index];
+        // Traditional requestFocus() does not seem to work when preparing GUI which is not yet visible...
+        // Use a focus requestor that activates after the dialog is shown.
+        defaultButton.addHierarchyListener(new InitialFocusRequestor()); 
         this.getRootPane().setDefaultButton(defaultButton);
         if (trace != null) trace.data(11, "setting default button... done.");
       }

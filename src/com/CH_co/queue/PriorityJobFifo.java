@@ -103,20 +103,20 @@ public class PriorityJobFifo extends PriorityFifo {
               Obj_IDs_Co request = (Obj_IDs_Co) msgAction.getMsgDataSet();
               Long[] fileLinkIDs = request.IDs[0];
               long sizeSum = getFileOrigSizeSum(fileLinkIDs);
-              if (sizeSum < getMaxFileSizeForMainConnection()) {
+              if (sizeSum < getMaxFileDownSizeForMainConnection()) {
                 priority = MAIN_WORKER_LOW_PRIORITY;
               }
             } else if (code == CommandCodes.FILE_Q_NEW_FILES) {
               File_NewFiles_Rq request = (File_NewFiles_Rq) msgAction.getMsgDataSet();
               long sizeSum = FileDataRecord.getFileEncSizeSum(request.fileDataRecords);
-              if (sizeSum < getMaxFileSizeForMainConnection()) {
+              if (sizeSum < getMaxFileUpSizeForMainConnection()) {
                 priority = MAIN_WORKER_LOW_PRIORITY;
               }
             } else if (code == CommandCodes.FILE_Q_UPLOAD_CONTENT) {
               // if transferred file is small then also LOW PRIORITY
               File_Transfer_Co request = (File_Transfer_Co) msgAction.getMsgDataSet();
               if (request.plainFileLength != null) {
-                if (request.plainFileLength.longValue() < getMaxFileSizeForMainConnection())
+                if (request.plainFileLength.longValue() < getMaxFileUpSizeForMainConnection())
                   priority = MAIN_WORKER_LOW_PRIORITY;
               }
             }
@@ -131,7 +131,7 @@ public class PriorityJobFifo extends PriorityFifo {
             try {
               Msg_New_Rq request = (Msg_New_Rq) msgAction.getMsgDataSet();
               long sizeSum = FileDataRecord.getFileEncSizeSum(request.localFiles.fileDataRecords);
-              if (sizeSum < getMaxFileSizeForMainConnection()) {
+              if (sizeSum < getMaxFileUpSizeForMainConnection()) {
                 priority = MAIN_WORKER_LOW_PRIORITY;
               }
             } catch (Throwable t) {
@@ -275,8 +275,12 @@ public class PriorityJobFifo extends PriorityFifo {
     return -1;
   }
 
-  public long getMaxFileSizeForMainConnection() {
-    return Long.MAX_VALUE;
+  public long getMaxFileDownSizeForMainConnection() {
+    return 0;
+  }
+
+  public long getMaxFileUpSizeForMainConnection() {
+    return 0;
   }
 
 }

@@ -243,13 +243,19 @@ public class GlobalProperties extends Object {
   // build 644 File data transfer overhaul to allow interrupted uploads to resume.
   // build 646 Fixes occasional download enc-file-size-zero bug, msg preview removal of styles and background images, faster applet resource loading
   // build 648 Image pasted in to HTML editor gets uploaded as attachment
+  // build 650 v3.5.1 updated installers
+  // build 652 v3.5.1 updated installers with fix to file attachment upload with additional Q&A encryption
+  // build 654 v3.5.1 updated installers with fix to voice file attachments static
+  // build 656 v3.5.2 emergency fix to build 652 for multiple file attachments
+  // build 658 Remove pasted image links and replace them by [filename], change warning when closing app with running uploads.
+  // build 660 File uploads do all encryptions asap to free up local file dependency, status notifications changed, added upload aborted popup message.
 
-  public static final short PROGRAM_BUILD_NUMBER = 648;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 660;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.5f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 3;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

@@ -34,6 +34,7 @@ import com.CH_cl.service.ops.DownloadUtilities;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
 import com.CH_gui.gui.*;
+import com.CH_gui.util.TempFile;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -73,8 +74,6 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
   String STR_PAUSE = "Pause";
   String STR_RESUME = "Resume";
   String STR_ATTACH = " Attach >> ";
-
-  Vector tempFilesToCleanupV;
 
   public AudioCapturePanel(MsgComposeManagerI composeMngrI) {//constructor
     this.composeMngrI = composeMngrI;
@@ -281,9 +280,7 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
       String prefix = FileLauncher.getVoicemailPrefix();
       String suffix = "."+fileType.getExtension();
       File tempDir = DownloadUtilities.getDefaultTempDir();
-      audioFile = new File(tempDir, prefix+Misc.getFormattedDateFileStr(new Date())+"-"+secondsWorthOfData+"s"+suffix);
-      if (tempFilesToCleanupV == null) tempFilesToCleanupV = new Vector();
-      tempFilesToCleanupV.addElement(audioFile);
+      audioFile = new TempFile(tempDir, prefix+Misc.getFormattedDateFileStr(new Date())+"-"+secondsWorthOfData+"s"+suffix);
 
       new WriteThread(ais, fileType, audioFile).start();
     } catch (Exception e) {
@@ -455,26 +452,12 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
   }//end inner class PlayThread
 //===================================//
 
-  private void cleanupTempFiles() {
-    if (tempFilesToCleanupV != null) {
-      while (tempFilesToCleanupV.size() > 0) {
-        File tempFile = (File) tempFilesToCleanupV.remove(tempFilesToCleanupV.size()-1);
-        boolean cleaned = false;
-        try { cleaned = CleanupAgent.wipeOrDelete(tempFile); } catch (Throwable t) { }
-        if (!cleaned && tempFile.exists()) {
-          GlobalProperties.addTempFileToCleanup(tempFile);
-        }
-      }
-    }
-  }
-
   public void disposeObj() {
     // Stop any potentially active threads...
     isCapturing = false;
     isPausing = false;
     isPlaying = false;
     isWriting = false;
-    cleanupTempFiles();
   }
 
   public static void main(String args[]) {
@@ -490,8 +473,4 @@ public class AudioCapturePanel extends JPanel implements DisposableObj {
     }
   }//end main
 
-  protected void finalize() throws Throwable {
-    cleanupTempFiles();
-    super.finalize();
-  }
 }//end outer class AudioCapturePanel.java

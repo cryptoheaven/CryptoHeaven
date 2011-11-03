@@ -34,26 +34,21 @@ import com.CH_co.util.Misc;
  *
  * Structure of stream chains:
  *  i/o stream ->
- *     speed limited i/o stream ->
- *         interruptible i/o stream ->
- *             buffered i/o stream ->
- *  a)
- *                 data i/o stream2
- *  b)
- *                 block cipher i/o stream ->
- *                     data i/o stream2
+ *     speed limited and interruptible i/o stream ->
+ *  a)  data i/o stream2
+ *  b)  block cipher i/o stream ->
+ *        data i/o stream2
+ * 
  * @author  Marcin Kurzawa
  * @version
  */
 public abstract class CommonSessionContext extends Object implements Interruptible {
 
-  private static final int BUFFER_SIZE = 1024*8;
-  
   protected Socket connectedSocket;
   private InputStream in;
   private OutputStream out;
-  private InputStream interIn;
-  private OutputStream interOut;
+  private SpeedLimitedInputStream speedIn;
+  private SpeedLimitedOutputStream speedOut;
   private DataInputStream2 dataIn;
   private DataOutputStream2 dataOut;
   private BlockCipherInputStream blockCipherIn;
@@ -133,20 +128,9 @@ public abstract class CommonSessionContext extends Object implements Interruptib
 
     // making throughput measuring and speed limited streems
     if (trace != null) trace.data(30, "making SpeedLimitedInputStream");
-    this.in = new SpeedLimitedInputStream(in, inRate, globalRateHookup); // Kbps
+    this.speedIn = new SpeedLimitedInputStream(in, inRate, globalRateHookup); // Kbps
     if (trace != null) trace.data(40, "making SpeedLimitedOutputStream");
-    this.out = new SpeedLimitedOutputStream(out, outRate, globalRateHookup);
-
-    if (isClient) {
-      // Interruptible streams for progress monitor CANCEL action
-      if (trace != null) trace.data(50, "client mode : making InterruptibleInputStream");
-      this.interIn = new InterruptibleInputStream(in);
-      if (trace != null) trace.data(60, "client mode : making InterruptibleOutputStream");
-      this.interOut = new InterruptibleOutputStream(out);
-    } else {
-      this.interIn = in;
-      this.interOut = out;
-    }
+    this.speedOut = new SpeedLimitedOutputStream(out, outRate, globalRateHookup);
 
     if (trace != null) trace.data(70, "getting InetAddress");
     InetAddress addr = connectedSocket.getInetAddress();
@@ -155,10 +139,9 @@ public abstract class CommonSessionContext extends Object implements Interruptib
     if (trace != null) trace.data(90, "getting connected port");
     String sourceName = "" + hostAddress + ":" + connectedSocket.getPort();
 
-    // buffer up the communications streams to take load off the speed limiting stream computations...
-    if (trace != null) trace.data(100, "wrapping in Data Input and Output streams, and buffering up");
-    this.dataIn = new DataInputStream2(new BufferedInputStream(interIn, BUFFER_SIZE), sourceName);
-    this.dataOut = new DataOutputStream2(new BufferedOutputStream(interOut, BUFFER_SIZE), sourceName);
+    if (trace != null) trace.data(100, "wrapping in Data Input and Output streams");
+    this.dataIn = new DataInputStream2(speedIn, sourceName);
+    this.dataOut = new DataOutputStream2(speedOut, sourceName);
 
     if (trace != null) trace.exit(CommonSessionContext.class);
   }
@@ -171,15 +154,15 @@ public abstract class CommonSessionContext extends Object implements Interruptib
       closed = true;
       try { getDataOutputStream2().flush(); } catch (Throwable t) { }
       try { in.close();                     } catch (Throwable t) { }
-      try { interIn.close();                } catch (Throwable t) { }
+      try { speedIn.close();                } catch (Throwable t) { }
       try { if (blockCipherIn  != null) blockCipherIn.close();  } catch (Throwable t) { }
       try { getDataInputStream2().close();  } catch (Throwable t) { }
       // Close the socket before closing output streams to help HTTP Socket
       // send a graceful disconnect action before it bails out.
       // Otherwise it would notice client streams closed before it can do final communications.
-      try { connectedSocket.close();            } catch (Throwable t) { }
+      try { connectedSocket.close();        } catch (Throwable t) { }
       try { out.close();                    } catch (Throwable t) { }
-      try { interOut.close();               } catch (Throwable t) { }
+      try { speedOut.close();               } catch (Throwable t) { }
       try { if (blockCipherOut != null) blockCipherOut.close(); } catch (Throwable t) { }
       try { getDataOutputStream2().close(); } catch (Throwable t) { }
       // used to try releasing native held object on linux
@@ -190,10 +173,14 @@ public abstract class CommonSessionContext extends Object implements Interruptib
   }
 
   public long calculateRateIn() {
-    return (in instanceof SpeedLimitedInputStream) ? ((SpeedLimitedInputStream) in).calculateRate() : 0;
+    long rate = 0;
+    try { rate = speedIn.calculateRate(); } catch (Throwable t) { }
+    return rate;
   }
   public long calculateRateOut() {
-    return (out instanceof SpeedLimitedOutputStream) ? ((SpeedLimitedOutputStream) out).calculateRate() : 0;
+    long rate = 0;
+    try { rate = speedOut.calculateRate(); } catch (Throwable t) { }
+    return rate;
   }
   public long calculateRate() {
     return calculateRateIn() + calculateRateOut();
@@ -223,14 +210,12 @@ public abstract class CommonSessionContext extends Object implements Interruptib
     Object monitorIn = dataIn;
     Object monitorOut = dataOut;
     synchronized (monitorIn) {
-      // buffer up the communications streams to take load off the speed limiting streams computations...
-      blockCipherIn = new BlockCipherInputStream(new BufferedInputStream(interIn, BUFFER_SIZE), symmetricKeyMaterialIncoming);
+      blockCipherIn = new BlockCipherInputStream(speedIn, symmetricKeyMaterialIncoming);
       dataIn = new DataInputStream2(blockCipherIn, dataIn.getName());
       monitorIn.notifyAll();
     }
     synchronized (monitorOut) {
-      // buffer up the communications streams to take load off the speed limiting streams computations...
-      blockCipherOut = new BlockCipherOutputStream(new BufferedOutputStream(interOut, BUFFER_SIZE), symmetricKeyMaterialOutgoing);
+      blockCipherOut = new BlockCipherOutputStream(speedOut, symmetricKeyMaterialOutgoing);
       dataOut = new DataOutputStream2(blockCipherOut, dataOut.getName());
       monitorOut.notifyAll();
     }
@@ -291,8 +276,8 @@ public abstract class CommonSessionContext extends Object implements Interruptib
         + ": connectedSocket="                  + connectedSocket
         + ", in="                               + (in==null?"null":"not null")
         + ", out="                              + (out==null?"null":"not null")
-        + ", interIn="                          + (interIn==null?"null":"not null")
-        + ", interOut="                         + (interOut==null?"null":"not null")
+        + ", speedIn="                          + (speedIn==null?"null":"not null")
+        + ", speedOut="                         + (speedOut==null?"null":"not null")
         + ", blockCipherIn="                    + (blockCipherIn==null?"null":"not null")
         + ", blockCipherOut="                   + (blockCipherOut==null?"null":"not null")
         + ", dataIn="                           + (dataIn==null?"null":"not null")
@@ -327,10 +312,8 @@ public abstract class CommonSessionContext extends Object implements Interruptib
    * Interruptible interface method.
    */
   public synchronized void interrupt() {
-    if (interIn instanceof InterruptibleInputStream)
-      ((InterruptibleInputStream)interIn).interrupt();
-    if (interOut instanceof InterruptibleOutputStream)
-      ((InterruptibleOutputStream)interOut).interrupt();
+    try { speedIn.interrupt();  } catch (Throwable t) { }
+    try { speedOut.interrupt(); } catch (Throwable t) { }
   }
 
   public synchronized void generateKeyPairIfDoesntExist(int strength) {

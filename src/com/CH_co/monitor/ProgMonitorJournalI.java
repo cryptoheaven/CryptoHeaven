@@ -29,5 +29,6 @@ public interface ProgMonitorJournalI {
   public void addProgress(String text);
   public void setEnabledClose(boolean b);
   public void setVisible(boolean b);
+  public boolean isVisible();
 
 }

@@ -30,5 +30,7 @@ public interface StatsListenerI {
   public void setStatsPing(Long pingMS);
   public void setStatsSizeBytes(Long sizeBytes);
   public void setStatsTransferRate(Long transferRate);
+  public void setStatsTransferRateIn(Long transferRateIn);
+  public void setStatsTransferRateOut(Long transferRateOut);
 
 }
