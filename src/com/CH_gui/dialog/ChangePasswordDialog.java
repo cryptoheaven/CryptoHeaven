@@ -188,8 +188,6 @@ public class ChangePasswordDialog extends GeneralDialog {
     return rc;
   }
 
-
-
   private void setEnabledInputs(boolean b) {
     jOldPass.setEnabled(b);
     jNewPass.setEnabled(b);
@@ -295,8 +293,9 @@ public class ChangePasswordDialog extends GeneralDialog {
         }
       }
 
-      // see if we need to re-setup Password Recovery
-      if (!error) {
+      // See if we need to re-setup Password Recovery
+      // Don't bother very fresh new accounts with this extra dialog, they will see it upon next login.
+      if (!isSetMode && !error) {
         SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_CHALLENGE, new Obj_List_Co(cache.getMyUserId())), 30000);
         if (cache.getMyPassRecoveryRecord() == null)
           new PassRecoverySetupDialog(MainFrame.getSingleInstance());

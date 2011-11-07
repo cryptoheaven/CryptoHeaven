@@ -249,8 +249,10 @@ public class GlobalProperties extends Object {
   // build 656 v3.5.2 emergency fix to build 652 for multiple file attachments
   // build 658 Remove pasted image links and replace them by [filename], change warning when closing app with running uploads.
   // build 660 File uploads do all encryptions asap to free up local file dependency, status notifications changed, added upload aborted popup message.
+  // build 662 Sferyx v11
+  // build 664 Welcome email changed, welcome email notification removed and replaced by welcome email body, tell-a-friend enabled.
 
-  public static final short PROGRAM_BUILD_NUMBER = 660;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 664;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

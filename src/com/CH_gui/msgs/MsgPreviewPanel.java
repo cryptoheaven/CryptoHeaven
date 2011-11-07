@@ -107,6 +107,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private int restoredViewLocation;
   private JPanel jLineAttachments;
   private JPanel jAttachments;
+  private HashMap attachmentsMap; // way to link files with GUI elements rendering them
   private JPanel jLineExpiration;
   private JLabel jExpirationLabel;
   private JLabel jExpiration;
@@ -141,6 +142,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
   private MsgLinkListener linkListener;
   private MsgDataListener dataListener;
+  private FileLinkListener fileListener;
 
   private static final String STR_SELECT_A_SINGLE_MESSAGE = "<html><p align=\"left\">To view a message in this reading window, click on a message in the list.<br>To select more then one, hold Shift or Control key and click the desired messages.</p></html>";
   private static final String STR_SELECT_A_SINGLE_ADDRESS = "<html><p align=\"left\">To view address details in this reading window, click on an address in the list.<br>To select more then one, hold Shift or Control key and click the desired addresses.</p></html>";
@@ -185,6 +187,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     FetchedDataCache.getSingleInstance().addMsgLinkRecordListener(linkListener);
     dataListener = new MsgDataListener();
     FetchedDataCache.getSingleInstance().addMsgDataRecordListener(dataListener);
+    fileListener = new FileLinkListener();
+    FetchedDataCache.getSingleInstance().addFileLinkRecordListener(fileListener);
 
     addPopup(jTextMessage);
     addPopup(jHtmlMessage);
@@ -297,6 +301,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
     jAttachments = new JPanel();
     jAttachments.setBorder(new EmptyBorder(0, 0, 0, 0));
+    attachmentsMap = new HashMap();
 
     jLoadImages = new JMyLinkLikeLabel(STR_IMAGES_SHOW, LINK_RELATIVE_FONT_SIZE);
     jLoadImages.addMouseListener(new MouseAdapter() {
@@ -374,7 +379,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             // change our own display, but other listeners should be notified by the unlock code
             setCurrentMessageText();
             // refetch the attachments, maybe the subjects and filenames will show now
-            setAttachmentsPanel(msgLinkRecord, msgDataRecord, jAttachments, jLineAttachments);
+            setAttachmentsPanel(msgLinkRecord, msgDataRecord, jAttachments, attachmentsMap, jLineAttachments);
           }
         }
       }
@@ -935,8 +940,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
 
-  private void setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final JPanel _jLineAttachments) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final JPanel _jLineAttachments)");
+  private void setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final HashMap _attachmentsMap, final JPanel _jLineAttachments) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel(final MsgLinkRecord _msgLink, final MsgDataRecord _dataRecord, final JPanel _jAttachments, final HashMap _attachmentsMap, final JPanel _jLineAttachments)");
     if (trace != null) trace.args(_msgLink, _dataRecord);
     Thread fetcher = new ThreadTraced("Attachments Preview Fetcher") {
       public void runTraced() {
@@ -958,7 +963,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             public void run() {
               Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "MsgPreviewPanel.setAttachmentsPanel1.run()");
               String subject = _dataRecord != null ? _dataRecord.getSubject() : null;
-              setAttachmentsPanel_updateGUI(null, _numOfAttachments > 0 ? new Object[] { _fetchingLabel } : null, subject, _jAttachments, _jLineAttachments);
+              setAttachmentsPanel_updateGUI(null, _numOfAttachments > 0 ? new Object[] { _fetchingLabel } : null, subject, _jAttachments, _attachmentsMap, _jLineAttachments);
               if (trace != null) trace.exit(getClass());
             }
           });
@@ -978,7 +983,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 // draw attachments in GUI only if preview is still pointing to the same message
                 if (msgLinkRecord == _msgLink && msgDataRecord == _dataRecord) {
                   String subject = _dataRecord != null ? _dataRecord.getSubject() : null;
-                  setAttachmentsPanel_updateGUI(_msgLink, _attachments, subject, _jAttachments, _jLineAttachments);
+                  setAttachmentsPanel_updateGUI(_msgLink, _attachments, subject, _jAttachments, _attachmentsMap, _jLineAttachments);
                 } // end if still the same message in preview
                 if (trace != null) trace.exit(getClass());
               }
@@ -997,12 +1002,13 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
 
-  private void setAttachmentsPanel_updateGUI(MsgLinkRecord parentMsgLink, Object[] attachments, String skipFileNameForSubject, JPanel jAttachments, JPanel jLineAttachments) {
+  private void setAttachmentsPanel_updateGUI(MsgLinkRecord parentMsgLink, Object[] attachments, String skipFileNameForSubject, JPanel jAttachments, HashMap attachmentsMap, JPanel jLineAttachments) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel_updateGUI(MsgLinkRecord parentMsgLink, Object[] attachments, String skipFileNameForSubject, JPanel jAttachments, JPanel jLineAttachments)");
     if (trace != null) trace.args(parentMsgLink, attachments, skipFileNameForSubject);
     boolean visible = false;
     String skipFileName = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject) : null;
     jAttachments.removeAll();
+    attachmentsMap.clear();
     if (attachments != null && attachments.length > 0) {
       jAttachments.setBorder(new EmptyBorder(0, 0, 0, 0));
 
@@ -1069,7 +1075,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           final JLabel progress = new JMyLabel("", (float) LINK_RELATIVE_FONT_SIZE);
           progress.setBorder(new EmptyBorder(0,2,0,0));
           if (fileLink != null) {
-            progress.setText(Misc.getFormattedSize(fileLink.origSize, 3, 2) + (fileLink.isAborted() ? " (Upload Aborted)" : (fileLink.isIncomplete() ? " (Upload Pending...)": "")));
+            progress.setText(getAttachmentNote(fileLink));
+            attachmentsMap.put(fileLink.fileLinkId, progress);
           }
 
           if (fileLink != null && (FileLauncher.isAudioWaveFilename(fileLink.getFileName()) || FileLauncher.isImageFilename(fileLink.getFileName()))) {
@@ -1401,7 +1408,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           // Clear panels and make them original size.
           setRecipientsPanel(null, jRecipients, jLineRecipients);
           setAttachmentsButton();
-          setAttachmentsPanel(null, null, jAttachments, jLineAttachments);
+          setAttachmentsPanel(null, null, jAttachments, attachmentsMap, jLineAttachments);
         }
       }
       // always break out of the loop as it is a single-pass-loop only
@@ -1587,12 +1594,17 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       FetchedDataCache.getSingleInstance().removeMsgDataRecordListener(dataListener);
       dataListener = null;
     }
+    if (fileListener != null) {
+      FetchedDataCache.getSingleInstance().removeFileLinkRecordListener(fileListener);
+      fileListener = null;
+    }
     if (msgPreviewUpdateFifo != null) {
       msgPreviewUpdateFifo.clear();
       msgPreviewUpdateFifo.close();
       msgPreviewUpdateFifo = null;
     }
     componentsForPopupV.clear();
+    attachmentsMap.clear();
   }
 
   public static class PrintRunnable implements Runnable {
@@ -1780,7 +1792,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           jPasswordHintText.setText("None");
           setCurrentMessageText();
           setAttachmentsButton();
-          setAttachmentsPanel(null, null, jAttachments, jLineAttachments);
+          setAttachmentsPanel(null, null, jAttachments, attachmentsMap, jLineAttachments);
         } else {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
@@ -1865,7 +1877,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
             jPasswordHintText.setText(msgData.bodyPassHint != null ? msgData.bodyPassHint : "None");
             setAttachmentsButton();
-            setAttachmentsPanel(msgLink, msgData, jAttachments, jLineAttachments);
+            setAttachmentsPanel(msgLink, msgData, jAttachments, attachmentsMap, jLineAttachments);
           }
 
           jStar.setIcon(Images.get(msgLink.isStarred() ? ImageNums.STAR_BRIGHT : ImageNums.STAR_WIRE));
@@ -2075,6 +2087,33 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       msgPreviewUpdateFifo.installSink("Msg Preview Update Queue", new MsgPreviewUpdaterProcessor());
     }
     msgPreviewUpdateFifo.add(msgLinkRecord);
+  }
+
+  /** Listen on updates to the FileLinkRecords in the cache.
+    * if the event happens relevant to this preview, act on it.
+    */
+  private class FileLinkListener implements FileLinkRecordListener {
+    public void fileLinkRecordUpdated(FileLinkRecordEvent event) {
+      final FileLinkRecord[] _fileLinks = event.getFileLinkRecords();
+      if (_fileLinks != null && _fileLinks.length > 0) {
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            if (attachmentsMap != null) {
+              for (int i=0; i<_fileLinks.length; i++) {
+                FileLinkRecord fileLink = _fileLinks[i];
+                JLabel note = (JLabel) attachmentsMap.get(fileLink.fileLinkId);
+                if (note != null)
+                  note.setText(getAttachmentNote(fileLink));
+              }
+            }
+          }
+        });
+      }
+    }
+  }
+
+  private String getAttachmentNote(FileLinkRecord fileLink) {
+    return Misc.getFormattedSize(fileLink.origSize, 3, 2) + (fileLink.isAborted() ? " (Upload Aborted)" : (fileLink.isIncomplete() ? " (Upload Pending...)": ""));
   }
 
 } // end class MsgPreviewPanel

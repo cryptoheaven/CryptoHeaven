@@ -8,32 +8,32 @@ body  {font-size: 12pt;
 
 rt  {font-size: 8pt;}
 
-td p   {margin-top: 0;margin-bottom: 15}
+td p   {margin-top: 0; margin-bottom: 15}
 /*td p-implied   {margin-top: 0;margin-bottom: 0}
 p-implied   {margin-top: 0;margin-bottom: 15}*/
-p {margin-top: 0;margin-bottom: 15}
+p {margin-top: 15; margin-bottom: 15}
 
-h1  {font-size: x-large;
+h1  {font-size: xx-large;
      font-weight: bold;
      margin-top: 0;
      margin-bottom: 15}
 
-h2 {font-size: large;
+h2 {font-size: x-large;
     font-weight: bold;
     margin-top: 0;
     margin-bottom: 15}
 
-h3 {font-size: medium;
+h3 {font-size: large;
     font-weight: bold;
     margin-top: 0;
     margin-bottom: 15}
 
-h4 {font-size: small;
+h4 {font-size: medium;
     font-weight: bold;
     margin-top: 0;
     margin-bottom: 15}
 
-h5 {font-size: x-small;
+h5 {font-size: small;
     font-weight: bold;
     margin-top: 0;
     margin-bottom: 15}
@@ -97,8 +97,8 @@ ol li {margin-left: 0;
     margin-bottom: 0}
 
 ol {
-    margin-top: 0;
-    margin-bottom: 10;
+    margin-top: 15;
+    margin-bottom: 15;
     padding-left: 40;
     -padding-left-ltr: 40;
     -margin-right-rtl: 40;
@@ -123,8 +123,8 @@ ul li {margin-left: 0;
     margin-top: 0;
     margin-bottom: 0}
 
-ul {margin-top: 0;
-    margin-bottom: 10;
+ul {margin-top: 15;
+    margin-bottom: 15;
     padding-left: 40;
     -padding-left-ltr: 40;
     -margin-right-rtl: 40;
@@ -208,8 +208,8 @@ var {font-weight: bold;
      font-style: italic}
 
 table {
-	border-color: Silver;
-	border-style: inset;
+	/*border-color: Silver;
+	border-style: inset;*/
         margin-top: 0;
         margin-bottom: 0
 }
@@ -219,8 +219,8 @@ tr {
 }
 
 td {
-	border-color: Silver;
-	border-style: inset;
+	/*border-color: Silver;
+	border-style: inset;*/
 	padding-left: 3;
 	padding-right: 3;
 	padding-top: 3;
