@@ -122,10 +122,24 @@ public class FileDataRecord extends Record {
    * <code> origDataDigest, signedOrigDigest, encDataDigest, signedEncDigest, encDataFile, encSize </code> .
    * using the sealant object which are <code> signingKeyRecord, symmetricKey </code> .
    * Hash of the data is distributed privately in encrypted form between trusted individuals,
-   * its not published publically, it need not be long.
+   * its not published publicly, it need not be long.
    * @param signingKeyRecord the asymmetric key used to produce signed digests.
-   * @param symmetricKey key matreial used for symmetric encryption of the file.
+   * @param symmetricKey key material used for symmetric encryption of the file.
    */
+  public void seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor, int maxTries) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor, int maxTries)");
+    if (trace != null) trace.args(maxTries);
+    for (int sealTry=0; sealTry<maxTries; sealTry++) {
+      try {
+        seal(signingKeyRecord, symmetricKey, sealTry == 0 ? progressMonitor : null);
+        break;
+      } catch (Throwable t) {
+        if (trace != null) trace.exception(FileDataRecord.class, 100, t);
+      }
+    }
+    if (trace != null) trace.exit(FileDataRecord.class);
+  }
+
   public void seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "seal()");
 
@@ -185,6 +199,14 @@ public class FileDataRecord extends Record {
       // create the original data digest
       origDataDigest = new BADigestBlock(dFileIn.getMessageDigest().digest());
       if (trace != null) trace.data(30, "origDataDigest", ArrayUtils.toString(origDataDigest.toByteArray()));
+      
+      // for file consistancy, make sure that original file didn't change during our encryption
+      byte[] digest = Digester.digestFile(plainDataFile, Digester.getDigest(SHA256.name));
+      BADigestBlock digestBA = new BADigestBlock(digest);
+      if (!digestBA.equals(origDataDigest)) {
+        throw new IllegalStateException("Original file modified during encryption, please retry.");
+      }
+      
       // sign the original data digest
       if (progressMonitor != null) progressMonitor.setCurrentStatus("Signing Encrypted File ...");
       // random filling will cause even the same 'origDataDigest' to look different in 'signedOrigDigest' form!
@@ -362,6 +384,9 @@ public class FileDataRecord extends Record {
 
         gzipIn.close();
         dFileOut.close();
+
+        // set the modified stamp to match the remote file
+        destinationFile.setLastModified(fileUpdated != null ? fileUpdated.getTime() : fileCreated.getTime());
 
         // Remember the newly created plain file.
         plainDataFile = destinationFile;
