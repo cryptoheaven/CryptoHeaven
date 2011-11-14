@@ -66,7 +66,6 @@ public class FileLobUp {
   private FileLinkRecord fileLink;
   private Long signingKeyId;
 
-  private BADigestBlock origDataDigest;
   private BAAsyCipherBlock signedOrigDigest;
   private BADigestBlock encDataDigest;
 
@@ -183,6 +182,21 @@ public class FileLobUp {
     }
     if (trace != null) trace.exit(FileLobUp.class, list);
     return list;
+  }
+
+  public static boolean isFileInQueue(String absolutePath) {
+    ArrayList list = getStateSessions();
+    boolean found = false;
+    if (list != null) {
+      for (int i=0; i<list.size(); i++) {
+        Object[] state = (Object[]) list.get(i);
+        if (state[0].equals(absolutePath)) {
+          found = true;
+          break;
+        }
+      }
+    }
+    return found;
   }
 
   private void removeStateSession(boolean removeFromMemAndHD) {
@@ -569,14 +583,18 @@ public class FileLobUp {
         if (trace != null) trace.data(40, "doUpload: going into encryption", plainDataFile);
         triggerEncryption();
         if (trace != null) trace.data(50, "doUpload: getting encrypted data stream", plainDataFile);
-        fileAppendingInputStream = null;
+        synchronized (encFileMonitor) {
+          fileAppendingInputStream = null;
+        }
         DigestInputStream dEncStream = null;
         try {
           FileLobUpSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
           // check for interrupt, maybe it got interrupted while we were waiting for entry to this throttled code
           if (isInterrupted)
             throw new IllegalStateException("Upload already interrupted.");
-          fileAppendingInputStream = getEncStream();
+          synchronized (encFileMonitor) {
+            fileAppendingInputStream = getEncStream();
+          }
           // any failed verification will reset 'isSigned' and we have to start from byte ZERO -- isSigned may have changed during seal()
           if (verifEncDataDigest != null && !isSigned)
             startFromByte = 0;
@@ -611,16 +629,11 @@ public class FileLobUp {
           // verify data integrity of what was originally sealed and what was transferred
           if (isCompletedTransfer) {
             BADigestBlock encDataDigestVerification = new BADigestBlock(dEncStream.getMessageDigest().digest());
-            if (!encDataDigest.equals(encDataDigestVerification)) {
+            if (encDataDigest == null || !encDataDigest.equals(encDataDigestVerification)) {
               if (DEBUG_CONSOLE) System.out.println("doUpload: integrity check FAILED "+plainDataFile);
               if (trace != null) trace.data(85, "doUpload: integrity check failed, will restart from ZERO", plainDataFile);
-              // start from ZERO
               isCompletedTransfer = false;
-              isSigned = false;
-              isSealed = false;
-              cleanupEncFile();
-              ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_UPLOAD_RESET, new Obj_IDPair_Co(fileLink.fileLinkId, fileLink.fileId)), 60000, 3);
-              DefaultReplyRunner.nonThreadedRun(SIL, reply, true);
+              resetUpload(SIL);
             } else {
               if (DEBUG_CONSOLE) System.out.println("doUpload: integrity check passed "+plainDataFile);
               if (trace != null) trace.data(86, "doUpload: integrity check passed", plainDataFile);
@@ -631,6 +644,13 @@ public class FileLobUp {
           if (trace != null) trace.exception(FileLobUp.class, 88, t);
         } finally {
           FileLobUpSynch.exit();
+          // check if the sealer did not interrupt the encrypted stream due to original file change
+          if (fileAppendingInputStream == null || fileAppendingInputStream.interrupted) {
+            if (DEBUG_CONSOLE) System.out.println("doUpload: fileAppendingInputStream was interrupted, will reset and start over "+plainDataFile);
+            if (trace != null) trace.data(88, "doUpload: fileAppendingInputStream was interrupted, will reset and start over", plainDataFile);
+            isCompletedTransfer = false;
+            resetUpload(SIL);
+          }
           // close the stream after we returned from upload -- this will make the temp file deletable and socket source stream terminated
           try { if (fileAppendingInputStream != null) fileAppendingInputStream.close(); } catch (Throwable t) { }
           try { if (dEncStream != null) dEncStream.close(); } catch (Throwable t) { }
@@ -659,8 +679,22 @@ public class FileLobUp {
     return isDone;
   }
 
+  private void resetUpload(ServerInterfaceLayer SIL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "resetUpload(ServerInterfaceLayer SIL)");
+    // start from ZERO
+    isSigned = false;
+    isSealed = false;
+    cleanupEncFile();
+    ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FILE_Q_UPLOAD_RESET, new Obj_IDPair_Co(fileLink.fileLinkId, fileLink.fileId)), 60000, 3);
+    DefaultReplyRunner.nonThreadedRun(SIL, reply, true);
+    if (trace != null) trace.exit(FileLobUp.class);
+  }
+
   private void seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor) throws FileNotFoundException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "seal()");
+
+    // clear prev value if we are re-trying sealing
+    encDataDigest = null;
 
     int oldPriority = Thread.currentThread().getPriority();
     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
@@ -735,8 +769,21 @@ public class FileLobUp {
       if (trace != null) trace.data(26, "GZIP completed to file len="+tempFile.length(), tempFile);
 
       // create the original data digest
-      origDataDigest = new BADigestBlock(dFileIn.getMessageDigest().digest());
+      BADigestBlock origDataDigest = new BADigestBlock(dFileIn.getMessageDigest().digest());
       if (trace != null) trace.data(30, "origDataDigest", ArrayUtils.toString(origDataDigest.toByteArray()));
+
+      // for file consistancy, make sure that original file didn't change during our encryption
+      byte[] digest = Digester.digestFile(plainDataFile, Digester.getDigest(SHA256.name));
+      BADigestBlock digestBA = new BADigestBlock(digest);
+      if (!digestBA.equals(origDataDigest)) {
+        synchronized (encFileMonitor) {
+          // interrupt only the stream, not the entire upload
+          if (fileAppendingInputStream != null)
+            fileAppendingInputStream.interrupt();
+          // digests don't match
+          throw new IllegalStateException("Original file modified during encryption, will retry.");
+        }
+      }
 
       // create the encrypted data digest
       encDataDigest = new BADigestBlock(dFileOut.getMessageDigest().digest());
@@ -1044,9 +1091,9 @@ public class FileLobUp {
     }
     public int read() throws IOException {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAppendingInputStream.class, "read()");
-      if (interrupted) throw new InterruptedIOException("IO was interrupted.");
       int b = -1;
       while (true) {
+        if (interrupted) throw new InterruptedIOException("IO was interrupted.");
         b = super.read();
         if (b == -1 && !isSealed) {
           if (trace != null) trace.data(100, "waiting for data", "FileAppendingInputStream.read()");
@@ -1065,10 +1112,10 @@ public class FileLobUp {
       return read(b, 0, b.length);
     }
     public int read(byte[] b, int off, int len) throws IOException {
-      if (interrupted) throw new InterruptedIOException("IO was interrupted.");
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAppendingInputStream.class, "read(byte[] b, int off, int len)");
       int count = -1;
       while (true) {
+        if (interrupted) throw new InterruptedIOException("IO was interrupted.");
         count = super.read(b, off, len);
         if (count == -1 && !isSealed) {
           if (trace != null) trace.data(100, "waiting for data", "FileAppendingInputStream.read(byte[] b, int off, int len)");
