@@ -56,7 +56,7 @@ public abstract class HashBase extends MessageDigest {
   * @param blockSize the block size of the internal transform.
   */
   protected HashBase(String name, int hashSize, int blockSize) {
-    super("SHA-256");
+    super(name);
     this.name = name;
     this.hashSize = hashSize;
     this.blockSize = blockSize;
