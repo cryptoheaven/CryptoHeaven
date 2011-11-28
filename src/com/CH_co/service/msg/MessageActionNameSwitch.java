@@ -200,6 +200,7 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FILE_Q_NEW_FILES), "Create File" },
       // New File Intent
       { new Integer(CommandCodes.FILE_Q_NEW_FILE_STUDS), "New File Intent" },
+      { new Integer(CommandCodes.FILE_Q_NEW_FILE_STUDS_BACKGROUND), "New Background File Intent" },
       // Query upload progress
       { new Integer(CommandCodes.FILE_Q_GET_PROGRESS), "File Progress" },
       // Upload file content bytes

@@ -52,7 +52,10 @@ public class FileDND_DragGestureListener extends Object implements DragGestureLi
     if ((fPairs != null && fPairs.length > 0) ||
         (fLinks != null && fLinks.length > 0))
     {
-      FileDND_Transferable transferable = new FileDND_Transferable(fPairs, fLinks);
+      FileLinkRecord[] fLinkAllVersions = null;
+      if (fileActionTable.getTableModel().getIsCollapseFileVersions())
+        fLinkAllVersions = (FileLinkRecord[]) fileActionTable.getSelectedInstancesOf(FileLinkRecord.class, true);
+      FileDND_Transferable transferable = new FileDND_Transferable(fPairs, fLinks, fLinkAllVersions);
       // as the name suggests, starts the dragging
       event.getDragSource().startDrag(event, null, transferable, new FileDND_DragSourceListener());
     } else {

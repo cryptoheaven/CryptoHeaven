@@ -28,6 +28,7 @@ public class MultiHashMap extends Object {
 
   private HashMap hm;
   private boolean enforceUniqueValues;
+  private int valueCount;
 
   /** Creates new MultiHashMap */
   public MultiHashMap() {
@@ -60,12 +61,14 @@ public class MultiHashMap extends Object {
   public void put(Object key, Object value) {
     Object o = hm.get(key);
     if (!enforceUniqueValues || !value.equals(o)) {
-      if (o == null)
+      if (o == null) {
         hm.put(key, value);
-      else if (o instanceof MyCollection) {
+        valueCount ++;
+      } else if (o instanceof MyCollection) {
         MyCollection v = (MyCollection) o;
         if (!enforceUniqueValues || !v.contains(value)) {
           v.add(value);
+          valueCount ++;
         }
       } else {
         MyCollection c = null;
@@ -76,6 +79,7 @@ public class MultiHashMap extends Object {
         c.add(o);
         c.add(value);
         hm.put(key, c);
+        valueCount ++;
       }
     }
   }
@@ -105,7 +109,6 @@ public class MultiHashMap extends Object {
       if (o instanceof MyCollection) {
         c = (MyCollection) o;
       } else {
-
         if (enforceUniqueValues)
           c = new MyHashSet();
         else
@@ -130,9 +133,12 @@ public class MultiHashMap extends Object {
       Iterator iter = c.iterator();
       o = iter.next();
       iter.remove();
+      valueCount --;
       if (c.size() > 0) {
         hm.put(key, c);
       }
+    } else if (o != null) {
+      valueCount --;
     }
     return o;
   }
@@ -147,6 +153,7 @@ public class MultiHashMap extends Object {
       boolean removed = c.remove(value);
       if (removed) {
         o = value;
+        valueCount --;
       } else {
         // the vector doesn't have the object we are looking for
         o = null;
@@ -158,6 +165,8 @@ public class MultiHashMap extends Object {
       // push back the object if its not what we were looking for
       hm.put(key, o);
       o = null;
+    } else if (o != null) {
+      valueCount --;
     }
     return o;
   }
@@ -166,7 +175,13 @@ public class MultiHashMap extends Object {
    * Remove all values stored for a given key.
    */
   public void removeAll(Object key) {
-    hm.remove(key);
+    Object o = hm.remove(key);
+    if (o instanceof MyCollection) {
+      MyCollection c = (MyCollection) o;
+      valueCount -= c.size();
+    } else if (o != null) {
+      valueCount --;
+    }
   }
 
   /**
@@ -184,6 +199,23 @@ public class MultiHashMap extends Object {
 
   public void clear() {
     hm.clear();
+    valueCount = 0;
+  }
+
+  public boolean hasMultivalues() {
+    return sizeKeys() != sizeValues();
+  }
+
+  public boolean isEmpty() {
+    return hm.isEmpty();
+  }
+
+  public int sizeKeys() {
+    return hm.size();
+  }
+
+  public int sizeValues() {
+    return valueCount;
   }
 
   private static interface MyCollection extends Collection {

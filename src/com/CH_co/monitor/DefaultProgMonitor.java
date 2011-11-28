@@ -315,6 +315,12 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(DefaultProgMonitor.class);
   }
+  public void setFilePathDestination(String filePath) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "setFileNameDestination(String filePath)");
+    if (trace != null) trace.args(filePath);
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(DefaultProgMonitor.class);
+  }
   public long getTransferred() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "getTransferred()");
     if (trace != null) trace.data(10, name);
@@ -401,6 +407,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
             msgActionCode == CommandCodes.FLD_Q_RED_FLAG_COUNT ||
             msgActionCode == CommandCodes.FLD_A_RED_FLAG_COUNT ||
             msgActionCode == CommandCodes.FILE_Q_GET_PROGRESS ||
+            msgActionCode == CommandCodes.FILE_Q_NEW_FILE_STUDS_BACKGROUND ||
             msgActionCode == CommandCodes.FILE_Q_UPLOAD_CONTENT ||
             msgActionCode == CommandCodes.FILE_A_UPLOAD_COMPLETED ||
             msgActionCode == CommandCodes.FILE_Q_UPDATE_DIGESTS ||

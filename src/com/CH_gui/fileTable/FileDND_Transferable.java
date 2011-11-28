@@ -41,8 +41,8 @@ public class FileDND_Transferable extends Object implements Transferable {
   private static final DataFlavor flavors[] = { FILE_RECORD_FLAVOR, RecycleDND_Transferable.RECYCLE_RECORD_FLAVOR };
   private FileDND_TransferableData data;
 
-  public FileDND_Transferable(FolderPair[] fPairs, FileLinkRecord[] fLinks) {
-    data = new FileDND_TransferableData(fPairs, fLinks);
+  public FileDND_Transferable(FolderPair[] fPairs, FileLinkRecord[] fLinks, FileLinkRecord[] fLinksAllVersions) {
+    data = new FileDND_TransferableData(fPairs, fLinks, fLinksAllVersions);
   }
 
   public DataFlavor[] getTransferDataFlavors() {

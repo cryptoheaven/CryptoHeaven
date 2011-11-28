@@ -212,11 +212,15 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
    * @return all selected FileRecords of specified class type (FolderPair or FileLinkRecord), or null if none
    */
   public FileRecord[] getSelectedInstancesOf(Class classType) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "getSelectedInstancesOf(Class classType)");
+    return getSelectedInstancesOf(classType, false);
+  }
+  public FileRecord[] getSelectedInstancesOf(Class classType, boolean includeOlderVersions) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "getSelectedInstancesOf(Class classType, boolean includeOlderVersions)");
     if (trace != null) trace.args(classType);
+    if (trace != null) trace.args(includeOlderVersions);
 
     FileRecord[] fileRecords = null;
-    List recordsL = getSelectedRecordsL();
+    List recordsL = getSelectedRecordsL(includeOlderVersions);
     if (recordsL != null && recordsL.size() > 0) {
       ArrayList selectedL = new ArrayList();
       for (int i=0; i<recordsL.size(); i++) {
@@ -316,7 +320,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+      FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
       FolderPair[] fPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
       FolderPair chosenFolderPair = getMoveCopyDestination(true, fPairs != null && fPairs.length > 0, fLinks != null && fLinks.length > 0);
       doMoveOrSaveAttachmentsAction(chosenFolderPair, fLinks, fPairs);
@@ -413,7 +417,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+      FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
       FolderPair[] folderPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
 
       if ((fileLinks != null && fileLinks.length > 0) || (folderPairs != null && folderPairs.length > 0)) {
@@ -683,16 +687,26 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
 
   private void markSelectedAs(Short newMark) {
-    FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
-    markRecordsAs(records, newMark);
+    if (StatRecord.FLAG_OLD.equals(newMark)) {
+      FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
+      markRecordsAs(records, newMark);
+    } else {
+      FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+      markRecordsAs(records, newMark);
+    }
   }
   private void markAllAs(Short newMark) {
     FileTableModel tableModel = (FileTableModel) getTableModel();
     ArrayList linksL = new ArrayList();
     for (int i=0; i<tableModel.getRowCount(); i++) {
       Record rec = tableModel.getRowObjectNoTrace(i);
-      if (rec instanceof FileLinkRecord)
-        linksL.add(rec);
+      if (rec instanceof FileLinkRecord) {
+        if (newMark.equals(StatRecord.FLAG_OLD) && tableModel.getIsCollapseFileVersions()) {
+          linksL.addAll(tableModel.getAllVersions((FileLinkRecord) rec));
+        } else {
+          linksL.add(rec);
+        }
+      }
     }
     if (linksL.size() > 0) {
       FileLinkRecord[] links = new FileLinkRecord[linksL.size()];
@@ -732,19 +746,22 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
    private void markSelectedStarred(boolean markStarred) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgActionTable.class, "markSelectedStarred(boolean markStarred)");
     if (trace != null) trace.args(markStarred);
-    FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+    FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
     markStarred(records, markStarred);
     if (trace != null) trace.exit(MsgActionTable.class);
   }
   public static void markStarred(FileLinkRecord[] records, boolean markStarred) {
     if (records != null && records.length > 0) {
+      Object[] newStats = new Object[records.length * 2];
       for (int i=0; i<records.length; i++) {
         FileLinkRecord link = (FileLinkRecord) records[i];
         if (link.isStarred() != markStarred) {
           link.markStarred(markStarred);
-          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.FILE_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { link.getId(), link.status })), 30000);
+          newStats[i*2+0] = link.getId();
+          newStats[i*2+1] = link.status;
         }
       }
+      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.FILE_Q_UPDATE_STATUS, new Obj_List_Co(newStats)), 30000);
 //      // immediatelly update the cache without waiting on the results from the server
 //      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 //      cache.addFileLinkRecords(records);

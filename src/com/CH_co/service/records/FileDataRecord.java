@@ -176,7 +176,8 @@ public class FileDataRecord extends Record {
       if (progressMonitor != null) {
         progressMonitor.setCurrentStatus("Compressing and Encrypting File ...");
         progressMonitor.setFileNameSource(getPlainDataFile().getAbsolutePath());
-        progressMonitor.setFileNameDestination(tempFile.getAbsolutePath());
+        progressMonitor.setFileNameDestination(tempFile.getName());
+        progressMonitor.setFilePathDestination(tempFile.getAbsolutePath());
         progressMonitor.setTransferSize(plainDataFileLength);
         progressMonitor.nextTask();
       }
@@ -199,14 +200,14 @@ public class FileDataRecord extends Record {
       // create the original data digest
       origDataDigest = new BADigestBlock(dFileIn.getMessageDigest().digest());
       if (trace != null) trace.data(30, "origDataDigest", ArrayUtils.toString(origDataDigest.toByteArray()));
-      
+
       // for file consistancy, make sure that original file didn't change during our encryption
       byte[] digest = Digester.digestFile(plainDataFile, Digester.getDigest(SHA256.name));
       BADigestBlock digestBA = new BADigestBlock(digest);
       if (!digestBA.equals(origDataDigest)) {
         throw new IllegalStateException("Original file modified during encryption, please retry.");
       }
-      
+
       // sign the original data digest
       if (progressMonitor != null) progressMonitor.setCurrentStatus("Signing Encrypted File ...");
       // random filling will cause even the same 'origDataDigest' to look different in 'signedOrigDigest' form!
@@ -286,7 +287,6 @@ public class FileDataRecord extends Record {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey, File destinationDirectory, Boolean isDefaultTempDir, String destinationFileName, ProgMonitor progressMonitor, Long originalSize)");
     if (trace != null) trace.args(verifyingKeyRecord, symmetricKey, destinationDirectory, isDefaultTempDir, destinationFileName, progressMonitor, originalSize);
 
-
     int oldPriority = Thread.currentThread().getPriority();
 
     super.unSeal();
@@ -312,10 +312,26 @@ public class FileDataRecord extends Record {
         destinationFile = new File(destinationDirectory, destinationFileName);
         // If file goes to temp dir, make sure its unique name and added to cleanup
         if (isDefaultTempDir != null && isDefaultTempDir.booleanValue()) {
+          int maxRnd = 99999;
+          int tryNum = 0;
+          String tmpName = destinationFileName;
+          String tmpExt = "";
+          int index = destinationFileName != null ? destinationFileName.lastIndexOf('.') : -1;
+          if (index > 0) {
+            tmpName = destinationFileName.substring(0, index);
+            tmpExt = destinationFileName.substring(index); // includes the dot '.' in front
+          }
           while (destinationFile.exists()) {
+            tryNum ++;
+            if (tryNum % 100 == 0)
+              maxRnd = maxRnd * 10;
+            else if (tryNum > 1000) {
+              destinationFile = null;
+              throw new IllegalStateException("Could not create a temporary file.");
+            }
             Random rnd = new Random();
-            int r = rnd.nextInt(99999);
-            destinationFile = new File(destinationDirectory, r+"-"+destinationFileName);
+            int r = rnd.nextInt(maxRnd-1-maxRnd/10)+1+maxRnd/10;
+            destinationFile = new File(destinationDirectory, tmpName+"-"+r+tmpExt);
           }
           GlobalProperties.addTempFileToCleanup(destinationFile);
         }
@@ -346,7 +362,8 @@ public class FileDataRecord extends Record {
       if (progressMonitor != null) {
         progressMonitor.setCurrentStatus("Decrypting and Uncompressing File ...");
         progressMonitor.setFileNameSource(getEncDataFile().getAbsolutePath());
-        progressMonitor.setFileNameDestination(destinationFile != null ? destinationFile.getAbsolutePath() : "");
+        progressMonitor.setFileNameDestination(destinationFile != null ? destinationFile.getName() : "");
+        progressMonitor.setFilePathDestination(destinationFile != null ? destinationFile.getAbsolutePath() : "");
         progressMonitor.setTransferSize(originalSize.longValue());
         progressMonitor.nextTask();
       }

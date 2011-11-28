@@ -246,7 +246,11 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
    * @return all selected records, if there are none selected, return null
    */
   public List getSelectedRecordsL() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecords()");
+    return getSelectedRecordsL(false);
+  }
+  public List getSelectedRecordsL(boolean includeOlderVersions) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecordsL(boolean includeOlderVersions)");
+    if (trace != null) trace.args(includeOlderVersions);
 
     ArrayList recordsL = new ArrayList();
     if (jSTable != null && jSTable.getSelectedRowCount() > 0) {
@@ -254,7 +258,15 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       for (int i=0; selectedRows!=null && i<selectedRows.length; i++) {
         Record rec = recordTableModel.getRowObject(jSTable.convertMyRowIndexToModel(selectedRows[i]));
         if (rec != null) {
-          recordsL.add(rec);
+          if (rec instanceof FileLinkRecord) {
+            FileLinkRecord fLink = (FileLinkRecord) rec;
+            if (includeOlderVersions)
+              recordsL.addAll(recordTableModel.getAllVersions(fLink));
+            else
+              recordsL.add(rec);
+          } else {
+            recordsL.add(rec);
+          }
         }
       }
     }

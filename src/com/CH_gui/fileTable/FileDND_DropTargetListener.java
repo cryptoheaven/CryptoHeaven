@@ -173,7 +173,11 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
         event.acceptDrop(DnDConstants.ACTION_MOVE);
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderPair moveToPair = CacheUtilities.convertRecordToPair(uploadShareRec);
-        FileLinkRecord[] fLinks = cache.getFileLinkRecords(fileRecs.fileRecordIDs[1]);
+        FileLinkRecord[] fLinks = null;
+        if (fileRecs.fileRecordIDs[2] != null)
+          fLinks = cache.getFileLinkRecords(fileRecs.fileRecordIDs[2]);
+        else 
+          fLinks = cache.getFileLinkRecords(fileRecs.fileRecordIDs[1]);
         FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
         fileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(fileRecs.fileRecordIDs[0])));
         event.getDropTargetContext().dropComplete(true);

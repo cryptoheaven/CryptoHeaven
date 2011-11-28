@@ -108,24 +108,29 @@ public class Images extends Object {
             traceGetError(imageCode, fileName, null);
           }
           if (location != null) {
-            imageIcons[imageCode] = new ImageIcon(location);
-            ImageNums.resetImageUpdated(imageCode);
+            try {
+              imageIcons[imageCode] = new ImageIcon(location);
+              ImageNums.resetImageUpdated(imageCode);
+            } catch (OutOfMemoryError err) {
+            }
           }
           if (isShared) {
             // only modify the icon if we have the base image loaded
             if (imageIcons[imageCode] != null) {
               // add a small share hand to the icon
               ImageIcon shareHandSmallImage = get(ImageNums.SHARE_HAND_L, false);
-              int newHeight = imageIcons[imageCode].getIconHeight() + 2;
-              BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-              Graphics2D g = total.createGraphics();
-              g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
-              double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
-              double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
-              AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
-              xform.translate(0.0, moveDownBy);
-              g.drawImage(shareHandSmallImage.getImage(), xform, null);
-              imageIcons[imageCode] = new ImageIcon(total);
+              if (shareHandSmallImage != null) {
+                int newHeight = imageIcons[imageCode].getIconHeight() + 2;
+                BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+                Graphics2D g = total.createGraphics();
+                g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
+                double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
+                double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
+                AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
+                xform.translate(0.0, moveDownBy);
+                g.drawImage(shareHandSmallImage.getImage(), xform, null);
+                imageIcons[imageCode] = new ImageIcon(total);
+              }
             }
           }
         } catch (Throwable t) {

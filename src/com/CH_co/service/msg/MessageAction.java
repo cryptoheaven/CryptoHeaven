@@ -187,7 +187,10 @@ public class MessageAction extends Message implements Cancellable {
     synchronized(out) {
       // This code will be consumed by code which determines what instance of MessageAction to reconstruct.
       if (trace != null) trace.data(10, "actionCode", actionCode);
-      out.writeInt(actionCode);
+      int sendActionCode = actionCode;
+      if (sendActionCode == CommandCodes.FILE_Q_NEW_FILE_STUDS_BACKGROUND)
+        sendActionCode = CommandCodes.FILE_Q_NEW_FILE_STUDS;
+      out.writeInt(sendActionCode);
 
       if (trace != null) trace.data(20, "uniqueStamp", uniqueStamp);
       out.writeLong(uniqueStamp);

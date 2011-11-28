@@ -36,9 +36,10 @@ public class FileDND_TransferableData extends Object implements Serializable {
   public Long[][] fileRecordIDs;
   public FileDND_TransferableData() {
   }
-  public FileDND_TransferableData(FolderPair[] fPairs,FileLinkRecord[] fLinks) {
-    fileRecordIDs = new Long[2][];
+  public FileDND_TransferableData(FolderPair[] fPairs,FileLinkRecord[] fLinks, FileLinkRecord[] fLinksAllVersions) {
+    fileRecordIDs = new Long[3][];
     fileRecordIDs[0] = RecordUtils.getIDs(fPairs);
     fileRecordIDs[1] = RecordUtils.getIDs(fLinks);
+    fileRecordIDs[2] = RecordUtils.getIDs(fLinksAllVersions);
   }
 }

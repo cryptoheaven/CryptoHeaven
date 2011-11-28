@@ -201,11 +201,15 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
    * @return all selected Records of specified class type (FolderPair or FileLinkRecord or MsgLinkRecord), or null if none
    */
   public Object[] getSelectedInstancesOf(Class classType) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleActionTable.class, "getSelectedInstancesOf(Class classType)");
+    return getSelectedInstancesOf(classType, false);
+  }
+  public Object[] getSelectedInstancesOf(Class classType, boolean includeOlderVersions) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleActionTable.class, "getSelectedInstancesOf(Class classType, boolean includeOlderVersions)");
     if (trace != null) trace.args(classType);
+    if (trace != null) trace.args(includeOlderVersions);
 
     Object[] records = null;
-    List recordsL = getSelectedRecordsL();
+    List recordsL = getSelectedRecordsL(includeOlderVersions);
     if (recordsL != null && recordsL.size() > 0) {
       Vector selectedV = new Vector();
       for (int i=0; i<recordsL.size(); i++) {
@@ -322,7 +326,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair[] fPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
-      FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+      FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
       MsgLinkRecord[] mLinks = (MsgLinkRecord[]) getSelectedInstancesOf(MsgLinkRecord.class);
       boolean forDirs = fPairs != null && fPairs.length > 0;
       boolean forFiles = fLinks != null && fLinks.length > 0;
@@ -343,7 +347,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
+      FileLinkRecord[] fileLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
       FolderPair[] folderPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedInstancesOf(MsgLinkRecord.class);
 

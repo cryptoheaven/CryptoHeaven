@@ -177,6 +177,15 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     return obj;
   }
 
+  /** @return the next object's priority without removing it. */
+  public synchronized long peekPriority() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "peekPriority()");
+    ObjectPair pair = (ObjectPair) list.getFirst();
+    long priority = pair.priority;
+    if (trace != null) trace.exit(PriorityFifo.class, priority);
+    return priority;
+  }
+
   /** Get number of objects in the fifo */
   public synchronized int size() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "size()");

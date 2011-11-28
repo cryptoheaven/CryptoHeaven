@@ -78,7 +78,8 @@ public class FileUtils extends Object {
 
       progressMonitor.setCurrentStatus("Receiving File ...");
       progressMonitor.setFileNameSource(in.getName());
-      progressMonitor.setFileNameDestination(tempFile.getAbsolutePath());
+      progressMonitor.setFileNameDestination(tempFile.getName());
+      progressMonitor.setFilePathDestination(tempFile.getAbsolutePath());
       progressMonitor.setTransferSize(dataLength);
       progressMonitor.nextTask();
 
@@ -147,6 +148,7 @@ public class FileUtils extends Object {
       progressMonitor.setCurrentStatus("Sending File ...");
       progressMonitor.setFileNameSource(file.getAbsolutePath());
       progressMonitor.setFileNameDestination(out.getName());
+      progressMonitor.setFilePathDestination(out.getName());
       progressMonitor.setTransferSize(dataLength);
       progressMonitor.nextTask();
 

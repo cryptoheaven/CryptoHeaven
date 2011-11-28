@@ -53,7 +53,10 @@ public class RecycleDND_DragGestureListener extends Object implements DragGestur
         (fLinks != null && fLinks.length > 0) ||
         (mLinks != null && mLinks.length > 0))
     {
-      RecycleDND_Transferable transferable = new RecycleDND_Transferable(fPairs, fLinks, mLinks);
+      FileLinkRecord[] fLinkAllVersions = null;
+      if (recycleActionTable.getTableModel().getIsCollapseFileVersions())
+        fLinkAllVersions = (FileLinkRecord[]) recycleActionTable.getSelectedInstancesOf(FileLinkRecord.class, true);
+      RecycleDND_Transferable transferable = new RecycleDND_Transferable(fPairs, fLinks, fLinkAllVersions, mLinks);
       // as the name suggests, starts the dragging
       event.getDragSource().startDrag(event, null, transferable, new RecycleDND_DragSourceListener());
     } else {

@@ -17,6 +17,7 @@ import com.CH_co.service.records.filters.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
+import com.CH_gui.fileTable.FileTableModel;
 import java.util.*;
 import javax.swing.ButtonGroup;
 import javax.swing.JTable;
@@ -51,6 +52,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   private ArrayList recordsL = new ArrayList();
   /** table of all records stored in this model, always holds identical data as recordsL, its purpose is to speed up queries */
   private HashMap recordsHM = new HashMap();
+  /** fast lookup table for FileLinkRecords where key is the filename, and value is the file link */
+  private MultiHashMap recordsHMfiles = new MultiHashMap(true);
 
   private ColumnHeaderData columnHeaderData;
   public ButtonGroup sortButtonGroup;
@@ -60,6 +63,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   private RecordFilter recordFilter;
   private RecordFilter recordFilterNarrowing;
   private RecordFilter multiFilter;
+  private boolean isCollapseFileVersions = true;
 
   // Main folder pair of which this class is managing messages
   private FolderPair folderPair;
@@ -139,7 +143,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   /**
    * Triggers refreshing of view when filter changes.
    */
-  public synchronized void reInitData() {
+  private void reInitData() {
     FolderPair fPair = getParentFolderPair();
     if (fPair != null) {
       initData(fPair.getId(), true);
@@ -180,6 +184,23 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     }
     else
       return null;
+  }
+
+  public synchronized void setCollapseFileVersions(boolean flag) {
+    boolean isChanged = isCollapseFileVersions != flag;
+    isCollapseFileVersions = flag;
+    if (isChanged) {
+      fireTableRowsDeleted(-101, -101);
+      reInitData();
+    }
+  }
+
+  public synchronized boolean getIsAnyCollapsedFileVersions() {
+    return recordsHMfiles.hasMultivalues();
+  }
+
+  public synchronized boolean getIsCollapseFileVersions() {
+    return isCollapseFileVersions;
   }
 
   public synchronized RecordFilter getFilterNarrowing() {
@@ -293,6 +314,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     return rc;
   }
 
+  public synchronized Collection getAllVersions(FileLinkRecord fLink) {
+    return recordsHMfiles.getAll(fLink.getFileName());
+  }
+
   /**
    * Sets the data for the model.
    */
@@ -300,33 +325,47 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "setData(Record[] records)");
     if (trace != null) trace.args(records);
 
+    boolean anyHiddenRows = getIsAnyCollapsedFileVersions();
     ArrayList insertedRecsL = null;
 
     // clear up the table first
     removeData();
     if (records != null && records.length > 0) {
-      RecordFilter filter = getFilterCombined();
-      if (filter == null) {
-        List recs = Arrays.asList(records);
-        recordsL.addAll(recs);
-        for (int i=0; i<records.length; i++) recordsHM.put(records[i].getId(), records[i]);
-        if (recordInsertionCallback != null) {
-          if (insertedRecsL == null) insertedRecsL = new ArrayList();
-          insertedRecsL.addAll(recs);
-        }
-      } else {
-        for (int i=0; i<records.length; i++ ) {
-          if (filter.keep(records[i])) {
-            recordsL.add(records[i]);
-            recordsHM.put(records[i].getId(), records[i]);
+      int countReplaced = 0;
+      for (int i=0; i<records.length; i++ ) {
+        Record newRec = records[i];
+        boolean keep = keep(newRec);
+        if (keep) {
+          // look for newer file version substitutions
+          if (isCollapseFileVersions && newRec instanceof FileLinkRecord) {
+            Object lookup = addFileRemoveOlderAndGetMostRecentReplacement((FileLinkRecord) newRec);
+            if (lookup == null) {
+              // ignore this file as its an older version
+              newRec = null;
+            } else if (lookup instanceof Record) {
+              // addition
+              newRec = (Record) lookup;
+            } else {
+              // replacement
+              newRec = ((Record[]) lookup)[1];
+              countReplaced ++;
+            }
+          }
+          if (newRec != null) {
+            recordsL.add(newRec);
+            recordsHM.put(newRec.getId(), newRec);
             if (recordInsertionCallback != null) {
               if (insertedRecsL == null) insertedRecsL = new ArrayList();
-              insertedRecsL.add(records[i]);
+              insertedRecsL.add(newRec);
             }
           }
         }
       }
-      if (recordsL.size() > 0) {
+      if (countReplaced > 0) {
+        if (trace != null) trace.info(10, "RecordTableModel.fireTableDataChanged()");
+        fireTableDataChanged();
+      }
+      else if (recordsL.size() > 0) {
         if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsInserted(0, "+(recordsL.size()-1)+");");
         fireTableRowsInserted(0, recordsL.size()-1);
       }
@@ -335,6 +374,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     if (recordInsertionCallback != null && insertedRecsL != null && insertedRecsL.size() > 0) {
       recordInsertionCallback.callback(insertedRecsL);
     }
+    if (anyHiddenRows != getIsAnyCollapsedFileVersions()) {
+      fireTableRowsDeleted(-101, -101);
+    }
+
     if (trace != null) trace.exit(RecordTableModel.class);
   }
 
@@ -347,12 +390,14 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "updateData(Record[] records)");
     if (trace != null) trace.args(records);
 
+    boolean anyHiddenRows = getIsAnyCollapsedFileVersions();
     ArrayList insertedRecsL = null;
 
     if (records != null) {
       int countInserted = 0;
       int countUpdated = 0;
       int countToDelete = 0;
+      int countReplaced = 0;
       ArrayList removeRecordsL = null;
       for (int i=0; i<records.length; i++) {
         Record newRec = records[i];
@@ -363,12 +408,29 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
             rec.merge(newRec);
             countUpdated ++;
           } else {
-            recordsL.add(newRec);
-            recordsHM.put(newRec.getId(), newRec);
-            countInserted ++;
-            if (recordInsertionCallback != null) {
-              if (insertedRecsL == null) insertedRecsL = new ArrayList();
-              insertedRecsL.add(newRec);
+            // look for newer file version substitutions
+            if (isCollapseFileVersions && newRec instanceof FileLinkRecord) {
+              Object lookup = addFileRemoveOlderAndGetMostRecentReplacement((FileLinkRecord) newRec);
+              if (lookup == null) {
+                // ignore this file as its an older version
+                newRec = null;
+              } else if (lookup instanceof Record) {
+                // addition
+                newRec = (Record) lookup;
+              } else {
+                // replacement
+                newRec = ((Record[]) lookup)[1];
+                countReplaced ++;
+              }
+            }
+            if (newRec != null) {
+              recordsL.add(newRec);
+              recordsHM.put(newRec.getId(), newRec);
+              countInserted ++;
+              if (recordInsertionCallback != null) {
+                if (insertedRecsL == null) insertedRecsL = new ArrayList();
+                insertedRecsL.add(newRec);
+              }
             }
           }
         }
@@ -378,21 +440,33 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
             if (removeRecordsL == null) removeRecordsL = new ArrayList();
             removeRecordsL.add(rec);
             countToDelete ++;
+          } else {
+            // We know the file was not visible.
+            // Now check if we are updating a file link type.
+            if (newRec instanceof FileLinkRecord) {
+              // Now check if it can be removed from hidden version cache.
+              FileLinkRecord potentiallyHiddenLink = (FileLinkRecord) newRec;
+              recordsHMfiles.remove(potentiallyHiddenLink.getFileName(), potentiallyHiddenLink);
+            }
           }
         }
       }
-      if (countInserted > 0 || countUpdated > 0) {
+      if (countInserted > 0 || countUpdated > 0 || countReplaced > 0) {
         // Can not fire event for specific row since sorter could shuffle it to another row -- fire entire data change.
         // We don't want the sorter to translate event rows and split row ranges.
         int size = recordsL.size();
-        if (countInserted > 0) {
+        if (countReplaced > 0) {
+          if (trace != null) trace.info(10, "RecordTableModel.fireTableDataChanged()");
+          fireTableDataChanged();
+        }
+        else if (countInserted > 0) {
           // Always inserts are at the end
-          if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsInserted("+(size - countInserted) + ", " + (size - 1) + ");");
+          if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsInserted("+(size - countInserted) + ", " + (size - 1) + ");");
           fireTableRowsInserted(size - countInserted, size - 1); // don't fire structure changed -- it would screw up the header renderer
         }
         // No need to fire update if insert was already fired, event will convert to entire table data update anyway.
         else {
-          if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsUpdated(0, "+(size-1)+");");
+          if (trace != null) trace.info(30, "RecordTableModel.fireTableRowsUpdated(0, "+(size-1)+");");
           fireTableRowsUpdated(0, size -1); // don't fire structure changed -- it would screw up the header renderer
         }
       }
@@ -407,7 +481,57 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     if (recordInsertionCallback != null && insertedRecsL != null && insertedRecsL.size() > 0) {
       recordInsertionCallback.callback(insertedRecsL);
     }
+    if (anyHiddenRows != getIsAnyCollapsedFileVersions()) {
+      fireTableRowsDeleted(-101, -101);
+    }
+
     if (trace != null) trace.exit(RecordTableModel.class);
+  }
+
+  /**
+   * Add a file to our list tracking versions in our private cache, find previous file listing and new replacement.
+   * @param fLink
+   * @return the replacement file or a set of {previous, replacement}
+   */
+  private Object addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink)");
+    if (trace != null) trace.args(fLink);
+    FileLinkRecord replacement = null;
+    // maintain a complete list of versioned files and find most-recent-file substitute
+    recordsHMfiles.put(fLink.getFileName(), fLink);
+    // find related files, most recent, and file already listed in our table
+    Collection relatedLinks = recordsHMfiles.getAll(fLink.getFileName());
+    FileLinkRecord mostRecent = FileLinkRecord.getMostRecent(relatedLinks);
+    Record prevFile = (Record) recordsHM.get(mostRecent.getId());
+    if (prevFile != null) {
+      replacement = null;
+    } else {
+      replacement = mostRecent;
+      // find the previous file with the same name
+      prevFile = (Record) recordsHM.get(fLink.getId());
+      if (prevFile == null) {
+        Iterator iter = relatedLinks.iterator();
+        while (iter.hasNext()) {
+          prevFile = (Record) recordsHM.get(((Record) iter.next()).getId());
+          if (prevFile != null)
+            break;
+        }
+      }
+      // if there was any previous entry for this file then clean it up
+      if (prevFile != null) {
+        fireTableRowsDeleted(-10,-10);
+        recordsL.remove(prevFile);
+        recordsHM.remove(prevFile.getId());
+        fireTableDataChanged();
+      }
+    }
+    Object rc = null;
+    if (prevFile == null)
+      rc = replacement;
+    else
+      rc = prevFile != null && replacement != null ? new Record[] { prevFile, replacement } : null;
+    if (trace != null) trace.exit(RecordTableModel.class, rc);
+    return rc;
   }
 
   /**
@@ -417,10 +541,14 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "removeData(Record[] records)");
     if (trace != null) trace.args(records);
 
+    boolean anyHiddenRows = getIsAnyCollapsedFileVersions();
+    HashSet linkNamesForReInsertCheck = null;
     int removeCount = 0;
+
     // records are compared with equals() by their ID.. so we can use generic Vector methods
     for (int i=0; i<records.length; i++ ) {
-      boolean contains = recordsHM.containsKey(records[i].getId());
+      Record rec = records[i];
+      boolean contains = recordsHM.containsKey(rec.getId());
       if (contains) {
 
         if (removeCount == 0) {
@@ -430,21 +558,58 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
           fireTableRowsDeleted(-10,-10);
         }
 
-        recordsL.remove(records[i]);
-        recordsHM.remove(records[i].getId());
+        recordsL.remove(rec);
+        recordsHM.remove(rec.getId());
         removeCount ++;
+      }
+      // also see if we need to remove a file version from our lists
+      if (rec instanceof FileLinkRecord) {
+        try {
+          FileLinkRecord fLink = (FileLinkRecord) rec;
+          String name = fLink.getFileName();
+          recordsHMfiles.remove(name, fLink);
+          if (linkNamesForReInsertCheck == null) linkNamesForReInsertCheck = new HashSet();
+          linkNamesForReInsertCheck.add(name);
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
       }
     }
     if (removeCount > 0) {
       // simulate reletions from the end.... to minimally confuse the selection list as
       // the rows are remapped by the sorter anyway
       int originalSize = recordsL.size() + removeCount;
-      if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsDeleted("+(originalSize - removeCount) + ", " +(originalSize - 1)+");");
-      fireTableRowsDeleted(originalSize - removeCount, originalSize - 1); // to fix number of elements in SizeSequence
+      if (this instanceof FileTableModel) {
+        fireTableDataChanged();
+      } else {
+        // Message tables have the selection advancing after deletion from the model and are treated differently.
+        if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsDeleted("+(originalSize - removeCount) + ", " +(originalSize - 1)+");");
+        fireTableRowsDeleted(originalSize - removeCount, originalSize - 1); // to fix number of elements in SizeSequence
+      }
 
       // don't need to call updated, because when a row is deleted, the table sorter will call update for all rows
       //-//System.out.println("RecordTableModel.fireTableRowsUpdated(0, "+(size-1)+");");
       //-//fireTableRowsUpdated(0, recordsL.size() -1); // don't fire structure changed -- it would screw up the header renderer
+    }
+    // check if there are any hidden files that need to be shown
+    if (linkNamesForReInsertCheck != null) {
+      Iterator iter = linkNamesForReInsertCheck.iterator();
+      HashSet linksForReInsert = null;
+      while (iter.hasNext()) {
+        String name = (String) iter.next();
+        Collection c = recordsHMfiles.getAll(name);
+        if (c != null && c.size() > 0) {
+          if (linksForReInsert == null) linksForReInsert = new HashSet();
+          linksForReInsert.addAll(c);
+        }
+      }
+      if (linksForReInsert != null && linksForReInsert.size() > 0) {
+        FileLinkRecord[] links = (FileLinkRecord[]) ArrayUtils.toArray(linksForReInsert, FileLinkRecord.class);
+        updateData(links);
+      }
+    }
+    if (anyHiddenRows != getIsAnyCollapsedFileVersions()) {
+      fireTableRowsDeleted(-101, -101);
     }
 
     if (trace != null) trace.exit(RecordTableModel.class);
@@ -456,13 +621,18 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   public synchronized void removeData() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "removeData()");
 
+    boolean anyHiddenRows = getIsAnyCollapsedFileVersions();
     int size = recordsL.size();
     if (size > 0) {
       recordsL.clear();
       recordsHM.clear();
+      recordsHMfiles.clear();
       if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsDeleted(0, "+(size-1)+");");
       fireTableRowsDeleted(0, size-1);
       //fireTableDataChanged();
+    }
+    if (anyHiddenRows != getIsAnyCollapsedFileVersions()) {
+      fireTableRowsDeleted(-101, -101);
     }
 
     if (trace != null) trace.exit(RecordTableModel.class);

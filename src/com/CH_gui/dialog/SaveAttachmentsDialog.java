@@ -12,19 +12,6 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
@@ -32,7 +19,6 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.*;
 
 import com.CH_co.cryptx.*;
-import com.CH_co.gui.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.msg.dataSets.msg.*;
@@ -43,10 +29,19 @@ import com.CH_co.util.*;
 
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
+import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.msgTable.*;
 import com.CH_gui.service.records.*;
 import com.CH_gui.util.*;
+
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -737,7 +732,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       event.getDragSource().startDrag(event, null, transferable, new MsgDND_DragSourceListener());
     }
     else if (!selectedMsgs && selectedFiles) {
-      FileDND_Transferable transferable = new FileDND_Transferable(null, fLinks);
+      FileDND_Transferable transferable = new FileDND_Transferable(null, fLinks, null);
       event.getDragSource().startDrag(event, null, transferable, new FileDND_DragSourceListener());
     }
   }

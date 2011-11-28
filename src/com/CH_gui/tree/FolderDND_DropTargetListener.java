@@ -310,7 +310,11 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
             isDropAccepted = true;
             FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             FileDND_TransferableData data = (FileDND_TransferableData) tr.getTransferData(FileDND_Transferable.FILE_RECORD_FLAVOR);
-            FileLinkRecord[] fLinks = cache.getFileLinkRecords(data.fileRecordIDs[1]);
+            FileLinkRecord[] fLinks = null;
+            if (data.fileRecordIDs[2] != null)
+              fLinks = cache.getFileLinkRecords(data.fileRecordIDs[2]);
+            else 
+              fLinks = cache.getFileLinkRecords(data.fileRecordIDs[1]);
             FolderPair[] fldPairs = CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]));
             if (isFileFolderType || isRecycleFolderType)
               FileActionTable.doMoveOrSaveAttachmentsAction(fPairs[0], fLinks, fldPairs);

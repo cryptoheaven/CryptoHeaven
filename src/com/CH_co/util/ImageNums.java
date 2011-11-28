@@ -44,7 +44,6 @@ public class ImageNums extends Object {
 
   public static final int TRANSPARENT16;
   //public static final int WAIT16;
-  public static final int STATUS_WAITING16;
   public static final int STOPWATCH16;
   public static final int STOPWATCH_ALERT16;
   public static final int STOPWATCH_ALERT24;
@@ -348,6 +347,7 @@ public class ImageNums extends Object {
   public static final int STATUS_OFFLINE16;
   public static final int STATUS_ONLINE16;
   public static final int STATUS_QUESTION16;
+  public static final int STATUS_WAITING16;
   public static final int LIGHT_ON_SMALL;
   public static final int LIGHT_ON_12;
   public static final int LIGHT_OFF_SMALL;

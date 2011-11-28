@@ -131,6 +131,7 @@ public class GroupTableModel extends RecordTableModel {
       switchData(folderId);
       refreshData(folderId, false);
     }
+    setCollapseFileVersions(true);
   }
 
   /**

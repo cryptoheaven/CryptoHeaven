@@ -24,7 +24,7 @@ package com.CH_cl.service.ops;
  */
 public class UploadDownloadSynch extends Object {
 
-  private static Object monitor = new Object();
+  private static final Object monitor = new Object();
   private static int synchCount = 0;
 
   public static void entry(int maxCount) {

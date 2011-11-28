@@ -20,7 +20,8 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.*;
 
-import com.CH_co.cryptx.BAEncodedPassword;
+import com.CH_co.cryptx.*;
+import com.CH_co.io.*;
 import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.obj.*;
@@ -45,6 +46,7 @@ import comx.tig.en.SingleTigerSession;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1006,22 +1008,30 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   private void exitAction() {
+    // check for modified files that could not start uploading
+    FileLobUpEditMonitor.FileSet[] modifiedSets = FileLobUpEditMonitor.getModifiedFileSets();
+    
     // check for active transfers
     ArrayList activeUps = FileLobUp.getStateSessions();
-    if (activeUps != null && activeUps.size() > 0) {
-      Runnable yes = new NamedRunnable("Suspend Uploads and Exit") {
+    final boolean anyModifications = modifiedSets != null && modifiedSets.length > 0;
+    final boolean anyUploads = activeUps != null && activeUps.size() > 0;
+    if (anyModifications || anyUploads) {
+      String exitName = modifiedSets != null && modifiedSets.length > 0 ? "Discard and Exit" : "Suspend Uploads and Exit";
+      Runnable yes = new NamedRunnable(exitName) {
         public void run() {
-          exitAction(MainFrame.this);
+          exitActionCheckOpenFiles_Threaded(false);
         }
       };
-      Runnable no = new NamedRunnable("Continue Uploading") {
+      Runnable no = new NamedRunnable(anyUploads ? "Continue Uploading" : "Cancel") {
         public void run() {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-              // minimize the window
-              try {
-                MainFrame.this.setState(JFrame.ICONIFIED);
-              } catch (Throwable t) {
+              if (anyUploads) {
+                // minimize the window
+                try {
+                  MainFrame.this.setState(JFrame.ICONIFIED);
+                } catch (Throwable t) {
+                }
               }
             }
           }); // end Runnable class
@@ -1029,13 +1039,107 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       };
       String summary = FileLobUp.getSummary();
       String progress = FileLobUp.getProgress();
-      NotificationCenter.showYesNo(NotificationCenter.WARNING_MESSAGE, 
-              "Recent file transfers are incomplete!", 
-              "<html>Exit and terminate current file transfers?<br>"
+      String title = "";
+      String msg = "";
+      int severityLevel = 0;
+      if (!anyModifications) {
+        severityLevel = NotificationCenter.WARNING_MESSAGE;
+        title = "Recent file transfers are incomplete!";
+        msg = "<html>Exit and suspend current file transfers?<br>"
               +"Transfers will resume upon your next login.<br><br>"
               +(summary != null ? summary+"<br><br>" : "")
-              +(progress != null ? "Incomplete file transfers are:<br>"+Misc.encodePlainIntoHtml(progress) : ""),
-              false, yes, no);
+              +(progress != null ? "Incomplete file transfers are:<br>"+Misc.encodePlainIntoHtml(progress) : "");
+      } else {
+        severityLevel = NotificationCenter.ERROR_MESSAGE;
+        String modifiedFiles = "";
+        for (int i=0; i<modifiedSets.length; i++) {
+          String errMsg = modifiedSets[i].getError();
+          modifiedFiles += modifiedSets[i].getRemoteFile().getFileName() + (errMsg != null && errMsg.length() > 0 ? " - "+errMsg : "") + "<br>";
+        }
+        title = "Discard recent changes?";
+        msg = "<html>Exit and discard file changes?<br>"
+              +"File changes could not be uploaded.<br><br>"
+              +modifiedFiles+"<br>";
+        if (activeUps != null && activeUps.size() > 0 && progress != null) {
+          msg += "Currently incomplete, but resumable transfers are:<br>"+Misc.encodePlainIntoHtml(progress);
+        }
+      }
+      NotificationCenter.showYesNo(severityLevel, title, msg, false, yes, no);
+    } else {
+      exitActionCheckOpenFiles_Threaded(false);
+    }
+  }
+  private void exitActionCheckOpenFiles_Threaded(final boolean suppressErrors) {
+    FileLobUpEditMonitor.FileSet[] monitoredFiles = FileLobUpEditMonitor.getMonitoredFileSets();
+    if (monitoredFiles != null && monitoredFiles.length > 0) {
+      File tempDir = DownloadUtilities.getDefaultTempDir();
+      ArrayList wipeLocalFilesL = new ArrayList();
+      long totalSize = 0;
+      for (int i=0; i<monitoredFiles.length; i++) {
+        FileLobUpEditMonitor.FileSet set = monitoredFiles[i];
+        File file = set.getLocalFile();
+        if (file.exists()) {
+          File dir = file.getParentFile();
+          if (tempDir.equals(dir)) {
+            // cleanup
+            wipeLocalFilesL.add(set);
+            totalSize += file.length();
+          }
+        }
+      }
+      if (wipeLocalFilesL.size() > 0) {
+        final ArrayList _wipeLocalFilesL = wipeLocalFilesL;
+        final long _totalSize = totalSize;
+        Thread tempFileWiper = new ThreadTraced("TempFileWiper") {
+          public void runTraced() {
+            SimpleProgMonitorImpl progMonitor = new SimpleProgMonitorImpl(_totalSize);
+            StringBuffer errorMsg = new StringBuffer();
+            boolean anyError = false;
+            for (int i=0; i<_wipeLocalFilesL.size(); i++) {
+              FileLobUpEditMonitor.FileSet set = (FileLobUpEditMonitor.FileSet) _wipeLocalFilesL.get(i);
+              File file = set.getLocalFile();
+              FileLobUpEditMonitor.removeFromMonitoring(set.getRemoteFile().fileLinkId);
+              if (!CleanupAgent.wipe(file, new RandomInputStream(Rnd.getSecureRandom()), progMonitor, false, null)) {
+                // re-register if wipe failed - note that wipe does rename so if any data was wiped/changed, adding will fail
+                FileLobUpEditMonitor.addToMonitoring(set);
+                if (!suppressErrors)
+                  anyError = true;
+                if (errorMsg.length() == 0) {
+                  errorMsg.append("<html>Could not cleanup temporary file(s).<br><br>Files maybe locked by another process. When you exit, any edits on opened files will not synchronize to remote storage:<br><br>");
+                }
+                errorMsg.append(file.getName());
+                errorMsg.append("<br>");
+              }
+            }
+            progMonitor.allDone();
+            if (anyError) {
+              String msg = errorMsg.toString();
+              Runnable yes = new NamedRunnable("Retry and Exit") {
+                public void run() {
+                  exitActionCheckOpenFiles_Threaded(true);
+                }
+              };
+              Runnable no = new NamedRunnable("Cancel") {
+                public void run() {
+                  SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                      // no-op
+                    }
+                  }); // end Runnable class
+                }
+              };
+              NotificationCenter.showYesNo(NotificationCenter.WARNING_MESSAGE, "Temporary file cleanup failed.", msg, true, yes, no);
+            } else {
+              exitAction(MainFrame.this);
+            }
+          }
+
+        };
+        tempFileWiper.setDaemon(true);
+        tempFileWiper.start();
+      } else {
+        exitAction(this);
+      }
     } else {
       exitAction(this);
     }

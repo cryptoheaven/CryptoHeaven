@@ -12,15 +12,15 @@
 
 package com.CH_gui.localFileTable;
 
-import com.CH_gui.util.MessageDialog;
-import java.io.*;
-import javax.swing.*;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
 import com.CH_co.monitor.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+import com.CH_gui.util.MessageDialog;
+
+import java.io.*;
+import javax.swing.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -61,7 +61,7 @@ public class WipingThread extends ThreadTraced {
         toRescan = true;
       }
       StringBuffer errBuffer = new StringBuffer();
-      boolean wiped = CleanupAgent.wipe(file, in, progMonitor, errBuffer);
+      boolean wiped = CleanupAgent.wipe(file, in, progMonitor, true, errBuffer);
       if (errBuffer.length() > 0)
         MessageDialog.showErrorDialog(jFileChooser, errBuffer.toString(), com.CH_gui.lang.Lang.rb.getString("msgTitle_Wipe_Error"));
       if (!wiped)

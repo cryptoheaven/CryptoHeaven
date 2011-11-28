@@ -291,6 +291,34 @@ public class CacheUtilities extends Object {
     return (MsgLinkRecord[]) ArrayUtils.toArray(mLinksFetchedL, MsgLinkRecord.class);
   }
 
+  public static Record getMsgSenderForReply(MsgDataRecord msgData) {
+    Record sender = null;
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    String fromEmailAddress = msgData.getFromEmailAddress();
+    if (msgData.isEmail() || fromEmailAddress != null) {
+      String[] replyTos = msgData.getReplyToAddresses();
+      if (replyTos != null && (replyTos.length > 1 || (replyTos.length == 1 && !EmailRecord.isAddressEqual(replyTos[0], msgData.getFromEmailAddress())))) {
+        sender = new EmailAddressRecord(replyTos[0]);
+      } else {
+        sender = new EmailAddressRecord(fromEmailAddress);
+      }
+    } else {
+      sender = cache.getContactRecordOwnerWith(cache.getMyUserId(), msgData.senderUserId);
+    }
+    if (sender instanceof ContactRecord) {
+      ContactRecord cRec = (ContactRecord) sender;
+      if (!cRec.isOfActiveType()) 
+        sender = cache.getUserRecord(msgData.senderUserId);
+    } else if (sender == null) {
+      sender = cache.getUserRecord(msgData.senderUserId);
+    }
+    // if the sender was a User but is now deleted, lets create an email address instead
+    if (sender == null && !msgData.isEmail()) {
+      sender = new EmailAddressRecord("" + msgData.senderUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0]);
+    }
+    return sender;
+  }
+
   /**
    * @return All user IDs that have access to specified shares through share ownerships or groups
    * Do not include related shares lookup

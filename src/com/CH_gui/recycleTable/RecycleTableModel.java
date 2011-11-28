@@ -150,6 +150,7 @@ public class RecycleTableModel extends RecordTableModel {
    */
   public synchronized void initData(Long folderId) {
     initData(folderId, false);
+    setCollapseFileVersions(true);
   }
   public synchronized void initData(Long folderId, boolean forceSwitch) {
     FolderPair folderPair = getParentFolderPair();
@@ -274,7 +275,15 @@ public class RecycleTableModel extends RecordTableModel {
         sb.add(ListRenderer.getRenderedText(CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress)));
         sb.add(fromEmailAddress); // also include the email address instead of only the converted Address Contact
       } else {
-        sb.add(ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true)));
+        Record fromAsSender = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
+        Record fromAsRecipient = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
+        Record fromUser = cache.getUserRecord(msgData.senderUserId);
+        if (fromAsSender != null)
+          sb.add(ListRenderer.getRenderedText(fromAsSender));
+        if (fromAsRecipient != null)
+          sb.add(ListRenderer.getRenderedText(fromAsRecipient));
+        if (fromUser != null)
+          sb.add(ListRenderer.getRenderedText(fromUser));
       }
 
       Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);

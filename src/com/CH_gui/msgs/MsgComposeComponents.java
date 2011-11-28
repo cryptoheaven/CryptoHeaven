@@ -106,8 +106,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private JLabel jPriorityLabelStretch;
   private JLabel jPriorityLabel;
   private JMyListCombo jPriority;
-  private JCheckBox jCopyToOutgoing;
-  private JLabel jOutgoing;
+  private JCheckBox jCopyToSent;
+  private JLabel jCopyToLabel;
   private JButton jRing;
   private JButton jAttach;
   private JLabel jReplyToLabel;
@@ -263,7 +263,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   public boolean isSelectedCopy() {
-    return jCopyToOutgoing.isSelected();
+    return jCopyToSent.isSelected();
   }
 
   public boolean isStagedSecure() {
@@ -325,8 +325,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jPriority.setEnabled(enabled);
     if (jSelectAttachments != null)
       jSelectAttachments.setEnabled(enabled);
-    if (jCopyToOutgoing != null)
-      jCopyToOutgoing.setEnabled(enabled);
+    if (jCopyToSent != null)
+      jCopyToSent.setEnabled(enabled);
     if (jSubject != null)
       jSubject.setEnabled(enabled);
     if (jExpiry != null)
@@ -366,7 +366,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   public void setSelectedCopy(boolean select) {
-    jCopyToOutgoing.setSelected(select);
+    jCopyToSent.setSelected(select);
   }
 
   public void setSelectedPriorityIndex(int index) {
@@ -394,6 +394,10 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       //setVisibleRecipientHeaders(new int[] { MsgComposePanel.BCC }, visible);
     }
     pressedShowBCC(visible);
+    if (jCopyToSent != null) {
+      jCopyToSent.setVisible(visible);
+      jCopyToLabel.setVisible(visible);
+    }
     if (jExpiry != null) {
       isExpiryLineVisible = visible;
       jExpiryLabel.setVisible(isExpiryLineVisible);
@@ -645,12 +649,12 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           String sentFolderName = getSentFolderName();
           copyItem.setText("Copy To " + sentFolderName);
           copyItem.setToolTipText("Save a copy of composed messages in the " + sentFolderName + " folder.");
-          copyItem.setSelected(jCopyToOutgoing != null && jCopyToOutgoing.isSelected());
+          copyItem.setSelected(jCopyToSent != null && jCopyToSent.isSelected());
 
           ActionListener copyListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              if (jCopyToOutgoing != null)
-                jCopyToOutgoing.setSelected(copyItem.isSelected());
+              if (jCopyToSent != null)
+                jCopyToSent.setSelected(copyItem.isSelected());
             }
           };
 
@@ -731,12 +735,12 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     // "Copy to Sent"
     Icon sentFolderIcon = getSentFolderIcon();
     String sentShareName = getSentFolderName();
-    jCopyToOutgoing = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Copy_To"), false);
+    jCopyToSent = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Copy_To"), false);
 
-    jOutgoing = new JMyLabel(sentShareName, sentFolderIcon, JLabel.LEFT);
-    jOutgoing.setBackground(jCopyToOutgoing.getBackground());
-    jOutgoing.setForeground(jCopyToOutgoing.getForeground());
-    jOutgoing.setFont(jCopyToOutgoing.getFont());
+    jCopyToLabel = new JMyLabel(sentShareName, sentFolderIcon, JLabel.LEFT);
+    jCopyToLabel.setBackground(jCopyToSent.getBackground());
+    jCopyToLabel.setForeground(jCopyToSent.getForeground());
+    jCopyToLabel.setFont(jCopyToSent.getFont());
 
     if (!isChatComposePanel) {
       // Initialize the state of showing headers
@@ -857,9 +861,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new MyInsets(5, 3, 2, 15), 0, 0));
 
     // "Copy to Sent"
-    jFromLine.add(jCopyToOutgoing, new GridBagConstraints(5, posY, 1, 1, 0, 0,
+    jFromLine.add(jCopyToSent, new GridBagConstraints(5, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 15, 2, 0), 0, 0));
-    jFromLine.add(jOutgoing, new GridBagConstraints(6, posY, 1, 1, 0, 0,
+    jFromLine.add(jCopyToLabel, new GridBagConstraints(6, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 0, 2, 5), 0, 0));
     posY ++;
 

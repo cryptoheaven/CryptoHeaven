@@ -213,12 +213,18 @@ public class CleanupAgent extends Thread {
   }
 
   private static boolean wipe(File file) {
-    return wipe(file, new RandomInputStream(Rnd.getSecureRandom()), null, null);
+    return wipe(file, new RandomInputStream(Rnd.getSecureRandom()), null, false, null);
   }
 
-  public static boolean wipe(File file, InputStream randomIn, ProgMonitorI progMonitor, StringBuffer errBuffer) {
+  public static boolean wipe(File file, InputStream randomIn, ProgMonitorI progMonitor, boolean wipeTwice, StringBuffer errBuffer) {
     boolean rc = false;
+    
+    String path = "";
     try {
+      File parent = file.getParentFile();
+      String name = file.getName();
+      path = file.getAbsolutePath();
+      
       if (file.isFile()) {
         // overwrite contents
         if (!file.canWrite()) {
@@ -228,22 +234,35 @@ public class CleanupAgent extends Thread {
           }
         }
         else {
+          // get available temp name for renaming
+          File tempName = File.createTempFile(name, "tmp", parent);
+          tempName.delete();
+          // Create our own File instance so we don't change the callers reference.
+          file = new File(parent, name);
+          // Rename 1st to decouple from any file monitors that track file content changes
+          // so this new garbage content is not treated as user's file edit save.
+          boolean renamed = file.renameTo(tempName);
+          if (renamed)
+            file = tempName;
+          else
+            throw new IllegalStateException("File is locked by another process.");
+
           // when user requests wiping, wipe twice... otherwise once
-          overwriteFile(randomIn, file, progMonitor, 1);
-          if (progMonitor != null) {
+          overwriteFile(randomIn, file, name, path, progMonitor, 1, wipeTwice ? 2 : 1);
+          if (wipeTwice) {
             // overwrite the file twice to make it extra hard to forensic sciences to recover data.
-            overwriteFile(randomIn, file, progMonitor, 2);
+            overwriteFile(randomIn, file, name, path, progMonitor, 2, 2);
           }
         }
       }
       else if (file.isDirectory()) {
         File[] files = file.listFiles();
         for (int i=0; i<files.length; i++) {
-          if (!wipe(files[i], randomIn, progMonitor, errBuffer))
+          if (!wipe(files[i], randomIn, progMonitor, wipeTwice, errBuffer))
             break;
         }
       }
-      File tempFile = File.createTempFile("junk", "tmp", file.getParentFile());
+      File tempFile = File.createTempFile("junk", "tmp", parent);
       tempFile.delete();
 
       String task = null;
@@ -253,8 +272,8 @@ public class CleanupAgent extends Thread {
         task = LangCo.rb.getString("task_Deleting_Directory") + " ";
 
       if (progMonitor != null) {
-        progMonitor.setCurrentStatus(task + file.getName());
-        progMonitor.appendLine(" " + task + file.getAbsolutePath());
+        progMonitor.setCurrentStatus(task + name);
+        progMonitor.appendLine(" " + task + path);
       }
 
       boolean renamed = file.renameTo(tempFile);
@@ -267,24 +286,36 @@ public class CleanupAgent extends Thread {
     } catch (Throwable t) {
       rc = false;
       if (errBuffer != null) {
-        errBuffer.append(LangCo.rb.getString("msg_Error_occurred_while_attempting_to_securely_wipe_the_contents_of_the_file_\n")).append(file.getAbsolutePath()).append("\n").append(t.getMessage());
+        errBuffer.append(LangCo.rb.getString("msg_Error_occurred_while_attempting_to_securely_wipe_the_contents_of_the_file_\n")).append(path).append("\n").append(t.getMessage());
         errBuffer.append("\n\n");
       }
     }
     return rc;
   }
 
-  private static void overwriteFile(InputStream randomIn, File file, ProgMonitorI progMonitor, int pass) throws FileNotFoundException, IOException {
+  /**
+   * Overwrites contents of the file with randomness.
+   * @param randomIn Source of randomness.
+   * @param file File which to overwrite (usually already renamed from original source file)
+   * @param name Name of the original file before rename to be used for user's progress reporting.
+   * @param path Abstract path name of the original file before rename to be used for user's progress reporting.
+   * @param progMonitor
+   * @param pass 1st or 2nd
+   * @throws FileNotFoundException
+   * @throws IOException 
+   */
+  private static void overwriteFile(InputStream randomIn, File file, String name, String path, ProgMonitorI progMonitor, int pass, int maxPasses) throws FileNotFoundException, IOException {
     long len = file.length();
     if (progMonitor != null) {
       progMonitor.setTransferSize(len);
-      String passS = " " + java.text.MessageFormat.format(LangCo.rb.getString("[Pass_{0}/2]"), new Object[] {new Integer(pass)});
-      String task = java.text.MessageFormat.format(LangCo.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getName(), passS});
+      String passS = " " + java.text.MessageFormat.format(LangCo.rb.getString("[Pass_{0}/{1}]"), new Object[] {new Integer(pass), new Integer(maxPasses)});
+      String task = java.text.MessageFormat.format(LangCo.rb.getString("Wiping_{0}_{1}"), new Object[] {name, passS});
       progMonitor.setCurrentStatus(task);
       progMonitor.nextTask(task);
-      progMonitor.appendLine(" " + java.text.MessageFormat.format(LangCo.rb.getString("Wiping_{0}_{1}"), new Object[] {file.getAbsolutePath(), passS}));
+      progMonitor.appendLine(" " + java.text.MessageFormat.format(LangCo.rb.getString("Wiping_{0}_{1}"), new Object[] {path, passS}));
       progMonitor.setFileNameSource(LangCo.rb.getString("label_Secure_Random_Stream"));
-      progMonitor.setFileNameDestination(file.getAbsolutePath());
+      progMonitor.setFileNameDestination(name);
+      progMonitor.setFilePathDestination(path);
     }
     try {
       RandomAccessFile raf = new RandomAccessFile(file, "rw");

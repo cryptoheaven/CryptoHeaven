@@ -141,6 +141,7 @@ public class StatTableModel extends RecordTableModel {
     if (parentObjLink == null)
       parentObjLink = cache.getMsgLinkRecord(parentObjLinkId);
     refreshData();
+    setCollapseFileVersions(true);
   }
 
   public synchronized void refreshData() {

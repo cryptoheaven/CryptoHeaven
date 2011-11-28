@@ -159,7 +159,13 @@ public class ContactTableModel extends RecordTableModel {
         case 1:
           value = contactWithMe ? contactRecord.getOtherNote() : contactRecord.getOwnerNote();
           value = value != null ? value : "";
-          int alphaStatus = -contactRecord.status.shortValue() + ((int) 'x');
+          short status = contactRecord.status.shortValue();
+          // overload a few flags because they look the same in user's display
+          if (status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED)
+            status = ContactRecord.STATUS_ACCEPTED;
+          else if (status == ContactRecord.STATUS_DECLINED_ACKNOWLEDGED)
+            status = ContactRecord.STATUS_DECLINED;
+          int alphaStatus = -status + ((int) 'x');
           value = "" + ((char) alphaStatus) + value;
           break;
         case 2: value = contactRecord.status;

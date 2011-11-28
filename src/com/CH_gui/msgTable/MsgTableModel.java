@@ -329,6 +329,7 @@ public class MsgTableModel extends RecordTableModel {
    */
   public synchronized void initData(Long folderId) {
     initData(folderId, false);
+    setCollapseFileVersions(true);
   }
   public synchronized void initData(Long folderId, boolean forceSwitch) {
     FolderPair folderPair = getParentFolderPair();

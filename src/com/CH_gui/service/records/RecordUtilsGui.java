@@ -34,13 +34,16 @@ public class RecordUtilsGui {
   public static Icon getIcon(Record rec) {
     int iconIndex = rec.getIcon();
     Icon icon = null;
-    if (iconIndex == ImageNums.IMAGE_SPECIAL_HANDLING) {
-      if (rec instanceof FileLinkRecord) {
-        String fileName = ((FileLinkRecord) rec).getFileName();
-        icon = fileName != null ? FileTypesIcons.getFileIcon(fileName) : null;
+    try {
+      if (iconIndex == ImageNums.IMAGE_SPECIAL_HANDLING) {
+        if (rec instanceof FileLinkRecord) {
+          String fileName = ((FileLinkRecord) rec).getFileName();
+          icon = fileName != null ? FileTypesIcons.getFileIcon(fileName) : null;
+        }
+      } else {
+        icon = Images.get(iconIndex);
       }
-    } else {
-      icon = Images.get(iconIndex);
+    } catch (OutOfMemoryError err) {
     }
     return icon;
   }

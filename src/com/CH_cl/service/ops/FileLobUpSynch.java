@@ -12,6 +12,8 @@
 
 package com.CH_cl.service.ops;
 
+import com.CH_co.queue.PriorityFifo;
+
 /**
  * <b>Copyright</b> &copy; 2001-2011
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
@@ -24,18 +26,37 @@ package com.CH_cl.service.ops;
  */
 public class FileLobUpSynch extends Object {
 
-  private static Object monitor = new Object();
+  private static final Object monitor = new Object();
   private static int synchCount = 0;
 
-  public static void entry(int maxCount) {
+  private static PriorityFifo priorityFifo = new PriorityFifo();
+
+  /**
+   * Lower priority value entries will get dispatched ahead of higher priority values.
+   * @param maxCount
+   * @param priority 
+   */
+  public static void entry(int maxCount, long priority) {
     // limit number of entries
     synchronized (monitor) {
-      while (synchCount >= maxCount) {
-        try {
-          monitor.wait();
-        } catch (InterruptedException e) { }
+      if (maxCount >= 1 + synchCount + priorityFifo.size()) {
+        // me plus all runners plus all waiting can fit so skip quarantine
+        synchCount ++;
+      } else if (maxCount >= 1 + synchCount && priorityFifo.size() > 0 && priority <= priorityFifo.peekPriority()) {
+        // last chance to skip quarantine if any spots available and I'm more important priority of all waiting
+        synchCount ++;
+      } else {
+        // go to quarantine and wait for my priority to be released
+        Object obj = new Object();
+        priorityFifo.add(obj, priority);
+        while (synchCount >= maxCount || priorityFifo.peekPriority() < priority) {
+          try {
+            monitor.wait();
+          } catch (InterruptedException e) { }
+        }
+        synchCount ++;
+        priorityFifo.remove();
       }
-      synchCount ++;
     }
   }
 

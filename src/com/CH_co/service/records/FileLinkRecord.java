@@ -19,6 +19,8 @@ import com.CH_co.cryptx.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011
@@ -224,6 +226,19 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     if (trace != null) trace.exit(FileLinkRecord.class);
   }
 
+  public static FileLinkRecord getMostRecent(Collection fLinks) {
+    FileLinkRecord mostRecent = null;
+    if (fLinks != null) {
+      Iterator iter = fLinks.iterator();
+      while (iter.hasNext()) {
+        FileLinkRecord fLink = (FileLinkRecord) iter.next();
+        if (mostRecent == null || fLink.recordCreated.after(mostRecent.recordCreated))
+          mostRecent = fLink;
+      }
+    }
+    return mostRecent;
+  }
+
   public static Long[] getOwnerObjIDs(FileLinkRecord[] fileLinks, short ownerType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLinkRecord.class, "getOwnerObjIDs(FileLinkRecord[] fileLinks, short ownerType)");
     if (trace != null) trace.args(fileLinks);
@@ -246,7 +261,6 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     if (trace != null) trace.exit(FileLinkRecord.class, ownerObjIDs);
     return ownerObjIDs;
   }
-
 
   public static Long[] getFileIDs(FileLinkRecord[] fileLinks) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLinkRecord.class, "getFileIDs(FileLinkRecord[] fileLinks)");

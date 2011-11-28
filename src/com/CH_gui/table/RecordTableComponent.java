@@ -83,6 +83,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private JPanel jDescriptionPanel2;
   private JPanel jOfflinePanel;
   private JPanel jUtilityButtonPanel;
+  private JMyLinkLikeLabel jShowVersionsLink;
   private ToolBarModel toolBarModel;
   private int countTopPanels = 0;
 
@@ -420,6 +421,20 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         // skip Search Button in utility bar, it already is in the mail toolbar
         // filterButton = ActionUtilities.makeSmallComponentToolButton(filterAction);
       }
+      jShowVersionsLink = new JMyLinkLikeLabel("show all versions", -1);
+      jShowVersionsLink.setVisible(false);
+      jShowVersionsLink.setBorder(new EmptyBorder(0, 3, 0, 3));
+      jShowVersionsLink.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+          RecordTableModel model = recordTableScrollPane.getTableModel();
+          // Save selection
+          RecordTableSelection selection = RecordTableSelection.getData(recordTableScrollPane);
+          // flip state
+          model.setCollapseFileVersions(!model.getIsCollapseFileVersions());
+          // Restore selection
+          selection.restoreData(recordTableScrollPane);
+        }
+      });
     }
 
     int posY = 0;
@@ -473,6 +488,10 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
     if (filterButton != null) {
       jUtilityButtonPanel.add(filterButton, new GridBagConstraints(7, 0, 1, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+    }
+    if (jShowVersionsLink != null) {
+      jUtilityButtonPanel.add(jShowVersionsLink, new GridBagConstraints(6, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
     }
     /*
@@ -542,7 +561,16 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       showTableOrDelayedTemplate();
       recordTableScrollPane.getTableModel().addTableModelListener(new TableModelListener() {
         public void tableChanged(TableModelEvent e) {
-          showTableOrDelayedTemplate();
+          if (e.getFirstRow() == -101 && e.getLastRow() == -101) {
+            RecordTableModel model = recordTableScrollPane.getTableModel();
+            jShowVersionsLink.setVisible(model.getIsAnyCollapsedFileVersions() || !model.getIsCollapseFileVersions());
+            if (model.getIsCollapseFileVersions())
+              jShowVersionsLink.setText("show all versions");
+            else
+              jShowVersionsLink.setText("hide older versions");
+          } else {
+            showTableOrDelayedTemplate();
+          }
         }
       });
 

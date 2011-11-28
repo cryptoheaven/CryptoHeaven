@@ -72,6 +72,8 @@ public class ProgMonitorDumping extends Object implements ProgMonitorI {
   }
   public void setFileNameDestination(String fileName) {
   }
+  public void setFilePathDestination(String filePath) {
+  }
   public long getTransferred() {
     return -1;
   }

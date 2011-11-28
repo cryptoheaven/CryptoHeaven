@@ -90,7 +90,7 @@ public class FileLobUp {
   private boolean isUploadInProgress;
   private boolean isInterrupted;
   private String interruptedMsg;
-  private Object interruptMonitor = new Object();
+  private final Object interruptMonitor = new Object();
 
   private static final Object stateMonitor = new Object();
   private static ArrayList stateLocalL = null;
@@ -588,7 +588,7 @@ public class FileLobUp {
         }
         DigestInputStream dEncStream = null;
         try {
-          FileLobUpSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
+          FileLobUpSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()), plainDataFile.length());
           // check for interrupt, maybe it got interrupted while we were waiting for entry to this throttled code
           if (isInterrupted)
             throw new IllegalStateException("Upload already interrupted.");
@@ -733,7 +733,8 @@ public class FileLobUp {
       if (progressMonitor != null) {
         progressMonitor.setCurrentStatus("Compressing and Encrypting File ...");
         progressMonitor.setFileNameSource(plainDataFile.getAbsolutePath());
-        progressMonitor.setFileNameDestination(tempFile.getAbsolutePath());
+        progressMonitor.setFileNameDestination(tempFile.getName());
+        progressMonitor.setFilePathDestination(tempFile.getAbsolutePath());
         progressMonitor.setTransferSize(plainDataFileLength.longValue());
         progressMonitor.nextTask();
       }
@@ -919,6 +920,8 @@ public class FileLobUp {
           if (size != null && size.longValue() > 0) {
             int percentX10 = (int) (1000 * counter.doubleValue() / size.doubleValue());
             double percent = (double) percentX10 / 10.0;
+            if (percent > 100.0)
+              percent = 100.0;
             sb.append("\n   progress: ").append(percent).append("% of ").append(size != null ? Misc.getFormattedSize(size, 3, 3) : "-");
           } else {
             sb.append("\n   progress: ").append(counter != null ? Misc.getFormattedSize(counter, 3, 3) : "-").append(" of ").append(size != null ? Misc.getFormattedSize(size, 3, 3) : "-");
@@ -941,7 +944,11 @@ public class FileLobUp {
         Long fileSize = (Long) state[8];
         Long origFileSize = (Long) state[9];
         if (fileSize != null || origFileSize != null) {
-          totalRemaining += (fileSize != null ? fileSize.longValue() : origFileSize.longValue()) - (counter != null ? counter.longValue() : 0);
+          long remaining = (fileSize != null ? fileSize.longValue() : origFileSize.longValue()) - (counter != null ? counter.longValue() : 0);
+          if (remaining > 0)
+            totalRemaining += remaining;
+          else
+            totalRemaining += 1;
         }
       }
       Long uploadRate = Stats.getTransferRateOut();

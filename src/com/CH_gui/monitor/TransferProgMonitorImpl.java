@@ -13,7 +13,7 @@
 package com.CH_gui.monitor;
 
 import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl.service.ops.*;
 
 import com.CH_co.monitor.*;
 import com.CH_co.service.records.*;
@@ -689,7 +689,14 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setFileNameDestination(String fileName)");
     if (trace != null) trace.args(fileName);
     if (trace != null) trace.data(10, name);
-    jNotes[2].setText(fileName);
+    // no-op, we are using full path name instead
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
+  }
+  public void setFilePathDestination(String filePath) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setFileNameDestination(String filePath)");
+    if (trace != null) trace.args(filePath);
+    if (trace != null) trace.data(10, name);
+    jNotes[2].setText(filePath);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
   public long getTransferred() {
@@ -792,15 +799,22 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (monitoringType == MONITORING_OPEN) {
       if (fileLinks != null) {
         for (int i=0; i<fileLinks.length; i++) {
-          FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLinks[i].fileId);
+          FileLinkRecord fileLink = fileLinks[i];
+          FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
           if (fileData != null) {
             File tempFile = fileData.getPlainDataFile();
             if (tempFile != null) {
-              tempFile.setReadOnly();
+              boolean shouldBeReadOnly = false;
+              if (!FileLobUpEditMonitor.canMonitor(fileLink)) {
+                shouldBeReadOnly = true;
+                tempFile.setReadOnly();
+              }
               GlobalProperties.addTempFileToCleanup(tempFile);
+              boolean openned = FileLauncher.openFile(fileData);
+              if (openned && !shouldBeReadOnly)
+                FileLobUpEditMonitor.registerForMonitoring(tempFile, fileLink, fileData);
             }
           }
-          FileLauncher.openFile(fileData);
         }
       }
     }

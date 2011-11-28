@@ -47,14 +47,14 @@ public class RecycleDND_Transferable extends Object implements Transferable {
   private FolderDND_TransferableData folderData;
   private MsgDND_TransferableData msgData;
 
-  public RecycleDND_Transferable(FolderPair[] fPairs, FileLinkRecord[] fLinks, MsgLinkRecord[] mLinks) {
-    data = new RecycleDND_TransferableData(fPairs, fLinks, mLinks);
+  public RecycleDND_Transferable(FolderPair[] fPairs, FileLinkRecord[] fLinks, FileLinkRecord[] fLinksAllVersions, MsgLinkRecord[] mLinks) {
+    data = new RecycleDND_TransferableData(fPairs, fLinks, fLinksAllVersions, mLinks);
     if (any(mLinks)) {
       if (none(fPairs) && none(fLinks))
         msgData = new MsgDND_TransferableData(mLinks);
     } else {
       if (any(fPairs) || any(fLinks))
-        fileData = new FileDND_TransferableData(fPairs, fLinks);
+        fileData = new FileDND_TransferableData(fPairs, fLinks, fLinksAllVersions);
       if (any(fPairs) && none(fLinks))
         folderData = new FolderDND_TransferableData(RecordUtils.getIDs(fPairs));
     }

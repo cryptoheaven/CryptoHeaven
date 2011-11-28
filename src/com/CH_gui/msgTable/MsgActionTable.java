@@ -625,34 +625,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           if (msgData != null) {
-            Record recipient = null;
-            {
-              String fromEmailAddress = msgData.getFromEmailAddress();
-              if (msgData.isEmail() || fromEmailAddress != null) {
-                String[] replyTos = msgData.getReplyToAddresses();
-                if (replyTos != null && (replyTos.length > 1 || (replyTos.length == 1 && !EmailRecord.isAddressEqual(replyTos[0], msgData.getFromEmailAddress())))) {
-                  recipient = new EmailAddressRecord(replyTos[0]);
-                } else {
-                  recipient = new EmailAddressRecord(fromEmailAddress);
-                }
-              } else {
-                recipient = cache.getContactRecordOwnerWith(cache.getMyUserId(), msgData.senderUserId);
-              }
-            }
-//            if (msgData.isEmail())
-//              recipient = new EmailAddressRecord(msgData.getFromEmailAddress());
-//            else
-//              recipient = cache.getContactRecordOwnerWith(cache.getMyUserId(), msgData.senderUserId);
-            if (recipient instanceof ContactRecord) {
-              ContactRecord cRec = (ContactRecord) recipient;
-              if (!cRec.isOfActiveType()) recipient = cache.getUserRecord(msgData.senderUserId);
-            } else if (recipient == null) {
-              recipient = cache.getUserRecord(msgData.senderUserId);
-            }
-            // if the sender was a User but is now deleted, lets create an email address instead
-            if (recipient == null && !msgData.isEmail()) {
-              recipient = new EmailAddressRecord("" + msgData.senderUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0]);
-            }
+            Record recipient = CacheUtilities.getMsgSenderForReply(msgData);
             if (recipient != null) {
               // new message trigger
               new MessageFrame(new Record[][] {{ recipient }}, msgLink);
@@ -692,31 +665,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           if (msgData != null) {
-            Record recipient = null;
-            {
-              String fromEmailAddress = msgData.getFromEmailAddress();
-              if (msgData.isEmail() || fromEmailAddress != null) {
-                recipient = new EmailAddressRecord(fromEmailAddress);
-              } else {
-                recipient = cache.getContactRecordOwnerWith(cache.getMyUserId(), msgData.senderUserId);
-              }
-            }
-//            if (msgData.isEmail())
-//              recipient = new EmailAddressRecord(msgData.getFromEmailAddress());
-//            else
-//              recipient = cache.getContactRecordOwnerWith(cache.getMyUserId(), msgData.senderUserId);
-            if (recipient instanceof ContactRecord) {
-              ContactRecord cRec = (ContactRecord) recipient;
-              if (!cRec.isOfActiveType()) recipient = cache.getUserRecord(msgData.senderUserId);
-            } else if (recipient == null) {
-              recipient = cache.getUserRecord(msgData.senderUserId);
-            }
-            // if the sender was a User but is now deleted, lets create an email address instead
-            if (recipient == null && !msgData.isEmail()) {
-              recipient = new EmailAddressRecord("" + msgData.senderUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0]);
-            }
+            Record recipient = CacheUtilities.getMsgSenderForReply(msgData);
             Record[][] allRecipients = MsgPanelUtils.gatherAllMsgRecipients(msgData);
-
             Record[] sender = new Record[] { recipient };
             // add the sender to the TO header as recipient
             if (allRecipients[0] != null) {

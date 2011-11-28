@@ -12,13 +12,14 @@
 
 package com.CH_gui.recycleTable;
 
-import com.CH_co.trace.Trace;
-import com.CH_co.service.records.*;
-
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.filters.FileFilter;
+
+import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
 
 import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
@@ -172,11 +173,15 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderPair moveToPair = CacheUtilities.convertRecordToPair(uploadShareRec);
         // move Files and Folders
-        FileLinkRecord[] fLinks = cache.getFileLinkRecords(transferRecs.recycleRecordIDs[1]);
+        FileLinkRecord[] fLinks = null;
+        if (transferRecs.recycleRecordIDs[2] != null)
+          fLinks = cache.getFileLinkRecords(transferRecs.recycleRecordIDs[2]);
+        else 
+          fLinks = cache.getFileLinkRecords(transferRecs.recycleRecordIDs[1]);
         FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
         FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
         // move Msgs
-        MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(transferRecs.recycleRecordIDs[2]);
+        MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(transferRecs.recycleRecordIDs[3]);
         MsgLinkRecord[] mLinksFiltered = (MsgLinkRecord[]) new MsgFilter(Record.RECORD_TYPE_FOLDER, moveToPair.getId()).filterExclude(mLinks);
         MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, moveToPair, mLinksFiltered);
         event.getDropTargetContext().dropComplete(true);

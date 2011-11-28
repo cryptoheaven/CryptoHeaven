@@ -2029,7 +2029,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     */
   private class MsgLinkListener implements MsgLinkRecordListener {
     public void msgLinkRecordUpdated(MsgLinkRecordEvent event) {
-      msgRecordUpdated(event);
+      // Exec on event thread to pospone the fetching of body until GUI settles
+      // to avoid flickering effects when quickly deleting a series of msgs.
+      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
     }
   }
 
@@ -2038,47 +2040,53 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     */
   private class MsgDataListener implements MsgDataRecordListener {
     public void msgDataRecordUpdated(MsgDataRecordEvent event) {
-      msgRecordUpdated(event);
+      // Exec on event thread to pospone the fetching of body until GUI settles
+      // to avoid flickering effects when quickly deleting a series of msgs.
+      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
     }
   }
 
-  /**
-   * Notify of updated record, no not modify GUI objects directly to avoid deadlocks.
-   * @param event
-   */
-  private void msgRecordUpdated(RecordEvent event) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "msgRecordUpdated(RecordEvent event)");
-    if (trace != null) trace.args(event);
+  private class MsgGUIUpdater implements Runnable {
+    private RecordEvent event;
+    public MsgGUIUpdater(RecordEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(RecordEvent event)");
+      this.event = event;
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
+    }
+    public void run() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
 
-    if (event instanceof MsgLinkRecordEvent) {
-      Record[] recs = event.getRecords();
-      Record ourRec = null;
-      for (int i=0; i<recs.length; i++) {
-        if (ourMsgFilter != null && ourMsgFilter.keep(recs[i])) {
-          ourRec = recs[i];
-          break;
+      if (event instanceof MsgLinkRecordEvent) {
+        Record[] recs = event.getRecords();
+        Record ourRec = null;
+        for (int i=0; i<recs.length; i++) {
+          if (ourMsgFilter != null && ourMsgFilter.keep(recs[i])) {
+            ourRec = recs[i];
+            break;
+          }
         }
-      }
-      if (ourRec != null) {
-        initData(FetchedDataCache.getSingleInstance().getMsgLinkRecord(ourRec.getId()));
-      }
-    } else if (event instanceof MsgDataRecordEvent) {
-      // and changes to Address Records may affect the view...
-      // only for message views, exclude address book view
-      if (msgDataRecord != null && msgDataRecord.isTypeMessage()) {
-        if (event.getEventType() == RecordEvent.SET) {
-          Record[] records = event.getRecords();
-          for (int i=0; i<records.length; i++) {
-            if (((MsgDataRecord) records[i]).isTypeAddress()) {
-              addToMsgPreviewUpdateQueue(msgLinkRecord);
-              break;
+        if (ourRec != null) {
+          initData(FetchedDataCache.getSingleInstance().getMsgLinkRecord(ourRec.getId()));
+        }
+      } else if (event instanceof MsgDataRecordEvent) {
+        // and changes to Address Records may affect the view...
+        // only for message views, exclude address book view
+        if (msgDataRecord != null && msgDataRecord.isTypeMessage()) {
+          if (event.getEventType() == RecordEvent.SET) {
+            Record[] records = event.getRecords();
+            for (int i=0; i<records.length; i++) {
+              if (((MsgDataRecord) records[i]).isTypeAddress()) {
+                addToMsgPreviewUpdateQueue(msgLinkRecord);
+                break;
+              }
             }
           }
         }
       }
-    }
 
-    if (trace != null) trace.exit(MsgPreviewPanel.class);
+      // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
+      if (trace != null) trace.exit(MsgGUIUpdater.class);
+    }
   }
 
   private synchronized void addToMsgPreviewUpdateQueue(MsgLinkRecord msgLinkRecord) {

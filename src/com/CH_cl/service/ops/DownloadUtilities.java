@@ -58,6 +58,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
   public static final String PROPERTY_NAME__LOCAL_FILE_DEST_DIR = "DownloadUtilities_localFileDestDir";
   public static final String PROPERTY_NAME__DOWNLOAD_AND_OPEN = "DownloadUtilities_downloadAndOpen";
+  public static File tempDir;
 
   public static void setImplExportMsgs(Class impl) {
     implExportMsgs = impl;
@@ -84,12 +85,16 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       String fileSeparator = System.getProperty("file.separator");
       if (fileSeparator == null || fileSeparator.length() == 0) fileSeparator = "/";
       if (propertyName.equals(PROPERTY_NAME__DOWNLOAD_AND_OPEN)) {
-        File tempFile = null;
-        try {
-          tempFile = File.createTempFile("test", "testing");
-          defaultDir = tempFile.getParentFile();
-          tempFile.delete();
-        } catch (Throwable t) {
+        if (tempDir == null) {
+          try {
+            File tempFile = File.createTempFile("test", "testing");
+            tempDir = tempFile.getParentFile();
+            tempFile.delete();
+          } catch (Throwable t) {
+          }
+        }
+        if (tempDir != null) {
+          defaultDir = tempDir;
         }
       }
       if (defaultDir == null) defaultDir = getDirForPathName(System.getProperty("user.home") + fileSeparator + "Desktop");
@@ -159,7 +164,6 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     } else {
       File destDir = getDefaultTempDir();
       downloadFilesStartCoordinator(new FileRecord[] { fileLink }, parentMsgLinks, destDir, SIL, false, true, suppressDownloadSoundsAndAutoClose);
-      //openCachedFile(fileLink);
     }
 
     if (trace != null) trace.exit(DownloadUtilities.class);
@@ -192,8 +196,11 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
   public static boolean openCachedFile(FileLinkRecord fileLink) {
     boolean cachedFileOpened = false;
-    FileDataRecord fileRec = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
-    cachedFileOpened = FileLauncher.openFile(fileRec);
+    FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
+    cachedFileOpened = FileLauncher.openFile(fileData);
+    if (cachedFileOpened && FileLobUpEditMonitor.canMonitor(fileLink)) {
+      FileLobUpEditMonitor.registerForMonitoring(fileData.getPlainDataFile(), fileLink, fileData);
+    }
     return cachedFileOpened;
   }
 

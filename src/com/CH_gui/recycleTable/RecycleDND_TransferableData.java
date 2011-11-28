@@ -42,24 +42,27 @@ public class RecycleDND_TransferableData extends Object implements Serializable 
   public Long[][] recycleRecordIDs;
   public RecycleDND_TransferableData() {
   }
-  public RecycleDND_TransferableData(FolderPair[] fPairs, FileLinkRecord[] fLinks, MsgLinkRecord[] mLinks) {
-    recycleRecordIDs = new Long[3][];
+  public RecycleDND_TransferableData(FolderPair[] fPairs, FileLinkRecord[] fLinks, FileLinkRecord[] fLinksAllVersions, MsgLinkRecord[] mLinks) {
+    recycleRecordIDs = new Long[4][];
     recycleRecordIDs[0] = RecordUtils.getIDs(fPairs);
     recycleRecordIDs[1] = RecordUtils.getIDs(fLinks);
-    recycleRecordIDs[2] = RecordUtils.getIDs(mLinks);
+    recycleRecordIDs[2] = RecordUtils.getIDs(fLinksAllVersions);
+    recycleRecordIDs[3] = RecordUtils.getIDs(mLinks);
   }
   public RecycleDND_TransferableData(FolderDND_TransferableData folderDND, FileDND_TransferableData fileDND, MsgDND_TransferableData msgDND) {
-    recycleRecordIDs = new Long[3][];
+    recycleRecordIDs = new Long[4][];
     recycleRecordIDs[0] = folderDND != null ? folderDND.folderIDs : null;
     if (fileDND != null)
       recycleRecordIDs[0] = (Long[]) ArrayUtils.concatinate(recycleRecordIDs[0], fileDND.fileRecordIDs[0], Long.class);
     recycleRecordIDs[1] = fileDND != null ? fileDND.fileRecordIDs[1] : null;
-    recycleRecordIDs[2] = msgDND != null ? msgDND.msgLinkIDs : null;
+    recycleRecordIDs[2] = fileDND != null ? fileDND.fileRecordIDs[2] : null;
+    recycleRecordIDs[3] = msgDND != null ? msgDND.msgLinkIDs : null;
   }
   public RecycleDND_TransferableData(AddrDND_TransferableData addrDND) {
-    recycleRecordIDs = new Long[3][];
+    recycleRecordIDs = new Long[4][];
     recycleRecordIDs[0] = null;
     recycleRecordIDs[1] = null;
-    recycleRecordIDs[2] = addrDND != null ? addrDND.msgLinkIDs : null;
+    recycleRecordIDs[2] = null;
+    recycleRecordIDs[3] = addrDND != null ? addrDND.msgLinkIDs : null;
   }
 }

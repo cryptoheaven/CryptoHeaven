@@ -178,6 +178,7 @@ public class UserTableModel extends RecordTableModel {
       switchData(newParentId);
       refreshData(newParentId, false);
     }
+    setCollapseFileVersions(true);
   }
 
   /**

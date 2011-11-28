@@ -520,7 +520,14 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setFileNameDestination(String fileName)");
     if (trace != null) trace.args(fileName);
     if (trace != null) trace.data(10, name);
-    jNotes[2].setText(fileName);
+    // no-op, we are using full path name instead
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
+  }
+  public void setFilePathDestination(String filePath) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setFileNameDestination(String filePath)");
+    if (trace != null) trace.args(filePath);
+    if (trace != null) trace.data(10, name);
+    jNotes[2].setText(filePath);
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
   public long getTransferred() {

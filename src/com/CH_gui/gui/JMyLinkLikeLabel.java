@@ -12,11 +12,10 @@
 
 package com.CH_gui.gui;
 
+import com.CH_co.trace.Trace;
+
 import java.awt.*;
 import java.awt.geom.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.trace.Trace;
 
 /**
  * <b>Copyright</b> &copy; 2001-2011
@@ -80,10 +79,11 @@ public class JMyLinkLikeLabel extends JMyLabel {
       // really all this size stuff below only needs to be recalculated if font or text changes
       Rectangle2D textBounds =  getFontMetrics(getFont()).getStringBounds(getText(), g);
 
+      Insets i = getInsets();
       //this layout stuff assumes the icon is to the left, or null
-      int y = getHeight()/2 + (int)(textBounds.getHeight()/2);
+      int y = (i != null ? i.top : 0) + getHeight()/2 + (int)(textBounds.getHeight()/2);
       int w = (int)textBounds.getWidth();
-      int x = (getIcon()==null ? 0 : getIcon().getIconWidth() + getIconTextGap());
+      int x = (i != null ? i.left : 0) + (getIcon() == null ? 0 : getIcon().getIconWidth() + getIconTextGap());
 
       g.setColor(underline);
       g.drawLine(x, y, x + w, y);

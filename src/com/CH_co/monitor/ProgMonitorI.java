@@ -59,6 +59,7 @@ public interface ProgMonitorI {
 
   public void setFileNameSource(String fileName);
   public void setFileNameDestination(String fileName);
+  public void setFilePathDestination(String fileName);
 
   public long getTransferred();
   public void setTransferSize(long size);

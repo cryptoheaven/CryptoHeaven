@@ -172,7 +172,15 @@ public class JSortedTable extends JTable implements DisposableObj {
             FileRecord fileRec = (FileRecord) ftm.getRowObject(rawRow);
             if (fileRec instanceof FileLinkRecord) {
               FileLinkRecord fileLink = (FileLinkRecord) fileRec;
-              FileActionTable.markStarred(new FileLinkRecord[] { fileLink }, !fileLink.isStarred());
+              if (!ftm.getIsCollapseFileVersions()) {
+                FileActionTable.markStarred(new FileLinkRecord[] { fileLink }, !fileLink.isStarred());
+              } else {
+                Collection c = ftm.getAllVersions(fileLink);
+                if (c != null && c.size() > 0) {
+                  FileLinkRecord[] fileLinks = (FileLinkRecord[]) ArrayUtils.toArray(c, FileLinkRecord.class);
+                  FileActionTable.markStarred(fileLinks, !fileLink.isStarred());
+                }
+              }
             }
           }
         }
