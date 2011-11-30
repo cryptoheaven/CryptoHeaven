@@ -13,7 +13,6 @@
 package com.CH_gui.fileTable;
 
 import java.awt.dnd.*;
-import java.awt.datatransfer.*;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
