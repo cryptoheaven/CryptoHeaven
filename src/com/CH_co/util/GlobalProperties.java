@@ -253,8 +253,10 @@ public class GlobalProperties extends Object {
   // build 664 Welcome email changed, welcome email notification removed and replaced by welcome email body, tell-a-friend enabled.
   // build 666 File Open tracking for edits
   // build 668 Exit wipes temp files open for edits
+  // build 670 First public release of applets and installers with edit-synch
+  // build 672 Sferxy editor 'insert symbol' icon resized
 
-  public static final short PROGRAM_BUILD_NUMBER = 668;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 672;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

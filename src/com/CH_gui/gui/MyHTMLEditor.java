@@ -177,7 +177,7 @@ public class MyHTMLEditor extends HTMLEditor {
     actionsBarTop.add(makeSeparator());
     actionsBarTop.add(makeDelegatingButton("Insert image", ImageNums.EDITOR_IMAGE, actionsTop, 2));
     actionsBarTop.add(makeDelegatingButton("Insert link", ImageNums.EDITOR_LINK, actionsTop, 3));
-    actionsBarTop.add(makeDelegatingButton("Insert symbol", -1, actionsTop, 4));
+    actionsBarTop.add(makeDelegatingButton("Insert symbol", ImageNums.EDITOR_SYMBOL, actionsTop, 4));
     actionsBarTop.add(makeDelegatingButton("Copy formatting", ImageNums.EDITOR_COPY_FORMATTING, actionsTop, 5));
     actionsBarTop.add(makeSeparator());
     actionsBarTop.add(makeDelegatingButton("Insert table", ImageNums.EDITOR_T_INSERT, actionsTop, 6));

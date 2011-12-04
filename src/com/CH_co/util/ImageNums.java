@@ -432,6 +432,7 @@ public class ImageNums extends Object {
   public static final int EDITOR_STRIKE;
   public static final int EDITOR_SUBSCRIPT;
   public static final int EDITOR_SUPERSCRIPT;
+  public static final int EDITOR_SYMBOL;
   public static final int EDITOR_T_DELETE_CELL;
   public static final int EDITOR_T_INSERT;
   public static final int EDITOR_T_INSERT_COLUMN;
@@ -519,7 +520,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[364+50]; // plus emotions
+    images = new String[365+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -1559,6 +1560,8 @@ public class ImageNums extends Object {
     images[i] = "editor-subscript.png"; i++;
     EDITOR_SUPERSCRIPT = i;
     images[i] = "editor-superscript.png"; i++;
+    EDITOR_SYMBOL = i;
+    images[i] = "editor-symbol.gif"; i++;
     EDITOR_T_DELETE_CELL = i;
     images[i] = "editor-t-delete-cell.png"; i++;
     EDITOR_T_INSERT = i;
