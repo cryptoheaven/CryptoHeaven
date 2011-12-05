@@ -254,7 +254,7 @@ public class GlobalProperties extends Object {
   // build 666 File Open tracking for edits
   // build 668 Exit wipes temp files open for edits
   // build 670 First public release of applets and installers with edit-synch
-  // build 672 Sferxy editor 'insert symbol' icon resized
+  // build 672 Sferxy editor 'insert symbol' icon resized, chat scroll to most recent when offline panel shows and reduces table view area.
 
   public static final short PROGRAM_BUILD_NUMBER = 672;  // even
   public static final boolean IS_BETA = false;

@@ -53,13 +53,7 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
 
   public static final int TYPING_NOTIFY_MILLIS = 6000; // 6 sec.
   private MsgTypingListener msgTypingListener;
-  private MsgLinkListener msgLinkRecordListener;
   private TableModelSortListener sortListener = null;
-
-  // used for auto-scrolling to the new chat message
-  private MsgLinkRecord prevKeepRecord;
-  private MsgLinkRecord lastKeepRecord;
-  private MsgLinkRecord lastScrollToRecord;
 
   private MsgLinkRecord mostRecentMsgLink;
 
@@ -69,16 +63,6 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChatActionTable.class, "ChatActionTable(RecordTableModel model)");
     msgTypingListener = new ChatTypingListener();
     FetchedDataCache.getSingleInstance().addMsgTypingListener(msgTypingListener);
-    // auto-scroll to new chat message...
-    msgLinkRecordListener = new MsgLinkListener();
-    FetchedDataCache.getSingleInstance().addMsgLinkRecordListener(msgLinkRecordListener);
-//    // scrolling should happen after the table had a change to re-sort itself so the record finds its final row destination...
-//    TableModel tModel = getJSortedTable().getModel();
-//    if (tModel instanceof TableMap) {
-////      TableMap map = (TableMap) tModel;
-////      sortListener = new SortListener();
-////      map.addTableModelSortListener(sortListener);
-//    }
     // disable auto-scrolls in viewport since row heights are variable and it doesn't quite work with variable row heights
     JViewport view = getViewport();
     if (view instanceof JBottomStickViewport) {
@@ -91,45 +75,29 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
           if (value != null && value instanceof java.util.List) {
             java.util.List valueList = (java.util.List) value;
             // pick the most recent element out of the vector
-            MsgLinkRecord mostRecentInVector = null;
+            MsgLinkRecord mostRecentInList = null;
             for (int i=0; i<valueList.size(); i++) {
               Record rec = (Record) valueList.get(i);
               if (rec instanceof MsgLinkRecord) {
                 MsgLinkRecord link = (MsgLinkRecord) rec;
-                if (mostRecentInVector == null || mostRecentInVector.dateCreated.before(link.dateCreated))
-                  mostRecentInVector = link;
+                if (mostRecentInList == null || mostRecentInList.dateCreated.before(link.dateCreated))
+                  mostRecentInList = link;
               }
             }
-            if (mostRecentInVector != null) {
+            if (mostRecentInList != null) {
               if (mostRecentMsgLink == null ||
                   getTableModel().getRowForObject(mostRecentMsgLink.getId()) < 0 ||
-                  mostRecentMsgLink.dateCreated.before(mostRecentInVector.dateCreated))
+                  mostRecentMsgLink.dateCreated.before(mostRecentInList.dateCreated))
               {
-                mostRecentMsgLink = mostRecentInVector;
+                mostRecentMsgLink = mostRecentInList;
               }
               // if there ever was a link we scrolled to, bring it to view again
               if (mostRecentMsgLink != null) {
                 // oddly without immediate scroll, scroll invoked later will fail with acuracy
-                try {
-                  JSortedTable jSTable = getJSortedTable();
-                  int rowModel = getTableModel().getRowForObject(mostRecentMsgLink.getId());
-                  int rowSorted = jSTable.convertMyRowIndexToView(rowModel);
-                  Rectangle rect = jSTable.getCellRect(rowSorted, 0, true);
-                  //System.out.println("callback: immediate: scroll to rect="+rect);
-                  jSTable.scrollRectToVisible(rect);
-                } catch (Throwable t) {
-                }
+                scrollToVisible(mostRecentMsgLink);
                 SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                    try {
-                      JSortedTable jSTable = getJSortedTable();
-                      int rowModel = getTableModel().getRowForObject(mostRecentMsgLink.getId());
-                      int rowSorted = jSTable.convertMyRowIndexToView(rowModel);
-                      Rectangle rect = jSTable.getCellRect(rowSorted, 0, true);
-                      //System.out.println("callback: invoked  : scroll to rect="+rect);
-                      jSTable.scrollRectToVisible(rect);
-                    } catch (Throwable t) {
-                    }
+                    scrollToVisible(mostRecentMsgLink);
                   } // end run()
                 }); // end Runnable
               }
@@ -144,87 +112,20 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
     if (trace != null) trace.exit(ChatActionTable.class);
   }
 
-  private class MsgLinkListener implements MsgLinkRecordListener {
-    public void msgLinkRecordUpdated(MsgLinkRecordEvent event) {
-      // Exec on event thread to avoid any GUI deadlocks
-      javax.swing.SwingUtilities.invokeLater(new MsgGUIUpdater(event));
-    }
-  }
-  
-  private class MsgGUIUpdater implements Runnable {
-    private MsgLinkRecordEvent e;
-    public MsgGUIUpdater(MsgLinkRecordEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater(MsgLinkRecordEvent event)");
-      this.e = event;
-      if (trace != null) trace.exit(MsgGUIUpdater.class);
-    }
-    public void run() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgGUIUpdater.class, "MsgGUIUpdater.run()");
-      if (e.getEventType() == MsgLinkRecordEvent.SET) {
-        // only auto-scroll if single message arrived, this means chat session is in progress and folder content is not fetched
-        MsgLinkRecord[] msgLinks = e.getMsgLinkRecords();
-        if (msgLinks != null && msgLinks.length == 1) {
-          if (getTableModel().keep(msgLinks[0])) {
-            lastKeepRecord = msgLinks[0];
-          }
-        } else if (msgLinks != null && msgLinks.length > 1) {
-          lastKeepRecord = prevKeepRecord;
-          if (!getTableModel().contains(lastKeepRecord)) {
-            lastKeepRecord = msgLinks[0];
-          }
-        }
-      }
-      // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
-      if (trace != null) trace.exit(MsgGUIUpdater.class);
-    }
+  public void scrollToMostRecent() {
+    scrollToVisible(mostRecentMsgLink);
   }
 
-//  private class SortListener implements TableModelSortListener {
-//    public void preSortDeleteNotify(TableModelSortEvent event) {
-//    }
-//    public void preSortNotify(TableModelSortEvent event) {
-//      lastScrollToRecord = lastKeepRecord;
-//      lastKeepRecord = null;
-//    }
-//    public void postSortNotify(TableModelSortEvent event) {
-//      SwingUtilities.invokeLater(new Runnable() {
-//        public void run() {
-//          if (lastScrollToRecord != null) {
-//            RecordTableModel model = getTableModel();
-//            JSortedTable table = getJSortedTable();
-//            table.doLayout();
-//            int row = model.getRowForObject(lastScrollToRecord.msgLinkId);
-//            if (row >= 0) {
-//              int viewRow = table.convertMyRowIndexToView(row);
-//              final JScrollBar sBar = getVerticalScrollBar();
-//              if (viewRow == 0) {
-//                int min = sBar.getMinimum();
-//                sBar.setValue(min);
-//              } else if (viewRow + 1 == getTableModel().getRowCount()) {
-//                int max = sBar.getMaximum();
-//                sBar.setValue(max);
-//                //System.out.println("postSort: immediate: setValue="+max);
-//                // try setting the value again as table has layout problems the first time
-//                SwingUtilities.invokeLater(new Runnable() {
-//                  public void run() {
-//                    int max = sBar.getMaximum();
-//                    sBar.setValue(max);
-//                    //System.out.println("postSort: invoked  : setValue="+max);
-//                  }
-//                });
-//              } else {
-//                Rectangle rect = getJSortedTable().getCellRect(viewRow, 0, true);
-//                table.scrollRectToVisible(rect);
-//                //System.out.println("postSort: immediate: scroll to rect="+rect);
-//              }
-//            }
-//            prevKeepRecord = lastScrollToRecord;
-//            lastScrollToRecord = null;
-//          }
-//        }
-//      });
-//    }
-//  }
+  private void scrollToVisible(MsgLinkRecord msgLink) {
+    try {
+      JSortedTable jSTable = getJSortedTable();
+      int rowModel = getTableModel().getRowForObject(msgLink.getId());
+      int rowSorted = jSTable.convertMyRowIndexToView(rowModel);
+      Rectangle rect = jSTable.getCellRect(rowSorted, 0, true);
+      jSTable.scrollRectToVisible(rect);
+    } catch (Throwable t) {
+    }
+  }
 
   private class ChatTypingListener implements MsgTypingListener {
     public void msgTypingUpdate(EventObject event) {
@@ -288,11 +189,7 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
       }
       sortListener = null;
     }
-    if (msgLinkRecordListener != null) {
-      FetchedDataCache.getSingleInstance().removeMsgLinkRecordListener(msgLinkRecordListener);
-      msgLinkRecordListener = null;
-    }
-//    getTableModel().recordInsertionCallback = null;
+    getTableModel().recordInsertionCallback = null;
     super.disposeObj();
   }
 

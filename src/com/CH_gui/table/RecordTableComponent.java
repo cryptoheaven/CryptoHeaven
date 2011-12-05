@@ -28,6 +28,7 @@ import com.CH_co.util.*;
 
 import com.CH_gui.action.*;
 import com.CH_gui.actionGui.*;
+import com.CH_gui.chatTable.ChatActionTable;
 import com.CH_gui.contactTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.gui.*;
@@ -970,8 +971,24 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
             }
             // Also use isAnyOffline to only show the offline-panel when we are sure we have offline contacts,
             // not just lack of information when for example refreshing folders, etc.
-            if (isAnyOnline || isAnyOffline)
-              jOfflinePanel.setVisible(fRec.isChatting() && !isAnyOnline && isAnyOffline);
+            if (isAnyOnline || isAnyOffline) {
+              boolean offlinePanelState = jOfflinePanel.isVisible();
+              boolean offlinePanelNewState = fRec.isChatting() && !isAnyOnline && isAnyOffline;
+              if (offlinePanelNewState != offlinePanelState) {
+                jOfflinePanel.setVisible(offlinePanelNewState);
+                if (offlinePanelNewState) {
+                  if (recordTableScrollPane instanceof ChatActionTable) {
+                    // After the visibility of panel which takes some of the table view area changes, 
+                    // dispatch a check to scroll the view making the last item visible.
+                    SwingUtilities.invokeLater(new Runnable() {
+                      public void run() {
+                        ((ChatActionTable) recordTableScrollPane).scrollToMostRecent();
+                      }
+                    });
+                  }
+                }
+              }
+            }
           }
         } // end share != null
       } catch (Throwable t) {
