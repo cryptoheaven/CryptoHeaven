@@ -28,8 +28,7 @@ import com.CH_gui.msgTable.*;
 import com.CH_gui.sortedTable.*;
 import com.CH_gui.util.*;
 
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
@@ -641,6 +640,26 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
   public Integer getVisualsVersion() {
     return null;
+  }
+  public boolean isVisible(Record rec) {
+    boolean visible = false;
+    try {
+      int rowModel = recordTableModel.getRowForObject(rec.getId());
+      int rowSorted = jSTable.convertMyRowIndexToView(rowModel);
+      // This rectangle is relative to the table where the
+      // northwest corner of cell (0,0) is always (0,0)
+      Rectangle rect = jSTable.getCellRect(rowSorted, 0, true);
+      // The location of the viewport relative to the table
+      Point pt = viewport.getViewPosition();
+      // Translate the cell location so that it is relative
+      // to the view, assuming the northwest corner of the
+      // view is (0,0)
+      rect.setLocation(rect.x-pt.x, rect.y-pt.y);
+      // Check if view completely contains cell
+      visible = new Rectangle(viewport.getExtentSize()).contains(rect);
+    } catch (Throwable t) {
+    }
+    return visible;
   }
   public boolean isVisuallyTraversable() {
     return true;

@@ -975,9 +975,13 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               boolean offlinePanelState = jOfflinePanel.isVisible();
               boolean offlinePanelNewState = fRec.isChatting() && !isAnyOnline && isAnyOffline;
               if (offlinePanelNewState != offlinePanelState) {
+                boolean isVisibleBefore = false;
+                if (recordTableScrollPane instanceof ChatActionTable) {
+                  isVisibleBefore = ((ChatActionTable) recordTableScrollPane).isVisibleMostRecent();
+                }
                 jOfflinePanel.setVisible(offlinePanelNewState);
                 if (offlinePanelNewState) {
-                  if (recordTableScrollPane instanceof ChatActionTable) {
+                  if (isVisibleBefore && recordTableScrollPane instanceof ChatActionTable) {
                     // After the visibility of panel which takes some of the table view area changes, 
                     // dispatch a check to scroll the view making the last item visible.
                     SwingUtilities.invokeLater(new Runnable() {

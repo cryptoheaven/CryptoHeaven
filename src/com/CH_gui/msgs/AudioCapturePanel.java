@@ -29,12 +29,13 @@ package com.CH_gui.msgs;
  * @author  Marcin Kurzawa
  */
 
-
 import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl.util.TempFile;
+
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
+
 import com.CH_gui.gui.*;
-import com.CH_gui.util.TempFile;
 
 import java.awt.*;
 import java.awt.event.*;

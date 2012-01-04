@@ -112,6 +112,10 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
     if (trace != null) trace.exit(ChatActionTable.class);
   }
 
+  public boolean isVisibleMostRecent() {
+    return isVisible(mostRecentMsgLink);
+  }
+
   public void scrollToMostRecent() {
     scrollToVisible(mostRecentMsgLink);
   }

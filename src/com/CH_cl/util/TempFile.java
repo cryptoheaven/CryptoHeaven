@@ -9,7 +9,7 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Development Team.
  */
-package com.CH_gui.util;
+package com.CH_cl.util;
 
 import com.CH_co.util.*;
 

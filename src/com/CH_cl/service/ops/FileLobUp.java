@@ -17,12 +17,14 @@ import com.CH_cl.service.actions.sys.SysANoop;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.*;
+import com.CH_cl.util.TempFile;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.io.*;
 import com.CH_co.monitor.Interruptible;
 import com.CH_co.monitor.ProgMonitorFactory;
 import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.ProgMonitorJournalI;
 import com.CH_co.monitor.Stats;
 import com.CH_co.service.msg.*;
 import com.CH_co.service.msg.dataSets.file.*;
@@ -30,9 +32,6 @@ import com.CH_co.service.msg.dataSets.obj.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
 import com.CH_co.util.*;
-
-import com.CH_gui.monitor.JournalProgMonitorImpl;
-import com.CH_gui.util.TempFile;
 
 import java.io.*;
 import java.security.*;
@@ -58,7 +57,7 @@ public class FileLobUp {
   private String arbiterKeySeal = "SEAL";
   private String arbiterKeyUpload = "UPLOAD";
 
-  private static JournalProgMonitorImpl progJournal = null;
+  private static ProgMonitorJournalI progJournal = null;
   private static final Object progMonitor = new Object();
 
   private File plainDataFile;
@@ -994,7 +993,7 @@ public class FileLobUp {
   private static void addProgressJournalText(String str) {
     synchronized (progMonitor) {
       if (progJournal == null)
-        progJournal = (JournalProgMonitorImpl) ProgMonitorFactory.newInstanceJournal("Upload ABORTED");
+        progJournal = (ProgMonitorJournalI) ProgMonitorFactory.newInstanceJournal("Upload ABORTED");
       if (!progJournal.isVisible()) {
         Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
         progJournal.setVisible(true);
