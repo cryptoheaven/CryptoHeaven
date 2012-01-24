@@ -592,7 +592,9 @@ public class FileDataRecord extends Record {
   public static long getRecordSizeSum(FileDataRecord[] files) {
     long sum = 0;
     for (int i=0; files!=null && i<files.length; i++) {
-      sum += files[i].recordSize.longValue();
+      FileDataRecord file = files[i];
+      if (file != null && file.recordSize != null)
+        sum += files[i].recordSize.longValue();
     }
     return sum;
   }
