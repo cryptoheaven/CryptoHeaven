@@ -17,6 +17,7 @@ import com.CH_cl.service.engine.*;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.dataSets.Str_Rp;
 import com.CH_co.service.msg.dataSets.file.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.*;
@@ -39,6 +40,7 @@ import java.util.*;
 public class FileLobUpEditMonitor {
 
   private static boolean ENABLE_SYNCH_CONFIRMATION = false;
+  private static long[] ERROR_DELAY_BEFORE_RETRY__MILLIS = new long[] { 5*1000, 10*1000, 15*1000, 30*1000, 2*60*1000, 5*60*1000, 15*60*1000 };
 
   public static final Object monitor = new Object();
   private static boolean isInitialized = false;
@@ -180,6 +182,10 @@ public class FileLobUpEditMonitor {
           if (!set.localFile.exists()) {
             iter.remove();
             removeFromMonitoring(set.getRemoteFile().fileLinkId);
+          } else if (set.timestampNextRetry > System.currentTimeMillis()) {
+            // ignore for now until enough time passes from last error
+            // Correct invalid stamps incase system clock was adjusted
+            set.timestampNextRetry = Math.min(set.timestampNextRetry, System.currentTimeMillis()+ERROR_DELAY_BEFORE_RETRY__MILLIS[ERROR_DELAY_BEFORE_RETRY__MILLIS.length-1]);
           } else {
             final long lastModified = set.localFile.lastModified();
             if (lastModified != set.timestampTrackingStart) {
@@ -209,7 +215,10 @@ public class FileLobUpEditMonitor {
                       hasWritePrivilege = share != null && share.canWrite.shortValue() == FolderShareRecord.YES;
                     }
                     if (!hasWritePrivilege) {
-                      set.setError("No 'write' privilege to folder.");
+                      if (share == null)
+                        set.setError("Folder was deleted or is inaccessible.");
+                      else
+                        set.setError("No 'write' privilege to folder '"+share.getFolderName()+"'.");
                       fileEditsMap.put(set.remoteFile.fileLinkId, set);
                     } else {
                       // check if connection is active
@@ -265,6 +274,8 @@ public class FileLobUpEditMonitor {
       DefaultReplyRunner.nonThreadedRun(SIL, replyMsgAction, true);
       // If success, mark this update with current evaluation and dispatch FileLobUp
       if (replyMsgAction.getActionCode() == CommandCodes.FILE_A_GET_FILES) {
+        set.errorCount = 0;
+        set.timestampNextRetry = 0;
         set.timestampTrackingStart = System.currentTimeMillis();
         set.trackingDataDigest = set.lastDigest;
         fileEditsMap.remove(set.remoteFile.fileLinkId);
@@ -272,7 +283,17 @@ public class FileLobUpEditMonitor {
         FileDataRecord data = request.fileDataRecords[0];
         new FileLobUp(data.getPlainDataFile(), link, data.getSigningKeyId(), 0);
       } else {
-        set.setError("Send failed.");
+        set.errorCount ++;
+        int errorDelayIndex = Math.min((int) set.errorCount, ERROR_DELAY_BEFORE_RETRY__MILLIS.length) - 1;
+        set.timestampNextRetry = System.currentTimeMillis() + ERROR_DELAY_BEFORE_RETRY__MILLIS[errorDelayIndex];
+        ProtocolMsgDataSet dataSet = replyMsgAction.getMsgDataSet();
+        String errMsg = "Send failed.";
+        if (dataSet instanceof Str_Rp) {
+          // Use specific error message if available.
+          errMsg = ((Str_Rp) dataSet).message;
+        }
+        errMsg += " - retry scheduled for "+Misc.getFormattedDate(new Date(set.timestampNextRetry), false);
+        set.setError(errMsg);
         fileEditsMap.put(set.remoteFile.fileLinkId, set);
       }
     }
@@ -287,6 +308,8 @@ public class FileLobUpEditMonitor {
     BADigestBlock trackingDataDigest;
     long timestampLastDigest;
     BADigestBlock lastDigest;
+    long errorCount;
+    long timestampNextRetry;
 
     private FileSet(File localFile, FileLinkRecord remoteFile, FileDataRecord remoteData) {
       this.localFile = localFile;

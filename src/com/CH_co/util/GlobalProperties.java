@@ -255,13 +255,14 @@ public class GlobalProperties extends Object {
   // build 668 Exit wipes temp files open for edits
   // build 670 First public release of applets and installers with edit-synch
   // build 672 Sferxy editor 'insert symbol' icon resized, chat scroll to most recent when offline panel shows and reduces table view area.
+  // build 674 Changes related to command line file uploads and msg attachment uploads, also stats and other server synchronizations.
 
-  public static final short PROGRAM_BUILD_NUMBER = 672;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 674;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.6f;
-  public static final short PROGRAM_VERSION_MINOR = 0;
+  public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

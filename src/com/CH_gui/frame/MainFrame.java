@@ -1301,9 +1301,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
                   UserRecord myUserRec = cache.getUserRecord();
                   java.sql.Timestamp last = null;
                   boolean include24ExpiryNote = false;
-                  if (myUserRec.dateLastLogin != null && myUserRec.dateLastLogout != null)
-                    last = myUserRec.dateLastLogin.compareTo(myUserRec.dateLastLogout) > 0 ? myUserRec.dateLastLogout : myUserRec.dateLastLogin;
-                  else if (myUserRec.dateLastLogin != null)
+                  if (myUserRec.dateLastLogin != null)
                     last = myUserRec.dateLastLogin;
                   else if (myUserRec.dateLastLogout != null)
                     last = myUserRec.dateLastLogout;

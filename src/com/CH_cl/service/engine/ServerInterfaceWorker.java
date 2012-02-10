@@ -473,7 +473,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       }
 
       if (trace != null) trace.data(300, "SIL Reader exits, server-mode="+(!workerManager.isClientMode())+", cleanBreak="+cleanBreak+", msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode);
-      if (!workerManager.isClientMode()) {
+      if (!cleanBreak && !workerManager.isClientMode()) {
         System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " exit! cleanBreak=" + cleanBreak + ", msgActionCode=" + msgActionCode+", prevMsgActionCode="+prevMsgActionCode);
       }
 
@@ -857,7 +857,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       }
 
       if (trace != null) trace.data(300, "SIL Writer exits, server-mode="+(!workerManager.isClientMode())+", cleanLogout="+cleanLogout);
-      if (!workerManager.isClientMode()) {
+      if (!cleanLogout && !workerManager.isClientMode()) {
         System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exit! cleanLogout=" + cleanLogout);
       }
 
