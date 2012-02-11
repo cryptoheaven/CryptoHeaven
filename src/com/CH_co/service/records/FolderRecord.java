@@ -53,7 +53,7 @@ public class FolderRecord extends Record {
   public static final String CHATTING_FOLDER_STR = "Chatting Folder";
   public static final String CONTACT_FOLDER_STR = "Contact Folder";
   public static final String KEY_FOLDER_STR = "Key Folder";
-  public static final String LOCAL_FILES_FOLDER_STR = "My Local Computer";
+  public static final String LOCAL_FILES_FOLDER_STR = "My Local Files";
   public static final String ADDRESS_FOLDER_STR = "Address Book";
   public static final String GROUP_FOLDER_STR = "Group Folder";
   public static final String WHITELIST_FOLDER_STR = "WhiteList Folder";

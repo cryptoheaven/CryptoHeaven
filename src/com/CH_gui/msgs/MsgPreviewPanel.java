@@ -1067,6 +1067,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           FileLinkRecord fileLink = null;
           if (attachments[i] instanceof FileLinkRecord) {
             fileLink = (FileLinkRecord) attachments[i];
+          } else if (attachments[i] instanceof MsgLinkRecord) {
+            attachmentsMap.put(((MsgLinkRecord) attachments[i]).msgLinkId, label);
           }
 
           JPanel panel = new JPanel();
@@ -1097,7 +1099,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               sliderTmp = new JSlider(0, 10000, 0);
               sliderTmp.setBorder(new EmptyBorder(0,2,0,0));
               sliderTmp.setEnabled(false);
-              //sliderTmp.setVisible(false);
             } else if (FileLauncher.isImageFilename(fileLink.getFileName())) {
               play.setIcon(Images.get(ImageNums.FIND16));
             }
@@ -2067,6 +2068,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         }
         if (ourRec != null) {
           initData(FetchedDataCache.getSingleInstance().getMsgLinkRecord(ourRec.getId()));
+        }
+        // check if the update is for one of our attachments where msg icon could change from New -> Openned
+        else if (attachmentsMap != null) {
+          for (int i=0; i<recs.length; i++) {
+            Record rec = recs[i];
+            JLabel note = (JLabel) attachmentsMap.get(rec.getId());
+            if (note != null) {
+              note.setIcon(ListRenderer.getRenderedIcon(rec));
+            }
+          }
         }
       } else if (event instanceof MsgDataRecordEvent) {
         // and changes to Address Records may affect the view...

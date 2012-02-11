@@ -40,7 +40,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public static final long CATEGORY_CHAT_ID = -201;
   public static final long CATEGORY_GROUP_ID = -101;
 
-  public static final String SHARE_LOCAL_NAME = "My Local Computer";
+  public static final String SHARE_LOCAL_NAME = "My Local Files";
   public static final String SHARE_LOCAL_DESC = "Local File System View";
 
   public static final String CATEGORY_FILE_NAME = "Files";
