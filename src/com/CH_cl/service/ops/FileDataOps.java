@@ -1,13 +1,13 @@
 /*
- * Copyright 2001-2011 by CryptoHeaven Development Team,
+ * Copyright 2001-2012 by CryptoHeaven Corp.,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  * 
  * This software is the confidential and proprietary information
- * of CryptoHeaven Development Team ("Confidential Information").  You
+ * of CryptoHeaven Corp. ("Confidential Information").  You
  * shall not disclose such Confidential Information and shall use
  * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Development Team.
+ * you entered into with CryptoHeaven Corp.
  */
 
 package com.CH_cl.service.ops;
@@ -24,9 +24,9 @@ import com.CH_co.trace.Trace;
 import java.io.File;
 
 /**
- * <b>Copyright</b> &copy; 2001-2011
+ * <b>Copyright</b> &copy; 2001-2012
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Development Team.
+ * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
  *
  * Class Description:
