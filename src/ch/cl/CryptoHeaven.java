@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011 by CryptoHeaven Development Team,
+ * Copyright 2001-2012 by CryptoHeaven Development Team,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -14,15 +14,18 @@ package ch.cl;
 
 import com.CH_cl.service.ops.AutoUpdaterArgs;
 import com.CH_cl.util.GlobalSubProperties;
-
 import com.CH_co.cryptx.*;
-import com.CH_co.service.records.*;
+import com.CH_co.service.records.KeyRecord;
+import com.CH_co.service.records.UserRecord;
 import com.CH_co.util.*;
-
-import com.CH_gui.util.*;
-
-import java.awt.*;
-import javax.swing.*;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MiscGui;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2011

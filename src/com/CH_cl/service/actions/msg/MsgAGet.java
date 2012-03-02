@@ -400,14 +400,16 @@ public class MsgAGet extends ClientMessageAction {
       if (linkRecords.length < Math.min(fetchNumMaxLength, fetchNumNew.shortValue())) {
         // fetch completed, time to notify listeners
         // When connecting to pre build 388 engine this may be null when number of messages in the folder modulus fetchNumMax = 0, so check it just in case...
-        if (fetchingFolderRec != null)
+        if (fetchingFolderRec != null) {
           cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_COMPLETED);
+        }
       } else {
         if (isInterrupted()) {
           interrupt();
           // When connecting to pre build 388 engine this may be null when number of messages in the folder modulus fetchNumMax = 0, so check it just in case...
-          if (fetchingFolderRec != null)
+          if (fetchingFolderRec != null) {
             cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
+          }
         } else {
           Timestamp timeStamp = linkRecords[linkRecords.length-1].dateCreated;
           if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
@@ -424,7 +426,7 @@ public class MsgAGet extends ClientMessageAction {
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
           double multiplier = ((double) MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time
           // multiplier cannot make too drastic of a change
-          multiplier = Math.max(0.2, Math.min(10.0, multiplier));
+          multiplier = Math.max(0.3, Math.min(10.0, multiplier));
 
           // if only new msgs fetched apply adjustment
           if (linkRecords.length == fetchNumNew.shortValue()) {
@@ -462,7 +464,6 @@ public class MsgAGet extends ClientMessageAction {
           int actionCode = full ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
           MessageAction msgAction = new MessageAction(actionCode, request);
           msgAction.setInterruptsFrom(this);
-          //msgAction.setPriority(PriorityJobFifo.MAIN_WORKER_HIGH_PRIORITY);
           getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
         }
       }

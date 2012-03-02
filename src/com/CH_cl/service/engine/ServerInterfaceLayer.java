@@ -1412,7 +1412,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
    * Disconnects the application and prevents workers from automatically
    * establishing any new connections.
    */
-  private void disconnect() {
+  public void disconnect() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "disconnect()");
 
     // clear last login action so no worker can automatically login
