@@ -12,49 +12,65 @@
 
 package com.CH_gui.msgTable;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_cl.service.records.InternetAddressRecord;
+import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.stat.*;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.monitor.*;
+import com.CH_co.monitor.Stats;
+import com.CH_co.nanoxml.XMLElement;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.msg.Msg_MoveCopy_Rq;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
-import com.CH_co.trace.*;
+import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.addressBook.*;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.addressBook.ContactInfoPanel;
+import com.CH_gui.addressBook.EmailPanel;
+import com.CH_gui.addressBook.NamePanel;
+import com.CH_gui.chatTable.ChatActionTable;
 import com.CH_gui.dialog.*;
-import com.CH_gui.chatTable.*;
-import com.CH_gui.fileTable.*;
+import com.CH_gui.fileTable.FileActionTable;
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.postTable.*;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgs.AttachmentFetcherPopup;
+import com.CH_gui.msgs.MsgComposePanel;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.msgs.MsgPreviewPanel;
+import com.CH_gui.postTable.PostActionTable;
+import com.CH_gui.postTable.PostTableCellRenderer;
 import com.CH_gui.service.ops.DownloadUtilsGui;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-import com.CH_gui.tree.*;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordActionTable;
+import com.CH_gui.table.RecordTableModel;
+import com.CH_gui.table.RecordTableScrollPane;
+import com.CH_gui.tree.FolderActionTree;
 import com.CH_gui.util.*;
-
 import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.util.*;
-
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.JTextComponent;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012

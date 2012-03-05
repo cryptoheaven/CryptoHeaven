@@ -12,30 +12,40 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.service.records.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.UploadUtilities;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_co.service.records.FileLinkRecord;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.fileTable.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.table.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.util.VisualsSavable;
+import com.CH_co.util.ArrayUtils;
+import com.CH_gui.fileTable.FileActionTable;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JSplitPaneVS;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.list.ListUpdatableI;
+import com.CH_gui.list.ObjectsProviderUpdaterI;
+import com.CH_gui.table.RecordSelectionEvent;
+import com.CH_gui.table.RecordSelectionListener;
+import com.CH_gui.table.RecordTableScrollPane;
+import com.CH_gui.table.TableComponent;
+import com.CH_gui.tree.FolderTreeComponent;
 import com.CH_gui.util.GeneralDialog;
-
+import com.CH_gui.util.VisualsSavable;
 import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -274,8 +284,8 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     jListPanel.add(jListPane, new GridBagConstraints(0, 2, 1, 1, 10, 10, 
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
-    hSplit = new JMySplitPane(getVisualsClassKeyName() + "_hSplit1", JSplitPane.HORIZONTAL_SPLIT, jTreePanel, jTablePanel, 0.0d);
-    hSplit2 = new JMySplitPane(getVisualsClassKeyName() + "_hSplit2", JSplitPane.HORIZONTAL_SPLIT, hSplit, jListPanel, 1.0d);
+    hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit1", JSplitPane.HORIZONTAL_SPLIT, jTreePanel, jTablePanel, 0.0d, 0.0d);
+    hSplit2 = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit2", JSplitPane.HORIZONTAL_SPLIT, hSplit, jListPanel, 1.0d, 1.0d);
 
     panel.setLayout(new GridBagLayout());
     panel.add(hSplit2, new GridBagConstraints(0, 0, 1, 1, 10, 10, 

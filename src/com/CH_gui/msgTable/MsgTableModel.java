@@ -12,32 +12,39 @@
 
 package com.CH_gui.msgTable;
 
-import com.CH_gui.addressBook.*;
-import com.CH_gui.frame.MainFrame;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.recycleTable.*;
-import com.CH_gui.table.*;
-import com.CH_gui.postTable.PostTableCellRenderer;
-
-import com.CH_guiLib.util.HTML_Ops;
-
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_cl.service.ops.FileLinkOps;
+import com.CH_cl.service.ops.MsgLinkOps;
+import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_cl.service.records.filters.FixedFilter;
+import com.CH_cl.service.records.filters.TextSearchFilter;
+import com.CH_co.monitor.Interrupter;
+import com.CH_co.monitor.Interruptible;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.util.*;
+import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_gui.addressBook.AddressTableCellRenderer;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.postTable.PostTableCellRenderer;
+import com.CH_gui.recycleTable.RecycleTableModel;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
+import com.CH_guiLib.util.HTML_Ops;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Vector;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -337,7 +344,7 @@ public class MsgTableModel extends RecordTableModel {
     if (folderPair != null && folderPair.getFolderRecord() != null && folderPair.getFolderRecord().isChatting())
       isChatting = true;
     // chatting folders force reload so that it will scroll to the bottom...
-    boolean effectiveForceSwitch = forceSwitch || isChatting;
+    boolean effectiveForceSwitch = forceSwitch || (isChatting && !isAutoScrollSuppressed);
     if (forceSwitch || effectiveForceSwitch || folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
       setFilter(folderId != null ? (RecordFilter) new MsgFilter(Record.RECORD_TYPE_FOLDER, folderId) : (RecordFilter) new FixedFilter(false));
       switchData(folderId, effectiveForceSwitch);
@@ -378,7 +385,7 @@ public class MsgTableModel extends RecordTableModel {
 
 
   /**
-   * @param fetch true if data should be refetched from the database.
+   * @param fetch true if data should be re-fetched from the database.
    */
   public synchronized void refreshData(boolean forceFetch) {
     FolderPair folderPair = getParentFolderPair();
@@ -405,10 +412,23 @@ public class MsgTableModel extends RecordTableModel {
     return getSearchableCharSequencesFor(searchableObj, true);
   }
   public Collection getSearchableCharSequencesFor(Object searchableObj, boolean includeMsgBody) {
-    if (searchableObj instanceof Record)
+    if (searchableObj instanceof Record) {
+      // The searchable string should use the possibly dynamically prepared
+      // version which may include attachments, etc.  So if we don't have the 
+      // rendering cache ready, initiate its creation here for more complete
+      // search results.
+      if (searchableObj instanceof MsgLinkRecord) {
+        MsgLinkRecord msgLink = (MsgLinkRecord) searchableObj;
+        if (msgLink.getPostRenderingCache() == null) {
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+          MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
+          getSubjectColumnValue(this, msgLink, msgData, null, cache);
+        }
+      }
       return RecycleTableModel.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
-    else
+    } else {
       return null;
+    }
   }
 
   public synchronized Object getValueAtRawColumn(Record record, int rawColumn, boolean forSortOnly) {

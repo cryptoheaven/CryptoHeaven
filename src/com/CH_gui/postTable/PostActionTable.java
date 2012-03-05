@@ -12,11 +12,10 @@
 
 package com.CH_gui.postTable;
 
-import javax.swing.JViewport;
-
 import com.CH_gui.gui.JBottomStickViewport;
 import com.CH_gui.msgTable.MsgActionTable;
 import com.CH_gui.table.RecordTableModel;
+import javax.swing.JViewport;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012

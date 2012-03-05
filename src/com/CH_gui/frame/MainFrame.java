@@ -14,36 +14,49 @@ package com.CH_gui.frame;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.cache.event.ContactRecordEvent;
+import com.CH_cl.service.cache.event.ContactRecordListener;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.io.*;
-import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_cl.service.records.filters.ContactFilterCl;
+import com.CH_cl.service.records.filters.FixedFilter;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_cl.service.records.filters.InvEmlFilter;
+import com.CH_co.cryptx.BAEncodedPassword;
+import com.CH_co.cryptx.Rnd;
+import com.CH_co.io.RandomInputStream;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.*;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
-import com.CH_gui.contactTable.*;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.ActionUtilities;
+import com.CH_gui.action.Actions;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.actionGui.JActionFrameClosable;
+import com.CH_gui.contactTable.ContactActionTable;
+import com.CH_gui.contactTable.ContactTableComponent;
+import com.CH_gui.contactTable.ContactTableComponent4Frame;
 import com.CH_gui.dialog.*;
 import com.CH_gui.gui.*;
-import com.CH_gui.monitor.*;
-import com.CH_gui.table.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.usrs.*;
+import com.CH_gui.monitor.MultiProgressMonitorImpl;
+import com.CH_gui.monitor.SimpleProgMonitorImpl;
+import com.CH_gui.monitor.StatsBar;
+import com.CH_gui.table.TableComponent;
+import com.CH_gui.tree.FolderTreeComponent;
+import com.CH_gui.usrs.UserGuiOps;
 import com.CH_gui.util.*;
-
-// "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this line
 import comx.tig.en.SingleTigerSession;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -52,7 +65,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -373,8 +386,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
           try {
             // Make the main panel
-            JSplitPane vSplit = new JMySplitPane(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d);
-            JSplitPane hSplit = new JMySplitPane(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.20d);
+            JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d, 0.65d);
+            JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.15d, 0.15d);
 
             // status bar
             statsBar = new StatsBar();

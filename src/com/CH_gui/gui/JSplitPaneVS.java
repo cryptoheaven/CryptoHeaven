@@ -13,12 +13,12 @@
 package com.CH_gui.gui;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
+import com.CH_co.util.GlobalProperties;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.VisualsSavable;
+import java.awt.Component;
+import java.util.StringTokenizer;
+import javax.swing.JSplitPane;
 import javax.swing.border.EmptyBorder;
 
 /** 
@@ -43,24 +43,30 @@ public class JSplitPaneVS extends JSplitPane implements VisualsSavable {
   private String propertyExtension = null;
 
   /** Creates new JSplitPaneVS */
-  public JSplitPaneVS(String propertyName, int orientation, double resizeWeight) {
-    super(orientation);
-    initialize(propertyName, resizeWeight);
+  public JSplitPaneVS(String propertyName, int defaultOrientation, double resizeWeightH, double resizeWeightV) {
+    super(defaultOrientation);
+    initialize(propertyName, resizeWeightH, resizeWeightV);
   }
-  public JSplitPaneVS(String propertyName, int orientation, Component c1, Component c2, double resizeWeight) {
-    super(orientation, c1, c2);
+  public JSplitPaneVS(String propertyName, int defaultOrientation, Component c1, Component c2, double resizeWeightH, double resizeWeightV) {
+    super(defaultOrientation, c1, c2);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JSplitPaneVS.class, "JSplitPaneVS()");
-    initialize(propertyName, resizeWeight);
+    initialize(propertyName, resizeWeightH, resizeWeightV);
     if (trace != null) trace.exit(JSplitPaneVS.class);
   }
-  private void initialize(String propertyName, double resizeWeight) {
+  private void initialize(String propertyName, double resizeWeightH, double resizeWeightV) {
     propertyExtension = propertyName;
     propertyKey = MiscGui.getVisualsKeyName(this);
     restoreVisuals(GlobalProperties.getProperty(propertyKey));
-    setResizeWeight(resizeWeight); // allow resize weight to change with client updates -- overwrite saved property
+    // Adjust resize-weight depending on the final orientation
+    if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT)
+      setResizeWeight(resizeWeightH);
+    else if (getOrientation() == JSplitPane.VERTICAL_SPLIT)
+      setResizeWeight(resizeWeightV);
     if (MiscGui.isSmallScreen())
       setDividerSize(2);
     setBorder(new EmptyBorder(0,0,0,0));
+    if (getDividerSize() > 5)
+      setDividerSize(5);
   }
 
 

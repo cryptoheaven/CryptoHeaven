@@ -1,53 +1,56 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.frame;
 
-import com.CH_cl.service.cache.*;
-
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.actionGui.*;
-import com.CH_gui.addressBook.*;
-import com.CH_gui.chatTable.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
+import com.CH_co.util.DisposableObj;
+import com.CH_gui.actionGui.JActionFrameClosable;
+import com.CH_gui.addressBook.AddressTableComponent;
+import com.CH_gui.addressBook.WhiteListTableComponent;
+import com.CH_gui.chatTable.ChatTableComponent4Frame;
+import com.CH_gui.gui.Template;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgTable.*;
-import com.CH_gui.postTable.*;
+import com.CH_gui.msgs.MsgComposePanel;
+import com.CH_gui.msgs.MsgPreviewPanel;
+import com.CH_gui.postTable.PostTableComponent;
 import com.CH_gui.table.*;
-
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Frame;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.29 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.29 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgTableFrame extends JActionFrameClosable implements DisposableObj {
 
   private RecordTableComponent mainTableComponent = null;
@@ -66,15 +69,15 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
     this(parent, initialData, Frame.NORMAL, true, parentViewTable);
   }
   /**
-   * Constructor used for application startup with this frame as main application window.
-   * Additional action is created to switch to full application.
-   */
+  * Constructor used for application startup with this frame as main application window.
+  * Additional action is created to switch to full application.
+  */
   protected MsgTableFrame(Record parent, MsgLinkRecord[] initialData, boolean isInitDataModel) {
     this(parent, initialData, isInitDataModel, Frame.NORMAL, !isInitDataModel, null);
   }
   /**
-   * @args parent Either FolderPair for folder parent or MsgLinkRecord for message parent.
-   */
+  * @args parent Either FolderPair for folder parent or MsgLinkRecord for message parent.
+  */
   private MsgTableFrame(Record parent, MsgLinkRecord[] initialData, int initialState, boolean msgPreviewMode, RecordTableScrollPane parentViewTable) {
     this(parent, initialData, initialData == null, initialState, msgPreviewMode, parentViewTable);
   }
@@ -132,9 +135,9 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
       if (msgPreviewMode) {
         if (initialData.length > 1) {
           if (objType == MsgDataRecord.OBJ_TYPE_MSG) {
-            mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.4d);
+            mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.3d);
           } else {
-            mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
+            mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.3d, 0.3d);
           }
           mainTableComponent.addPreviewComponent(mainSplitPane, msgPreviewPanel);
           mainComponent = mainTableComponent;
@@ -154,9 +157,9 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         }
       } else {
         if (objType == MsgDataRecord.OBJ_TYPE_MSG) {
-          mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.4d);
+          mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.3d);
         } else {
-          mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
+          mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.3d, 0.3d);
         }
         mainTableComponent.addPreviewComponent(mainSplitPane, msgPreviewPanel);
         mainComponent = mainTableComponent;
@@ -171,7 +174,7 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
         MsgComposePanel msgComposePanel = new MsgComposePanel(folderPair, MsgDataRecord.OBJ_TYPE_MSG, true);
         if (mainTableComponent.getToolBarModel() != null)
           mainTableComponent.getToolBarModel().addComponentActions(msgComposePanel);
-        mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.90d);
+        mainSplitPane = createSplitPane(TableComponent.visualsClassKeyName + "_" + mainTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.85d, 0.85d);
         mainTableComponent.addEntryComponent(mainSplitPane, msgComposePanel);
         mainComponent = mainTableComponent;
       }
@@ -225,12 +228,8 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
 
   }
 
-  private JSplitPane createSplitPane(String propertyName, int orientation, double resizeWeight) {
-    return TableComponent.createSplitPane(propertyName, orientation, resizeWeight);
-  }
-
-  private JSplitPane createSplitPane(RecordTableComponent recordTableComp, JComponent viewer, String propertyNamePrefix, int orientation, double resizeWeight) {
-    return TableComponent.createSplitPane(getVisualsClassKeyName() + propertyNamePrefix, recordTableComp, viewer, orientation, resizeWeight);
+  private JSplitPane createSplitPane(String propertyName, int defaultOrientation, double resizeWeightH, double resizeWeightV) {
+    return TableComponent.createSplitPane(propertyName, defaultOrientation, resizeWeightH, resizeWeightV);
   }
 
   public RecordTableComponent getTableComponent() {
@@ -238,9 +237,9 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
   }
 
   /**
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
-   */
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
+  */
   public void disposeObj() {
     if (mainTableComponent != null)
       mainTableComponent.removeRecordListeners();

@@ -117,7 +117,7 @@ public class CryptoHeaven extends Object {
       {com.CH_gui.dialog.TraceRecordDialog.visualsClassKeyName+"_VS",      "Dimension width 450 height 320"},
       {com.CH_gui.dialog.UserSelectorDialog.visualsClassKeyName+"_VS",     "Dimension width 500 height 600"},
 
-      //{com.CH_gui.msgs.MsgPreviewPanel.visualsClassKeyName+"_VS","Dimension width 700 height 274"},
+      //{com.CH_gui.msgs.MsgPreviewPanel.visualsClassKeyName+"_VS","Dimension width 700 height 500"},
 
       // Frames
       {com.CH_gui.frame.AddressFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 670 height 550 Location x 0 y 0"},
@@ -139,13 +139,13 @@ public class CryptoHeaven extends Object {
       {com.CH_gui.frame.SubUserTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 800 height 365 Location x 0 y 0"},
       {com.CH_gui.frame.WhiteListTableFrame.visualsClassKeyName+"_VS_Ver6", "Dimension width 670 height 540 Location x 0 y 0"},
 
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.chatTable.ChatTableComponent.visualsClassKeyName+"_VS", "Divider location 500 -1 90 0"},
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.chatTable.ChatTableComponent4Frame.visualsClassKeyName+"_VS", "Divider location 300 -1 90 0"},
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgDraftsTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgInboxTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgSentTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgSpamTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
-      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 40 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.chatTable.ChatTableComponent.visualsClassKeyName+"_VS", "Divider location 500 -1 85 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.chatTable.ChatTableComponent4Frame.visualsClassKeyName+"_VS", "Divider location 300 -1 85 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgDraftsTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 30 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgInboxTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 30 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgSentTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 30 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgSpamTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 30 0"},
+      {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_"+com.CH_gui.msgTable.MsgTableComponent.visualsClassKeyName+"_VS", "Divider location 201 -1 30 0"},
 
       {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.frame.ChatTableFrame.visualsClassKeyName+"_chat_VS","Divider location 320 -1 70 0"},
       {com.CH_gui.gui.JSplitPaneVS.visualsClassKeyName+"_"+com.CH_gui.table.TableComponent.visualsClassKeyName+"_chatComp_VS","Divider location 485 -1 70 0"},

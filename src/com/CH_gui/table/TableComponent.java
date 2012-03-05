@@ -1,65 +1,80 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.table;
 
-import com.CH_gui.actionGui.JActionFrame;
-import com.CH_gui.addressBook.*;
-import com.CH_gui.chatTable.*;
-import com.CH_gui.fileTable.*;
-import com.CH_gui.groupTable.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.folder.*;
-import com.CH_gui.keyTable.*;
-import com.CH_gui.localFileTable.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.postTable.PostTableComponent;
-import com.CH_gui.recycleTable.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.util.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.service.records.*;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.UploadUtilities;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.service.records.Record;
 import com.CH_co.trace.Trace;
-import com.CH_co.tree.*;
-import com.CH_co.util.*;
-
+import com.CH_co.tree.FolderTreeNode;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.GlobalProperties;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.addressBook.AddressTableComponent;
+import com.CH_gui.addressBook.WhiteListTableComponent;
+import com.CH_gui.chatTable.ChatTableComponent;
+import com.CH_gui.fileTable.FileActionTable;
+import com.CH_gui.fileTable.FileTableComponent;
+import com.CH_gui.folder.FolderSelectionListener;
+import com.CH_gui.groupTable.GroupTableComponent;
+import com.CH_gui.gui.JSplitPaneVS;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.keyTable.KeyTableComponent;
+import com.CH_gui.localFileTable.FileChooserComponent;
+import com.CH_gui.msgTable.*;
+import com.CH_gui.msgs.MsgComposePanel;
+import com.CH_gui.msgs.MsgPreviewPanel;
+import com.CH_gui.postTable.PostTableComponent;
+import com.CH_gui.recycleTable.RecycleTableComponent;
+import com.CH_gui.tree.FolderTree;
+import com.CH_gui.util.ActionUtils;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.OpenChatFolders;
+import com.CH_gui.util.VisualsSavable;
 import java.awt.*;
 import java.util.EventListener;
 import java.util.StringTokenizer;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.40 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.40 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class TableComponent extends JPanel implements TreeSelectionListener, VisualsSavable, DisposableObj {
 
   public static final boolean DEBUG__DISABLE_LOCAL_FILE_CHOOSER = false;
@@ -550,7 +565,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           (mode.shortValue() == FolderRecord.MESSAGE_FOLDER && isSpamFolder != displayMode_IsSpamFolder) ||
           (mode.shortValue() == FolderRecord.MESSAGE_FOLDER && isDraftsFolder != displayMode_IsDraftsFolder)
         )
-       )
+      )
     {
       // save the visuals from the last component to GlobalProperties
       VisualsSavable vs1 = null;
@@ -679,7 +694,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
             // make sure we have the table component;
             initAddressTableComponent();
             addressPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_ADDR);
-            addressSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + addressTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
+            addressSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + addressTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.3d, 0.3d);
             addressTableComponent.addPreviewComponent(addressSplitPane, addressPreviewPanel);
           }
           c = addressTableComponent;
@@ -689,7 +704,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
             // make sure we have the table component;
             initWhiteListTableComponent();
             whiteListPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_ADDR);
-            whiteListSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + whiteListTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.5d);
+            whiteListSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + whiteListTableComponent.getVisualsClassKeyName(), JSplitPane.HORIZONTAL_SPLIT, 0.3d, 0.3d);
             whiteListTableComponent.addPreviewComponent(whiteListSplitPane, whiteListPreviewPanel);
           }
           c = whiteListTableComponent;
@@ -700,7 +715,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               // make sure we have the msg table component;
               initMsgTableComponent();
               msgPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_MSG);
-              msgSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
+              msgSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.30d);
               msgTableComponent.addPreviewComponent(msgSplitPane, msgPreviewPanel);
             }
             c = msgTableComponent;
@@ -709,7 +724,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               // make sure we have the msg table component;
               initMsgInboxTableComponent();
               msgInboxPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_MSG);
-              msgInboxSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgInboxTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
+              msgInboxSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgInboxTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.30d);
               msgInboxTableComponent.addPreviewComponent(msgInboxSplitPane, msgInboxPreviewPanel);
             }
             c = msgInboxTableComponent;
@@ -718,7 +733,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               // make sure we have the msg table component;
               initMsgSentTableComponent();
               msgSentPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_MSG);
-              msgSentSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgSentTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
+              msgSentSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgSentTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.30d);
               msgSentTableComponent.addPreviewComponent(msgSentSplitPane, msgSentPreviewPanel);
             }
             c = msgSentTableComponent;
@@ -727,7 +742,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               // make sure we have the msg table component;
               initMsgSpamTableComponent();
               msgSpamPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_MSG);
-              msgSpamSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgSpamTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
+              msgSpamSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgSpamTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.30d);
               msgSpamTableComponent.addPreviewComponent(msgSpamSplitPane, msgSpamPreviewPanel);
             }
             c = msgSpamTableComponent;
@@ -736,8 +751,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
               // make sure we have the msg table component;
               initMsgDraftsTableComponent();
               msgDraftsPreviewPanel = new MsgPreviewPanel(MsgDataRecord.OBJ_TYPE_MSG);
-              msgDraftsSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgDraftsTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
-              //msgDraftsSplitPane = createSplitPane(msgDraftsTableComponent, msgDraftsPreviewPanel, "_" + msgDraftsTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.40d);
+              msgDraftsSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + msgDraftsTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.3d, 0.30d);
               msgDraftsTableComponent.addPreviewComponent(msgDraftsSplitPane, msgDraftsPreviewPanel);
             }
             c = msgDraftsTableComponent;
@@ -753,8 +767,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           if (chatSplitPane == null) {
             // make sure we have the chat table component;
             initChatTableComponent();
-            chatSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + chatTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.90d);
-            //chatSplitPane = createSplitPane(chatTableComponent, chatComposePanel, "_chatComp", JSplitPane.VERTICAL_SPLIT, 0.90d);
+            chatSplitPane = createSplitPane(getVisualsClassKeyName() + "_" + chatTableComponent.getVisualsClassKeyName(), JSplitPane.VERTICAL_SPLIT, 0.85d, 0.85d);
             chatTableComponent.addEntryComponent(chatSplitPane, chatComposePanel);
           }
           //c = chatSplitPane;
@@ -817,8 +830,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   }
 
   /**
-   * Switch the displayed component.
-   */
+  * Switch the displayed component.
+  */
   private void setDisplayed(Component c) {
     boolean displayedChanged = false;
     if (c == null) {
@@ -877,15 +890,15 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   }
 
   /**
-   * Creates a coupled vertically split pane view of a record table and component viewer.
-   * The attached viewer must be a RecordSelectionListener to respond to record selection changes
-   * in the table.  Property name is used to store visuals about the split bar.
-   */
-  public static JSplitPane createSplitPane(String propertyName, int orientation, double resizeWeight) {
-    JSplitPane splitPane = new JMySplitPane(propertyName, orientation, resizeWeight);
+  * Creates a coupled vertically split pane view of a record table and component viewer.
+  * The attached viewer must be a RecordSelectionListener to respond to record selection changes
+  * in the table.  Property name is used to store visuals about the split bar.
+  */
+  public static JSplitPane createSplitPane(String propertyName, int defaultOrientation, double resizeWeightH, double resizeWeightV) {
+    JSplitPane splitPane = new JSplitPaneVS(propertyName, defaultOrientation, resizeWeightH, resizeWeightV);
     return splitPane;
   }
-  public static JSplitPane createSplitPane(String propertyName, RecordTableComponent recordTableComp, JComponent viewer, int orientation, double resizeWeight) {
+  public static JSplitPane createSplitPane(String propertyName, RecordTableComponent recordTableComp, JComponent viewer, int defaultOrientation, double resizeWeightH, double resizeWeightV) {
     viewer.setBorder(new EmptyBorder(0,0,0,0));
 
     // link the table with preview panel
@@ -893,7 +906,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       recordTableComp.getActionTable().addRecordSelectionListener((RecordSelectionListener) viewer);
     recordTableComp.setBorder(new EmptyBorder(0,0,0,0));
 
-    JSplitPane splitPane = new JMySplitPane(propertyName, orientation, recordTableComp, viewer, resizeWeight);
+    JSplitPane splitPane = new JSplitPaneVS(propertyName, defaultOrientation, recordTableComp, viewer, resizeWeightH, resizeWeightV);
     splitPane.setOneTouchExpandable(false);
 
     return splitPane;
@@ -1105,8 +1118,8 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   }
 
   /**
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
   */
   public void disposeObj() {
     removeRecordListeners();

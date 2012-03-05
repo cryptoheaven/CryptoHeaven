@@ -12,35 +12,51 @@
 
 package com.CH_gui.table;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.monitor.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.ContactRecordEvent;
+import com.CH_cl.service.cache.event.ContactRecordListener;
+import com.CH_cl.service.cache.event.FolderRecordEvent;
+import com.CH_cl.service.cache.event.FolderRecordListener;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_co.monitor.Stats;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
-import com.CH_gui.contactTable.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.list.*;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.SingleTokenArbiter;
+import com.CH_co.util.Sounds;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.actionGui.JActionButton;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.contactTable.ChatSessionCreator;
+import com.CH_gui.contactTable.ContactActionTable;
+import com.CH_gui.dialog.CustomizeColumnsDialog;
+import com.CH_gui.frame.MsgTableStarterFrame;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.menuing.PopupMouseAdapter;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.msgs.*;
+import com.CH_gui.msgTable.MsgTableModel;
+import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.ContactRecUtil;
-import com.CH_gui.sortedTable.*;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.sortedTable.TableSorter;
 import com.CH_gui.util.*;
-
 import java.awt.*;
 import java.awt.dnd.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -697,7 +713,6 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                                 // wait for other chat scrolling events for the same user to skip over this arbiter
                                 Thread.sleep(1000);
                               } catch (InterruptedException ex) {
-                                ex.printStackTrace();
                               }
                               offlineDialogArbiter.removeToken(key, token);
                             }
@@ -741,7 +756,6 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                         // wait for other chat scrolling events for the same user to skip over this arbiter
                         Thread.sleep(1000);
                       } catch (InterruptedException ex) {
-                        ex.printStackTrace();
                       }
                       offlineDialogArbiter.removeToken(key, token);
                     }

@@ -12,30 +12,42 @@
 
 package com.CH_gui.table;
 
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.records.*;
-
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.records.*;
-
-import com.CH_gui.frame.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.GlobalProperties;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.JBottomStickViewport;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import com.CH_gui.msgTable.MsgTableModel;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.sortedTable.TableModelSortEvent;
+import com.CH_gui.sortedTable.TableModelSortListener;
+import com.CH_gui.sortedTable.TableSorter;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.VisualsSavable;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.table.TableModel;
@@ -75,6 +87,9 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
   // Used to enable auto-scroll correction if recently resized
   private long lastResizeStamp = 0;
+  
+  // Auto scroll suppression
+  private boolean isAutoScrollSuppressed = false;
 
   /** Creates new RecordTableScrollPane */
   public RecordTableScrollPane(RecordTableModel recordTableModel) {
@@ -135,6 +150,13 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
   protected void setAreaComponent(JComponent areaComponent) {
     this.areaComponent = areaComponent;
+  }
+
+  public boolean isAutoScrollSuppressed() {
+    return isAutoScrollSuppressed;
+  }
+  public void setAutoScrollSuppressed(boolean flag) {
+    isAutoScrollSuppressed = flag;
   }
 
   public void setOpaqueTable(boolean opaque) {

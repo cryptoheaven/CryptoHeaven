@@ -1,22 +1,24 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.table;
 
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.FileLinkRecord;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
 import com.CH_gui.fileTable.FileTableModel;
 import java.util.*;
 import javax.swing.ButtonGroup;
@@ -25,22 +27,22 @@ import javax.swing.event.EventListenerList;
 import javax.swing.table.AbstractTableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: Provides a superclass table model for all record types.
- *                    Also manages all raw and viewable columns and provides
- *                    column number translation for subclases.
- * Class Details: This class manages hidden and shown columns and handles
- *                structure changes to resize the columns properly.
- *                Convention is that all column values mean, model columns,
- *                and not raw columns (unless atherwise specified).
- * <b>$Revision: 1.27 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: Provides a superclass table model for all record types.
+*                    Also manages all raw and viewable columns and provides
+*                    column number translation for subclases.
+* Class Details: This class manages hidden and shown columns and handles
+*                structure changes to resize the columns properly.
+*                Convention is that all column values mean, model columns,
+*                and not raw columns (unless atherwise specified).
+* <b>$Revision: 1.27 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public abstract class RecordTableModel extends AbstractTableModel implements SearchTextProviderI {
 
   public static final Integer TIMESTAMP_PRL = new Integer(110); // Preferred Long
@@ -72,11 +74,12 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
   /** Used by Chat table to scroll to the inserted Record */
   public CallbackI recordInsertionCallback;
+  public boolean isAutoScrollSuppressed = false;
 
   /**
-   * Creates new RecordTableModel
-   * Default filter is no-filter = accept all; for objects managed in folders this is usually not desirable.
-   */
+  * Creates new RecordTableModel
+  * Default filter is no-filter = accept all; for objects managed in folders this is usually not desirable.
+  */
   public RecordTableModel(ColumnHeaderData columnHeaderData) {
     this (columnHeaderData, null);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "RecordTableModel(ColumnHeaderData columnHeaderData)");
@@ -115,25 +118,29 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
   public abstract Vector getCachedFetchedFolderIDs();
 
+  public void setAutoScrollSuppressed(boolean flag) {
+    isAutoScrollSuppressed = flag;
+  }
+
   /**
-   * Assigns or removes record cache listeners in the cache.
-   */
+  * Assigns or removes record cache listeners in the cache.
+  */
   public abstract void setAutoUpdate(boolean b);
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public abstract boolean isContentFetched(Long shareId);
 
   /**
-   * Initializes tables data
-   */
+  * Initializes tables data
+  */
   public synchronized void initData(Long folderId) {
   }
   public synchronized void initData(Long folderId, boolean forceSwitch) {
@@ -141,8 +148,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * Triggers refreshing of view when filter changes.
-   */
+  * Triggers refreshing of view when filter changes.
+  */
   private void reInitData() {
     FolderPair fPair = getParentFolderPair();
     if (fPair != null) {
@@ -217,9 +224,9 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
 
   /**
-   * JTable uses this method to fetch displayable Objects for the table cells.
-   * The coordinates used are the display model row and column.
-   */
+  * JTable uses this method to fetch displayable Objects for the table cells.
+  * The coordinates used are the display model row and column.
+  */
   public synchronized Object getValueAt(int row, int column) {
     return getValueAt(row, column, false);
   }
@@ -247,8 +254,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
 
   /**
-   * @return Record object at specified row position.
-   */
+  * @return Record object at specified row position.
+  */
   public synchronized Record getRowObject(int modelRow) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "getRowObject(int modelRow)");
     if (trace != null) trace.args(modelRow);
@@ -265,8 +272,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * @return model row index for a given object ID, -1 if not found.
-   */
+  * @return model row index for a given object ID, -1 if not found.
+  */
   public synchronized int getRowForObject(Long id) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "getRowForObject(Long id)");
     int row = getRowForObject(id, null);
@@ -274,8 +281,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     return row;
   }
   /**
-   * @return model row index for a given object ID, -1 if not found.
-   */
+  * @return model row index for a given object ID, -1 if not found.
+  */
   public synchronized int getRowForObject(Long id, Class classType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "getRowForObject(Long id, Class classType)");
     if (trace != null) trace.args(id);
@@ -319,8 +326,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * Sets the data for the model.
-   */
+  * Sets the data for the model.
+  */
   public synchronized void setData(Record[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "setData(Record[] records)");
     if (trace != null) trace.args(records);
@@ -382,10 +389,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * Updates the specified records into the model by merging the new updates or
-   * adding the elements if they don't already exist in the model.  If any of the records
-   * should not be in the model, it will be removed with a call to removeData().
-   */
+  * Updates the specified records into the model by merging the new updates or
+  * adding the elements if they don't already exist in the model.  If any of the records
+  * should not be in the model, it will be removed with a call to removeData().
+  */
   public synchronized void updateData(Record[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "updateData(Record[] records)");
     if (trace != null) trace.args(records);
@@ -489,10 +496,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * Add a file to our list tracking versions in our private cache, find previous file listing and new replacement.
-   * @param fLink
-   * @return the replacement file or a set of {previous, replacement}
-   */
+  * Add a file to our list tracking versions in our private cache, find previous file listing and new replacement.
+  * @param fLink
+  * @return the replacement file or a set of {previous, replacement}
+  */
   private Object addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink)");
     if (trace != null) trace.args(fLink);
@@ -535,8 +542,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * Removes the specified records from the model.
-   */
+  * Removes the specified records from the model.
+  */
   public synchronized void removeData(Record[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "removeData(Record[] records)");
     if (trace != null) trace.args(records);
@@ -571,7 +578,6 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
           if (linkNamesForReInsertCheck == null) linkNamesForReInsertCheck = new HashSet();
           linkNamesForReInsertCheck.add(name);
         } catch (Throwable t) {
-          t.printStackTrace();
         }
       }
     }
@@ -616,8 +622,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   }
 
   /**
-   * Removes all data from the model.
-   */
+  * Removes all data from the model.
+  */
   public synchronized void removeData() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "removeData()");
 
@@ -680,8 +686,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
 
   /*******************************************
-   ***    ParentFolderListener handling    ***
-   *******************************************/
+  ***    ParentFolderListener handling    ***
+  *******************************************/
 
   public synchronized void addParentFolderListener(ParentFolderListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "addParentFolderListener(FolderParentListener l)");
@@ -699,11 +705,11 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireParentFolderChanged(FolderPair prevParent, FolderPair newParent) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "fireParentFolderChanged(FolderPair prevParent, FolderPair newParent)");
     if (trace != null) trace.args(prevParent, newParent);

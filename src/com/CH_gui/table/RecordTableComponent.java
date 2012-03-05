@@ -14,43 +14,55 @@
 package com.CH_gui.table;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.records.filters.TextSearchFilter;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDPair_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_ID_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.action.ActionUtilities;
+import com.CH_gui.action.Actions;
+import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.chatTable.ChatActionTable;
-import com.CH_gui.contactTable.*;
-import com.CH_gui.frame.*;
+import com.CH_gui.contactTable.ContactTableModel;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.recycleTable.*;
-import com.CH_gui.service.records.*;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.menuing.PopupMouseAdapter;
+import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.msgTable.MsgTableModel;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.recycleTable.RecycleTableModel;
+import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -111,6 +123,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private boolean suppressVisualsSavable;
   private FolderShareListener folderShareListener;
   private ContactListener contactListener;
+
+  private Thread timedScrollerThread;
 
   /**
    * Creates new RecordTableComponent.
@@ -997,8 +1011,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         } // end share != null
       } catch (Throwable t) {
         // if I'm not logged in, we can expect Exception, just note it in description...
-        System.out.println(t.getMessage());
-        t.printStackTrace();
         desc = "Folder could not be located.";
       }
       jDescriptionLabel.setText("<html>"+desc+"</html>"); // html gives us multi-line label capability
@@ -1179,24 +1191,31 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       ((RecordActionTable) RecordTableComponent.this.recordTableScrollPane).getFilterAction().putValue(Actions.STATE_CHECK, enableFilter);
   }
   public void setFilterNarrowing(String filterStr, boolean includeMsgBodies) {
+    // reset any prior delayed scrollers
+    try {
+      if (timedScrollerThread != null)
+        timedScrollerThread.interrupt();
+    } catch (Throwable t) {
+    }
     // Memorize current selection so we can attempt to restore it after filter is changed.
-    List selectionL = recordTableScrollPane.getSelectedRecordsL();
-    if (filterStr != null && filterStr.trim().length() > 0)
+    final List selectionL = recordTableScrollPane.getSelectedRecordsL();
+    setAutoScrollSuppressed(true);
+    if (filterStr != null && filterStr.trim().length() > 0) {
       recordTableScrollPane.getTableModel().setFilterNarrowing(new TextSearchFilter(filterStr, includeMsgBodies, recordTableScrollPane.getTableModel()));
-    else
+    } else {
       recordTableScrollPane.getTableModel().setFilterNarrowing(null);
+    }
     // Try restoring selection
     boolean anySelected = false;
-    if (selectionL != null) {
+    if (selectionL != null && selectionL.size() > 0) {
+      // restore the selection
       for (int i=0; i<selectionL.size(); i++) {
         int row = recordTableScrollPane.getTableModel().getRowForObject(((Record) selectionL.get(i)).getId());
         if (row >= 0) {
-          int viewRow = recordTableScrollPane.getJSortedTable().convertMyRowIndexToView(row);
+          final int viewRow = recordTableScrollPane.getJSortedTable().convertMyRowIndexToView(row);
           if (viewRow >= 0) {
             if (!anySelected) {
               recordTableScrollPane.getJSortedTable().getSelectionModel().setSelectionInterval(viewRow, viewRow);
-              Rectangle rect = recordTableScrollPane.getJSortedTable().getCellRect(viewRow, 0, true);
-              recordTableScrollPane.getJSortedTable().scrollRectToVisible(rect);
               anySelected = true;
             } else {
               recordTableScrollPane.getJSortedTable().getSelectionModel().addSelectionInterval(viewRow, viewRow);
@@ -1204,7 +1223,71 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           }
         }
       }
+      // scroll selection to visible...
+      // Try scrolling to the visible row many times for 1 second.
+      // This is to give a change for dynamic rendering of rows to update as this may change their
+      // rendering heights and consequently change the position of the row we are scrolling to.
+      Runnable timedScrollInvoker = new Runnable() {
+        public void run() {
+          try {
+            Runnable awtScrollRunner = new Runnable() {
+              public void run() {
+                try {
+                  if (timedScrollerThread != null && !timedScrollerThread.isInterrupted()) {
+                    Rectangle rectUnion = null;
+                    for (int i=0; i<selectionL.size(); i++) {
+                      int row = recordTableScrollPane.getTableModel().getRowForObject(((Record) selectionL.get(i)).getId());
+                      if (row >= 0) {
+                        int viewRow = recordTableScrollPane.getJSortedTable().convertMyRowIndexToView(row);
+                        if (viewRow >= 0) {
+                          Rectangle rect = recordTableScrollPane.getJSortedTable().getCellRect(viewRow, 0, true);
+                          if (rectUnion == null)
+                            rectUnion = rect;
+                          else
+                            rectUnion = rectUnion.union(rect);
+                        }
+                      }
+                    } // end for
+                    if (rectUnion != null)
+                      recordTableScrollPane.getJSortedTable().scrollRectToVisible(rectUnion);
+                  }
+                } catch (Throwable t) {
+                }
+              }
+            };
+            int scrollTimes = 2;
+            long delayInitial = 1000;
+            long delayNext = 1;
+            for (int i=0; i<scrollTimes; i++) {
+              try {
+                if (timedScrollerThread.isInterrupted()) break;
+                if (i == 0 && delayInitial > 0) Thread.sleep(delayInitial);
+                else if (i > 0 && delayNext > 0) Thread.sleep(delayNext);
+                SwingUtilities.invokeAndWait(awtScrollRunner);
+              } catch (InterruptedException e) {
+                break;
+              } catch (Throwable t) {
+              }
+            }
+          } finally {
+            timedScrollerThread = null;
+            setAutoScrollSuppressed(false);
+          }
+        } // end run()
+      };
+      timedScrollerThread = new ThreadTraced(timedScrollInvoker, "Timed Scroller");
+      timedScrollerThread.start();
+    } else {
+      setAutoScrollSuppressed(false);
     }
+  }
+
+  private void setAutoScrollSuppressed(boolean isSuppressed) {
+    JViewport vp = recordTableScrollPane.getViewport();
+    if (vp instanceof JBottomStickViewport)
+      ((JBottomStickViewport) vp).setAutoScrollSuppressed(isSuppressed);
+    recordTableScrollPane.setAutoScrollSuppressed(isSuppressed);
+    recordTableScrollPane.getTableModel().setAutoScrollSuppressed(isSuppressed);
   }
 
   /***********************************************************
