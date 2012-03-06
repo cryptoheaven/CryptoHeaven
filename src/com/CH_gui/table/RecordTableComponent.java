@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 
 package com.CH_gui.table;
@@ -65,21 +65,21 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.32 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.32 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public abstract class RecordTableComponent extends JPanel implements ToolBarProducerI, VisualsSavable, DisposableObj {
 
   private JLabel jTitleLabel;
@@ -127,9 +127,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private Thread timedScrollerThread;
 
   /**
-   * Creates new RecordTableComponent.
-   * @param recordTableScrollPane is often an RecordActionTable which is a subclass of RecordTableScrollPane
-   */
+  * Creates new RecordTableComponent.
+  * @param recordTableScrollPane is often an RecordActionTable which is a subclass of RecordTableScrollPane
+  */
   public RecordTableComponent(RecordTableScrollPane recordTableScrollPane) {
     this(recordTableScrollPane, Template.get(Template.NONE), Template.get(Template.NONE));
   }
@@ -294,9 +294,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   * Setting the title overwrites the default title construction when initData() is called.
-   * Setting it to 'null' resets the custom title setting.
-   */
+  * Setting the title overwrites the default title construction when initData() is called.
+  * Setting it to 'null' resets the custom title setting.
+  */
   public void setTitle(Object title) {
     this.title = title;
     if (title != null) {
@@ -512,7 +512,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     /*
     add(recordTableScrollPane, new GridBagConstraints(0, 1, 5, 1, 60, 60,
         GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
-     */
+    */
 
     cards = new JPanel();
     cardLayout = new CardLayout();
@@ -639,7 +639,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               (   (fsr != null && !model.isContentFetched(fsr.shareId)) ||
                   (fsr == null && model instanceof ContactTableModel)
               )
-           )
+          )
         {
           runTimer = true;
         }
@@ -761,13 +761,13 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   * This method should take care of setting the TableModel to display specified folders data.
-   */
+  * This method should take care of setting the TableModel to display specified folders data.
+  */
   public abstract void initDataModel(Long folderId);
 
   /**
-   * Initializes to display specified folder's data.  Will call initDataModel(folderId);
-   */
+  * Initializes to display specified folder's data.  Will call initDataModel(folderId);
+  */
   public void initData(Long folderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableComponent.class, "initData(Long folderId)");
 
@@ -794,8 +794,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   * Sets the title of the folder to reflect the description of the given folder.
-   */
+  * Sets the title of the folder to reflect the description of the given folder.
+  */
   private void changeTitle(Long folderId) {
     if (folderId == null) {
       jTitleLabel.setText(null);
@@ -824,8 +824,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     jTitleLabel.repaint();
   }
   /**
-   * Sets the description of the folder to reflect the description of the given folder.
-   */
+  * Sets the description of the folder to reflect the description of the given folder.
+  */
   private void changeDescription(Long folderId) {
     boolean isParticipantsPanelMade = false;
     boolean isAnyOnline = false;
@@ -1037,10 +1037,10 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   *
-   * @param fRec
-   * @return Array of all participants starting with folder owner
-   */
+  *
+  * @param fRec
+  * @return Array of all participants starting with folder owner
+  */
   public Record[] getFolderParticipants(FolderRecord fRec) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long ownerUserId = fRec.ownerUserId;
@@ -1077,8 +1077,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   * Folder Share listener to update title and description labels when they change.
-   */
+  * Folder Share listener to update title and description labels when they change.
+  */
   private class FolderShareListener implements FolderShareRecordListener {
     public void folderShareRecordUpdated(FolderShareRecordEvent event) {
       // to prevent deadlocks, run in seperate thread
@@ -1087,8 +1087,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   * Contacts listener to update participants list when they change.
-   */
+  * Contacts listener to update participants list when they change.
+  */
   private class ContactListener implements ContactRecordListener {
     public void contactRecordUpdated(ContactRecordEvent event) {
       // to prevent deadlocks, run in seperate thread
@@ -1199,7 +1199,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
     // Memorize current selection so we can attempt to restore it after filter is changed.
     final List selectionL = recordTableScrollPane.getSelectedRecordsL();
-    setAutoScrollSuppressed(true);
+    boolean anyToSelect = selectionL != null && selectionL.size() > 0;
+    if (anyToSelect)
+      setAutoScrollSuppressed(true);
     if (filterStr != null && filterStr.trim().length() > 0) {
       recordTableScrollPane.getTableModel().setFilterNarrowing(new TextSearchFilter(filterStr, includeMsgBodies, recordTableScrollPane.getTableModel()));
     } else {
@@ -1207,7 +1209,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
     // Try restoring selection
     boolean anySelected = false;
-    if (selectionL != null && selectionL.size() > 0) {
+    if (anyToSelect) {
       // restore the selection
       for (int i=0; i<selectionL.size(); i++) {
         int row = recordTableScrollPane.getTableModel().getRowForObject(((Record) selectionL.get(i)).getId());
@@ -1223,62 +1225,64 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           }
         }
       }
-      // scroll selection to visible...
-      // Try scrolling to the visible row many times for 1 second.
-      // This is to give a change for dynamic rendering of rows to update as this may change their
-      // rendering heights and consequently change the position of the row we are scrolling to.
-      Runnable timedScrollInvoker = new Runnable() {
-        public void run() {
-          try {
-            Runnable awtScrollRunner = new Runnable() {
-              public void run() {
-                try {
-                  if (timedScrollerThread != null && !timedScrollerThread.isInterrupted()) {
-                    Rectangle rectUnion = null;
-                    for (int i=0; i<selectionL.size(); i++) {
-                      int row = recordTableScrollPane.getTableModel().getRowForObject(((Record) selectionL.get(i)).getId());
-                      if (row >= 0) {
-                        int viewRow = recordTableScrollPane.getJSortedTable().convertMyRowIndexToView(row);
-                        if (viewRow >= 0) {
-                          Rectangle rect = recordTableScrollPane.getJSortedTable().getCellRect(viewRow, 0, true);
-                          if (rectUnion == null)
-                            rectUnion = rect;
-                          else
-                            rectUnion = rectUnion.union(rect);
+      if (!anySelected) {
+        setAutoScrollSuppressed(false);
+      } else {
+        // Scroll selection to visible... then restore auto-scroll...
+        // Try scrolling to the visible row many times for 1 second.
+        // This is to give a change for dynamic rendering of rows to update as this may change their
+        // rendering heights and consequently change the position of the row we are scrolling to.
+        Runnable timedScrollInvoker = new Runnable() {
+          public void run() {
+            try {
+              Runnable awtScrollRunner = new Runnable() {
+                public void run() {
+                  try {
+                    if (timedScrollerThread != null && !timedScrollerThread.isInterrupted()) {
+                      Rectangle rectUnion = null;
+                      for (int i=0; i<selectionL.size(); i++) {
+                        int row = recordTableScrollPane.getTableModel().getRowForObject(((Record) selectionL.get(i)).getId());
+                        if (row >= 0) {
+                          int viewRow = recordTableScrollPane.getJSortedTable().convertMyRowIndexToView(row);
+                          if (viewRow >= 0) {
+                            Rectangle rect = recordTableScrollPane.getJSortedTable().getCellRect(viewRow, 0, true);
+                            if (rectUnion == null)
+                              rectUnion = rect;
+                            else
+                              rectUnion = rectUnion.union(rect);
+                          }
                         }
-                      }
-                    } // end for
-                    if (rectUnion != null)
-                      recordTableScrollPane.getJSortedTable().scrollRectToVisible(rectUnion);
+                      } // end for
+                      if (rectUnion != null)
+                        recordTableScrollPane.getJSortedTable().scrollRectToVisible(rectUnion);
+                    }
+                  } catch (Throwable t) {
                   }
+                }
+              };
+              int scrollTimes = 2;
+              long delayInitial = 1000;
+              long delayNext = 1;
+              for (int i=0; i<scrollTimes; i++) {
+                try {
+                  if (timedScrollerThread.isInterrupted()) break;
+                  if (i == 0 && delayInitial > 0) Thread.sleep(delayInitial);
+                  else if (i > 0 && delayNext > 0) Thread.sleep(delayNext);
+                  SwingUtilities.invokeAndWait(awtScrollRunner);
+                } catch (InterruptedException e) {
+                  break;
                 } catch (Throwable t) {
                 }
               }
-            };
-            int scrollTimes = 2;
-            long delayInitial = 1000;
-            long delayNext = 1;
-            for (int i=0; i<scrollTimes; i++) {
-              try {
-                if (timedScrollerThread.isInterrupted()) break;
-                if (i == 0 && delayInitial > 0) Thread.sleep(delayInitial);
-                else if (i > 0 && delayNext > 0) Thread.sleep(delayNext);
-                SwingUtilities.invokeAndWait(awtScrollRunner);
-              } catch (InterruptedException e) {
-                break;
-              } catch (Throwable t) {
-              }
+            } finally {
+              timedScrollerThread = null;
+              setAutoScrollSuppressed(false);
             }
-          } finally {
-            timedScrollerThread = null;
-            setAutoScrollSuppressed(false);
-          }
-        } // end run()
-      };
-      timedScrollerThread = new ThreadTraced(timedScrollInvoker, "Timed Scroller");
-      timedScrollerThread.start();
-    } else {
-      setAutoScrollSuppressed(false);
+          } // end run()
+        };
+        timedScrollerThread = new ThreadTraced(timedScrollInvoker, "Timed Scroller");
+        timedScrollerThread.start();
+      }
     }
   }
 
@@ -1363,8 +1367,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   }
 
   /**
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
   */
   public void disposeObj() {
     removeRecordListeners();
