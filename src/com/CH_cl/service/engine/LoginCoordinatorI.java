@@ -10,7 +10,7 @@
  * you entered into with CryptoHeaven Corp.
  */
 
-package com.CH_gui.frame;
+package com.CH_cl.service.engine;
 
 import com.CH_co.monitor.ProgMonitorI;
 
@@ -33,9 +33,9 @@ import com.CH_co.monitor.ProgMonitorI;
 public interface LoginCoordinatorI {
 
   public ProgMonitorI getLoginProgMonitor();
-  public void loginAttemptCloseCurrentSession();
-  public void loginComplete(boolean isSuccess);
-  public void readyForMainData();
+  public void loginAttemptCloseCurrentSession(ServerInterfaceLayer SIL);
+  public void loginComplete(ServerInterfaceLayer SIL, boolean isSuccess);
+  public void readyForMainData(ServerInterfaceLayer SIL);
   public void setLoginProgMonitor(ProgMonitorI progMonitor);
   public void startPreloadingComponents_Threaded();
 

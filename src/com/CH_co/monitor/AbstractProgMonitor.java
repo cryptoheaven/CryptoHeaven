@@ -73,7 +73,7 @@ abstract public class AbstractProgMonitor extends Object {
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.moveGlobe(this);
-//    Stats.setStatus("New request created ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    Stats.setStatusAll("Request [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(AbstractProgMonitor.class);
   }
 
@@ -92,7 +92,7 @@ abstract public class AbstractProgMonitor extends Object {
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.moveGlobe(this);
-//    Stats.setStatus("Sending request ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    Stats.setStatusAll("Sending [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(AbstractProgMonitor.class);
   }
 
@@ -112,7 +112,7 @@ abstract public class AbstractProgMonitor extends Object {
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
 //    if (!CommandCodes.isCodeForShortenStatusNotification(actionCode))
-//      Stats.setStatus("Receiving reply ... [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+//      Stats.setStatusAll("Receiving [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(AbstractProgMonitor.class);
   }
 
@@ -139,7 +139,7 @@ abstract public class AbstractProgMonitor extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AbstractProgMonitor.class, "doneExecution(int actionCode)");
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.data(10, name);
-//    Stats.setStatus("Action completed. [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+    Stats.setStatusAll("Completed [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     //Stats.stopGlobe(this); // fixing ever-spinning globe
     if (trace != null) trace.exit(AbstractProgMonitor.class);
   }

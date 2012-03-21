@@ -15,31 +15,42 @@ package com.CH_gui.frame;
 import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.engine.LoginCoordinatorI;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.DownloadUtilities;
 import com.CH_cl_eml.service.ops.ExportMsgsImpl;
-
-import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
+import com.CH_co.monitor.ConfirmFileReplaceFactory;
+import com.CH_co.monitor.ProgMonitorFactory;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.ContactFilterCo;
-import com.CH_co.trace.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.trace.TraceDiagnostics;
 import com.CH_co.util.*;
-
 import com.CH_gui.actionGui.JActionFrame;
-import com.CH_gui.dialog.*;
-import com.CH_gui.gui.*;
+import com.CH_gui.dialog.AcceptDeclineContactDialog;
+import com.CH_gui.dialog.ChangePasswordDialog;
+import com.CH_gui.gui.InactivityEventQueue;
+import com.CH_gui.gui.SingleFileChooser;
 import com.CH_gui.monitor.*;
 import com.CH_gui.util.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.net.URLDecoder;
 import java.util.*;
-
-import javax.swing.*;
+import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
 
@@ -71,9 +82,9 @@ public class MainFrameStarter extends Object {
     if (!skipLogin) {
       new LoginFrame(loginCoordinator, splashWindow);
     } else {
-      loginCoordinator.loginAttemptCloseCurrentSession();
+      loginCoordinator.loginAttemptCloseCurrentSession(MainFrame.getServerInterfaceLayer());
       loginCoordinator.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
-      loginCoordinator.loginComplete(true);
+      loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), true);
     }
     if (swingMemoryFootprintTestExitWhenMainScreenLoaded) {
       System.exit(0);
@@ -370,11 +381,11 @@ public class MainFrameStarter extends Object {
       monitor = progMonitor;
     }
 
-    public void loginAttemptCloseCurrentSession() {
+    public void loginAttemptCloseCurrentSession(ServerInterfaceLayer SIL) {
     }
 
-    public void loginComplete(boolean success) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StarterLoginCoordinator.class, "loginComplete(boolean success)");
+    public void loginComplete(ServerInterfaceLayer SIL, boolean success) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StarterLoginCoordinator.class, "loginComplete(ServerInterfaceLayer SIL, boolean success)");
       if (trace != null) trace.args(success);
 
       final Frame[] mainStartupFrame = new Frame[1];
@@ -389,7 +400,6 @@ public class MainFrameStarter extends Object {
         InactivityEventQueue.getInstance().sendActiveFlagIfInactive();
 
         // Get the folders and contacts when login Completes...
-        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
         final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         if (SIL != null) {
           // fetch and select desired message
@@ -435,7 +445,7 @@ public class MainFrameStarter extends Object {
             }
           }
           // fetch the rest of supporting data required for replies and other operations
-          readyForMainData();
+          readyForMainData(SIL);
         }
 
         if (trace != null) trace.data(20, "closing down the Login Progress Monitor");
@@ -445,7 +455,7 @@ public class MainFrameStarter extends Object {
         if (mainStartupFrame[0] == null) {
           MainFrame mainFrame = new MainFrame(null, null, null);
           mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
-          mainFrame.loginComplete(true);
+          mainFrame.loginComplete(SIL, true);
           mainStartupFrame[0] = mainFrame;
         } else {
           // check if password is set
@@ -469,10 +479,10 @@ public class MainFrameStarter extends Object {
       // no-op
     }
 
-    public void readyForMainData() {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrameStarter.class, "readyForMainData()");
+    public void readyForMainData(ServerInterfaceLayer SIL) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrameStarter.class, "readyForMainData(ServerInterfaceLayer SIL)");
       // fetch contacts, root folders (including Sent folder for replying to message), etc...
-      MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE));
+      SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE));
       if (trace != null) trace.exit(MainFrameStarter.class);
     }
   } // end class StarterLoginCoordinator

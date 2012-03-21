@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.monitor;
 
@@ -18,25 +18,27 @@ import com.CH_co.util.*;
 import java.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.19 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.19 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class Stats extends Object {
 
   protected static final LinkedList statusHistoryL = new LinkedList();
+  protected static final LinkedList statusHistoryAllL = new LinkedList();
   protected static final LinkedList statusHistoryDatesL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
+  protected static final LinkedList statusHistoryDatesAllL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
   private static final int MAX_HISTORY_SIZE = 500;
 
   private static HashMap globeMoversTraceHM = new HashMap(); // for debug, stack traces of our Movers
@@ -110,6 +112,15 @@ public class Stats extends Object {
     }
     return new ArrayList[] { historyL, historyDatesL };
   }
+  public static ArrayList[] getStatsHistoryAllLists() {
+    ArrayList historyL = null;
+    ArrayList historyDatesL = null;
+    synchronized (monitor) {
+      historyL = new ArrayList(statusHistoryAllL);
+      historyDatesL = new ArrayList(statusHistoryDatesAllL);
+    }
+    return new ArrayList[] { historyL, historyDatesL };
+  }
 
   public static ArrayList getGlobeMoversTraceL() {
     ArrayList moversTraceL = null;
@@ -165,6 +176,20 @@ public class Stats extends Object {
       while (statusHistoryL.size() > MAX_HISTORY_SIZE) {
         statusHistoryL.removeLast();
         statusHistoryDatesL.removeLast();
+      }
+    }
+    if (trace != null) trace.exit(Stats.class);
+  }
+
+  public static void setStatusAll(String newStatus) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Stats.class, "setStatusAll(String newStatus)");
+    if (trace != null) trace.args(newStatus);
+    synchronized (monitor) {
+      statusHistoryAllL.addFirst(newStatus);
+      statusHistoryDatesAllL.addFirst(new Date());
+      while (statusHistoryAllL.size() > MAX_HISTORY_SIZE) {
+        statusHistoryAllL.removeLast();
+        statusHistoryDatesAllL.removeLast();
       }
     }
     if (trace != null) trace.exit(Stats.class);

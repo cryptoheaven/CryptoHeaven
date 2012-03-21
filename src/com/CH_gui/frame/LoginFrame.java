@@ -12,40 +12,59 @@
 
 package com.CH_gui.frame;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
-import com.CH_co.service.records.*;
-
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.EngineFinder;
+import com.CH_cl.service.engine.LoginCoordinatorI;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.UserOps;
 import com.CH_co.cryptx.*;
-import com.CH_co.monitor.*;
+import com.CH_co.monitor.ProgMonitorFactory;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.ProgMonitorPool;
+import com.CH_co.monitor.Stats;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.msg.dataSets.Str_Rp;
-import com.CH_co.trace.*;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.usr.Usr_LoginSecSess_Rp;
+import com.CH_co.service.msg.dataSets.usr.Usr_LoginSecSess_Rq;
+import com.CH_co.service.msg.dataSets.usr.Usr_NewUsr_Rq;
+import com.CH_co.service.records.EmailRecord;
+import com.CH_co.service.records.FolderShareRecord;
+import com.CH_co.service.records.KeyRecord;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.dialog.*;
+import com.CH_gui.dialog.KeyGenerationOptionsDialog;
+import com.CH_gui.dialog.LicenseDialog;
+import com.CH_gui.dialog.UserSelectPassRecoveryDialog;
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.list.ListUpdatableI;
+import com.CH_gui.list.ObjectsProviderUpdaterI;
+import com.CH_gui.list.TypeAheadPopupList;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.MiscGui;
+import com.CH_guiLib.gui.JMyComboBox;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
-import java.io.*;
-import java.net.*;
+import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.*;
-
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.Timer;
-import javax.swing.text.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.text.Keymap;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -221,7 +240,7 @@ public class LoginFrame extends JFrame {
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
         closeFrame();
-        LoginFrame.this.loginCoordinator.loginComplete(false);
+        LoginFrame.this.loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), false);
       }
     });
 
@@ -1348,7 +1367,7 @@ public class LoginFrame extends JFrame {
     newUser_request = null;
     login_request = null;
     closeFrame();
-    loginCoordinator.loginComplete(false);
+    loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), false);
   }
 
 
@@ -1643,7 +1662,7 @@ public class LoginFrame extends JFrame {
         boolean isLoginSuccess = performLogin();
         if (isLoginSuccess) {
           LoginFrame.this.closeFrame();
-          loginCoordinator.loginComplete(true);
+          loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), true);
           Stats.setStatus("Welcome "+FetchedDataCache.getSingleInstance().getUserRecord().handle);
         } else if (!isUsernameForRetry) {
           if (isUsernameInRetry) {
@@ -1716,7 +1735,7 @@ public class LoginFrame extends JFrame {
     boolean isStoreRemoteFlag = false;
 
     // Notify main frame that login will now be attempted.
-    loginCoordinator.loginAttemptCloseCurrentSession();
+    loginCoordinator.loginAttemptCloseCurrentSession(MainFrame.getServerInterfaceLayer());
 
     // logout current session
     performLogout();

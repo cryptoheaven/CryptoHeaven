@@ -18,6 +18,7 @@ import com.CH_cl.service.cache.event.ContactRecordEvent;
 import com.CH_cl.service.cache.event.ContactRecordListener;
 import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.LoginCoordinatorI;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
@@ -175,7 +176,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Called just before a login is attempted.
    */
-  public void loginAttemptCloseCurrentSession() {
+  public void loginAttemptCloseCurrentSession(ServerInterfaceLayer SIL) {
     JActionFrameClosable.closeAllClosableFramesLeaveNonUserSensitive();
     if (SIL != null)
       SIL.disconnectAndClear();
@@ -185,8 +186,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /**
    * Called right after login completed.
    */
-  public void loginComplete(boolean success) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "loginComplete(boolean success)");
+  public void loginComplete(ServerInterfaceLayer SIL, boolean success) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "loginComplete(ServerInterfaceLayer SIL, boolean success)");
     if (trace != null) trace.args(success);
 
     if (success) {
@@ -280,7 +281,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderId)), 25000, 3);
           try { SwingUtilities.invokeAndWait(folderSelect2); } catch (Throwable t) { }
         }
-        readyForMainData();
+        readyForMainData(SIL);
       }
 
       // Make the frame visible in a GUI thread
@@ -430,8 +431,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
   }
 
-  public void readyForMainData() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "readyForMainData()");
+  public void readyForMainData(ServerInterfaceLayer SIL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "readyForMainData(ServerInterfaceLayer SIL)");
     SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE));
     if (trace != null) trace.exit(MainFrame.class);
   }

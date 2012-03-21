@@ -12,21 +12,24 @@
 
 package com.CH_gui.frame;
 
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.monitor.ProgMonitorFactory;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.ActionUtilities;
+import com.CH_gui.action.Actions;
+import com.CH_gui.monitor.StatsBar;
 import com.CH_gui.util.ActionProducerI;
 import com.CH_gui.util.Images;
-import com.CH_cl.service.cache.*;
-
-import com.CH_co.monitor.ProgMonitorFactory;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.monitor.StatsBar;
-
 import java.awt.BorderLayout;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import javax.swing.Action;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -105,7 +108,7 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
           if (MainFrame.getSingleInstance() == null) {
             MainFrame mainFrame = new MainFrame(MsgTableStarterFrame.this, null, null);
             mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
-            mainFrame.loginComplete(true);
+            mainFrame.loginComplete(MainFrame.getServerInterfaceLayer(), true);
           }
         }
       };
