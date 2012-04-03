@@ -1,45 +1,45 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.frame;
 
-import java.awt.*;
-import java.io.*;
-
-import com.CH_gui.actionGui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-
-import com.CH_co.nanoxml.*;
+import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.actionGui.JActionFrameClosable;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgs.MsgComposeComponents;
+import com.CH_gui.msgs.MsgComposePanel;
 import com.CH_gui.util.MiscGui;
+import java.awt.BorderLayout;
+import java.io.File;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.24 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.24 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class MessageFrame extends JActionFrameClosable {
 
   private MsgComposePanel composePanel;
@@ -62,7 +62,6 @@ public class MessageFrame extends JActionFrameClosable {
     if (trace != null) trace.args(objType);
     if (trace != null) trace.args(draftMsgLink);
     if (trace != null) trace.args(isDeleteDraftAfterSave);
-    //composePanel.setFromDraft_Threaded(draftMsgLink, isDeleteDraftAfterSave);
     if (trace != null) trace.exit(MessageFrame.class);
   }
 
@@ -143,10 +142,13 @@ public class MessageFrame extends JActionFrameClosable {
     if (trace != null) trace.args(initialRecipients, replyToMsg);
 
     composePanel = new MsgComposePanel(initialRecipients, null, MsgDataRecord.OBJ_TYPE_MSG, false, true);
-    composePanel.setReplyTo_Threaded(replyToMsg, initialRecipients);
     if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
       this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
+
+    // Initializing the components involves focus request so do this after 
+    // components is already added to the window.
+    composePanel.setReplyTo_Threaded(replyToMsg, initialRecipients);
 
     // all JActionFrames already size themself
     setVisible(true);
@@ -163,13 +165,16 @@ public class MessageFrame extends JActionFrameClosable {
     if (trace != null) trace.args(initialRecipients, attachments);
 
     composePanel = new MsgComposePanel(new Record[][] { initialRecipients }, attachments);
-    if (attachments != null && attachments.length == 1 && attachments[0] instanceof MsgLinkRecord) {
-      MsgLinkRecord forwardMsg = (MsgLinkRecord) attachments[0];
-      composePanel.setForwardBody_Threaded(forwardMsg);
-    }
     if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
       this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
     this.getContentPane().add(composePanel, BorderLayout.CENTER);
+
+    // Initializing the components involves focus request so do this after 
+    // components is already added to the window.
+    if (attachments != null && attachments.length == 1 && attachments[0] instanceof MsgLinkRecord) {
+      composePanel.setForwardBody_Threaded((MsgLinkRecord) attachments[0]);
+    }
+    composePanel.setFocusToRecipient();
 
     // all JActionFrames already size themself
     setVisible(true);
@@ -228,15 +233,20 @@ public class MessageFrame extends JActionFrameClosable {
 
     boolean skipSignatures = draftData != null;
     composePanel = new MsgComposePanel(initialRecipients, null, objType, false, skipSignatures);
+    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
+      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
+    this.getContentPane().add(composePanel, BorderLayout.CENTER);
+
+    // Initializing the components involves focus request so do this after 
+    // components is already added to the window.
     if (draftData != null) {
       if (draftData instanceof XMLElement)
         composePanel.setFromDraft((XMLElement) draftData);
       else if (draftData instanceof MsgLinkRecord)
         composePanel.setFromDraft_Threaded((MsgLinkRecord) draftData, isDeleteDraftAfterSave);
+    } else {
+      composePanel.setFocusToRecipient();
     }
-    if (!JActionFrame.ENABLE_FRAME_TOOLBARS)
-      this.getContentPane().add(composePanel.initToolBarModel(MiscGui.getVisualsKeyName(this), null, composePanel).getToolBar(), BorderLayout.NORTH);
-    this.getContentPane().add(composePanel, BorderLayout.CENTER);
 
     // all JActionFrames already size themself
     setVisible(true);

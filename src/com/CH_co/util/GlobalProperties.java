@@ -256,8 +256,9 @@ public class GlobalProperties extends Object {
   // build 672 Sferxy editor 'insert symbol' icon resized, chat scroll to most recent when offline panel shows and reduces table view area.
   // build 674 Changes related to command line file uploads and msg attachment uploads, also stats and other server synchronizations.
   // build 676 Search in msg chat folder includes attachments dynamic rendering part, autoscroll to selected item after searching, save scroll pane size/orientation, logo 2012
+  // build 678 Delayed GUI focusing adjustments
 
-  public static final short PROGRAM_BUILD_NUMBER = 676;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 678;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

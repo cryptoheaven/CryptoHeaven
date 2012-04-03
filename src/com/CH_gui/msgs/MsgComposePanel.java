@@ -12,61 +12,84 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgTypingListener;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.MsgDataOps;
+import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_cl.service.records.InternetAddressRecord;
+import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.cnt.*;
-import com.CH_co.service.msg.dataSets.key.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.nanoxml.XMLElement;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.cnt.Cnt_NewCnt_Rq;
+import com.CH_co.service.msg.dataSets.key.Key_PubKeys_Rp;
+import com.CH_co.service.msg.dataSets.msg.Msg_New_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_ID_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
-import com.CH_co.service.msg.dataSets.usr.*;
+import com.CH_co.service.msg.dataSets.usr.Usr_AltUsrData_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.trace.*;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.actionGui.JActionFrameClosable;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.chatTable.ChatActionTable;
-import com.CH_gui.dialog.*;
-import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.*;
+import com.CH_gui.dialog.InitiateContactDialog;
+import com.CH_gui.dialog.InviteByEmailDialog;
+import com.CH_gui.dialog.RecipientsDialog;
+import com.CH_gui.dialog.RecordChooserDialog;
+import com.CH_gui.fileTable.FileDND_Transferable;
+import com.CH_gui.fileTable.FileDND_TransferableData;
+import com.CH_gui.frame.AddressFrame;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.msgTable.*;
+import com.CH_gui.list.ListComparator;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.list.ListUpdatableI;
+import com.CH_gui.menuing.PopupMouseAdapter;
+import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.msgTable.MsgDND_Transferable;
+import com.CH_gui.msgTable.MsgDND_TransferableData;
 import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
-import comx.tig.en.SingleTigerSession;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
 import comx.Tiger.gui.*;
-
-import java.awt.event.*;
+import comx.tig.en.SingleTigerSession;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
-import javax.swing.undo.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.undo.UndoManager;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -500,6 +523,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     // recipients are filled, so subject is first empty/editable field
     if (isAnyRecipients()) {
       msgComponents.setFocusToSubject();
+    } else {
+      msgComponents.setFocusToRecipient();
     }
 
     markCurrentContentAsOriginal();
@@ -514,6 +539,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   public void setFromDraft(XMLElement draftData) {
     msgComponents.setFromDraft(draftData);
     markCurrentContentAsOriginal();
+  }
+
+  public void setFocusToRecipient() {
+    msgComponents.setFocusToRecipient();
   }
 
   /**
@@ -552,6 +581,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       msgComponents.setQuotedContent(forwardMsg, dataRecord, false, true);
     }
 
+    msgComponents.setFocusToRecipient();
     markCurrentContentAndAttachmentsAsOriginal();
 
     initCopyToSent();
@@ -652,6 +682,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     // recipients are filled, so subject is first empty/editable field
     if (isAnyRecipients()) {
       msgComponents.setFocusToSubject();
+    } else {
+      msgComponents.setFocusToRecipient();
     }
 
     markCurrentContentAndAttachmentsAsOriginal();

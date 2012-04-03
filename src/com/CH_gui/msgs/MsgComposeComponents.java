@@ -1,66 +1,67 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
-
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.usr.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_co.nanoxml.XMLElement;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.usr.Usr_AltUsrData_Rq;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.frame.*;
+import com.CH_gui.action.Actions;
+import com.CH_gui.actionGui.JActionCheckBoxMenuItem;
+import com.CH_gui.dialog.UserSelectorDialog;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.*;
 import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
+import com.CH_gui.util.Images;
+import com.CH_guiLib.gui.JMyTextField;
 import com.CH_guiLib.util.HTML_Ops;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Timestamp;
-import java.text.*;
-import java.util.*;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.text.JTextComponent;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.25 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.25 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgComposeComponents extends Object implements DisposableObj {
 
   private static String STR_RE = com.CH_gui.lang.Lang.rb.getString("msg_Re");
@@ -578,12 +579,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         jRecipients[recipientType].add(jRecipientsInput[recipientType], BorderLayout.CENTER);
       }
 
-      // Set initial focus to the subject and the "TO" field
-      if (isInitialRecipientPresent)
-        jSubject.addHierarchyListener(new InitialFocusRequestor());
-      else
-        jRecipientsInput[MsgComposePanel.TO].addHierarchyListener(new InitialFocusRequestor());
-
       // setup Reply To label
       jReplyToLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_In_reply_to"));
       jReplyToLabel.setVisible(false);
@@ -780,8 +775,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   /**
-   * Set message content with the signature is available.
-   */
+  * Set message content with the signature is available.
+  */
   public void setSignatureIfRequired(boolean isReplyOrForwardMsgType) {
     if (!isChatComposePanel && objType == MsgDataRecord.OBJ_TYPE_MSG) {
       UserSettingsRecord userSettingsRecord = cache.getMyUserSettingsRecord();
@@ -799,10 +794,18 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     }
   }
 
+  public void setFocusToRecipient() {
+    if (jRecipientsInput[MsgComposePanel.TO] != null) {
+      jRecipientsInput[MsgComposePanel.TO].requestFocus();
+      jRecipientsInput[MsgComposePanel.TO].requestFocusInWindow();
+      jRecipientsInput[MsgComposePanel.TO].addHierarchyListener(new InitialFocusRequestor());
+    }
+  }
 
   public void setFocusToSubject() {
     if (jSubject != null) {
       jSubject.requestFocus();
+      jSubject.requestFocusInWindow();
       jSubject.addHierarchyListener(new InitialFocusRequestor());
     }
   }
@@ -1082,9 +1085,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   /**
-   * Sets the From field by searching the recipients lists for a potential match to one of users own accounts...
-   * @param pickFromRecipients
-   */
+  * Sets the From field by searching the recipients lists for a potential match to one of users own accounts...
+  * @param pickFromRecipients
+  */
   public void setFromAccounts(MsgDataRecord originalMsg) {
     if (jFromCombo != null && originalMsg != null) {
       EmailRecord emlRecFound = MsgPanelUtils.getOurMatchingFromEmlRec(originalMsg);
@@ -1177,8 +1180,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   /**
-   * @return Elements consist of: header type ("text/plain" or "text/html"), header, body type, body
-   */
+  * @return Elements consist of: header type ("text/plain" or "text/html"), header, body type, body
+  */
   public static String[] makeReplyToContent(MsgLinkRecord linkRecord, MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "makeReplyToContent(MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody)");
     if (trace != null) trace.args(dataRecord);
@@ -1353,8 +1356,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   /**
-   * @return a set of personal(nullable)/short/full version of email address.
-   */
+  * @return a set of personal(nullable)/short/full version of email address.
+  */
   private static String[] getEmailAddressSet(Record rec) {
     String[] emailSet = null;
     if (rec instanceof UserRecord) {
@@ -1496,9 +1499,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
 
   /*************************************************************************
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
-   ************************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
+  ************************************************************************/
   public void disposeObj() {
     // remove DocumentChangeListener
     if (msgTypeListener != null) {

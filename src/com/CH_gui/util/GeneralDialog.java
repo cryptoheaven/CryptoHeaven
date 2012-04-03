@@ -1,40 +1,45 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.util;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.Misc;
 import com.CH_gui.gui.InitialFocusRequestor;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.util.StringTokenizer;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 
- /* Description: This a general dialog that containts a panel and buttons
- * on the bottom-right corner of the dialog.
- */
+/* Description: This a general dialog that containts a panel and buttons
+* on the bottom-right corner of the dialog.
+*/
 public class GeneralDialog extends JDialog {
 
   // Default parent window for showing up dialogs.
@@ -109,31 +114,34 @@ public class GeneralDialog extends JDialog {
 
 
   /**
-   * default_index and default_cancel when negative (-1) are ignored.
-   */
+  * default_index and default_cancel when negative (-1) are ignored.
+  */
   public void init(Component owner, final JButton[] buttons, JComponent mainComponent, int default_index, final int default_cancel) {
-    init(owner, buttons, mainComponent, null, default_index, default_cancel, true);
+    init(owner, buttons, mainComponent, null, default_index, default_cancel, false, true);
   }
   public void init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel) {
-    init(owner, buttons, mainComponent, header, default_index, default_cancel, true);
+    init(owner, buttons, mainComponent, header, default_index, default_cancel, false, true);
   }
   protected void init(Component owner, final JButton[] buttons, JComponent mainComponent, int default_index, final int default_cancel, boolean show) {
-    init(owner, buttons, mainComponent, null, default_index, default_cancel, show);
+    init(owner, buttons, mainComponent, null, default_index, default_cancel, false, show);
   }
-  protected void init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel, boolean show) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GeneralDialog.class, "init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel, boolean show)");
+  protected void init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel, final boolean suppressButtonFocusRequest, final boolean show) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GeneralDialog.class, "init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, int default_cancel, boolean suppressButtonFocusRequest, boolean show)");
     if (trace != null) trace.args(owner, buttons, mainComponent, header);
     if (trace != null) trace.args(default_index);
     if (trace != null) trace.args(default_cancel);
+    if (trace != null) trace.args(suppressButtonFocusRequest);
     if (trace != null) trace.args(show);
 
     if (!Misc.isAllGUIsuppressed()) {
       if (default_index >= 0) {
         if (trace != null) trace.data(10, "setting default button...");
         JButton defaultButton = buttons[default_index];
-        // Traditional requestFocus() does not seem to work when preparing GUI which is not yet visible...
-        // Use a focus requestor that activates after the dialog is shown.
-        defaultButton.addHierarchyListener(new InitialFocusRequestor()); 
+        if (!suppressButtonFocusRequest) {
+          // Traditional requestFocus() does not seem to work when preparing GUI which is not yet visible...
+          // Use a focus requestor that activates after the dialog is shown.
+          defaultButton.addHierarchyListener(new InitialFocusRequestor()); 
+        }
         this.getRootPane().setDefaultButton(defaultButton);
         if (trace != null) trace.data(11, "setting default button... done.");
       }
@@ -288,8 +296,8 @@ public class GeneralDialog extends JDialog {
 
 
   /**
-   * Clicks a specified button when ESCAPE key click is detected.
-   */
+  * Clicks a specified button when ESCAPE key click is detected.
+  */
   private class EscapeKeyListener extends KeyAdapter {
     public void keyPressed(KeyEvent event) {
       if (event.getModifiers() == 0) {

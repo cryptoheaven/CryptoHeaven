@@ -1,54 +1,70 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.VisualsSavable;
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
-import com.CH_gui.gui.JMyButton;
-import com.CH_gui.gui.MyInsets;
-import com.CH_gui.util.GeneralDialog;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import com.CH_cl.service.records.*;
-
-import com.CH_co.service.records.*;
+import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_co.service.records.EmailRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_guiLib.gui.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_gui.gui.InitialFocusRequestor;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_gui.list.*;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.VisualsSavable;
+import com.CH_guiLib.gui.JMyTextField;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.31 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.31 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class RecipientsDialog extends GeneralDialog implements DisposableObj, VisualsSavable, ObjectsProviderUpdaterI {
 
   private static final int DEFAULT_BUTTON_INDEX = 0;
@@ -92,7 +108,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
     JButton[] buttons = createButtons();
     JPanel panel = createMainPanel();
     jOkButton.setEnabled(true);
-    jSearchName.requestFocus();
+    jSearchName.addHierarchyListener(new InitialFocusRequestor());
 
     provider = new RecipientListProvider(true, true, true, true, true);
     dualListBox.addDefaultSourceElements(provider.provide(null));
@@ -108,15 +124,15 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
       provider.registerForUpdates(dualListBox);
       if (trace != null) trace.data(81, "making gui");
       setModal(skipDialogIfPerfectMatch);
-      super.init(frame, buttons, panel, DEFAULT_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
+      super.init(frame, buttons, panel, null, DEFAULT_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX, true, true);
     }
 
     if (trace != null) trace.exit(RecipientsDialog.class);
   }
 
   /**
-   * @return true if "perfect match" -- all strings were resolved at once, without additional searches/editing/etc
-   */
+  * @return true if "perfect match" -- all strings were resolved at once, without additional searches/editing/etc
+  */
   private boolean initChosenValues(Frame parent, Record[] initialChoices, String selectedStringsDelimited, String searchString) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecipientsDialog.class, "initChosenValues(Frame parent, Record[] initialChoices, String selectedStringsDelimited, String searchString)");
     if (trace != null) trace.args(parent);
@@ -137,8 +153,8 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
   }
 
   /**
-   * @return true if "perfect match" -- all strings were resolved at once, without additional searches/editing/etc
-   */
+  * @return true if "perfect match" -- all strings were resolved at once, without additional searches/editing/etc
+  */
   private boolean initSelectedStrings(Window parent, String selectedStringsDelimited, String searchString) {
     boolean perfectMatch = true;
 
@@ -154,7 +170,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
     // preselect items by string values
     if (selectedStrings != null) {
       String[] failedStrs = dualListBox.moveToDestinationElementsSearchByUniqueStringsOnly(selectedStrings);
-      Vector otherFailedStrsV = null;
+      ArrayList otherFailedStrsL = null;
       // process all failed strings to see if they qualify as UserRecord or EmailAddress
       if (failedStrs != null && failedStrs.length > 0) {
         for (int i=0; i<failedStrs.length; i++) {
@@ -165,17 +181,17 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
             String emailAddress = failedStr;
             selectOrAddEmailAddress(emailAddress);
           } else {
-            if (otherFailedStrsV == null) otherFailedStrsV = new Vector();
-            otherFailedStrsV.addElement(failedStr);
+            if (otherFailedStrsL == null) otherFailedStrsL = new ArrayList();
+            otherFailedStrsL.add(failedStr);
           }
         }
       }
-      if (otherFailedStrsV != null && otherFailedStrsV.size() > 0) {
+      if (otherFailedStrsL != null && otherFailedStrsL.size() > 0) {
         // if no search string defined, make these the search strings
         StringBuffer searchStr = new StringBuffer();
-        for (int i=0; i<otherFailedStrsV.size(); i++) {
-          searchStr.append(otherFailedStrsV.elementAt(i));
-          if (i+1 < otherFailedStrsV.size())
+        for (int i=0; i<otherFailedStrsL.size(); i++) {
+          searchStr.append(otherFailedStrsL.get(i));
+          if (i+1 < otherFailedStrsL.size())
             searchStr.append(", ");
         }
         jSearchName.setText(searchStr.toString());
@@ -466,9 +482,9 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
   }
 
   /**
-   * Check the input line for possibly valid email address, allow for different
-   * encodings which may be compatible with InternetAddress constructor.
-   */
+  * Check the input line for possibly valid email address, allow for different
+  * encodings which may be compatible with InternetAddress constructor.
+  */
   public static boolean isEmailLineValid(String addr) {
     StringTokenizer st = new StringTokenizer(addr, " ,;:[]{}<>\t\r\n");
     while (st.hasMoreTokens()) {
