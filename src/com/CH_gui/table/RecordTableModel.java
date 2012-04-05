@@ -339,24 +339,17 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     removeData();
     if (records != null && records.length > 0) {
       int countReplaced = 0;
+      Object[] prevFileBuffer = null;
       for (int i=0; i<records.length; i++ ) {
         Record newRec = records[i];
         boolean keep = keep(newRec);
         if (keep) {
           // look for newer file version substitutions
           if (isCollapseFileVersions && newRec instanceof FileLinkRecord) {
-            Object lookup = addFileRemoveOlderAndGetMostRecentReplacement((FileLinkRecord) newRec);
-            if (lookup == null) {
-              // ignore this file as its an older version
-              newRec = null;
-            } else if (lookup instanceof Record) {
-              // addition
-              newRec = (Record) lookup;
-            } else {
-              // replacement
-              newRec = ((Record[]) lookup)[1];
+            if (prevFileBuffer == null) prevFileBuffer = new Object[1];
+            newRec = addFileRemoveOlderAndGetMostRecentReplacement((FileLinkRecord) newRec, prevFileBuffer);
+            if (prevFileBuffer[0] != null)
               countReplaced ++;
-            }
           }
           if (newRec != null) {
             recordsL.add(newRec);
@@ -406,6 +399,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       int countToDelete = 0;
       int countReplaced = 0;
       ArrayList removeRecordsL = null;
+      Object[] prevFileBuffer = null;
       for (int i=0; i<records.length; i++) {
         Record newRec = records[i];
         boolean keep = keep(newRec);
@@ -417,18 +411,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
           } else {
             // look for newer file version substitutions
             if (isCollapseFileVersions && newRec instanceof FileLinkRecord) {
-              Object lookup = addFileRemoveOlderAndGetMostRecentReplacement((FileLinkRecord) newRec);
-              if (lookup == null) {
-                // ignore this file as its an older version
-                newRec = null;
-              } else if (lookup instanceof Record) {
-                // addition
-                newRec = (Record) lookup;
-              } else {
-                // replacement
-                newRec = ((Record[]) lookup)[1];
+              if (prevFileBuffer == null) prevFileBuffer = new Object[1];
+              newRec = addFileRemoveOlderAndGetMostRecentReplacement((FileLinkRecord) newRec, prevFileBuffer);
+              if (prevFileBuffer[0] != null)
                 countReplaced ++;
-              }
             }
             if (newRec != null) {
               recordsL.add(newRec);
@@ -497,11 +483,12 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
   /**
   * Add a file to our list tracking versions in our private cache, find previous file listing and new replacement.
-  * @param fLink
-  * @return the replacement file or a set of {previous, replacement}
+  * @param fLink This is the file we are adding
+  * @param returnBufferPrevFile This is the return buffer of the previous file that was in place before this addition.
+  * @return the replacement file and the previous file in the buffer argument
   */
-  private Object addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink)");
+  private FileLinkRecord addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink, Object[] returnBufferPrevFile) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "addFileRemoveOlderAndGetMostRecentReplacement(FileLinkRecord fLink, Object[] returnBufferPrevFile)");
     if (trace != null) trace.args(fLink);
     FileLinkRecord replacement = null;
     // maintain a complete list of versioned files and find most-recent-file substitute
@@ -532,13 +519,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
         fireTableDataChanged();
       }
     }
-    Object rc = null;
-    if (prevFile == null)
-      rc = replacement;
-    else
-      rc = prevFile != null && replacement != null ? new Record[] { prevFile, replacement } : null;
-    if (trace != null) trace.exit(RecordTableModel.class, rc);
-    return rc;
+    if (returnBufferPrevFile != null)
+      returnBufferPrevFile[0] = prevFile;
+    if (trace != null) trace.exit(RecordTableModel.class, replacement);
+    return replacement;
   }
 
   /**
