@@ -350,7 +350,7 @@ public class LoginFrame extends JFrame {
     setTitle(com.CH_gui.lang.Lang.rb.getString("title_Login_Dialog"));
 //    switchModeLink.setText("Sign up for a new account");
     userName.selectAll();
-    userName.requestFocus();
+    userName.requestFocusInWindow();
     passwordLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Password"));
     recoveryLabel.setText("Forgot your password?");
     recoveryLabel.setVisible(true);
@@ -474,7 +474,7 @@ public class LoginFrame extends JFrame {
     setTitle(com.CH_gui.lang.Lang.rb.getString("title_Create_New_Account"));
 //    switchModeLink.setText("Sign in to an existing account");
     userName.selectAll();
-    userName.requestFocus();
+    userName.requestFocusInWindow();
     passwordLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Unique_Password"));
     recoveryLabel.setText("To setup optional Password Recovery settings click here.");
     recoveryLabel.setVisible(false);
@@ -1543,7 +1543,7 @@ public class LoginFrame extends JFrame {
           });
           password.setText(""); retypePassword.setText("");
           error = true;
-          password.requestFocus();
+          password.requestFocusInWindow();
         }
 
         // clear password arrays
@@ -1671,7 +1671,7 @@ public class LoginFrame extends JFrame {
           }
           LoginFrame.this.setVisible(true);
           userName.selectAll();
-          password.requestFocus();
+          password.requestFocusInWindow();
           password.getCaret().setVisible(true);
           password.selectAll();
         }

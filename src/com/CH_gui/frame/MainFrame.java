@@ -967,9 +967,13 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     public void actionPerformedTraced(ActionEvent event) {
       Thread th = new ThreadTraced("Manage White List Action") {
         public void runTraced() {
-          FolderPair whiteListFolderPair = FolderOps.getOrCreateWhiteList(SIL);
+          final FolderPair whiteListFolderPair = FolderOps.getOrCreateWhiteList(SIL);
           if (whiteListFolderPair != null) {
-            new WhiteListTableFrame(whiteListFolderPair);
+            SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                new WhiteListTableFrame(whiteListFolderPair);
+              }
+            });
           }
         }
       };
@@ -1308,9 +1312,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               ClientMessageAction replyAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_CHALLENGE, new Obj_List_Co(cache.getMyUserId())), 30000, 3);
               DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
               if (replyAction != null && replyAction.getActionCode() == CommandCodes.USR_A_PASS_RECOVERY_GET_CHALLENGE) {
-                PassRecoveryRecord myPassRecoveryRec = cache.getMyPassRecoveryRecord();
-                if (myPassRecoveryRec == null)
-                  new PassRecoverySetupDialog(MainFrame.this);
+                final PassRecoveryRecord myPassRecoveryRec = cache.getMyPassRecoveryRecord();
+                if (myPassRecoveryRec == null) {
+                  SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                      new PassRecoverySetupDialog(MainFrame.this);
+                    }
+                  });
+                }
                 else {
                   UserRecord myUserRec = cache.getUserRecord();
                   java.sql.Timestamp last = null;
@@ -1330,7 +1339,13 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
                       (myPassRecoveryRec.lastFailed != null && myPassRecoveryRec.lastFailed.compareTo(last) > 0) ||
                       (myPassRecoveryRec.lastRecovered != null && myPassRecoveryRec.lastRecovered.compareTo(last) > 0))
                   {
-                    new PassRecoveryRecoverDialog(MainFrame.this, myPassRecoveryRec, last, include24ExpiryNote);
+                    final java.sql.Timestamp _last = last;
+                    final boolean _include24ExpiryNote = include24ExpiryNote;
+                    SwingUtilities.invokeLater(new Runnable() {
+                      public void run() {
+                        new PassRecoveryRecoverDialog(MainFrame.this, myPassRecoveryRec, _last, _include24ExpiryNote);
+                      }
+                    });
                   }
                 }
               }

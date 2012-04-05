@@ -615,7 +615,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   public void focusMessageArea() {
-    getTextComponent().requestFocus();
+    getTextComponent().requestFocusInWindow();
   }
 
   public void setCaretAtTheTop() {

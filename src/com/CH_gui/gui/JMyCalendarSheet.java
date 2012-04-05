@@ -20,8 +20,6 @@ import java.text.DateFormatSymbols;
 import java.util.*;
 import javax.swing.*;
 
-import com.CH_co.gui.*;
-
 /**
  * <b>Copyright</b> &copy; 2001-2012
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
@@ -189,7 +187,7 @@ public class JMyCalendarSheet extends JPanel implements Serializable, ActionList
     if (i < 0 || i > 41)
       return false;
     if (buttonSet[i].isVisible()) {
-      buttonSet[i].requestFocus();
+      buttonSet[i].requestFocusInWindow();
       return true;
     } else {
       return false;
@@ -202,7 +200,7 @@ public class JMyCalendarSheet extends JPanel implements Serializable, ActionList
     for (int k = j; k >= 0; k -= byte0) {
       if (!buttonSet[k].isVisible())
         continue;
-      buttonSet[k].requestFocus();
+      buttonSet[k].requestFocusInWindow();
       break;
     }
   }
@@ -213,7 +211,7 @@ public class JMyCalendarSheet extends JPanel implements Serializable, ActionList
     for (int k = j; k < 42; k += byte0) {
       if (!buttonSet[k].isVisible())
         continue;
-      buttonSet[k].requestFocus();
+      buttonSet[k].requestFocusInWindow();
       break;
     }
   }
@@ -271,7 +269,7 @@ public class JMyCalendarSheet extends JPanel implements Serializable, ActionList
       if (!buttonSet[i].isVisible())
         buttonSet[i].setVisible(true);
       if (i1 == j) {
-        buttonSet[i].requestFocus();
+        buttonSet[i].requestFocusInWindow();
         focusButton = buttonSet[i];
       }
       i++;
@@ -352,7 +350,7 @@ public class JMyCalendarSheet extends JPanel implements Serializable, ActionList
 
   public void requestFocus() {
     if (focusButton != null)
-      focusButton.requestFocus();
+      focusButton.requestFocusInWindow();
   }
 
 

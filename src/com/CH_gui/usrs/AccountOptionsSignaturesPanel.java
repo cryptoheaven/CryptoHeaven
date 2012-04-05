@@ -398,8 +398,6 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     jFileField.setEditable(false);
     jFileField.setEnabled(false);
     jBrowse.setEnabled(false);
-    if (anySelected)
-      sigTypeArea.requestFocus();
   }
 
   private void pressedFile() {
@@ -408,8 +406,6 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     jFileField.setEditable(anySelected);
     jFileField.setEnabled(anySelected);
     jBrowse.setEnabled(anySelected);
-    if (anySelected)
-      jFileField.requestFocus();
   }
 
   private void storeEdit(int sigIndex) {

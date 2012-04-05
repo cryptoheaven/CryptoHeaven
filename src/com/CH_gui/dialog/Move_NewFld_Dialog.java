@@ -12,38 +12,49 @@
 
 package com.CH_gui.dialog;
 
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import javax.swing.event.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.ops.FolderOps;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.fld.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-
+import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.trace.*;
-import com.CH_co.tree.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.folder.*;
-import com.CH_gui.frame.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.fld.Fld_NewFld_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.FolderShareRecord;
+import com.CH_co.service.records.MemberContactRecordI;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.tree.FolderTreeNode;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.folder.FolderPurgingPanel;
+import com.CH_gui.folder.FolderSharingPanel;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
+import com.CH_gui.tree.FolderTree;
+import com.CH_gui.tree.FolderTreeComponent;
+import com.CH_gui.tree.FolderTreeModelGui;
+import com.CH_gui.tree.FolderTreeSelectionExpansion;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.VisualsSavable;
+import com.CH_guiLib.gui.JMyComboBox;
+import com.CH_guiLib.gui.JMyTextField;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Hashtable;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.tree.TreePath;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -579,7 +590,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
     if (jFolderName.getText() == null || jFolderName.getText().trim().length() == 0) {
       MessageDialog.showErrorDialog(this, FLD_NAME_EMPTY, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
-      jFolderName.requestFocus();
+      jFolderName.requestFocusInWindow();
     } else if (folderSharingPanel.shareTableModel.getRowCount() > 0 && folderSharingPanel.jShareName.getText().length() == 0) {
       MessageDialog.showErrorDialog(this, SHARE_FOLDER_NAME_EMPTY, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
     } else if (

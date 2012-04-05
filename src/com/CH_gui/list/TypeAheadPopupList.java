@@ -1,44 +1,43 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.list;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.DisposableObj;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
+import javax.swing.border.LineBorder;
+import javax.swing.text.JTextComponent;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.9 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.9 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class TypeAheadPopupList extends Object implements KeyListener, StringHighlighterI, ListUpdatableI, DisposableObj {
 
   private JTextComponent owner = null;
@@ -124,7 +123,7 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
       list.addFocusListener(new FocusAdapter() {
         public void focusGained(FocusEvent e) {
           synchronized (TypeAheadPopupList.this) {
-            owner.requestFocus();
+            owner.requestFocusInWindow();
           }
         }
       });
@@ -310,18 +309,18 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
       // exclude all elements which are currently in the text field
       {
         String last = ListUtils.getLastElement(fullSearchText);
-        Vector exceptionsV = new Vector();
+        ArrayList exceptionsL = new ArrayList();
         StringTokenizer st = new StringTokenizer(fullSearchText, ",");
         while (st.hasMoreTokens()) {
           String token = st.nextToken().trim();
           if (token.length() > 0 && !token.equals(last)) {
-            exceptionsV.addElement(token);
+            exceptionsL.add(token);
           }
         }
         String[] exceptions = null;
-        if (exceptionsV.size() > 0) {
-          exceptions = new String[exceptionsV.size()];
-          exceptionsV.toArray(exceptions);
+        if (exceptionsL.size() > 0) {
+          exceptions = new String[exceptionsL.size()];
+          exceptionsL.toArray(exceptions);
         }
         // remember current exclusions
         this.searchExcludedStrs = exceptions;
@@ -437,8 +436,8 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
   }
 
   /**********************************************
-   * K e y L i s t e n e r    interface methods *
-   *********************************************/
+  * K e y L i s t e n e r    interface methods *
+  *********************************************/
   public synchronized void keyPressed(KeyEvent keyEvent) {
     if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER || 
         keyEvent.getKeyCode() == KeyEvent.VK_TAB || 
@@ -495,8 +494,8 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
 
 
   /***********************************************************
-   * S t r i n g H i g h l i g h t e r I   interface methods *
-   ***********************************************************/
+  * S t r i n g H i g h l i g h t e r I   interface methods *
+  ***********************************************************/
 
   public synchronized Object[] getExcludedObjs() {
     return searchExcludedStrs;
@@ -528,8 +527,8 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
 
 
   /***************************************************
-   * L i s t U p d a t a b l e I   interface methods *
-   ***************************************************/
+  * L i s t U p d a t a b l e I   interface methods *
+  ***************************************************/
 
   public void update(final Object[] objects) {
     SwingUtilities.invokeLater(new Runnable() {

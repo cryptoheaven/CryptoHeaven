@@ -102,7 +102,7 @@ public class InitiateContactDialog extends GeneralDialog {
 
     super.init(owner, jButtons, jPanel, DEFAULT_OK_BUTTON, DEFAULT_CANCEL_BUTTON);
 
-    jContactReason.requestFocus();
+    jContactReason.requestFocusInWindow();
     getPubKey();
 
     if (trace != null) trace.exit(InitiateContactDialog.class);

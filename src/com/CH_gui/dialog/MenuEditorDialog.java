@@ -12,19 +12,28 @@
 
 package com.CH_gui.dialog;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import javax.swing.event.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
-
-import com.CH_gui.actionGui.*;
-import com.CH_gui.menuing.*;
-
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
+import com.CH_gui.actionGui.JActionFrame;
+import com.CH_gui.menuing.MenuActionItem;
+import com.CH_gui.menuing.MenuActionTreeCellRenderer;
+import com.CH_gui.menuing.MenuTreeModel;
 import com.CH_gui.util.GeneralDialog;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Vector;
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.*;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2002
@@ -412,7 +421,7 @@ public class MenuEditorDialog extends GeneralDialog {
     } else {
       currentMenuActionItem.setMnemonic(null);
     }
-    jMnemonic.requestFocus();
+    jMnemonic.requestFocusInWindow();
   }
 
   private void pressedShortcutCheck() {
@@ -422,7 +431,7 @@ public class MenuEditorDialog extends GeneralDialog {
     } else {
       currentMenuActionItem.setKeyStroke(null);
     }
-    jShortcut.requestFocus();
+    jShortcut.requestFocusInWindow();
   }
 
   private void pressedSave() {

@@ -176,7 +176,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       public void actionPerformed(ActionEvent event) {
         setFilterNarrowing(jFilterField.getText(), jFilterMsgBodyCheck.isSelected());
         jFilterField.selectAll();
-        jFilterField.requestFocus();
+        jFilterField.requestFocusInWindow();
       }
     });
     jFilterMsgBodyCheck = new JMyCheckBox();
@@ -197,7 +197,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       public void actionPerformed(ActionEvent event) {
         setFilterNarrowing(jFilterField.getText(), jFilterMsgBodyCheck.isSelected());
         jFilterField.selectAll();
-        jFilterField.requestFocus();
+        jFilterField.requestFocusInWindow();
       }
     });
     jFilterCloseButton = new JMyButton(Images.get(ImageNums.X15));
@@ -427,7 +427,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 setFilterNarrowing(null, jFilterMsgBodyCheck.isSelected());
               } else {
                 setFilterNarrowing(jFilterField.getText(), jFilterMsgBodyCheck.isSelected());
-                jFilterField.requestFocus();
+                jFilterField.requestFocusInWindow();
                 jFilterField.selectAll();
               }
             }

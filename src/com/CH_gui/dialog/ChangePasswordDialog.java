@@ -268,7 +268,7 @@ public class ChangePasswordDialog extends GeneralDialog {
           MessageDialog.showErrorDialog(ChangePasswordDialog.this, LoginFrame.RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           jNewPass.setText(""); jRePass.setText("");
           error = true;
-          jNewPass.requestFocus();
+          jNewPass.requestFocusInWindow();
         }
         // clear password arrays
         for (int i=0; i<pass1.length; i++)

@@ -310,12 +310,12 @@ public class JMyCalendarDropdownField extends JPanel implements ActionListener, 
     } else
       if (actionevent.getActionCommand() == "Date rolled back") {
         unPop();
-        button.requestFocus();
+        button.requestFocusInWindow();
       } else
         if (actionevent.getActionCommand() == "Date committed") {
           field.setText(formatter.format(calendar.getDate().getTime()));
           unPop();
-          button.requestFocus();
+          button.requestFocusInWindow();
         }
   }
 
@@ -336,7 +336,7 @@ public class JMyCalendarDropdownField extends JPanel implements ActionListener, 
       layeredPane.add(calendar, JLayeredPane.POPUP_LAYER);
       layeredPane.moveToFront(calendar);
     }
-    calendar.requestFocus();
+    calendar.requestFocusInWindow();
   }
 
   public void unPop() {

@@ -1,62 +1,74 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.UserOps;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
+import com.CH_co.cryptx.BAEncodedPassword;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.key.Key_KeyRecov_Co;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.records.KeyRecoveryRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_gui.frame.LoginFrame;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyPasswordKeyboardField;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.util.*;
-
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.MiscGui;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
-
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.5 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.5 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class PasswordResetDialog extends GeneralDialog {
 
   private static final int DEFAULT_OK_BUTTON_INDEX = 0;
@@ -256,14 +268,14 @@ public class PasswordResetDialog extends GeneralDialog {
             boolean anyAvailable = false;
             // fetch any keys that we don't have in the cache
             if (subAccountsRecoveryRecs != null && subAccountsRecoveryRecs.length > 0) {
-              Vector keysIDsV = new Vector();
+              ArrayList keysIDsL = new ArrayList();
               for (int i=0; i<subAccountsRecoveryRecs.length; i++) {
                 Long keyId = subAccountsRecoveryRecs[i].keyId;
                 if (cache.getKeyRecord(keyId) == null)
-                  keysIDsV.addElement(keyId);
+                  keysIDsL.add(keyId);
               }
-              if (keysIDsV.size() > 0) {
-                SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keysIDsV)), 60000);
+              if (keysIDsL.size() > 0) {
+                SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keysIDsL)), 60000);
               }
               for (int i=0; i<subAccountsRecoveryRecs.length; i++) {
                 Long uID = cache.getKeyRecord(subAccountsRecoveryRecs[i].keyId).ownerUserId;
@@ -413,8 +425,8 @@ public class PasswordResetDialog extends GeneralDialog {
   }
 
   /**
-   * Thread that takes all input data and runs the action.
-   */
+  * Thread that takes all input data and runs the action.
+  */
   private class OKThread extends ThreadTraced {
     public OKThread() {
       super("PasswordResetDialog OKThread");
@@ -442,7 +454,7 @@ public class PasswordResetDialog extends GeneralDialog {
           MessageDialog.showErrorDialog(PasswordResetDialog.this, LoginFrame.RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           jNewPass.setText(""); jRePass.setText("");
           error = true;
-          jNewPass.requestFocus();
+          jNewPass.requestFocusInWindow();
         }
         // clear password arrays
         for (int i=0; i<pass1.length; i++)

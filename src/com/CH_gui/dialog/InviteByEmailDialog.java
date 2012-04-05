@@ -96,7 +96,7 @@ public class InviteByEmailDialog extends GeneralDialog {
     JButton[] jButtons = createButtons();
     JPanel jPanel = createPanel(initialEmails);
     super.init(owner, jButtons, jPanel, DEFAULT_OK_BUTTON, DEFAULT_CANCEL_BUTTON);
-    jToText.requestFocus();
+    jToText.requestFocusInWindow();
   }
 
   private JButton[] createButtons() {

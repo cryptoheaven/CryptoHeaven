@@ -425,18 +425,18 @@ public class AccountOptionsDialog extends GeneralDialog {
     JLabel emlAddrLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
     EmailAddressRecord emlRec = new EmailAddressRecord("");
     defaultEmail = emlRec.address.toLowerCase();
-    ActionListener emlAction = new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-        Window w = SwingUtilities.windowForComponent(AccountOptionsDialog.this);
-        if (w instanceof Dialog) new ManageEmailAddressesDialog((Dialog) w, userRec, AccountOptionsDialog.this);
-        else if (w instanceof Frame) new ManageEmailAddressesDialog((Frame) w, userRec, AccountOptionsDialog.this);
-      }
-    };
     //jDefaultEmail = new JMyTextOptionField(emlRec.address, new JMyDropdownIcon(), emlAction);
     jDefaultEmail = new JMyTextField(emlRec.address);
     jDefaultEmail.setCaretPosition(0);
     JButton jManage = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString("button_Manage"));
     jManage.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
+    ActionListener emlAction = new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+        Window w = SwingUtilities.windowForComponent((Component) event.getSource());
+        if (w instanceof Dialog) new ManageEmailAddressesDialog((Dialog) w, userRec, AccountOptionsDialog.this);
+        else if (w instanceof Frame) new ManageEmailAddressesDialog((Frame) w, userRec, AccountOptionsDialog.this);
+      }
+    };
     jManage.addActionListener(emlAction);
     if (userRec.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
       EmailRecord emlRecord = cache.getEmailRecord(userRec.defaultEmlId);

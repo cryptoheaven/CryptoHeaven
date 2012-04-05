@@ -257,8 +257,9 @@ public class GlobalProperties extends Object {
   // build 674 Changes related to command line file uploads and msg attachment uploads, also stats and other server synchronizations.
   // build 676 Search in msg chat folder includes attachments dynamic rendering part, autoscroll to selected item after searching, save scroll pane size/orientation, logo 2012
   // build 678 Delayed GUI focusing adjustments
+  // build 680 Elimination of .requestFocus() in favour to .requestFocusInWindow() and eliminate grabbing delayed focus to dialog's default button as it caused some random focus switching between windows.
 
-  public static final short PROGRAM_BUILD_NUMBER = 678;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 680;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

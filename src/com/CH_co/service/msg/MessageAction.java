@@ -169,6 +169,12 @@ public class MessageAction extends Message implements Cancellable {
     if (trace != null) trace.exit(MessageAction.class, stampTime);
     return stampTime;
   }
+  /**
+   * Change the stamp to a current and next value.
+   */
+  public void restamp() {
+    uniqueStamp = nextStamp();
+  }
 
   public Long getPriority() {
     return priority;

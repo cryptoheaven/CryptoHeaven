@@ -58,7 +58,6 @@ public class InitialFocusRequestor extends Object implements HierarchyListener {
             && c != null && c.isShowing())
     {
       c.removeHierarchyListener(this);
-      c.requestFocus();
       c.requestFocusInWindow();
 
       // Start delayed requests
@@ -70,7 +69,6 @@ public class InitialFocusRequestor extends Object implements HierarchyListener {
           } finally {
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
-                c.requestFocus();
                 c.requestFocusInWindow();
 
                 // Start 2nd delayed request incase 1st failed.
@@ -82,7 +80,6 @@ public class InitialFocusRequestor extends Object implements HierarchyListener {
                     } finally {
                       SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                          c.requestFocus();
                           c.requestFocusInWindow();
                         }
                       });

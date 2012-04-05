@@ -117,31 +117,28 @@ public class GeneralDialog extends JDialog {
   * default_index and default_cancel when negative (-1) are ignored.
   */
   public void init(Component owner, final JButton[] buttons, JComponent mainComponent, int default_index, final int default_cancel) {
-    init(owner, buttons, mainComponent, null, default_index, default_cancel, false, true);
+    init(owner, buttons, mainComponent, null, default_index, default_cancel, true);
   }
   public void init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel) {
-    init(owner, buttons, mainComponent, header, default_index, default_cancel, false, true);
+    init(owner, buttons, mainComponent, header, default_index, default_cancel, true);
   }
   protected void init(Component owner, final JButton[] buttons, JComponent mainComponent, int default_index, final int default_cancel, boolean show) {
-    init(owner, buttons, mainComponent, null, default_index, default_cancel, false, show);
+    init(owner, buttons, mainComponent, null, default_index, default_cancel, show);
   }
-  protected void init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel, final boolean suppressButtonFocusRequest, final boolean show) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GeneralDialog.class, "init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, int default_cancel, boolean suppressButtonFocusRequest, boolean show)");
+  protected void init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, final int default_cancel, final boolean show) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GeneralDialog.class, "init(Component owner, final JButton[] buttons, JComponent mainComponent, JComponent header, int default_index, int default_cancel, boolean show)");
     if (trace != null) trace.args(owner, buttons, mainComponent, header);
     if (trace != null) trace.args(default_index);
     if (trace != null) trace.args(default_cancel);
-    if (trace != null) trace.args(suppressButtonFocusRequest);
     if (trace != null) trace.args(show);
 
     if (!Misc.isAllGUIsuppressed()) {
       if (default_index >= 0) {
         if (trace != null) trace.data(10, "setting default button...");
         JButton defaultButton = buttons[default_index];
-        if (!suppressButtonFocusRequest) {
-          // Traditional requestFocus() does not seem to work when preparing GUI which is not yet visible...
-          // Use a focus requestor that activates after the dialog is shown.
-          defaultButton.addHierarchyListener(new InitialFocusRequestor()); 
-        }
+        // Don't explicitly request focus to default button as it is not positioned in the window yet.
+        // Also, don't use InitialFocusRequestor to get delayed focus as it is randomly causing problems
+        // and transfering focus to parent window.
         this.getRootPane().setDefaultButton(defaultButton);
         if (trace != null) trace.data(11, "setting default button... done.");
       }

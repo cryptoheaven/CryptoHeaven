@@ -124,7 +124,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
       provider.registerForUpdates(dualListBox);
       if (trace != null) trace.data(81, "making gui");
       setModal(skipDialogIfPerfectMatch);
-      super.init(frame, buttons, panel, null, DEFAULT_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX, true, true);
+      super.init(frame, buttons, panel, null, DEFAULT_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX);
     }
 
     if (trace != null) trace.exit(RecipientsDialog.class);

@@ -50,8 +50,7 @@ public class InitialRunner extends Object implements HierarchyListener {
     final Component c = event.getComponent();
     long changeFlags = event.getChangeFlags();
     if ((changeFlags & (HierarchyEvent.SHOWING_CHANGED | HierarchyEvent.DISPLAYABILITY_CHANGED)) != 0 && 
-        c != null && 
-        c.isShowing()) 
+        c != null && c.isShowing()) 
     {
       c.removeHierarchyListener(this);
       SwingUtilities.invokeLater(runner);

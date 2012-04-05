@@ -294,11 +294,10 @@ public class MessageDialog extends Object {
           final Component c = e.getComponent();
           long changeFlags = e.getChangeFlags();
           if ((changeFlags & (HierarchyEvent.SHOWING_CHANGED | HierarchyEvent.DISPLAYABILITY_CHANGED)) != 0 &&
-              c != null &&
-              c.isShowing())
+              c != null && c.isShowing())
           {
             c.removeHierarchyListener(this);
-            c.requestFocus();
+            c.requestFocusInWindow();
           }
         }
       });

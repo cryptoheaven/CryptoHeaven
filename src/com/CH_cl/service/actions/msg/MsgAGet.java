@@ -1,20 +1,21 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.actions.msg;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.records.FolderRecUtil;
 
 import com.CH_co.trace.Trace;
@@ -30,24 +31,26 @@ import java.sql.Timestamp;
 import java.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.18 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.18 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgAGet extends ClientMessageAction {
 
   public static int MAX_BATCH_MILLIS = 2000;
+  public static boolean suppressAutoFetchContinuation = false;
+  public static Hashtable nextFetchActionsHT;
 
   /** Creates new MsgAGet */
   public MsgAGet() {
@@ -56,9 +59,9 @@ public class MsgAGet extends ClientMessageAction {
   }
 
   /**
-   * The action handler performs all actions related to the received message (reply),
-   * and optionally returns a request Message.  If there is no request, null is returned.
-   */
+  * The action handler performs all actions related to the received message (reply),
+  * and optionally returns a request Message.  If there is no request, null is returned.
+  */
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgAGet.class, "runAction(Connection)");
 
@@ -389,7 +392,6 @@ public class MsgAGet extends ClientMessageAction {
       }
     }
 
-
     // if this was a bulk fetch done in stages, continue the fetch
     if (linkRecords != null && fetchNumMax != null && fetchNumNew != null) {
       int fetchNumMaxLength = Math.abs(fetchNumMax.shortValue());
@@ -403,6 +405,8 @@ public class MsgAGet extends ClientMessageAction {
         if (fetchingFolderRec != null) {
           cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_COMPLETED);
         }
+        if (nextFetchActionsHT != null)
+          nextFetchActionsHT.remove(fetchingFolderId);
       } else {
         if (isInterrupted()) {
           interrupt();
@@ -411,7 +415,7 @@ public class MsgAGet extends ClientMessageAction {
             cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
           }
         } else {
-          Timestamp timeStamp = linkRecords[linkRecords.length-1].dateCreated;
+          Timestamp lastMsgFetchedStamp = linkRecords[linkRecords.length-1].dateCreated;
           if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
           Long fetchingShareId = cache.getFolderShareRecordMy(fetchingFolderId, groupIDsSet).shareId;
 
@@ -460,11 +464,17 @@ public class MsgAGet extends ClientMessageAction {
             numMax = (short) -Math.max(-numMax, Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE);
           numNew = (short) Math.max(numNew, Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE);
 
-          Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, numNew, timeStamp);
+          Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, numNew, lastMsgFetchedStamp);
           int actionCode = full ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
           MessageAction msgAction = new MessageAction(actionCode, request);
-          msgAction.setInterruptsFrom(this);
-          getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
+          if (!suppressAutoFetchContinuation) {
+            msgAction.setInterruptsFrom(this);
+            getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
+          } else {
+            if (nextFetchActionsHT == null)
+              nextFetchActionsHT = new Hashtable();
+            nextFetchActionsHT.put(fetchingFolderId, msgAction);
+          }
         }
       }
     }
@@ -473,4 +483,14 @@ public class MsgAGet extends ClientMessageAction {
     return null;
   }
 
+  public static boolean sendNextFetchRequest(ServerInterfaceLayer SIL, Long folderId) {
+    boolean anySent = false;
+    MessageAction msgAction = (MessageAction) nextFetchActionsHT.get(folderId);
+    if (msgAction != null) {
+      msgAction.restamp();
+      SIL.submitAndReturn(msgAction);
+      anySent = true;
+    }
+    return anySent;
+  }
 }

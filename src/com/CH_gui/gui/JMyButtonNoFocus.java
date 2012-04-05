@@ -12,7 +12,7 @@
 
 package com.CH_gui.gui;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012

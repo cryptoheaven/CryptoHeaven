@@ -12,14 +12,17 @@
 
 package com.CH_gui.gui;
 
-import java.awt.*;
-import java.awt.event.*;
+import com.CH_guiLib.gui.JMyPopupMenu;
+import com.CH_guiLib.gui.JMyTextField;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
-
-import com.CH_co.gui.*;
-import com.CH_guiLib.gui.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.Document;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -121,7 +124,7 @@ public class JMyTextOptionField extends JPanel {
             public void actionPerformed(ActionEvent event) {
               jText.setText(options[index]);
               if (options[index].startsWith("<") && options[index].endsWith(">")) {
-                jText.requestFocus();
+                jText.requestFocusInWindow();
                 jText.selectAll();
               }
               else

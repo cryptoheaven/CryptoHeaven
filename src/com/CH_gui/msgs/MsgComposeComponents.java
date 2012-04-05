@@ -796,7 +796,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   public void setFocusToRecipient() {
     if (jRecipientsInput[MsgComposePanel.TO] != null) {
-      jRecipientsInput[MsgComposePanel.TO].requestFocus();
       jRecipientsInput[MsgComposePanel.TO].requestFocusInWindow();
       jRecipientsInput[MsgComposePanel.TO].addHierarchyListener(new InitialFocusRequestor());
     }
@@ -804,7 +803,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   public void setFocusToSubject() {
     if (jSubject != null) {
-      jSubject.requestFocus();
       jSubject.requestFocusInWindow();
       jSubject.addHierarchyListener(new InitialFocusRequestor());
     }

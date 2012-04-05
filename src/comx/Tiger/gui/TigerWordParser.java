@@ -12,8 +12,7 @@
 
 package comx.Tiger.gui;
 
-import comx.Tiger.ssce.*;
-
+import comx.Tiger.ssce.StringWordParser;
 import java.util.NoSuchElementException;
 import javax.swing.text.*;
 
@@ -96,7 +95,7 @@ public class TigerWordParser extends StringWordParser {
   public void highlightWord() {
     if (hasMoreElements()) {
       String word = getWord();
-      component.requestFocus();
+      component.requestFocusInWindow();
 
       // selectionStart and selectionEnd are constrained so
       // selectionStart <= selectionEnd, so selectionStart

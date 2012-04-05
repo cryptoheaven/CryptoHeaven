@@ -127,7 +127,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     JComponent mainComponent = createMainComponent();
     init(owner, buttons, new JScrollPane(mainComponent), DEFAULT_OK_INDEX, DEFAULT_CANCEL_INDEX);
 
-    jContactName.requestFocus();
+    jContactName.requestFocusInWindow();
     setEnabledButtons();
     fetchData();
 

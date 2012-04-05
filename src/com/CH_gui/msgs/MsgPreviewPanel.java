@@ -1515,7 +1515,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       jLineExpiration.setVisible(isExpiry);
       jPasswordField.setText("");
       jLinePassword.setVisible(isPassword);
-      //if (isPassword) jLinePassword.requestFocus();
       if (addrMode) {
         setHTMLMode(true);
       }
