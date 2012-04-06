@@ -12,23 +12,29 @@
 
 package com.CH_gui.traceTable;
 
-import java.util.*;
-
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.stat.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rp;
+import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
-import com.CH_gui.list.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.CallbackI;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.AttachmentFetcherPopup;
-import com.CH_gui.table.*;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -136,7 +142,7 @@ public class TraceTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public Vector getCachedFetchedFolderIDs() {
+  public ArrayList getCachedFetchedFolderIDs() {
     return null;
   }
 

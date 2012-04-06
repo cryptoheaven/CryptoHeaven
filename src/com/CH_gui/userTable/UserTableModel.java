@@ -12,21 +12,24 @@
 
 package com.CH_gui.userTable;
 
-import java.util.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.cache.event.UserRecordEvent;
+import com.CH_cl.service.cache.event.UserRecordListener;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_cl.service.records.filters.SubUserFilter;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.table.*;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -50,7 +53,7 @@ public class UserTableModel extends RecordTableModel {
   private Long parentUserId;
 
   /* parentIds for which the sub-account user records has been fetched already */
-  private static final Vector fetchedIds = new Vector();
+  private static final ArrayList fetchedIds = new ArrayList();
 
   private static String STR_USER_NAME = com.CH_gui.lang.Lang.rb.getString("column_Username");
   private static String STR_USER_ID = com.CH_gui.lang.Lang.rb.getString("column_User_ID");
@@ -145,7 +148,7 @@ public class UserTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public Vector getCachedFetchedFolderIDs() {
+  public ArrayList getCachedFetchedFolderIDs() {
     return null;
   }
 
@@ -239,11 +242,11 @@ public class UserTableModel extends RecordTableModel {
 
         // remove file links from the cache, leave the folders
         int rowCount = getRowCount();
-        Vector recordsToRemove = new Vector();
+        ArrayList recordsToRemove = new ArrayList();
         for (int row=0; row<rowCount; row++) {
           Record rec = getRowObjectNoTrace(row);
           if (rec instanceof UserRecord) {
-            recordsToRemove.addElement(rec);
+            recordsToRemove.add(rec);
           }
         }
         if (recordsToRemove.size() > 0) {

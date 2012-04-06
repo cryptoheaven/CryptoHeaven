@@ -12,17 +12,18 @@
 
 package com.CH_gui.contactTable;
 
-import java.util.*;
-
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.table.*;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
+import java.util.ArrayList;
+import java.util.Vector;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -94,7 +95,7 @@ public class ContactTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public Vector getCachedFetchedFolderIDs() {
+  public ArrayList getCachedFetchedFolderIDs() {
     return null;
   }
 

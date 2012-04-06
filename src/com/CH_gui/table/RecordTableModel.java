@@ -122,7 +122,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   * user switches focus to another folder...
   * This vector should also be cleared when users are switched...
   */
-  public abstract Vector getCachedFetchedFolderIDs();
+  public abstract ArrayList getCachedFetchedFolderIDs();
 
   public void setAutoScrollSuppressed(boolean flag) {
     isAutoScrollSuppressed = flag;

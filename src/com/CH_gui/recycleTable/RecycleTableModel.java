@@ -1,55 +1,62 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.recycleTable;
 
-import java.util.*;
-import java.sql.Timestamp;
-
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_cl.service.records.filters.FileFilter;
+import com.CH_cl.service.records.filters.FixedFilter;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.MainFrame;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
 import com.CH_gui.file.FileUtilities;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.table.*;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.2 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.2 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class RecycleTableModel extends RecordTableModel {
 
   private FileLinkListener fileLinkListener;
@@ -58,9 +65,9 @@ public class RecycleTableModel extends RecordTableModel {
   private MsgLinkListener msgLinkListener;
 
   /* folderShareIds for which the files has been fetched already */
-  private static final Vector fetchedIds = new Vector(); // briefs and full
-  private static final Vector fetchedIdsBriefs = new Vector();
-  private static final Vector fetchedIdsFull = new Vector();
+  private static final ArrayList fetchedIds = new ArrayList(); // briefs and full
+  private static final ArrayList fetchedIdsBriefs = new ArrayList();
+  private static final ArrayList fetchedIdsFull = new ArrayList();
 
   protected static final String STR_FILE_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_File_Folder");
   protected static final String STR_SHARED_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_Shared_Folder");
@@ -101,17 +108,17 @@ public class RecycleTableModel extends RecordTableModel {
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
-  public Vector getCachedFetchedFolderIDs() {
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
+  public ArrayList getCachedFetchedFolderIDs() {
     return fetchedIds;
   }
 
   /**
-   * Sets auto update mode by listening on the cache contact updates.
-   */
+  * Sets auto update mode by listening on the cache contact updates.
+  */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleTableModel.class, "setAutoUpdate(boolean flag)");
     if (trace != null) trace.args(flag);
@@ -146,8 +153,8 @@ public class RecycleTableModel extends RecordTableModel {
 
 
   /**
-   * Initializes the model setting the specified folderId as its main variable
-   */
+  * Initializes the model setting the specified folderId as its main variable
+  */
   public synchronized void initData(Long folderId) {
     initData(folderId, false);
     setCollapseFileVersions(true);
@@ -162,8 +169,8 @@ public class RecycleTableModel extends RecordTableModel {
   }
 
   /**
-   * @param fetch true if data should be refetched from the database.
-   */
+  * @param fetch true if data should be refetched from the database.
+  */
   public synchronized void refreshData(boolean forceFetch) {
     FolderPair folderPair = getParentFolderPair();
     if (folderPair != null) {
@@ -172,8 +179,8 @@ public class RecycleTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model setting the specified folderId as its main variable
-   */
+  * Initializes the model setting the specified folderId as its main variable
+  */
   private synchronized void switchData(Long folderId, boolean forceSwitch) {
     FolderPair folderPair = getParentFolderPair();
     if (forceSwitch || folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
@@ -215,8 +222,8 @@ public class RecycleTableModel extends RecordTableModel {
 
 
   /**
-   * Forces a refresh of data displayed even if its already displaying the specified folder data.
-   */
+  * Forces a refresh of data displayed even if its already displaying the specified folder data.
+  */
   private synchronized void refreshData(Long folderId, boolean forceFetch) {
     if (folderId != null) {
       FolderShareRecord shareRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(folderId, true);
@@ -369,7 +376,7 @@ public class RecycleTableModel extends RecordTableModel {
 
       switch (column) {
         case 0:
-         boolean isStarred = msgLink.isStarred();
+        boolean isStarred = msgLink.isStarred();
           boolean isFlagged = false;
           StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
           if (stat != null)
@@ -438,8 +445,8 @@ public class RecycleTableModel extends RecordTableModel {
 
 
   /**
-   * Invoked by the cell editor when value in the column changes.
-   */
+  * Invoked by the cell editor when value in the column changes.
+  */
   public void setValueAt(Object aValue, int row, int column) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleTableModel.class, "setValueAt(Object aValue, int row, int column)");
     if (trace != null) trace.args(aValue);
@@ -487,10 +494,10 @@ public class RecycleTableModel extends RecordTableModel {
 
 
   /**
-   * Send a request to fetch files and msg briefs for the <code> shareId </code> from the server
-   * if files were not fetched for this folder, otherwise get them from cache
-   * @param force true to force a fetch from the database
-   */
+  * Send a request to fetch files and msg briefs for the <code> shareId </code> from the server
+  * if files were not fetched for this folder, otherwise get them from cache
+  * @param force true to force a fetch from the database
+  */
   private void fetchFilesAndMsgs(final Long shareId, final Long folderId, boolean force) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecycleTableModel.class, "fetchFilesAndMsgs(Long shareId, Long folderId, boolean force)");
     if (trace != null) trace.args(shareId, folderId);
@@ -504,14 +511,14 @@ public class RecycleTableModel extends RecordTableModel {
         // if folder previously fetched, remove file and msg links from the cache, leave the folders
         if (fetchedIds.contains(shareId)) {
           int rowCount = getRowCount();
-          Vector fileLinksToRemove = new Vector();
-          Vector msgLinksToRemove = new Vector();
+          ArrayList fileLinksToRemove = new ArrayList();
+          ArrayList msgLinksToRemove = new ArrayList();
           for (int row=0; row<rowCount; row++) {
             Record rec = getRowObjectNoTrace(row);
             if (rec instanceof FileLinkRecord) {
-              fileLinksToRemove.addElement(rec);
+              fileLinksToRemove.add(rec);
             } else if (rec instanceof MsgLinkRecord) {
-              msgLinksToRemove.addElement(rec);
+              msgLinksToRemove.add(rec);
             }
           }
           if (fileLinksToRemove.size() > 0) {
@@ -582,8 +589,8 @@ public class RecycleTableModel extends RecordTableModel {
   }
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public boolean isContentFetched(Long shareId) {
     synchronized (fetchedIds) {
       return fetchedIds.contains(shareId);
@@ -669,8 +676,8 @@ public class RecycleTableModel extends RecordTableModel {
     if (folderPair != null && recs != null && recs.length > 0) {
 
       // filter out only interested records
-      Vector halfPairPicksV = new Vector();
-      Vector linksPicksV = new Vector();
+      ArrayList halfPairPicksL = new ArrayList();
+      ArrayList linksPicksL = new ArrayList();
       Record[] halfPairPicks = null;
       FolderPair[] pairPicks = null;
       Record[] linksPicks = null;
@@ -681,26 +688,26 @@ public class RecycleTableModel extends RecordTableModel {
       for (int i=0; i<recs.length; i++) {
         Record rec = recs[i];
         if (rec instanceof FolderRecord) {
-          halfPairPicksV.addElement(rec);
+          halfPairPicksL.add(rec);
         } else if (rec instanceof FolderShareRecord) {
           FolderShareRecord sRec = (FolderShareRecord) rec;
           if (sRec.ownerUserId.equals(userId)) {
-            halfPairPicksV.addElement(rec);
+            halfPairPicksL.add(rec);
           }
         } else if (rec instanceof FileLinkRecord || rec instanceof MsgLinkRecord) {
-          linksPicksV.addElement(rec);
+          linksPicksL.add(rec);
         }
       }
 
-      if (halfPairPicksV.size() > 0) {
-        halfPairPicks = new Record[halfPairPicksV.size()];
-        halfPairPicksV.toArray(halfPairPicks);
+      if (halfPairPicksL.size() > 0) {
+        halfPairPicks = new Record[halfPairPicksL.size()];
+        halfPairPicksL.toArray(halfPairPicks);
         pairPicks = CacheUtilities.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
       }
 
-      if (linksPicksV.size() > 0) {
-        linksPicks = new Record[linksPicksV.size()];
-        linksPicksV.toArray(linksPicks);
+      if (linksPicksL.size() > 0) {
+        linksPicks = new Record[linksPicksL.size()];
+        linksPicksL.toArray(linksPicks);
       }
 
       if (event.getEventType() == RecordEvent.SET) {

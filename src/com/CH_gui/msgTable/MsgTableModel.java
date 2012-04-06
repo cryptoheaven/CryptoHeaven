@@ -44,7 +44,6 @@ import com.CH_guiLib.util.HTML_Ops;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -65,8 +64,8 @@ import java.util.Vector;
 public class MsgTableModel extends RecordTableModel {
 
   // FolderShareIds for which records have been fetched already.
-  private static final Vector fetchedIds = new Vector(); // default non-filter type (full or brief depending on folder type)
-  private static final Vector fetchedIdsFull = new Vector();
+  private static final ArrayList fetchedIds = new ArrayList(); // default non-filter type (full or brief depending on folder type)
+  private static final ArrayList fetchedIdsFull = new ArrayList();
 
   private MsgLinkListener linkListener;
   private MsgDataListener dataListener;
@@ -302,7 +301,7 @@ public class MsgTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public Vector getCachedFetchedFolderIDs() {
+  public ArrayList getCachedFetchedFolderIDs() {
     return fetchedIds;
   }
 

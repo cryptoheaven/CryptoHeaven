@@ -12,19 +12,24 @@
 
 package com.CH_gui.shareTable;
 
-import java.util.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.FolderShareRecordEvent;
+import com.CH_cl.service.cache.event.FolderShareRecordListener;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.records.filters.ShareFilter;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderShareRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.filters.*;
-
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.table.*;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -119,7 +124,7 @@ public class ShareTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public Vector getCachedFetchedFolderIDs() {
+  public ArrayList getCachedFetchedFolderIDs() {
     return null;
   }
 
