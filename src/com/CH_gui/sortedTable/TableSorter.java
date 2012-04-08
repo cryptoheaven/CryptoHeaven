@@ -40,6 +40,7 @@ import com.CH_gui.table.*;
 public class TableSorter extends TableMap implements Comparator, TableModelListener {
 
   int indexes[] = new int[0];
+  int indexesReverse[] = new int [0];
 
   // positive=ascending, negative(+100)=descending; can't have -0 hance the offset
   private Vector sortingColumns = new Vector();
@@ -200,12 +201,13 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
 
     TableModel model = getRawModel();
     if (model != null) {
-
       int rowCount = model.getRowCount();
       indexes = new int[rowCount];
-
-      for (int row = 0; row < rowCount; row++)
+      indexesReverse = new int[rowCount];
+      for (int row = 0; row < rowCount; row++) {
         indexes[row] = row;
+        indexesReverse[row] = row;
+      }
     }
 
     if (trace != null) trace.exit(TableSorter.class);
@@ -261,7 +263,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
 
 
   /**
-   * Illediately sort the table and fire table updated event for all rows.
+   * Immediately sort the table and fire table updated event for all rows.
    * Threaded sort is out of the question because we need to be in synch with selection listeners.
    */
   private void sort() {
@@ -300,7 +302,9 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
         sortPostProcessing(objs);
 
         for (int i=0; i<length; i++) {
-          indexes[i] = ((Integer) objs[i]).intValue();
+          int row = ((Integer) objs[i]).intValue();
+          indexes[i] = row;
+          indexesReverse[row] = i;
         }
       }
 
@@ -440,12 +444,8 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
    */
   synchronized int convertMyRowIndexToView(int modelRowIndex) {
     int rc = -1;
-    for (int i=0; i<indexes.length; i++) {
-      if (indexes[i] == modelRowIndex) {
-        rc = i;
-        break;
-      }
-    }
+    if (modelRowIndex >= 0 && modelRowIndex < indexesReverse.length)
+      rc = indexesReverse[modelRowIndex];
     return rc;
   }
 

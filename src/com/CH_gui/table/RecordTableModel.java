@@ -463,7 +463,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
           fireTableRowsUpdated(0, size -1); // don't fire structure changed -- it would screw up the header renderer
         }
       }
-      // if somethind is to be removed/deleted, use another call to removeData()
+      // if something is to be removed/deleted, use another call to removeData()
       if (countToDelete > 0) {
         Record[] recs = new Record[removeRecordsL.size()];
         removeRecordsL.toArray(recs);
@@ -566,8 +566,8 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       }
     }
     if (removeCount > 0) {
-      // simulate reletions from the end.... to minimally confuse the selection list as
-      // the rows are remapped by the sorter anyway
+      // simulate deletions from the end.... to minimally confuse the selection list as
+      // the rows are re-mapped by the sorter anyway
       int originalSize = recordsL.size() + removeCount;
       if (this instanceof FileTableModel) {
         fireTableDataChanged();
