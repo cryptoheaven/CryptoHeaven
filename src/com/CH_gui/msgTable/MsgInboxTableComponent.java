@@ -12,11 +12,9 @@
 
 package com.CH_gui.msgTable;
 
-import com.CH_gui.gui.Template;
 import com.CH_co.trace.Trace;
-
-import com.CH_gui.gui.*;
-import com.CH_gui.table.*;
+import com.CH_gui.gui.Template;
+import com.CH_gui.table.RecordTableComponent;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
