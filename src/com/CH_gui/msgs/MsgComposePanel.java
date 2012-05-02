@@ -1482,18 +1482,22 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
         // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-        TigerPropSession speller = SingleTigerSession.getSingleInstance();
-        if (SingleTigerSession.countLanguageLexicons(speller) > 0) {
-          JTextComponent component = msgComponents.getMsgTypeArea();
-          JTigerCheckDialog spellDialog = new JTigerCheckDialog(parent, component, speller);
-          MiscGui.setSuggestedWindowLocation(parent, spellDialog);
-          spellDialog.setVisible(true);
-          EventListener[] listeners = component.getListeners(CaretListener.class);
-          for (int i=0; listeners!=null && i<listeners.length; i++)
-            if (listeners[i] instanceof TigerBkgChecker)
-              ((TigerBkgChecker) listeners[i]).recheckAll();
-        } else {
-          MessageDialog.showErrorDialog(parent, "No dictionary found!", "No dictionary", false);
+        try {
+          TigerPropSession speller = SingleTigerSession.getSingleInstance();
+          if (SingleTigerSession.countLanguageLexicons(speller) > 0) {
+            JTextComponent component = msgComponents.getMsgTypeArea();
+            JTigerCheckDialog spellDialog = new JTigerCheckDialog(parent, component, speller);
+            MiscGui.setSuggestedWindowLocation(parent, spellDialog);
+            spellDialog.setVisible(true);
+            EventListener[] listeners = component.getListeners(CaretListener.class);
+            for (int i=0; listeners!=null && i<listeners.length; i++)
+              if (listeners[i] instanceof TigerBkgChecker)
+                ((TigerBkgChecker) listeners[i]).recheckAll();
+          } else {
+            MessageDialog.showErrorDialog(parent, "No dictionary found!", "No dictionary", false);
+          }
+        } catch (Throwable t) {
+          t.printStackTrace();
         }
       }
     }
@@ -1517,13 +1521,17 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
         // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-        TigerPropSession speller = SingleTigerSession.getSingleInstance();
-        if (speller.countUserLexicons() > 0) {
-          JTigerUserDialog dialog = new JTigerUserDialog(parent, speller.getUserLexicons()[0]);
-          MiscGui.setSuggestedWindowLocation(parent, dialog);
-          dialog.setVisible(true);
-        } else {
-          MessageDialog.showErrorDialog(parent, "No user dictionary found!", "No dictionary", false);
+        try {
+          TigerPropSession speller = SingleTigerSession.getSingleInstance();
+          if (speller.countUserLexicons() > 0) {
+            JTigerUserDialog dialog = new JTigerUserDialog(parent, speller.getUserLexicons()[0]);
+            MiscGui.setSuggestedWindowLocation(parent, dialog);
+            dialog.setVisible(true);
+          } else {
+            MessageDialog.showErrorDialog(parent, "No user dictionary found!", "No dictionary", false);
+          }
+        } catch (Throwable t) {
+          t.printStackTrace();
         }
       }
     }
@@ -1547,8 +1555,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
         // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-        TigerPropSession speller = SingleTigerSession.getSingleInstance();
-        new JTigerOptionsDialog(parent, speller, MainFrame.getServerInterfaceLayer());
+        try {
+          TigerPropSession speller = SingleTigerSession.getSingleInstance();
+          new JTigerOptionsDialog(parent, speller, MainFrame.getServerInterfaceLayer());
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
       }
     }
   }
