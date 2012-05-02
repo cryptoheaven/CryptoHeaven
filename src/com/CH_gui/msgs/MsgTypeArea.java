@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgs;
 
@@ -37,21 +37,21 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.parser.ParserDelegator;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:  Component for typing message in either PLAIN or HTML mode.
- *
- *
- * Class Details: put text component on this to isolate layout calculations when switching PLAIN/HTML
- *
- *
- * <b>$Revision: 1.20 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:  Component for typing message in either PLAIN or HTML mode.
+*
+*
+* Class Details: put text component on this to isolate layout calculations when switching PLAIN/HTML
+*
+*
+* <b>$Revision: 1.20 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgTypeArea extends JPanel implements ComponentContainerI, DisposableObj {
 
   private UndoManagerI undoMngrI;
@@ -88,13 +88,12 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   private Object tigerBkgChecker = null;
 
   /** Creates new MsgTypeArea */
-  public MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean grabInitialFocus, boolean suppressSpellCheck, boolean isChatMode)");
+  public MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean suppressSpellCheck, boolean isChatMode) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean suppressSpellCheck, boolean isChatMode)");
     if (trace != null) trace.args(htmlPropertyPostfix);
     if (trace != null) trace.args(objType);
     if (trace != null) trace.args(defaultHTML);
     if (trace != null) trace.args(undoMngrI);
-    if (trace != null) trace.args(grabInitialFocus);
     if (trace != null) trace.args(suppressSpellCheck);
     if (trace != null) trace.args(isChatMode);
 
@@ -108,10 +107,6 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
 
     init();
 
-    if (grabInitialFocus) {
-      getTextComponent().addHierarchyListener(new InitialFocusRequestor());
-    }
-
     if (!suppressSpellCheck) {
     //if (isChatMode && !suppressSpellCheck) {
       // Create spell checker for the message
@@ -123,6 +118,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
         if (jTextMessage != null)
           jTextMessage.addMouseListener(new TigerMouseAdapter(null));
       } catch (Throwable t) {
+        t.printStackTrace();
       }
     }
     // avoid super small sizing especially in chat entry panel
@@ -538,8 +534,8 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   /**
-   * @return current text component used in the message composition.
-   */
+  * @return current text component used in the message composition.
+  */
   protected JTextComponent getTextComponent() {
     JTextComponent textComp = null;
     if (isHTML)
@@ -662,8 +658,8 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   /**
-   * Strip down the HEAD tag
-   */
+  * Strip down the HEAD tag
+  */
   private static String removeHEADtag(String str) {
     String rc = str;
     String h1 = "<head>";
