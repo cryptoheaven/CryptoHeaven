@@ -12,16 +12,14 @@
 
 package com.CH_co.service.msg;
 
-import java.io.IOException;
-
-import com.CH_co.trace.Trace;
-
-import com.CH_co.util.Misc;
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
 import com.CH_co.monitor.*;
-import com.CH_co.io.*;
-
 import com.CH_co.service.engine.CommonSessionContext;
 import com.CH_co.service.msg.dataSets.Str_Rp;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
+import java.io.IOException;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -193,10 +191,7 @@ public class MessageAction extends Message implements Cancellable {
     synchronized(out) {
       // This code will be consumed by code which determines what instance of MessageAction to reconstruct.
       if (trace != null) trace.data(10, "actionCode", actionCode);
-      int sendActionCode = actionCode;
-      if (sendActionCode == CommandCodes.FILE_Q_NEW_FILE_STUDS_BACKGROUND)
-        sendActionCode = CommandCodes.FILE_Q_NEW_FILE_STUDS;
-      out.writeInt(sendActionCode);
+      out.writeInt(actionCode);
 
       if (trace != null) trace.data(20, "uniqueStamp", uniqueStamp);
       out.writeLong(uniqueStamp);
