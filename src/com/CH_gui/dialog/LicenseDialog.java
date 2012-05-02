@@ -12,18 +12,23 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
-
-import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
-
+import com.CH_co.util.URLs;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.VisualsSavable;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.Keymap;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -103,7 +108,7 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
   private String getLicenseText() {
     String licenseText = "";
     try {
-      InputStream inStream = URLs.getResourceURL("License.txt").openStream();
+      InputStream inStream = URLs.getResourceURL("ch/cl/License.txt").openStream();
       BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
       StringBuffer sb = new StringBuffer();
       String line = null;
