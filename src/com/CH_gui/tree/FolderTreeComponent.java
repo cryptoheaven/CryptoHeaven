@@ -12,21 +12,33 @@
 
 package com.CH_gui.tree;
 
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.util.*;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-
-import com.CH_gui.action.*;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.GlobalProperties;
+import com.CH_gui.action.ActionUtilities;
 import com.CH_gui.actionGui.JActionFrame;
-import com.CH_gui.folder.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
+import com.CH_gui.folder.FolderSelectionEvent;
+import com.CH_gui.folder.FolderSelectionListener;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.menuing.PopupMouseAdapter;
+import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.util.ActionProducerI;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.ToolBarProducerI;
+import com.CH_gui.util.VisualsSavable;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.StringTokenizer;
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
