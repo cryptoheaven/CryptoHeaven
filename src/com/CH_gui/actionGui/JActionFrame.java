@@ -1,59 +1,60 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.actionGui;
 
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.service.records.*;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.table.*;
-import com.CH_gui.toolBar.*;
-import com.CH_gui.tree.*;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_co.util.NotificationCenter;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.dialog.MenuEditorDialog;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.menuing.MenuTreeModel;
+import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.table.RecordTableComponent;
+import com.CH_gui.toolBar.DualBox_Launcher;
+import com.CH_gui.tree.FolderTreeComponent;
 import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_guiLib.gui.JMyRadioButton;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.swing.*;
-
 import javax.swing.tree.DefaultTreeModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.39 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.39 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public abstract class JActionFrame extends JFrame implements ContainerListener, ActionProducerI, ToolBarProducerI, VisualsSavable {
 
   public static boolean ENABLE_FRAME_TOOLBARS = false;
@@ -239,9 +240,11 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     Integer extendedState = null;
     java.lang.reflect.Method getExtendedState = null;
     try {
-      getExtendedState = Frame.class.getMethod("getExtendedState", null);
+      Class[] paramTypes = null;
+      getExtendedState = Frame.class.getMethod("getExtendedState", paramTypes);
       if (getExtendedState != null) {
-        extendedState = (Integer) getExtendedState.invoke(JActionFrame.this, null);
+        Object[] args = null;
+        extendedState = (Integer) getExtendedState.invoke(JActionFrame.this, args);
       }
     } catch (Exception t) {
     }
@@ -290,9 +293,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   }
 
   /**
-   * Default exit operation is to save frame properties and visual preferences
-   * into the GlobalProperties.
-   */
+  * Default exit operation is to save frame properties and visual preferences
+  * into the GlobalProperties.
+  */
   public void saveFrameProperties() {
     MiscGui.storeVisualsSavable(this);
     if (menuTreeModel != null)
@@ -379,27 +382,27 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       } else {
         // gather toolbars
         ToolBarProducerI[] toolBarProducers = (ToolBarProducerI[]) MiscGui.getComponentsRecursively(JActionFrame.this, ToolBarProducerI.class);
-        final Vector liveProducersV = new Vector();
+        final ArrayList liveProducersL = new ArrayList();
         for (int i=0; i<toolBarProducers.length; i++) {
           if (toolBarProducers[i].getToolBarModel() != null) {
-            liveProducersV.addElement(toolBarProducers[i]);
+            liveProducersL.add(toolBarProducers[i]);
           }
         }
 
-        if (liveProducersV.size() == 0) {
+        if (liveProducersL.size() == 0) {
 
-        } else if (liveProducersV.size() == 1) {
-          new DualBox_Launcher(JActionFrame.this, ((ToolBarProducerI) liveProducersV.elementAt(0)).getToolBarModel());
+        } else if (liveProducersL.size() == 1) {
+          new DualBox_Launcher(JActionFrame.this, ((ToolBarProducerI) liveProducersL.get(0)).getToolBarModel());
         } else {
           JPanel choicePanel = new JPanel(new GridBagLayout());
           int posY = 0;
           choicePanel.add(new JMyLabel("Which Toolbar would you like to customize?"), new GridBagConstraints(0, posY, 1, 1, 10, 0,
               GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
           posY ++;
-          final JRadioButton[] choices = new JRadioButton[liveProducersV.size()];
+          final JRadioButton[] choices = new JRadioButton[liveProducersL.size()];
           ButtonGroup group = new ButtonGroup();
-          for (int i=0; i<liveProducersV.size(); i++) {
-            ToolBarProducerI producer = (ToolBarProducerI) liveProducersV.elementAt(i);
+          for (int i=0; i<liveProducersL.size(); i++) {
+            ToolBarProducerI producer = (ToolBarProducerI) liveProducersL.get(i);
             String name = producer.getToolBarTitle();
             if (producer instanceof RecordTableComponent) {
               RecordTableComponent recTable = (RecordTableComponent) producer;
@@ -426,9 +429,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
           jEdit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
               ToolBarModel tModel = null;
-              for (int i=0; i<liveProducersV.size(); i++) {
+              for (int i=0; i<liveProducersL.size(); i++) {
                 if (choices[i].isSelected()) {
-                  tModel = ((ToolBarProducerI) liveProducersV.elementAt(i)).getToolBarModel();
+                  tModel = ((ToolBarProducerI) liveProducersL.get(i)).getToolBarModel();
                   break;
                 }
               }
@@ -513,9 +516,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
 
   /**
-   * ComponentListener interface method.
-   * When component has been added, add its actions.
-   */
+  * ComponentListener interface method.
+  * When component has been added, add its actions.
+  */
   public void componentAdded(final ContainerEvent event) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "componentAdded(ContainerEvent event)");
     if (trace != null) trace.args(event);
@@ -524,9 +527,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   }
 
   /**
-   * ComponentListener interface method.
-   * When component has been added, DISABLE its actions.
-   */
+  * ComponentListener interface method.
+  * When component has been added, DISABLE its actions.
+  */
   public void componentRemoved(final ContainerEvent event) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "componentRemoved(ContainerEvent event)");
     if (trace != null) trace.args(event);
@@ -535,9 +538,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   }
 
   /**
-   * Add menus and tools.
-   * @return true if new component causes addition of menus or tools
-   */
+  * Add menus and tools.
+  * @return true if new component causes addition of menus or tools
+  */
   public boolean addComponentActions(Component source) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "addComponentActions(Component)");
     if (trace != null) trace.args(source);
@@ -591,9 +594,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   }
 
   /**
-   * @param forComponent is the changed component, if null, rebuild entire Frame's actions
-   * It does not remove the menu actions if they are no longer present.... just disables.
-   */
+  * @param forComponent is the changed component, if null, rebuild entire Frame's actions
+  * It does not remove the menu actions if they are no longer present.... just disables.
+  */
   public void rebuildAllActions(Component forComponent) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "rebuildComponentActions()");
 
@@ -613,9 +616,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   }
 
   /**
-   * Discards the current Menu Bar and rebuilds a new one.
-   * Used after Customize Menus action -- currently unused as this function has been taken out of menus.
-   */
+  * Discards the current Menu Bar and rebuilds a new one.
+  * Used after Customize Menus action -- currently unused as this function has been taken out of menus.
+  */
   public void reconstructMenusFromScratch(DefaultTreeModel treeModel) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrame.class, "reconstructMenusFromScratch(DefaultTreeModel treeModel)");
     if (trace != null) trace.args(treeModel);
@@ -674,26 +677,26 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   /*        A c t i o n P r o d u c e r I
   /****************************************************************************/
   /**
-   * ActionProducerI interface method.
-   * @return all the acitons that this objects produces.
-   */
+  * ActionProducerI interface method.
+  * @return all the acitons that this objects produces.
+  */
   public Action[] getActions() {
     if (actions == null)
       initActions();
     return actions;
   }
   /**
-   * ActionProducerI interface method.
-   * Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true if this object will gather all actions from its childeren or hide them counciously.
-   */
+  * ActionProducerI interface method.
+  * Final Action Producers will not be traversed to collect its containing objects' actions.
+  * @return true if this object will gather all actions from its childeren or hide them counciously.
+  */
   public boolean isFinalActionProducer() {
     return false;
   }
 
   /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  * Enables or Disables actions based on the current state of the Action Producing component.
+  */
   public void setEnabledActions() {
   }
 
@@ -804,8 +807,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
 
   /**
-   * Overwrite super.setVisible() to pack the frame when it is first shown and no visuals were saved.
-   */
+  * Overwrite super.setVisible() to pack the frame when it is first shown and no visuals were saved.
+  */
   private boolean wasShown = false;
   public void setVisible(boolean b) {
     if (b && !wasShown) {
@@ -838,8 +841,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   }
 
   /**
-   * Overwrite super.setTitle() to accommodate visual update notifications through title animations.
-   */
+  * Overwrite super.setTitle() to accommodate visual update notifications through title animations.
+  */
   public synchronized void setTitle(String title) {
     if (title != null) {
       if (!title.endsWith(" "))
