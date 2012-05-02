@@ -13,18 +13,20 @@
 package com.CH_gui.menuing;
 
 import com.CH_co.trace.Trace;
-
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.util.ActionProducerI;
-
-import comx.Tiger.gui.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.ref.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import comx.Tiger.gui.TigerBkgChecker;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.lang.ref.WeakReference;
+import java.util.EventListener;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.event.CaretListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -69,11 +71,15 @@ public class PopupMouseAdapter extends MouseAdapter {
         for (int i=0; listeners!=null && i<listeners.length; i++) {
           CaretListener listener = (CaretListener) listeners[i];
           // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-          if (listener instanceof TigerBkgChecker) {
-            TigerBkgChecker bgc = (TigerBkgChecker) listener;
-            Point pt = new Point(mouseEvent.getX(), mouseEvent.getY());
-            if (bgc.isInMisspelledWord(pt))
-              jPopupSpell = bgc.createPopupMenu(mouseEvent.getX(), mouseEvent.getY(), 8, "Ignore All", "Add to Dictionary", "(no spelling suggestions)");
+          try {
+            if (listener instanceof TigerBkgChecker) {
+              TigerBkgChecker bgc = (TigerBkgChecker) listener;
+              Point pt = new Point(mouseEvent.getX(), mouseEvent.getY());
+              if (bgc.isInMisspelledWord(pt))
+                jPopupSpell = bgc.createPopupMenu(mouseEvent.getX(), mouseEvent.getY(), 8, "Ignore All", "Add to Dictionary", "(no spelling suggestions)");
+            }
+          } catch (Throwable t) {
+            t.printStackTrace();
           }
         }
       }
