@@ -2475,38 +2475,42 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
    * Enables or Disables actions based on the current state of the Action Producing component.
    */
   public void setEnabledActions() {
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        boolean inputActive = isInputActive();
+    if (!isDisposed) {
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          if (!isDisposed) {
+            boolean inputActive = isInputActive();
 
-        setEnabledSend();
+            setEnabledSend();
 
-        if (!isChatComposePanel) {
-          actions[SELECT_RECIPIENTS_ACTION].setEnabled(true && inputActive);
-          actions[SHOW_ALL_HEADERS].setEnabled(true);
-          actions[RECORD_PANEL_ACTION].setEnabled(true); // always active
+            if (!isChatComposePanel) {
+              actions[SELECT_RECIPIENTS_ACTION].setEnabled(true && inputActive);
+              actions[SHOW_ALL_HEADERS].setEnabled(true);
+              actions[RECORD_PANEL_ACTION].setEnabled(true); // always active
+            }
+            actions[SELECT_ATTACHMENTS_ACTION].setEnabled(inputActive);
+            actions[CUT_ACTION].setEnabled(inputActive);
+            actions[COPY_ACTION].setEnabled(inputActive);
+            actions[PASTE_ACTION].setEnabled(inputActive);
+            actions[PRIORITY_ACTION].setEnabled(inputActive);
+            actions[PRIORITY_ACTION+1].setEnabled(inputActive);
+            actions[PRIORITY_ACTION+2].setEnabled(inputActive);
+            actions[SPELL_CHECK_ACTION].setEnabled(inputActive);
+            actions[SPELL_CHECK_EDIT_DICTIONARY_ACTION].setEnabled(true); // always active
+            actions[SPELL_CHECK_OPTIONS_ACTION].setEnabled(true); // always active
+            if (isChatComposePanel) {
+              actions[RING_BELL_ACTION].setEnabled(true); // always active
+            }
+
+            setEnabledUndoAndRedo();
+
+            if (msgComponents != null) {
+              msgComponents.setEnabled(inputActive);
+            }
+          }
         }
-        actions[SELECT_ATTACHMENTS_ACTION].setEnabled(inputActive);
-        actions[CUT_ACTION].setEnabled(inputActive);
-        actions[COPY_ACTION].setEnabled(inputActive);
-        actions[PASTE_ACTION].setEnabled(inputActive);
-        actions[PRIORITY_ACTION].setEnabled(inputActive);
-        actions[PRIORITY_ACTION+1].setEnabled(inputActive);
-        actions[PRIORITY_ACTION+2].setEnabled(inputActive);
-        actions[SPELL_CHECK_ACTION].setEnabled(inputActive);
-        actions[SPELL_CHECK_EDIT_DICTIONARY_ACTION].setEnabled(true); // always active
-        actions[SPELL_CHECK_OPTIONS_ACTION].setEnabled(true); // always active
-        if (isChatComposePanel) {
-          actions[RING_BELL_ACTION].setEnabled(true); // always active
-        }
-
-        setEnabledUndoAndRedo();
-
-        if (msgComponents != null) {
-          msgComponents.setEnabled(inputActive);
-        }
-      }
-    });
+      });
+    }
   }
 
 
@@ -2742,27 +2746,31 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
    * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
    * Dispose the object and release resources to help in garbage collection.
    ************************************************************************/
+  private boolean isDisposed = false;
   public void disposeObj() {
-    for (int i=0; i<dropTargetL.size(); i++) {
-      try {
-        DropTarget target = (DropTarget) dropTargetL.get(i);
-        if (target != null) {
-          Component c = target.getComponent();
-          if (c != null)
-            c.setDropTarget(null);
-          target.setComponent(null);
+    if (!isDisposed) {
+      isDisposed = true;
+      for (int i=0; i<dropTargetL.size(); i++) {
+        try {
+          DropTarget target = (DropTarget) dropTargetL.get(i);
+          if (target != null) {
+            Component c = target.getComponent();
+            if (c != null)
+              c.setDropTarget(null);
+            target.setComponent(null);
+          }
+        } catch (Throwable t) {
         }
-      } catch (Throwable t) {
       }
+      if (typingListener != null) {
+        cache.removeMsgTypingListener(typingListener);
+        typingListener = null;
+      }
+      dropTargetL.clear();
+      componentsForDNDL.clear();
+      componentsForPopupL.clear();
+      msgComponents.disposeObj();
     }
-    if (typingListener != null) {
-      cache.removeMsgTypingListener(typingListener);
-      typingListener = null;
-    }
-    dropTargetL.clear();
-    componentsForDNDL.clear();
-    componentsForPopupL.clear();
-    msgComponents.disposeObj();
   } // end disposeObj
 
   /*****************************************************************************
