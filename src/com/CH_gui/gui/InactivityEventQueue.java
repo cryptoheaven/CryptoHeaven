@@ -12,22 +12,26 @@
 
 package com.CH_gui.gui;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.cache.event.UserSettingsRecordEvent;
+import com.CH_cl.service.cache.event.UserSettingsRecordListener;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.records.ContactRecord;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.service.records.UserSettingsRecord;
 import com.CH_co.trace.Trace;
-import com.CH_gui.util.MessageDialog;
 import com.CH_gui.frame.MainFrame;
-
+import com.CH_gui.util.MessageDialog;
+import comx.Tiger.gui.TigerPropSession;
 import comx.tig.en.SingleTigerSession;
-import comx.Tiger.gui.*;
-
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.EventQueue;
 import java.awt.event.*;
-import javax.swing.*;
+import javax.swing.Timer;
 
 
 /**
@@ -260,8 +264,12 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
           eventQueue.setDelayToRemainder();
         }
         if (userSettingsRecord.spellingProps != null) {
-          TigerPropSession tigerSession = SingleTigerSession.getSingleInstance();
-          tigerSession.setOptionsFromProperties(userSettingsRecord.spellingProps, null);
+          try {
+            TigerPropSession tigerSession = SingleTigerSession.getSingleInstance();
+            tigerSession.setOptionsFromProperties(userSettingsRecord.spellingProps, null);
+          } catch (Throwable t) {
+            t.printStackTrace();
+          }
         }
       }
       if (trace != null) trace.exit(UserSettingsUpdater.class);
