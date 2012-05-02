@@ -897,7 +897,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           // Use our own pane to fix display of internal icons because it will adjust document base
           //JEditorPane pane = new JEditorPane("text/html", "<html></html>");
           JEditorPane pane = new HTML_ClickablePane("");
-          MsgPanelUtils.setMessageContent(normalizedText, true, pane);
+          MsgPanelUtils.setMessageContent(normalizedText, true, pane, true);
           renderer.setDocument(pane);
           Window w = SwingUtilities.windowForComponent(MsgActionTable.this);
           if (w instanceof Dialog)
