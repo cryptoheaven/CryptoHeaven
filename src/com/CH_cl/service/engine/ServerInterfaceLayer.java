@@ -15,16 +15,22 @@ package com.CH_cl.service.engine;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FileLobUp;
-
-import com.CH_co.monitor.*;
-import com.CH_co.queue.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.trace.*;
+import com.CH_co.monitor.DefaultProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.ProgMonitorPool;
+import com.CH_co.monitor.Stats;
+import com.CH_co.queue.Fifo;
+import com.CH_co.queue.FifoWriterI;
+import com.CH_co.queue.PriorityFifoReaderI;
+import com.CH_co.queue.ProcessingFunctionI;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.obj.Obj_EncSet_Co;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import comx.HTTP_Socket.*;
-
+import comx.HTTP_Socket.HTTP_Socket;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -88,6 +94,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
   // The maximum number of connections to the server that we may establish.
   public static final int DEFAULT_MAX_CONNECTION_COUNT = 4;
+  public static final int DEFAULT_MIN_CONNECTION_COUNT = 1;
 
   private int maxConnectionCount = DEFAULT_MAX_CONNECTION_COUNT;
   public static final String PROPERTY_NAME_MAX_CONNECTION_COUNT = "ServerInterfaceLayer" + "_maxConnCount";
@@ -823,7 +830,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       // when main worker exists (the login message is available for new connections)
       if (hasMainWorker()) {
         // for every some non-heavy jobs create additional worker
-        countWorkersToCreate += (countAllJobs - countLargeFileJobs) / (FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION * countAllWorkers);
+        if (countAllWorkers > 0) { // Avoid divizion-by-zero.
+          // Jobs waiting | Workers
+          // 0|1, 1-2|2, 3-4|3, 5-10|4
+          countWorkersToCreate += (1 + countAllJobs - countLargeFileJobs) / (FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION * countAllWorkers);
+        }
         // If we should create at least 1 connection because there are jobs long awaiting to be sent...
         if (forceAdditionalConnection && countWorkersToCreate < 1) {
           countWorkersToCreate = 1;
@@ -832,6 +843,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         // Never create more than 1 (used to have '2' here) additional workers at a time when main worker is already present
         if (countWorkersToCreate > 1) {
           if (trace != null) trace.data(25, "don't create more than 1 additional workers at a time when main worker is already present");
+          countWorkersToCreate = 1;
+        }
+        // Maintain at least the minimum number of workers
+        if (countWorkersToCreate == 0 && countAllWorkers < DEFAULT_MIN_CONNECTION_COUNT) {
           countWorkersToCreate = 1;
         }
       }
@@ -1851,8 +1866,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     public void runTraced() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "WaitingJobsScanner.runTraced()");
 
-      int NORMAL_DELAY = 3000;
-      int delay = NORMAL_DELAY;
+      int DELAY_NORMAL = 1000;
+      int DELAY_AFTER_CHECK = 10000;
+      int delay = DELAY_NORMAL;
       while (!destroyed) {
         try {
           boolean checkForImmediateJobsNow = false;
@@ -1866,7 +1882,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               } catch (InterruptedException e) {
                 if (trace != null) trace.data(12, "waiting in jobs scanner interrupted");
               }
-              delay = NORMAL_DELAY;
+              delay = DELAY_NORMAL;
             }
             // If scanner sleep was interrupted, then check immediately in job queue
             // for waiting jobs and try to create workers to serve them.
@@ -1910,7 +1926,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               // Another mechanizm is meant for that.
               if (hasPersistantMainWorker()) {
                 ensureEnoughAllWorkersExist(forceAdditionalConnection);
-                delay = (int) ((double) NORMAL_DELAY * 2.5d);
+                delay = DELAY_AFTER_CHECK;
               }
             }
             lastScanHeadJob = headJob;
