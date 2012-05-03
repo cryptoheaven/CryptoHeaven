@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgs;
 
@@ -92,21 +92,21 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.undo.UndoManager;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.73 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.73 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarProducerI, DropTargetListener, DisposableObj, MsgTypeManagerI, MsgComposeManagerI, MsgSendInfoProviderI, UndoManagerI, VetoRisibleI {
 
   public static final String PROPERTY_NAME__SHOW_ALL_HEADERS = "showAllHeaders";
@@ -328,23 +328,23 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Remembers all content as original for purposes of checking later on if any changes were made.
-   */
+  * Remembers all content as original for purposes of checking later on if any changes were made.
+  */
   public void markCurrentContentAndAttachmentsAsOriginal() {
     markCurrentContentAsOriginal();
     markCurrentAttachmentsAsOriginal();
   }
   /**
-   * Remembers the current content (subject, body) as original
-   * for purpose of checking later on if any changes were made.
-   */
+  * Remembers the current content (subject, body) as original
+  * for purpose of checking later on if any changes were made.
+  */
   private void markCurrentContentAsOriginal() {
     originalContent = getContent();
   }
   /**
-   * Remembers the current attachments as original
-   * for purpose of checking later on if any changes were made.
-   */
+  * Remembers the current attachments as original
+  * for purpose of checking later on if any changes were made.
+  */
   private void markCurrentAttachmentsAsOriginal() {
     originalAttachments = getSelectedAttachments();
   }
@@ -452,8 +452,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Initialize the message composer from the selected draft message.
-   */
+  * Initialize the message composer from the selected draft message.
+  */
   public void setFromDraft_Threaded(final MsgLinkRecord draftMsgLink, final boolean isDeleteDraftAfterSave) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "setFromDraft_Threaded(MsgLinkRecord draftMsgLink)");
     if (trace != null) trace.args(draftMsgLink);
@@ -546,8 +546,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Initialize the message composer to form a forward of selected message.
-   */
+  * Initialize the message composer to form a forward of selected message.
+  */
   public void setForwardBody_Threaded(final MsgLinkRecord forwardMsg) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "setForwardBody_Threaded(MsgLinkRecord forwardMsg");
     if (trace != null) trace.args(forwardMsg);
@@ -591,8 +591,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Initialize the message composer to form a reply to selected message.
-   */
+  * Initialize the message composer to form a reply to selected message.
+  */
   public void setReplyTo_Threaded(final MsgLinkRecord replyToMsg, final Record[][] overrideRecipientsList) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "setReplyTo_Threaded(MsgLinkRecord replyToMsg, Record[][] overrideRecipientsList)");
     if (trace != null) trace.args(replyToMsg, overrideRecipientsList);
@@ -681,7 +681,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
     // recipients are filled, so subject is first empty/editable field
     if (isAnyRecipients()) {
-      msgComponents.setFocusToSubject();
+      msgComponents.setFocusToBody();
     } else {
       msgComponents.setFocusToRecipient();
     }
@@ -885,8 +885,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Send composed message
-   */
+  * Send composed message
+  */
   private class SendAction extends AbstractActionTraced {
     public SendAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Send_message"), Images.get(ImageNums.MAIL_SEND16));
@@ -1226,8 +1226,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   } // end class SendAction
 
   /**
-   * Save composed message as Draft
-   */
+  * Save composed message as Draft
+  */
   private class SaveAsDraftAction extends AbstractActionTraced {
     public SaveAsDraftAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Save_as_Draft"), Images.get(ImageNums.SAVE16));
@@ -1246,8 +1246,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Select recipients
-   */
+  * Select recipients
+  */
   private class SelectRecipientsAction extends AbstractActionTraced {
     public SelectRecipientsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.ADDRESS_BOOK16));
@@ -1263,8 +1263,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Select attachments
-   */
+  * Select attachments
+  */
   private class SelectAttachmentsAction extends AbstractActionTraced {
     public SelectAttachmentsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH16));
@@ -1280,8 +1280,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Cut
-   */
+  * Cut
+  */
   private class CutAction extends DefaultEditorKit.CutAction {
     public CutAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Cut"));
@@ -1299,8 +1299,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Copy
-   */
+  * Copy
+  */
   private class CopyAction extends DefaultEditorKit.CopyAction {
     public CopyAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Copy"));
@@ -1318,8 +1318,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Paste
-   */
+  * Paste
+  */
   private class PasteAction extends DefaultEditorKit.PasteAction {
     public PasteAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
@@ -1373,8 +1373,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Undo
-   */
+  * Undo
+  */
   private class UndoAction extends AbstractActionTraced {
     public UndoAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Undo"), Images.get(ImageNums.UNDO16));
@@ -1407,8 +1407,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Redo
-   */
+  * Redo
+  */
   private class RedoAction extends AbstractActionTraced {
     public RedoAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Redo"), Images.get(ImageNums.REDO16));
@@ -1441,8 +1441,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Show All Headers
-   */
+  * Show All Headers
+  */
   private class ShowAllHeaders extends AbstractActionTraced {
     private String propertyName = null;
     public ShowAllHeaders(int actionId) {
@@ -1467,8 +1467,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Spell Check
-   */
+  * Spell Check
+  */
   private class SpellCheckAction extends AbstractActionTraced {
     public SpellCheckAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_..."), Images.get(ImageNums.SPELL16));
@@ -1504,8 +1504,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Spell Check Edit User Dictionary
-   */
+  * Spell Check Edit User Dictionary
+  */
   private class SpellCheckEditDictionaryAction extends AbstractActionTraced {
     public SpellCheckEditDictionaryAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Edit_user_dictionary_..."));
@@ -1538,8 +1538,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Spell Check Options
-   */
+  * Spell Check Options
+  */
   private class SpellCheckOptionsAction extends AbstractActionTraced {
     public SpellCheckOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_preferences_..."));
@@ -1566,8 +1566,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Voice Recording panel
-   */
+  * Voice Recording panel
+  */
   private class RecordPanelAction extends AbstractActionTraced {
     public RecordPanelAction(int actionId) {
       super("Voice Recording Panel", Images.get(ImageNums.RECORD16));
@@ -1582,8 +1582,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * Ring panel
-   */
+  * Ring panel
+  */
   private class RingBellAction extends AbstractActionTraced {
     public RingBellAction(int actionId) {
       super("Ring the bell", Images.get(ImageNums.RING_BELL));
@@ -1612,9 +1612,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Check if all recipients are valid and display a message for the ones not valid.
-   * @return the valid recipients
-   */
+  * Check if all recipients are valid and display a message for the ones not valid.
+  * @return the valid recipients
+  */
   public void checkValidityOfRecipients() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkValidityOfRecipients()");
     checkValidityOfRecipients(true);
@@ -1714,10 +1714,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /**
-   * Convert any EmailAddressRecords in the array to familiar users or contact objects.
-   * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
-   * @return true if anything was converted.
-   */
+  * Convert any EmailAddressRecords in the array to familiar users or contact objects.
+  * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
+  * @return true if anything was converted.
+  */
   private boolean convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertNotHostedEmailsToWebAccounts) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertNotHostedEmailsToWebAccounts)");
     if (trace != null) trace.args(recipients);
@@ -2041,9 +2041,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /**
-   * @return Vector of emailAddresses Strings which do not exist in the Address Books
-   * xxx To-Do: enforce check in specified folder filter type
-   */
+  * @return Vector of emailAddresses Strings which do not exist in the Address Books
+  * xxx To-Do: enforce check in specified folder filter type
+  */
   public static ArrayList checkEmailAddressesForAddressBookAdition(Component parent, ArrayList emailNicksL, ArrayList emailStringRecordsL, boolean displayNoNewAddressesDialog, boolean performCheckOnly, RecordFilter folderFilter) {
     return checkEmailAddressesForAddressBookAdition(parent, emailNicksL, emailStringRecordsL, displayNoNewAddressesDialog, performCheckOnly, folderFilter, false, null, false);
   }
@@ -2469,23 +2469,23 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   /****************************************************************************/
 
   /**
-   * @return all the acitons that this objects produces.
-   */
+  * @return all the acitons that this objects produces.
+  */
   public Action[] getActions() {
     return actions;
   }
 
   /**
-   * Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true if this object will gather all actions from its childeren or hide them counciously.
-   */
+  * Final Action Producers will not be traversed to collect its containing objects' actions.
+  * @return true if this object will gather all actions from its childeren or hide them counciously.
+  */
   public boolean isFinalActionProducer() {
     return true;
   }
 
   /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  * Enables or Disables actions based on the current state of the Action Producing component.
+  */
   public void setEnabledActions() {
     if (!isDisposed) {
       SwingUtilities.invokeLater(new Runnable() {
@@ -2659,8 +2659,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /*************************************************************
-   * D R O P   T A R G E T   L I S T E N E R   I n t e r f a c e
-   *************************************************************/
+  * D R O P   T A R G E T   L I S T E N E R   I n t e r f a c e
+  *************************************************************/
 
   public void dragEnter(DropTargetDragEvent event) {
     updateCursor(event);
@@ -2700,7 +2700,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           event.rejectDrop();
       }
       else if (tr.isDataFlavorSupported(MsgDND_Transferable.MSG_RECORD_FLAVOR) ||
-               tr.isDataFlavorSupported(AddrDND_Transferable.ADDR_RECORD_FLAVOR)) {
+              tr.isDataFlavorSupported(AddrDND_Transferable.ADDR_RECORD_FLAVOR)) {
         Long[] msgLinkIDs = null;
         if (tr.isDataFlavorSupported(MsgDND_Transferable.MSG_RECORD_FLAVOR))
           msgLinkIDs = ((MsgDND_TransferableData) tr.getTransferData(MsgDND_Transferable.MSG_RECORD_FLAVOR)).msgLinkIDs;
@@ -2740,8 +2740,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     event.getDropTargetContext().dropComplete(true);
   }
   /**
-   * Update the 'selectedAttachments' array to add the additionalAttachments.
-   */
+  * Update the 'selectedAttachments' array to add the additionalAttachments.
+  */
   private void addAdditionalAttachments(Object[] additionalAttachments) {
     if (additionalAttachments != null && additionalAttachments.length > 0) {
       selectedAttachments = ArrayUtils.concatinate(selectedAttachments, additionalAttachments, Object.class);
@@ -2755,9 +2755,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /*************************************************************************
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
-   ************************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
+  ************************************************************************/
   private boolean isDisposed = false;
   public void disposeObj() {
     if (!isDisposed) {
@@ -2786,8 +2786,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   } // end disposeObj
 
   /*****************************************************************************
-   * I N T E R F A C E   M E T H O D  ---   M s g T y p e M a n a g e r I  *****
-   ****************************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   M s g T y p e M a n a g e r I  *****
+  ****************************************************************************/
   public Long getTypeNotifyFolderId() {
     Long folderId = null;
     Record[] recipients = selectedRecipients[MsgLinkRecord.RECIPIENT_TYPE_TO];
@@ -2805,8 +2805,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   }
 
   /***************************************************************************************
-   * I N T E R F A C E   M E T H O D  ---   M s g S e n d I n f o P r o v i d e r I  *****
-   **************************************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   M s g S e n d I n f o P r o v i d e r I  *****
+  **************************************************************************************/
   public void messageSentNotify() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "messageSentNotify()");
     // do gui action in a gui thread...
@@ -2821,7 +2821,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           if (fromDraftMsgLink != null) {
             boolean isSave = !isSavingAsDraft;
             boolean isFromDraftFolderToDraftFolder =
-               (isSavingAsDraft && // destination Draft folder
+              (isSavingAsDraft && // destination Draft folder
                 fromDraftMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER &&
                 fromDraftMsgLink.ownerObjId.equals(cache.getUserRecord().draftFolderId) // source Draft folder
                 );
@@ -3005,8 +3005,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /***********************************************************************
-   * I N T E R F A C E   M E T H O D  ---   U n d o M a n a g e r I  *****
-   **********************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   U n d o M a n a g e r I  *****
+  **********************************************************************/
   public UndoManager getUndoManager() {
     return undoMngr;
   }
@@ -3017,8 +3017,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
 
   /***********************************************************************
-   * I N T E R F A C E   M E T H O D  ---   V e t o R i s i b l e I  *****
-   **********************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   V e t o R i s i b l e I  *****
+  **********************************************************************/
   public boolean isVetoRaised(int type) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "isVetoRaised(int type)");
     if (trace != null) trace.args(type);
