@@ -1,40 +1,45 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package comx.HTTP_Socket;
 
-import com.CH_co.trace.*;
-import comx.HTTP_Common.*;
-
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import comx.HTTP_Common.DataSet;
+import comx.HTTP_Common.DataSetCache;
+import comx.HTTP_Common.OrderedFifo;
+import comx.HTTP_Common.SequenceFifo;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.6 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.6 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class HTTP_Socket extends Socket {
 
   private static Random rnd = new Random();
@@ -383,7 +388,7 @@ public class HTTP_Socket extends Socket {
             if (trace != null) trace.data(20, "received packet, action is", recvDS.action);
             switch (recvDS.action) {
               case DataSet.ACTION_CONNECT_RP :
-                //xxx System.out.println("ACTION_CONNECT_RP");
+                //System.out.println("ACTION_CONNECT_RP");
                 synchronized (connectionIdMonitor) {
                   connected = true;
                   connectionId = recvDS.connectionId;
@@ -396,7 +401,7 @@ public class HTTP_Socket extends Socket {
                 break;
               case DataSet.ACTION_SEND_RECV :
               case DataSet.ACTION_SEND_RECV_ASYNCH :
-                //xxx System.out.println("ACTION_SEND_RECV");
+                //System.out.println("ACTION_SEND_RECV");
                 if (recvDS.data != null && recvDS.data.length > 0) {
                   try {
                     anyOut = true;
@@ -1003,17 +1008,17 @@ public class HTTP_Socket extends Socket {
   } // end class SendConverter
 
   /**
-   * Get the balance of timeToWait less the already elapsed time.
-   * @return
-   */
+  * Get the balance of timeToWait less the already elapsed time.
+  * @return
+  */
   private long adjustedTimeToWait() {
     long timeWaited = Math.abs(System.currentTimeMillis() - lastSendTimestamp);
     return Math.max(5, timeToWait-timeWaited);
   }
 
   /**
-   * @return true if data set has content.
-   */
+  * @return true if data set has content.
+  */
   private boolean adjustWaitTime_PreSend(DataSet sendDS, boolean isHTTP) {
     boolean hadSomethingToSay = false;
     if (sendDS.isContentOrControlPacket()) {
@@ -1078,8 +1083,8 @@ public class HTTP_Socket extends Socket {
   }
 
   /**
-   * @return String to replace '/index.jsp?SESSIONID='
-   */
+  * @return String to replace '/index.jsp?SESSIONID='
+  */
   private static String makeRandomGETPrefix() {
     StringBuffer sb = new StringBuffer();
     sb.append('/');
@@ -1092,8 +1097,8 @@ public class HTTP_Socket extends Socket {
     return sb.toString();
   }
   /**
-   * @return String to replace '/index.jsp'
-   */
+  * @return String to replace '/index.jsp'
+  */
   private static String makeRandomPOSTPrefix() {
     StringBuffer sb = new StringBuffer();
     sb.append('/');
@@ -1188,12 +1193,12 @@ public class HTTP_Socket extends Socket {
 //                String response = new String(bytes).trim();
 //                System.out.println("> " + response + " <");
 //              } else {
-//                //xxx System.out.println("********** EOF in testRecive **********");
+//                //System.out.println("********** EOF in testRecive **********");
 //                break;
 //              }
 //            }
 //          } catch (Throwable t) {
-//            //xxx System.out.println("Exception in testRecive... QUITTING");
+//            //System.out.println("Exception in testRecive... QUITTING");
 //            t.printStackTrace();
 //          }
 //        }
