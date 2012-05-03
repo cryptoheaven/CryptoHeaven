@@ -31,7 +31,6 @@ import com.CH_gui.list.*;
 import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_gui.util.Images;
 import com.CH_guiLib.gui.JMyTextField;
-import com.CH_guiLib.util.HTML_Ops;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Timestamp;
@@ -468,7 +467,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "initComponents()");
     String htmlPropertyPostfix = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "_addr" : (isChatComposePanel ? "_chat" : "_mail");
     boolean defaultHTML = true;
-    msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, isChatComposePanel, false, isChatComposePanel);
+    msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, false, isChatComposePanel);
     jHTML = msgTypeArea.getHTMLSwitchButton();
 //    jShowBcc = new JMyLinkLikeLabel("Show BCC", MsgPreviewPanel.LINK_RELATIVE_FONT_SIZE);
     jShowBcc = new JMyButtonNoFocus("Show BCC");
@@ -791,6 +790,12 @@ public class MsgComposeComponents extends Object implements DisposableObj {
           }
         }
       }
+    }
+  }
+
+  public void setFocusToBody() {
+    if (msgTypeArea != null) {
+      msgTypeArea.getTextComponent().addHierarchyListener(new InitialFocusRequestor());
     }
   }
 
@@ -1249,8 +1254,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
       // << comes in HTML
       if (dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
-        // clear any styles in the header
-        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, true, true, true, true, false);
+        // clear excessive HTML to make feasible for usage as reply content
+        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, false, false, true, true, true, false, false);
         if (convertHTMLBodyToPlain) {
           String html = quotedMsgBody;
           if (trace != null) trace.data(50, "extracting plain from html");
