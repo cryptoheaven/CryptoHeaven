@@ -50,7 +50,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   private static int counter = 0;
 
   public DefaultProgMonitor() {
-    this(true);
+    this(false);
   }
   /** Creates new DefaultProgMonitor */
   public DefaultProgMonitor(boolean withProgressDialog) {
