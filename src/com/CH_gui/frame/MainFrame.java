@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.frame;
 
@@ -69,21 +69,21 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.72 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.72 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoordinatorI, ComponentContainerI, DisposableObj {
 
   private Action[] actions;
@@ -136,14 +136,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
 
   /**
-   * @returns a single instance of the MainFrame.
-   */
+  * @returns a single instance of the MainFrame.
+  */
   public static MainFrame getSingleInstance() {
     return singleInstance;
   }
 
   /** Creates new MainFrame */
-  protected MainFrame(Window splashWindow, Long initialFolderId, Long initialMsgLinkId) {
+  protected MainFrame(final Window splashWindow, Long initialFolderId, Long initialMsgLinkId) {
     super(URLs.get(URLs.SERVICE_SOFTWARE_NAME), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "MainFrame()");
 
@@ -153,8 +153,23 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     singleInstance = this;
 
     if (splashWindow != null && splashWindow.isShowing()) {
-      splashWindow.setVisible(false);
-      splashWindow.dispose();
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          try {
+            if (splashWindow instanceof DisposableObj) {
+              ((DisposableObj) splashWindow).disposeObj();
+            }
+          } catch (Throwable t) {
+          }
+          try {
+            if (splashWindow.isShowing()) {
+              splashWindow.setVisible(false);
+              splashWindow.dispose();
+            }
+          } catch (Throwable t) {
+          }
+        }
+      });
     }
 
     // set default parent to multi-progress monitors to the main window
@@ -174,8 +189,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Called just before a login is attempted.
-   */
+  * Called just before a login is attempted.
+  */
   public void loginAttemptCloseCurrentSession(ServerInterfaceLayer SIL) {
     JActionFrameClosable.closeAllClosableFramesLeaveNonUserSensitive();
     if (SIL != null)
@@ -184,20 +199,23 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Called right after login completed.
-   */
+  * Called right after login completed.
+  */
   public void loginComplete(ServerInterfaceLayer SIL, boolean success) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "loginComplete(ServerInterfaceLayer SIL, boolean success)");
     if (trace != null) trace.args(success);
 
     if (success) {
 
-      if (!isInitializationsStarted) startPreloadingComponents_Threaded();
+      if (!isInitializationsStarted) loadComponents();
 
       if (trace != null) trace.data(10, "advance progress monitor, login is complete");
-      if (!getLoginProgMonitor().isAllDone()) {
-        getLoginProgMonitor().nextTask();
-        getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
+      ProgMonitorI progMonitor = getLoginProgMonitor();
+      if (progMonitor != null) {
+        if (!progMonitor.isAllDone()) {
+          progMonitor.nextTask();
+          progMonitor.setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
+        }
       }
 
       initScreen();
@@ -206,7 +224,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       // this.pack();
 
       if (trace != null) trace.data(20, "closing down the Login Progress Monitor");
-      getLoginProgMonitor().allDone();
+      if (progMonitor != null)
+        progMonitor.allDone();
       setLoginProgMonitor(null);
 
       // All parent-less dialogs should go on top of the main window from now on.
@@ -311,124 +330,144 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     if (trace != null) trace.exit(MainFrame.class);
   }
 
-  public void startPreloadingComponents_Threaded() {
+  public synchronized void startPreloadingComponents_Threaded() {
     if (!isInitializationsStarted) {
-      isInitializationsStarted = true;
       // init main table components after initial frame is shown so actions are added to the frame menus
-      Thread tableCompInitializerThread = new ThreadTraced("Main-Table-Comp-initializer") {
+      Thread compInitializerThread = new ThreadTraced("Main-Comp-initializer") {
         public void runTraced() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "runTraced()");
-
-          try {
-            // Adding actions will instantiate menu and toolbar components...
-            MainFrame.this.addComponentActions(MainFrame.this);
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 100, t);
-            t.printStackTrace();
-          }
-
-          try {
-            // Make the main table
-            tableComp = new TableComponent("Browse", false, false, false);
-            tableComp.initAddressTableComponent();
-            tableComp.initPostTableComponent(); // fastest msg type component to change any prior address related menu changes
-            tableComp.initChatTableComponent(); // chat menu loads here for the first time
-            tableComp.initMsgTableComponent();
-            tableComp.initGroupTableComponent();
-            tableComp.initKeyTableComponent();
-            tableComp.initRecycleTableComponent();
-            tableComp.initFileTableComponent();
-            tableComp.initLocalFileTableComponent();
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 200, t);
-            t.printStackTrace();
-          }
-
-          try {
-            // Make the main tree
-            treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true), false);
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 300, t);
-            t.printStackTrace();
-          }
-
-          try {
-            // Make the main contact table
-            String propertyName = ContactActionTable.getTogglePropertyName(MainFrame.this);
-            boolean oldShow = false;
-            String oldShowS = GlobalProperties.getProperty(propertyName);
-            if (oldShowS != null) {
-              Boolean oldShowsB = Boolean.valueOf(oldShowS);
-              if (oldShowsB != null)
-                oldShow = oldShowsB.booleanValue();
-            }
-            RecordFilter contactFilter = new MultiFilter(new RecordFilter[] {
-              //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
-              new ContactFilterCl(oldShow),
-              new FolderFilter(FolderRecord.GROUP_FOLDER),
-              new InvEmlFilter(true, false) }
-            , MultiFilter.OR);
-
-            // Make the ContactTableComponent
-            contactComp = new ContactTableComponent(contactFilter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
-            contactComp.addTopContactBuildingPanel();
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 400, t);
-            t.printStackTrace();
-          }
-
-          try {
-            // Make the welcome ContactTableComponent used for toolbar actions
-            welcomeContactTableComponent = new ContactTableComponent4Frame(null, new FixedFilter(false), null, null, false, false, true);
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 500, t);
-            t.printStackTrace();
-          }
-
-          try {
-            // Make the main panel
-            JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d, 0.65d);
-            JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.15d, 0.15d);
-
-            // status bar
-            statsBar = new StatsBar();
-            statsBar.installListeners();
-
-            mainPanel = new JPanel();
-            mainPanel.setLayout(new BorderLayout());
-            mainPanel.add(hSplit, BorderLayout.CENTER);
-            mainPanel.add(statsBar, BorderLayout.SOUTH);
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 600, t);
-            t.printStackTrace();
-          }
-
-          try {
-            // getting actions will instantiate Action objects
-            ActionUtils.getActionsRecursively(treeComp);
-            ActionUtils.getActionsRecursively(contactComp);
-            ActionUtils.getActionsRecursively(welcomeContactTableComponent);
-            ActionUtils.getActionsRecursively(tableComp.getAddressTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getPostTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getChatTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getMsgTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getGroupTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getKeyTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getRecycleTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getFileTableComponent());
-            ActionUtils.getActionsRecursively(tableComp.getLocalFileTableComponent());
-          } catch (Throwable t) {
-            if (trace != null) trace.exception(getClass(), 700, t);
-            t.printStackTrace();
-          }
-
-          isInitializationsFinished = true;
+          loadComponents();
           if (trace != null) trace.exit(getClass());
         }
       };
-      tableCompInitializerThread.setDaemon(true);
-      tableCompInitializerThread.start();
+      // Don't want this to be killed in the middle of initializations becuase
+      // another thread maybe waiting for that 'finished' flag to be set.
+      compInitializerThread.setDaemon(false);
+      compInitializerThread.start();
     }
+  }
+
+  public void loadComponents() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "loadComponents()");
+
+    if (!isInitializationsStarted) {
+      isInitializationsStarted = true;
+      try {
+        try {
+          if (trace != null) trace.data(50, "adding component actions");
+          // Adding actions will instantiate menu and toolbar components...
+          MainFrame.this.addComponentActions(MainFrame.this);
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 100, t);
+          t.printStackTrace();
+        }
+
+        try {
+          if (trace != null) trace.data(150, "making main table");
+          // Make the main table
+          tableComp = new TableComponent("Browse", false, false, false);
+          tableComp.initAddressTableComponent();
+          tableComp.initPostTableComponent(); // fastest msg type component to change any prior address related menu changes
+          tableComp.initChatTableComponent(); // chat menu loads here for the first time
+          tableComp.initMsgTableComponent();
+          tableComp.initGroupTableComponent();
+          tableComp.initKeyTableComponent();
+          tableComp.initRecycleTableComponent();
+          tableComp.initFileTableComponent();
+          tableComp.initLocalFileTableComponent();
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 200, t);
+          t.printStackTrace();
+        }
+
+        try {
+          if (trace != null) trace.data(250, "making main tree");
+          // Make the main tree
+          treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true), false);
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 300, t);
+          t.printStackTrace();
+        }
+
+        try {
+          if (trace != null) trace.data(350, "making contact table");
+          // Make the main contact table
+          String propertyName = ContactActionTable.getTogglePropertyName(MainFrame.this);
+          boolean oldShow = false;
+          String oldShowS = GlobalProperties.getProperty(propertyName);
+          if (oldShowS != null) {
+            Boolean oldShowsB = Boolean.valueOf(oldShowS);
+            if (oldShowsB != null)
+              oldShow = oldShowsB.booleanValue();
+          }
+          RecordFilter contactFilter = new MultiFilter(new RecordFilter[] {
+            //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
+            new ContactFilterCl(oldShow),
+            new FolderFilter(FolderRecord.GROUP_FOLDER),
+            new InvEmlFilter(true, false) }
+          , MultiFilter.OR);
+
+          // Make the ContactTableComponent
+          contactComp = new ContactTableComponent(contactFilter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
+          contactComp.addTopContactBuildingPanel();
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 400, t);
+          t.printStackTrace();
+        }
+
+        try {
+          if (trace != null) trace.data(450, "making welcome contact table component");
+          // Make the welcome ContactTableComponent used for toolbar actions
+          welcomeContactTableComponent = new ContactTableComponent4Frame(null, new FixedFilter(false), null, null, false, false, true);
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 500, t);
+          t.printStackTrace();
+        }
+
+        try {
+          if (trace != null) trace.data(550, "making main panel");
+          // Make the main panel
+          JSplitPane vSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_vSplit", JSplitPane.VERTICAL_SPLIT, treeComp, contactComp, 0.65d, 0.65d);
+          JSplitPane hSplit = new JSplitPaneVS(getVisualsClassKeyName() + "_hSplit", JSplitPane.HORIZONTAL_SPLIT, vSplit, tableComp, 0.15d, 0.15d);
+
+          // status bar
+          statsBar = new StatsBar();
+          statsBar.installListeners();
+
+          mainPanel = new JPanel();
+          mainPanel.setLayout(new BorderLayout());
+          mainPanel.add(hSplit, BorderLayout.CENTER);
+          mainPanel.add(statsBar, BorderLayout.SOUTH);
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 600, t);
+          t.printStackTrace();
+        }
+
+        try {
+          if (trace != null) trace.data(650, "instantiating actions recursively");
+          // getting actions will instantiate Action objects
+          ActionUtils.getActionsRecursively(treeComp);
+          ActionUtils.getActionsRecursively(contactComp);
+          ActionUtils.getActionsRecursively(welcomeContactTableComponent);
+          ActionUtils.getActionsRecursively(tableComp.getAddressTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getPostTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getChatTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getMsgTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getGroupTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getKeyTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getRecycleTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getFileTableComponent());
+          ActionUtils.getActionsRecursively(tableComp.getLocalFileTableComponent());
+        } catch (Throwable t) {
+          if (trace != null) trace.exception(MainFrame.class, 700, t);
+          t.printStackTrace();
+        }
+      } finally {
+        isInitializationsFinished = true;
+      }
+    }
+
+    if (trace != null) trace.exit(MainFrame.class);
   }
 
   public void readyForMainData(ServerInterfaceLayer SIL) {
@@ -450,18 +489,22 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Initialize the main window and layout the main components.
-   */
+  * Initialize the main window and layout the main components.
+  */
   private void initScreen() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "initScreen()");
 
     // wait for initializer thread to complete
-    while (!isInitializationsFinished) {
-      try { Thread.sleep(10); } catch (Throwable t) { }
+    if (isInitializationsStarted && !isInitializationsFinished) {
+      if (trace != null) trace.data(10, "waiting for the initializer thread to complete");
+    }
+    while (isInitializationsStarted && !isInitializationsFinished) {
+      try { Thread.sleep(20); } catch (Throwable t) { }
     }
 
     // use a component initialized below to check if run for the first time
     boolean isFirstTimeInitialization = welcomeScreenPanel == null;
+    if (trace != null) trace.data(20, "is first time initialization", isFirstTimeInitialization);
 
     // Make new Folder Tree
     if (isFirstTimeInitialization) {
@@ -469,6 +512,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
       // set window welcome panel
       welcomeScreenPanel = new JPanel();
+      welcomeScreenPanel.setBackground(Color.white);
       tableComp.setWelcomeScreenComponent(welcomeScreenPanel);
 
       // adding a listener will initialize the FileTableComponent so do that after we add it into the frame so actions can be generated and displayed
@@ -546,6 +590,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
   /** Sets the default welcome screen component */
   public void setDefaultWelcomeScreenPanel() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "setDefaultWelcomeScreenPanel()");
     // clear prior panel content
     welcomeScreenPanel.removeAll();
 
@@ -564,48 +609,40 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
 
     // Create welcome content
-    Long userId = SIL.getFetchedDataCache().getMyUserId();
-    Component welcomeComp = getWelcomeScreenComponent(URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId, false);
-    welcomeScreenPanel.add(new JScrollPane(welcomeComp), BorderLayout.CENTER);
+    Component welcomeComp = getWelcomeScreenComponent();
+    if (welcomeComp != null)
+      welcomeScreenPanel.add(new JScrollPane(welcomeComp), BorderLayout.CENTER);
+    if (trace != null) trace.exit(MainFrame.class);
   }
 
-  /** Create a welcome screen message component for the new user or regular login component to established user */
-  private Component getWelcomeScreenComponent(final String url, boolean onceDaily) {
+  /** Create a welcome screen message component */
+  private Component getWelcomeScreenComponent() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "getWelcomeScreenComponent()");
     Component pane = null;
     try {
-      boolean displayOk = true;
-      if (onceDaily) {
-        String PROPERTY_NAME__WELCOME_SCREEN_DATE = "WelcomeScreenLastDate";
-        Date today = new Date();
-        long todaysDate = today.getTime() / (1000*60*60*24); // round off to a day number
-        try {
-          long displayedDate = Long.parseLong(GlobalProperties.getProperty(PROPERTY_NAME__WELCOME_SCREEN_DATE, "0"));
-          if (displayedDate == todaysDate) {
-            displayOk = false;
-          }
-        } catch (Throwable t) {
-        }
-        if (displayOk) {
-          GlobalProperties.setProperty(PROPERTY_NAME__WELCOME_SCREEN_DATE, ""+todaysDate);
-        }
-      }
-      if (displayOk) {
+      if (Misc.isRunningFromApplet() || Misc.isRunningFromJNLP()) {
+        pane = Template.getTemplate(Template.CATEGORY_MAIL);
+      } else {
+        Long userId = SIL.getFetchedDataCache().getMyUserId();
+        String url = URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId;
         HTML_ClickablePane clickPane = HTML_ClickablePane.createNewAndLoading(new URL(url));
-        pane = clickPane;
         clickPane.setRegisteredLocalLauncher(HTML_ClickablePane.PROTOCOL_HTTP, clickPane);
         clickPane.setRegisteredLocalLauncher(HTML_ClickablePane.PROTOCOL_MAIL, new URLLauncherMAILTO());
         clickPane.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
+        pane = clickPane;
       }
     } catch (Throwable t) {
+      if (trace != null) trace.exception(MainFrame.class, 100, t);
     }
+    if (trace != null) trace.exit(MainFrame.class);
     return pane;
   }
 
 
   /**
-   * Synchronization makes sure only single thread can initialize it, and
-   * that initialization can happen only once.
-   */
+  * Synchronization makes sure only single thread can initialize it, and
+  * that initialization can happen only once.
+  */
   private synchronized void initActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "initActions()");
     if (this.actions == null) {
@@ -641,7 +678,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   /*********************************************/
 
   /** @return all the acitons that this objects produces.
-   */
+  */
   public Action[] getActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "getActions()");
     if (actions == null) {
@@ -652,15 +689,15 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     return a;
   }
   /** Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true if this object will gather all actions from its childeren or hide them counciously.
-   */
+  * @return true if this object will gather all actions from its childeren or hide them counciously.
+  */
   public boolean isFinalActionProducer() {
     return false;
   }
 
   /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  * Enables or Disables actions based on the current state of the Action Producing component.
+  */
   public void setEnabledActions() {
     if (actions == null)
       initActions();
@@ -692,8 +729,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   // =====================================================================
 
   /**
-   * Exit the program and store menus and chosen tools in configuration file
-   **/
+  * Exit the program and store menus and chosen tools in configuration file
+  **/
   private class ExitAction extends AbstractActionTraced {
     public ExitAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Exit"), Images.get(ImageNums.DELETE16));
@@ -708,8 +745,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show the About Dialog
-   */
+  * Show the About Dialog
+  */
   protected static class AboutAction extends AbstractActionTraced {
     public AboutAction(int actionId) {
       super(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
@@ -724,8 +761,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show the Change Password Dialog
-   */
+  * Show the Change Password Dialog
+  */
   private class ChangePassAction extends AbstractActionTraced {
     public ChangePassAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
@@ -754,8 +791,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show the Change UserName Dialog
-   */
+  * Show the Change UserName Dialog
+  */
   private class ChangeUserNameAction extends AbstractActionTraced {
     public ChangeUserNameAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
@@ -787,8 +824,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
 
   /**
-   * Show the Account Options Dialog
-   */
+  * Show the Account Options Dialog
+  */
   private class AccountOptionsAction extends AbstractActionTraced {
     public AccountOptionsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Account_Options"), Images.get(ImageNums.USER_EDIT16));
@@ -802,8 +839,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
 
   /**
-   * Switch Identity to login as a different user
-   */
+  * Switch Identity to login as a different user
+  */
   private class SwitchIdentityAction extends AbstractActionTraced {
     public SwitchIdentityAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Switch_Identity"));
@@ -817,8 +854,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show dialog to Manage Sub-Accounts
-   */
+  * Show dialog to Manage Sub-Accounts
+  */
   private class ManageSubAccountsAction extends AbstractActionTraced {
     public ManageSubAccountsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Manage_User_Accounts"), Images.get(ImageNums.USER_MANAGE16));
@@ -845,8 +882,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show dialog to Delete User Account
-   */
+  * Show dialog to Delete User Account
+  */
   private class DeleteMyAccountAction extends AbstractActionTraced {
     public DeleteMyAccountAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Account_..."));
@@ -860,8 +897,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show import Address Book wizard
-   */
+  * Show import Address Book wizard
+  */
   private class ImportAddressBookAction extends AbstractActionTraced {
     public ImportAddressBookAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Import_Address_Book_..."));
@@ -874,8 +911,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Open the General FAQ URL
-   */
+  * Open the General FAQ URL
+  */
   protected static class URLGeneralFAQAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_FAQ_PAGE);
     public URLGeneralFAQAction(int actionId) {
@@ -894,8 +931,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Open the Quick Tour URL
-   */
+  * Open the Quick Tour URL
+  */
   protected static class URLQuickTourAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_QUICK_TOUR_PAGE);
     public URLQuickTourAction(int actionId) {
@@ -914,8 +951,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Open the User's Guide URL
-   */
+  * Open the User's Guide URL
+  */
   protected static class URLUsersGuideAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_USER_GUIDE_PAGE);
     public URLUsersGuideAction(int actionId) {
@@ -934,8 +971,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Open the Account Upgrade URL
-   */
+  * Open the Account Upgrade URL
+  */
   protected static class URLAccountUpgradeAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.SIGNUP_PAGE);
     public URLAccountUpgradeAction(int actionId) {
@@ -955,8 +992,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Manage WhiteList
-   */
+  * Manage WhiteList
+  */
   protected static class ManageWhiteListAction extends AbstractActionTraced {
     public ManageWhiteListAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Manage_WhiteList_..."));
@@ -983,8 +1020,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show the Setup Password Recovery Dialog
-   */
+  * Show the Setup Password Recovery Dialog
+  */
   private class SetupPasswordRecovery extends AbstractActionTraced {
     public SetupPasswordRecovery(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Setup_Password_Recovery"));
@@ -997,8 +1034,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show the Trace Diagnostics Dialog
-   */
+  * Show the Trace Diagnostics Dialog
+  */
   private class TraceDiagnosticsAction extends AbstractActionTraced {
     public TraceDiagnosticsAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Problem_Reporting"), Images.get(ImageNums.TOOLS_FIX16));
@@ -1012,8 +1049,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Email Support
-   */
+  * Email Support
+  */
   private class EmailSupportAction extends AbstractActionTraced {
     public EmailSupportAction(int actionId) {
       super(com.CH_gui.lang.Lang.rb.getString("action_Email_Support"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
@@ -1028,7 +1065,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private void exitAction() {
     // check for modified files that could not start uploading
     FileLobUpEditMonitor.FileSet[] modifiedSets = FileLobUpEditMonitor.getModifiedFileSets();
-    
+
     // check for active transfers
     ArrayList activeUps = FileLobUp.getStateSessions();
     final boolean anyModifications = modifiedSets != null && modifiedSets.length > 0;
@@ -1234,8 +1271,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   }
 
   /**
-   * Show one time message notification when main window shows.
-   */
+  * Show one time message notification when main window shows.
+  */
   private boolean wasShown = false;
   public void setVisible(boolean b) {
     super.setVisible(b);
@@ -1292,6 +1329,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
               }
             }
           } catch (Throwable t) {
+            t.printStackTrace();
           }
         }
       });
@@ -1376,8 +1414,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
 
   /**
-   * Listen on updates to the contacts in the cache and notify users of changes.
-   */
+  * Listen on updates to the contacts in the cache and notify users of changes.
+  */
   private class ContactListener implements ContactRecordListener {
     public void contactRecordUpdated(ContactRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -1408,7 +1446,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           if (cRec.status != null) {
             short status = cRec.status.shortValue();
             if (cRec.ownerUserId != null && cRec.ownerUserId.equals(cache.getMyUserId()) &&
-               (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
+              (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
 
               UserRecord uRec = cache.getUserRecord(cRec.contactWithId);
               String userName = uRec != null ? uRec.shortInfo() : ("(" + cRec.contactWithId + ")");
