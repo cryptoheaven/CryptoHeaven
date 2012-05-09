@@ -1,20 +1,21 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.engine;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FileLobUp;
+import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.monitor.DefaultProgMonitor;
 import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.monitor.ProgMonitorPool;
@@ -27,6 +28,7 @@ import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.msg.dataSets.obj.Obj_EncSet_Co;
+import com.CH_co.service.records.FolderRecord;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -37,41 +39,41 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- * <pre>
- *                                                                          __ Independent Running Queue
- *                                                                    ===|/   \
- *                                                                +--->  |  X  |
- *                                        _________________       |   ===|\___/
- *  ||    ____________         ========|/                  \      |
- *  ||-->|            |-------->   | | |   Execution Queue  |-->--+-----+
- *  ||   |   Workers  |        ========|\__________________/            |
- *  ||<--|____________|-<>-+                                            |
- *  ||                     |                                            |
- *  ||                     |                                            |
- *  ||                     |                                            |
- *  ||                     |   Job Queue  |------------------------|    |
- *  ||                     |     |=====   | submitAndReturn        |    |
- *  Wire                   +-<>--|||| <---| submitAndWait          |<---+
- *                               |=====   | submitAndFetchReply    |
- *               WaitingJobScanner        |                        |       Requests
- *                                        | getFetchedDataCache    |<----------------
- *                                        |------------------------|
- *
- *
- * </pre>
- * <b>$Revision: 1.49 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+* <pre>
+*                                                                          __ Independent Running Queue
+*                                                                    ===|/   \
+*                                                                +--->  |  X  |
+*                                        _________________       |   ===|\___/
+*  ||    ____________         ========|/                  \      |
+*  ||-->|            |-------->   | | |   Execution Queue  |-->--+-----+
+*  ||   |   Workers  |        ========|\__________________/            |
+*  ||<--|____________|-<>-+                                            |
+*  ||                     |                                            |
+*  ||                     |                                            |
+*  ||                     |                                            |
+*  ||                     |   Job Queue  |------------------------|    |
+*  ||                     |     |=====   | submitAndReturn        |    |
+*  Wire                   +-<>--|||| <---| submitAndWait          |<---+
+*                               |=====   | submitAndFetchReply    |
+*               WaitingJobScanner        |                        |       Requests
+*                                        | getFetchedDataCache    |<----------------
+*                                        |------------------------|
+*
+*
+* </pre>
+* <b>$Revision: 1.49 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public final class ServerInterfaceLayer extends Object implements WorkerManagerI, RequestSubmitterI {
 
   private static final boolean DEBUG_ON__SUPPERSS_RETRIES = false;
@@ -131,12 +133,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private boolean currentHostShouldIncrement = false;
 
   /** When a worker fails, remember its type to try to delay next one of the same type being created.
-   * Re-connection mechanizm spawns multiple threads trying to connect to different hosts/ports with
-   * possibly different connection protocols. We will delay the type that failed last to give better chance
-   * for other to succeed first before this one connects again.  This should help to fight providers
-   * deteriorating and breaking certain connection types.
-   * Static variable because it is a property of our Internet provider connectivity, so must be global for all SILs.
-   */
+  * Re-connection mechanizm spawns multiple threads trying to connect to different hosts/ports with
+  * possibly different connection protocols. We will delay the type that failed last to give better chance
+  * for other to succeed first before this one connects again.  This should help to fight providers
+  * deteriorating and breaking certain connection types.
+  * Static variable because it is a property of our Internet provider connectivity, so must be global for all SILs.
+  */
   private static Class penalizedSocketType;
   private static final int DELAY_PENALIZED_CONNECTION_TYPE = 2000;
   // always delay protocoled sockets just a tiny bit to allow plain Socket some advantage of being first to connect...
@@ -145,9 +147,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private static final int MAX_CONNECTION_DELAY = Math.max(DELAY_PENALIZED_CONNECTION_TYPE, DELAY_PROTOCOLED_CONNECTION);
 
   /**
-   * Main Worker should send Ping-Pong to retain a persistent connection.
-   * Also, this worker will handle the small item's queue.
-   */
+  * Main Worker should send Ping-Pong to retain a persistent connection.
+  * Also, this worker will handle the small item's queue.
+  */
   private ServerInterfaceWorker mainWorker;
   private boolean mainWorkerSubmition;
   private final Object mainWorkerMonitor = new Object();
@@ -166,9 +168,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public static ServerInterfaceLayer lastSIL;
 
   /**
-   * Creates new ServerInterfaceLayer
-   * @param connectedSocket through which communication will take place
-   */
+  * Creates new ServerInterfaceLayer
+  * @param connectedSocket through which communication will take place
+  */
   public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient) {
     this(hostsAndPorts, null, null, isClient);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
@@ -180,10 +182,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
-   * Creates new ServerInterfaceLayer
-   * @param independentExecutor if null, IndependentClientQueueExecutionFunction will be used.
-   * @param connectedSocket through which communication will take place
-   */
+  * Creates new ServerInterfaceLayer
+  * @param independentExecutor if null, IndependentClientQueueExecutionFunction will be used.
+  * @param connectedSocket through which communication will take place
+  */
   public ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts, independentExecutor, fixedMaxConnectionCount);
@@ -273,6 +275,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     jobScanner.setDaemon(true);
     jobScanner.start();
 
+    if (isClient) {
+      // Start monitoring for CPU suspension so we can requests updates when we wake up.
+      new SleepMonitor().start();
+    }
+
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
@@ -316,8 +323,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return Socket type worker count and HTTP type worker count
-   */
+  * @return Socket type worker count and HTTP type worker count
+  */
   private int[] getWorkerCounts() {
     int[] counts = new int[2];
     synchronized (workers) {
@@ -334,9 +341,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return the Fetched Data Cache storage where all data is to be cached.
-   * There should be only one instance of this cache in the program runtime.
-   */
+  * @return the Fetched Data Cache storage where all data is to be cached.
+  * There should be only one instance of this cache in the program runtime.
+  */
   public static FetchedDataCache getFetchedDataCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getFetchedDataCache()");
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -345,8 +352,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Assigns progress monitor if not already registered.
-   */
+  * Assigns progress monitor if not already registered.
+  */
   protected ProgMonitorI assignProgMonitor(MessageAction msgAction, Boolean withProgressDialog) {
     long msgActionStamp = msgAction.getStamp();
     ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
@@ -361,8 +368,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Assigns and enqueues progress monitor if not already registered.
-   */
+  * Assigns and enqueues progress monitor if not already registered.
+  */
   private void enqueueProgMonitor(MessageAction msgAction) {
     ProgMonitorI progressMonitor = assignProgMonitor(msgAction, null);
     if (progressMonitor != null)
@@ -370,9 +377,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Submit and do not wait for the reply.  This method returns immediately.
-   * When the reply is ready, it will be run by the executionQueue serving process.
-   */
+  * Submit and do not wait for the reply.  This method returns immediately.
+  * When the reply is ready, it will be run by the executionQueue serving process.
+  */
   private void submitAndReturnNow(MessageAction msgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturnNow(MessageAction)");
     if (trace != null) trace.args(msgAction);
@@ -395,9 +402,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Submit and do not wait for the reply.  This method returns immediately.
-   * When the reply is ready, it will be run by the executionQueue serving process.
-   */
+  * Submit and do not wait for the reply.  This method returns immediately.
+  * When the reply is ready, it will be run by the executionQueue serving process.
+  */
   public void submitAndReturn(MessageAction msgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturn(MessageAction)");
     if (trace != null) trace.args(msgAction);
@@ -413,12 +420,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
-   * Similar to submitAndReturn but runs an action after the job is done.
-   * @param timeout max time to wait (millis) for the job to finish so we can start executing one of the after jobs, 0 for unlimited.
-   * @param replyReceivedJob a runnable element to be done when job finishes within time allowed but prior of its execution in the client
-   * @param afterJob a runnable element to be done after the job is done within time allowed and already executed
-   * @param timeoutJob a runnable element when timeout is reached (afterJob and timeoutJob are exclusive, either one or the other)
-   */
+  * Similar to submitAndReturn but runs an action after the job is done.
+  * @param timeout max time to wait (millis) for the job to finish so we can start executing one of the after jobs, 0 for unlimited.
+  * @param replyReceivedJob a runnable element to be done when job finishes within time allowed but prior of its execution in the client
+  * @param afterJob a runnable element to be done after the job is done within time allowed and already executed
+  * @param timeoutJob a runnable element when timeout is reached (afterJob and timeoutJob are exclusive, either one or the other)
+  */
   public void submitAndReturn(final MessageAction msgAction, final long timeout, final Runnable afterJob, final Runnable timeoutJob) {
     submitAndReturn(msgAction, timeout, null, afterJob, timeoutJob);
   }
@@ -545,9 +552,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
-   * @param timeout in milliseconds, 0=infinite
-   */
+  * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
+  * @param timeout in milliseconds, 0=infinite
+  */
   public ClientMessageAction submitAndFetchReply(MessageAction msgAction) { return submitAndFetchReply(msgAction, 0); }
   public ClientMessageAction submitAndFetchReply(MessageAction msgAction, long timeout) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndFetchReply(MessageAction, long timeout)");
@@ -665,8 +672,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Removes and returns the reply message from the done list.
-   */
+  * Removes and returns the reply message from the done list.
+  */
   private ClientMessageAction findAndRemoveMsgForStamp(Stamp stamp) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "findAndRemoveMsgForStamp(Stamp)");
     if (trace != null) trace.args(stamp);
@@ -696,17 +703,17 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   } // end findAndRemoveMsgForStamp()
 
   /**
-   * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
-   * @param timeout in milliseconds for each transaction, 0=infinite
-   * @param msgAction the message action to be submitted.
-   */
+  * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
+  * @param timeout in milliseconds for each transaction, 0=infinite
+  * @param msgAction the message action to be submitted.
+  */
   public void submitAndWait(MessageAction msgAction) { submitAndWait(msgAction, 0, 0, null); }
   /**
-   * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
-   * @param timeout in milliseconds for each transaction, 0=infinite
-   * @param msgAction the message action to be submitted.
-   * @return true if reply was received in time, false when timeout reached.
-   */
+  * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
+  * @param timeout in milliseconds for each transaction, 0=infinite
+  * @param msgAction the message action to be submitted.
+  * @return true if reply was received in time, false when timeout reached.
+  */
   public boolean submitAndWait(MessageAction msgAction, long timeout) {
     return submitAndWait(msgAction, timeout, 0, null);
   }
@@ -886,10 +893,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Make sure that at least one additional worker aside from the persistant connection
-   * worker exists.  Useful as a preparation for file upload to establish a connection
-   * prior to having the transaction ready to minimize the delay.
-   */
+  * Make sure that at least one additional worker aside from the persistant connection
+  * worker exists.  Useful as a preparation for file upload to establish a connection
+  * prior to having the transaction ready to minimize the delay.
+  */
   public void ensureAtLeastOneAdditionalWorker_SpawnThread() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ensureAtLeastOneAdditionalWorker()");
     Thread th = new ThreadTraced("Additional Worker Ensurer") {
@@ -911,8 +918,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Create additional workers.
-   */
+  * Create additional workers.
+  */
   private void createWorkers(int numberOfWorkersToCreate) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "createWorkers(int numberOfWorkersToCreate)");
     if (!destroyed) {
@@ -1058,9 +1065,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                   if (trace != null) trace.data(71, "no auto-login message to restamp");
                 }
                 worker = new ServerInterfaceWorker(socket, this, this,
-                                                   getReplyFifoWriterI(),
-                                                   getRequestPriorityFifoReaderI(),
-                                                   lastLoginMessageAction);
+                                                  getReplyFifoWriterI(),
+                                                  getRequestPriorityFifoReaderI(),
+                                                  lastLoginMessageAction);
                 if (trace != null) trace.data(80, "ServerInterfaceWorker instantiated");
               }
 
@@ -1117,9 +1124,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Joins first thread that dies.
-   * @returns index of thread that it joined, (first dead/completed thread)
-   */
+  * Joins first thread that dies.
+  * @returns index of thread that it joined, (first dead/completed thread)
+  */
   private int joinAny(Thread[] threads) {
     int rc = -1;
     while (true) {
@@ -1142,8 +1149,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return true if there still are any non-null elements
-   */
+  * @return true if there still are any non-null elements
+  */
   private boolean isAnyNonNULL(Object[] objs) {
     boolean rc = false;
     for (int i=0; i<objs.length; i++) {
@@ -1156,9 +1163,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Spawn a thread that will create a new worker.
-   * @return the creating thread and worker is returned in the provided buffer.
-   */
+  * Spawn a thread that will create a new worker.
+  * @return the creating thread and worker is returned in the provided buffer.
+  */
   private Thread createSocket_Threaded(final String hostName, final int portNumber, final Socket[] socketBuffer, final Throwable[] errorBuffer) {
     Thread th = new ThreadTraced("Socket Creator") {
       public void runTraced() {
@@ -1181,8 +1188,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return newly created worker.
-   */
+  * @return newly created worker.
+  */
   private Socket createSocket(final String hostName, final int portNumber) throws UnknownHostException, IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "createSocket(String hostName, int portNumber");
     if (trace != null) trace.args(hostName);
@@ -1408,10 +1415,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Disconnects the application and prevents workers from automatically
-   * establishing any new connections.
-   * Clear all account data and the cache -- removes all user objects.
-   */
+  * Disconnects the application and prevents workers from automatically
+  * establishing any new connections.
+  * Clear all account data and the cache -- removes all user objects.
+  */
   public void disconnectAndClear() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "disconnectAndClear()");
 
@@ -1424,9 +1431,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Disconnects the application and prevents workers from automatically
-   * establishing any new connections.
-   */
+  * Disconnects the application and prevents workers from automatically
+  * establishing any new connections.
+  */
   public void disconnect() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "disconnect()");
 
@@ -1453,9 +1460,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   // Worker Manager interface methods
   //===========================================================================
   /**
-   * Logs out all workers and disconnects them.
-   * This call causes loss of all knowledge about connections for workers and data cache
-   */
+  * Logs out all workers and disconnects them.
+  * This call causes loss of all knowledge about connections for workers and data cache
+  */
   public void logoutWorkers() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "logoutWorkers()");
     // kill all workers
@@ -1480,8 +1487,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Sets the last successful login action, called by workers after successful login.
-   */
+  * Sets the last successful login action, called by workers after successful login.
+  */
   public synchronized void setLoginMsgAction(MessageAction loginMsgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "setLoginMsgAction(MessageAction loginMsgAction)");
     if (trace != null) trace.args(loginMsgAction);
@@ -1529,8 +1536,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Worker notifies the manager that it quit processing and it will no longer be active.
-   */
+  * Worker notifies the manager that it quit processing and it will no longer be active.
+  */
   public void workerDone(ServerInterfaceWorker worker, boolean cleanLogout, boolean suppressConnectionTypePenalization) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "workerDone(ServerInterfaceWorker worker, boolean cleanLogout, boolean suppressConnectionTypePenalization)");
     if (trace != null) trace.args(worker);
@@ -1566,7 +1573,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       // if not loging out, then maybe we need to create more workers if one died.
       if (!cleanLogout) {
         if (workers.size() == 0) {
-          lastForcedWorkerStamp = new Date();
+          if (lastForcedWorkerStamp == null) {
+            // Only stamp when last worker exits and do not overwrite stamps to newer
+            // as we must ignore failed connection attempts and only mark last active
+            // connection brakages.
+            lastForcedWorkerStamp = new Date();
+          }
         }
       }
       // If a MAIN WORKER quits, we need to designate another main worker.
@@ -1585,8 +1597,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * The worker that picks up the SYS_Q_NOTIFY message action should claim Main Worker status.
-   */
+  * The worker that picks up the SYS_Q_NOTIFY message action should claim Main Worker status.
+  */
   public void claimMainWorker(ServerInterfaceWorker worker) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "claimMainWorker(ServerInterfaceWorker worker)");
     if (trace != null) trace.args(worker);
@@ -1609,11 +1621,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * Causes that a Main Worker is designated or a submission is in progress.
-   * If necessary, submits a Message Action to start Main Worker designation.
-   * That message upon being picked up by some worker will grant a Main Worker
-   * status when claimMainWorker() is called by that worker.
-   */
+  * Causes that a Main Worker is designated or a submission is in progress.
+  * If necessary, submits a Message Action to start Main Worker designation.
+  * That message upon being picked up by some worker will grant a Main Worker
+  * status when claimMainWorker() is called by that worker.
+  */
   private void triggerCheckForMainWorker() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "triggerCheckForMainWorker()");
 
@@ -1646,16 +1658,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Client mode or Server mode
-   * @return
-   */
+  * Client mode or Server mode
+  * @return
+  */
   public boolean isClientMode() {
     return isClient;
   }
 
   /**
-   * @return true if the specified worker is registered as the Main Worker.
-   */
+  * @return true if the specified worker is registered as the Main Worker.
+  */
   public boolean isMainWorker(ServerInterfaceWorker worker) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "isMainWorker(ServerInterfaceWorker worker)");
     if (trace != null) trace.args(worker);
@@ -1671,9 +1683,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-   * @return true if there is a designated Main Worker.
-   * Main Worker is registered when any Worker grabs a NOTIFY request and is ready to write it to server.
-   */
+  * @return true if there is a designated Main Worker.
+  * Main Worker is registered when any Worker grabs a NOTIFY request and is ready to write it to server.
+  */
   public boolean hasMainWorker() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "hasMainWorker()");
     boolean rc;
@@ -1685,9 +1697,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return true if there is a main worker which is persistent;
-   * Main Worker becomes persistent when it retrieves a NOTIFY reply from the server allowing it to become persistent.
-   */
+  * @return true if there is a main worker which is persistent;
+  * Main Worker becomes persistent when it retrieves a NOTIFY reply from the server allowing it to become persistent.
+  */
   public boolean hasPersistantMainWorker() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "hasPersistantMainWorker()");
     ServerInterfaceWorker mWorker = mainWorker;
@@ -1697,15 +1709,15 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * @return maximum number of workers this manager can have
-   */
+  * @return maximum number of workers this manager can have
+  */
   public int getMaxWorkerCount() {
     return getMaxConnectionCount();
   }
 
   /**
-   * Push-back a request to be placed on the job queue again.
-   */
+  * Push-back a request to be placed on the job queue again.
+  */
   public void pushbackRequest(MessageAction msgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "pushbackRequest(MessageAction msgAction)");
     if (trace != null) trace.args(msgAction);
@@ -1714,7 +1726,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   /**
-   * Called to inform that some worker has just logged in.
+  * Called to inform that some worker has just logged in.
   */
   public void workerLoginComplete(ServerInterfaceWorker worker, boolean loginSuccessful) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "workerLoginComplete(ServerInterfaceWorker worker, boolean loginSuccessful)");
@@ -1738,11 +1750,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   //===========================================================================
 
   /**
-   * Private inner class.
-   * Executes messages from the Execution Queue by handing them over to the waiting
-   * processes, or by handing them over to the independent execution queue if no
-   * process is waiting for it.  This queue does not actually run the replies, just manages them.
-   */
+  * Private inner class.
+  * Executes messages from the Execution Queue by handing them over to the waiting
+  * processes, or by handing them over to the independent execution queue if no
+  * process is waiting for it.  This queue does not actually run the replies, just manages them.
+  */
   private class QueueExecutionFunction extends Object implements ProcessingFunctionI {
     /* =======================================================
     Methods from ProcessingFunctionI for the 'executionQueue'
@@ -1859,7 +1871,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     private Object lastScanHeadJob = null;
     private boolean triggeredMonitor = false;
     private final Object triggerMonitor = new Object();
-    public WaitingJobsScanner() {
+    private WaitingJobsScanner() {
       super("Waiting Jobs Scanner");
       setDaemon(true);
     }
@@ -1955,6 +1967,38 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (trace != null) trace.exit(getClass());
     }
   } // end class BusyConnectionScanner
+
+  private class SleepMonitor extends ThreadTraced {
+    private long stampLast = 0;
+    private SleepMonitor() {
+      super("SleepMonitor");
+      setDaemon(true);
+    }
+    public void runTraced() {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "SleepMonitor.runTraced()");
+      while (!destroyed) {
+        try {
+          long stampNow = System.currentTimeMillis();
+          boolean invalidStamp = stampLast > stampNow;
+          if (stampLast > 0 && (stampNow - stampLast > ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE || invalidStamp)) {
+            sleepDetected();
+          }
+          stampLast = stampNow;
+          Thread.sleep(1000);
+        } catch (Throwable t) {
+        }
+      }
+      if (trace != null) trace.exit(getClass());
+    }
+    private void sleepDetected() {
+      // invalidate views of fetched folders so that client reloads them on demand
+      FolderRecord[] folders = FetchedDataCache.getSingleInstance().getFolderRecords();
+      for (int i=0; i<folders.length; i++) {
+        Long folderId = folders[i].folderId;
+        FolderRecUtil.markFolderViewInvalidated(folderId, true);
+      }
+    }
+  }
 
 //  public String getDebugInfo() {
 //    StringBuffer sb = new StringBuffer();

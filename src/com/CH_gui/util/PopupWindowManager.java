@@ -12,17 +12,18 @@
 
 package com.CH_gui.util;
 
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-
+import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.util.HTML_Ops;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
 import com.CH_gui.actionGui.JActionFrameClosable;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-
-import com.CH_guiLib.util.HTML_Ops;
-
-import java.awt.*;
-import java.awt.event.*;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgs.MsgPanelUtils;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -66,7 +67,7 @@ public class PopupWindowManager extends Object {
 
         String body = null;
         if (msgData.isHtml()) {
-          body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true, true, true, true);
+          body = msgData.isTypeAddress() ? msgData.addressBody : HTML_Ops.clearHTMLheaderAndConditionForDisplay(msgData.getText(), true, true, true, true, true, true, true);
         } else {
           body = msgData.getEncodedHTMLData();
         }

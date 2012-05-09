@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.util;
 
@@ -22,14 +22,14 @@ import java.util.*;
 import java.util.zip.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class Misc extends Object {
 
   public static boolean DEBUG_ON_MINIMIZE_STATIC_MEMORY_BUFFERS = false;
@@ -107,8 +107,8 @@ public class Misc extends Object {
   }
 
   /**
-   * Set a flag to suppress all GUI, put it in Misc and not in MiscGUI because MiscGUI class loads some GUI components
-   */
+  * Set a flag to suppress all GUI, put it in Misc and not in MiscGUI because MiscGUI class loads some GUI components
+  */
   public static void suppressAllGUI() {
     guiSuppressed = true;
   }
@@ -127,8 +127,8 @@ public class Misc extends Object {
 
 
   /**
-   * @return Class name from the full name, ex: 'com.CH_co.util.Misc' would be trimmed to 'Misc' only
-   */
+  * @return Class name from the full name, ex: 'com.CH_co.util.Misc' would be trimmed to 'Misc' only
+  */
   public static String getClassNameWithoutPackage(String fullName) {
     int lastIndex = fullName.lastIndexOf('.');
     if (lastIndex > 0)
@@ -137,16 +137,16 @@ public class Misc extends Object {
   }
 
   /**
-   * @return Class name from a class, ex: 'com.CH_co.util.Misc' would be trimmed to 'Misc' only
-   */
+  * @return Class name from a class, ex: 'com.CH_co.util.Misc' would be trimmed to 'Misc' only
+  */
   public static String getClassNameWithoutPackage(Class c) {
     String fullName = c.getName();
     return getClassNameWithoutPackage(fullName);
   }
 
   /**
-   * @return Package name from a class, ex: 'com.CH_co.util.Misc' would be trimmed to 'com.CH_co.util' only
-   */
+  * @return Package name from a class, ex: 'com.CH_co.util.Misc' would be trimmed to 'com.CH_co.util' only
+  */
   public static String getPackageName(String fullName) {
     int lastIndex = fullName.lastIndexOf('.');
     if (lastIndex > 0)
@@ -154,16 +154,16 @@ public class Misc extends Object {
     return fullName;
   }
   /**
-   * @return Package name from a class, ex: 'com.CH_co.util.Misc' would be trimmed to 'com.CH_co.util' only
-   */
+  * @return Package name from a class, ex: 'com.CH_co.util.Misc' would be trimmed to 'com.CH_co.util' only
+  */
   public static String getPackageName(Class c) {
     String fullName = c.getName();
     return getPackageName(fullName);
   }
 
   /**
-   * Converts a throwable into a String output
-   */
+  * Converts a throwable into a String output
+  */
   public static String getStack(Throwable t) {
     String stack = "Unknown";
     try {
@@ -179,9 +179,9 @@ public class Misc extends Object {
   }
 
   /**
-   * Tries to digest array objects and convert them element-by-element.
-   * @return a representation of specified object as a string.
-   */
+  * Tries to digest array objects and convert them element-by-element.
+  * @return a representation of specified object as a string.
+  */
   public static String objToStr(Object obj) {
     int MAX_ITEMS_TO_LIST = 50;
     return objToStr(obj, MAX_ITEMS_TO_LIST);
@@ -194,9 +194,9 @@ public class Misc extends Object {
   }
 
   /**
-   * Tries to digest array objects and convert them element-by-element.
-   * @return a representation of specified object as a string, appended to the StringBuffer;
-   */
+  * Tries to digest array objects and convert them element-by-element.
+  * @return a representation of specified object as a string, appended to the StringBuffer;
+  */
   public static void objToStr(Object obj, StringBuffer strB) {
     int MAX_ITEMS_TO_LIST = 50;
     objToStr(obj, strB, MAX_ITEMS_TO_LIST);
@@ -405,9 +405,9 @@ public class Misc extends Object {
 
 
   /**
-   * Format elapsed time.  Time must always be positive!
-   * @param time is in seconds.
-   */
+  * Format elapsed time.  Time must always be positive!
+  * @param time is in seconds.
+  */
   public static String getFormattedTime(long time) {
     // make sure 'time is positive or zero
     time = time > 0 ? time : 0;
@@ -463,8 +463,8 @@ public class Misc extends Object {
     return s;
   }
   /**
-   * Format a timestamp into more readable form, limit precision from nanoseconds to milliseconds.
-   */
+  * Format a timestamp into more readable form, limit precision from nanoseconds to milliseconds.
+  */
   public static String getFormattedTimestamp(Date timestamp) {
     String s = "";
     if (timestamp != null) {
@@ -476,13 +476,13 @@ public class Misc extends Object {
       if (millis >= 100) s += "." + millis;
       else if (millis >= 10) s += ".0" + millis;
       else s += ".00" + millis;
-       */
+      */
     }
     return s;
   }
   /**
-   * Format a timestamp into more readable form.
-   */
+  * Format a timestamp into more readable form.
+  */
   public static String getFormattedTimestamp(Date timestamp, int dateStyle, int timeStyle) {
     String s = "";
     if (timestamp != null) {
@@ -644,11 +644,11 @@ public class Misc extends Object {
 
 
   /**
-   * Input string should be in format <hostname>[:<portNumber>] with port as an optional part.
-   * If port is not present, it defaults to 80.
-   * @return If format is ok, return Object[] with two elements, the server name and port number.
-   * If not OK, return NULL
-   */
+  * Input string should be in format <hostname>[:<portNumber>] with port as an optional part.
+  * If port is not present, it defaults to 80.
+  * @return If format is ok, return Object[] with two elements, the server name and port number.
+  * If not OK, return NULL
+  */
   public static Object[] parseHostAndPort(String server) {
     boolean httpAdded = false;
     if (server.indexOf("://") < 0) {
@@ -679,9 +679,9 @@ public class Misc extends Object {
   }
 
   /**
-   * Do cloning using serialization.
-   * @return cloned instance of object
-   */
+  * Do cloning using serialization.
+  * @return cloned instance of object
+  */
   public static Object cloneSerializable(Object object) {
     Object rcObj = null;
 

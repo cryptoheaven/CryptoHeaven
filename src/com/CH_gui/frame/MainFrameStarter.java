@@ -83,7 +83,11 @@ public class MainFrameStarter extends Object {
       new LoginFrame(loginCoordinator, splashWindow);
     } else {
       loginCoordinator.loginAttemptCloseCurrentSession(MainFrame.getServerInterfaceLayer());
-      loginCoordinator.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
+      try {
+        // Create progress monitor, but ignore any exceptions as it is not necessary that we have it.
+        loginCoordinator.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
+      } catch (Throwable t) {
+      }
       loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), true);
     }
     if (swingMemoryFootprintTestExitWhenMainScreenLoaded) {
@@ -454,7 +458,11 @@ public class MainFrameStarter extends Object {
 
         if (mainStartupFrame[0] == null) {
           MainFrame mainFrame = new MainFrame(null, null, null);
-          mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
+          try {
+            // Create progress monitor, but ignore any exceptions as it is not necessary that we have it.
+            mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
+          } catch (Throwable t) {
+          }
           mainFrame.loginComplete(SIL, true);
           mainStartupFrame[0] = mainFrame;
         } else {

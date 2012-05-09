@@ -1,71 +1,81 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.queue.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_co.queue.Fifo;
+import com.CH_co.queue.ProcessingFunctionI;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-import com.CH_co.trace.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.frame.*;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.dialog.OpenSaveCancelDialog;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.frame.MsgPreviewFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.menuing.PopupMouseAdapter;
-import com.CH_gui.msgTable.*;
+import com.CH_gui.msgTable.MsgActionTable;
 import com.CH_gui.service.ops.DownloadUtilsGui;
-import com.CH_gui.table.*;
+import com.CH_gui.table.RecordSelectionEvent;
+import com.CH_gui.table.RecordSelectionListener;
 import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.text.DateFormat;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.EditorKit;
+import javax.swing.text.JTextComponent;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.59 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.59 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSelectionListener, MsgDataProviderI, VisualsSavable, DisposableObj {
+
+  private static boolean ENABLE_SFERYX_AS_HTML_RENDERER = true;
 
   private Action[] actions;
 
@@ -138,6 +148,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   // currently displayed message
   private MsgLinkRecord msgLinkRecord;
   private MsgDataRecord msgDataRecord;
+  private String msgDataText; // to track changes due to revokation
   private RecordFilter ourMsgFilter;
 
   private MsgLinkListener linkListener;
@@ -191,7 +202,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     FetchedDataCache.getSingleInstance().addFileLinkRecordListener(fileListener);
 
     addPopup(jTextMessage);
-    addPopup(jHtmlMessage);
+    if (jHtmlMessage instanceof MyHTMLEditor) {
+      addPopup(((MyHTMLEditor) jHtmlMessage).getPreviewJEditorPane());
+    } else {
+      addPopup(jHtmlMessage);
+    }
+
+    // initialize with blank
+    initData(null);
 
     if (trace != null) trace.exit(MsgPreviewPanel.class);
   }
@@ -213,17 +231,17 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   /**
-   * MsgDataProviderI Interface method
-   * @return
-   */
+  * MsgDataProviderI Interface method
+  * @return
+  */
   public MsgDataRecord provideMsgData() {
     return msgDataRecord;
   }
 
 
   /**
-   * Copy
-   */
+  * Copy
+  */
   private class CopyAction extends DefaultEditorKit.CopyAction {
     public CopyAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Copy"));
@@ -238,8 +256,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   /**
-   * Select All
-   */
+  * Select All
+  */
   private class SelectAllAction extends AbstractActionTraced {
     public SelectAllAction(int actionId) {
       putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Select_All"));
@@ -249,9 +267,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
-      jMessage.grabFocus();
       if (jMessage instanceof JTextComponent) {
         ((JTextComponent) jMessage).selectAll();
+      } else if (jMessage instanceof MyHTMLEditor) {
+        ((MyHTMLEditor) jMessage).selectAll();
+        ((MyHTMLEditor) jMessage).getPreviewJEditorPane().selectAll();
       }
     }
   }
@@ -657,33 +677,48 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
   private JComponent makeTextPane(boolean forHTML) {
     JComponent textComp = null;
-    HTML_ClickablePane jHtmlMsg = null;
+    JComponent jHtmlMsg = null;
     JTextArea jTextMsg = null;
     if (forHTML) {
-      final HTML_EditorKit editorKit = new HTML_EditorKit();
-      editorKit.registerRemoteImageBlockedCallback(new CallbackI() {
-        public void callback(Object value) {
-          if (value instanceof Boolean) {
-            Boolean isBlocked = (Boolean) value;
-            if (isBlocked.booleanValue()) {
-              if (jLoadImages.isVisible())
-                jLoadImages.setVisible(false);
-              jLoadImages.setText(STR_IMAGES_SHOW, LINK_BG_FOCUS_COLOR);
-              if (!jImageFilterPanel.isVisible())
-                jImageFilterPanel.setVisible(true);
-            } else {
-              if (isDefaultToPLAINpreferred(msgDataRecord)) {
-                if (!jLoadImages.isVisible()) {
-                  jLoadImages.setText(STR_IMAGES_HIDE);
-                  jLoadImages.setVisible(true);
+      //if (!Misc.isRunningFromApplet() && ENABLE_SFERYX_AS_HTML_RENDERER) {
+      if (ENABLE_SFERYX_AS_HTML_RENDERER) {
+        MyHTMLEditor editor = new MyHTMLEditor();
+        jHtmlMsg = editor;
+        Container viewport_ = editor.getPreviewJEditorPane().getParent();
+        if (viewport_ instanceof JViewport) {
+          JViewport viewport = (JViewport) viewport_;
+          Container scrollPane_ = viewport.getParent();
+          if (scrollPane_ instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) scrollPane_;
+            scrollPane.setBorder(new EmptyBorder(0,0,0,0));
+          }
+        }
+      } else {
+        HTML_EditorKit editorKit = new HTML_EditorKit();
+        jHtmlMsg = new HTML_ClickablePane(no_selected_msg_html, editorKit);
+        ((HTML_ClickablePane) jHtmlMsg).setEditable(false);
+        editorKit.registerRemoteImageBlockedCallback(new CallbackI() {
+          public void callback(Object value) {
+            if (value instanceof Boolean) {
+              Boolean isBlocked = (Boolean) value;
+              if (isBlocked.booleanValue()) {
+                if (jLoadImages.isVisible())
+                  jLoadImages.setVisible(false);
+                jLoadImages.setText(STR_IMAGES_SHOW, LINK_BG_FOCUS_COLOR);
+                if (!jImageFilterPanel.isVisible())
+                  jImageFilterPanel.setVisible(true);
+              } else {
+                if (isDefaultToPLAINpreferred(msgDataRecord)) {
+                  if (!jLoadImages.isVisible()) {
+                    jLoadImages.setText(STR_IMAGES_HIDE);
+                    jLoadImages.setVisible(true);
+                  }
                 }
               }
             }
           }
-        }
-      });
-      jHtmlMsg = new HTML_ClickablePane(no_selected_msg_html, editorKit);
-      jHtmlMsg.setEditable(false);
+        });
+      }
     } else {
       jTextMsg = new JMyTextArea();
       jTextMsg.setWrapStyleWord(true);
@@ -753,10 +788,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       EditorKit editorKit = ((JEditorPane) jHtmlMessage).getEditorKit();
       if (editorKit instanceof HTML_EditorKit) {
         ((HTML_EditorKit) editorKit).setDisplayRemoteImages(newHTMLstate);
-        // reload the editor with new image settings
-        setCurrentMessageText();
       }
     }
+    // reload the editor after changing image settings
+    setCurrentMessageText();
 
     // Display mode does not change, it is in HTML
 //    // Change the display mode now... and send request for change on the server.
@@ -1351,8 +1386,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   /**
-   * Invoked to display info stating that no "Message" is selected.
-   */
+  * Invoked to display info stating that no "Message" is selected.
+  */
   private void setCurrentMessageText() {
     setCurrentMessageText(isHTML);
   }
@@ -1403,6 +1438,29 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           } else {
             isWaitingForMsgBody = false;
           }
+
+          // if we should restrict remote loading, manage the 'image load' panel
+          boolean hasImages = text.indexOf(" src=\"http") >= 0 || text.indexOf(" SRC=\"http") >= 0 
+                  || text.indexOf(" src='http") >= 0 || text.indexOf(" SRC='http") >= 0 
+                  || text.indexOf(" src=http") >= 0 || text.indexOf(" SRC=http") >= 0;
+          if (hasImages) {
+            boolean anyImageBlocked = !skipRemoteLoadingCleaning && hasImages;
+            if (anyImageBlocked) {
+              if (jLoadImages.isVisible())
+                jLoadImages.setVisible(false);
+              jLoadImages.setText(STR_IMAGES_SHOW, LINK_BG_FOCUS_COLOR);
+              if (!jImageFilterPanel.isVisible())
+                jImageFilterPanel.setVisible(true);
+            } else {
+              if (isDefaultToPLAINpreferred(msgDataRecord)) {
+                if (!jLoadImages.isVisible()) {
+                  jLoadImages.setText(STR_IMAGES_HIDE);
+                  jLoadImages.setVisible(true);
+                }
+              }
+            }
+          }
+
           MsgPanelUtils.setPreviewContent_Threaded(text, isHTML, convertHTMLtoPLAIN, skipHeaderClearing, skipRemoteLoadingCleaning, jMessage);
         } else {
           MsgPanelUtils.setPreviewContent_Threaded(msgLinkRecord == null ? no_selected_msg_html : STR_LOADING, isHTML, false, true, true, jMessage);
@@ -1420,9 +1478,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
   /**
-   * Initialize the Preview Panel to display specified message data.
-   * Update takes place right away.
-   */
+  * Initialize the Preview Panel to display specified message data.
+  * Update takes place right away.
+  */
   public void initData(MsgLinkRecord msgLinkRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "initData(MsgLinkRecord msgLinkRecord)");
     if (trace != null) trace.args(msgLinkRecord);
@@ -1448,8 +1506,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
   /**
-   * RecordSelectionListener interface implementation.
-   */
+  * RecordSelectionListener interface implementation.
+  */
   public void recordSelectionChanged(RecordSelectionEvent recordSelectionEvent) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "recordSelectionChanged(RecordSelectionEvent recordSelectionEvent)");
     if (trace != null) trace.args(recordSelectionEvent);
@@ -1583,8 +1641,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
 
   /**  I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
-   */
+  * Dispose the object and release resources to help in garbage collection.
+  */
   public void disposeObj() {
     if (linkListener != null) {
       FetchedDataCache.getSingleInstance().removeMsgLinkRecordListener(linkListener);
@@ -1625,32 +1683,32 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
       context.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       try {
-        com.CH_gui.print.DocumentRenderer renderer = new com.CH_gui.print.DocumentRenderer();
-
         boolean simplifyHTML = msgDataRecord.isHtmlMail() && isForceSimpleHTML;
         String[] contentParts = MsgComposeComponents.makeReplyToContent(msgLinkRecord, msgDataRecord, simplifyHTML, true, false);
-        String content = "<html><body>";
+        StringBuffer sb = new StringBuffer();
+        sb.append("<html><body>");
         if (contentParts[0].equalsIgnoreCase("text/html")) {
-          content += "<p>" + contentParts[1] + "</p>\n";
+          sb.append("<p>").append(contentParts[1]).append("</p>\n");
         } else {
-          content += "<p>" + Misc.encodePlainIntoHtml(contentParts[1]) + "</p>\n";
+          sb.append("<p>").append(Misc.encodePlainIntoHtml(contentParts[1])).append("</p>\n");
         }
         if (contentParts[2].equalsIgnoreCase("text/html")) {
-          content += "<p><font size='-1'>" + contentParts[3] + "</font></p>";
+          sb.append("<p><font size='-1'>").append(contentParts[3]).append("</font></p>");
         } else {
-          content += "<p><font size='-1'>" + Misc.encodePlainIntoHtml(contentParts[3]) + "</font></p>";
+          sb.append("<p><font size='-1'>").append(Misc.encodePlainIntoHtml(contentParts[3])).append("</font></p>");
         }
-        content += "</body></html>";
+        sb.append("</body></html>");
 
-        // condition and normalize text
-        //JEditorPane normalization = new JEditorPane("text/html", content);
-        JEditorPane normalization = new HTML_ClickablePane(content);
-        // Use our own pane to fix display of internal icons because it will adjust document base
-        //JEditorPane pane = new JEditorPane("text/html", "<html></html>");
-        JEditorPane pane = new HTML_ClickablePane("");
-        MsgPanelUtils.setMessageContent(normalization.getText(), true, pane);
+        boolean isRemoveStyles = false;
+        boolean isRemoveHead = false;
+        boolean isRemoveRemoteLoading = false;
+        String content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(sb.toString(), isRemoveStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
 
-        renderer.setDocument(pane);
+        MyHTMLEditor pane = new MyHTMLEditor();
+        MsgPanelUtils.setMessageContent(content, true, pane, true);
+
+        com.CH_gui.print.DocumentRenderer renderer = new com.CH_gui.print.DocumentRenderer();
+        renderer.setDocument(pane.getPreviewJEditorPane());
         Window w = SwingUtilities.windowForComponent(context);
         if (w instanceof Dialog)
           new com.CH_gui.print.PrintPreview(renderer, "Print Preview", (Dialog) w);
@@ -1800,8 +1858,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           boolean isSwitchingDataView = !msgData.equals(msgDataRecord);
           // If switching msg data, or the data has changed and gui needs to update in anyway
           boolean msgDataChanged = isSwitchingDataView ||
-                                   !msgData.isPrivilegedBodyAccess(cache.getMyUserId(), new Date()) || // in case the body got expired, update preview
-                                   (isWaitingForMsgBody && msgData.getText() != null);
+                                  !msgData.isPrivilegedBodyAccess(cache.getMyUserId(), new Date()) || // in case the body got expired, update preview
+                                  (isWaitingForMsgBody && msgData.getText() != null) ||
+                                  msgDataText == null || !msgDataText.equals(msgData.getText()); // in case revoked / un-revoked
 
           // Force msgDataChanged if layout changed...
           JSplitPane splitPane = MiscGui.getParentSplitPane(MsgPreviewPanel.this);
@@ -1814,6 +1873,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
           // assign a global view msg data
           msgDataRecord = msgData;
+          msgDataText = msgData.getText();
 
           // create the Add Contact link if email address is not in the Address Books
           //jFromNameAddContact.setText("");
@@ -1889,18 +1949,18 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
           // update text only if content changed
           if (isHTML != displayHtmlMode || msgDataChanged) {
+            boolean isDisplayRemoteImages = displayHtmlMode && !Misc.isRunningFromApplet() && !Misc.isRunningFromJNLP();
             if (msgData.isHtml()) {
               if (jHtmlMessage instanceof JEditorPane) {
                 EditorKit editorKit = ((JEditorPane) jHtmlMessage).getEditorKit();
                 if (editorKit instanceof HTML_EditorKit) {
-                  boolean isDisplayRemoteImages = displayHtmlMode && !Misc.isRunningFromApplet() && !Misc.isRunningFromJNLP();
                   ((HTML_EditorKit) editorKit).setDisplayRemoteImages(isDisplayRemoteImages);
-                  if (isDisplayRemoteImages)
-                    jLoadImages.setText(STR_IMAGES_HIDE);
-                  else
-                    jLoadImages.setText(STR_IMAGES_SHOW);
                 }
               }
+              if (isDisplayRemoteImages)
+                jLoadImages.setText(STR_IMAGES_HIDE);
+              else
+                jLoadImages.setText(STR_IMAGES_SHOW);
             }
             if (isSwitchingDataView) {
               if (jLoadImages.isVisible())
@@ -1938,9 +1998,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   /**
-   * @param mData
-   * @return true iff message should default to PLAIN mode given user's general settings
-   */
+  * @param mData
+  * @return true iff message should default to PLAIN mode given user's general settings
+  */
   private static boolean isDefaultToPLAINpreferred(MsgDataRecord mData) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "isDefaultToPLAINpreferred(MsgDataRecord mData)");
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -1949,17 +2009,17 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE);
     else
       plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE) &&
-                       !mData.senderUserId.equals(cache.getMyUserId()) && // Msgs created by myself never display in non-native mode
-                       !(MsgPanelUtils.convertUserIdToFamiliarUser(mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
+                      !mData.senderUserId.equals(cache.getMyUserId()) && // Msgs created by myself never display in non-native mode
+                      !(MsgPanelUtils.convertUserIdToFamiliarUser(mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
     if (trace != null) trace.exit(MsgPreviewPanel.class, plainPreferred);
     return plainPreferred;
   }
 
   /**
-   * @param msgLink
-   * @param dataRecord
-   * @return true iff message should be displayed in PLAIN mode
-   */
+  * @param msgLink
+  * @param dataRecord
+  * @return true iff message should be displayed in PLAIN mode
+  */
   public static boolean isDefaultToPLAINpreferred(MsgLinkRecord msgLink, MsgDataRecord dataRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "isDefaultToPLAINpreferred(MsgLinkRecord msgLink, MsgDataRecord dataRecord)");
     boolean plainPreferred = false;
@@ -1993,23 +2053,23 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   /****************************************************************************/
 
   /**
-   * @return all the acitons that this objects produces.
-   */
+  * @return all the acitons that this objects produces.
+  */
   public Action[] getActions() {
     return actions;
   }
 
   /**
-   * Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true if this object will gather all actions from its childeren or hide them counciously.
-   */
+  * Final Action Producers will not be traversed to collect its containing objects' actions.
+  * @return true if this object will gather all actions from its childeren or hide them counciously.
+  */
   public boolean isFinalActionProducer() {
     return true;
   }
 
   /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  * Enables or Disables actions based on the current state of the Action Producing component.
+  */
   public void setEnabledActions() {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {

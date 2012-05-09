@@ -279,6 +279,12 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
   }
 
+  public void setSuspendedRecordSelectionEvents(boolean flag) {
+    if (recordTableScrollPane != null) {
+      recordTableScrollPane.setSuspendedRecordSelectionEvents(flag);
+    }
+  }
+
   public RecordActionTable getActionTable() {
     if (recordTableScrollPane instanceof RecordActionTable)
       return (RecordActionTable) recordTableScrollPane;
@@ -774,7 +780,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     initDataModel(folderId);
     if (recordTableScrollPane instanceof RecordActionTable) {
       ((RecordActionTable) recordTableScrollPane).setEnabledActions();
-      getActionTable().fireRecordSelectionChanged();
     }
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();

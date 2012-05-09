@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.frame;
 
@@ -67,21 +67,21 @@ import javax.swing.border.LineBorder;
 import javax.swing.text.Keymap;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.39 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.39 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class LoginFrame extends JFrame {
 
   private static final boolean ENABLE_PASSWORD_LENGTH_NOTE = false;
@@ -163,8 +163,8 @@ public class LoginFrame extends JFrame {
   private Usr_LoginSecSess_Rq login_request;
   private Usr_NewUsr_Rq newUser_request;
 
-  private int keyLength = KeyRecord.DEFAULT__KEY_LENGTH;
-  private int certainty = KeyRecord.DEFAULT__CERTAINTY;
+  private int keyLength = KeyRecord.KEY_LENGTH_DEFAULT;
+  private int certainty = KeyRecord.CERTAINTY_DEFAULT;
   private boolean storeRemoteFlag = true;
   private File localPrivKeyFile = null;
 
@@ -191,13 +191,16 @@ public class LoginFrame extends JFrame {
   private boolean isUsernameInRetry;
   private String usernamePreRetry;
 
+  // We'll publish this GUI for the progress monitor to attach to... and clean it up when we are done.
+  public static JFrame loginFrameForProgress = null;
+
   /** Creates new LoginFrame */
   public LoginFrame(LoginCoordinatorI loginCoordinator, Window splashWindow) {
     super(com.CH_gui.lang.Lang.rb.getString("title_Login_Window"));
 
     if (KeyRecord.DEBUG__ALLOW_SHORT_KEYS) {
       keyLength = KeyRecord.DEBUG__SHORTEST_KEY;
-      certainty = KeyRecord.DEBUG__MIN_CERTAINTY;
+      certainty = KeyRecord.DEBUG__CERTAINTY_MIN;
     }
 
     this.loginCoordinator = loginCoordinator;
@@ -211,6 +214,7 @@ public class LoginFrame extends JFrame {
     this.defaultUserName = GlobalProperties.getProperty(PROPERTY_USER_NAME, DEFAULT_USER_NAME);
     this.defaultUserNameList = getUserList();
     this.defaultRememberUserName = getRememberUserNameProperty();
+
     if (GeneralDialog.getDefaultParent() == null)
       GeneralDialog.setDefaultParent(this);
 
@@ -301,22 +305,14 @@ public class LoginFrame extends JFrame {
   }
 
   private void setEnabledInputs(boolean b) {
-    //userName.setEditable(b);
     userName.setEnabled(b);
-//    //newEmail.setEditable(b);
-//    newEmail.setEnabled(b);
-    //password.setEditable(b);
     password.setEnabled(b);
-    //retypePassword.setEditable(b);
     if (retypePassword != null)
       retypePassword.setEnabled(b);
-    //currentEmail.setEditable(b);
     if (currentEmail != null)
       currentEmail.setEnabled(b);
-    //accountCode.setEditable(b);
     if (accountCode != null)
       accountCode.setEnabled(b);
-    //serverCombo.setEditable(b);
     if (serverCombo != null)
       serverCombo.setEnabled(b);
     okButton.setEnabled(b);
@@ -378,7 +374,7 @@ public class LoginFrame extends JFrame {
     licenseButton.setVisible(false);
     licenseCheck.setVisible(false);
     expectedTime.setVisible(false);
-     */
+    */
 
 //    mainPanel.remove(newEmailLabel);
 //    mainPanel.remove(newEmail);
@@ -606,8 +602,8 @@ public class LoginFrame extends JFrame {
   }
 
   /**
-   * Private helper to fetch the server list as Vector of Strings.
-   */
+  * Private helper to fetch the server list as Vector of Strings.
+  */
   private ArrayList getServerList() {
     String serversStr = defaultServer != null ? defaultServer : GlobalProperties.getProperty(PROPERTY_SERVER_LIST);
     ArrayList al = new ArrayList();
@@ -680,8 +676,8 @@ public class LoginFrame extends JFrame {
   }
 
   /**
-   * Initiates last saved proxy settings.
-   */
+  * Initiates last saved proxy settings.
+  */
   private void initiateProxySettings() {
     // Fetch Proxy settings -- use try-catch blocks incase properties are corrupted or blank
     try {
@@ -730,8 +726,8 @@ public class LoginFrame extends JFrame {
   }
 
   /**
-   * Applies current proxy settings into system properties.
-   */
+  * Applies current proxy settings into system properties.
+  */
   private void applyProxySettings() {
     Properties prop = System.getProperties();
     prop.remove("socksProxyHost");
@@ -783,8 +779,8 @@ public class LoginFrame extends JFrame {
   }
 
   /**
-   * @return currently selected server - the array that includes Server name as String and port number as Integer.
-   */
+  * @return currently selected server - the array that includes Server name as String and port number as Integer.
+  */
   private Object[] getServer() {
     return Misc.parseHostAndPort(getServerStr());
   }
@@ -799,8 +795,8 @@ public class LoginFrame extends JFrame {
 
 
   /**
-   * Put the new server list and proxy servers to Global Properties.
-   */
+  * Put the new server list and proxy servers to Global Properties.
+  */
   private void putServerListAndProxySettings() {
     Object[] server = getServer();
     if (server != null) {
@@ -909,8 +905,8 @@ public class LoginFrame extends JFrame {
     recoveryLabel = new JMyLinkLikeLabel("Forgot your password?", -1);
     recoveryLabel.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent event) {
-        performLogout();
-        performConnect();
+        performDisconnect();
+        performConnect(getServer());
         MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.SYS_Q_VERSION, new Obj_List_Co(new Object[] { new Float(GlobalProperties.PROGRAM_VERSION), new Short(GlobalProperties.PROGRAM_RELEASE), new Short(GlobalProperties.PROGRAM_BUILD_NUMBER)})));
         new UserSelectPassRecoveryDialog(LoginFrame.this, "Recover Password", userName.getText().trim());
       }
@@ -989,14 +985,14 @@ public class LoginFrame extends JFrame {
             setEnablement();
           }
         });
-         */
+        */
         /*
         jHttpProxyUsed.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             setEnablement();
           }
         });
-         */
+        */
         jProxyAuthentication.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             setEnablement();
@@ -1299,8 +1295,8 @@ public class LoginFrame extends JFrame {
   }
 
   /**
-   * @return error message if input is not valid, else return NULL for valid.
-   */
+  * @return error message if input is not valid, else return NULL for valid.
+  */
   private String isInputValid() {
     String errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Invalid_input,_please_recheck_your_entry_fields");
     boolean rc = false;
@@ -1347,19 +1343,33 @@ public class LoginFrame extends JFrame {
   }
 
 
+  /**
+  * Close and dispose of the frame.
+  */
   public void closeFrame() {
-    if (typeAheadPopupList != null) {
-      typeAheadPopupList.disposeObj();
-      typeAheadPopupList = null;
+    try {
+      if (typeAheadPopupList != null) {
+        typeAheadPopupList.disposeObj();
+        typeAheadPopupList = null;
+      }
+    } catch (Throwable t) {
     }
-    // reset defaults so when this window is used again for Switch Identity then it start up clean
-    defaultPassword = null;
-    defaultMode = null;
-    defaultSignupEmail = null;
-    setVisible(false);
-    if (capsLockTimer != null)
-      capsLockTimer.stop();
-    dispose();
+    try {
+      // reset defaults so when this window is used again for Switch Identity then it start up clean
+      defaultPassword = null;
+      defaultMode = null;
+      defaultSignupEmail = null;
+      setVisible(false);
+    } catch (Throwable t) {
+    }
+    try {
+      if (capsLockTimer != null)
+        capsLockTimer.stop();
+      dispose();
+    } catch (Throwable t) {
+    }
+    // Nullify the frame reference for progress -- so it gets GC'd eventually.
+    loginFrameForProgress = null;
   }
 
 
@@ -1508,9 +1518,12 @@ public class LoginFrame extends JFrame {
 
     public OKThread() {
       super("LoginFrame OKThread");
-      setDaemon(true);
+      setDaemon(false);
     }
     public void runTraced() {
+      // expose this frame for the login progress to attach
+      loginFrameForProgress = LoginFrame.this;
+
       // keep track of the regular vs retry cycle
       isUsernameInRetry = isUsernameForRetry;
       isUsernameForRetry = false;
@@ -1688,7 +1701,7 @@ public class LoginFrame extends JFrame {
   }
 
 
-  public static void performLogout() {
+  public static void performDisconnect() {
     ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     if (SIL != null) {
       SIL.destroyServer();
@@ -1696,9 +1709,8 @@ public class LoginFrame extends JFrame {
     }
   }
 
-  public void performConnect() {
+  public static void performConnect(Object[] server) {
     if (MainFrame.getServerInterfaceLayer() == null) {
-      Object[] server = getServer();
       Object[][] hostsAndPorts = null;
       try {
         // this is a complex call that involves IO so wrap it in try-catch
@@ -1738,7 +1750,7 @@ public class LoginFrame extends JFrame {
     loginCoordinator.loginAttemptCloseCurrentSession(MainFrame.getServerInterfaceLayer());
 
     // logout current session
-    performLogout();
+    performDisconnect();
 
     // when login dialog is reshown due to previous failure, need to recheck the mode!
     if (isNewAccountRequested()) {
@@ -1747,7 +1759,7 @@ public class LoginFrame extends JFrame {
       if (request == null) {
         newAccountFailure = true;
       } else {
-        performConnect();
+        performConnect(getServer());
         if (createNewAccount(request)) {
           newAccountCreated = true;
           isStoreRemoteFlag = storeRemoteFlag;
@@ -1764,7 +1776,7 @@ public class LoginFrame extends JFrame {
       ProgMonitorI loginProgMonitor = null;
       if (request != null) {
         // HTTP fetch server list and create ServerInterfaceLayer
-        performConnect();
+        performConnect(getServer());
         // try to login...
         loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"),
                 new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_Secure_Channel"),
@@ -1830,8 +1842,8 @@ public class LoginFrame extends JFrame {
 
 
   /**
-   * @return approximate time the key generation will run in seconds.
-   */
+  * @return approximate time the key generation will run in seconds.
+  */
   public static int estimateGenerationTime(int keyLength, int certainty) {
     // make sure the secure random is initialized
     Rnd.initSecureRandom();
@@ -1842,21 +1854,21 @@ public class LoginFrame extends JFrame {
     }
 
     Date start = new Date();
-    // average out 3 quick runs
-    for (int i=0; i<3; i++) {
+    // average out 5 quick runs
+    for (int i=0; i<5; i++) {
       RSAKeyPairGenerator.generateKeyPair(512, 128);
     }
     Date end = new Date();
-    long tDiff = (end.getTime() - start.getTime()) / 3;
+    double tDiff = (end.getTime() - start.getTime()) / 5.0;
     // tDiff should be about 420 ms on a reference machine that the following approx. can be used
     // use the approximation curve 6.42*10^(-9) * keyLength^(2.867)
 
     // find a scale for this machine
-    double scale = ((double)tDiff) / 420.0;
-    long expectedTime = (long) (( ((double)certainty)/128.0 ) * 0.00000642 * Math.pow(keyLength, 2.867) * scale);
+    double scale = tDiff / 420.0;
+    double expectedTime = ( ((double)certainty)/128.0 ) * 0.00000642 * Math.pow(keyLength, 2.867) * scale;
     // add 30%
     expectedTime *= 1.3;
-    return (int) expectedTime / 1000;
+    return (int) (expectedTime / 1000.0);
   }
 
   private String getUserName() {
@@ -1871,9 +1883,9 @@ public class LoginFrame extends JFrame {
 
 
   /**
-   * Submit and fetch request to login
-   * @return true on success, false on failure
-   */
+  * Submit and fetch request to login
+  * @return true on success, false on failure
+  */
   private boolean login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor)");
     MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_LOGIN_SECURE_SESSION, request, false);
@@ -2039,7 +2051,7 @@ public class LoginFrame extends JFrame {
     if (trace != null) trace.exit(LoginFrame.class, success);
     return success;
   }
-   */
+  */
 
 
   /* Submit and fetch request to fetch keys for the user to the cache */
@@ -2080,12 +2092,12 @@ public class LoginFrame extends JFrame {
     if (trace != null) trace.exit(LoginFrame.class, success);
     return success;
   }
-   */
+  */
 
   /**
-   * When the account was first created, it was created without a private key.
-   * We must update the key before any requests are sent to the server for other regular data.
-   */
+  * When the account was first created, it was created without a private key.
+  * We must update the key before any requests are sent to the server for other regular data.
+  */
   private void sendKeyUpdate(RSAPrivateKey rsaPrivateKey, boolean storeKeyOnServer) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "sendKeyUpdate(RSAPrivateKey rsaPrivateKey, boolean storeKeyOnServer)");
     if (trace != null) trace.args(storeKeyOnServer);
@@ -2192,7 +2204,7 @@ public class LoginFrame extends JFrame {
 
     newUser_request.requestedEmailAddress = emailAddress;
 
-     // keyRecord
+    // keyRecord
     KeyRecord kRec = new KeyRecord();
     newUser_request.keyRecord = kRec;
     newUser_request.keyRecord.setPrivateKey(keyPair.getPrivateKey());

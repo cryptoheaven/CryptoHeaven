@@ -68,8 +68,6 @@ public class MenuTreeModel extends Object {
         // Main Frame
         "File|-10|"+KeyEvent.VK_F+"|"+
           "(|"+
-            // Message Table Starter Frame
-            "Switch to Full Application|1400|-1|-1|-1|"+
             // File Table
             "Open|716|"+KeyEvent.VK_O+"|"+KeyEvent.VK_O+"|"+Event.CTRL_MASK+"|"+
             // Accounts Management Frame
@@ -107,6 +105,8 @@ public class MenuTreeModel extends Object {
             "Separator|0|"+
             "Folder Properties and Sharing|305|-1|-1|-1|"+
             "File Properties|404|-1|-1|-1|"+
+            // Message Table Starter Frame
+            "Switch to Full Application|1400|-1|-1|-1|"+
             "Separator|0|"+
             // All Closable Frames
             "Close|800|"+KeyEvent.VK_C+"|"+KeyEvent.VK_C+"|"+(Event.CTRL_MASK|Event.ALT_MASK)+"|"+

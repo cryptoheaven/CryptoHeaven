@@ -1,45 +1,52 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.postTable;
 
-import com.CH_gui.gui.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-import com.CH_gui.util.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.records.*;
-
-import java.awt.*;
-import java.security.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
+import com.CH_co.cryptx.SHA256;
+import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.Record;
+import com.CH_gui.gui.URLLauncherCHACTION;
+import com.CH_gui.gui.URLLauncherMAILTO;
+import com.CH_gui.msgTable.MsgTableCellRenderer;
+import com.CH_gui.msgTable.MsgTableModel;
+import com.CH_gui.msgTable.MsgTableSorter;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.util.HTML_ClickablePane;
+import com.CH_gui.util.HTML_EditorKit;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.JTable;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.text.JTextComponent;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class PostTableCellRenderer extends MsgTableCellRenderer {
 
   private HTML_ClickablePane jTextAreaRenderer = null;
@@ -225,7 +232,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       editor.setBorder(RecordTableCellRenderer.getIndentedBorder(0, false));
 
       // Set contents of the message area
-      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true, true, true);
+      MsgPanelUtils.setMessageContent(sb != null ? sb.toString() : "", true, editor, true);
       //xx-xx editor.setText(value.toString());
 
 //      editor.setPreferredWidthLimit(usableColumnWidth);
@@ -278,18 +285,18 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
 
 
   /**
-   * Provide alternate row background colors.
-   */
+  * Provide alternate row background colors.
+  */
   /*
   public Color[] getAltBkColors() {
     return altBkColors;
   }
-   */
+  */
 
 
   /**
-   * @return true to overwrite background color management.
-   */
+  * @return true to overwrite background color management.
+  */
   public boolean isSubClassManagingRowColors() {
     return true;
   }

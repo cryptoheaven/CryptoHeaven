@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.monitor;
 
@@ -16,6 +16,7 @@ import com.CH_co.monitor.*;
 import com.CH_co.service.msg.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
+import com.CH_gui.frame.LoginFrame;
 
 import com.CH_gui.gui.*;
 import com.CH_gui.util.*;
@@ -24,22 +25,22 @@ import java.awt.*;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.12 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
-public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.12 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
+public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
 
   private String title;
 
@@ -52,12 +53,13 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
 
   /** Creates new LoginProgMonitorImpl */
   public LoginProgMonitorImpl() {
+    super(LoginFrame.loginFrameForProgress);
   }
 
   /**
-   * Creates new LoginProgMonitorImpl
-   * Every task takes 4 steps, start send, done send, start receive, done receive.
-   */
+  * Creates new LoginProgMonitorImpl
+  * Every task takes 4 steps, start send, done send, start receive, done receive.
+  */
   public void init(String title, String[] tasks, String infoNote) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "init(String title, String[] tasks, String infoNote)");
     if (trace != null) trace.args(title, tasks, infoNote);
@@ -158,14 +160,16 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
   }
 
 
+  private boolean isClosed = false;
   public void closeProgMonitor() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "closeProgMonitor()");
-    ProgMonitorPool.removeProgMonitor(this);
-    Stats.stopGlobe(this);
-
-    setVisible(false);
-    MiscGui.removeAllComponentsAndListeners(this);
-    dispose();
+    if (!isClosed) {
+      isClosed = true;
+      ProgMonitorPool.removeProgMonitor(this);
+      Stats.stopGlobe(this);
+      setVisible(false);
+      dispose();
+    }
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
 
@@ -276,24 +280,28 @@ public class LoginProgMonitorImpl extends JFrame implements ProgMonitorLoginI {
   }
   public void nextTask() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "nextTask()");
-    if (currentTask >= 0 && currentTask < jCheckTasks.length) {
-      MiscGui.setPlainFont(jCheckTasks[currentTask]);
-      jCheckTasks[currentTask].setSelected(true);
-      jImageLabel.setIcon(Images.get(ImageNums.ANIM_TRANSFER));
-    }
-    currentTask ++;
-    if (currentTask < jCheckTasks.length) {
-      MiscGui.setBoldFont(jCheckTasks[currentTask]);
-      setTitle(title + ": " + jCheckTasks[currentTask].getText());
+    if (!isClosed && !allDone && !killed) {
+      if (currentTask >= 0 && currentTask < jCheckTasks.length) {
+        MiscGui.setPlainFont(jCheckTasks[currentTask]);
+        jCheckTasks[currentTask].setSelected(true);
+        jImageLabel.setIcon(Images.get(ImageNums.ANIM_TRANSFER));
+      }
+      currentTask ++;
+      if (currentTask < jCheckTasks.length) {
+        MiscGui.setBoldFont(jCheckTasks[currentTask]);
+        setTitle(title + ": " + jCheckTasks[currentTask].getText());
+      }
     }
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   } // end nextTask()
 
   public void allDone() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginProgMonitorImpl.class, "allDone()");
-    allDone = true;
-    setTitle(title + ": " + "Done");
-    closeProgMonitor();
+    if (!allDone) {
+      allDone = true;
+      setTitle(title + ": " + "Done");
+      closeProgMonitor();
+    }
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   } // end allDone()
 

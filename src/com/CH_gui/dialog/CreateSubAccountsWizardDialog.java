@@ -97,8 +97,8 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
   private boolean interrupted = false;
 
-  private int keyLength = KeyRecord.DEFAULT__KEY_LENGTH;
-  private int certainty = KeyRecord.DEFAULT__CERTAINTY;
+  private int keyLength = KeyRecord.KEY_LENGTH_DEFAULT;
+  private int certainty = KeyRecord.CERTAINTY_DEFAULT;
 
 
   /** Creates new CreateSubAccountsWizardDialog */

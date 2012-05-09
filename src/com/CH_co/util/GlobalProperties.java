@@ -258,13 +258,16 @@ public class GlobalProperties extends Object {
   // build 676 Search in msg chat folder includes attachments dynamic rendering part, autoscroll to selected item after searching, save scroll pane size/orientation, logo 2012
   // build 678 Delayed GUI focusing adjustments
   // build 680 Elimination of .requestFocus() in favour to .requestFocusInWindow() and eliminate grabbing delayed focus to dialog's default button as it caused some random focus switching between windows.
+  // build 682 Further trimming of styles in HTML rendering
+  // build 684 Various performance tuning to make the GUI more snappy, increase minimum RSA key length to 2048.
+  // build 686 Fix for reconnection updates and folder validation when computer is put to 'sleep'
 
-  public static final short PROGRAM_BUILD_NUMBER = 680;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 686;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.6f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 2;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

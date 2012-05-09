@@ -13,10 +13,14 @@
 package com.CH_co.util;
 
 import com.CH_co.trace.Trace;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -614,7 +618,7 @@ public class ArrayUtils extends Object {
       while ((start = str.indexOf(set[0], oldStart)) >= 0) {
         boolean isInsideReplacementRange = true;
         if (beginTags != null || endTags != null)
-          isInsideReplacementRange = isInsideTagsInclusion == isInsideSegment(str, start, beginTags, endTags);
+          isInsideReplacementRange = isInsideTagsInclusion == isInsideSegment(str, start, start+set[0].length(), beginTags, endTags);
         anyFound = true;
         if (start > oldStart) {
           int len = start-oldStart;
@@ -644,9 +648,17 @@ public class ArrayUtils extends Object {
     if (trace != null) trace.exit(ArrayUtils.class);
     return str;
   }
-  private static boolean isInsideSegment(String str, int start, String[] startTags, String[] endTags) {
+  /**
+   * @param str The main text
+   * @param start The starting index of the tag of which we will check around
+   * @param end The ending index of the tag of which we will check around
+   * @param startTags Starting tags meant to be before the "start" index
+   * @param endTags Ending tags meant to be after the "end" index
+   * @return
+   */
+  private static boolean isInsideSegment(String str, int start, int end, String[] startTags, String[] endTags) {
     boolean isAfterStartTag = false;
-    boolean isBeforeEndTag = isBeforeEndTag(str, start, startTags, endTags);
+    boolean isBeforeEndTag = isBeforeEndTag(str, end, startTags, endTags);
     if (isBeforeEndTag) {
       // reverse the String and tags to search for beginning of the matching tag.
       String strR = new StringBuffer(str).reverse().toString();
@@ -707,6 +719,9 @@ public class ArrayUtils extends Object {
       };
    */
   public static String removeTags(String str, String[][] startTags, String[][] endTags, Object[] replacementTags) {
+    return removeTags(str, startTags, endTags, replacementTags, true, null, null);
+  }
+  public static String removeTags(String str, String[][] startTags, String[][] endTags, Object[] replacementTags, boolean isInsideTagsInclusion, String[] outerBeginTags, String[] outerEndTags) {
     char[] chars = null;
     for (int x=0; x<startTags.length; x++) {
       String[] startTag = startTags[x];
@@ -754,7 +769,14 @@ public class ArrayUtils extends Object {
             str.getChars(oldStart, iStart, chars, 0);
             resultB.append(chars, 0, len);
           }
-          if (replacementTag != null) {
+          boolean isInsideReplacementRange = true;
+          if (outerBeginTags != null || outerEndTags != null)
+            isInsideReplacementRange = isInsideTagsInclusion == isInsideSegment(str, iStart, iEnd+endTag[endTagIndex].length(), outerBeginTags, outerEndTags);
+          if (!isInsideReplacementRange) {
+            // Since requirement of replacement range is not satisfied, copy the original characters without changing them.
+            String strBeingReplaced = str.substring(iStart, iEnd + endTag[endTagIndex].length());
+            resultB.append(strBeingReplaced);
+          } else if (replacementTag != null) {
             if (replacementTag instanceof CallbackReturnI) {
               String strBeingReplaced = str.substring(iStart, iEnd + endTag[endTagIndex].length());
               resultB.append(((CallbackReturnI) replacementTag).callback(strBeingReplaced));

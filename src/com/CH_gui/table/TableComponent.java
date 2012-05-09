@@ -917,6 +917,11 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableComponent.class, "valueChanged(final TreeSelectionEvent event)");
     if (trace != null) trace.args(event);
 
+    // suspend selection events
+    if (displayed instanceof RecordTableComponent) {
+      ((RecordTableComponent) displayed).setSuspendedRecordSelectionEvents(true);
+    }
+
     Object source = event.getSource();
     Long selectedFolderID = null;
     boolean selectionAttempted = false;
@@ -1041,6 +1046,17 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
       if (trace != null) trace.data(110, "selectionAttempted -- out");
     }
 
+    // Re-enable selection events, but after the chain reaction of 
+    // events fired due to this component switching is done.
+    if (displayed instanceof RecordTableComponent) {
+      final RecordTableComponent _displayed = (RecordTableComponent) displayed;
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          _displayed.setSuspendedRecordSelectionEvents(false);
+        }
+      });
+    }
+
     if (selectionAttempted)
       lastSelectedFolderID = selectedFolderID;
 
@@ -1135,7 +1151,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
     if (fileTableComponent != null)
       fileTableComponent.disposeObj();
     if (folderSelectionListeners != null) {
-      EventListener[] listeners = folderSelectionListeners.getListeners(FolderSelectionListener.class);
+      FolderSelectionListener[] listeners = (FolderSelectionListener[]) folderSelectionListeners.getListeners(FolderSelectionListener.class);
       if (listeners != null) {
         for (int i=0; i<listeners.length; i++)
           folderSelectionListeners.remove(FolderSelectionListener.class, listeners[i]);

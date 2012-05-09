@@ -90,6 +90,7 @@ public class ProgMonitorDumping extends Object implements ProgMonitorI {
   public void nextTask(String task) {
   }
   public void allDone() {
+    ProgMonitorPool.removeProgMonitor(this);
   }
   public void setInterrupt(Interruptible interruptible) {
   }

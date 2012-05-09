@@ -301,7 +301,7 @@ public class DeleteAccountDialog extends GeneralDialog {
           if (LoginFrame.getRememberUserNameProperty()) {
             LoginFrame.putUserList(null, oldUserName);
           }
-          LoginFrame.performLogout();
+          LoginFrame.performDisconnect();
           new LoginFrame(MainFrame.getSingleInstance(), null);
         }
       } else {

@@ -12,30 +12,38 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.actions.msg.*;
-import com.CH_cl.service.actions.sys.*;
-import com.CH_cl.service.records.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.msg.MsgAGet;
+import com.CH_cl.service.actions.sys.SysANoop;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.UploadUtilities;
+import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.file.File_NewFiles_Rq;
+import com.CH_co.service.msg.dataSets.msg.Msg_New_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.Hasher;
+import com.CH_co.util.Misc;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.util.MessageDialog;
-
-import java.awt.*;
-import java.io.*;
-import java.security.*;
-import java.util.*;
+import java.awt.Component;
+import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Locale;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012

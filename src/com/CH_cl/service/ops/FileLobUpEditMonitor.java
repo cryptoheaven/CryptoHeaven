@@ -283,8 +283,9 @@ public class FileLobUpEditMonitor {
         FileDataRecord data = request.fileDataRecords[0];
         new FileLobUp(data.getPlainDataFile(), link, data.getSigningKeyId(), 0);
       } else {
-        set.errorCount ++;
-        int errorDelayIndex = Math.min((int) set.errorCount, ERROR_DELAY_BEFORE_RETRY__MILLIS.length) - 1;
+        if (set.errorCount < Long.MAX_VALUE)
+          set.errorCount ++;
+        int errorDelayIndex = (int) (Math.min(set.errorCount, (long) ERROR_DELAY_BEFORE_RETRY__MILLIS.length) - 1);
         set.timestampNextRetry = System.currentTimeMillis() + ERROR_DELAY_BEFORE_RETRY__MILLIS[errorDelayIndex];
         ProtocolMsgDataSet dataSet = replyMsgAction.getMsgDataSet();
         String errMsg = "Send failed.";

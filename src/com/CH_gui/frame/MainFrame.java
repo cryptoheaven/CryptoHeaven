@@ -620,9 +620,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "getWelcomeScreenComponent()");
     Component pane = null;
     try {
-      if (Misc.isRunningFromApplet() || Misc.isRunningFromJNLP()) {
-        pane = Template.getTemplate(Template.CATEGORY_MAIL);
-      } else {
+//      if (Misc.isRunningFromApplet() || Misc.isRunningFromJNLP()) {
+//        pane = Template.getTemplate(Template.CATEGORY_MAIL);
+//      } else {
         Long userId = SIL.getFetchedDataCache().getMyUserId();
         String url = URLs.get(URLs.WELCOME_TEMPLATE)+"?uId=" + userId;
         HTML_ClickablePane clickPane = HTML_ClickablePane.createNewAndLoading(new URL(url));
@@ -630,7 +630,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         clickPane.setRegisteredLocalLauncher(HTML_ClickablePane.PROTOCOL_MAIL, new URLLauncherMAILTO());
         clickPane.setRegisteredLocalLauncher(new URLLauncherCHACTION(), URLLauncherCHACTION.ACTION_PATH);
         pane = clickPane;
-      }
+//      }
     } catch (Throwable t) {
       if (trace != null) trace.exception(MainFrame.class, 100, t);
     }

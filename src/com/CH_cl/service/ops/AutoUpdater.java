@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.ops;
 
@@ -29,21 +29,21 @@ import java.sql.Timestamp;
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.12 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.12 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class AutoUpdater extends ThreadTraced {
 
   private static int TINY_FILE_SIZE = 2048;
@@ -52,7 +52,7 @@ public class AutoUpdater extends ThreadTraced {
   private static int DEFAULT_BATCH_SIZE = 1024;
   private int BATCH_SIZE = DEFAULT_BATCH_SIZE;
 
-  private static String FILENAME__LICENSE_TXT = "License.txt";
+  private static String FILENAME__LICENSE_TXT = "ch/cl/License.txt";
   private static String FILENAME__ONEJAR_VERSION = ".version";
 
   private static Byte BOUNDRY_EOF = new Byte((byte) 0);
@@ -269,8 +269,8 @@ public class AutoUpdater extends ThreadTraced {
   }
 
   /**
-   * Create an initial 'updateStruct' for the update file to be fetched.
-   */
+  * Create an initial 'updateStruct' for the update file to be fetched.
+  */
   private LinkedList makeUpdateStruct(AutoUpdateRecord updateRec) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "makeUpdateStruct(AutoUpdateRecord updateRec)");
     if (trace != null) trace.args(updateRec);
@@ -295,8 +295,8 @@ public class AutoUpdater extends ThreadTraced {
   }
 
   /**
-   * Writes the header to the file to make the current 'updateStruct' persistent.
-   */
+  * Writes the header to the file to make the current 'updateStruct' persistent.
+  */
   private void writeHeader(RandomAccessFile rndAccFile, int size, LinkedList updateStruct) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "writeHeader(RandomAccessFile rndAccFile, int size, LinkedList updateStruct)");
     if (trace != null) trace.args(rndAccFile);
@@ -318,8 +318,8 @@ public class AutoUpdater extends ThreadTraced {
   }
 
   /**
-   * Writes the data chunk to the file and update 'updateStruct'
-   */
+  * Writes the data chunk to the file and update 'updateStruct'
+  */
   private void writeDataChunk(RandomAccessFile rndAccFile, int startPosition, byte[] bytes, LinkedList updateStruct) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "writeDataChunk(RandomAccessFile rndAccFile, int startPosition, byte[] bytes, LinkedList updateStruct)");
     if (trace != null) trace.args(rndAccFile);
@@ -383,9 +383,9 @@ public class AutoUpdater extends ThreadTraced {
   }
 
   /**
-   * Make a single request for some file data bytes and write them to file updating the 'updateStruct'.
-   * @return true if some data was requested, false if no more bytes are available, null if operation did not return any data (server is not serving updates right now
-   */
+  * Make a single request for some file data bytes and write them to file updating the 'updateStruct'.
+  * @return true if some data was requested, false if no more bytes are available, null if operation did not return any data (server is not serving updates right now
+  */
   private Boolean requestBytes(boolean skipHeader, AutoUpdateRecord updateRec, LinkedList updateStruct, RandomAccessFile rndAccFile) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "requestBytes(boolean skipHeader, AutoUpdateRecord updateRec, LinkedList updateStruct, RandomAccessFile rndAccFile)");
     if (trace != null) trace.args(skipHeader);
@@ -907,8 +907,8 @@ public class AutoUpdater extends ThreadTraced {
   }
 
   /**
-   * Returns a byte array from a String containing hex encoding bytes.
-   */
+  * Returns a byte array from a String containing hex encoding bytes.
+  */
   public static byte[] toByteArray(String hex) {
     byte[] bytes = null;
     if (hex != null) {
@@ -978,4 +978,10 @@ public class AutoUpdater extends ThreadTraced {
     if (trace != null) trace.exit(AutoUpdater.class);
   }
 
+  public static void main(String[] args) {
+    System.out.println("Resource URL="+getResourceURL(FILENAME__LICENSE_TXT));
+    System.out.println("Is running from JAR="+isRunningFromJar());
+    System.out.println("Main JAR name="+getMainJarName());
+    System.out.println("Main dir="+getMainDir());
+  }
 }

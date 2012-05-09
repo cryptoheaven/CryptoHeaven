@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.table;
 
@@ -23,6 +23,7 @@ import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.DisposableObj;
 import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.Misc;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.JBottomStickViewport;
 import com.CH_gui.msgTable.MsgTableModel;
@@ -43,6 +44,7 @@ import java.awt.event.ComponentEvent;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
@@ -53,21 +55,21 @@ import javax.swing.event.*;
 import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.31 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.31 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class RecordTableScrollPane extends JScrollPane implements VisualsSavable, DisposableObj {
 
   private RecordTableModel recordTableModel;
@@ -75,6 +77,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
   // List of record selection listeners, selection events are suppressed when sorting takes place.
   private EventListenerList recordSelectionListenerList = new EventListenerList();
+  private boolean isSuspendedRecordSelectionEvents;
   private SortListener sortListener;
   private RecordListSelectionListener recordListSelectionListener;
   private Thread selectionUpdater;
@@ -87,7 +90,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
   // Used to enable auto-scroll correction if recently resized
   private long lastResizeStamp = 0;
-  
+
   // Auto scroll suppression
   private boolean isAutoScrollSuppressed = false;
 
@@ -248,8 +251,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
 
   /**
-   * @return a single selected record, if there are multiple selected, return null
-   */
+  * @return a single selected record, if there are multiple selected, return null
+  */
   public Record getSelectedRecord() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecord()");
 
@@ -264,8 +267,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
 
   /**
-   * @return all selected records, if there are none selected, return null
-   */
+  * @return all selected records, if there are none selected, return null
+  */
   public List getSelectedRecordsL() {
     return getSelectedRecordsL(false);
   }
@@ -297,9 +300,9 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
 
   /**
-   * @return all selected records, if there are none selected, return null
-   * Runtime instance of the array is of the contained records (ie: UserRecord[])
-   */
+  * @return all selected records, if there are none selected, return null
+  * Runtime instance of the array is of the contained records (ie: UserRecord[])
+  */
   public Record[] getSelectedRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "getSelectedRecords()");
 
@@ -356,15 +359,15 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   }
 
   /**
-   * Advances record selection in the table in directions next or previous (down or up)
-   * @param isNext true for next, flase for previous
-   * @param skipOverCurrentSelection true if currently selected records are not to be selected next
-   * @param skipOverRecs additional records that are to be skipped when considering next selection
-   * @param startFrom consider starting position to be from this given record
-   * @param startFromViewIndex consider starting position to be from this view index (-1 for none)
-   * @param isSimulation true if only consider advancing selection without actually doing so
-   * @return true if selection could be advanced
-   */
+  * Advances record selection in the table in directions next or previous (down or up)
+  * @param isNext true for next, flase for previous
+  * @param skipOverCurrentSelection true if currently selected records are not to be selected next
+  * @param skipOverRecs additional records that are to be skipped when considering next selection
+  * @param startFrom consider starting position to be from this given record
+  * @param startFromViewIndex consider starting position to be from this view index (-1 for none)
+  * @param isSimulation true if only consider advancing selection without actually doing so
+  * @return true if selection could be advanced
+  */
   public boolean advanceSelection(boolean isNext, boolean skipOverCurrentSelection, Record[] skipOverRecs, Record startFrom, int startFromViewIndex, boolean isSimulation) {
     boolean selectionAdvanced = false;
     if (startFromViewIndex <= -1) {
@@ -467,6 +470,10 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     if (trace != null) trace.exit(RecordTableScrollPane.class);
   }
 
+  public void setSuspendedRecordSelectionEvents(boolean flag) {
+    isSuspendedRecordSelectionEvents = flag;
+  }
+
   public void removeRecordSelectionListener(RecordSelectionListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "removeRecordSelectionListener(RecordSelectionListener l)");
     if (trace != null) trace.args(l);
@@ -483,27 +490,31 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.
+  */
   public void fireRecordSelectionChanged() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableScrollPane.class, "fireRecordSelectionChanged()");
 
-    Record[] selectedRecords = getSelectedRecords();
-    if (trace != null) trace.info(10, selectedRecords);
+    if (!isSuspendedRecordSelectionEvents) {
+      Record[] selectedRecords = getSelectedRecords();
+      if (trace != null) trace.info(10, selectedRecords);
 
-    // Guaranteed to return a non-null array
-    Object[] listeners = recordSelectionListenerList.getListenerList();
-    RecordSelectionEvent e = null;
-    // Process the listeners last to first, notifying
-    // those that are interested in this event
-    for (int i = listeners.length-2; i>=0; i-=2) {
-      if (listeners[i] == RecordSelectionListener.class) {
-        // Lazily create the event:
-        if (e == null) e = new RecordSelectionEvent(this, selectedRecords);
-        ((RecordSelectionListener)listeners[i+1]).recordSelectionChanged(e);
+      // Guaranteed to return a non-null array
+      Object[] listeners = recordSelectionListenerList.getListenerList();
+      RecordSelectionEvent e = null;
+      // Process the listeners last to first, notifying
+      // those that are interested in this event
+      for (int i = listeners.length-2; i>=0; i-=2) {
+        if (listeners[i] == RecordSelectionListener.class) {
+          // Lazily create the event:
+          if (e == null) e = new RecordSelectionEvent(this, selectedRecords);
+          RecordSelectionListener l = (RecordSelectionListener) listeners[i+1];
+          l.recordSelectionChanged(e);
+        }
       }
     }
+
     if (trace != null) trace.exit(RecordTableScrollPane.class);
   }
 
@@ -546,8 +557,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
 
   /**
-   * Worker that checks in the background for possible invalidated GUI that require refresh
-   */
+  * Worker that checks in the background for possible invalidated GUI that require refresh
+  */
   private class SilentValidator extends ThreadTraced {
     private SilentValidator() {
       super("Silent Validator");
@@ -650,10 +661,10 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     if (trace != null) trace.exit(RecordTableScrollPane.class);
   }
   /**
-   * We cannot provide an extension depending on owner window because
-   * when 'this' is instantiated, it doesn't yet have an owning window to restore settings for it.
-   * @return null
-   */
+  * We cannot provide an extension depending on owner window because
+  * when 'this' is instantiated, it doesn't yet have an owning window to restore settings for it.
+  * @return null
+  */
   public String getExtension() {
     return null;
   }
@@ -701,9 +712,9 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
 
   /**
-   ****  I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
-   */
+  ****  I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
+  */
   public void disposeObj() {
     isDisposed = true;
     if (silentValidator != null) {

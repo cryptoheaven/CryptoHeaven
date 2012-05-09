@@ -29,6 +29,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.HTML_Ops;
 import com.CH_co.util.ImageNums;
 import com.CH_co.util.Misc;
 import com.CH_gui.addressBook.AddressTableCellRenderer;
@@ -40,7 +41,6 @@ import com.CH_gui.recycleTable.RecycleTableModel;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
-import com.CH_guiLib.util.HTML_Ops;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -826,8 +826,9 @@ public class MsgTableModel extends RecordTableModel {
               // If it is a PLAIN mail, then convert special characters <>& characters to entities.
               messageText = msgData.getEncodedHTMLData();
             } else {
+              // simplify HTML message for chat display - also converting <p> to <br> to keep it simpler
+              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true, true, true, true, true);
               // move the BODY tag right after the HTML tag...
-              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true, true, true, true);
               int iBody1 = messageText.indexOf("<body");
               if (iBody1 < 0)
                 iBody1 = messageText.indexOf("<BODY");

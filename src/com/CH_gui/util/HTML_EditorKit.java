@@ -13,10 +13,10 @@ package com.CH_gui.util;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.CallbackI;
-
 import java.util.Enumeration;
-import javax.swing.text.html.*;
 import javax.swing.text.*;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLEditorKit;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012

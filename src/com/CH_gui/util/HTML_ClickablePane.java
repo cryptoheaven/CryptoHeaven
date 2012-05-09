@@ -1,48 +1,58 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.util;
 
-import com.CH_co.trace.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.URLs;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.text.html.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Hashtable;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.24 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.24 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class HTML_ClickablePane extends JTextPane implements URLLauncher {
 
   public static final String PROTOCOL_HTTP = "http";
@@ -52,7 +62,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
   private boolean fontChangeInProgress = false;
   private SingleTokenArbiter arbiter = new SingleTokenArbiter();
   private DocumentListener documentListener;
-   */
+  */
 
   private static Hashtable registeredLunchersHT;
   private Hashtable registeredLocalLunchersHT;
@@ -117,11 +127,11 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
 
 
   /**
-   * To fetch a HTML_ClickablePane from a URL, use this method to immediately
-   * return a component that will become loaded in a background thread.
-   * @param url is the address of page to be loaded.
-   * @return empty or currently loading HTML_ClickablePane
-   */
+  * To fetch a HTML_ClickablePane from a URL, use this method to immediately
+  * return a component that will become loaded in a background thread.
+  * @param url is the address of page to be loaded.
+  * @return empty or currently loading HTML_ClickablePane
+  */
   public static HTML_ClickablePane createNewAndLoading(final URL url) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_ClickablePane.class, "createNewAndLoading(final URL url)");
     if (trace != null) trace.args(url);
@@ -156,8 +166,8 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
   }
 
   /**
-   * Initialize the pane and set base optionally.
-   */
+  * Initialize the pane and set base optionally.
+  */
   private void init(boolean setBase) {
     setEditable(false);
     addHyperlinkListener(new HyperListener());
@@ -186,13 +196,13 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
         }
       }
     };
-     */
+    */
     initFont();
   }
 
   /**
-   * Initialize default fonts.
-   */
+  * Initialize default fonts.
+  */
   public void initFont() {
     // add a CSS rule to force body tags to use the default label font
     // instead of the value in javax.swing.text.html.default.css
@@ -225,7 +235,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
       fontChangeInProgress = false;
       arbiter.removeToken(arbiter, token);
     }
-     */
+    */
   }
 
   public Component getRendererContainer() {
@@ -235,8 +245,8 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
     this.rendererContainer = rendererContainer;
   }
   /**
-   * Launcher is invoked with URL when key matches URL type upon hyper link click.
-   */
+  * Launcher is invoked with URL when key matches URL type upon hyper link click.
+  */
   public static void setRegisteredGlobalLauncher(String protocol, URLLauncher launcher) {
     if (registeredLunchersHT == null) registeredLunchersHT = new Hashtable();
     registeredLunchersHT.put(protocol.toLowerCase(), launcher);
@@ -324,8 +334,8 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
       base = defaultBase;
     } else {
       try {
-        URL url = URLs.getResourceURL("License.txt");
-        String path = url.getPath().substring(0, url.getPath().lastIndexOf("/")+1);	// will work from inside jar
+        URL url = URLs.getResourceURL("ch/cl/License.txt");
+        String path = url.getPath().substring(0, url.getPath().lastIndexOf("/ch/cl")+1);	// will work from inside jar
         base = new URL(url.getProtocol(),url.getHost(),url.getPort(), path);
         defaultBase = base;
       } catch (Throwable t) { }
@@ -334,12 +344,13 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
   }
 
   /**
-   * Set default base of the document.
-   */
+  * Set default base of the document.
+  */
   public static void setBaseToDefault(HTMLDocument doc) {
     try {
       URL base = getDefaultBase();
-      doc.setBase(base);
+      if (base != null)
+        doc.setBase(base);
     } catch (Throwable t) { }
   }
 
@@ -439,10 +450,11 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
 //  }
 
   /**
-   * Testing of HTML renderer on certain pages.
-   */
+  * Testing of HTML renderer on certain pages.
+  */
   public static void main(String[] args) {
     if (args.length < 1) {
+      System.out.println("Default base is "+getDefaultBase());
       System.out.println("Usage: <program> [<html-file-name>|<url>] [URL|file]");
       System.exit(-1);
     }

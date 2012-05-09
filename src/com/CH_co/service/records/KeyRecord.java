@@ -1,49 +1,48 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
+import com.CH_co.cryptx.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
 import java.sql.Timestamp;
 
-import com.CH_co.trace.Trace;
-import com.CH_co.cryptx.*;
-import com.CH_co.util.*;
-
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>  
- *
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>  
+*
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class KeyRecord extends Record { // implicit no-argument constructor
 
   // for production set DEBUG to false
   public static boolean DEBUG__ALLOW_SHORT_KEYS = false;
   public static final int DEBUG__SHORTEST_KEY = 696;
-  public static final int DEBUG__MIN_CERTAINTY = 8;
+  public static final int DEBUG__CERTAINTY_MIN = 8;
 
   // accounts key sizes and prime number generation certainty
-  public static final int MIN__KEY_LENGTH = 1024;
-  //public static final int MIN__KEY_LENGTH = 2048;
-  public static final int DEFAULT__KEY_LENGTH = 1024;
-  //public static final int DEFAULT__KEY_LENGTH = 2048;
-  public static final int MAX__KEY_LENGTH = 4096;
-  public static final int MIN__CERTAINTY = 128;
-  public static final int DEFAULT__CERTAINTY = 128;
-  public static final int MAX__CERTAINTY = 256;
+  public static final int KEY_LENGTH_MIN_SRV = 1024;
+  public static final int KEY_LENGTH_MIN_NEW = 2048;
+  public static final int KEY_LENGTH_DEFAULT = 2048;
+  public static final int KEY_LENGTH_MAX = 4096;
 
+  public static final int CERTAINTY_MIN = 128;
+  public static final int CERTAINTY_DEFAULT = 128;
+  public static final int CERTAINTY_MAX = 512;
 
   public Long keyId;
   public Long folderId;
@@ -76,9 +75,9 @@ public class KeyRecord extends Record { // implicit no-argument constructor
   }
 
   /**
-   * Seals the <code> privateKey </code> into <code> encPrivateKey </code> 
-   * using the sealant object which is the <code> encodedPassword </code>.
-   */
+  * Seals the <code> privateKey </code> into <code> encPrivateKey </code> 
+  * using the sealant object which is the <code> encodedPassword </code>.
+  */
   public synchronized void seal(BAEncodedPassword encodedPassword) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyRecord.class, "seal()");
 
@@ -98,9 +97,9 @@ public class KeyRecord extends Record { // implicit no-argument constructor
   }
 
   /**
-   * Unseals the <code> encPrivateKey </code> into <code> privateKey </code> 
-   * using the unSealant object which is the <code> encodedPassword </code>.
-   */
+  * Unseals the <code> encPrivateKey </code> into <code> privateKey </code> 
+  * using the unSealant object which is the <code> encodedPassword </code>.
+  */
   public synchronized void unSeal(BAEncodedPassword encodedPassword) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyRecord.class, "unSeal()");
 

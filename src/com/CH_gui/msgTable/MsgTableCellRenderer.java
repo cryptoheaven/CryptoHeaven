@@ -501,8 +501,13 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 if  (((MsgTableSorter) sTable.getModel()).isThreaded())
                   indentLevel = mLink.getSortThreadLayer();
                 // set Subject
-                if (subject == null || subject.length() == 0)
-                  subject = ListRenderer.getRenderedText(mData);
+                if (subject == null || subject.length() == 0) {
+                  subject = mLink.getPostRenderingCache();
+                  if (subject == null) {
+                    subject = ListRenderer.getRenderedText(mData);
+                    mLink.setPostRenderingCache(subject);
+                  }
+                }
                 ((JLabel) renderer).setText(subject);
 
                 // in Address type tables, if no "Email Address" column, show it here under "Name"

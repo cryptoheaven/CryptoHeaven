@@ -12,25 +12,30 @@
 
 package com.CH_gui.usrs;
 
-import com.CH_gui.gui.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.util.Images;
-import com.CH_gui.util.ExtensionFileFilter;
-
-import com.CH_guiLib.gui.*;
-
-import com.CH_co.service.records.*;
+import com.CH_co.service.records.UserSettingsRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ImageNums;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.msgs.MsgTypeArea;
+import com.CH_gui.util.ExtensionFileFilter;
+import com.CH_gui.util.Images;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
+import com.CH_guiLib.gui.MyDefaultListCellRenderer;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Vector;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -185,7 +190,7 @@ public class AccountOptionsSignaturesPanel extends JPanel {
     jTypeText = new JMyRadioButton("Text");
     jTypeFile = new JMyRadioButton("File");
 
-    sigTypeArea = new MsgTypeArea("_sig", (short) -1, true, null, false, true, false);
+    sigTypeArea = new MsgTypeArea("_sig", (short) -1, true, null, true, false);
     jFileField = new JMyTextField();
     sigTypeArea.setMaximumSize(new Dimension(350, 200));
   }

@@ -1,35 +1,35 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.util;
 
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.18 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.18 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ImageNums extends Object {
 
   public static final int LOGO_KEY_MAIN;
@@ -42,6 +42,7 @@ public class ImageNums extends Object {
   public static final int PRIME_CERTEINTY32;
   public static final int STORE_REMOTE32;
 
+  public static final int CLEAR_PIXEL;
   public static final int TRANSPARENT16;
   //public static final int WAIT16;
   public static final int STOPWATCH16;
@@ -520,13 +521,13 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[365+50]; // plus emotions
+    images = new String[366+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
     /******************************************************************
-     * First 4 indexed images are permanent and used in customizations.
-     ******************************************************************/
+    * First 4 indexed images are permanent and used in customizations.
+    ******************************************************************/
     LOGO_KEY_MAIN = i;
     images[i] = "logo-soft-435x100.png"; i++;
     LOGO_BANNER_MAIN = i;
@@ -536,8 +537,8 @@ public class ImageNums extends Object {
     FRAME_LOCK32 = i;
     images[i] = "FrameLock32.png"; i++;
     /******************************************************************
-     * First 4 indexed images are permanent and used in customizations.
-     ******************************************************************/
+    * First 4 indexed images are permanent and used in customizations.
+    ******************************************************************/
 
 
     KEYBOARD = i;
@@ -551,6 +552,9 @@ public class ImageNums extends Object {
 
     STORE_REMOTE32 = i;
     images[i] = "StoreRemote32.png"; i++;
+
+    CLEAR_PIXEL = i;
+    images[i] = "clear-pixel.gif"; i++;
 
     TRANSPARENT16 = i;
     images[i] = "Transparent16.gif"; i++;

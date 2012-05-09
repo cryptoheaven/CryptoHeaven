@@ -467,7 +467,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "initComponents()");
     String htmlPropertyPostfix = objType == MsgDataRecord.OBJ_TYPE_ADDR ? "_addr" : (isChatComposePanel ? "_chat" : "_mail");
     boolean defaultHTML = true;
-    msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, false, isChatComposePanel);
+    boolean suppressSpellChecker = false;
+    msgTypeArea = new MsgTypeArea(htmlPropertyPostfix, objType, defaultHTML, undoMngrI, suppressSpellChecker, isChatComposePanel);
     jHTML = msgTypeArea.getHTMLSwitchButton();
 //    jShowBcc = new JMyLinkLikeLabel("Show BCC", MsgPreviewPanel.LINK_RELATIVE_FONT_SIZE);
     jShowBcc = new JMyButtonNoFocus("Show BCC");
@@ -795,7 +796,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   public void setFocusToBody() {
     if (msgTypeArea != null) {
-      msgTypeArea.getTextComponent().addHierarchyListener(new InitialFocusRequestor());
+      JTextComponent textComp = msgTypeArea.getTextComponent();
+      textComp.requestFocusInWindow();
+      textComp.addHierarchyListener(new InitialFocusRequestor());
     }
   }
 

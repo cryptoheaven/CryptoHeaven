@@ -79,7 +79,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
   public static void uploadFilesStartCoordinator(File[] newFiles, FolderShareRecord destinationShareRecord, ServerInterfaceLayer SIL) {
     uploadFilesStartCoordinator(newFiles, null, destinationShareRecord, SIL);
   }
-  public static void uploadFilesStartCoordinator(File[] newFiles, FileLinkRecord[] oldFiles, FolderShareRecord destinationShareRecord, ServerInterfaceLayer SIL) {
+  private static void uploadFilesStartCoordinator(File[] newFiles, FileLinkRecord[] oldFiles, FolderShareRecord destinationShareRecord, ServerInterfaceLayer SIL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadUtilities.class, "uploadFilesStartCoordinator(File[] newFiles, FileLinkRecord[] oldFiles, FolderShareRecord destinationShareRecord, ServerInterfaceLayer SIL)");
     if (trace != null) trace.args(newFiles, destinationShareRecord, SIL);
 
@@ -119,7 +119,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
     public UploadCoordinator(File[] files, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun, boolean isSuppressStuds) {
       this(files, null, shareRecord, SIL, isThreadedRun, isSuppressStuds);
     }
-    public UploadCoordinator(File[] files, FileLinkRecord[] oldFiles, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun, boolean isSuppressStuds) {
+    private UploadCoordinator(File[] files, FileLinkRecord[] oldFiles, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun, boolean isSuppressStuds) {
       super("Upload Coordinator # " + uploadCoordinatorCount);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadCoordinator.class, "UploadCoordinator(File[] files, FileLinkRecord[] oldFiles, FolderShareRecord shareRecord, ServerInterfaceLayer SIL, boolean isThreadedRun, boolean isSuppressStuds)");
       if (trace != null) trace.args(files, oldFiles, shareRecord, SIL);

@@ -37,10 +37,10 @@ import com.CH_co.service.msg.ProtocolMsgDataSet;
  */
 public class Msg_GetMsgs_Rq extends ProtocolMsgDataSet {
 
-  public static final short FETCH_NUM_LIST__INITIAL_SIZE = 15;
+  public static final short FETCH_NUM_LIST__INITIAL_SIZE = 50;
   public static final short FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT = 1000;
 
-  public static final short FETCH_NUM_NEW__INITIAL_SIZE = 5;
+  public static final short FETCH_NUM_NEW__INITIAL_SIZE = 15;
   public static final short FETCH_NUM_NEW__MAX_SIZE__HARD_LIMIT = 100;
 
   // <shareId> <ownerObjType> <ownerObjId> <fetchNumMax> <fetchNumNew> <timestamp> { <exceptLinkIDs }*

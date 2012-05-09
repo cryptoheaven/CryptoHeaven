@@ -444,30 +444,32 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
           }
         }
       }
-      if (countInserted > 0 || countUpdated > 0 || countReplaced > 0) {
-        // Can not fire event for specific row since sorter could shuffle it to another row -- fire entire data change.
-        // We don't want the sorter to translate event rows and split row ranges.
-        int size = recordsL.size();
-        if (countReplaced > 0) {
-          if (trace != null) trace.info(10, "RecordTableModel.fireTableDataChanged()");
-          fireTableDataChanged();
+      if (countInserted > 0 || countUpdated > 0 || countReplaced > 0 || countToDelete > 0) {
+        if (countInserted > 0 || countUpdated > 0 || countReplaced > 0) {
+          // Can not fire event for specific row since sorter could shuffle it to another row -- fire entire data change.
+          // We don't want the sorter to translate event rows and split row ranges.
+          int size = recordsL.size();
+          if (countReplaced > 0) {
+            if (trace != null) trace.info(10, "RecordTableModel.fireTableDataChanged()");
+            fireTableDataChanged();
+          }
+          else if (countInserted > 0) {
+            // Always inserts are at the end
+            if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsInserted("+(size - countInserted) + ", " + (size - 1) + ");");
+            fireTableRowsInserted(size - countInserted, size - 1); // don't fire structure changed -- it would screw up the header renderer
+          }
+          // No need to fire update if insert was already fired, event will convert to entire table data update anyway.
+          else {
+            if (trace != null) trace.info(30, "RecordTableModel.fireTableRowsUpdated(0, "+(size-1)+");");
+            fireTableRowsUpdated(0, size -1); // don't fire structure changed -- it would screw up the header renderer
+          }
         }
-        else if (countInserted > 0) {
-          // Always inserts are at the end
-          if (trace != null) trace.info(20, "RecordTableModel.fireTableRowsInserted("+(size - countInserted) + ", " + (size - 1) + ");");
-          fireTableRowsInserted(size - countInserted, size - 1); // don't fire structure changed -- it would screw up the header renderer
+        // if something is to be removed/deleted, use another call to removeData()
+        if (countToDelete > 0) {
+          Record[] recs = new Record[removeRecordsL.size()];
+          removeRecordsL.toArray(recs);
+          removeData(recs);
         }
-        // No need to fire update if insert was already fired, event will convert to entire table data update anyway.
-        else {
-          if (trace != null) trace.info(30, "RecordTableModel.fireTableRowsUpdated(0, "+(size-1)+");");
-          fireTableRowsUpdated(0, size -1); // don't fire structure changed -- it would screw up the header renderer
-        }
-      }
-      // if something is to be removed/deleted, use another call to removeData()
-      if (countToDelete > 0) {
-        Record[] recs = new Record[removeRecordsL.size()];
-        removeRecordsL.toArray(recs);
-        removeData(recs);
       }
     }
     // Notify callback of inserted records

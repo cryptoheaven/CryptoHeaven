@@ -28,6 +28,7 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.sys.SysANullAction;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -70,6 +71,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private static final int DEBUG__REQUEST_PACKET_DROP_FREQUENCY = 10;
   private static final int DEBUG__REPLY_PACKET_DROP_FREQUENCY = 10;
 
+  public static final long TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE = 1000 * 30; // 30 seconds
   public static final long PING_PONG_INTERVAL = 1000 * 60 * 1; // 1 minute
   private static final long PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK = 1; // zero for no pinging and exit after first ping delay
 
@@ -490,8 +492,9 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         markPersistant();
       }
 
-      // monitor last activity Stamp
-      workerManager.markLastWorkerActivityStamp();
+      // monitor last activity Stamp -- skip null actions that maybe caused by connection errors
+      if (!msgAction.getClass().equals(SysANullAction.class))
+        workerManager.markLastWorkerActivityStamp();
 
       // All synchronized request-reply actions must go here.
       // If streams are about to change due to securing streams, then wait.

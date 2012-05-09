@@ -24,12 +24,14 @@ import com.CH_co.util.ImageNums;
 import com.CH_gui.action.AbstractActionTraced;
 import com.CH_gui.action.ActionUtilities;
 import com.CH_gui.action.Actions;
+import com.CH_gui.monitor.LoginProgMonitorImpl;
 import com.CH_gui.monitor.StatsBar;
 import com.CH_gui.util.ActionProducerI;
 import com.CH_gui.util.Images;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
+import javax.swing.SwingUtilities;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -96,7 +98,7 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
    **/
   private class SwitchToFullAction extends AbstractActionTraced {
     public SwitchToFullAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Switch_To_Full_App"), Images.get(ImageNums.FRAME_LOCK32));
+      super(com.CH_gui.lang.Lang.rb.getString("action_Switch_To_Full_App"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Switch_To_Full_App."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FRAME_LOCK32));
@@ -106,13 +108,25 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
       Thread th = new ThreadTraced("Switch To Full Runner") {
         public void runTraced() {
           if (MainFrame.getSingleInstance() == null) {
-            MainFrame mainFrame = new MainFrame(MsgTableStarterFrame.this, null, null);
-            mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
+            final MainFrame mainFrame = new MainFrame(MsgTableStarterFrame.this, null, null);
+            // Set Main Frame as the parent to the progress dialog.
+            LoginFrame.loginFrameForProgress = mainFrame;
+            try {
+              // Create progress monitor, but ignore any exceptions as it is not necessary that we have it.
+              mainFrame.setLoginProgMonitor(ProgMonitorFactory.newInstanceLogin("Initializing ...", new String[] { "Loading Main Window" }, null));
+            } catch (Throwable t) {
+            }
             mainFrame.loginComplete(MainFrame.getServerInterfaceLayer(), true);
+            LoginFrame.loginFrameForProgress = null;
+            SwingUtilities.invokeLater(new Runnable() { 
+              public void run() {
+                mainFrame.setVisible(true);
+              }
+            });
           }
         }
       };
-      th.setDaemon(true);
+      th.setDaemon(false);
       th.start();
     }
   }
@@ -137,9 +151,18 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
    * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
    * Dispose the object and release resources to help in garbage collection.
    */
+  private boolean isDisposed = false;
   public void disposeObj() {
-    statsBar.uninstallListeners();
-    super.disposeObj();
+    if (!isDisposed) {
+      isDisposed = true;
+      statsBar.uninstallListeners();
+      super.disposeObj();
+    }
+  }
+
+  public void dispose() {
+    super.dispose();
+    disposeObj();
   }
 
   /*******************************************************

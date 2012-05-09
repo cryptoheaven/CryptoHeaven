@@ -190,9 +190,9 @@ public class TraceProperties extends Object {
     int jarDirIndex = 0;
     // when we have a leading '!' ...
     if ((jarDirIndex = alternatePropertiesDir.indexOf('!')) == 0) {
-      URL url = URLs.getResourceURL("License.txt");
+      URL url = URLs.getResourceURL("ch/cl/License.txt");
       String path = URLDecoder.decode(url.getPath());
-      path = path.substring(0, path.lastIndexOf('/')+1);	// will work from inside jar	
+      path = path.substring(0, path.lastIndexOf("/ch/cl/")+1);	// will work from inside jar	
       if (url.getProtocol().equalsIgnoreCase("jar") && path.startsWith("file:")) {
         path = path.substring("file:".length());
       }

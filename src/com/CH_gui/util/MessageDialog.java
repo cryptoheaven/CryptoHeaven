@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.util;
 
@@ -23,21 +23,21 @@ import javax.swing.border.*;
 import javax.swing.text.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.15 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.15 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MessageDialog extends Object {
 
   /** Show dialog with "OK" button */
@@ -63,11 +63,11 @@ public class MessageDialog extends Object {
     }
   }
   /**
-   * Shows the message dialog. If no buttons are specified, and 'defaultButtonAction' is specified,
-   * then it will be run when user clicks the default OK button.
-   * @param buttons is optional
-   * @return the dialog which is created and shown
-   */
+  * Shows the message dialog. If no buttons are specified, and 'defaultButtonAction' is specified,
+  * then it will be run when user clicks the default OK button.
+  * @param buttons is optional
+  * @return the dialog which is created and shown
+  */
   public static JDialog showDialog(Component parent, String messageText, String title, int messageType, JButton[] buttons, boolean modal) {
     return showDialog(parent, messageText, title, messageType, buttons, null, modal, null);
   }
@@ -231,9 +231,9 @@ public class MessageDialog extends Object {
 
 
   /**
-   * Displays modal Yes / No option dialog.
-   * @return true if user clicks Yes, false for No .
-   */
+  * Displays modal Yes / No option dialog.
+  * @return true if user clicks Yes, false for No .
+  */
   public static boolean showDialogYesNo(Component parent, String messageText, String title) {
     return showDialogYesNo(parent, messageText, title, NotificationCenter.QUESTION_MESSAGE, null, null, true);
   }

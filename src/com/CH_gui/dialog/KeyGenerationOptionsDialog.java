@@ -12,23 +12,24 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.Images;
-import com.CH_gui.gui.JMyLabel;
+import com.CH_co.service.records.KeyRecord;
+import com.CH_co.util.ImageNums;
 import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.GeneralDialog;
-import javax.swing.*;
-import javax.swing.event.*;
+import com.CH_gui.util.Images;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import com.CH_co.gui.*;
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Hashtable;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -123,12 +124,12 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
     panel.setLayout(new GridBagLayout());
 
     if (KeyRecord.DEBUG__ALLOW_SHORT_KEYS) {
-      jKeyLength = new JSlider(KeyRecord.DEBUG__SHORTEST_KEY, KeyRecord.MAX__KEY_LENGTH, keyLength);
-      jCertainty = new JSlider(KeyRecord.DEBUG__MIN_CERTAINTY, KeyRecord.MAX__CERTAINTY, certainty);
+      jKeyLength = new JSlider(KeyRecord.DEBUG__SHORTEST_KEY, KeyRecord.KEY_LENGTH_MAX, keyLength);
+      jCertainty = new JSlider(KeyRecord.DEBUG__CERTAINTY_MIN, KeyRecord.CERTAINTY_MAX, certainty);
     }
     else {
-      jKeyLength = new JSlider(KeyRecord.MIN__KEY_LENGTH, KeyRecord.MAX__KEY_LENGTH, keyLength);
-      jCertainty = new JSlider(KeyRecord.MIN__CERTAINTY, KeyRecord.MAX__CERTAINTY, certainty);
+      jKeyLength = new JSlider(KeyRecord.KEY_LENGTH_MIN_NEW, KeyRecord.KEY_LENGTH_MAX, keyLength);
+      jCertainty = new JSlider(KeyRecord.CERTAINTY_MIN, KeyRecord.CERTAINTY_MAX, certainty);
     }
 
     jKeyLength.addChangeListener(new KeyLengthListener());
@@ -158,8 +159,8 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
 
     jKeyLength.setMinorTickSpacing(128);
     jKeyLength.setMajorTickSpacing(512);
-    jCertainty.setMinorTickSpacing(4);
-    jCertainty.setMajorTickSpacing(32);
+    jCertainty.setMinorTickSpacing(16);
+    jCertainty.setMajorTickSpacing(128);
 
     Hashtable htKey = new Hashtable();
     htKey.put(new Integer(1024), new JMyLabel("1024"));
@@ -172,14 +173,13 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
 
     Hashtable htCert = new Hashtable();
     htCert.put(new Integer(128), new JMyLabel("128"));
-    htCert.put(new Integer(192), new JMyLabel("192"));
     htCert.put(new Integer(256), new JMyLabel("256"));
-    htCert.put(new Integer(160), new JMyLabel("160"));
-    htCert.put(new Integer(224), new JMyLabel("224"));
+    htCert.put(new Integer(384), new JMyLabel("384"));
+    htCert.put(new Integer(512), new JMyLabel("512"));
 
     if (KeyRecord.DEBUG__ALLOW_SHORT_KEYS) {
       htKey.put(new Integer(KeyRecord.DEBUG__SHORTEST_KEY), new JMyLabel(""+KeyRecord.DEBUG__SHORTEST_KEY));
-      htCert.put(new Integer(KeyRecord.DEBUG__MIN_CERTAINTY), new JMyLabel(""+KeyRecord.DEBUG__MIN_CERTAINTY));
+      htCert.put(new Integer(KeyRecord.DEBUG__CERTAINTY_MIN), new JMyLabel(""+KeyRecord.DEBUG__CERTAINTY_MIN));
     }
 
     jKeyLength.setLabelTable(htKey);

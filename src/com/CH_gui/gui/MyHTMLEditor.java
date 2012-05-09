@@ -1,46 +1,78 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.gui;
 
+import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.ImageNums;
-import com.CH_gui.util.*;
-import comx.Tiger.gui.*;
+import com.CH_gui.util.HTML_ClickablePane;
+import com.CH_gui.util.Images;
+import comx.Tiger.gui.TigerBkgChecker;
+import comx.Tiger.gui.TigerMouseAdapter;
 import comx.tig.en.SingleTigerSession;
-
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
-
 import sferyx.administration.editors.HTMLEditor;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MyHTMLEditor extends HTMLEditor {
 
   private JComponent actionsPanel = null;
 
+  /**
+  * Constructor for VIEWER
+  * @param isSimplified
+  * @param suppressSpellCheck 
+  */
+  public MyHTMLEditor() {
+    super(false, true, false, false, false, false);
+    setSingleParagraphSpacing(true);
+    getPreviewJEditorPane().setBorder(new EmptyBorder(3,3,3,3));
+    HTML_ClickablePane.setBaseToDefault((HTMLDocument) getInternalJEditorPane().getDocument());
+    // Only viewer, no editor
+    setPreviewModeOnly(true);
+    // Enable clickable links - we'll trap them and launch handlers
+    setBrowsingInPreviewEnabled(true);
+    // Remove build in popup
+    setPopupMenuVisible(false);
+    // Don't reset the popup
+    setDontClearPopupMenu(true);
+    // try to remove some flickering of components which are suppose to be hidden from the get-go
+    revalidate();
+  }
+
+  /**
+  * Constructor for EDITOR
+  * @param isSimplified
+  * @param suppressSpellCheck 
+  */
   public MyHTMLEditor(boolean isSimplified, boolean suppressSpellCheck) {
     super(false, false, true, false, false, true);
     if (!suppressSpellCheck)
@@ -64,7 +96,10 @@ public class MyHTMLEditor extends HTMLEditor {
       initToolBarSimple();
     else
       initToolBarExtended();
+    // Hide native toolbar after we copied items we'll be using to our own toolbar
     setToolBarVisible(false);
+    // try to remove some flickering of components which are suppose to be hidden from the get-go
+    revalidate();
   }
 
   public JComponent getActionsPanel() {
@@ -253,9 +288,10 @@ public class MyHTMLEditor extends HTMLEditor {
       if (comp instanceof AbstractButton) {
         AbstractButton ab = (AbstractButton) comp;
         String command = ab.getActionCommand();
-        if (command.equals("font-properties"))
-          actions[0] = ab;
-        else if (command.equals("font-bold"))
+        // removed font-properties because it uses STYLES which are scraped in the chat rendering
+//        if (command.equals("font-properties"))
+//          actions[0] = ab;
+        if (command.equals("font-bold"))
           actions[1] = ab;
         else if (command.equals("font-italic"))
           actions[2] = ab;
@@ -263,8 +299,9 @@ public class MyHTMLEditor extends HTMLEditor {
           actions[3] = ab;
         else if (command.equals("font-foreground"))
           actions[4] = ab;
-        else if (command.equals("font-background"))
-          actions[5] = ab;
+        // removed font-background because it uses STYLES which are scraped in the chat rendering
+//        else if (command.equals("font-background"))
+//          actions[5] = ab;
       }
     }
 
@@ -272,12 +309,12 @@ public class MyHTMLEditor extends HTMLEditor {
     actionsBar.setFloatable(false);
     actionsBar.setBorder(new EmptyBorder(0,0,0,0));
 
-    actionsBar.add(makeDelegatingButton("Change font", ImageNums.EDITOR_FONTS, actions, 0));
+    //actionsBar.add(makeDelegatingButton("Change font", ImageNums.EDITOR_FONTS, actions, 0));
     actionsBar.add(makeDelegatingToggleButton("Bold", ImageNums.EDITOR_BOLD, actions, 1));
     actionsBar.add(makeDelegatingToggleButton("Italic", ImageNums.EDITOR_ITALIC, actions, 2));
     actionsBar.add(makeDelegatingToggleButton("Underline", ImageNums.EDITOR_UNDERLINE, actions, 3));
     actionsBar.add(makeDelegatingButton("Foreground color", ImageNums.EDITOR_COLOR, actions, 4));
-    actionsBar.add(makeDelegatingButton("Highlight", ImageNums.EDITOR_HIGHLIGHT, actions, 5));
+    //actionsBar.add(makeDelegatingButton("Highlight", ImageNums.EDITOR_HIGHLIGHT, actions, 5));
     actionsBar.add(makeDelegatingButton("Insert link", ImageNums.EDITOR_LINK, actions, 6));
 
     JMyButtonNoFocus jEmoticons = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_EMOTICONS));
@@ -291,6 +328,21 @@ public class MyHTMLEditor extends HTMLEditor {
     actionsBar.add(jEmoticons);
 
     actionsPanel = actionsBar;
+  }
+
+  /**
+  * Called when user clicks on a link in a preview mode.
+  * @param url 
+  */
+  public void linkActivated(URL url) {
+    try {
+      if (url.getProtocol().startsWith("http"))
+        BrowserLauncher.openURL(url.toExternalForm());
+      else if (url.getProtocol().startsWith("mail"))
+        new URLLauncherMAILTO().openURL(url, this);
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
   }
 
   private static JMyButtonNoFocus makeDelegatingButton(String toolTip, int iconIndex, final AbstractButton[] delegateToButtons, final int delegateToIndex) {
@@ -337,7 +389,8 @@ public class MyHTMLEditor extends HTMLEditor {
       TigerBkgChecker tigerBkgChecker = new TigerBkgChecker(SingleTigerSession.getSingleInstance());
       ((TigerBkgChecker)tigerBkgChecker).restart(textComp);
       textComp.addMouseListener(new TigerMouseAdapter(this));
-    } catch (Exception e) {
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
   }
 

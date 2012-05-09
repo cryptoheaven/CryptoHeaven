@@ -12,23 +12,29 @@
 
 package com.CH_cl.service.actions.msg;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.MsgDataRecordEvent;
+import com.CH_cl.service.cache.event.MsgLinkRecordEvent;
+import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.records.FolderRecUtil;
-
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.stat.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetLinkAndData_Rp;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
+import com.CH_co.service.msg.dataSets.msg.Msg_ToSymEnc_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rq;
 import com.CH_co.service.records.*;
-
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -48,9 +54,9 @@ import java.util.*;
 */
 public class MsgAGet extends ClientMessageAction {
 
-  public static int MAX_BATCH_MILLIS = 2000;
+  public static int MAX_BATCH_MILLIS = 5000;
   public static boolean suppressAutoFetchContinuation = false;
-  public static Hashtable nextFetchActionsHT;
+  public static HashMap nextFetchActionsHM;
 
   /** Creates new MsgAGet */
   public MsgAGet() {
@@ -405,8 +411,8 @@ public class MsgAGet extends ClientMessageAction {
         if (fetchingFolderRec != null) {
           cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_COMPLETED);
         }
-        if (nextFetchActionsHT != null)
-          nextFetchActionsHT.remove(fetchingFolderId);
+        if (nextFetchActionsHM != null)
+          nextFetchActionsHM.remove(fetchingFolderId);
       } else {
         if (isInterrupted()) {
           interrupt();
@@ -429,8 +435,8 @@ public class MsgAGet extends ClientMessageAction {
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
           double multiplier = ((double) MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time
-          // multiplier cannot make too drastic of a change
-          multiplier = Math.max(0.3, Math.min(10.0, multiplier));
+          // multiplier cannot make too drastic of a change, increase it 10 times at the most or subtract 20% at the most
+          multiplier = Math.max(0.8, Math.min(10.0, multiplier));
 
           // if only new msgs fetched apply adjustment
           if (linkRecords.length == fetchNumNew.shortValue()) {
@@ -471,9 +477,9 @@ public class MsgAGet extends ClientMessageAction {
             msgAction.setInterruptsFrom(this);
             getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
           } else {
-            if (nextFetchActionsHT == null)
-              nextFetchActionsHT = new Hashtable();
-            nextFetchActionsHT.put(fetchingFolderId, msgAction);
+            if (nextFetchActionsHM == null)
+              nextFetchActionsHM = new HashMap();
+            nextFetchActionsHM.put(fetchingFolderId, msgAction);
           }
         }
       }
@@ -485,7 +491,7 @@ public class MsgAGet extends ClientMessageAction {
 
   public static boolean sendNextFetchRequest(ServerInterfaceLayer SIL, Long folderId) {
     boolean anySent = false;
-    MessageAction msgAction = (MessageAction) nextFetchActionsHT.get(folderId);
+    MessageAction msgAction = (MessageAction) nextFetchActionsHM.get(folderId);
     if (msgAction != null) {
       msgAction.restamp();
       SIL.submitAndReturn(msgAction);

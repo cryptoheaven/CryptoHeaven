@@ -1,45 +1,51 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.queue;
 
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.MessageActionNameSwitch;
+import com.CH_co.service.msg.dataSets.file.File_NewFiles_Rq;
+import com.CH_co.service.msg.dataSets.file.File_Transfer_Co;
+import com.CH_co.service.msg.dataSets.msg.Msg_New_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
+import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.trace.Trace;
-
 import java.util.Iterator;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.5 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.5 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class PriorityJobFifo extends PriorityFifo {
 
-  public static final int MAIN_WORKER_HIGH_PRIORITY = 0;
+  public static final int MAIN_WORKER_REAL_TIME_PRIORITY = 0;
+  public static final int MAIN_WORKER_HIGHEST_PRIORITY = 10;
+  public static final int MAIN_WORKER_HIGH_PRIORITY = 20;
+  public static final int MAIN_WORKER_SNAPPY_PRIORITY = 40;
+  public static final int MAIN_WORKER_NORMAL_PRIORITY = 50;
   public static final int MAIN_WORKER_LOW_PRIORITY = 100;
   public static final int MAIN_WORKER_LOWEST_PRIORITY = 200;
 
@@ -58,23 +64,23 @@ public class PriorityJobFifo extends PriorityFifo {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "isJobComputationallyIntensive(int code)");
     if (trace != null) trace.args(code);
     boolean rc = code == CommandCodes.FILE_Q_REMOVE_FILES ||
-                 code == CommandCodes.FLD_Q_REMOVE_FOLDER ||
-                 code == CommandCodes.FLD_Q_REMOVE_FOLDER_SHARES ||
-                 code == CommandCodes.MSG_Q_REMOVE ||
-                 code == CommandCodes.MSG_Q_REMOVE_OLD;
+                code == CommandCodes.FLD_Q_REMOVE_FOLDER ||
+                code == CommandCodes.FLD_Q_REMOVE_FOLDER_SHARES ||
+                code == CommandCodes.MSG_Q_REMOVE ||
+                code == CommandCodes.MSG_Q_REMOVE_OLD;
     if (trace != null) trace.exit(PriorityJobFifo.class, rc);
     return rc;
   }
 
   public static boolean isJobLogin(int code) {
     return code == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
-           code == CommandCodes.SYSENG_Q_LOGIN;
+          code == CommandCodes.SYSENG_Q_LOGIN;
   }
   public static boolean isJobForRetry(MessageAction msgAction) {
     return msgAction != null && !msgAction.areRetriesExceeded() &&
-           !PriorityJobFifo.isJobLogin(msgAction.getActionCode()) &&
-           msgAction.getActionCode() != CommandCodes.SYS_Q_PING &&
-           getJobType(msgAction) != JOB_TYPE_HEAVY;
+          !PriorityJobFifo.isJobLogin(msgAction.getActionCode()) &&
+          msgAction.getActionCode() != CommandCodes.SYS_Q_PING &&
+          getJobType(msgAction) != JOB_TYPE_HEAVY;
   }
 
   public long getJobPriority(MessageAction msgAction) {
@@ -88,10 +94,10 @@ public class PriorityJobFifo extends PriorityFifo {
       switch (code) {
         case CommandCodes.SYS_Q_VERSION :
         case CommandCodes.USR_Q_LOGIN_SECURE_SESSION :
-          priority = MAIN_WORKER_HIGH_PRIORITY + 10;
+          priority = MAIN_WORKER_HIGHEST_PRIORITY;
           break;
         case CommandCodes.SYS_Q_NOTIFY :
-          priority = MAIN_WORKER_HIGH_PRIORITY + 20;
+          priority = MAIN_WORKER_HIGH_PRIORITY;
           break;
         case CommandCodes.FILE_Q_GET_FILES_DATA :
         case CommandCodes.FILE_Q_NEW_FILES :
@@ -137,15 +143,26 @@ public class PriorityJobFifo extends PriorityFifo {
             } catch (Throwable t) {
             }
           } else {
-            priority = MAIN_WORKER_LOW_PRIORITY;
+            priority = MAIN_WORKER_SNAPPY_PRIORITY;
           }
           break;
-        case CommandCodes.FLD_A_GET_FOLDERS :
-          priority = MAIN_WORKER_LOW_PRIORITY + 20;
+        case CommandCodes.MSG_Q_GET_BODY :
+          priority = MAIN_WORKER_SNAPPY_PRIORITY;
           break;
-
-        default :
+        case CommandCodes.FLD_Q_GET_FOLDERS :
           priority = MAIN_WORKER_LOW_PRIORITY;
+          break;
+        case CommandCodes.FILE_Q_GET_FILES_STAGED :
+          priority = MAIN_WORKER_LOW_PRIORITY;
+          break;
+        case CommandCodes.MSG_Q_GET_BRIEFS :
+          priority = MAIN_WORKER_LOW_PRIORITY;
+          break;
+        case CommandCodes.MSG_Q_GET_FULL :
+          priority = MAIN_WORKER_LOW_PRIORITY;
+          break;
+        default :
+          priority = MAIN_WORKER_NORMAL_PRIORITY;
       }
       priorityValue = new Long(priority);
     }
@@ -176,9 +193,9 @@ public class PriorityJobFifo extends PriorityFifo {
   }
 
   /**
-   * @return job type based on the code, new message request is treated as LIGHT (even with attachments)
-   * For HEAVY treatment of new message request with uploadable file attachments, use getJobType(MessageAction) call.
-   */
+  * @return job type based on the code, new message request is treated as LIGHT (even with attachments)
+  * For HEAVY treatment of new message request with uploadable file attachments, use getJobType(MessageAction) call.
+  */
   public static int getJobType(int code) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "getJobType(int code)");
     if (trace != null) trace.args(code);
@@ -204,8 +221,8 @@ public class PriorityJobFifo extends PriorityFifo {
   }
 
   /**
-   * @return a count of jobs matching specified TYPE.
-   */
+  * @return a count of jobs matching specified TYPE.
+  */
   private synchronized int countJobs(int jobType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "countJobs(int jobType)");
     if (trace != null) trace.args(jobType);
@@ -235,8 +252,8 @@ public class PriorityJobFifo extends PriorityFifo {
   } // end countWorkerJobs();
 
   /**
-   * @return a count of jobs matching specified PRIORITY.
-   */
+  * @return a count of jobs matching specified PRIORITY.
+  */
   public synchronized int countJobs(boolean priorityAll, boolean priorityLowest) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "countJobs(boolean priorityAll, boolean priorityLowest)");
     if (trace != null) trace.args(priorityAll);
@@ -260,13 +277,40 @@ public class PriorityJobFifo extends PriorityFifo {
   } // end countWorkerJobs();
 
   /**
-   * Prioritizes and adds a jobs.
-   */
+  * Counts jobs in the queue with higher or equal priority.
+  * Useful for checking number of jobs ahead of the next job if we enqueue it at specified priority.
+  * @param priorityCap
+  * @return 
+  */
+  private int countJobsAhead(long priorityCap) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "countJobsAhead(long priorityCap)");
+    if (trace != null) trace.args(priorityCap);
+    int count = 0;
+    PriorityFifoIterator iter = (PriorityFifoIterator) iterator();
+    while (iter.hasNext()) {
+      Object obj = iter.next();
+      if (obj != null) {
+        count += iter.priority() <= priorityCap ? 1 : 0;
+      }
+    }
+    if (trace != null) trace.exit(PriorityJobFifo.class, count);
+    return count;
+  }
+
+  /**
+  * Prioritizes and adds a jobs.
+  */
   public synchronized void addJob(MessageAction msgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityJobFifo.class, "addJob(MessageAction msgAction)");
     if (trace != null) trace.args(msgAction);
 
-    add(msgAction, getJobPriority(msgAction));
+    long priority = getJobPriority(msgAction);
+    // countJobs ahead 
+    int jobsAhead = countJobsAhead(priority);
+    if (jobsAhead > 0) {
+      if (trace != null) trace.data(10, "jobs ahead of this "+MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()), jobsAhead);
+    }
+    add(msgAction, priority);
 
     if (trace != null) trace.exit(PriorityJobFifo.class);
   }
