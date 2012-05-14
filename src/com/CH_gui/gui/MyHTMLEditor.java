@@ -50,6 +50,7 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
 
   private static String PROPERTY__FONT_RENDERING_ZOOM = "font-rendering-zoom";
   private static int MAX_ZOOM = 6;
+  private static int MIN_ZOOM = 1;
 
   private JComponent actionsPanel = null;
   private AbstractButton[] zoomButtons;
@@ -109,10 +110,12 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
 
     HTML_ClickablePane.setBaseToDefault((HTMLDocument) getInternalJEditorPane().getDocument());
 
-    if (isSimplified)
+    if (isSimplified) {
       initToolBarSimple();
-    else
+      setFontRenderingZoom(MIN_ZOOM);
+    } else {
       initToolBarExtended();
+    }
     // Hide native toolbar after we copied items we'll be using
     setToolBarVisible(false);
     // Use last zoom value -- but don't change zoom for chat composers
@@ -134,10 +137,13 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
       } catch (Throwable t) {
       }
     }
-    if (fontRenderingZoom > -1000)
-      setFontRenderingZoom(fontRenderingZoom);
+    if (fontRenderingZoom < MIN_ZOOM)
+      fontRenderingZoom = MIN_ZOOM;
+    else if (fontRenderingZoom > MAX_ZOOM)
+      fontRenderingZoom = MAX_ZOOM;
+    setFontRenderingZoom(fontRenderingZoom);
     zoomButtons[0].setEnabled(fontRenderingZoom < MAX_ZOOM);
-    zoomButtons[1].setEnabled(fontRenderingZoom > 0);
+    zoomButtons[1].setEnabled(fontRenderingZoom > MIN_ZOOM);
   }
 
   public JComponent getActionsPanel() {
@@ -313,7 +319,7 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
 
   private void initZoomActions() {
     zoomButtons = new AbstractButton[2];
-    final AbstractButton[] actions = new AbstractButton[7];
+    final AbstractButton[] actions = new AbstractButton[2];
 
     Component[] editComps = getEditingToolBar().getComponents();
     for (int i=0; i<editComps.length; i++) {
@@ -497,15 +503,23 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           fontRenderingZoom = getFontRenderingZoom();
+          if (fontRenderingZoom < MIN_ZOOM || fontRenderingZoom > MAX_ZOOM) {
+            if (fontRenderingZoom < MIN_ZOOM)
+              fontRenderingZoom = MIN_ZOOM;
+            else if (fontRenderingZoom > MAX_ZOOM)
+              fontRenderingZoom = MAX_ZOOM;
+            setFontRenderingZoom(fontRenderingZoom);
+            updatePreview();
+          }
           zoomButtons[0].setEnabled(fontRenderingZoom < MAX_ZOOM);
-          zoomButtons[1].setEnabled(fontRenderingZoom > 0);
+          zoomButtons[1].setEnabled(fontRenderingZoom > MIN_ZOOM);
           GlobalProperties.setProperty(PROPERTY__FONT_RENDERING_ZOOM, new Integer(fontRenderingZoom).toString(), FetchedDataCache.getSingleInstance().getMyUserId());
           for (int i=0; i<editorsForZoomSynchL.size(); i++) {
             MyHTMLEditor e = (MyHTMLEditor) editorsForZoomSynchL.get(i);
             if (e != MyHTMLEditor.this) {
               e.setFontRenderingZoom(fontRenderingZoom);
               e.zoomButtons[0].setEnabled(fontRenderingZoom < MAX_ZOOM);
-              e.zoomButtons[1].setEnabled(fontRenderingZoom > 0);
+              e.zoomButtons[1].setEnabled(fontRenderingZoom > MIN_ZOOM);
               e.updatePreview();
             }
           }
