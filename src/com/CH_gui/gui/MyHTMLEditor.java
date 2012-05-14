@@ -12,7 +12,10 @@
 
 package com.CH_gui.gui;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.util.BrowserLauncher;
+import com.CH_co.util.DisposableObj;
+import com.CH_co.util.GlobalProperties;
 import com.CH_co.util.ImageNums;
 import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_gui.util.Images;
@@ -24,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -42,9 +46,17 @@ import sferyx.administration.editors.HTMLEditor;
 * @author  Marcin Kurzawa
 * @version
 */
-public class MyHTMLEditor extends HTMLEditor {
+public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
+
+  private static String PROPERTY__FONT_RENDERING_ZOOM = "font-rendering-zoom";
+  private static int MAX_ZOOM = 6;
 
   private JComponent actionsPanel = null;
+  private AbstractButton[] zoomButtons;
+  private ZoomChangeSynchronizer zoomChangeSynchronizer;
+
+  private static int fontRenderingZoom = -1000;
+  private static ArrayList editorsForZoomSynchL = null;
 
   /**
   * Constructor for VIEWER
@@ -52,7 +64,7 @@ public class MyHTMLEditor extends HTMLEditor {
   * @param suppressSpellCheck 
   */
   public MyHTMLEditor() {
-    super(false, true, false, false, false, false);
+    super(false, true, true, false, false, false);
     setSingleParagraphSpacing(true);
     getPreviewJEditorPane().setBorder(new EmptyBorder(3,3,3,3));
     HTML_ClickablePane.setBaseToDefault((HTMLDocument) getInternalJEditorPane().getDocument());
@@ -64,6 +76,11 @@ public class MyHTMLEditor extends HTMLEditor {
     setPopupMenuVisible(false);
     // Don't reset the popup
     setDontClearPopupMenu(true);
+    initZoomActions();
+    // Hide native toolbar after we copied items we'll be using
+    setToolBarVisible(false);
+    // Use last zoom value
+    initEditorListAndZoomSize();
     // try to remove some flickering of components which are suppose to be hidden from the get-go
     revalidate();
   }
@@ -96,10 +113,31 @@ public class MyHTMLEditor extends HTMLEditor {
       initToolBarSimple();
     else
       initToolBarExtended();
-    // Hide native toolbar after we copied items we'll be using to our own toolbar
+    // Hide native toolbar after we copied items we'll be using
     setToolBarVisible(false);
+    // Use last zoom value -- but don't change zoom for chat composers
+    if (!isSimplified)
+      initEditorListAndZoomSize();
     // try to remove some flickering of components which are suppose to be hidden from the get-go
     revalidate();
+  }
+
+  private void initEditorListAndZoomSize() {
+    if (editorsForZoomSynchL == null)
+      editorsForZoomSynchL = new ArrayList();
+    if (!editorsForZoomSynchL.contains(this))
+      editorsForZoomSynchL.add(this);
+    if (fontRenderingZoom == -1000) {
+      String zoom = GlobalProperties.getProperty(PROPERTY__FONT_RENDERING_ZOOM, null, FetchedDataCache.getSingleInstance().getMyUserId());
+      try {
+        fontRenderingZoom = Integer.parseInt(zoom);
+      } catch (Throwable t) {
+      }
+    }
+    if (fontRenderingZoom > -1000)
+      setFontRenderingZoom(fontRenderingZoom);
+    zoomButtons[0].setEnabled(fontRenderingZoom < MAX_ZOOM);
+    zoomButtons[1].setEnabled(fontRenderingZoom > 0);
   }
 
   public JComponent getActionsPanel() {
@@ -230,6 +268,10 @@ public class MyHTMLEditor extends HTMLEditor {
     actionsBarTop.add(makeDelegatingButton("Table properties", ImageNums.EDITOR_T_PROPERTIES, actionsTop, 16));
     actionsBarTop.add(makeDelegatingButton("Cell properties", ImageNums.EDITOR_T_PROPERTIES_CELL, actionsTop, 17));
 
+    initZoomActions();
+    actionsBarTop.add(zoomButtons[0]);
+    actionsBarTop.add(zoomButtons[1]);
+
     actionsBarBot.add(makeDelegatingButton("Change font", ImageNums.EDITOR_FONTS, actionsBot, 0));
     actionsBarBot.add(makeSeparator());
     actionsBarBot.add(makeDelegatingToggleButton("Bold", ImageNums.EDITOR_BOLD, actionsBot, 1));
@@ -267,6 +309,36 @@ public class MyHTMLEditor extends HTMLEditor {
             GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,0,0,0), 0,0));
     actionsPanel.add(actionsBarBot, new GridBagConstraints(0, 1, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,0,0,0), 0,0));
+  }
+
+  private void initZoomActions() {
+    zoomButtons = new AbstractButton[2];
+    final AbstractButton[] actions = new AbstractButton[7];
+
+    Component[] editComps = getEditingToolBar().getComponents();
+    for (int i=0; i<editComps.length; i++) {
+      Component comp = editComps[i];
+      if (comp instanceof AbstractButton) {
+        AbstractButton ab = (AbstractButton) comp;
+        String command = ab.getActionCommand();
+        if (command.equals("zoomin-text"))
+          actions[0] = ab;
+        else if (command.equals("zoomout-text"))
+          actions[1] = ab;
+      }
+    }
+
+    zoomButtons[0] = makeDelegatingButton("Zoom in", ImageNums.EDITOR_ZOOM_IN, actions, 0);
+    zoomButtons[1] = makeDelegatingButton("Zoom out", ImageNums.EDITOR_ZOOM_OUT, actions, 1);
+    zoomChangeSynchronizer = new ZoomChangeSynchronizer();
+    zoomButtons[0].addActionListener(zoomChangeSynchronizer);
+    zoomButtons[1].addActionListener(zoomChangeSynchronizer);
+  }
+  public AbstractButton getZoomInButton() {
+    return zoomButtons[0];
+  }
+  public AbstractButton getZoomOutButton() {
+    return zoomButtons[1];
   }
 
   private void initToolBarSimple() {
@@ -415,4 +487,31 @@ public class MyHTMLEditor extends HTMLEditor {
     jPop.add(cPanel);
     jPop.show(invoker, 0, invoker.getSize().height);
   }
+
+  public void disposeObj() {
+    editorsForZoomSynchL.remove(this);
+  }
+
+  private class ZoomChangeSynchronizer implements ActionListener {
+    public void actionPerformed(ActionEvent e) {
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          fontRenderingZoom = getFontRenderingZoom();
+          zoomButtons[0].setEnabled(fontRenderingZoom < MAX_ZOOM);
+          zoomButtons[1].setEnabled(fontRenderingZoom > 0);
+          GlobalProperties.setProperty(PROPERTY__FONT_RENDERING_ZOOM, new Integer(fontRenderingZoom).toString(), FetchedDataCache.getSingleInstance().getMyUserId());
+          for (int i=0; i<editorsForZoomSynchL.size(); i++) {
+            MyHTMLEditor e = (MyHTMLEditor) editorsForZoomSynchL.get(i);
+            if (e != MyHTMLEditor.this) {
+              e.setFontRenderingZoom(fontRenderingZoom);
+              e.zoomButtons[0].setEnabled(fontRenderingZoom < MAX_ZOOM);
+              e.zoomButtons[1].setEnabled(fontRenderingZoom > 0);
+              e.updatePreview();
+            }
+          }
+        }
+      });
+    }
+  }
+
 }

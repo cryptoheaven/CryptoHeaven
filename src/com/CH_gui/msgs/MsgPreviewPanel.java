@@ -76,6 +76,7 @@ import javax.swing.text.JTextComponent;
 public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSelectionListener, MsgDataProviderI, VisualsSavable, DisposableObj {
 
   private static boolean ENABLE_SFERYX_AS_HTML_RENDERER = true;
+  private static boolean ENABLE_PLAIN_RENDERER = false;
 
   private Action[] actions;
 
@@ -459,13 +460,28 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       }
     }));
 
-    this.jTextMessage = makeTextPane(false);
+    if (ENABLE_PLAIN_RENDERER) {
+      this.jTextMessage = makeTextPane(false);
+    }
     this.jHtmlMessage = makeTextPane(true);
 
     if (isHTML) {
       jMessage = jHtmlMessage;
     } else {
       jMessage = jTextMessage;
+    }
+
+    AbstractButton jZoomIn = null;
+    AbstractButton jZoomOut = null;
+    if (jHtmlMessage instanceof MyHTMLEditor) {
+      jZoomIn = ((MyHTMLEditor) jHtmlMessage).getZoomInButton();
+      jZoomIn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      jZoomIn.setBorder(new EmptyBorder(1, 1, 1, 1));
+      jZoomIn.setSize(16,16);
+      jZoomOut = ((MyHTMLEditor) jHtmlMessage).getZoomOutButton();
+      jZoomOut.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      jZoomOut.setBorder(new EmptyBorder(1, 1, 1, 1));
+      jZoomOut.setSize(16,16);
     }
 
     jLinePriority = new JPanel(new GridBagLayout());
@@ -617,7 +633,13 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineSubject.add(jAttachment, new GridBagConstraints(8, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    jLineSubject.add(jPrint, new GridBagConstraints(9, 0, 1, 1, 0, 0,
+    if (jZoomIn != null && jZoomOut != null) {
+      jLineSubject.add(jZoomIn, new GridBagConstraints(9, 0, 1, 1, 0, 0,
+            GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
+      jLineSubject.add(jZoomOut, new GridBagConstraints(10, 0, 1, 1, 0, 0,
+            GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    }
+    jLineSubject.add(jPrint, new GridBagConstraints(11, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
 
@@ -824,7 +846,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (isChange) {
       isHTML = isHtml;
       try {
-        if (isHTML) {
+        if (isHTML || jTextMessage == null) {
           jMessage = jHtmlMessage;
         } else {
           jMessage = jTextMessage;
@@ -1459,6 +1481,12 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 }
               }
             }
+          }
+
+          // See if we should convert PLAIN to HTML because the 
+          // message  is plain and our viewer is not plain.
+          if (!msgDataRecord.isHtml() && !(jMessage instanceof JTextArea)) {
+            text = Misc.encodePlainIntoHtml(text);
           }
 
           MsgPanelUtils.setPreviewContent_Threaded(text, isHTML, convertHTMLtoPLAIN, skipHeaderClearing, skipRemoteLoadingCleaning, jMessage);

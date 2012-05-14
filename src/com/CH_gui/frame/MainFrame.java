@@ -870,7 +870,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         new SubUserTableFrame();
       } else {
         String urlStr = "\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + myUserRec.userId + "&account=2\""; // account 2 for business
-        String htmlText = "";
+        String htmlText;
         if (myUserRec.isBusinessSubAccount()) {
           htmlText = "<html>You cannot manage other user accounts.  If you would like to change your personal options, use Account Options instead.  To change your storage quotas or special permissions, please contact your administrator for assistance.</html>";
         } else {
@@ -1064,7 +1064,12 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
   private void exitAction() {
     // check for modified files that could not start uploading
-    FileLobUpEditMonitor.FileSet[] modifiedSets = FileLobUpEditMonitor.getModifiedFileSets();
+    FileLobUpEditMonitor.FileSet[] modifiedSets = null;
+    try {
+      modifiedSets = FileLobUpEditMonitor.getModifiedFileSets();
+    } catch (NoClassDefFoundError e) {
+      // recompiling project usually causes the exit to fail here - so skip this error
+    }
 
     // check for active transfers
     ArrayList activeUps = FileLobUp.getStateSessions();
@@ -1094,9 +1099,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       };
       String summary = FileLobUp.getSummary();
       String progress = FileLobUp.getProgress();
-      String title = "";
-      String msg = "";
-      int severityLevel = 0;
+      String title;
+      String msg;
+      int severityLevel;
       if (!anyModifications) {
         severityLevel = NotificationCenter.WARNING_MESSAGE;
         title = "Recent file transfers are incomplete!";
@@ -1125,13 +1130,18 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
   }
   private void exitActionCheckOpenFiles_Threaded(final boolean suppressErrors) {
-    FileLobUpEditMonitor.FileSet[] monitoredFiles = FileLobUpEditMonitor.getMonitoredFileSets();
-    if (monitoredFiles != null && monitoredFiles.length > 0) {
+    FileLobUpEditMonitor.FileSet[] monitoredSets = null;
+    try {
+      monitoredSets = FileLobUpEditMonitor.getModifiedFileSets();
+    } catch (NoClassDefFoundError e) {
+      // recompiling project usually causes the exit to fail here - so skip this error
+    }
+    if (monitoredSets != null && monitoredSets.length > 0) {
       File tempDir = DownloadUtilities.getDefaultTempDir();
       ArrayList wipeLocalFilesL = new ArrayList();
       long totalSize = 0;
-      for (int i=0; i<monitoredFiles.length; i++) {
-        FileLobUpEditMonitor.FileSet set = monitoredFiles[i];
+      for (int i=0; i<monitoredSets.length; i++) {
+        FileLobUpEditMonitor.FileSet set = monitoredSets[i];
         File file = set.getLocalFile();
         if (file.exists()) {
           File dir = file.getParentFile();

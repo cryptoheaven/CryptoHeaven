@@ -447,6 +447,8 @@ public class ImageNums extends Object {
   public static final int EDITOR_T_SELECT_ROW;
   public static final int EDITOR_T_SPLIT;
   public static final int EDITOR_UNDERLINE;
+  public static final int EDITOR_ZOOM_IN;
+  public static final int EDITOR_ZOOM_OUT;
 
   // emotions
   public static final int EM_ARROW_LEFT;
@@ -521,7 +523,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[366+50]; // plus emotions
+    images = new String[368+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -1592,6 +1594,10 @@ public class ImageNums extends Object {
     images[i] = "editor-t-split.png"; i++;
     EDITOR_UNDERLINE = i;
     images[i] = "editor-underline.png"; i++;
+    EDITOR_ZOOM_IN = i;
+    images[i] = "editor-zoomin.png"; i++;
+    EDITOR_ZOOM_OUT = i;
+    images[i] = "editor-zoomout.png"; i++;
 
     EM_ARROW_LEFT     = i;    images[i] = "emotions/arrow-left.gif";     i++;
     EM_ARROW_RIGHT    = i;    images[i] = "emotions/arrow-right.gif";    i++;
