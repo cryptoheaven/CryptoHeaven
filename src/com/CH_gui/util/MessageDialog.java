@@ -202,10 +202,10 @@ public class MessageDialog extends Object {
         Dimension dim = dialog.getSize();
         int width = dim.width;
         int height = dim.height;
-        width = Math.min(width, 500); // make the dialog smaller if too big
+        width = Math.min(width, 550); // make the dialog smaller if too big
         if (sizeAboveMinimum)
           width = Math.max(width, 250); // keep dialog at some minimum size, no less
-        height = Math.min(height, 410); // make the dialog smaller if too big // must be big enough to accomodate email sending warning
+        height = Math.min(height, 450); // make the dialog smaller if too big // must be big enough to accomodate email sending warning
         if (sizeAboveMinimum)
           height = Math.max(height, 250); // keep dialog at some minimum size, no less
         dialog.setSize(width, height);

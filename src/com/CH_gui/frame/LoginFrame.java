@@ -59,9 +59,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.Keymap;
@@ -576,7 +578,7 @@ public class LoginFrame extends JFrame {
   private int estimateKeyGenerationTimeNow(int keyLength, int certainty) {
     synchronized (estimateMonitor) {
       if (estimatedTime == null) {
-        estimatedTime = new Integer(LoginFrame.estimateGenerationTime(keyLength, certainty));
+        estimatedTime = new Integer(RSAKeyPairGenerator.estimateGenerationTime(keyLength, certainty));
       }
       return estimatedTime.intValue();
     }
@@ -1840,36 +1842,6 @@ public class LoginFrame extends JFrame {
     return isSuccess;
   }
 
-
-  /**
-  * @return approximate time the key generation will run in seconds.
-  */
-  public static int estimateGenerationTime(int keyLength, int certainty) {
-    // make sure the secure random is initialized
-    Rnd.initSecureRandom();
-    try {
-      // rest for 1 second so that things have a change to seattle down
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-    }
-
-    Date start = new Date();
-    // average out 5 quick runs
-    for (int i=0; i<5; i++) {
-      RSAKeyPairGenerator.generateKeyPair(512, 128);
-    }
-    Date end = new Date();
-    double tDiff = (end.getTime() - start.getTime()) / 5.0;
-    // tDiff should be about 420 ms on a reference machine that the following approx. can be used
-    // use the approximation curve 6.42*10^(-9) * keyLength^(2.867)
-
-    // find a scale for this machine
-    double scale = tDiff / 420.0;
-    double expectedTime = ( ((double)certainty)/128.0 ) * 0.00000642 * Math.pow(keyLength, 2.867) * scale;
-    // add 30%
-    expectedTime *= 1.3;
-    return (int) (expectedTime / 1000.0);
-  }
 
   private String getUserName() {
     return userName.getText().trim();

@@ -1,32 +1,32 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.cryptx;
 
+import com.CH_co.monitor.Interrupter;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Random;
 
-import com.CH_co.monitor.Interrupter;
-
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+*
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class RSAKeyPairGenerator extends Object {
 
   public static final int DEFAULT_CERTAINTY = 128;
@@ -38,7 +38,7 @@ public class RSAKeyPairGenerator extends Object {
   private transient int certainty = DEFAULT_CERTAINTY;
   private transient Random random;
 
-   /** Creates new RSAKeyPairGenerator */
+  /** Creates new RSAKeyPairGenerator */
   public RSAKeyPairGenerator() {
   }
 
@@ -57,7 +57,35 @@ public class RSAKeyPairGenerator extends Object {
     this.random = random;
   }
 
-  // statics
+  /**
+  * @return approximate time the key generation will run in seconds.
+  */
+  public static int estimateGenerationTime(int keyLength, int certainty) {
+    // make sure the secure random is initialized
+    Rnd.initSecureRandom();
+    try {
+      // rest for 1 second so that things have a change to seattle down
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+    }
+
+    Date start = new Date();
+    // average out 5 quick runs
+    for (int i=0; i<5; i++) {
+      RSAKeyPairGenerator.generateKeyPair(512, 128);
+    }
+    Date end = new Date();
+    double tDiff = (end.getTime() - start.getTime()) / 5.0;
+    // tDiff should be about 420 ms on a reference machine that the following approx. can be used
+    // use the approximation curve 6.42*10^(-9) * keyLength^(2.867)
+
+    // find a scale for this machine
+    double scale = tDiff / 420.0;
+    double expectedTime = ( ((double)certainty)/128.0 ) * 0.00000642 * Math.pow(keyLength, 2.867) * scale;
+    // add 30%
+    expectedTime *= 1.3;
+    return (int) (expectedTime / 1000.0);
+  }
 
   public static RSAKeyPair generateKeyPair(int strength) {
     return generateKeyPair(strength, DEFAULT_CERTAINTY, Rnd.getSecureRandom());
@@ -72,7 +100,7 @@ public class RSAKeyPairGenerator extends Object {
     return generateKeyPair(strength, certainty, Rnd.getSecureRandom(), interrupter);
   }
 
-   /** 
+  /** 
     * @return RSA key pair of the minimum (or higher) strength specified using 
     * specified minimum certainty that selected numbers are prime within 1-(1/2)^certainty.
     * @param random source of randomness for selection of prime numbers.
@@ -85,9 +113,9 @@ public class RSAKeyPairGenerator extends Object {
 
       boolean interrupted = false;
       /*
-       * Each part of the key should be half the given strength, 
-       * plus some margin, better to be stronger than weaker.
-       */
+      * Each part of the key should be half the given strength, 
+      * plus some margin, better to be stronger than weaker.
+      */
       int keyStrength1 = strength / 2 + 1;
       int keyStrength2 = strength / 2 + 1;
 
@@ -99,9 +127,9 @@ public class RSAKeyPairGenerator extends Object {
             p = new BigInteger(keyStrength1, certainty, random);
             if (interrupted || (interrupter != null && (interrupted=interrupter.isInterrupted()))) break;
             /**
-             * Generate a random number of strength bits that is a
-             * probable prime with a certainty of 1 - 1/2**certainty.
-             */
+            * Generate a random number of strength bits that is a
+            * probable prime with a certainty of 1 - 1/2**certainty.
+            */
             q = new BigInteger(keyStrength2, certainty, random);
             if (interrupted || (interrupter != null && (interrupted=interrupter.isInterrupted()))) break;
             n = p.multiply(q);
@@ -111,7 +139,7 @@ public class RSAKeyPairGenerator extends Object {
           if (interrupted || (interrupter != null && (interrupted=interrupter.isInterrupted()))) break;
           if (p.compareTo(q) < 0) {
             // swap
-             BigInteger tmp = p; p = q; q = tmp;
+            BigInteger tmp = p; p = q; q = tmp;
           }
 
           if (interrupted || (interrupter != null && (interrupted=interrupter.isInterrupted()))) break;
@@ -130,7 +158,7 @@ public class RSAKeyPairGenerator extends Object {
           /*
           e = BigInteger.valueOf(17);
           while (!e.gcd(phi).equals(one))
-             e = e.add(two);
+            e = e.add(two);
           */
 
           if (interrupted || (interrupter != null && (interrupted=interrupter.isInterrupted()))) break;
@@ -144,8 +172,8 @@ public class RSAKeyPairGenerator extends Object {
       // Decryption function: (C) = (C^D) mod PQ   where C is the ciphertext (a positive integer)
 
       /*
-       * create the factors for the private key
-       */
+      * create the factors for the private key
+      */
       BigInteger dP=null, dQ=null, qInv=null;
       while (true) { // loop only for conveniance so we can break-out with interrupt
         if (interrupted || (interrupter != null && (interrupted=interrupter.isInterrupted()))) break;
@@ -161,6 +189,6 @@ public class RSAKeyPairGenerator extends Object {
         return null;
       else 
         return new RSAKeyPair(new RSAPublicKey(e, n), new RSAPrivateKey(d, p, q, dP, dQ, qInv));
-   }
+  }
 
 }

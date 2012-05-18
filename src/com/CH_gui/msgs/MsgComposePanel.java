@@ -1035,9 +1035,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
       int posY = 0;
       //String msgText = "Unable to find public keys for the following addresses: ";
-      String msgText1 = "Your message cannot be automatically encrypted for all recipients;";
-      String msgText2 = "however, it can be encrypted using a Question and Answer. To read the";
-      String msgText3 = "message the recipient will have to answer the question correctly.";
+      String msgText1 = "Your message cannot be automatically encrypted for all recipients; ";
+      String msgText2 = "however, it can be encrypted using a Question and Answer. To read the ";
+      String msgText3 = "message your recipient will have to answer the question correctly. ";
       panel.add(new JMyLabel(msgText1), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 1, 10), 0, 0));
       posY ++;

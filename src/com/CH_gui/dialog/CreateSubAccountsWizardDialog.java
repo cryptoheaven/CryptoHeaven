@@ -12,38 +12,44 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.cryptx.*;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_cl.service.records.filters.SubUserFilter;
+import com.CH_co.cryptx.BAEncodedPassword;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.cryptx.RSAKeyPair;
+import com.CH_co.cryptx.RSAKeyPairGenerator;
 import com.CH_co.monitor.Interrupter;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.cnt.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.cnt.Cnt_NewCnt_Rq;
 import com.CH_co.service.msg.dataSets.key.Key_KeyRecov_Co;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
+import com.CH_co.service.msg.dataSets.msg.Msg_New_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.usr.Usr_GetSubAcc_Rp;
+import com.CH_co.service.msg.dataSets.usr.Usr_NewUsr_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-import com.CH_co.trace.*;
-
-import com.CH_gui.frame.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
+import com.CH_gui.frame.LoginFrame;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.usrs.*;
-import com.CH_gui.util.MiscGui;
+import com.CH_gui.msgs.SendMessageRunner;
+import com.CH_gui.usrs.AccountOptionPermitChecks;
 import com.CH_gui.util.MessageDialog;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.util.MiscGui;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Vector;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -763,7 +769,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
   private int estimateKeyGenerationTimeNow(int keyLength, int certainty) {
     synchronized (estimateMonitor) {
       if (estimatedTime == null) {
-        estimatedTime = new Integer(LoginFrame.estimateGenerationTime(keyLength, certainty) * accountsV.size());
+        estimatedTime = new Integer(RSAKeyPairGenerator.estimateGenerationTime(keyLength, certainty) * accountsV.size());
       }
       return estimatedTime.intValue();
     }
