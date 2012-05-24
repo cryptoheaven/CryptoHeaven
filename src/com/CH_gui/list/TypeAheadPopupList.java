@@ -464,7 +464,7 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
           }
           keyEvent.consume();
           if (focusEscapeWithTab || isSingleItemList) {
-            if (keyEvent.getModifiers() == KeyEvent.VK_SHIFT)
+            if (keyEvent.isShiftDown())
               textComp.transferFocusBackward();
             else
               textComp.transferFocus();
