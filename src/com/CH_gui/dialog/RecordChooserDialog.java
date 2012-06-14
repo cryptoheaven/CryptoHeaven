@@ -170,7 +170,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordChooserDialog.class, "createButtons()");
     JButton[] buttons = new JButton[4];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Done"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Done"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
@@ -188,7 +188,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     });
     jReset = buttons[1];
     */
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Remove_All"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Remove_All"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedRemoveAll();
@@ -196,7 +196,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     });
     jRemoveAll = buttons[1];
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Remove"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Remove"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedRemove();
@@ -204,7 +204,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     });
     jRemove = buttons[2];
 
-    buttons[3] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[3] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[3].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -256,7 +256,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     JPanel jTreePanel = new JPanel();
     jTreePanel.setBorder(new EmptyBorder(0,0,0,0));
     jTreePanel.setLayout(new GridBagLayout());
-    jTreePanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_From_Folder")), new GridBagConstraints(0, 0, 1, 1, 10, 0, 
+    jTreePanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_From_Folder")), new GridBagConstraints(0, 0, 1, 1, 10, 0, 
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
     jTreePanel.add(new JSeparator(), new GridBagConstraints(0, 1, 1, 1, 10, 0, 
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
@@ -277,7 +277,7 @@ public class RecordChooserDialog extends GeneralDialog implements VisualsSavable
     JPanel jListPanel = new JPanel();
     jListPanel.setBorder(new EmptyBorder(0,0,0,0));
     jListPanel.setLayout(new GridBagLayout());
-    jListPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_choices")), new GridBagConstraints(0, 0, 1, 1, 10, 0, 
+    jListPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Current_choices")), new GridBagConstraints(0, 0, 1, 1, 10, 0, 
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));
     jListPanel.add(new JSeparator(), new GridBagConstraints(0, 1, 1, 1, 10, 0, 
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 5, 3, 5), 0, 0));

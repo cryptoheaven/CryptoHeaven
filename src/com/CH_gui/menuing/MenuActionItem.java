@@ -35,7 +35,7 @@ import com.CH_gui.list.List_Viewable;
  */
 public class MenuActionItem extends Object implements List_Viewable, Cloneable {
 
-  public static String STR_SEPARATOR = com.CH_gui.lang.Lang.rb.getString("Separator");
+  public static String STR_SEPARATOR = com.CH_cl.lang.Lang.rb.getString("Separator");
 
   /** Name of the menu or menu item that is expected, or already showing. */
   private String menuName;

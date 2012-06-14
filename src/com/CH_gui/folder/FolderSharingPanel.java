@@ -254,7 +254,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
 
 
     JPanel jSharePanel = new JPanel();
-    jSharePanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_gui.lang.Lang.rb.getString("title_Currently_Authorized_Users")));
+    jSharePanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_cl.lang.Lang.rb.getString("title_Currently_Authorized_Users")));
     // dummy
     add(jSharePanel, new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 5, 5), 0, 0));
@@ -285,7 +285,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    jSharePanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    jSharePanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jShareDesc = new JMyTextArea(3, 20);
     if (!isFolderCreationMode)
@@ -310,7 +310,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     });
     jSharePanel.add(tablePane, new GridBagConstraints(1, posY, 1, 3, 10, 20,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
-    jAdd = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Add"));
+    jAdd = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Add"));
     jAdd.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedAdd();
@@ -320,7 +320,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    jRemove = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Remove"));
+    jRemove = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Remove"));
     jRemove.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedRemove();
@@ -447,9 +447,9 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
           if (i<noFldShareContacts.length-1)
             sb.append(", ");
         }
-        String warnMsg = com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_folder_sharing_permission_disabled...");
+        String warnMsg = com.CH_cl.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_folder_sharing_permission_disabled...");
         warnMsg += "\n\n" + sb.toString();
-        String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission.");
+        String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission.");
         MessageDialog.showDialog(FolderSharingPanel.this, warnMsg, title, NotificationCenter.WARNING_MESSAGE, false);
       }
 
@@ -553,27 +553,27 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     if (!amIOwner) {
       if (!canIAdd && !canIRemove) {
         if (folderType == FolderRecord.GROUP_FOLDER)
-          msg = com.CH_gui.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_group...");
+          msg = com.CH_cl.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_group...");
         else
-          msg = com.CH_gui.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_folder...");
+          msg = com.CH_cl.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_folder...");
       } else {
         if (folderType == FolderRecord.GROUP_FOLDER)
-          msg = com.CH_gui.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_group_with_limited_ability_to_change_membership_properties...");
+          msg = com.CH_cl.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_group_with_limited_ability_to_change_membership_properties...");
         else
-          msg = com.CH_gui.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_folder_with_limited_ability_to_change_sharing_properties...");
+          msg = com.CH_cl.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_folder_with_limited_ability_to_change_sharing_properties...");
       }
     }
     else if (isSharableType) {// && !isMySuperRoot)
       if (folderType == FolderRecord.GROUP_FOLDER)
-        msg = com.CH_gui.lang.Lang.rb.getString("label_You_can_share_this_group_among_other_users_in_your_contact_list...");
+        msg = com.CH_cl.lang.Lang.rb.getString("label_You_can_share_this_group_among_other_users_in_your_contact_list...");
       else
-        msg = com.CH_gui.lang.Lang.rb.getString("label_You_can_share_this_folder_among_other_users_in_your_contact_list...");
+        msg = com.CH_cl.lang.Lang.rb.getString("label_You_can_share_this_folder_among_other_users_in_your_contact_list...");
 //    else if (isSharableType && isMySuperRoot)
 //      msg = com.CH_gui.lang.Lang.rb.getString("label_You_cannot_share_a_super_root_folder...");
     } else if (!isSharableType) {
-      msg = com.CH_gui.lang.Lang.rb.getString("label_Folders_of_this_type_are_not_sharable.");
+      msg = com.CH_cl.lang.Lang.rb.getString("label_Folders_of_this_type_are_not_sharable.");
     } else {
-      msg = com.CH_gui.lang.Lang.rb.getString("label_Unexpected_folder_type.");
+      msg = com.CH_cl.lang.Lang.rb.getString("label_Unexpected_folder_type.");
     }
 
     jShareMsg.setText(msg);
@@ -583,16 +583,16 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     this.folderType = folderType;
     setShareMsg();
     String labelText = null;
-    String labelText1 = com.CH_gui.lang.Lang.rb.getString("label_Input_Group_Name_here");
-    String labelText2 = com.CH_gui.lang.Lang.rb.getString("label_Input_Share_Name_here");
+    String labelText1 = com.CH_cl.lang.Lang.rb.getString("label_Input_Group_Name_here");
+    String labelText2 = com.CH_cl.lang.Lang.rb.getString("label_Input_Share_Name_here");
     if (folderType == FolderRecord.GROUP_FOLDER) {
       ShareTableModel.columnHeaderDatas[1].applyToTable(tablePane.getJSortedTable());
       jShareIcon.setIcon(Images.get(ImageNums.PEOPLE48));
       if (jRadioInheritSharing != null)
-        jRadioInheritSharing.setText(com.CH_gui.lang.Lang.rb.getString("radio_Inherit_membership_properties_from_parent_folder."));
-      jRadioDoNotShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Do_not_share_this_group."));
-      jRadioDoShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Customize_group_memberships."));
-      jShareLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Group_Name"));
+        jRadioInheritSharing.setText(com.CH_cl.lang.Lang.rb.getString("radio_Inherit_membership_properties_from_parent_folder."));
+      jRadioDoNotShare.setText(com.CH_cl.lang.Lang.rb.getString("radio_Do_not_share_this_group."));
+      jRadioDoShare.setText(com.CH_cl.lang.Lang.rb.getString("radio_Customize_group_memberships."));
+      jShareLabel.setText(com.CH_cl.lang.Lang.rb.getString("label_Group_Name"));
       labelText = labelText1;
     } else {
       ShareTableModel.columnHeaderDatas[0].applyToTable(tablePane.getJSortedTable());
@@ -603,10 +603,10 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
       else
         jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED48));
       if (jRadioInheritSharing != null)
-        jRadioInheritSharing.setText(com.CH_gui.lang.Lang.rb.getString("radio_Inherit_sharing_properties_from_parent_folder."));
-      jRadioDoNotShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Do_not_share_this_folder."));
-      jRadioDoShare.setText(com.CH_gui.lang.Lang.rb.getString("radio_Customize_sharing_properties."));
-      jShareLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Share_Name"));
+        jRadioInheritSharing.setText(com.CH_cl.lang.Lang.rb.getString("radio_Inherit_sharing_properties_from_parent_folder."));
+      jRadioDoNotShare.setText(com.CH_cl.lang.Lang.rb.getString("radio_Do_not_share_this_folder."));
+      jRadioDoShare.setText(com.CH_cl.lang.Lang.rb.getString("radio_Customize_sharing_properties."));
+      jShareLabel.setText(com.CH_cl.lang.Lang.rb.getString("label_Share_Name"));
       labelText = labelText2;
     }
     if (jShareName.getText().equals("") || jShareName.getText().equals(labelText1) || jShareName.getText().equals(labelText2)) {

@@ -1,56 +1,60 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.recycleTable;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.UploadUtilities;
 import com.CH_cl.service.records.filters.FileFilter;
-
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
-
-import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-
-import java.awt.*;
+import com.CH_gui.fileTable.FileActionTable;
+import com.CH_gui.fileTable.FileDND_Transferable;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.frame.MessageFrame;
+import com.CH_gui.msgTable.MsgActionTable;
+import com.CH_gui.msgTable.MsgDND_Transferable;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableModel;
+import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import javax.swing.ListSelectionModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.1 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.1 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class RecycleDND_DropTargetListener extends Object implements DropTargetListener {
 
   private RecycleActionTable recycleActionTable;
@@ -171,7 +175,7 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
         RecycleDND_TransferableData transferRecs = (RecycleDND_TransferableData) tr.getTransferData(RecycleDND_Transferable.RECYCLE_RECORD_FLAVOR);
         event.acceptDrop(DnDConstants.ACTION_MOVE);
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        FolderPair moveToPair = CacheUtilities.convertRecordToPair(uploadShareRec);
+        FolderPair moveToPair = CacheFldUtils.convertRecordToPair(uploadShareRec);
         // move Files and Folders
         FileLinkRecord[] fLinks = null;
         if (transferRecs.recycleRecordIDs[2] != null)
@@ -179,7 +183,7 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
         else 
           fLinks = cache.getFileLinkRecords(transferRecs.recycleRecordIDs[1]);
         FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
-        FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
+        FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
         // move Msgs
         MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(transferRecs.recycleRecordIDs[3]);
         MsgLinkRecord[] mLinksFiltered = (MsgLinkRecord[]) new MsgFilter(Record.RECORD_TYPE_FOLDER, moveToPair.getId()).filterExclude(mLinks);

@@ -40,7 +40,7 @@ public class LocalFileTableFrame extends JActionFrameClosable {
 
   /** Creates new FileTableFrame */
   public LocalFileTableFrame(String propertyName) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Local_File_System_View"), true, true);
+    super(com.CH_cl.lang.Lang.rb.getString("title_Local_File_System_View"), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableFrame.class, "FileTableFrame()");
 
     FileChooserComponent mainComponent = new FileChooserComponent(propertyName);

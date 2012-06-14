@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.statTable;
 
@@ -30,32 +30,31 @@ import com.CH_gui.list.ListRenderer;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
-import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.20 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.20 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class StatTableModel extends RecordTableModel {
 
   // Parent is either MsgLinkRecord or FileLinkRecord
   private Record parentObjLink;
 
-  private static String STR_USER = com.CH_gui.lang.Lang.rb.getString("column_User");
-  private static String STR_FIRST_SEEN = com.CH_gui.lang.Lang.rb.getString("column_First_Seen");
-  private static String STR_CONTENT_RETRIEVED = com.CH_gui.lang.Lang.rb.getString("column_Content_Retrieved");
+  private static String STR_USER = com.CH_cl.lang.Lang.rb.getString("column_User");
+  private static String STR_FIRST_SEEN = com.CH_cl.lang.Lang.rb.getString("column_First_Seen");
+  private static String STR_CONTENT_RETRIEVED = com.CH_cl.lang.Lang.rb.getString("column_Content_Retrieved");
 
   private static final ColumnHeaderData columnHeaderData = 
       new ColumnHeaderData(new Object[][]
@@ -93,17 +92,16 @@ public class StatTableModel extends RecordTableModel {
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return null;
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
+  public void clearCachedFetchedFolderIDs() {
   }
 
   /**
-   * Sets auto update mode by listening on the cache stat updates.
-   */
+  * Sets auto update mode by listening on the cache stat updates.
+  */
   public void setAutoUpdate(boolean flag) {
   }
 
@@ -185,8 +183,8 @@ public class StatTableModel extends RecordTableModel {
   }
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public boolean isContentFetched(Long shareId) {
     return false;
   }

@@ -74,14 +74,14 @@ public class TraceRecordDialog extends GeneralDialog implements VisualsSavable {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgDataRecord msgData = cache.getMsgDataRecord(((MsgLinkRecord) parentObjLinks[0]).msgId);
         if (msgData != null && msgData.isTypeAddress())
-          return com.CH_gui.lang.Lang.rb.getString("title_Address_Access_Trace");
+          return com.CH_cl.lang.Lang.rb.getString("title_Address_Access_Trace");
         else
-          return com.CH_gui.lang.Lang.rb.getString("title_Message_Access_Trace");
+          return com.CH_cl.lang.Lang.rb.getString("title_Message_Access_Trace");
       } else if (parentObjLinks[0] instanceof FileLinkRecord) {
-        return com.CH_gui.lang.Lang.rb.getString("title_File_Access_Trace");
+        return com.CH_cl.lang.Lang.rb.getString("title_File_Access_Trace");
       }
     }
-    return com.CH_gui.lang.Lang.rb.getString("title_Access_Trace");
+    return com.CH_cl.lang.Lang.rb.getString("title_Access_Trace");
   }
 
   private void initialize(Component owner, Record[] parentObjLinks) {
@@ -94,7 +94,7 @@ public class TraceRecordDialog extends GeneralDialog implements VisualsSavable {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[1];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Close"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new CloseActionListener());
 

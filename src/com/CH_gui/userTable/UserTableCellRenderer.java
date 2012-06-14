@@ -1,47 +1,47 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.userTable;
 
-import com.CH_gui.util.Images;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.JTable;
-import javax.swing.table.*;
-
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_co.service.records.EmailRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.util.Misc;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.util.Images;
+import java.awt.Component;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.21 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.21 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class UserTableCellRenderer extends RecordTableCellRenderer {
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -62,7 +62,7 @@ public class UserTableCellRenderer extends RecordTableCellRenderer {
           UserRecord uRec = (UserRecord) tm.getRowObject(sTable.convertMyRowIndexToModel(row));
 
           // Convert UserRecord to possibly a ContactRecord if we have one... note the name may change.
-          Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
           setIcon(ListRenderer.getRenderedIcon(rec));
           if (rec instanceof UserRecord) {
             // do nothing, username is already there
@@ -96,29 +96,29 @@ public class UserTableCellRenderer extends RecordTableCellRenderer {
         boolean emailRegOk = (accSpam & UserRecord.ACC_SPAM_YES_REG_EMAIL) != 0;
         boolean emailSslOk = (accSpam & UserRecord.ACC_SPAM_YES_SSL_EMAIL) != 0;
         if (innerOk && emailRegOk && emailSslOk) {
-          setText(com.CH_gui.lang.Lang.rb.getString("messaging_All"));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("messagingTip_General_public_may_send_messages_to_this_user_without_special_authorization."));
+          setText(com.CH_cl.lang.Lang.rb.getString("messaging_All"));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("messagingTip_General_public_may_send_messages_to_this_user_without_special_authorization."));
         } else if (!innerOk && !emailRegOk && !emailSslOk) {
-          setText(com.CH_gui.lang.Lang.rb.getString("messaging_Contacts"));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("messagingTip_Only_people_having_an_Active_Contact_with_this_user_are_authorized_to_send_him_messages."));
+          setText(com.CH_cl.lang.Lang.rb.getString("messaging_Contacts"));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("messagingTip_Only_people_having_an_Active_Contact_with_this_user_are_authorized_to_send_him_messages."));
         } else if (!innerOk && emailRegOk && emailSslOk) {
-          setText(com.CH_gui.lang.Lang.rb.getString("messaging_Email"));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("messagingTip_Only_people_having_an_Active_Contact_with_this_user_are_authorized_to_send_him_messages._This_user_also_accepts_email_correspondance."));
+          setText(com.CH_cl.lang.Lang.rb.getString("messaging_Email"));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("messagingTip_Only_people_having_an_Active_Contact_with_this_user_are_authorized_to_send_him_messages._This_user_also_accepts_email_correspondance."));
         } else if (innerOk && !emailRegOk && !emailSslOk) {
-          setText(com.CH_gui.lang.Lang.rb.getString("messaging_Members"));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("messagingTip_Only_members_can_message_this_user."));
+          setText(com.CH_cl.lang.Lang.rb.getString("messaging_Members"));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("messagingTip_Only_members_can_message_this_user."));
         } else {
           String text = "";
           if (innerOk) {
-            text += com.CH_gui.lang.Lang.rb.getString("messaging_Members");
+            text += com.CH_cl.lang.Lang.rb.getString("messaging_Members");
           }
           if (emailRegOk) {
             if (text.length() > 0) text += ", ";
-            text += com.CH_gui.lang.Lang.rb.getString("messaging_Regular_Email");
+            text += com.CH_cl.lang.Lang.rb.getString("messaging_Regular_Email");
           }
           if (emailSslOk) {
             if (text.length() > 0) text += ", ";
-            text += com.CH_gui.lang.Lang.rb.getString("messaging_Encrypted_Email");
+            text += com.CH_cl.lang.Lang.rb.getString("messaging_Encrypted_Email");
           }
           setText(text);
           setToolTipText(text);
@@ -136,7 +136,7 @@ public class UserTableCellRenderer extends RecordTableCellRenderer {
         }
       }
     }
-     */
+    */
     // Storage Limit, and Storage Used
     else if (rawColumn == 5 || rawColumn == 6) {
       Long amount = (Long) value;

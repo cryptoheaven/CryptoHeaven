@@ -253,8 +253,8 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
           if (oldFiles != null)
             oldBunch[i] = oldFiles[count+i];
         }
-        runUploadFileBunch(fileBunch, oldBunch, shareRecord, SIL, isThreadedRun, isSuppressStuds);
         count += bunch;
+        runUploadFileBunch(fileBunch, oldBunch, shareRecord, SIL, isThreadedRun, isSuppressStuds);
       }
     }
 

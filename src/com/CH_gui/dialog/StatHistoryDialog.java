@@ -68,11 +68,11 @@ public class StatHistoryDialog extends GeneralDialog implements VisualsSavable {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       MsgDataRecord msgData = cache.getMsgDataRecord(((MsgLinkRecord) parentObjLink).msgId);
       if (msgData != null && msgData.isTypeAddress())
-        return com.CH_gui.lang.Lang.rb.getString("title_Address_Access_History");
+        return com.CH_cl.lang.Lang.rb.getString("title_Address_Access_History");
       else
-        return com.CH_gui.lang.Lang.rb.getString("title_Message_Access_History");
+        return com.CH_cl.lang.Lang.rb.getString("title_Message_Access_History");
     } else {
-      return com.CH_gui.lang.Lang.rb.getString("title_File_Access_History");
+      return com.CH_cl.lang.Lang.rb.getString("title_File_Access_History");
     }
   }
 
@@ -86,7 +86,7 @@ public class StatHistoryDialog extends GeneralDialog implements VisualsSavable {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[1];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Close"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new CloseActionListener());
 

@@ -95,14 +95,14 @@ public class ManageContactsDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOk();
       }
     });
     jOk = buttons[0];
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -113,8 +113,8 @@ public class ManageContactsDialog extends GeneralDialog {
 
   private void createComponents() {
     dualListBox = new DualListBox(true, false, true, true);
-    dualListBox.setSourceChoicesTitle(com.CH_gui.lang.Lang.rb.getString("label_Available_Contacts"));
-    dualListBox.setDestinationChoicesTitle(com.CH_gui.lang.Lang.rb.getString("label_Selected_Contacts"));
+    dualListBox.setSourceChoicesTitle(com.CH_cl.lang.Lang.rb.getString("label_Available_Contacts"));
+    dualListBox.setDestinationChoicesTitle(com.CH_cl.lang.Lang.rb.getString("label_Selected_Contacts"));
     jUsersButton = new JMyButton("user(s):");
     jUsersButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -124,9 +124,9 @@ public class ManageContactsDialog extends GeneralDialog {
     jUsersPanel = new JPanel();
     jUsersPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
     jUsersPanel.setBorder(new EmptyBorder(0,0,0,0));
-    jAllowMessaging = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_messaging."), true);
-    jAllowSharing = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_folder_sharing."), true);
-    jNotifyStatus = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Notify_of_online_status."), true);
+    jAllowMessaging = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Allow_messaging."), true);
+    jAllowSharing = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Allow_folder_sharing."), true);
+    jNotifyStatus = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Notify_of_online_status."), true);
     jAdvanced = new JMyButton("Advanced >>");
     jAdvanced.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {

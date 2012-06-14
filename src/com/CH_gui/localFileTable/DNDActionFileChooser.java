@@ -12,31 +12,36 @@
 
 package com.CH_gui.localFileTable;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.beans.*;
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.UploadUtilities;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-import com.CH_co.service.records.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.msgTable.*;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.dialog.Move_NewFld_Dialog;
+import com.CH_gui.fileTable.FileActionTable;
+import com.CH_gui.frame.LocalFileTableFrame;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.menuing.PopupMouseAdapter;
+import com.CH_gui.msgTable.MsgActionTable;
 import com.CH_gui.util.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.Vector;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -142,12 +147,12 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
    */
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_File_List_from_local_file_system."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Refresh_File_List_from_local_file_system."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       rescanCurrentDirectory();
@@ -159,9 +164,9 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
    */
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -175,12 +180,12 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
    */
   private class WipeAction extends AbstractActionTraced {
     public WipeAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Wipe_File"), Images.get(ImageNums.FILE_REMOVE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Wipe_File"), Images.get(ImageNums.FILE_REMOVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_file."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_file."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FILE_REMOVE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Wipe_File"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Wipe_File"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       File[] files = getSelectedFiles();
@@ -188,7 +193,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         JCheckBox[] jFiles = new JCheckBox[files.length];
-        JLabel q = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_securely_and_permanently_wipe_the_selected_files_from_your_local_file_system?"));
+        JLabel q = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_securely_and_permanently_wipe_the_selected_files_from_your_local_file_system?"));
         panel.add(q, new GridBagConstraints(0, 0, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         JPanel innerPanel = new JPanel();
@@ -213,7 +218,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
         }
 
         // show question dialog
-        String title = com.CH_gui.lang.Lang.rb.getString("title_File_Wipe");
+        String title = com.CH_cl.lang.Lang.rb.getString("title_File_Wipe");
         boolean option = MessageDialog.showDialogYesNo(DNDActionFileChooser.this, panel, title);
 
         if (option == true) {
@@ -236,11 +241,11 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
     } // end actionPerformed
     private void updateText(int countSelectedFiles) {
       if (countSelectedFiles > 1) {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Wipe_Files_..."));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_files."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Wipe_Files_..."));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_files."));
       } else {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Wipe_File_..."));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_file."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Wipe_File_..."));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Securely_and_permanently_wipe_selected_file."));
       }
     }
   }
@@ -248,12 +253,12 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
 
   private class UploadAction extends AbstractActionTraced {
     public UploadAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Upload_File_..."), Images.get(ImageNums.EXPORT16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Upload_File_..."), Images.get(ImageNums.EXPORT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Upload"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Upload"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.EXPORT24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Upload"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Upload"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       File[] files = getSelectedFiles();
@@ -274,9 +279,9 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
     }
     private void updateText(int countSelectedFiles) {
       if (countSelectedFiles > 1) {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Upload_Files_..."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Upload_Files_..."));
       } else {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Upload_File_..."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Upload_File_..."));
       }
     }
   }
@@ -292,12 +297,12 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheUtilities.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
     allFolderPairs = (FolderPair[]) FolderFilter.MOVE_FOLDER.filterInclude(allFolderPairs);
 
     Window w = SwingUtilities.windowForComponent(this);
 
-    String title = com.CH_gui.lang.Lang.rb.getString("title_Upload_to_Folder");
+    String title = com.CH_cl.lang.Lang.rb.getString("title_Upload_to_Folder");
     FolderPair[] folderPairs = null;
     if (forFileUpload)
       folderPairs = (FolderPair[]) FolderFilter.NON_FILE_FOLDERS.filterInclude(allFolderPairs);

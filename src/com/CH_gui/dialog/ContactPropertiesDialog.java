@@ -80,7 +80,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
   private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
 
-  private static String FETCHING_DATA = com.CH_gui.lang.Lang.rb.getString("Fetching_Data...");
+  private static String FETCHING_DATA = com.CH_cl.lang.Lang.rb.getString("Fetching_Data...");
 
   private ContactRecord contactRecord;
 
@@ -97,11 +97,11 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
   /** Creates new ContactPropertiesDialog */
   public ContactPropertiesDialog(Frame owner, ContactRecord contactRecord) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Contact_Properties"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Contact_Properties"));
     constructDialog(owner, contactRecord);
   }
   public ContactPropertiesDialog(Dialog owner, ContactRecord contactRecord) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Contact_Properties"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Contact_Properties"));
     constructDialog(owner, contactRecord);
   }
   private void constructDialog(Component owner, ContactRecord contactRecord) {
@@ -121,7 +121,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     this.canAlterContact = !amIOwner && (!isGivenContact || (myUser.flags.longValue() & UserRecord.FLAG_ENABLE_GIVEN_CONTACTS_ALTER) != 0);
 
     String contactName = amIOwner ? contactRecord.getOwnerNote() : contactRecord.getOtherNote();
-    setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_OBJECT_-_Contact_Properties"), new Object[] {contactName}));
+    setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_OBJECT_-_Contact_Properties"), new Object[] {contactName}));
 
     JButton[] buttons = createButtons();
     JComponent mainComponent = createMainComponent();
@@ -181,7 +181,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
                     handleBy = "'Unknown User ("+contactRecord.contactWithId+")'";
                     jContactWith.setText("Unknown User ("+contactRecord.contactWithId+")");
                   }
-                  jPermissionsLabel.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {handleFor, handleBy}));
+                  jPermissionsLabel.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {handleFor, handleBy}));
                   setEnabledButtons();
                 }
               } // end synchronized
@@ -243,7 +243,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
@@ -252,14 +252,14 @@ public class ContactPropertiesDialog extends GeneralDialog {
     jOk = buttons[0];
 
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Transcript"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Transcript"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedTranscript();
       }
     });
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -295,34 +295,34 @@ public class ContactPropertiesDialog extends GeneralDialog {
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(contactRecord.contactId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Creator")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_Creator")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContactCreator = new JMyLabel(FETCHING_DATA);
     panel.add(jContactCreator, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContactOwner = new JMyLabel(FETCHING_DATA);
     panel.add(jContactOwner, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_With")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_With")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContactWith = new JMyLabel(FETCHING_DATA);
     panel.add(jContactWith, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Status")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String status = ContactRecUtil.getStatusText(contactRecord.status, contactRecord.ownerUserId);
     ImageIcon icon = ContactRecUtil.getStatusIcon(contactRecord.status, contactRecord.ownerUserId);
@@ -339,7 +339,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Owner's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Owner's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jOwnerEncryption = new JMyLabel(FETCHING_DATA);
     panel.add(jOwnerEncryption, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -347,7 +347,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jOtherEncryption = new JMyLabel(FETCHING_DATA);
     panel.add(jOtherEncryption, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -361,10 +361,10 @@ public class ContactPropertiesDialog extends GeneralDialog {
     posY ++;
 
 
-    jAllowMessaging = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_messaging."));
-    jAllowFolderSharing = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_folder_sharing."));
-    jNotifyOfOnlineStatus = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Notify_of_online_status."));
-    jEnableAudibleOnlineNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Enable_audible_notification..."));
+    jAllowMessaging = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Allow_messaging."));
+    jAllowFolderSharing = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Allow_folder_sharing."));
+    jNotifyOfOnlineStatus = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Notify_of_online_status."));
+    jEnableAudibleOnlineNotify = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Enable_audible_notification..."));
     if (trace != null) trace.data(100, canAlterContact);
     jAllowMessaging.setEnabled(canAlterContact);
     jAllowFolderSharing.setEnabled(canAlterContact);
@@ -391,7 +391,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
     jNotifyOfOnlineStatus.addChangeListener(changeListener);
     jEnableAudibleOnlineNotify.addChangeListener(changeListener);
 
-    jPermissionsLabel = new JMyLabel(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {"contact owner", "other party"}));
+    jPermissionsLabel = new JMyLabel(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("label_Permissions_for_USER1_set_by_USER2"), new Object[] {"contact owner", "other party"}));
     panel.add(jPermissionsLabel, new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
@@ -411,7 +411,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
       final ContactRecord otherContact = cache.getContactRecordOwnerWith(contactRecord.contactWithId, contactRecord.ownerUserId);
       JButton jReciprocalButton = null;
       if (otherContact != null) {
-        jReciprocalButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Show_Reciprocal_Contact"));
+        jReciprocalButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Show_Reciprocal_Contact"));
         jReciprocalButton.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (otherContactPropertiesDialog == null) {
@@ -428,7 +428,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
           }
         });
       } else if (!amIOwner) {
-        jReciprocalButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Create_Reciprocal_Contact"));
+        jReciprocalButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Create_Reciprocal_Contact"));
         jReciprocalButton.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (parentWindow instanceof Frame)
@@ -452,13 +452,13 @@ public class ContactPropertiesDialog extends GeneralDialog {
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Date_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Date_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(Misc.getFormattedTimestamp(contactRecord.dateCreated)), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Date_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Date_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     //String dateUpdated = fileLink.recordUpdated != null ? dateFormat.format(fileLink.recordUpdated) : "";
     String dateUpdated = Misc.getFormattedTimestamp(contactRecord.dateUpdated);
@@ -672,7 +672,7 @@ public class ContactPropertiesDialog extends GeneralDialog {
         d.dispose();
       }
     });
-    new GeneralDialog(this, com.CH_gui.lang.Lang.rb.getString("title_Contact_Transcript"), new JButton[] { jClose }, -1, 0, new JScrollPane(textArea));
+    new GeneralDialog(this, com.CH_cl.lang.Lang.rb.getString("title_Contact_Transcript"), new JButton[] { jClose }, -1, 0, new JScrollPane(textArea));
   }
 
 

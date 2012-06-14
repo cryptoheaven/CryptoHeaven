@@ -63,7 +63,7 @@ public class WipingThread extends ThreadTraced {
       StringBuffer errBuffer = new StringBuffer();
       boolean wiped = CleanupAgent.wipe(file, in, progMonitor, true, errBuffer);
       if (errBuffer.length() > 0)
-        MessageDialog.showErrorDialog(jFileChooser, errBuffer.toString(), com.CH_gui.lang.Lang.rb.getString("msgTitle_Wipe_Error"));
+        MessageDialog.showErrorDialog(jFileChooser, errBuffer.toString(), com.CH_cl.lang.Lang.rb.getString("msgTitle_Wipe_Error"));
       if (!wiped)
         break;
       if (toRescan) {

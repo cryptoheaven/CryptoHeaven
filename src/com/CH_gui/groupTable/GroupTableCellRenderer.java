@@ -12,20 +12,20 @@
 
 package com.CH_gui.groupTable;
 
-import com.CH_gui.util.Images;
-import java.awt.*;
-import javax.swing.JTable;
-import javax.swing.table.*;
-
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.FolderShareRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.util.ImageNums;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.util.Images;
+import java.awt.Component;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -69,17 +69,17 @@ public class GroupTableCellRenderer extends RecordTableCellRenderer {
           }
 
           if (uRec != null) {
-            Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           } else if (gRec != null) {
             setIcon(ListRenderer.getRenderedIcon(gRec));
             setText(ListRenderer.getRenderedText(gRec));
           } else if (shareRecord.isOwnedByGroup()) {
-            setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Group_(GROUP-ID)"), new Object[] {shareRecord.ownerUserId}));
+            setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("Group_(GROUP-ID)"), new Object[] {shareRecord.ownerUserId}));
             setIcon(Images.get(ImageNums.PEOPLE16));
           } else {
-            setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {shareRecord.ownerUserId}));
+            setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {shareRecord.ownerUserId}));
             setIcon(Images.get(ImageNums.PERSON_SMALL));
           }
 

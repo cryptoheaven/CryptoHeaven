@@ -1,48 +1,52 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.recycleTable;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.table.*;
-
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
+import com.CH_cl.service.cache.CacheEmlUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.service.records.FileLinkRecord;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.StatRecord;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.sortedTable.JSortedTable;
-import com.CH_gui.table.*;
-import com.CH_gui.util.*;
-
-import com.CH_cl.service.cache.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.util.Images;
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- * This class renderers cells of a table, where files' information is displayed
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.1 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+* This class renderers cells of a table, where files' information is displayed
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.1 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 
 public class RecycleTableCellRenderer extends RecordTableCellRenderer {
 
@@ -115,7 +119,7 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
 
       // set an file icon beside folder name
       // this is for weird scenario where we have selected multiple folders and folder names appear in first column
-      if (value instanceof String && table.getColumnName(column).equals(com.CH_gui.lang.Lang.rb.getString("column_Folder_Name"))) {
+      if (value instanceof String && table.getColumnName(column).equals(com.CH_cl.lang.Lang.rb.getString("column_Folder_Name"))) {
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         setIcon(Images.get(ImageNums.FLD_CLOSED16));
       }
@@ -171,13 +175,13 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
           setHorizontalAlignment(LEFT);
           // The From field is the contact name or user's short info, whichever is available
           Long userId = (Long) value;
-          Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(userId, false, true);
+          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(userId, false, true);
           if (rec != null) {
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           }
           else {
-            setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {userId}));
+            setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {userId}));
             setIcon(Images.get(ImageNums.PERSON_SMALL));
           }
         }
@@ -185,7 +189,7 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
         else if (value instanceof String) {
           setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
           setHorizontalAlignment(LEFT);
-          Record sender = CacheUtilities.convertToFamiliarEmailRecord((String) value);
+          Record sender = CacheEmlUtils.convertToFamiliarEmailRecord((String) value);
           setIcon(ListRenderer.getRenderedIcon(sender));
           setText(ListRenderer.getRenderedText(sender));
         }
@@ -212,8 +216,8 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
 
 
   /**
-   * Provide alternate row background colors.
-   */
+  * Provide alternate row background colors.
+  */
   public Color[] getAltBkColors() {
     return altBkColors;
   }

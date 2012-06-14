@@ -96,7 +96,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, String subject) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Compose_Message"), true, true);
+    super(com.CH_cl.lang.Lang.rb.getString("title_Compose_Message"), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, String subject)");
     if (trace != null) trace.args(initialRecipients, subject);
 
@@ -116,7 +116,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, String subject, String plainBody) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Compose_Message"), true, true);
+    super(com.CH_cl.lang.Lang.rb.getString("title_Compose_Message"), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, String subject, String plainBody)");
     if (trace != null) trace.args(initialRecipients, subject, plainBody);
 
@@ -215,7 +215,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   private MessageFrame(Record[][] initialRecipients, XMLElement draftData, short objType) {
-    this(objType == MsgDataRecord.OBJ_TYPE_MSG ? com.CH_gui.lang.Lang.rb.getString("title_Compose_Message") : com.CH_gui.lang.Lang.rb.getString("title_Compose_Address"), 
+    this(objType == MsgDataRecord.OBJ_TYPE_MSG ? com.CH_cl.lang.Lang.rb.getString("title_Compose_Message") : com.CH_cl.lang.Lang.rb.getString("title_Compose_Address"), 
           initialRecipients, draftData, objType, false, false);
   }
   public MessageFrame(String title, Record[] initialRecipients, XMLElement draftData) {

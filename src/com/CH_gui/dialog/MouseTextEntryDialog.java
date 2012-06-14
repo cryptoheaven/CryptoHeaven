@@ -52,12 +52,12 @@ public class MouseTextEntryDialog extends GeneralDialog {
 
   /** Creates new MouseTextEntryDialog */
   public MouseTextEntryDialog(Dialog parent, JTextComponent textComp) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Virtual_Keyboard"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Virtual_Keyboard"));
     this.editingTextComp = textComp;
     init(parent, textComp);
   }
   public MouseTextEntryDialog(Frame parent, JTextComponent textComp) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Virtual_Keyboard"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Virtual_Keyboard"));
     this.editingTextComp = textComp;
     init(parent, textComp);
   }
@@ -82,12 +82,12 @@ public class MouseTextEntryDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     okButton = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new CancelActionListener());
     cancelButton = buttons[1];
 

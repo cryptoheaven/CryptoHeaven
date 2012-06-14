@@ -1,38 +1,37 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.msg;
 
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
-
-import java.util.*;
+import java.util.Arrays;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.44 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.44 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MessageActionNameSwitch extends Object {
 
   private static Switch_StrInt_Comparator codeComparator = new Switch_StrInt_Comparator(false, false);
@@ -160,6 +159,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FLD_Q_NEW_DFT_DRAFT_OR_GET_OLD), "Prepare Draft Folder" },
       // New Private Default Junk Folder
       { new Integer(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD), "Prepare Spam Folder" }, // "Junk email"
+      // New Private Default Recycle Folder
+      { new Integer(CommandCodes.FLD_Q_NEW_DFT_RECYCLE_OR_GET_OLD), "Prepare Recycle Folder" },
       // Alter Folder Attributes
       { new Integer(CommandCodes.FLD_Q_ALTER_FLD_ATTR), "Alter Folder Attributes" },
       // Alter Share Strings

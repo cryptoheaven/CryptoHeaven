@@ -12,7 +12,7 @@
 
 package com.CH_gui.actionGui;
 
-import com.CH_cl.service.ops.UserOps;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.GlobalProperties;
@@ -105,7 +105,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     }
     if (withToolBar && ENABLE_FRAME_TOOLBARS) {
       if (trace != null) trace.data(20, "creating tool bar");
-      toolBarModel = initToolBarModel(MiscGui.getVisualsKeyName(this), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Toolbar"), new Object[] {title}), null);
+      toolBarModel = initToolBarModel(MiscGui.getVisualsKeyName(this), java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Toolbar"), new Object[] {title}), null);
     }
 
     Container contentPane = getContentPane();
@@ -371,7 +371,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   /** Display a dialog so the user can customize the tool bar **/
   private class CustomizeToolsAction extends AbstractActionTraced {
     public CustomizeToolsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Toolbar_..."), Images.get(ImageNums.TOOLS16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Customize_Toolbar_..."), Images.get(ImageNums.TOOLS16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -456,7 +456,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
   /** Display a dialog so the user can customize the menu bar **/
   private class CustomizeMenuAction extends AbstractActionTraced {
     public CustomizeMenuAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Customize_Menus_..."), Images.get(ImageNums.TOOLS16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Customize_Menus_..."), Images.get(ImageNums.TOOLS16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.TOOLS24));
     }
@@ -468,8 +468,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
   private static class ToolTipsAction extends AbstractActionTraced {
     public ToolTipsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Display_Tool_Tips"));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Enable/Disable_Tool_Tip_help"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Display_Tool_Tips"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Enable/Disable_Tool_Tip_help"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.STATE_CHECK, Boolean.TRUE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -485,7 +485,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     public LookAndFeelAction(UIManager.LookAndFeelInfo look, int actionId, ButtonGroup group) {
       super(look.getName());
       this.lafClassName = look.getClassName();
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Change_the_application_Look_And_Feel"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Change_the_application_Look_And_Feel"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       // set "selected" only if the current L&F is the one specified
       putValue(Actions.SELECTED_RADIO, Boolean.valueOf(UIManager.getLookAndFeel().getName().equals(look.getName())));
@@ -502,8 +502,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
             UIManager.setLookAndFeel(finalLafClassName);
             SwingUtilities.updateComponentTreeUI(JActionFrame.this);
           } catch (Exception exception) {
-            String messageText = com.CH_gui.lang.Lang.rb.getString("msg_Can't_change_look_and_feel");
-            String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_PLAF");
+            String messageText = com.CH_cl.lang.Lang.rb.getString("msg_Can't_change_look_and_feel");
+            String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_PLAF");
             MessageDialog.showErrorDialog(JActionFrame.this, messageText, title);
           }
           // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
@@ -829,12 +829,8 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
   public void setUserTitle(UserRecord uRec) {
     if (uRec != null) {
-      String emailStr = "";
-      if (!uRec.isWebAccount()) {
-        String[] emailStrings = UserOps.getCachedDefaultEmail(uRec, false);
-        emailStr = emailStrings != null ? " :: " + emailStrings[2] : "";
-      }
-      setTitle(uRec.shortInfo() + emailStr);
+      String title = CacheUsrUtils.getDefaultApplicationTitle(uRec);
+      setTitle(title);
     } else {
       setTitle(getDefaultTitle());
     }

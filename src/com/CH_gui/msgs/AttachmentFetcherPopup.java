@@ -51,7 +51,7 @@ public class AttachmentFetcherPopup extends ThreadTraced {
 
   private MsgLinkRecord[] paramParentMsgLinkRecords;
 
-  private JPopupMenu popup = new JMyPopupMenu(com.CH_gui.lang.Lang.rb.getString("Attachment_Options"));
+  private JPopupMenu popup = new JMyPopupMenu(com.CH_cl.lang.Lang.rb.getString("Attachment_Options"));
   private Component parent;
 
 
@@ -67,7 +67,7 @@ public class AttachmentFetcherPopup extends ThreadTraced {
     this.parent = parent;
     this.paramParentMsgLinkRecords = parentLinkRecords;
 
-    popup.add(new JMyMenuItem(com.CH_gui.lang.Lang.rb.getString("Fetching_Attachment(s)_...")));
+    popup.add(new JMyMenuItem(com.CH_cl.lang.Lang.rb.getString("Fetching_Attachment(s)_...")));
     if (parent != null) {
       popup.pack();
       // wrong-popup-location
@@ -169,7 +169,7 @@ public class AttachmentFetcherPopup extends ThreadTraced {
 
     popup.removeAll();
 
-    JMenuItem saveItem = new JMyMenuItem(com.CH_gui.lang.Lang.rb.getString("Save_Attachment(s)_..."));
+    JMenuItem saveItem = new JMyMenuItem(com.CH_cl.lang.Lang.rb.getString("Save_Attachment(s)_..."));
     saveItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         Window w = SwingUtilities.windowForComponent(parent);

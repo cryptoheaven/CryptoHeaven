@@ -1,49 +1,50 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.traceTable;
 
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.TraceRecord;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.table.RecordTableModel;
 import com.CH_gui.util.Images;
-import java.awt.*;
+import java.awt.Component;
 import java.sql.Timestamp;
 import javax.swing.JTable;
-import javax.swing.table.*;
-
-import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
-import com.CH_gui.table.*;
-import com.CH_gui.sortedTable.JSortedTable;
-
-import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- * This class renderers cells of a table, where traces' information is displayed
- *
- * Class Details:
- * 
- *
- * <b>$Revision: 1.21 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+* This class renderers cells of a table, where traces' information is displayed
+*
+* Class Details:
+* 
+*
+* <b>$Revision: 1.21 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 
 public class TraceTableCellRenderer extends RecordTableCellRenderer {
 
@@ -54,7 +55,7 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
     // User info OR object name
     if (value instanceof String) {
       int rawColumn = ((RecordTableModel) ((JSortedTable) table).getRawModel()).getColumnHeaderData().convertColumnToRawModel(table.convertColumnIndexToModel(column));
-      
+
       // Find the trace record
       JSortedTable sTable = (JSortedTable) table;
       TableModel tableModel = sTable.getRawModel();
@@ -73,12 +74,12 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
           UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(traceRecord.ownerUserId);
 
           if (uRec != null) {
-            Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           }
           else {
-            setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {traceRecord.ownerUserId}));
+            setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {traceRecord.ownerUserId}));
             setIcon(Images.get(ImageNums.PERSON_SMALL));
           }
         }
@@ -97,22 +98,22 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
       if (rawColumn == 1) {
         if (b.booleanValue()) {
           setIcon(Images.get(ImageNums.TRACE_PRIVILEGE13));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_user_has_a_direct_or_indirect_read_privilege_to_the_object."));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_user_has_a_direct_or_indirect_read_privilege_to_the_object."));
         }
         else {
           setIcon(Images.get(ImageNums.TRANSPARENT16));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_user_does_not_possess_a_direct_or_indirect_read_privilege_to_the_object."));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_user_does_not_possess_a_direct_or_indirect_read_privilege_to_the_object."));
         }
       }
       // History
       else if (rawColumn == 2) {
         if (b.booleanValue()) {
           setIcon(Images.get(ImageNums.TRACE_HISTORY13));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_user_has_an_access_history_for_the_object."));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_user_has_an_access_history_for_the_object."));
         }
         else {
           setIcon(Images.get(ImageNums.TRANSPARENT16));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_user_does_not_possess_an_access_history_for_the_object."));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_user_does_not_possess_an_access_history_for_the_object."));
         }
       }
     }
@@ -124,6 +125,5 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
 
     return this;
   }
-
 
 }

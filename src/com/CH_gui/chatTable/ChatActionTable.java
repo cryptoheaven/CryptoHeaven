@@ -12,6 +12,7 @@
 
 package com.CH_gui.chatTable;
 
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgTypingListener;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
@@ -25,7 +26,6 @@ import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.gui.JBottomStickViewport;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgTable.MsgActionTable;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.sortedTable.TableMap;
 import com.CH_gui.sortedTable.TableModelSortListener;
@@ -166,9 +166,9 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
               Window w = SwingUtilities.windowForComponent(ChatActionTable.this);
               if (w instanceof JActionFrame) {
                 JActionFrame f = (JActionFrame) w;
-                Record r = MsgPanelUtils.convertUserIdToFamiliarUser(userId, false, true);
+                Record r = CacheUsrUtils.convertUserIdToFamiliarUser(userId, false, true);
                 String name = ListRenderer.getRenderedText(r);
-                String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("USER-NAME_is_typing_a_message."), new Object[] {name});
+                String msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("USER-NAME_is_typing_a_message."), new Object[] {name});
                 f.triggerVisualUpdateNotificationStill(msg, f.getTitle() + " :: ", null, TYPING_NOTIFY_MILLIS);
               }
             }

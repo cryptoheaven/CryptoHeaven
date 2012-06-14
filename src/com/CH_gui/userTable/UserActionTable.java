@@ -100,11 +100,11 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
    */
   private class InitiateAction extends AbstractActionTraced {
     public InitiateAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_to_Contacts"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Add_to_Contacts"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] uRecs = (UserRecord[]) getSelectedRecords();
@@ -123,11 +123,11 @@ public class UserActionTable extends RecordActionTable implements ActionProducer
    */
   private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Send_Message"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Send_Message"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       new MessageFrame(getSelectedRecords());

@@ -98,7 +98,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
   /** Creates new AcceptDeclineContactDialog */
   public AcceptDeclineContactDialog(Frame owner, ContactRecord contactRecord) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Accept_/_Decline_Contact"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Accept_/_Decline_Contact"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AcceptDeclineContactDialog.class, "AcceptDeclineContact()");
 
     this.contactRecord = contactRecord;
@@ -237,7 +237,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
     int button = 0;
 
-    jButtons[button] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Accept"));
+    jButtons[button] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Accept"));
     jAccept = jButtons[button];
     jButtons[button].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -246,7 +246,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     });
     button ++;
 
-    jButtons[button] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Decline"));
+    jButtons[button] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Decline"));
     jDecline = jButtons[button];
     jButtons[button].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -255,7 +255,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     });
     button ++;
 
-    jButtons[button] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    jButtons[button] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     jButtons[button].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -278,15 +278,15 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     panel.add(new JMyLabel(Images.get(ImageNums.CONTACT_NEW32)), new GridBagConstraints(0, 0, 1, 2, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_From")), new GridBagConstraints(1, 0, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_From")), new GridBagConstraints(1, 0, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reason_For_Contact")), new GridBagConstraints(1, 2, 2, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Reason_For_Contact")), new GridBagConstraints(1, 2, 2, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 6, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 6, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Contact_Name")), new GridBagConstraints(1, 7, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_New_Contact_Name")), new GridBagConstraints(1, 7, 1, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
@@ -298,7 +298,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     jContactReason.setLineWrap(true);
     jYourEncryption = new JMyLabel(keyRecord.plainPublicKey.shortInfo() + "/" + "AES(256)", RecordUtilsGui.getIcon(keyRecord), JLabel.LEFT);
 
-    jNewContactName = new JMyTextField(com.CH_gui.lang.Lang.rb.getString("textfield_Fetching_Username..."));
+    jNewContactName = new JMyTextField(com.CH_cl.lang.Lang.rb.getString("textfield_Fetching_Username..."));
     documentChangeListener = new DocumentChangeListener();
     jNewContactName.getDocument().addDocumentListener(documentChangeListener);
 
@@ -320,18 +320,18 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
     panel.add(jNewContactName, new GridBagConstraints(2, 7, 1, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jAllowMessaging = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_messaging."));
+    jAllowMessaging = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Allow_messaging."));
     jAllowMessaging.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_MESSAGING) == 0);
-    jAllowFolderSharing = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Allow_folder_sharing."));
+    jAllowFolderSharing = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Allow_folder_sharing."));
     jAllowFolderSharing.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) == 0);
-    jNotifyOfOnlineStatus = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Notify_of_online_status."));
+    jNotifyOfOnlineStatus = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Notify_of_online_status."));
     jNotifyOfOnlineStatus.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS) == 0);
-    jAudibleNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Enable_audible_notification..."));
+    jAudibleNotify = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Enable_audible_notification..."));
     jAudibleNotify.setSelected((contactRecord.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0);
 
     JPanel jPermitsPanel = new JPanel();
     jPermitsPanel.setLayout(new GridBagLayout());
-    jPermitsPanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_gui.lang.Lang.rb.getString("title_Grant_Permissions")));
+    jPermitsPanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_cl.lang.Lang.rb.getString("title_Grant_Permissions")));
 
     panel.add(jPermitsPanel, new GridBagConstraints(1, 8, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -345,7 +345,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
 
     JPanel jOptionsPanel = new JPanel();
     jOptionsPanel.setLayout(new GridBagLayout());
-    jOptionsPanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_gui.lang.Lang.rb.getString("title_Options")));
+    jOptionsPanel.setBorder(new TitledBorder(new EtchedBorder(), com.CH_cl.lang.Lang.rb.getString("title_Options")));
 
     panel.add(jOptionsPanel, new GridBagConstraints(1, 9, 2, 1, 10, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));

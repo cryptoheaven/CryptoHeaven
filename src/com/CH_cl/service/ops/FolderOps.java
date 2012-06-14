@@ -1,53 +1,61 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.ops;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.fld.Fld_AddShares_Rq;
+import com.CH_co.service.msg.dataSets.fld.Fld_Folders_Rp;
+import com.CH_co.service.msg.dataSets.fld.Fld_NewFld_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.fld.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.util.*;
-
-import java.util.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.NotificationCenter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.22 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.22 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderOps extends Object {
 
 
   /**
-   * Static method to fill the New Folder Request with data provided (usually from GUI entry fields)
-   * @return Fld_NewFld_Rq data set suitable to send as a request for new folder, or creat/fetch of chat folder.
-   */
+  * Static method to fill the New Folder Request with data provided (usually from GUI entry fields)
+  * @return Fld_NewFld_Rq data set suitable to send as a request for new folder, or creat/fetch of chat folder.
+  */
   public static Fld_NewFld_Rq createNewFldRq( FolderPair parentPair,
                                               short newFolderType,
                                               String newFolderName,
@@ -230,8 +238,8 @@ public class FolderOps extends Object {
   }
 
   /**
-   * @return all chatting folder pairs related to the specified contact, including multi-user chat folders.
-   */
+  * @return all chatting folder pairs related to the specified contact, including multi-user chat folders.
+  */
   public static FolderPair[] getAllChatFolderPairsFromCache(ContactRecord chatWithContact, FolderRecord[]  chatFlds) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     ArrayList chatFolderPairsL = null;
@@ -241,7 +249,7 @@ public class FolderOps extends Object {
       for (int i=0; i<chatFlds.length; i++) {
         // Check folder's shares to confirm that one is mine and second other guy's.
         FolderShareRecord[] chatShares = cache.getFolderShareRecordsForFolder(chatFlds[i].folderId);
-        Long[] accessUserIDs = CacheUtilities.findAccessUsers(chatShares);
+        Long[] accessUserIDs = CacheUsrUtils.findAccessUsers(chatShares);
         if (accessUserIDs.length >= 2) {
           boolean foundMy = false;
           boolean foundOther = false;
@@ -266,8 +274,8 @@ public class FolderOps extends Object {
   }
 
   /**
-   * @return chatting folder pair for chatting with specified contact searching between specified chat folder records.
-   */
+  * @return chatting folder pair for chatting with specified contact searching between specified chat folder records.
+  */
   public static FolderPair getChatFolderPairFromCache(MemberContactRecordI[] chatWithContacts, FolderRecord[] chatFlds) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord chatFolder = null;
@@ -338,7 +346,7 @@ public class FolderOps extends Object {
     }
     FolderPair fPair = null;
     if (addrFolderId != null) {
-      fPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(addrFolderId));
+      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(addrFolderId));
     }
     return fPair;
   }
@@ -361,7 +369,7 @@ public class FolderOps extends Object {
     }
     FolderPair fPair = null;
     if (whiteFolderId != null) {
-      fPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(whiteFolderId));
+      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(whiteFolderId));
     }
     return fPair;
   }
@@ -384,7 +392,7 @@ public class FolderOps extends Object {
     }
     FolderPair fPair = null;
     if (draftFolderId != null) {
-      fPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(draftFolderId));
+      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(draftFolderId));
     }
     return fPair;
   }
@@ -407,7 +415,7 @@ public class FolderOps extends Object {
     }
     FolderPair fPair = null;
     if (junkFolderId != null) {
-      fPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(junkFolderId));
+      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(junkFolderId));
     }
     return fPair;
   }
@@ -430,16 +438,16 @@ public class FolderOps extends Object {
     }
     FolderPair fPair = null;
     if (recycleFolderId != null) {
-      fPair = CacheUtilities.convertRecordToPair(cache.getFolderRecord(recycleFolderId));
+      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(recycleFolderId));
     }
     return fPair;
   }
 
   /**
-   * Search among the cached folders, and find a folder which is most likely the
-   * root in the tree view.
-   * @return Root folder or null if guess cannot be made or some looping of folders is found.
-   */
+  * Search among the cached folders, and find a folder which is most likely the
+  * root in the tree view.
+  * @return Root folder or null if guess cannot be made or some looping of folders is found.
+  */
   public static FolderPair getRootmostFolderInViewHierarchy(Long childFolderId) {
     HashSet visitedFolderIDsHS = new HashSet();
     Set groupIDsSet = FetchedDataCache.getSingleInstance().getFolderGroupIDsMySet();

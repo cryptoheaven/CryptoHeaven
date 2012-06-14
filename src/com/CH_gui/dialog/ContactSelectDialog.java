@@ -76,11 +76,11 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
   }
   /** Creates new ContactSelectDialog */
   public ContactSelectDialog(Dialog owner, boolean includeGroups, boolean show) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Select_Contacts"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Select_Contacts"));
     initialize(owner, includeGroups, show);
   }
   public ContactSelectDialog(Frame owner, boolean includeGroups, boolean show) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Select_Contacts"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Select_Contacts"));
     initialize(owner, includeGroups, show);
   }
   private void initialize(Component owner, boolean includeGroups, boolean show) {
@@ -94,7 +94,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Select"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Select"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
@@ -103,7 +103,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     jOk = buttons[0];
     jOk.setEnabled(false);
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();

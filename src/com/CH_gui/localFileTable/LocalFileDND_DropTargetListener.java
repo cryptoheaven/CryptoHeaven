@@ -12,22 +12,26 @@
 
 package com.CH_gui.localFileTable;
 
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.awt.Point;
-import javax.swing.*;
-import java.util.*;
-import java.io.*;
-
-import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.MainFrame;
-
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_co.service.records.FileLinkRecord;
+import com.CH_co.service.records.FileRecord;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.Record;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-import com.CH_co.service.records.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_gui.fileTable.FileDND_Transferable;
+import com.CH_gui.fileTable.FileDND_TransferableData;
+import com.CH_gui.frame.MainFrame;
+import java.awt.Point;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Vector;
+import javax.swing.JFileChooser;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -146,7 +150,7 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
         }
         // if any folders
         if (data.fileRecordIDs[0] != null && data.fileRecordIDs[0].length > 0) {
-          fileRecsV.addAll(Arrays.asList(CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]))));
+          fileRecsV.addAll(Arrays.asList(CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]))));
         }
         FileRecord[] fileRecs = null;
         if (fileRecsV.size() > 0) {

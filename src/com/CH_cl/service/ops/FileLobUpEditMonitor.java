@@ -293,7 +293,7 @@ public class FileLobUpEditMonitor {
           // Use specific error message if available.
           errMsg = ((Str_Rp) dataSet).message;
         }
-        errMsg += " - retry scheduled for "+Misc.getFormattedDate(new Date(set.timestampNextRetry), false);
+        errMsg += " - retry scheduled for "+Misc.getFormattedDate(new Date(set.timestampNextRetry), true, false);
         set.setError(errMsg);
         fileEditsMap.put(set.remoteFile.fileLinkId, set);
       }

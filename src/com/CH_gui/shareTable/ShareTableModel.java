@@ -29,7 +29,6 @@ import com.CH_gui.frame.MainFrame;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
-import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -54,11 +53,11 @@ public class ShareTableModel extends RecordTableModel {
   /* Main folder pair of which this class is managing shares */
   private FolderPair folderPair;
 
-  private static String STR_NAME = com.CH_gui.lang.Lang.rb.getString("column_Name");
-  private static String STR_WRITE = com.CH_gui.lang.Lang.rb.getString("column_Write");
-  private static String STR_DELETE = com.CH_gui.lang.Lang.rb.getString("column_Delete");
-  private static String STR_ADD = com.CH_gui.lang.Lang.rb.getString("column_Add");
-  private static String STR_REMOVE = com.CH_gui.lang.Lang.rb.getString("column_Remove");
+  private static String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Name");
+  private static String STR_WRITE = com.CH_cl.lang.Lang.rb.getString("column_Write");
+  private static String STR_DELETE = com.CH_cl.lang.Lang.rb.getString("column_Delete");
+  private static String STR_ADD = com.CH_cl.lang.Lang.rb.getString("column_Add");
+  private static String STR_REMOVE = com.CH_cl.lang.Lang.rb.getString("column_Remove");
 
   //private static final ColumnHeaderData columnHeaderData = 
   public static final ColumnHeaderData[] columnHeaderDatas = new ColumnHeaderData[] {
@@ -124,8 +123,7 @@ public class ShareTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return null;
+  public void clearCachedFetchedFolderIDs() {
   }
 
   /**

@@ -76,7 +76,7 @@ public class InitiateContactDialog extends GeneralDialog {
 
   /** Creates new InitiateContactDialog */
   public InitiateContactDialog(Frame owner, Long[] contactWithIds) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Add_New_Contact"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Add_New_Contact"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "InitiateContactDialog(Frame owner, Long[] contactWithIds)");
     if (trace != null) trace.args(contactWithIds);
     initialize(owner, contactWithIds);
@@ -84,7 +84,7 @@ public class InitiateContactDialog extends GeneralDialog {
   }
   /** Creates new InitiateContactDialog */
   public InitiateContactDialog(Dialog owner, Long[] contactWithIds) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Add_New_Contact"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Add_New_Contact"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "InitiateContactDialog(Dialog owner, Long[] contactWithIds)");
     if (trace != null) trace.args(contactWithIds);
     initialize(owner, contactWithIds);
@@ -134,14 +134,14 @@ public class InitiateContactDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] jButtons = new JButton[2];
 
-    jButtons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    jButtons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     jButtons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
       }
     });
 
-    jButtons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    jButtons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     jButtons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -161,7 +161,7 @@ public class InitiateContactDialog extends GeneralDialog {
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     documentChangeListener = new DocumentChangeListener();
-    jContactReason = new JMyTextArea(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle}), 3, 30);
+    jContactReason = new JMyTextArea(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle}), 3, 30);
     jContactReason.setWrapStyleWord(true);
     jContactReason.setLineWrap(true);
     jContactReason.getDocument().addDocumentListener(documentChangeListener);
@@ -171,13 +171,13 @@ public class InitiateContactDialog extends GeneralDialog {
     contactReasonMap.removeKeyStrokeBinding(enter);
 
     if (contactWithIds.length == 1) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_To")), new GridBagConstraints(1, 0, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_To")), new GridBagConstraints(1, 0, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Your_Encryption")), new GridBagConstraints(1, 1, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Name")), new GridBagConstraints(1, 2, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_Name")), new GridBagConstraints(1, 2, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 3, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact's_Encryption")), new GridBagConstraints(1, 3, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
       UserRecord uRec = cache.getUserRecord(contactWithIds[0]);
@@ -205,7 +205,7 @@ public class InitiateContactDialog extends GeneralDialog {
 
 
     // Always include Reason field
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contact_Reason")), new GridBagConstraints(1, contactWithIds.length == 1 ? 4 : 0, 2, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contact_Reason")), new GridBagConstraints(1, contactWithIds.length == 1 ? 4 : 0, 2, 1, 0, 0,
       GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     panel.add(new JScrollPane(jContactReason), new GridBagConstraints(1, contactWithIds.length == 1 ? 5 : 1, 2, 3, 10, 10,

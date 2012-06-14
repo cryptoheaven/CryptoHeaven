@@ -149,7 +149,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Create New Account");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_NEW24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Create"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(SubUserActionTable.this);
@@ -167,7 +167,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Edit User Account");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Edit"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Edit"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] selectedRecords = (UserRecord[]) getSelectedRecords();
@@ -188,7 +188,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Delete User Account");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_DELETE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Delete"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] records = (UserRecord[]) getSelectedRecords();
@@ -200,11 +200,11 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
     }
     private void updateText(int countSelected) {
       if (countSelected > 1) {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Delete_Accounts_..."));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_user_accounts."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Delete_Accounts_..."));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_user_accounts."));
       } else {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Delete_Account_..."));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_user_account."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Delete_Account_..."));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_user_account."));
       }
     }
   }
@@ -214,11 +214,11 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
    */
   private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_New_Message"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       new MessageFrame(getSelectedRecords());
@@ -274,7 +274,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Manage user contacts.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Manage_Contacts"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Manage_Contacts"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] selectedRecords = (UserRecord[]) getSelectedRecords();
@@ -297,7 +297,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Activate or Suspend user accounts.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_ACTIVATE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Activate_or_Suspend"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Activate_or_Suspend"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] records = (UserRecord[]) getSelectedRecords();
@@ -318,7 +318,7 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Password Reset for user accounts.");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_PASS_RESET24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Password_Reset"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Password_Reset"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       UserRecord[] records = (UserRecord[]) getSelectedRecords();

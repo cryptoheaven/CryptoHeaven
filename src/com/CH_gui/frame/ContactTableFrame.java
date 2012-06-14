@@ -47,7 +47,7 @@ public class ContactTableFrame extends JActionFrameClosable {
 
   /** Creates new ContactTableFrame */
   public ContactTableFrame() {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Contacts"), true, true);
+    super(com.CH_cl.lang.Lang.rb.getString("title_Contacts"), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableFrame.class, "ContactTableFrame()");
 
     String propertyName = ContactActionTable.getTogglePropertyName(this);

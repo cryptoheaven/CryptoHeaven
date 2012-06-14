@@ -400,13 +400,13 @@ public class JSortedTable extends JTable implements DisposableObj {
 
         int sortColumnIndex = sorter.getSortingColumnIndex(rawColumn);
         boolean ascending = sorter.getSortingColumnDirection(rawColumn) > 0 ? true : false;
-        String order = ascending ? com.CH_gui.lang.Lang.rb.getString("sort_ascending") : com.CH_gui.lang.Lang.rb.getString("sort_descending");
+        String order = ascending ? com.CH_cl.lang.Lang.rb.getString("sort_ascending") : com.CH_cl.lang.Lang.rb.getString("sort_descending");
 
         /* sorted column */
         if (sortColumnIndex == 0) {
           sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING2 : ImageNums.ORDER_DESCENDING2;
           sortIcon = Images.get(sortIconIndex);
-          sortToolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("sort_Primary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
+          sortToolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("sort_Primary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
         }
         /* last sorted column */
         else if (sortColumnIndex == 1) {
@@ -414,7 +414,7 @@ public class JSortedTable extends JTable implements DisposableObj {
             sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING : ImageNums.ORDER_DESCENDING;
             sortIcon = Images.get(sortIconIndex);
           }
-          sortToolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("sort_Secondary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
+          sortToolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("sort_Secondary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
         }
       }
 

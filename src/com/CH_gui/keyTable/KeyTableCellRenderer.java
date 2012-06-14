@@ -12,16 +12,16 @@
 
 package com.CH_gui.keyTable;
 
-import java.awt.*;
-import javax.swing.JTable;
-
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.table.*;
-import com.CH_gui.sortedTable.JSortedTable;
-
-import com.CH_co.service.records.*;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_co.service.records.KeyRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableCellRenderer;
+import java.awt.Component;
+import javax.swing.JTable;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -63,11 +63,11 @@ public class KeyTableCellRenderer extends RecordTableCellRenderer {
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         JSortedTable jSortedTable = (JSortedTable) table;
         KeyRecord kRec = (KeyRecord) (((KeyTableModel) jSortedTable.getRawModel()).getRowObject(jSortedTable.convertMyRowIndexToModel(row)));
-        Record owner = MsgPanelUtils.convertUserIdToFamiliarUser(kRec.ownerUserId, true, true);
+        Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(kRec.ownerUserId, true, true);
         if (owner == null) {
           UserRecord uRec = new UserRecord();
           uRec.userId = kRec.keyId;
-          uRec.handle = com.CH_gui.lang.Lang.rb.getString("User");
+          uRec.handle = com.CH_cl.lang.Lang.rb.getString("User");
           owner = uRec;
         }
         setText(ListRenderer.getRenderedText(owner));

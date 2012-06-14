@@ -214,7 +214,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       if (progMonitor != null) {
         if (!progMonitor.isAllDone()) {
           progMonitor.nextTask();
-          progMonitor.setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
+          progMonitor.setCurrentStatus(com.CH_cl.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
         }
       }
 
@@ -536,24 +536,27 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
     // Check or display the 'upgrade' popup window.
     {
-      // See if a user account is expired or out of space, if so this will display a popup window with a message.
-      SysOps.checkExpiry();
-      SysOps.checkQuotas();
+      // !-- skip quota popups, we have a status line on top of the tables --!
+//      // See if a user account is expired or out of space, if so this will display a popup window with a message.
+//      SysOps.checkExpiry();
+//      SysOps.checkQuotas();
 
       UserRecord myUserRec = SIL.getFetchedDataCache().getUserRecord();
       Long userId = SIL.getFetchedDataCache().getMyUserId();
-      // Display popup window to suggest upgrading
-      if (myUserRec != null && myUserRec.isFreePromoAccount()) {
-        String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
-        String urlStrEnd = "</a>";
-        String htmlText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_free_demo_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
-        PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
-      } else if (myUserRec != null && myUserRec.isGuestAccount()) {
-        String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
-        String urlStrEnd = "</a>";
-        String htmlText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_free_guest_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
-        PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
-      }
+
+      // !-- skip upgrade popup, we have a status line on top of the tables --!
+//      // Display popup window to suggest upgrading
+//      if (myUserRec != null && myUserRec.isFreePromoAccount()) {
+//        String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
+//        String urlStrEnd = "</a>";
+//        String htmlText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_free_demo_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
+//        PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
+//      } else if (myUserRec != null && myUserRec.isGuestAccount()) {
+//        String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
+//        String urlStrEnd = "</a>";
+//        String htmlText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_free_guest_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
+//        PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
+//      }
 
       if (myUserRec != null) {
         // see if we should remind users to update their email address
@@ -733,11 +736,11 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   **/
   private class ExitAction extends AbstractActionTraced {
     public ExitAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Exit"), Images.get(ImageNums.DELETE16));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Exit_the_application."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Exit"), Images.get(ImageNums.DELETE16));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Exit_the_application."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.DELETE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Exit"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Exit"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       exitAction();
@@ -749,7 +752,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   protected static class AboutAction extends AbstractActionTraced {
     public AboutAction(int actionId) {
-      super(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
+      super(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
             new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) }), Images.get(ImageNums.INFO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -765,7 +768,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class ChangePassAction extends AbstractActionTraced {
     public ChangePassAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Change_Password"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Change_Password"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -795,7 +798,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class ChangeUserNameAction extends AbstractActionTraced {
     public ChangeUserNameAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Change_Username"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Change_Username"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -828,7 +831,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class AccountOptionsAction extends AbstractActionTraced {
     public AccountOptionsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Account_Options"), Images.get(ImageNums.USER_EDIT16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Account_Options"), Images.get(ImageNums.USER_EDIT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_EDIT24));
     }
@@ -843,8 +846,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class SwitchIdentityAction extends AbstractActionTraced {
     public SwitchIdentityAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Switch_Identity"));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Log_off_current_identity_and_log_in_as_a_different_user."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Switch_Identity"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Log_off_current_identity_and_log_in_as_a_different_user."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -858,7 +861,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class ManageSubAccountsAction extends AbstractActionTraced {
     public ManageSubAccountsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Manage_User_Accounts"), Images.get(ImageNums.USER_MANAGE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Manage_User_Accounts"), Images.get(ImageNums.USER_MANAGE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       //putValue(Actions.TOOL_TIP, "Manage User Accounts");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_MANAGE24));
@@ -886,9 +889,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class DeleteMyAccountAction extends AbstractActionTraced {
     public DeleteMyAccountAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Account_..."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Delete_Account_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_my_user_account."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Permanently_delete_my_user_account."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -901,7 +904,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class ImportAddressBookAction extends AbstractActionTraced {
     public ImportAddressBookAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Import_Address_Book_..."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Import_Address_Book_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -916,7 +919,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLGeneralFAQAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_FAQ_PAGE);
     public URLGeneralFAQAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_General_FAQ"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_General_FAQ"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -925,7 +928,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       try {
         BrowserLauncher.openURL(url);
       } catch (Throwable t) {
-        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {url, t.getMessage()}), com.CH_gui.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
+        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {url, t.getMessage()}), com.CH_cl.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
       }
     }
   }
@@ -936,7 +939,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLQuickTourAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_QUICK_TOUR_PAGE);
     public URLQuickTourAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Quick_Tour"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Quick_Tour"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -945,7 +948,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       try {
         BrowserLauncher.openURL(url);
       } catch (Throwable t) {
-        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {url, t.getMessage()}), com.CH_gui.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
+        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {url, t.getMessage()}), com.CH_cl.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
       }
     }
   }
@@ -956,7 +959,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLUsersGuideAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_USER_GUIDE_PAGE);
     public URLUsersGuideAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_User's_Guide"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_User's_Guide"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -965,7 +968,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       try {
         BrowserLauncher.openURL(url);
       } catch (Throwable t) {
-        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {url, t.getMessage()}), com.CH_gui.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
+        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {url, t.getMessage()}), com.CH_cl.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
       }
     }
   }
@@ -976,7 +979,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLAccountUpgradeAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.SIGNUP_PAGE);
     public URLAccountUpgradeAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Account_Upgrade"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Account_Upgrade"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -986,7 +989,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       try {
         BrowserLauncher.openURL(urlToOpen);
       } catch (Throwable t) {
-        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {urlToOpen, t.getMessage()}), com.CH_gui.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
+        MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Error_occured_while_trying_to_open_URL..."), new Object[] {urlToOpen, t.getMessage()}), com.CH_cl.lang.Lang.rb.getString("msgTitle_Error_opening_URL"));
       }
     }
   }
@@ -996,9 +999,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   protected static class ManageWhiteListAction extends AbstractActionTraced {
     public ManageWhiteListAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Manage_WhiteList_..."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Manage_WhiteList_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Manage_WhiteList_..."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Manage_WhiteList_..."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -1024,7 +1027,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class SetupPasswordRecovery extends AbstractActionTraced {
     public SetupPasswordRecovery(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Setup_Password_Recovery"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Setup_Password_Recovery"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -1038,7 +1041,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class TraceDiagnosticsAction extends AbstractActionTraced {
     public TraceDiagnosticsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Problem_Reporting"), Images.get(ImageNums.TOOLS_FIX16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Problem_Reporting"), Images.get(ImageNums.TOOLS_FIX16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Send Diagnostics Information");
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -1053,7 +1056,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class EmailSupportAction extends AbstractActionTraced {
     public EmailSupportAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Email_Support"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Email_Support"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }

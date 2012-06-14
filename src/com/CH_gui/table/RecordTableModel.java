@@ -19,7 +19,7 @@ import com.CH_co.service.records.filters.MultiFilter;
 import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-import com.CH_gui.fileTable.FileTableModel;
+import com.CH_gui.msgTable.MsgTableModel;
 import java.util.*;
 import javax.swing.ButtonGroup;
 import javax.swing.JTable;
@@ -47,7 +47,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
 
   public static final Integer TIMESTAMP_PRL = new Integer(110); // Preferred Long
   public static final Integer TIMESTAMP_PRS = new Integer(93);  // Preferred Short
-  public static final Integer TIMESTAMP_MAX = new Integer(130); // Mac OSX has wider text
+  public static final Integer TIMESTAMP_MAX = new Integer(150); // Mac OSX has wider text
   public static final Integer TIMESTAMP_MIN = new Integer(60);
 
   /** list of all records stored in this model */
@@ -122,7 +122,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   * user switches focus to another folder...
   * This vector should also be cleared when users are switched...
   */
-  public abstract ArrayList getCachedFetchedFolderIDs();
+  public abstract void clearCachedFetchedFolderIDs();
 
   public void setAutoScrollSuppressed(boolean flag) {
     isAutoScrollSuppressed = flag;
@@ -568,15 +568,15 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       }
     }
     if (removeCount > 0) {
-      // simulate deletions from the end.... to minimally confuse the selection list as
-      // the rows are re-mapped by the sorter anyway
-      int originalSize = recordsL.size() + removeCount;
-      if (this instanceof FileTableModel) {
-        fireTableDataChanged();
-      } else {
+      // simulate deletions from the end.... to minimally confuse the user's selection 
+      // list as the rows are re-mapped by the sorter anyway
+      if (this instanceof MsgTableModel) {
+        int originalSize = recordsL.size() + removeCount;
         // Message tables have the selection advancing after deletion from the model and are treated differently.
         if (trace != null) trace.info(10, "RecordTableModel.fireTableRowsDeleted("+(originalSize - removeCount) + ", " +(originalSize - 1)+");");
         fireTableRowsDeleted(originalSize - removeCount, originalSize - 1); // to fix number of elements in SizeSequence
+      } else {
+        fireTableDataChanged();
       }
 
       // don't need to call updated, because when a row is deleted, the table sorter will call update for all rows

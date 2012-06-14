@@ -12,7 +12,8 @@
 
 package com.CH_gui.recycleTable;
 
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.FolderRecUtil;
@@ -32,14 +33,11 @@ import com.CH_co.util.ImageNums;
 import com.CH_gui.file.FileUtilities;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -69,23 +67,23 @@ public class RecycleTableModel extends RecordTableModel {
   private static final ArrayList fetchedIdsBriefs = new ArrayList();
   private static final ArrayList fetchedIdsFull = new ArrayList();
 
-  protected static final String STR_FILE_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_File_Folder");
-  protected static final String STR_SHARED_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_Shared_Folder");
-  protected static final String STR_FLAG = com.CH_gui.lang.Lang.rb.getString("column_Flag");
-  protected static final String STR_NAME = com.CH_gui.lang.Lang.rb.getString("column_Name");
-  protected static final String STR_FROM = com.CH_gui.lang.Lang.rb.getString("column_From");
-  protected static final String STR_TYPE = com.CH_gui.lang.Lang.rb.getString("column_Type");
-  protected static final String STR_SIZE = com.CH_gui.lang.Lang.rb.getString("Size");
-  protected static final String STR_CREATED = com.CH_gui.lang.Lang.rb.getString("column_Created");
-  protected static final String STR_DELETED = com.CH_gui.lang.Lang.rb.getString("column_Deleted");
-  protected static final String STR_LINK_ID = com.CH_gui.lang.Lang.rb.getString("column_Link_ID");
-  protected static final String STR_DATA_ID = com.CH_gui.lang.Lang.rb.getString("column_Data_ID");
+  protected static final String STR_FILE_FOLDER = com.CH_cl.lang.Lang.rb.getString("folder_File_Folder");
+  protected static final String STR_SHARED_FOLDER = com.CH_cl.lang.Lang.rb.getString("folder_Shared_Folder");
+  protected static final String STR_FLAG = com.CH_cl.lang.Lang.rb.getString("column_Flag");
+  protected static final String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Name");
+  protected static final String STR_FROM = com.CH_cl.lang.Lang.rb.getString("column_From");
+  protected static final String STR_TYPE = com.CH_cl.lang.Lang.rb.getString("column_Type");
+  protected static final String STR_SIZE = com.CH_cl.lang.Lang.rb.getString("Size");
+  protected static final String STR_CREATED = com.CH_cl.lang.Lang.rb.getString("column_Created");
+  protected static final String STR_DELETED = com.CH_cl.lang.Lang.rb.getString("column_Deleted");
+  protected static final String STR_LINK_ID = com.CH_cl.lang.Lang.rb.getString("column_Link_ID");
+  protected static final String STR_DATA_ID = com.CH_cl.lang.Lang.rb.getString("column_Data_ID");
 
   static final ColumnHeaderData columnHeaderData =
       new ColumnHeaderData(new Object[][]
         { { null, STR_NAME, STR_FROM, STR_TYPE, STR_SIZE, STR_CREATED, STR_DELETED, STR_LINK_ID, STR_DATA_ID },
           { STR_FLAG, STR_NAME, STR_FROM, STR_TYPE, STR_SIZE, STR_CREATED, STR_DELETED, STR_LINK_ID, STR_DATA_ID },
-          { com.CH_gui.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag"), null, null, null, null, null, null },
+          { com.CH_cl.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag"), null, null, null, null, null, null },
           { new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null, null },
           { new Integer(16), new Integer(141), new Integer(100), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
           { new Integer(16), new Integer(141), new Integer(100), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
@@ -112,8 +110,10 @@ public class RecycleTableModel extends RecordTableModel {
   * user switches focus to another folder...
   * This vector should also be cleared when users are switched...
   */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return fetchedIds;
+  public void clearCachedFetchedFolderIDs() {
+    fetchedIds.clear();
+    fetchedIdsBriefs.clear();
+    fetchedIdsFull.clear();
   }
 
   /**
@@ -236,73 +236,6 @@ public class RecycleTableModel extends RecordTableModel {
   }
 
 
-  public Collection getSearchableCharSequencesFor(Object searchableObj) {
-    return getSearchableCharSequencesFor(searchableObj, true);
-  }
-  public Collection getSearchableCharSequencesFor(Object searchableObj, boolean includeMsgBody) {
-    if (searchableObj instanceof Record)
-      return RecycleTableModel.getSearchTextFor((Record) searchableObj, includeMsgBody);
-    else
-      return null;
-  }
-
-  public static Collection getSearchTextFor(Record searchableObj, boolean includeMsgBody) {
-    Collection sb = new LinkedList();
-    if (searchableObj instanceof FileLinkRecord)
-      sb = getSearchTextFor((FileLinkRecord) searchableObj, sb);
-    else if (searchableObj instanceof MsgLinkRecord)
-      sb = getSearchTextFor((MsgLinkRecord) searchableObj, includeMsgBody, sb);
-    return sb;
-  }
-
-  private static Collection getSearchTextFor(FileLinkRecord fileLink, Collection sb) {
-    sb.add(fileLink.getFileName());
-    sb.add(fileLink.getFileType());
-    return sb;
-  }
-
-  private static Collection getSearchTextFor(MsgLinkRecord msgLink, boolean includeMsgBody, Collection sb) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
-    if (msgData != null) {
-      // searching chat msgs should also include attachment listing -- use cached string
-      if (includeMsgBody && msgLink.getPostRenderingCache() != null)
-        sb.add(msgLink.getPostRenderingCache());
-      else {
-        sb.add(msgData.getSubject());
-        if (includeMsgBody) {
-          String text = msgData.getText();
-          if (text != null)
-            sb.add(text);
-        }
-      }
-
-      String fromEmailAddress = msgData.getFromEmailAddress();
-      if (msgData.isEmail() || fromEmailAddress != null) {
-        sb.add(ListRenderer.getRenderedText(CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress)));
-        sb.add(fromEmailAddress); // also include the email address instead of only the converted Address Contact
-      } else {
-        Record fromAsSender = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
-        Record fromAsRecipient = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
-        Record fromUser = cache.getUserRecord(msgData.senderUserId);
-        if (fromAsSender != null)
-          sb.add(ListRenderer.getRenderedText(fromAsSender));
-        if (fromAsRecipient != null)
-          sb.add(ListRenderer.getRenderedText(fromAsRecipient));
-        if (fromUser != null)
-          sb.add(ListRenderer.getRenderedText(fromUser));
-      }
-
-      Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);
-      for (int i=0; i<recipients.length; i++)
-        for (int k=0; k<recipients[i].length; k++)
-          if (recipients[i][k] != null && !(recipients[i][k] instanceof FolderPair) && !(recipients[i][k] instanceof FolderRecord) && !(recipients[i][k] instanceof FolderShareRecord))
-            sb.add(ListRenderer.getRenderedText(recipients[i][k]));
-    }
-    return sb;
-  }
-
-
   public Object getValueAtRawColumn(Record record, int column, boolean forSortOnly) {
     Object value = null;
 
@@ -402,7 +335,7 @@ public class RecycleTableModel extends RecordTableModel {
               value = fromEmailAddress;
             } else {
               if (forSortOnly) {
-                value = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
               } else {
                 value = msgData.senderUserId;
               }
@@ -702,7 +635,7 @@ public class RecycleTableModel extends RecordTableModel {
       if (halfPairPicksL.size() > 0) {
         halfPairPicks = new Record[halfPairPicksL.size()];
         halfPairPicksL.toArray(halfPairPicks);
-        pairPicks = CacheUtilities.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
+        pairPicks = CacheFldUtils.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
       }
 
       if (linksPicksL.size() > 0) {

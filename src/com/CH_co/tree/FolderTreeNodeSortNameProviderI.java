@@ -12,7 +12,7 @@
 
 package com.CH_co.tree;
 
-import com.CH_co.service.records.*;
+import com.CH_co.service.records.FolderPair;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012

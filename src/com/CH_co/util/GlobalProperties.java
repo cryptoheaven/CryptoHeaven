@@ -262,8 +262,9 @@ public class GlobalProperties extends Object {
   // build 684 Various performance tuning to make the GUI more snappy, increase minimum RSA key length to 2048.
   // build 686 Fix for reconnection updates and folder validation when computer is put to 'sleep'
   // build 688 Zoom-in and Zoom-out in message preview and email composer.
+  // build 690 Language files moved to client side package, and extensive code remodeling for android. Added info/warning/error status bar on top of tables.
 
-  public static final short PROGRAM_BUILD_NUMBER = 688;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 690;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

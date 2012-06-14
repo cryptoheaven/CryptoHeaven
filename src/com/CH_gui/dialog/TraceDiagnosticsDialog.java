@@ -102,7 +102,7 @@ public class TraceDiagnosticsDialog extends GeneralDialog {
       }
     });
     jStopSend = jButtons[1];
-    jButtons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    jButtons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     jButtons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         closeDialog();

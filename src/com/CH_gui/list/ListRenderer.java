@@ -1,49 +1,47 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.list;
 
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.TextRenderer;
+import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
 import com.CH_gui.action.Actions;
 import com.CH_gui.menuing.MenuActionItem;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.tree.FolderTree;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
-import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.records.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_gui.util.FileTypesIcons;
+import com.CH_gui.util.Images;
+import com.CH_guiLib.gui.MyDefaultListCellRenderer;
 import java.awt.Component;
 import java.io.File;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ListRenderer implements ListCellRenderer, Cloneable {
 
-  private static String STR_UNKNOWN = com.CH_gui.lang.Lang.rb.getString("unknown");
+  private static String STR_UNKNOWN = com.CH_cl.lang.Lang.rb.getString("unknown");
 
   private DefaultListCellRenderer defaultRenderer = new MyDefaultListCellRenderer();
   private boolean withFileSizes;
@@ -138,29 +136,6 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     else if (value instanceof JSeparator) {
       label = MenuActionItem.STR_SEPARATOR;
     }
-    else if (value instanceof ContactRecord) {
-      ContactRecord cRec = (ContactRecord) value;
-      Long myUserId = FetchedDataCache.getSingleInstance().getMyUserId();
-      if (myUserId != null)
-        label = cRec.getNote(myUserId);
-    }
-    else if (value instanceof FolderPair) {
-      FolderPair fPair = (FolderPair) value;
-      if (includeFolderParticipants) {
-        label = FolderTree.getFolderAndShareNames(fPair, true);
-      } else {
-        label = fPair.getMyName();
-      }
-    }
-    else if (value instanceof FileLinkRecord) {
-      FileLinkRecord fLink = (FileLinkRecord) value;
-      label = fLink.getFileName();
-      if (includeFileSizes) {
-        label += "   (" + Misc.getFormattedSize(fLink.origSize.longValue(), 4, 3) + (includeUploadPendingNote ? (fLink.isAborted() ? " Upload Aborded..." : (fLink.isIncomplete() ? " Upload Pending..." : "")) : "") + ")";
-      } else if (includeUploadPendingNote) {
-        label += "   " + (fLink.isAborted()? "(Upload Aborded)" : (fLink.isIncomplete() ? "(Upload Pending...)" : ""));
-      }
-    }
     else if (value instanceof MsgLinkRecord || value instanceof MsgDataRecord) {
       MsgDataRecord mData = null;
       if (value instanceof MsgLinkRecord) {
@@ -185,68 +160,14 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
                   {"\n", " "},
               });
             } else {
-              subject = "(" + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_No_subject__Message_ID_MSGID"), new Object[] {mData.msgId}) + ")";
+              subject = "(No subject, Message ID " + mData.msgId + ")";
             }
           }
           label = subject;
-        } else if (mData.isTypeAddress()) {
-          if (mData.fileAs != null && mData.fileAs.length() > 0 && mData.fileAs.trim().length() > 0) {
-            label = mData.fileAs.trim();
-          } else if (mData.name != null && mData.name.length() > 0 && mData.name.trim().length() > 0) {
-            label = mData.name.trim();
-          }
-          if (label != null) {
-            if (includeFullEmailAddress && mData.email != null) {
-              String personal = EmailRecord.getPersonal(mData.email);
-              if (personal != null && personal.length() > 0)
-                label = mData.email;
-              else
-                label += " <" + mData.email + ">";
-            }
-          } else {
-            if (mData.email != null)
-              label = mData.email.trim();
-            else
-              label = "(" + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_No_name__Address_ID_ADDRID"), new Object[] {mData.msgId}) + ")";
-          }
+          if (includeFileSizes && mData.recordSize != null)
+            label += "   (" + Misc.getFormattedSize(mData.recordSize.intValue(), 4, 3) + ")";
         }
-        if (includeFileSizes && mData.recordSize != null)
-          label += "   (" + Misc.getFormattedSize(mData.recordSize.intValue(), 4, 3) + ")";
       }
-    }
-    else if (value instanceof FolderRecord) {
-      FolderRecord fRec = (FolderRecord) value;
-      FolderShareRecord sRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(fRec.folderId, true);
-      if (sRec != null) {
-        label = sRec.getFolderName();
-      } else if (!fRec.isGroupType()) {
-        label = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Folder_(FOLDER-ID)"), new Object[] {fRec.folderId});
-      } else {
-        label = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("Group_(GROUP-ID)"), new Object[] {fRec.folderId});
-      }
-    }
-    else if (value instanceof FolderShareRecord) {
-      FolderShareRecord sRec = (FolderShareRecord) value;
-      label = sRec.getFolderName();
-    }
-    else if (value instanceof UserRecord) {
-      UserRecord uRec = (UserRecord) value;
-      label = uRec.shortInfo();
-    }
-    else if (value instanceof String) {
-      label = (String) value;
-    }
-    else if (value instanceof File) {
-      File file = (File) value;
-      label = file.getName();
-    }
-    else if (value instanceof InternetAddressRecord) {
-      InternetAddressRecord eRec = (InternetAddressRecord) value;
-      label = eRec.address;
-    }
-    else if (value instanceof EmailRecord) {
-      EmailRecord eRec = (EmailRecord) value;
-      label = eRec.getEmailAddressFull();
     }
     else if (value instanceof ObjectsProviderUpdaterI) {
       label = value.toString();
@@ -255,6 +176,10 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
       InvEmlRecord rec = (InvEmlRecord) value;
       String msg = rec.msg != null && rec.msg.length() > 0 ? "<FONT size='-2' COLOR=#777777>"+rec.msg+"</FONT>" : "";
       label = "<html><body>"+rec.emailAddr+" "+msg+"</body></html>";
+    }
+
+    if (label == null) {
+      label = TextRenderer.getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFullEmailAddress, includeUploadPendingNote);
     }
 
     if (label == null) {

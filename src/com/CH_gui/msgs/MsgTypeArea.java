@@ -223,7 +223,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
     }
 
     if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
-      add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Notes")), new GridBagConstraints(0, posY, 1, 1, 10, 0,
+      add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Notes")), new GridBagConstraints(0, posY, 1, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
       add(jHTML, new GridBagConstraints(1, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));

@@ -240,7 +240,7 @@ public class AccountOptionPermitChecks extends Object {
     centerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     centerPanel.setLayout(new BorderLayout(10, 10));
     if (userRecs.length > 1) {
-      jIncludeChangesToOptions = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
+      jIncludeChangesToOptions = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
       jIncludeChangesToOptions.setFont(jIncludeChangesToOptions.getFont().deriveFont(Font.BOLD));
       jIncludeChangesToOptions.addChangeListener(checkBoxListener);
       centerPanel.add(jIncludeChangesToOptions, BorderLayout.NORTH);
@@ -261,7 +261,7 @@ public class AccountOptionPermitChecks extends Object {
 
     int posY = 0;
     
-    jKeyOnServer = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Store_encrypted_Private_Key_on_the_server."));
+    jKeyOnServer = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Store_encrypted_Private_Key_on_the_server."));
     jKeyOnServer.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (!jKeyOnServer.isSelected() && jPasswordReset.isSelected()) {
@@ -304,17 +304,17 @@ public class AccountOptionPermitChecks extends Object {
       }
     }
 
-    jSpamInternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_messages_from_outside_of_Contact_List."));
+    jSpamInternal = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Accept_messages_from_outside_of_Contact_List."));
     jSpamInternalUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSpamInternal, jSpamInternalUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_INTER, checkBoxListener, posY);
     posY ++;
 
-    jSpamRegEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_regular_external_email."));
+    jSpamRegEmail = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Accept_regular_external_email."));
     jSpamRegEmailUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSpamRegEmail, jSpamRegEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_REG_EMAIL, checkBoxListener, posY);
     posY ++;
 
-    jSpamSslEmail = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Accept_encrypted_external_email."));
+    jSpamSslEmail = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Accept_encrypted_external_email."));
     jSpamSslEmailUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jSpamSslEmail, jSpamSslEmailUpdate, myUserRecord.acceptingSpam, getMostCommonAcceptingSpamBits(userRecs), UserRecord.ACC_SPAM_YES_SSL_EMAIL, checkBoxListener, posY);
     posY ++;
@@ -324,7 +324,7 @@ public class AccountOptionPermitChecks extends Object {
 //    addCheckBoxes(bottomPanel, includeUpdate, jSpamBlockNumeric, jSpamBlockNumericUpdate, myUserRecord.acceptingSpam, userRecord.acceptingSpam, UserRecord.ACC_SPAM_BLOCK_REG_NUMERIC_ADDRESS, checkBoxListener, posY);
 //    posY ++;
 
-    jWarnExternal = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Display_a_warning_before_sending_unencrypted_email."));
+    jWarnExternal = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Display_a_warning_before_sending_unencrypted_email."));
     jWarnExternalUpdate = new JMyCheckBox();
     addCheckBoxes(bottomPanel, includeUpdate, jWarnExternal, jWarnExternalUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_WARN_EXTERNAL, checkBoxListener, posY);
     posY ++;
@@ -335,14 +335,14 @@ public class AccountOptionPermitChecks extends Object {
     posY ++;
 
     if (jNotify == null) {
-      jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
+      jNotify = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
       jNotifyUpdate = new JMyCheckBox();
       addCheckBoxes(null, jNotify, jNotifyUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
       posY ++;
     }
 
     if (jNotifySubjectAddress == null) {
-      jNotifySubjectAddress = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
+      jNotifySubjectAddress = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
       jNotifySubjectAddressUpdate = new JMyCheckBox();
       addCheckBoxes(bottomPanel, jNotifySubjectAddress, jNotifySubjectAddressUpdate, myUserRecord.notifyByEmail, getMostCommonNotifyByEmailBits(userRecs), UserRecord.EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, checkBoxListener, posY);
       posY ++;
@@ -401,7 +401,7 @@ public class AccountOptionPermitChecks extends Object {
     centerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     centerPanel.setLayout(new BorderLayout(10, 10));
     if (userRecs.length > 1) {
-      jIncludeChangesToPermissions = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
+      jIncludeChangesToPermissions = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
       jIncludeChangesToPermissions.setFont(jIncludeChangesToPermissions.getFont().deriveFont(Font.BOLD));
       jIncludeChangesToPermissions.addChangeListener(checkBoxListener);
       centerPanel.add(jIncludeChangesToPermissions, BorderLayout.NORTH);

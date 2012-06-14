@@ -13,6 +13,7 @@
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
@@ -37,7 +38,6 @@ import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyPasswordKeyboardField;
 import com.CH_gui.gui.MyInsets;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_gui.util.GeneralDialog;
 import com.CH_gui.util.Images;
@@ -98,11 +98,11 @@ public class PasswordResetDialog extends GeneralDialog {
 
   /** Creates new PasswordResetDialog */
   public PasswordResetDialog(Frame frame, Long[] subAccountsToManage) {
-    super(frame, com.CH_gui.lang.Lang.rb.getString("title_Password_Reset"));
+    super(frame, com.CH_cl.lang.Lang.rb.getString("title_Password_Reset"));
     initialize(frame, subAccountsToManage);
   }
   public PasswordResetDialog(Dialog dialog, Long[] subAccountsToManage) {
-    super(dialog, com.CH_gui.lang.Lang.rb.getString("title_Password_Reset"));
+    super(dialog, com.CH_cl.lang.Lang.rb.getString("title_Password_Reset"));
     initialize(dialog, subAccountsToManage);
   }
   private void initialize(Component parent, Long[] subAccountsToManage) {
@@ -128,12 +128,12 @@ public class PasswordResetDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     okButton = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].setDefaultCapable(true);
     buttons[1].addActionListener(new CancelActionListener());
     cancelButton = buttons[1];
@@ -170,7 +170,7 @@ public class PasswordResetDialog extends GeneralDialog {
 
     int posY = 0;
 
-    String changeUserNameLabel = com.CH_gui.lang.Lang.rb.getString("label_Password_Reset_warning_text");
+    String changeUserNameLabel = com.CH_cl.lang.Lang.rb.getString("label_Password_Reset_warning_text");
 
     JLabel warningLabel = new JMyLabel(Images.get(ImageNums.SHIELD32));
     warningLabel.setText(changeUserNameLabel);
@@ -182,7 +182,7 @@ public class PasswordResetDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 10, 1), 20, 20));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Selected_Accounts")), new GridBagConstraints(0, posY, 3, 1, 10, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Selected_Accounts")), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -190,7 +190,7 @@ public class PasswordResetDialog extends GeneralDialog {
     listPanel.setLayout(new GridBagLayout());
     UserRecord[] subUsers = cache.getUserRecords(subAccountsToManage);
     for (int i=0; i<subUsers.length; i++) {
-      Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
+      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 5), 0, 0));
       jSubAccountsNotes[i] = new JMyLabel();
@@ -215,33 +215,33 @@ public class PasswordResetDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_New_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jNewPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Re-type_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jRePass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    String confirmPasswordLabel = com.CH_gui.lang.Lang.rb.getString("label_Please_enter_your_account_password_to_confirm_this_action.");
+    String confirmPasswordLabel = com.CH_cl.lang.Lang.rb.getString("label_Please_enter_your_account_password_to_confirm_this_action.");
     panel.add(new JMyLabel(confirmPasswordLabel), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     JLabel userName = new JMyLabel(userRecord.handle);
     userName.setIcon(RecordUtilsGui.getIcon(userRecord));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(userName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 0), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -373,7 +373,7 @@ public class PasswordResetDialog extends GeneralDialog {
       messageText = "Are you sure you want to Reset the Password for the following accounts: \n";
       messageText += getUsersAsText(subAccountsToReset, ", ");
       messageText += "\n\nDo you want to continue?";
-      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
+      String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Confirmation");
       boolean option = MessageDialog.showDialogYesNo(PasswordResetDialog.this, messageText, title);
       if (option == true) {
         // run the long part is another thread
@@ -440,8 +440,8 @@ public class PasswordResetDialog extends GeneralDialog {
       BAEncodedPassword oldBA = getOldBAEncodedPassword();
       if (!cache.getEncodedPassword().equals(oldBA)) {
         error = true;
-        String PASSWORD_ERROR = com.CH_gui.lang.Lang.rb.getString("msg_Password_does_not_match");
-        MessageDialog.showErrorDialog(PasswordResetDialog.this, PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+        String PASSWORD_ERROR = com.CH_cl.lang.Lang.rb.getString("msg_Password_does_not_match");
+        MessageDialog.showErrorDialog(PasswordResetDialog.this, PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
         jOldPass.setText("");
       }
 
@@ -451,7 +451,7 @@ public class PasswordResetDialog extends GeneralDialog {
         char[] pass2 = jRePass.getPassword();
         /* Password and re-typed password do not match */
         if (!Arrays.equals(pass1, pass2)) {
-          MessageDialog.showErrorDialog(PasswordResetDialog.this, LoginFrame.RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+          MessageDialog.showErrorDialog(PasswordResetDialog.this, LoginFrame.RETYPE_PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           jNewPass.setText(""); jRePass.setText("");
           error = true;
           jNewPass.requestFocusInWindow();

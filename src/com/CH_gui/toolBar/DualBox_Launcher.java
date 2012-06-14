@@ -62,7 +62,7 @@ public class DualBox_Launcher extends Object {
 
     JButton[] buttons = createButtons();
 
-    dialog = new CustomizeToolbarDialog(parentFrame, com.CH_gui.lang.Lang.rb.getString("title_Customize_Tool_Bar"), buttons, 
+    dialog = new CustomizeToolbarDialog(parentFrame, com.CH_cl.lang.Lang.rb.getString("title_Customize_Tool_Bar"), buttons, 
                                 DEFAULT_BUTTON_INDEX, DEFAULT_CANCEL_BUTTON_INDEX, dual);
 
     if (trace != null) trace.exit(DualBox_Launcher.class);
@@ -93,10 +93,10 @@ public class DualBox_Launcher extends Object {
 
   /** Create "ok" and "cancel" buttons **/
   private JButton[] createButtons() {
-    JButton okButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    JButton okButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     okButton.addActionListener(new OKActionListener());
 
-    JButton cancelButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    JButton cancelButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     cancelButton.addActionListener(new CancelActionListener());
 
     JButton[] buttons = new JButton[2];

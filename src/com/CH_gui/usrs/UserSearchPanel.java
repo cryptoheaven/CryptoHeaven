@@ -131,7 +131,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
    * @return create and return 'Search' button
    */
   private JButton createSearchButton() {
-    jSearch = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Search"));
+    jSearch = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Search"));
     jSearch.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         // search action
@@ -167,18 +167,18 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     }
 
     // create radio buttons first
-    jRadioNicExact = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Exact"));
-    jRadioNicNoCase = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Ignore_Case"));
+    jRadioNicExact = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Exact"));
+    jRadioNicNoCase = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Ignore_Case"));
     jRadioNicNoCase.setSelected(true);
-    jRadioNicPartial = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Partial"));
-    jRadioNicPhonetic = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Phonetic"));
+    jRadioNicPartial = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Partial"));
+    jRadioNicPhonetic = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Phonetic"));
 
     ButtonGroup g1 = new ButtonGroup();
     g1.add(jRadioNicExact); g1.add(jRadioNicNoCase); g1.add(jRadioNicPartial); g1.add(jRadioNicPhonetic);
 
-    jRadioIDExact = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Exact"));
+    jRadioIDExact = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Exact"));
     jRadioIDExact.setSelected(true);
-    jRadioIDPartial = new JMyRadioButton(com.CH_gui.lang.Lang.rb.getString("searchMatch_Partial"));
+    jRadioIDPartial = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Partial"));
 
     ButtonGroup g2 = new ButtonGroup();
     g2.add(jRadioIDExact); g2.add(jRadioIDPartial);
@@ -242,20 +242,20 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
     String introStr = customSearchHeader;
     if (introStr == null)
-      introStr = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Search_the_world_wide__SERVICE_COMMUNITY_NAME__for_your_Friends_and_Associates_by_specifying_their_username,_email_address,_or_ID."), new Object[] { URLs.get(URLs.SERVICE_COMMUNITY_NAME) });
+      introStr = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("label_Search_the_world_wide__SERVICE_COMMUNITY_NAME__for_your_Friends_and_Associates_by_specifying_their_username,_email_address,_or_ID."), new Object[] { URLs.get(URLs.SERVICE_COMMUNITY_NAME) });
     JLabel intro = new JMyLabel(introStr);
     intro.setIcon(Images.get(ImageNums.USER_FIND32));
     mainPanel.add(intro, new GridBagConstraints(0, posY, 7, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username(s)")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Username(s)")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 5), 0, 0));
     mainPanel.add(jNickname, new GridBagConstraints(2, posY, 5, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 8, 5), 0, 0));
     mainPanel.add(jRadioNicExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
@@ -267,14 +267,14 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_ID")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_ID")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 5), 0, 0));
     mainPanel.add(jUserID, new GridBagConstraints(2, posY, 5, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
     posY ++;
 
     // Two radio buttons combined in one row.
-    mainPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 8, 5), 0, 0));
     mainPanel.add(jRadioIDExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
@@ -343,8 +343,8 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
         uID = Long.valueOf(sId);
       } catch (NumberFormatException e) {
         inputValid = false;
-        String messageText = com.CH_gui.lang.Lang.rb.getString("msg_User_ID_must_have_a_numeric_value.");
-        String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_User_ID");
+        String messageText = com.CH_cl.lang.Lang.rb.getString("msg_User_ID_must_have_a_numeric_value.");
+        String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_User_ID");
         MessageDialog.showErrorDialog(this, messageText, title);
       }
     }
@@ -460,7 +460,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
             JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
             msgPanel.add(new JMyLabel(line1));
             msgPanel.add(new JMyLabel(line2));
-            String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
+            String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_users_found");
             ActionListener yesAction = new ActionListener() {
               public void actionPerformed(ActionEvent e) {
                 emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION].actionPerformed(null);
@@ -468,8 +468,8 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
             };
             MessageDialog.showDialogYesNo(UserSearchPanel.this, msgPanel, title, NotificationCenter.QUESTION_MESSAGE, false, yesAction, null);
           } else {
-            String messageText = com.CH_gui.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
-            String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_No_users_found");
+            String messageText = com.CH_cl.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
+            String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_users_found");
             MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
           }
         }

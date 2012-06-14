@@ -62,7 +62,7 @@ public class FindUserFrame extends JActionFrameClosable {
 
   /** Creates new FindUserFrame */
   public FindUserFrame(String selectButtonCustomText, String closeButtonCustomText, String searchString, boolean isSelectButtonHot) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Find_Friends_and_Associates"), false, false);
+    super(com.CH_cl.lang.Lang.rb.getString("title_Find_Friends_and_Associates"), false, false);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FindUserFrame.class, "FindUserFrame()");
 
     this.selectButtonCustomText = selectButtonCustomText;
@@ -99,7 +99,7 @@ public class FindUserFrame extends JActionFrameClosable {
     buttons[0].setText(selectButtonCustomText != null ? selectButtonCustomText : "Add to Contacts");
     buttons[1] = new JMyButton(userSearchPanel.emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION]);
     buttons[1].setText("Invite by Email");
-    buttons[2] = new JMyButton(closeButtonCustomText != null ? closeButtonCustomText : com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[2] = new JMyButton(closeButtonCustomText != null ? closeButtonCustomText : com.CH_cl.lang.Lang.rb.getString("button_Close"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         closeFrame();
@@ -138,7 +138,7 @@ public class FindUserFrame extends JActionFrameClosable {
       Long[] contactWithIds = RecordUtils.getIDs(userSearchPanel.userActionTable.getSelectedRecords());
       if (contactWithIds != null && contactWithIds.length > 0) {
         FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
-        String reason = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle});
+        String reason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle});
         InitiateContactDialog.sendContactCreate_Threaded(null, reason, contactWithIds, contactCreateHotButtonCallback);
         closeFrame();
       }

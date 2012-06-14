@@ -12,7 +12,7 @@
 
 package com.CH_gui.contactTable;
 
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_co.service.records.*;
@@ -50,9 +50,9 @@ public class ContactTableModel extends RecordTableModel {
 
   static final ColumnHeaderData columnHeaderData =
       new ColumnHeaderData(new Object[][]
-        { { null, com.CH_gui.lang.Lang.rb.getString("column_Name"), null, com.CH_gui.lang.Lang.rb.getString("column_Contact_ID"), com.CH_gui.lang.Lang.rb.getString("column_User_ID"), com.CH_gui.lang.Lang.rb.getString("column_Encryption"), com.CH_gui.lang.Lang.rb.getString("column_Created"), com.CH_gui.lang.Lang.rb.getString("column_Updated"), null },
-          { com.CH_gui.lang.Lang.rb.getString("column_Direction"), com.CH_gui.lang.Lang.rb.getString("column_Name"), com.CH_gui.lang.Lang.rb.getString("column_Status"), com.CH_gui.lang.Lang.rb.getString("column_Contact_ID"), com.CH_gui.lang.Lang.rb.getString("column_User_ID"), com.CH_gui.lang.Lang.rb.getString("column_Encryption"), com.CH_gui.lang.Lang.rb.getString("column_Created"), com.CH_gui.lang.Lang.rb.getString("column_Updated"), com.CH_gui.lang.Lang.rb.getString("column_Permissions") },
-          { com.CH_gui.lang.Lang.rb.getString("columnTip_Direction_of_the_contact..."), null, com.CH_gui.lang.Lang.rb.getString("columnTip_Contact_Status"), com.CH_gui.lang.Lang.rb.getString("columnTip_Contact_Permissions") },
+        { { null, com.CH_cl.lang.Lang.rb.getString("column_Name"), null, com.CH_cl.lang.Lang.rb.getString("column_Contact_ID"), com.CH_cl.lang.Lang.rb.getString("column_User_ID"), com.CH_cl.lang.Lang.rb.getString("column_Encryption"), com.CH_cl.lang.Lang.rb.getString("column_Created"), com.CH_cl.lang.Lang.rb.getString("column_Updated"), null },
+          { com.CH_cl.lang.Lang.rb.getString("column_Direction"), com.CH_cl.lang.Lang.rb.getString("column_Name"), com.CH_cl.lang.Lang.rb.getString("column_Status"), com.CH_cl.lang.Lang.rb.getString("column_Contact_ID"), com.CH_cl.lang.Lang.rb.getString("column_User_ID"), com.CH_cl.lang.Lang.rb.getString("column_Encryption"), com.CH_cl.lang.Lang.rb.getString("column_Created"), com.CH_cl.lang.Lang.rb.getString("column_Updated"), com.CH_cl.lang.Lang.rb.getString("column_Permissions") },
+          { com.CH_cl.lang.Lang.rb.getString("columnTip_Direction_of_the_contact..."), null, com.CH_cl.lang.Lang.rb.getString("columnTip_Contact_Status"), com.CH_cl.lang.Lang.rb.getString("columnTip_Contact_Permissions") },
           { new Integer(ImageNums.ARROW_DOUBLE16), null, new Integer(ImageNums.HANDSHAKE16), null, null, null, null, null, new Integer(ImageNums.TOOLS16) },
           { new Integer(18), new Integer(128), new Integer(18), new Integer( 60), new Integer( 60), new Integer(120), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer(30) },
           { new Integer(18), new Integer(128), new Integer(18), new Integer( 60), new Integer( 60), new Integer(120), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer(30) },
@@ -95,8 +95,7 @@ public class ContactTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return null;
+  public void clearCachedFetchedFolderIDs() {
   }
 
   /**
@@ -305,7 +304,7 @@ public class ContactTableModel extends RecordTableModel {
         if (halfPairPicksV.size() > 0) {
           halfPairPicks = new Record[halfPairPicksV.size()];
           halfPairPicksV.toArray(halfPairPicks);
-          pairPicks = CacheUtilities.convertRecordsToPairs(halfPairPicks);
+          pairPicks = CacheFldUtils.convertRecordsToPairs(halfPairPicks);
         }
 
         if (contactPicksV.size() > 0) {

@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.frame;
 
@@ -55,21 +55,21 @@ import javax.swing.plaf.FontUIResource;
 
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.7 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.7 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MainFrameStarter extends Object {
 
   private MainFrameStarter(JWindow splashWindow, boolean skipLogin, boolean swingMemoryFootprintTestExitWhenMainScreenLoaded, Long initialFolderId, Long initialMsgLinkId) {
@@ -109,9 +109,9 @@ public class MainFrameStarter extends Object {
 
     // initialize a clean-up agent to run every 15 minutes for garbage-collection and every 60 minutes for temp file cleanup
     CleanupAgent.startSingleInstance(CleanupAgent.MODE_FINALIZATION | CleanupAgent.MODE_GC | CleanupAgent.MODE_TEMP_FILE_CLEANER,
-                     new String[][] { { FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null },
+                    new String[][] { { FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null },
                                       { FileDataRecord.TEMP_PLAIN_FILE_PREFIX, null } },
-                     29, 29, 37, 37, 1, 1440);
+                    29, 29, 37, 37, 1, 1440);
     // File cleaner will start early, but wipe/delete left over temp files after they are at least 24h old.
     // All temp files should be wiped/deleted in other ways, this is a last resort cleanup in case of exceptions, etc.
 
@@ -240,7 +240,7 @@ public class MainFrameStarter extends Object {
         if (st.hasMoreTokens())
           minor = Integer.parseInt(st.nextToken());
         if (major < 1 || (major == 1 && minor < 3)) {
-          System.out.println(com.CH_gui.lang.Lang.rb.getString("Please_upgrade_your_JRE..."));
+          System.out.println(com.CH_cl.lang.Lang.rb.getString("Please_upgrade_your_JRE..."));
           Misc.systemExit(-2);
         }
       }
@@ -281,8 +281,8 @@ public class MainFrameStarter extends Object {
   }
 
   private static void usageExit() {
-    System.out.println(com.CH_gui.lang.Lang.rb.getString("usage_line_1"));
-    System.out.println(com.CH_gui.lang.Lang.rb.getString("usage_line_2"));
+    System.out.println(com.CH_cl.lang.Lang.rb.getString("usage_line_1"));
+    System.out.println(com.CH_cl.lang.Lang.rb.getString("usage_line_2"));
     Misc.systemExit(-1);
   }
 
@@ -397,7 +397,7 @@ public class MainFrameStarter extends Object {
       if (success) {
         if (trace != null) trace.data(10, "advance progress monitor, login is complete");
         getLoginProgMonitor().nextTask();
-        getLoginProgMonitor().setCurrentStatus(com.CH_gui.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
+        getLoginProgMonitor().setCurrentStatus(com.CH_cl.lang.Lang.rb.getString("label_Loading_Main_Program..._Please_Wait."));
 
         // Mark Active Status right away since the GUI timer is scheduled in intervals...
         // if user was disconnected in INACTIVE state, he should be marked active now...
@@ -425,21 +425,22 @@ public class MainFrameStarter extends Object {
 
                     GeneralDialog.setDefaultParent(mainStartupFrame[0]);
 
-                    // Display popup window to suggest upgrading
-                    UserRecord myUserRec = cache.getUserRecord();
-                    if (myUserRec != null && myUserRec.isFreePromoAccount()) {
-                      Long userId = myUserRec.userId;
-                      String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
-                      String urlStrEnd = "</a>";
-                      String htmlText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_free_demo_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
-                      PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
-                    } else if (myUserRec != null && myUserRec.isGuestAccount()) {
-                      Long userId = myUserRec.userId;
-                      String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
-                      String urlStrEnd = "</a>";
-                      String htmlText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_free_guest_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
-                      PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
-                    }
+                    // !-- skip upgrade popup, we have a status line on top of the tables --!
+//                     Display popup window to suggest upgrading
+//                    UserRecord myUserRec = cache.getUserRecord();
+//                    if (myUserRec != null && myUserRec.isFreePromoAccount()) {
+//                      Long userId = myUserRec.userId;
+//                      String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
+//                      String urlStrEnd = "</a>";
+//                      String htmlText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_free_demo_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
+//                      PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
+//                    } else if (myUserRec != null && myUserRec.isGuestAccount()) {
+//                      Long userId = myUserRec.userId;
+//                      String urlStrStart = "<a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID=" + userId + "\">";
+//                      String urlStrEnd = "</a>";
+//                      String htmlText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_free_guest_account_sliding_message"), new Object[] {urlStrStart, urlStrEnd, URLs.get(URLs.SERVICE_SOFTWARE_NAME)});
+//                      PopupWindow.getSingleInstance().addForScrolling(new HTML_ClickablePane(htmlText));
+//                    }
 
                     if (trace != null) trace.exit(getClass());
                   }
@@ -501,8 +502,8 @@ public class MainFrameStarter extends Object {
   /****************************************************************************************/
 
   /**
-   * Listen on updates to the ContactRecords in the cache.
-   */
+  * Listen on updates to the ContactRecords in the cache.
+  */
   private class ContactListener implements ContactRecordListener {
     public void contactRecordUpdated(ContactRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -559,8 +560,8 @@ public class MainFrameStarter extends Object {
   }
 
   /**
-   * Listen on updates to the UserRecords in the cache.
-   */
+  * Listen on updates to the UserRecords in the cache.
+  */
   private static class UserListener implements UserRecordListener {
     public void userRecordUpdated(UserRecordEvent event) {
       // to prevent gui tree deadlocks, run on an AWT thread
@@ -569,8 +570,8 @@ public class MainFrameStarter extends Object {
   }
 
   /**
-   * Listen on updates to the EmailRecords in the cache.
-   */
+  * Listen on updates to the EmailRecords in the cache.
+  */
   private static class EmailListener implements EmailRecordListener {
     public void emailRecordUpdated(EmailRecordEvent event) {
       // to prevent gui tree deadlocks, run on an AWT thread

@@ -12,6 +12,7 @@
 
 package com.CH_gui.keyTable;
 
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.KeyRecordEvent;
 import com.CH_cl.service.cache.event.KeyRecordListener;
@@ -21,11 +22,9 @@ import com.CH_co.service.records.Record;
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
-import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -47,11 +46,11 @@ public class KeyTableModel extends RecordTableModel {
   
   private KeyListener keyListener;
 
-  private static String STR_KEY = com.CH_gui.lang.Lang.rb.getString("column_Key");
-  private static String STR_OWNER = com.CH_gui.lang.Lang.rb.getString("column_Owner");
-  private static String STR_CREATED = com.CH_gui.lang.Lang.rb.getString("column_Created");
-  private static String STR_UPDATED = com.CH_gui.lang.Lang.rb.getString("column_Updated");
-  private static String STR_KEY_ID = com.CH_gui.lang.Lang.rb.getString("column_Key_ID");
+  private static String STR_KEY = com.CH_cl.lang.Lang.rb.getString("column_Key");
+  private static String STR_OWNER = com.CH_cl.lang.Lang.rb.getString("column_Owner");
+  private static String STR_CREATED = com.CH_cl.lang.Lang.rb.getString("column_Created");
+  private static String STR_UPDATED = com.CH_cl.lang.Lang.rb.getString("column_Updated");
+  private static String STR_KEY_ID = com.CH_cl.lang.Lang.rb.getString("column_Key_ID");
 
   static final ColumnHeaderData columnHeaderData = 
       new ColumnHeaderData(new Object[][]
@@ -90,8 +89,7 @@ public class KeyTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return null;
+  public void clearCachedFetchedFolderIDs() {
   }
 
   /**
@@ -127,21 +125,21 @@ public class KeyTableModel extends RecordTableModel {
           boolean hasPrivate = keyRecord.getPrivateKey() != null;
           String extras = null;
           if (hasPublic && !hasPrivate)
-            extras = " " + com.CH_gui.lang.Lang.rb.getString("key_public_only");
+            extras = " " + com.CH_cl.lang.Lang.rb.getString("key_public_only");
           else if (hasPublic && hasPrivate)
-            extras = " " + com.CH_gui.lang.Lang.rb.getString("key_private/public");
+            extras = " " + com.CH_cl.lang.Lang.rb.getString("key_private/public");
           else if (!hasPublic && hasPrivate)
-            extras = " " + com.CH_gui.lang.Lang.rb.getString("key_private_only");
+            extras = " " + com.CH_cl.lang.Lang.rb.getString("key_private_only");
           else
-            extras = " " + com.CH_gui.lang.Lang.rb.getString("key_no_key");
+            extras = " " + com.CH_cl.lang.Lang.rb.getString("key_no_key");
           value = value.toString() + extras;
           break;
         case 1: value = keyRecord.ownerUserId;
-          Record owner = MsgPanelUtils.convertUserIdToFamiliarUser(keyRecord.ownerUserId, true, true);
+          Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(keyRecord.ownerUserId, true, true);
           if (owner == null) {
             UserRecord uRec = new UserRecord();
             uRec.userId = keyRecord.ownerUserId;
-            uRec.handle = com.CH_gui.lang.Lang.rb.getString("User");
+            uRec.handle = com.CH_cl.lang.Lang.rb.getString("User");
             owner = uRec;
           }
           value = ListRenderer.getRenderedText(owner);

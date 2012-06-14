@@ -42,10 +42,10 @@ import com.CH_co.trace.Trace;
 public class MouseTextEntry extends JPanel {
 
   private static int ROW_LENGTH = 9;
-  private String[] keys = new String[] { com.CH_gui.lang.Lang.rb.getString("virtual_keys_1"), 
-                                         com.CH_gui.lang.Lang.rb.getString("virtual_keys_2"),
-                                         com.CH_gui.lang.Lang.rb.getString("virtual_keys_3"),
-                                         com.CH_gui.lang.Lang.rb.getString("virtual_keys_4") 
+  private String[] keys = new String[] { com.CH_cl.lang.Lang.rb.getString("virtual_keys_1"), 
+                                         com.CH_cl.lang.Lang.rb.getString("virtual_keys_2"),
+                                         com.CH_cl.lang.Lang.rb.getString("virtual_keys_3"),
+                                         com.CH_cl.lang.Lang.rb.getString("virtual_keys_4") 
                                         };
   private JButton[][] keyButtons;
   private JPasswordField jPass;
@@ -108,7 +108,7 @@ public class MouseTextEntry extends JPanel {
       for (int k=0; k<keys[i].length(); k++) {
         String s = keys[i].substring(k, k+1);
         if (s.equals(" ")) {
-          s = com.CH_gui.lang.Lang.rb.getString("virtual_keys_space");
+          s = com.CH_cl.lang.Lang.rb.getString("virtual_keys_space");
         }
         bts[i][k] = new JMyButton(s);
         bts[i][k].addActionListener(buttonActionListener);
@@ -132,32 +132,32 @@ public class MouseTextEntry extends JPanel {
 
     Color grayBack = new Color(180, 180, 180);
 
-    jabc = new JMyButton(com.CH_gui.lang.Lang.rb.getString("virtual_keys_button1_abc"));
+    jabc = new JMyButton(com.CH_cl.lang.Lang.rb.getString("virtual_keys_button1_abc"));
     jabc.setBackground(grayBack);
     jabc.setForeground(Color.blue);
     jabc.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-    jABC = new JMyButton(com.CH_gui.lang.Lang.rb.getString("virtual_keys_button2_ABC"));
+    jABC = new JMyButton(com.CH_cl.lang.Lang.rb.getString("virtual_keys_button2_ABC"));
     jABC.setBackground(grayBack);
     jABC.setForeground(Color.blue);
     jABC.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-    j123 = new JMyButton(com.CH_gui.lang.Lang.rb.getString("virtual_keys_button3_123"));
+    j123 = new JMyButton(com.CH_cl.lang.Lang.rb.getString("virtual_keys_button3_123"));
     j123.setBackground(grayBack);
     j123.setForeground(Color.blue);
     j123.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-    jsym = new JMyButton(com.CH_gui.lang.Lang.rb.getString("virtual_keys_button4_#@%"));
+    jsym = new JMyButton(com.CH_cl.lang.Lang.rb.getString("virtual_keys_button4_#@%"));
     jsym.setBackground(grayBack);
     jsym.setForeground(Color.blue);
     jsym.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-    jbak = new JMyButton(com.CH_gui.lang.Lang.rb.getString("virtual_keys_button5_DEL"));
+    jbak = new JMyButton(com.CH_cl.lang.Lang.rb.getString("virtual_keys_button5_DEL"));
     jbak.setBackground(grayBack);
     jbak.setForeground(Color.blue);
     jbak.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-    jclr = new JMyButton(com.CH_gui.lang.Lang.rb.getString("virtual_keys_button6_CLR"));
+    jclr = new JMyButton(com.CH_cl.lang.Lang.rb.getString("virtual_keys_button6_CLR"));
     jclr.setBackground(grayBack);
     jclr.setForeground(Color.blue);
     jclr.setBorder(new EmptyBorder(6, 6, 6, 6));
@@ -263,7 +263,7 @@ public class MouseTextEntry extends JPanel {
       }
       else {
         String s = button.getText();
-        if (s.equals(com.CH_gui.lang.Lang.rb.getString("virtual_keys_space"))) {
+        if (s.equals(com.CH_cl.lang.Lang.rb.getString("virtual_keys_space"))) {
           s = " ";
         }
         doAppend(s);

@@ -56,7 +56,7 @@ public class ErrorStorageExceeded extends ClientMessageAction {
       pm.jobKilled();
 
     // Check individual action GUI suppression, global flag will be checked by NotificationCenter
-    if (isGUIsuppressed) {
+    if (!isGUIsuppressed) {
       Str_Rp reply = (Str_Rp) getMsgDataSet();
       String title = "Server Storage Limit Exceeded";
       String msg = reply.message;

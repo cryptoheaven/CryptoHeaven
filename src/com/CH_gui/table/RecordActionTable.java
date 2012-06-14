@@ -1,17 +1,18 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.table;
 
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.ContactRecordEvent;
 import com.CH_cl.service.cache.event.ContactRecordListener;
@@ -37,7 +38,6 @@ import com.CH_gui.frame.MsgTableStarterFrame;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.msgTable.MsgTableModel;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.sortedTable.TableSorter;
@@ -59,21 +59,21 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.34 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.34 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public abstract class RecordActionTable extends RecordTableScrollPane implements ActionProducerI, DisposableObj {
 
   private RecordTableModelListener tableModelListener;
@@ -171,8 +171,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   }
 
   /**
-   * Enable notification of new content in this tables folder on the frame's title bar.
-   */
+  * Enable notification of new content in this tables folder on the frame's title bar.
+  */
   public void setEnabledFolderNewItemsNotify(boolean b) {
     if (enabledFolderNewItemsNotify && !b) {
       if (folderListener != null) {
@@ -232,7 +232,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /** @return all the acitons that this objects produces.
-   */
+  */
   public abstract Action[] getActions();
 
   public Action getRefreshAction() {
@@ -264,15 +264,15 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /** Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true (because this object will gather all actions from its childeren or hide them counciously).
-   */
+  * @return true (because this object will gather all actions from its childeren or hide them counciously).
+  */
   public boolean isFinalActionProducer() {
     return true;
   }
 
   /**
-   * Determine is action is from the popup menu, ie: not menu nor shortcut.
-   */
+  * Determine is action is from the popup menu, ie: not menu nor shortcut.
+  */
   public static boolean isActionActivatedFromPopup(ActionEvent event) {
     boolean fromMenu = false;
     boolean fromPopup = false;
@@ -301,7 +301,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /** Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  */
   public abstract void setEnabledActions();
 
 
@@ -314,11 +314,11 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
   public class IterateNextAction extends AbstractActionTraced {
     public IterateNextAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Next"), Images.get(ImageNums.GO_NEXT16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Next"), Images.get(ImageNums.GO_NEXT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Next"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Next"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GO_NEXT24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Next"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Next"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
@@ -335,11 +335,11 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
   public class IteratePrevAction extends AbstractActionTraced {
     public IteratePrevAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Previous"), Images.get(ImageNums.GO_PREV16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Previous"), Images.get(ImageNums.GO_PREV16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Previous"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Previous"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GO_PREV24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Previous"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Previous"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
@@ -355,8 +355,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /**
-   * Toggle the split layout between horizontal and vertical.
-   */
+  * Toggle the split layout between horizontal and vertical.
+  */
   public class SplitLayoutAction extends AbstractActionTraced {
     private boolean initialized = false;
     private int switchPercentageMin;
@@ -452,15 +452,15 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /**
-   * Toggle Filter.
-   */
+  * Toggle Filter.
+  */
   public static class FilterAction extends AbstractActionTraced {
     public FilterAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Search"), Images.get(ImageNums.FIND16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Search"), Images.get(ImageNums.FIND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Find Messages and Files ...");
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FIND24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Search"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Search"));
       putValue(Actions.STATE_CHECK, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
@@ -475,7 +475,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       this(isAscending, actionId, sharedAscDescButtonGroup);
     }
     public SortAscDescAction(boolean isAscending, int actionId, ButtonGroup group) {
-      super(isAscending ? com.CH_gui.lang.Lang.rb.getString("sort_Ascending") : com.CH_gui.lang.Lang.rb.getString("sort_Descending"));
+      super(isAscending ? com.CH_cl.lang.Lang.rb.getString("sort_Ascending") : com.CH_cl.lang.Lang.rb.getString("sort_Descending"));
       this.isAscending = isAscending;
       putValue(Actions.ACTION_ID, new Integer(actionId));
       // Set "selected" only if the primary sort column direction matches 'isAscending'
@@ -537,12 +537,12 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
   public class CustomizeColumnsAction extends AbstractActionTraced {
     public CustomizeColumnsAction(int actionId) {
-      this(actionId, com.CH_gui.lang.Lang.rb.getString("action_Table_Columns_..."));
+      this(actionId, com.CH_cl.lang.Lang.rb.getString("action_Table_Columns_..."));
     }
     public CustomizeColumnsAction(int actionId, String actionName) {
       super(actionName);
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_columns_to_render_in_the_table."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Select_columns_to_render_in_the_table."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
@@ -573,16 +573,16 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   }
 
   /**
-   * Remembers the folderId and associates it with a mark.
-   * Useful to check if folder update count has changed since last marking.
-   */
+  * Remembers the folderId and associates it with a mark.
+  * Useful to check if folder update count has changed since last marking.
+  */
   private void setFolderUpdateMark(Long folderId, int mark) {
     if (folderUpdateHistoryHT == null) folderUpdateHistoryHT = new Hashtable();
     folderUpdateHistoryHT.put(folderId, new Integer(mark));
   }
   /**
-   * @return last stored mark for given folder, or zero '0' is not stored at all.
-   */
+  * @return last stored mark for given folder, or zero '0' is not stored at all.
+  */
   private int getFolderUpdateMark(Long folderId) {
     Integer mark = null;
     if (folderUpdateHistoryHT != null)
@@ -592,8 +592,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /** Listen on updates to the FolderRecords in the cache.
-   * If the event happens, visually notify the user of new items.
-   */
+  * If the event happens, visually notify the user of new items.
+  */
   private class FolderListener implements FolderRecordListener {
     public void folderRecordUpdated(FolderRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -641,8 +641,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
 
 
   /** Listen on updates to the ContactRecords in the cache.
-   * If the event happens, visually notify the user of new items.
-   */
+  * If the event happens, visually notify the user of new items.
+  */
   private class ContactListener implements ContactRecordListener {
     public void contactRecordUpdated(ContactRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -672,7 +672,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
         ContactRecord cRec = cRecs[i];
         // If notification capable contact.
         if (cRec.previousStatus != null && cRec.ownerUserId.equals(userId)) {
-          String userName = ListRenderer.getRenderedText( MsgPanelUtils.convertUserIdToFamiliarUser(cRec.contactWithId, true, true) );
+          String userName = ListRenderer.getRenderedText( CacheUsrUtils.convertUserIdToFamiliarUser(cRec.contactWithId, true, true) );
           // If STATUS pop-up notifications enabled
           if (userRecord != null && (userRecord.flags.longValue() & UserRecord.FLAG_USER_ONLINE_STATUS_POPUP) != 0) {
             // Popup slider for user "OFFLINE" notification
@@ -706,7 +706,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                           public void run() {
                             Object token = new Object();
                             if (offlineDialogArbiter.putToken(key, token)) {
-                              String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_{0}_left_the_chat_area_and_went_Offline."), new Object[] {msgUserName});
+                              String msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_{0}_left_the_chat_area_and_went_Offline."), new Object[] {msgUserName});
                               PopupWindow.getSingleInstance().addForScrolling("<html><img src=\"images/"+ImageNums.getImageName(ImageNums.STATUS_OFFLINE16)+"\" height=\"16\" width=\"16\">&nbsp;"+msg, true);
                               Sounds.playAsynchronous(Sounds.OFFLINE);
                               try {
@@ -741,7 +741,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                   public void runTraced() {
                     Object token = new Object();
                     if (offlineDialogArbiter.putToken(key, token)) {
-                      String msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {msgUserName});
+                      String msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {msgUserName});
                       String iconStr = ImageNums.getImageName(imageCode);
                       MouseListener clickListener = new MouseAdapter() {
                         public void mouseClicked(MouseEvent e) {
@@ -794,16 +794,16 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                 String msg = null;
                 if (ContactRecord.isOnlineStatus(cRec.previousStatus) &&
                     cRec.status.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED) {
-                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_went_offline."), new Object[] {userName});
+                      msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_USER-NAME_went_offline."), new Object[] {userName});
                 } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED &&
                     ContactRecord.isOnlineStatus(cRec.status)) {
-                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {userName});
+                      msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_USER-NAME_came_online."), new Object[] {userName});
                 } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_INITIATED &&
                     cRec.status.shortValue() == ContactRecord.STATUS_ACCEPTED) {
-                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_accepted."), new Object[] {userName});
+                      msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_accepted."), new Object[] {userName});
                 } else if (cRec.previousStatus.shortValue() == ContactRecord.STATUS_INITIATED &&
                     cRec.status.shortValue() == ContactRecord.STATUS_DECLINED) {
-                      msg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_declined."), new Object[] {userName});
+                      msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Contact_with_USER-NAME_was_declined."), new Object[] {userName});
                 }
                 if (msg != null) {
                   String userStr = ListRenderer.getRenderedText(FetchedDataCache.getSingleInstance().getUserRecord());
@@ -823,8 +823,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
   } // end class ContactGUIUpdater
 
   /**
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
   */
   public void disposeObj() {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();

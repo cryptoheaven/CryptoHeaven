@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.tree;
 
@@ -26,21 +26,21 @@ import java.awt.*;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *  This class overrides the default renderer to manage the icons properly.
- *
- * Class Details:
- *  Icons used are taken from Icon Repository.
- *
- * <b>$Revision: 1.22 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*  This class overrides the default renderer to manage the icons properly.
+*
+* Class Details:
+*  Icons used are taken from Icon Repository.
+*
+* <b>$Revision: 1.22 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
 
   /** Creates new FolderTreeCellRenderer */
@@ -102,22 +102,22 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
       if (toolTip == null) {
         int updateCount = fRec.getUpdateCount();
         if (!selected && updateCount > 0) {
-          String times = updateCount > 1 ? com.CH_gui.lang.Lang.rb.getString("times") : com.CH_gui.lang.Lang.rb.getString("time");
-          toolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("folderTip_This_folder_was_updated_NUMBER-OF_TIMES_while_you_were_not_viewing_its_content..."), new Object[] {new Integer(updateCount), times});
+          String times = updateCount > 1 ? com.CH_cl.lang.Lang.rb.getString("times") : com.CH_cl.lang.Lang.rb.getString("time");
+          toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_This_folder_was_updated_NUMBER-OF_TIMES_while_you_were_not_viewing_its_content..."), new Object[] {new Integer(updateCount), times});
         } else {
-          String[] notes = FolderTree.getOwnerAndChatNote(fRec);
+          String[] notes = TextRenderer.getOwnerAndChatNote(fRec);
           String ownerNote = notes[0];
           String chatNote = notes[1];
 
           if (ownerNote.length() > 0 && chatNote.length() == 0) {
             //toolTip = "<html>The user <b>" + ownerNote + "</b> is the primary owner of this folder.";
-            toolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_folder."), new Object[] {ownerNote});
+            toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_folder."), new Object[] {ownerNote});
           } else if (ownerNote.length() == 0 && chatNote.length() > 0) {
             //toolTip = "<html>You are sharing this chatting folder with <b>" + chatNote + "</b>.";
-            toolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("folderTip_You_are_sharing_this_chatting_folder_with_USER."), new Object[] {chatNote});
+            toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_You_are_sharing_this_chatting_folder_with_USER."), new Object[] {chatNote});
           } else if (ownerNote.length() > 0 && chatNote.length() > 0) {
             //toolTip = "<html>The user <b>" + ownerNote+ "</b> is the primary owner of this chatting folder. <br>Other participants are <b>" + chatNote + "</b>.";
-            toolTip = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_chatting_folder._Other_participants_are_OTHER-USERS."), new Object[] {ownerNote, chatNote});
+            toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_chatting_folder._Other_participants_are_OTHER-USERS."), new Object[] {ownerNote, chatNote});
           }
         }
         fRec.setCachedToolTip(toolTip == null ? "" : toolTip);

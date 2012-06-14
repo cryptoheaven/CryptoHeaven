@@ -98,7 +98,7 @@ public class ContactTableComponent extends RecordTableComponent {
   }
 
   private void initialize(boolean suppressUtilityComponent) {
-    JLabel titleLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("compTitle_Contacts"));
+    JLabel titleLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("compTitle_Contacts"));
     titleLabel.setIcon(Images.get(ImageNums.FLD_CNT_CLOSED16));
     setTitle(titleLabel);
     if (!suppressUtilityComponent)
@@ -205,7 +205,7 @@ public class ContactTableComponent extends RecordTableComponent {
         if (addresses != null && addresses.length > 0) {
           InviteByEmailDialog.doInvite(text, "", null, autoCreateWebAccounts);
         } else {
-          new FindUserFrame(com.CH_gui.lang.Lang.rb.getString("button_Select"), com.CH_gui.lang.Lang.rb.getString("button_Close"), text, true).setContactCreateHotButtonCallback(new CallbackI() {
+          new FindUserFrame(com.CH_cl.lang.Lang.rb.getString("button_Select"), com.CH_cl.lang.Lang.rb.getString("button_Close"), text, true).setContactCreateHotButtonCallback(new CallbackI() {
             public void callback(Object value) {
               Long[] contactWithIDs = (Long[]) value;
               FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -308,7 +308,7 @@ public class ContactTableComponent extends RecordTableComponent {
             } else {
               jMinutes.grabFocus();
               jMinutes.selectAll();
-              MessageDialog.showDialog(ContactTableComponent.this, "Please enter a valid integer value.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"), NotificationCenter.ERROR_MESSAGE, false);
+              MessageDialog.showDialog(ContactTableComponent.this, "Please enter a valid integer value.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"), NotificationCenter.ERROR_MESSAGE, false);
             }
           }
         });

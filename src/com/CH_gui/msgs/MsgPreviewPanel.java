@@ -12,7 +12,9 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
@@ -245,7 +247,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   */
   private class CopyAction extends DefaultEditorKit.CopyAction {
     public CopyAction(int actionId) {
-      putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Copy"));
+      putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Copy"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.COPY16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_MENU, Boolean.FALSE);
@@ -261,7 +263,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   */
   private class SelectAllAction extends AbstractActionTraced {
     public SelectAllAction(int actionId) {
-      putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Select_All"));
+      putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Select_All"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.SELECT_ALL16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_MENU, Boolean.FALSE);
@@ -333,7 +335,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     });
     jImageFilterPanel = new JPanel(new GridBagLayout());
     jImageFilterPanel.setVisible(false);
-    jImageFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jImageFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
     jImageFilterPanel.setLayout(new GridBagLayout());
     jImageFilterPanel.add(new JMyLabel(" "), new GridBagConstraints(0, 0, 1, 1, 0, 0, // left justify spacer element used in From and To lines
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
@@ -357,7 +359,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jAttachment.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     jAttachment.setBorder(new EmptyBorder(1, 1, 1, 1));
     jAttachment.setVisible(false);
-    jAttachment.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Show_attachments..."));
+    jAttachment.setToolTipText(com.CH_cl.lang.Lang.rb.getString("actionTip_Show_attachments..."));
     jAttachment.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedAttachment();
@@ -417,7 +419,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         jNotSpam.setDescription(null);
         // Move message to Inbox
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        FolderPair inbox = CacheUtilities.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().msgFolderId));
+        FolderPair inbox = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().msgFolderId));
         MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, inbox, new MsgLinkRecord[] { msgLinkRecord });
         // Add sender email address at once to Whitelist (free up AWT thread)
         Thread th = new ThreadTraced("Not Spam Mover") {
@@ -560,7 +562,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     JLabel jMinHeight1 = new JMyLabel(" ");
     jLinePriority.add(jMinHeight1, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    jPriorityLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority"));
+    jPriorityLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Priority"));
     jLinePriority.add(jPriorityLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLinePriority.add(jPriority, new GridBagConstraints(2, 0, 1, 1, 10, 0,
@@ -570,7 +572,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     JLabel jMinHeight2 = new JMyLabel(" ");
     jLineFrom.add(jMinHeight2, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    jFromLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_From"));
+    jFromLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_From"));
     jLineFrom.add(jFromLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineFrom.add(jFromName, new GridBagConstraints(2, 0, 1, 1, 0, 0,
@@ -595,7 +597,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     JLabel jMinHeight3 = new JMyLabel(" ");
     jLineReplyTo.add(jMinHeight3, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    jReplyToLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Reply_To"));
+    jReplyToLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Reply_To"));
     jLineReplyTo.add(jReplyToLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineReplyTo.add(jReplyTo, new GridBagConstraints(2, 0, 1, 1, 10, 0,
@@ -656,7 +658,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     JLabel jMinHeight6 = new JMyLabel(" ");
     jLineExpiration.add(jMinHeight6, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
-    jExpirationLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Expiry_Date"));
+    jExpirationLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Expiry_Date"));
     jExpirationLabel.setFont(jExpirationLabel.getFont().deriveFont(Font.BOLD));
     jLineExpiration.add(jExpirationLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
@@ -913,7 +915,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
         // Don't do a flowing-resizable panel, just put a label style boxes
         //MsgPanelUtils.drawMsgRecipientsPanel(dataRecord, jRecipients, maxSize);
-        Record[][] recipientsAll = MsgPanelUtils.gatherAllMsgRecipients(dataRecord);
+        Record[][] recipientsAll = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
         jRecipients.removeAll();
         Record[][] objSets = recipientsAll;
         Record[] recipients = null;
@@ -927,11 +929,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           if (objs != null && objs.length > 0) {
             String setHeader = "";
             if (setIndex == TO)
-              setHeader = com.CH_gui.lang.Lang.rb.getString("label_To");
+              setHeader = com.CH_cl.lang.Lang.rb.getString("label_To");
             else if (setIndex == CC)
-              setHeader = com.CH_gui.lang.Lang.rb.getString("label_Cc");
+              setHeader = com.CH_cl.lang.Lang.rb.getString("label_Cc");
             else
-              setHeader = com.CH_gui.lang.Lang.rb.getString("label_Bcc");
+              setHeader = com.CH_cl.lang.Lang.rb.getString("label_Bcc");
             JLabel headerLabel = new JMyLabel("<html>"+setHeader+"</html>");
             if (setIndex == 0) {
               headerLabel.setBorder(new EmptyBorder(0,0,0,3));
@@ -1920,21 +1922,13 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                               msgLink.ownerObjId.equals(cache.getUserRecord().junkFolderId));
 
           // Set text and icon for the From field in the preview.
-          Record fromRec = null;
-          {
-            String fromEmailAddress = msgData.getFromEmailAddress();
-            if (msgData.isEmail() || fromEmailAddress != null) {
-              fromRec = CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress);
-            } else {
-              fromRec = MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
-            }
-          }
+          Record fromRec = CacheMsgUtils.getFromAsFamiliar(msgData);
           if (fromRec != null) {
             jFromName.setIcon(ListRenderer.getRenderedIcon(fromRec));
             jFromName.setText(ListRenderer.getRenderedText(fromRec, false, false, true));
           } else {
             jFromName.setIcon(Images.get(ImageNums.PERSON_SMALL));
-            jFromName.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {msgData.senderUserId}));
+            jFromName.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {msgData.senderUserId}));
           }
 
           if (msgDataChanged) {
@@ -2038,7 +2032,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     else
       plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE) &&
                       !mData.senderUserId.equals(cache.getMyUserId()) && // Msgs created by myself never display in non-native mode
-                      !(MsgPanelUtils.convertUserIdToFamiliarUser(mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
+                      !(CacheUsrUtils.convertUserIdToFamiliarUser(mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
     if (trace != null) trace.exit(MsgPreviewPanel.class, plainPreferred);
     return plainPreferred;
   }

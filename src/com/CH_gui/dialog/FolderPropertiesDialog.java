@@ -84,7 +84,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
   private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
 
-  private static String FETCHING_DATA = com.CH_gui.lang.Lang.rb.getString("Fetching_Data...");
+  private static String FETCHING_DATA = com.CH_cl.lang.Lang.rb.getString("Fetching_Data...");
 
   private DocumentChangeListener documentChangeListener;
 
@@ -97,11 +97,11 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     this(owner, folderPair, 0);
   }
   public FolderPropertiesDialog(Frame owner, FolderPair folderPair, int openWithTabNumber) {
-    super(owner, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString(folderPair.getFolderRecord().isGroupType() ? "title_OBJECT_-_Group_Properties_and_Members" : "title_OBJECT_-_Folder_Properties_and_Sharing"), new Object[] {folderPair.getMyName()}));
+    super(owner, java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString(folderPair.getFolderRecord().isGroupType() ? "title_OBJECT_-_Group_Properties_and_Members" : "title_OBJECT_-_Folder_Properties_and_Sharing"), new Object[] {folderPair.getMyName()}));
     constructDialog(owner, folderPair, openWithTabNumber);
   }
   public FolderPropertiesDialog(Dialog owner, FolderPair folderPair, int openWithTabNumber) {
-    super(owner, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString(folderPair.getFolderRecord().isGroupType() ? "title_OBJECT_-_Group_Properties_and_Members" : "title_OBJECT_-_Folder_Properties_and_Sharing"), new Object[] {folderPair.getMyName()}));
+    super(owner, java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString(folderPair.getFolderRecord().isGroupType() ? "title_OBJECT_-_Group_Properties_and_Members" : "title_OBJECT_-_Folder_Properties_and_Sharing"), new Object[] {folderPair.getMyName()}));
     constructDialog(owner, folderPair, openWithTabNumber);
   }
   private void constructDialog(Component owner, FolderPair folderPair, int openWithTabNumber) {
@@ -134,7 +134,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
@@ -142,7 +142,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     });
     jOk = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Transcript"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Transcript"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedTranscript();
@@ -150,7 +150,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     });
     jTranscript = buttons[1];
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -164,19 +164,19 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     FolderRecord folderRec = folderPair.getFolderRecord();
 
     JTabbedPane pane = new JMyTabbedPane();
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_General"), createGeneralPanel());
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_General"), createGeneralPanel());
 
     folderSharingPanel = new FolderSharingPanel(folderPair);
     folderSharingPanel.jShareName.getDocument().addDocumentListener(documentChangeListener);
     if (folderRec.isGroupType()) {
-      pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Members"), folderSharingPanel);
+      pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Members"), folderSharingPanel);
     } else {
-      pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Sharing"), folderSharingPanel);
+      pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Sharing"), folderSharingPanel);
     }
 
     if (folderRec.isFileType() || folderRec.isMailType()) {
       folderPurgingPanel = new FolderPurgingPanel(folderPair);
-      pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Purging"), folderPurgingPanel);
+      pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Purging"), folderPurgingPanel);
     }
 
     pane.setSelectedIndex(openWithTabNumber);
@@ -206,7 +206,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     int posY = 0;
     panel.add(new JMyLabel(Images.get(imageNum)), new GridBagConstraints(0, posY, 1, 2, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(1, posY, 2, 1, 10, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.SOUTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jFolderName, new GridBagConstraints(1, posY+1, 2, 1, 10, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -220,41 +220,41 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Folder_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(folderPair.getId().toString()), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     JLabel jType = new JMyLabel(folderPair.getFolderRecord().getFolderType(), RecordUtilsGui.getIcon(folderPair), JLabel.LEFT);
     panel.add(jType, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Folder_Owner")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jFolderOwner = new JMyLabel(FETCHING_DATA);
     panel.add(jFolderOwner, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Size")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jSize = new JMyLabel(FETCHING_DATA);
     panel.add(jSize, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jSizeOnDisk = new JMyLabel(FETCHING_DATA);
     panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Contains")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Contains")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jContains = new JMyLabel(FETCHING_DATA);
     panel.add(jContains, new GridBagConstraints(1, posY, 2, 1, 10, 0,
@@ -268,13 +268,13 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Folder_Created")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(Misc.getFormattedTimestamp(folderPair.getFolderRecord().dateCreated)), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Folder_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Folder_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String dateUpdated = Misc.getFormattedTimestamp(folderPair.getFolderRecord().dateUpdated);
     panel.add(new JMyLabel(dateUpdated), new GridBagConstraints(1, posY, 2, 1, 10, 0,
@@ -288,14 +288,14 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel("AES(256)"), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String desc = folderPair.getFolderShareRecord().getFolderDesc();
     jFolderDesc = new JMyTextArea(desc != null ? desc : "", 4, 20);
@@ -487,8 +487,8 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
                     if (kRec != null) {
                       newShares[i].seal(kRec);
                     } else {
-                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, com.CH_gui.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Fetch_Error"));
-                      throw new RuntimeException(com.CH_gui.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."));
+                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, com.CH_cl.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."), com.CH_cl.lang.Lang.rb.getString("msgTitle_Fetch_Error"));
+                      throw new RuntimeException(com.CH_cl.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."));
                     }
                   } else {
                     FolderShareRecord groupShare = cache.getFolderShareRecordMy(newShares[i].ownerUserId, true);
@@ -638,7 +638,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
         d.dispose();
       }
     });
-    new GeneralDialog(this, com.CH_gui.lang.Lang.rb.getString("title_Folder_Transcript"), new JButton[] { jClose }, -1, 0, new JScrollPane(textArea));
+    new GeneralDialog(this, com.CH_cl.lang.Lang.rb.getString("title_Folder_Transcript"), new JButton[] { jClose }, -1, 0, new JScrollPane(textArea));
   }
 
 
@@ -687,7 +687,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
               sb.append(", ");
             sb.append(countFiles);
             sb.append(' ');
-            sb.append(countFiles == 1 ? com.CH_gui.lang.Lang.rb.getString("File") : com.CH_gui.lang.Lang.rb.getString("Files"));
+            sb.append(countFiles == 1 ? com.CH_cl.lang.Lang.rb.getString("File") : com.CH_cl.lang.Lang.rb.getString("Files"));
           }
 
           long countMsgs = ((Long[]) data.objs[1])[0].longValue();
@@ -696,7 +696,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
               sb.append(", ");
             sb.append(countMsgs);
             sb.append(' ');
-            sb.append(countMsgs == 1 ? com.CH_gui.lang.Lang.rb.getString("Message") : com.CH_gui.lang.Lang.rb.getString("Messages"));
+            sb.append(countMsgs == 1 ? com.CH_cl.lang.Lang.rb.getString("Message") : com.CH_cl.lang.Lang.rb.getString("Messages"));
           }
 
           long countAddrs = ((Long[]) data.objs[2])[0].longValue();
@@ -705,7 +705,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
               sb.append(", ");
             sb.append(countAddrs);
             sb.append(' ');
-            sb.append(countAddrs == 1 ? com.CH_gui.lang.Lang.rb.getString("Address") : com.CH_gui.lang.Lang.rb.getString("Addresses"));
+            sb.append(countAddrs == 1 ? com.CH_cl.lang.Lang.rb.getString("Address") : com.CH_cl.lang.Lang.rb.getString("Addresses"));
           }
 
           long countMembers = ((Long[]) data.objs[3])[0].longValue();
@@ -714,7 +714,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
               sb.append(", ");
             sb.append(countMembers);
             sb.append(' ');
-            sb.append(countMembers == 1 ? com.CH_gui.lang.Lang.rb.getString("Member") : com.CH_gui.lang.Lang.rb.getString("Members"));
+            sb.append(countMembers == 1 ? com.CH_cl.lang.Lang.rb.getString("Member") : com.CH_cl.lang.Lang.rb.getString("Members"));
           }
 
           long countFolders = 0;

@@ -95,15 +95,15 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
     JButton[] buttons = null;
     if (!reportActivityMode && initialRecoveryRecord != null && initialRecoveryRecord.isEnabledQA()) {
       buttons = new JButton[2];
-      buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+      buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
       buttons[0].setDefaultCapable(true);
       buttons[0].addActionListener(new OKActionListener());
 
-      buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+      buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
       buttons[1].addActionListener(new CancelActionListener());
     } else {
       buttons = new JButton[1];
-      buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+      buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Close"));
       buttons[0].setDefaultCapable(true);
       buttons[0].addActionListener(new CancelActionListener());
     }
@@ -308,7 +308,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
       // check if minimum number of answers is specified
       if (!error && countAnswers < initialRecoveryRecord.minAs.shortValue()) {
         error = true;
-        MessageDialog.showWarningDialog(PassRecoveryRecoverDialog.this, new JMyLabel("You must specify at least " + initialRecoveryRecord.minAs + " answers to decrypt and recover your password."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"), false);
+        MessageDialog.showWarningDialog(PassRecoveryRecoverDialog.this, new JMyLabel("You must specify at least " + initialRecoveryRecord.minAs + " answers to decrypt and recover your password."), com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"), false);
       }
 
       if (!error) {

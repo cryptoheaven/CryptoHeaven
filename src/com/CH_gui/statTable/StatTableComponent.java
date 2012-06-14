@@ -61,15 +61,15 @@ public class StatTableComponent extends RecordTableComponent {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FileLinkRecord fileLink = cache.getFileLinkRecord(parentObjLinkId);
     if (fileLink != null) {
-      setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_file_ID_FILEID"), new Object[] {fileLink.fileId}));
+      setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_file_ID_FILEID"), new Object[] {fileLink.fileId}));
     } else {
       MsgLinkRecord msgLink = cache.getMsgLinkRecord(parentObjLinkId);
       if (msgLink != null) {
         MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
         if (msgData.isTypeMessage())
-          setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_message_ID_MSGID"), new Object[] {msgLink.msgId}));
+          setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_message_ID_MSGID"), new Object[] {msgLink.msgId}));
         else if (msgData.isTypeAddress())
-          setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_address_ID_ADDRID"), new Object[] {msgLink.msgId}));
+          setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_address_ID_ADDRID"), new Object[] {msgLink.msgId}));
       }
     }
   }

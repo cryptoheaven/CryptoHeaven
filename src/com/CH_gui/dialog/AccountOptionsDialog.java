@@ -12,37 +12,54 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.SysOps;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.util.GlobalSubProperties;
-
 import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.usr.Usr_AltUsrData_Rq;
+import com.CH_co.service.msg.dataSets.usr.Usr_GetSubAcc_Rp;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.trace.TraceProperties;
 import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
+import com.CH_gui.frame.LoginFrame;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.util.*;
-import com.CH_gui.usrs.*;
-import com.CH_gui.service.records.*;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.usrs.AccountOptionPermitChecks;
+import com.CH_gui.usrs.AccountOptionsQuotasPanel;
+import com.CH_gui.usrs.AccountOptionsResponderPanel;
+import com.CH_gui.usrs.AccountOptionsSignaturesPanel;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.MiscGui;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -87,7 +104,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 
   private JButton jOk;
 
-  private static String FETCHING_DATA = com.CH_gui.lang.Lang.rb.getString("Fetching_Data...");
+  private static String FETCHING_DATA = com.CH_cl.lang.Lang.rb.getString("Fetching_Data...");
 
   private DocumentChangeListener documentChangeListener;
 
@@ -113,7 +130,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     this(parent, new UserRecord[] { userRec });
   }
   public AccountOptionsDialog(Frame parent, UserRecord[] userRecs) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Account_Options"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Account_Options"));
     initialize(parent, userRecs);
   }
   /** Creates new AccountOptionsDialog */
@@ -124,7 +141,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     this(parent, new UserRecord[] { userRec });
   }
   public AccountOptionsDialog(Dialog parent, UserRecord[] userRecs) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Account_Options"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Account_Options"));
     initialize(parent, userRecs);
   }
 
@@ -310,11 +327,11 @@ public class AccountOptionsDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new OKActionListener());
     jOk = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].setDefaultCapable(true);
     buttons[1].addActionListener(new CancelActionListener());
 
@@ -353,9 +370,9 @@ public class AccountOptionsDialog extends GeneralDialog {
     JComponent accountComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(panelAccount) : (JComponent) panelAccount;
     JComponent optionsComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(panelOptions) : (JComponent) panelOptions;
     JComponent permitsComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(panelPermissions) : (JComponent) panelPermissions;
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Account"), accountComp);
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Options"), optionsComp);
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Permissions"), permitsComp);
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Account"), accountComp);
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Options"), optionsComp);
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Permissions"), permitsComp);
 
     if (isChangingMyUserRecord) {
       UserSettingsRecord userSettingsRecord = cache.getMyUserSettingsRecord();
@@ -364,14 +381,14 @@ public class AccountOptionsDialog extends GeneralDialog {
       } else {
         jPanelSignatures = new AccountOptionsSignaturesPanel();
       }
-      pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Signatures"), jPanelSignatures);
+      pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Signatures"), jPanelSignatures);
       jPanelSignatures.addDocumentListener(documentChangeListener);
     }
     jPanelResponder = new AccountOptionsResponderPanel(userRecs, jPanelSignatures, checkBoxListener);
     jPanelResponder.addDocumentListener(documentChangeListener);
     JComponent responderComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(jPanelResponder) : (JComponent) jPanelResponder;
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Auto-Responder"), responderComp);
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Quotas"), jPanelQuotas);
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Auto-Responder"), responderComp);
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Quotas"), jPanelQuotas);
 
     JPanel panel = new JPanel();
     panel.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -403,7 +420,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     topPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     topPanel.setLayout(new GridBagLayout());
 
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Account_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    topPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Account_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     JLabel jAccountStatus = new JMyLabel(userRec.getAccountType());
     if (userRec.isHeld())
@@ -412,7 +429,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    JLabel accNameLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Account_Name"));
+    JLabel accNameLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Account_Name"));
     JLabel accName = new JMyLabel(ListRenderer.getRenderedText(userRec));
     topPanel.add(accNameLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -422,13 +439,13 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
-    JLabel emlAddrLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Email_Address"));
+    JLabel emlAddrLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Email_Address"));
     EmailAddressRecord emlRec = new EmailAddressRecord("");
     defaultEmail = emlRec.address.toLowerCase();
     //jDefaultEmail = new JMyTextOptionField(emlRec.address, new JMyDropdownIcon(), emlAction);
     jDefaultEmail = new JMyTextField(emlRec.address);
     jDefaultEmail.setCaretPosition(0);
-    JButton jManage = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString("button_Manage"));
+    JButton jManage = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString("button_Manage"));
     jManage.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
     ActionListener emlAction = new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -462,7 +479,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    topPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jEncryption = new JMyLabel("...");
     topPanel.add(jEncryption, new GridBagConstraints(1, posY, 3, 1, 10, 0,
@@ -483,7 +500,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 //        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 //    posY ++;
 
-    topPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    topPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Activation_Code")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jActivationCode = new JMyTextField();
     jActivationCode.getDocument().addDocumentListener(documentChangeListener);
@@ -508,10 +525,10 @@ public class AccountOptionsDialog extends GeneralDialog {
     JPanel centerPanel = new JPanel();
     centerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     centerPanel.setLayout(new BorderLayout());
-    centerPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_Settings")), BorderLayout.WEST);
+    centerPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_Settings")), BorderLayout.WEST);
     centerPanel.add(new JMyLabel(), BorderLayout.CENTER);
     if (isUpdatePermitsMode) {
-      centerPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Allow_User_to_Change_the_Setting")), BorderLayout.EAST);
+      centerPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Allow_User_to_Change_the_Setting")), BorderLayout.EAST);
     }
     // insert the center portion of the panel
     panel.add(centerPanel, new GridBagConstraints(0, 1, 1, 1, 10, 0,
@@ -524,14 +541,14 @@ public class AccountOptionsDialog extends GeneralDialog {
 
     posY = 0;
 
-    checks.jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
+    checks.jNotify = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
     checks.jNotifyUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotify, checks.jNotifyUpdate, myUserRec.notifyByEmail, userRec.notifyByEmail, UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
     posY ++;
 
     jContactEmail = new JMyTextField(userRec.emailAddress);
     jContactEmail.getDocument().addDocumentListener(documentChangeListener);
-    final JMyLabel jSendNotificationsLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Send_notifications_to_address"));
+    final JMyLabel jSendNotificationsLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Send_notifications_to_address"));
     bottomPanel.add(jSendNotificationsLabel, new GridBagConstraints(0, posY, 2, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 25, 5, 5), 0, 0));
     posY ++;
@@ -548,7 +565,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     jSendNotificationsLabel.setEnabled(userRec.isNotifyByEmail());
     jContactEmail.setEnabled(userRec.isNotifyByEmail());
 
-    checks.jNotifySubjectAddress = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
+    checks.jNotifySubjectAddress = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
     checks.jNotifySubjectAddressUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotifySubjectAddress, checks.jNotifySubjectAddressUpdate, myUserRec.notifyByEmail, userRec.notifyByEmail, UserRecord.EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, checkBoxListener, posY);
     posY ++;
@@ -560,14 +577,14 @@ public class AccountOptionsDialog extends GeneralDialog {
       posY ++;
 
       isSoundEnabled = Boolean.valueOf(GlobalProperties.getProperty(Sounds.SOUND_ENABLEMENT_PROPERTY, "true")).booleanValue();
-      jEnableSound = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Enable_sound_on_this_computer."), isSoundEnabled);
+      jEnableSound = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Enable_sound_on_this_computer."), isSoundEnabled);
       jEnableSound.addChangeListener(checkBoxListener);
       bottomPanel.add(jEnableSound, new GridBagConstraints(0, posY, 4, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
       isAntialiasingEnabled = Boolean.valueOf(GlobalProperties.getProperty(MiscGui.ANTIALIASING_ENABLEMENT_PROPERTY, "true")).booleanValue();
-      jEnableAntialiasing = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Enable_anti-aliasing_on_this_computer."), isAntialiasingEnabled);
+      jEnableAntialiasing = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Enable_anti-aliasing_on_this_computer."), isAntialiasingEnabled);
       jEnableAntialiasing.addChangeListener(checkBoxListener);
       jEnableAntialiasing.setEnabled(MiscGui.isAntiAliasingCapable());
       bottomPanel.add(jEnableAntialiasing, new GridBagConstraints(0, posY, 4, 1, 0, 0,
@@ -605,13 +622,13 @@ public class AccountOptionsDialog extends GeneralDialog {
     topPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     topPanel.setLayout(new GridBagLayout());
 
-    JLabel accNameLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Selected_Accounts"));
+    JLabel accNameLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Selected_Accounts"));
     topPanel.add(accNameLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     JPanel listPanel = new JPanel();
     listPanel.setLayout(new GridBagLayout());
     for (int i=0; i<subUsers.length; i++) {
-      Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
+      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
     }
@@ -643,14 +660,14 @@ public class AccountOptionsDialog extends GeneralDialog {
     JPanel centerPanel = new JPanel();
     centerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
     centerPanel.setLayout(new BorderLayout(10, 10));
-    jIncludeChangesToAccounts = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
+    jIncludeChangesToAccounts = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
     jIncludeChangesToAccounts.setFont(jIncludeChangesToAccounts.getFont().deriveFont(Font.BOLD));
     jIncludeChangesToAccounts.addChangeListener(checkBoxListener);
     centerPanel.add(jIncludeChangesToAccounts, BorderLayout.NORTH);
-    centerPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_Settings")), BorderLayout.WEST);
+    centerPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_Settings")), BorderLayout.WEST);
     centerPanel.add(new JMyLabel(), BorderLayout.CENTER);
     if (isUpdatePermitsMode) {
-      centerPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Allow_User_to_Change_the_Setting")), BorderLayout.EAST);
+      centerPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Allow_User_to_Change_the_Setting")), BorderLayout.EAST);
     }
     // insert the center portion of the panel
     panel.add(centerPanel, new GridBagConstraints(0, 1, 1, 1, 10, 0,
@@ -662,12 +679,12 @@ public class AccountOptionsDialog extends GeneralDialog {
 
     posY = 0;
 
-    checks.jNotify = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
+    checks.jNotify = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Send_email_notification_when_new_messages_arrive."));
     checks.jNotifyUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotify, checks.jNotifyUpdate, myUserRec.notifyByEmail, AccountOptionPermitChecks.getMostCommonNotifyByEmailBits(subUsers), UserRecord.EMAIL_NOTIFY_YES, checkBoxListener, posY);
     posY ++;
 
-    checks.jNotifySubjectAddress = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
+    checks.jNotifySubjectAddress = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_sender_address_and_message_subject_in_notifications."));
     checks.jNotifySubjectAddressUpdate = new JMyCheckBox();
     checks.addCheckBoxes(bottomPanel, includeUpdate, checks.jNotifySubjectAddress, checks.jNotifySubjectAddressUpdate, myUserRec.notifyByEmail, AccountOptionPermitChecks.getMostCommonNotifyByEmailBits(subUsers), UserRecord.EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS, checkBoxListener, posY);
     posY ++;
@@ -785,10 +802,10 @@ public class AccountOptionsDialog extends GeneralDialog {
         if (newDefaultEmail.length() == 0) {
           if (uRec.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
             // remove email address
-            String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
-            String body = com.CH_gui.lang.Lang.rb.getString("msg_You_are_about_to_delete_your_personalized_email_address.");
+            String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
+            String body = com.CH_cl.lang.Lang.rb.getString("msg_You_are_about_to_delete_your_personalized_email_address.");
             body += "  \n\n";
-            body += com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_do_this?");
+            body += com.CH_cl.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_do_this?");
             boolean option = MessageDialog.showDialogYesNo(AccountOptionsDialog.this, body, title);
             if (option) {
               Obj_IDList_Co ids = new Obj_IDList_Co(uRec.defaultEmlId);
@@ -801,14 +818,14 @@ public class AccountOptionsDialog extends GeneralDialog {
           SIL.submitAndReturn(new MessageAction(CommandCodes.EML_Q_CREATE, new Obj_List_Co(objs)));
         } else {
           // alter existing email address
-          String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
-          String body = com.CH_gui.lang.Lang.rb.getString("msg_You_are_about_to_change_your_personalized_email_address.");
+          String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Confirmation");
+          String body = com.CH_cl.lang.Lang.rb.getString("msg_You_are_about_to_change_your_personalized_email_address.");
           if (!EmailRecord.isDomainEqual(newDefaultEmail, defaultEmail)) {
             body += "  ";
-            body += java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_This_change_will_terminate_your_current_use_of_email_domain_'{0}'."), new Object[] {EmailRecord.getDomain(defaultEmail)});
+            body += java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_This_change_will_terminate_your_current_use_of_email_domain_'{0}'."), new Object[] {EmailRecord.getDomain(defaultEmail)});
           }
           body += "  \n\n";
-          body += com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_do_this?");
+          body += com.CH_cl.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_do_this?");
           boolean option = MessageDialog.showDialogYesNo(AccountOptionsDialog.this, body, title);
           if (option) {
             Object[] objs = new Object[] { uRec.defaultEmlId, newDefaultEmail, Boolean.TRUE };
@@ -912,7 +929,7 @@ public class AccountOptionsDialog extends GeneralDialog {
       } catch (Throwable t) {
       }
       if (capped) {
-        MessageDialog.showWarningDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Quotas_for_user_accounts_may_not_exceed_your_account_quotas.__User_accounts'_limits_have_been_reduced_to_match_your_quotas."), com.CH_gui.lang.Lang.rb.getString("title_Quotas_too_high"));
+        MessageDialog.showWarningDialog(parent, com.CH_cl.lang.Lang.rb.getString("msg_Quotas_for_user_accounts_may_not_exceed_your_account_quotas.__User_accounts'_limits_have_been_reduced_to_match_your_quotas."), com.CH_cl.lang.Lang.rb.getString("title_Quotas_too_high"));
       }
     }
 
@@ -1009,7 +1026,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     if (userRecords.length == 1) {
       UserRecord uRec = cache.getUserRecord(userRecords[0].userId);
       if (uRec != null) {
-        String[] emls = UserOps.getCachedDefaultEmail(uRec, false);
+        String[] emls = CacheUsrUtils.getCachedDefaultEmail(uRec, false);
         if (emls != null) {
           jDefaultEmail.setText(emls[2]);
           jDefaultEmail.setCaretPosition(0);

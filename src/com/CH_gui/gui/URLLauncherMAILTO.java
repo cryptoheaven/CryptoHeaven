@@ -1,48 +1,50 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.gui;
 
-import com.CH_gui.util.URLLauncher;
-import java.awt.*;
-import java.net.*;
-
-import com.CH_cl.service.records.*;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.service.records.EmailRecord;
 import com.CH_co.service.records.MsgDataRecord;
-import com.CH_co.util.*;
-import com.CH_gui.frame.*;
+import com.CH_co.service.records.Record;
+import com.CH_gui.frame.MessageFrame;
 import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.util.URLLauncher;
+import java.awt.Component;
+import java.net.URL;
+import java.net.URLDecoder;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.6 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.6 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class URLLauncherMAILTO extends Object implements URLLauncher {
 
   public void openURL(URL url, Component invoker) {
-    String emailAddress = URLDecoder.decode(url.getPath());
+    Record initialRecipient = null;
+    String path = URLDecoder.decode(url.getPath());
     // find first Parent that is RecipientProviderI
     EmailRecord sendFromEmailAccount = null;
     MsgDataProviderI msgDataProvider = null;
@@ -55,7 +57,17 @@ public class URLLauncherMAILTO extends Object implements URLLauncher {
       MsgDataRecord msgData = msgDataProvider.provideMsgData();
       sendFromEmailAccount = MsgPanelUtils.getOurMatchingFromEmlRec(msgData);
     }
-    new MessageFrame(new EmailAddressRecord(emailAddress), sendFromEmailAccount);
+    if (path != null && path.length() > 0) {
+      Long userid = null;
+      try {
+        userid = Long.valueOf(path);
+        initialRecipient = CacheUsrUtils.convertUserIdToFamiliarUser(userid, true, true);
+      } catch (Throwable t) {
+      }
+      if (initialRecipient == null)
+        initialRecipient = new EmailAddressRecord(path);
+    }
+    new MessageFrame(initialRecipient, sendFromEmailAccount);
   }
 
 }

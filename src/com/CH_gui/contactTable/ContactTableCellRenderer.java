@@ -66,11 +66,11 @@ public class ContactTableCellRenderer extends RecordTableCellRenderer {
         if (v.booleanValue()) {
           // contactWithMe
           setIcon(Images.get(ImageNums.ARROW_RIGHT16));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_Contact_with_you_made_by_another_person."));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_Contact_with_you_made_by_another_person."));
         } else {
           // ! contactWithMe = I'm the owner
           setIcon(Images.get(ImageNums.ARROW_LEFT16));
-          setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_Your_contact_with_another_person."));
+          setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_Your_contact_with_another_person."));
         }
       }
     } 
@@ -94,22 +94,22 @@ public class ContactTableCellRenderer extends RecordTableCellRenderer {
             case ContactRecord.STATUS_INITIATED:
               // If contact status is INITIATED, depending who is the owner, display different icon.
               if (contactRecord.ownerUserId.equals(FetchedDataCache.getSingleInstance().getMyUserId())) {
-                setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_Contact_Invitation.__Waiting_for_authorization."));
+                setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_Contact_Invitation.__Waiting_for_authorization."));
               } else {
-                setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_Contact_Invitation.__You_should_either_accept_or_decline_this_invitation."));
+                setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_Contact_Invitation.__You_should_either_accept_or_decline_this_invitation."));
               }
               break;
             case ContactRecord.STATUS_ACCEPTED:
             case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED:
-              setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_contact_has_been_accepted_and_is_active."));
+              setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_contact_has_been_accepted_and_is_active."));
               break;
             case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE:
             case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE :
-              setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_user_is_currently_online.__This_contact_has_been_accepted_and_is_active."));
+              setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_user_is_currently_online.__This_contact_has_been_accepted_and_is_active."));
               break;
             case ContactRecord.STATUS_DECLINED :
             case ContactRecord.STATUS_DECLINED_ACKNOWLEDGED :
-              setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_contact_has_been_declined_and_is_inactive."));
+              setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_contact_has_been_declined_and_is_inactive."));
               break;
             default :
               setToolTipText(ContactRecUtil.getStatusText(contactRecord.status, contactRecord.ownerUserId));
@@ -144,22 +144,22 @@ public class ContactTableCellRenderer extends RecordTableCellRenderer {
               case ContactRecord.STATUS_INITIATED:
                 // If contact status is INITIATED, depending who is the owner, display different icon.
                 if (contactRecord.ownerUserId.equals(FetchedDataCache.getSingleInstance().getMyUserId())) {
-                  setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_Contact_Invitation.__Waiting_for_authorization."));
+                  setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_Contact_Invitation.__Waiting_for_authorization."));
                 } else {
-                  setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_Contact_Invitation.__You_should_either_accept_or_decline_this_invitation."));
+                  setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_Contact_Invitation.__You_should_either_accept_or_decline_this_invitation."));
                 }
                 break;
               case ContactRecord.STATUS_ACCEPTED:
               case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED:
-                setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_contact_has_been_accepted_and_is_active."));
+                setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_contact_has_been_accepted_and_is_active."));
                 break;
               case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE:
               case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE :
-                setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_user_is_currently_online.__This_contact_has_been_accepted_and_is_active."));
+                setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_user_is_currently_online.__This_contact_has_been_accepted_and_is_active."));
                 break;
               case ContactRecord.STATUS_DECLINED :
               case ContactRecord.STATUS_DECLINED_ACKNOWLEDGED :
-                setToolTipText(com.CH_gui.lang.Lang.rb.getString("rowTip_This_contact_has_been_declined_and_is_inactive."));
+                setToolTipText(com.CH_cl.lang.Lang.rb.getString("rowTip_This_contact_has_been_declined_and_is_inactive."));
                 break;
               default :
                 setToolTipText(ContactRecUtil.getStatusText(contactRecord.status, contactRecord.ownerUserId));
@@ -172,7 +172,7 @@ public class ContactTableCellRenderer extends RecordTableCellRenderer {
 
     // Permissions
     else if (rawColumn == 8) {
-      setToolTipText(com.CH_gui.lang.Lang.rb.getString("columnTip_Contact_Permissions"));
+      setToolTipText(com.CH_cl.lang.Lang.rb.getString("columnTip_Contact_Permissions"));
     }
 
     // ---- begin optimization to avoid painting background ----

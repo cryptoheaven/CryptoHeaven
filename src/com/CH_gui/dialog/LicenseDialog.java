@@ -52,11 +52,11 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
 
   /** Creates new LicenseDialog */
   public LicenseDialog(Dialog parent) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_License"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_License"));
     init(parent);
   }
   public LicenseDialog(Frame parent) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_License"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_License"));
     init(parent);
   }
   private void init(Component parent) {
@@ -71,7 +71,7 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[1];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Close"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     return buttons;
@@ -118,11 +118,11 @@ public class LicenseDialog extends GeneralDialog implements VisualsSavable {
       }
       licenseText = sb.toString();
     } catch (Throwable t) {
-      licenseText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("text_Copyright_(c)__CryptoHeaven_Development_Team.__All_rights_reserved."), new Object[] { URLs.get(URLs.HOME_PAGE) });
+      licenseText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("text_Copyright_(c)__CryptoHeaven_Development_Team.__All_rights_reserved."), new Object[] { URLs.get(URLs.HOME_PAGE) });
     }
 
     if (!URLs.get(URLs.SERVICE_SOFTWARE_NAME).startsWith("CryptoHeaven")) {
-      String preAboutText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
+      String preAboutText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
       licenseText = preAboutText+"\n\n" + licenseText;
     }
     return licenseText;

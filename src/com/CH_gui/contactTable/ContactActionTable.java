@@ -1,66 +1,83 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.contactTable;
 
-import com.CH_gui.action.*;
-import com.CH_gui.actionGui.*;
-import com.CH_gui.addressBook.*;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.records.filters.ContactFilterCl;
+import com.CH_cl.service.records.filters.FixedFilter;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_cl.service.records.filters.InvEmlFilter;
+import com.CH_co.nanoxml.XMLElement;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.*;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.actionGui.JActionButton;
+import com.CH_gui.addressBook.ContactInfoPanel;
+import com.CH_gui.addressBook.EmailPanel;
+import com.CH_gui.addressBook.NamePanel;
 import com.CH_gui.dialog.*;
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.table.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.util.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.util.*;
-import com.CH_co.trace.Trace;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_gui.list.ListRenderer;
-
+import com.CH_gui.msgs.MsgComposePanel;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordActionTable;
+import com.CH_gui.table.RecordTableModel;
+import com.CH_gui.tree.FolderActionTree;
+import com.CH_gui.tree.FolderTree;
+import com.CH_gui.tree.FolderTreeComponent;
+import com.CH_gui.tree.FolderTreeModelGui;
+import com.CH_gui.util.*;
 import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.41 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.41 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ContactActionTable extends RecordActionTable implements ActionProducerI {
 
   private Action[] actions;
@@ -168,7 +185,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       ButtonGroup sortAscDescGroup = new ButtonGroup();
       actions[SORT_ASC_ACTION] = new SortAscDescAction(true, leadingActionId + SORT_ASC_ACTION, sortAscDescGroup);
       actions[SORT_DESC_ACTION] = new SortAscDescAction(false, leadingActionId + SORT_DESC_ACTION, sortAscDescGroup);
-      actions[CUSTOMIZE_COLUMNS_ACTION] = new CustomizeColumnsAction(leadingActionId + CUSTOMIZE_COLUMNS_ACTION, com.CH_gui.lang.Lang.rb.getString("action_Contact_Columns_..."));
+      actions[CUSTOMIZE_COLUMNS_ACTION] = new CustomizeColumnsAction(leadingActionId + CUSTOMIZE_COLUMNS_ACTION, com.CH_cl.lang.Lang.rb.getString("action_Contact_Columns_..."));
       ButtonGroup columnSortGroup = new ButtonGroup();
       for (int i=0; i<NUM_OF_SORT_COLUMNS; i++) {
         actions[SORT_BY_FIRST_COLUMN_ACTION+i] = new SortByColumnAction(i, leadingActionId+SORT_BY_FIRST_COLUMN_ACTION+i, columnSortGroup);
@@ -194,9 +211,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * @return all selected records, if there are none selected, return null
-   * Runtime instance of the returned array is of MemberContactRecordI[].
-   */
+  * @return all selected records, if there are none selected, return null
+  * Runtime instance of the returned array is of MemberContactRecordI[].
+  */
   public MemberContactRecordI[] getSelectedMemberContacts() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedMemberContacts()");
     List selectedRecsL = getSelectedRecordsL();
@@ -214,9 +231,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * @return all selected records, if there are none selected, return null
-   * Runtime instance of the returned array is of Record[].
-   */
+  * @return all selected records, if there are none selected, return null
+  * Runtime instance of the returned array is of Record[].
+  */
   public Record[] getSelectedRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedRecords()");
     Record[] records = (Record[]) ArrayUtils.toArray(getSelectedRecordsL(), Record.class);
@@ -225,8 +242,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * @return all selected Records of specified class type (ContactRecord or FolderPair), or null if none
-   */
+  * @return all selected Records of specified class type (ContactRecord or FolderPair), or null if none
+  */
   public Record[] getSelectedInstancesOf(Class classType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "getSelectedInstancesOf(Class classType)");
     if (trace != null) trace.args(classType);
@@ -256,15 +273,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   // =====================================================================
 
   /**
-   * Initiate a new contact.
-   */
+  * Initiate a new contact.
+  */
   private static class NewContactAction extends AbstractActionTraced {
     public NewContactAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Find_Friends_and_Associates_..."), Images.get(ImageNums.USER_FIND16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Find_Friends_and_Associates_..."), Images.get(ImageNums.USER_FIND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Find_Users_on_the_System_and_Invite_them_to_your_Contact_List."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Find_Users_on_the_System_and_Invite_them_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.USER_FIND24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Find"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Find"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       new FindUserFrame();
@@ -272,15 +289,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * Create a new group.
-   */
+  * Create a new group.
+  */
   private class NewGroupAction extends AbstractActionTraced {
     public NewGroupAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Create_Group"), Images.get(ImageNums.GROUP_ADD16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Create_Group"), Images.get(ImageNums.GROUP_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Create_Group"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Create_Group"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.GROUP_ADD24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Group"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Create_Group"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       chatOrShareSpace(false, FolderRecord.GROUP_FOLDER, event);
@@ -288,15 +305,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * Accept contact(s).
-   */
+  * Accept contact(s).
+  */
   private class AcceptDeclineAction extends AbstractActionTraced {
     public AcceptDeclineAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Accept_/_Decline_Contact(s)_..."), Images.get(ImageNums.CONTACT_CHECK16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Accept_/_Decline_Contact(s)_..."), Images.get(ImageNums.CONTACT_CHECK16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Accept_or_Decline_selected_contact(s)"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Accept_or_Decline_selected_contact(s)"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_CHECK24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Accept"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Accept"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       ContactRecord[] contacts = (ContactRecord[]) getSelectedInstancesOf(ContactRecord.class);
@@ -309,19 +326,19 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * Ignore contact request and Remove the contact object.
-   */
+  * Ignore contact request and Remove the contact object.
+  */
   private class RemoveAction extends AbstractActionTraced {
     public RemoveAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Delete_Contact_..."), Images.get(ImageNums.CONTACT_DELETE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Delete_Contact_..."), Images.get(ImageNums.CONTACT_DELETE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contact."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contact."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_DELETE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Delete"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Delete"));
     }
     public void actionPerformedTraced(ActionEvent event) {
-      String messageText = com.CH_gui.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_delete_selected_contact(s)?");
-      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
+      String messageText = com.CH_cl.lang.Lang.rb.getString("msg_Are_you_sure_you_want_to_delete_selected_contact(s)?");
+      String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
       boolean option = MessageDialog.showDialogYesNo(ContactActionTable.this, messageText, title);
       if (option == true) {
         ContactRecord[] contacts = (ContactRecord[]) getSelectedInstancesOf(ContactRecord.class);
@@ -353,26 +370,26 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
     private void updateText(int countSelectedContacts) {
       if (countSelectedContacts > 1) {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Delete_Contacts_..."));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contacts."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Delete_Contacts_..."));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contacts."));
       } else {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Delete_Contact_..."));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contact."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Delete_Contact_..."));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Permanently_delete_the_selected_contact."));
       }
     }
   }
 
 
   /**
-   * Send a new message to contact(s).
-   */
+  * Send a new message to contact(s).
+  */
   private class NewMessageAction extends AbstractActionTraced {
     public NewMessageAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_New_Message"), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Message"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_New_Message"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_New_Message"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       // Determine if action from menu, popup menu or shortcut
@@ -392,13 +409,13 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * Send a new message to contact(s).
-   */
+  * Send a new message to contact(s).
+  */
   private class NewAddressAction extends AbstractActionTraced {
     public NewAddressAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Address_Book"), Images.get(ImageNums.ADDRESS_ADD16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Add_to_Address_Book"), Images.get(ImageNums.ADDRESS_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Create_a_New_Address_Book_entry."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Create_a_New_Address_Book_entry."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_ADD24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -446,7 +463,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
               String fullName = userId.equals(cRec.ownerUserId) ? cRec.getOwnerNote() : cRec.getOtherNote();
               UserRecord uRec = cache.getUserRecord(otherUID);
               if (uRec != null) {
-                String[] emailStrings = UserOps.getCachedDefaultEmail(uRec, false);
+                String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(uRec, false);
                 emailAddress = emailStrings != null ? emailStrings[2] : null;
                 if (emailAddress != null && emailAddress.length() > 0) {
                   emailNicksL.add(fullName);
@@ -473,13 +490,13 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * Show Contact Properties Dialog.
-   */
+  * Show Contact Properties Dialog.
+  */
   private class PropertiesAction extends AbstractActionTraced {
     public PropertiesAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Contact_Properties"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Contact_Properties"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_Properties_of_the_selected_Contact."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Show_Properties_of_the_selected_Contact."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -498,15 +515,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * Refresh Contact List.
-   */
+  * Refresh Contact List.
+  */
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Contacts"), Images.get(ImageNums.REFRESH16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Refresh_Contacts"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Contact_List_from_the_server."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Refresh_Contact_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Refresh"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -519,14 +536,14 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * Show/Hide incoming Contacts
-   */
+  * Show/Hide incoming Contacts
+  */
   private class ToggleIncomingAction extends AbstractActionTraced {
     private Boolean lastSetShow = null;
     public ToggleIncomingAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Show_Other's_Contacts"), Images.get(ImageNums.ARROW_DOUBLE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Show_Other's_Contacts"), Images.get(ImageNums.ARROW_DOUBLE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_other's_contacts_with_you."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Show_other's_contacts_with_you."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ARROW_DOUBLE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
@@ -550,8 +567,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       if (lastSetShow == null || lastSetShow.booleanValue() != isShow) {
         lastSetShow = Boolean.valueOf(isShow);
         if (isShow) {
-          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Hide_Other's_Contacts"));
-          putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Hide_other's_contacts_with_you."));
+          putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Hide_Other's_Contacts"));
+          putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Hide_other's_contacts_with_you."));
           putValue(Actions.MENU_ICON, Images.get(ImageNums.ARROW_LEFT16));
           putValue(Actions.TOOL_ICON, Images.get(ImageNums.ARROW_LEFT24));
 
@@ -570,8 +587,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
             getTableModel().updateHeaderDataFromTo(null, getJSortedTable());
           }
         } else {
-          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Show_Other's_Contacts"));
-          putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_other's_contacts_with_you."));
+          putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Show_Other's_Contacts"));
+          putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Show_other's_contacts_with_you."));
           putValue(Actions.MENU_ICON, Images.get(ImageNums.ARROW_DOUBLE16));
           putValue(Actions.TOOL_ICON, Images.get(ImageNums.ARROW_DOUBLE24));
 
@@ -613,13 +630,13 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * Open in seperate window
-   */
+  * Open in seperate window
+  */
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Clone_Contact_List_View"), Images.get(ImageNums.CLONE_CONTACT16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Contact_List_View"), Images.get(ImageNums.CLONE_CONTACT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Display_contact_list_table_in_its_own_window."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_contact_list_table_in_its_own_window."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
@@ -632,11 +649,11 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
   private class ChatAction extends AbstractActionTraced {
     public ChatAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Chat"), Images.get(ImageNums.CHAT16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Chat"), Images.get(ImageNums.CHAT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Enter_chat_mode_with_selected_party."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Enter_chat_mode_with_selected_party."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CHAT24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Chat"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Chat"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       chatOrShareSpace(true, (short) 0, event);
@@ -645,15 +662,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * Send Email Message to invite someone to join.
-   */
+  * Send Email Message to invite someone to join.
+  */
   private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.PEOPLE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.PEOPLE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Email_Message_to_invite_others_to_join_the_service."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Email_Message_to_invite_others_to_join_the_service."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.PEOPLE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Invite"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Invite"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -697,11 +714,11 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     */
   private class CreateSharedSpaceAction extends AbstractActionTraced {
     public CreateSharedSpaceAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Create_Shared_Space_..."), Images.get(ImageNums.FOLDER_NEW_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Create_Shared_Space_..."), Images.get(ImageNums.FOLDER_NEW_SHARED16, true));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Create_New_Shared_Space"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Create_New_Shared_Space"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_NEW_SHARED24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Create_Shared_Space"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Create_Shared_Space"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       chatOrShareSpace(false, (short) 0, event);
@@ -789,7 +806,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           } else if (createSharedSpaceOk) {
             doSharedSpace(parent, selectedRecords, folderType);
           } else {
-            MessageDialog.showInfoDialog(parent, com.CH_gui.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_gui.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
+            MessageDialog.showInfoDialog(parent, com.CH_cl.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_cl.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
           }
         }
       }
@@ -830,7 +847,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
     Window w = SwingUtilities.windowForComponent(parent);
     if (w == null) w = MainFrame.getSingleInstance();
-    String title = folderType == FolderRecord.GROUP_FOLDER ? com.CH_gui.lang.Lang.rb.getString("title_Create_New_Shared_Group") : com.CH_gui.lang.Lang.rb.getString("title_Create_New_Shared_Space");
+    String title = folderType == FolderRecord.GROUP_FOLDER ? com.CH_cl.lang.Lang.rb.getString("title_Create_New_Shared_Group") : com.CH_cl.lang.Lang.rb.getString("title_Create_New_Shared_Space");
     if (w instanceof Frame) new Move_NewFld_Dialog((Frame) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts);
     else if (w instanceof Dialog) new Move_NewFld_Dialog((Dialog) w, treeModel, selectedFolderPair, title, true, folderType, cache, contacts);
   }
@@ -840,14 +857,14 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   /****************************************************************************/
 
   /** @return all the acitons that this objects produces.
-   */
+  */
   public Action[] getActions() {
     return actions;
   }
 
   /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  * Enables or Disables actions based on the current state of the Action Producing component.
+  */
   public void setEnabledActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "setEnabledActions()");
 
@@ -945,9 +962,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-   * Send a request to fetch contacts for the current user from the server
-   * if contacts were not fetched for yet, otherwise get them from cache
-   */
+  * Send a request to fetch contacts for the current user from the server
+  * if contacts were not fetched for yet, otherwise get them from cache
+  */
   private void fetchContacts() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "fetchContacts()");
 
@@ -961,8 +978,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * Re-Add my groups to the cache so that listeners can grab them
-   */
+  * Re-Add my groups to the cache so that listeners can grab them
+  */
   private void reAddGroupsToCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "reAddGroupsToCache()");
 

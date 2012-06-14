@@ -1,57 +1,62 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_co.cryptx.BAEncodedPassword;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.MsgPanelUtils;
+import com.CH_gui.list.ListRenderer;
 import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.util.*;
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.MiscGui;
+import com.CH_guiLib.gui.JMyRadioButton;
 import java.awt.*;
-import java.awt.event.*;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.5 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.5 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ActivateSuspendDialog extends GeneralDialog {
 
   private static final int DEFAULT_OK_BUTTON_INDEX = 0;
@@ -76,11 +81,11 @@ public class ActivateSuspendDialog extends GeneralDialog {
 
   /** Creates new ActivateSuspendDialog */
   public ActivateSuspendDialog(Frame frame, Long[] subAccountsToManage) {
-    super(frame, com.CH_gui.lang.Lang.rb.getString("title_Activate_Suspend_Accounts"));
+    super(frame, com.CH_cl.lang.Lang.rb.getString("title_Activate_Suspend_Accounts"));
     initialize(frame, subAccountsToManage);
   }
   public ActivateSuspendDialog(Dialog dialog, Long[] subAccountsToManage) {
-    super(dialog, com.CH_gui.lang.Lang.rb.getString("title_Activate_Suspend_Accounts"));
+    super(dialog, com.CH_cl.lang.Lang.rb.getString("title_Activate_Suspend_Accounts"));
     initialize(dialog, subAccountsToManage);
   }
   private void initialize(Component parent, Long[] subAccountsToManage) {
@@ -103,12 +108,12 @@ public class ActivateSuspendDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     okButton = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].setDefaultCapable(true);
     buttons[1].addActionListener(new CancelActionListener());
     cancelButton = buttons[1];
@@ -146,7 +151,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
 
     int posY = 0;
 
-    String changeUserNameLabel = com.CH_gui.lang.Lang.rb.getString("label_Suspend_Sub_User_Accounts_warning_text");
+    String changeUserNameLabel = com.CH_cl.lang.Lang.rb.getString("label_Suspend_Sub_User_Accounts_warning_text");
 
     JLabel warningLabel = new JMyLabel(Images.get(ImageNums.SHIELD32));
     warningLabel.setText(changeUserNameLabel);
@@ -158,7 +163,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 1, 10, 1), 20, 20));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Selected_Accounts")), new GridBagConstraints(0, posY, 3, 1, 10, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Selected_Accounts")), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -166,7 +171,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
     listPanel.setLayout(new GridBagLayout());
     UserRecord[] subUsers = cache.getUserRecords(subAccountsToManage);
     for (int i=0; i<subUsers.length; i++) {
-      Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
+      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
     }
@@ -198,21 +203,21 @@ public class ActivateSuspendDialog extends GeneralDialog {
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(1, 5, 5, 5), 0, 0));
     posY ++;
 
-    String confirmPasswordLabel = com.CH_gui.lang.Lang.rb.getString("label_Please_enter_your_account_password_to_confirm_this_action.");
+    String confirmPasswordLabel = com.CH_cl.lang.Lang.rb.getString("label_Please_enter_your_account_password_to_confirm_this_action.");
     panel.add(new JMyLabel(confirmPasswordLabel), new GridBagConstraints(0, posY, 3, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     JLabel userName = new JMyLabel(userRecord.handle);
     userName.setIcon(RecordUtilsGui.getIcon(userRecord));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(userName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 0), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -254,7 +259,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
       messageText = "Are you sure you want to "+ (jSuspend.isSelected() ? "Suspend" : "Activate") +" the following accounts: \n";
       messageText += getUsersAsText(subAccountsToManage, ", ");
       messageText += "\n\nDo you want to continue?";
-      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Confirmation");
+      String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Confirmation");
       boolean option = MessageDialog.showDialogYesNo(ActivateSuspendDialog.this, messageText, title);
       if (option == true) {
         // run the long part is another thread
@@ -306,8 +311,8 @@ public class ActivateSuspendDialog extends GeneralDialog {
   }
 
   /**
-   * Thread that takes all input data and runs the action.
-   */
+  * Thread that takes all input data and runs the action.
+  */
   private class OKThread extends ThreadTraced {
     public OKThread() {
       super("ActivateSuspendDialog OKThread");
@@ -321,8 +326,8 @@ public class ActivateSuspendDialog extends GeneralDialog {
       BAEncodedPassword oldBA = getOldBAEncodedPassword();
       if (!cache.getEncodedPassword().equals(oldBA)) {
         error = true;
-        String PASSWORD_ERROR = com.CH_gui.lang.Lang.rb.getString("msg_Password_does_not_match");
-        MessageDialog.showErrorDialog(ActivateSuspendDialog.this, PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+        String PASSWORD_ERROR = com.CH_cl.lang.Lang.rb.getString("msg_Password_does_not_match");
+        MessageDialog.showErrorDialog(ActivateSuspendDialog.this, PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
         jOldPass.setText("");
       }
 

@@ -55,21 +55,21 @@ public class UserSelectorDialog extends GeneralDialog implements VisualsSavable,
 
   /** Creates new UserSelectorDialog */
   public UserSelectorDialog(Frame owner) {
-    this(owner, com.CH_gui.lang.Lang.rb.getString("button_Close"), null);
+    this(owner, com.CH_cl.lang.Lang.rb.getString("button_Close"), null);
   }
   /** Creates new UserSelectorDialog */
   public UserSelectorDialog(Dialog owner) {
-    this(owner, com.CH_gui.lang.Lang.rb.getString("button_Close"), null);
+    this(owner, com.CH_cl.lang.Lang.rb.getString("button_Close"), null);
   }
 
   /** Creates new UserSelectorDialog */
   public UserSelectorDialog(Frame owner, String selectButtonText, String searchString) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Select_Users"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Select_Users"));
     constructDialog(owner, selectButtonText, searchString);
   }
   /** Creates new UserSelectorDialog */
   public UserSelectorDialog(Dialog owner, String selectButtonText, String searchString) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Select_Users"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Select_Users"));
     constructDialog(owner, selectButtonText, searchString);
   }
 
@@ -108,7 +108,7 @@ public class UserSelectorDialog extends GeneralDialog implements VisualsSavable,
     });
     jSelect = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         // cancel action

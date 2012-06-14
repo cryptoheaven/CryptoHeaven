@@ -80,11 +80,11 @@ public class PriorityComboBoxModel extends AbstractListModel implements ComboBox
     } else {
       Hashtable result = new Hashtable();
       if(index == 0)
-        result.put("title",com.CH_gui.lang.Lang.rb.getString("priority_FYI"));
+        result.put("title",com.CH_cl.lang.Lang.rb.getString("priority_FYI"));
       else if (index == 1)
-        result.put("title",com.CH_gui.lang.Lang.rb.getString("priority_Normal"));
+        result.put("title",com.CH_cl.lang.Lang.rb.getString("priority_Normal"));
       else if (index == 2)
-        result.put("title",com.CH_gui.lang.Lang.rb.getString("priority_High"));
+        result.put("title",com.CH_cl.lang.Lang.rb.getString("priority_High"));
       if (images[index] != null)
         result.put("image", images[index]);
       cache[index] = result;

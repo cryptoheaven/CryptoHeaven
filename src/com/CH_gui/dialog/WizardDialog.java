@@ -83,20 +83,20 @@ public abstract class WizardDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[4];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Previous"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Previous"));
     buttons[0].addActionListener(new PreviousActionListener());
     buttonPrevious = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Next"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Next"));
     buttons[1].addActionListener(new NextActionListener());
     buttonNext = buttons[1];
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Finish"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Finish"));
     buttons[2].setDefaultCapable(true);
     buttons[2].addActionListener(new FinishActionListener());
     buttonFinish = buttons[2];
 
-    buttons[3] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[3] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[3].addActionListener(new CancelActionListener());
     buttonCancel = buttons[3];
 

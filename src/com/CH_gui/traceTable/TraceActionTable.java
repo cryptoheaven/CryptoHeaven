@@ -110,9 +110,9 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
    */
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Refresh_Traces"), Images.get(ImageNums.REFRESH16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Refresh_Traces"), Images.get(ImageNums.REFRESH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Refresh_Trace_List_from_the_server."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Refresh_Trace_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -127,9 +127,9 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
    */
   private class InitiateAction extends AbstractActionTraced {
     public InitiateAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CONTACT_ADD24));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -151,9 +151,9 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
    */
   private class SendMessageAction extends AbstractActionTraced {
     public SendMessageAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Send_Message_..."), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Message_to_the_selected_user(s)."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -186,7 +186,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
             if (enm.hasMoreElements())
               sb.append(", ");
           }
-          subject = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msgSubject_Access_Trace_for"), new Object[] {sb.toString()});
+          subject = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msgSubject_Access_Trace_for"), new Object[] {sb.toString()});
         } else {
           Long objId = traceRecs[0].objId;
           Record rec = (Record) usedRecsHT.get(objId);
@@ -195,22 +195,22 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
           boolean isFolder = rec instanceof FolderRecord;
           String objType = "";
           if (isFile) {
-            objType = com.CH_gui.lang.Lang.rb.getString("File");
+            objType = com.CH_cl.lang.Lang.rb.getString("File");
           } else if (isMsg) {
             FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             MsgDataRecord msgData = cache.getMsgDataRecord(((MsgLinkRecord) rec).msgId);
             if (msgData != null && msgData.isTypeAddress())
-              objType = com.CH_gui.lang.Lang.rb.getString("Address");
+              objType = com.CH_cl.lang.Lang.rb.getString("Address");
             else 
-              objType = com.CH_gui.lang.Lang.rb.getString("Message");
+              objType = com.CH_cl.lang.Lang.rb.getString("Message");
           } else if (isFolder) {
             FolderRecord fldRec = (FolderRecord) rec;
             if (!fldRec.isGroupType())
-              objType = com.CH_gui.lang.Lang.rb.getString("Folder");
+              objType = com.CH_cl.lang.Lang.rb.getString("Folder");
             else
-              objType = com.CH_gui.lang.Lang.rb.getString("Group");
+              objType = com.CH_cl.lang.Lang.rb.getString("Group");
           }
-          subject = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msgSubject_Access_Trace_for_OBJECT-TYPE_-_OBJECT-NAME___(id_OBJECT-ID)"), new Object[] {objType, '"'+ListRenderer.getRenderedText(rec)+'"', objId});
+          subject = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msgSubject_Access_Trace_for_OBJECT-TYPE_-_OBJECT-NAME___(id_OBJECT-ID)"), new Object[] {objType, '"'+ListRenderer.getRenderedText(rec)+'"', objId});
         }
         new MessageFrame(uRecs, subject);
       }

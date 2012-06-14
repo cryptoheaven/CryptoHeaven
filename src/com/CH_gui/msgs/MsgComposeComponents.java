@@ -12,6 +12,8 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.EmailAddressRecord;
@@ -63,8 +65,8 @@ import javax.swing.text.JTextComponent;
 */
 public class MsgComposeComponents extends Object implements DisposableObj {
 
-  private static String STR_RE = com.CH_gui.lang.Lang.rb.getString("msg_Re");
-  private static String STR_FWD = com.CH_gui.lang.Lang.rb.getString("msg_Fwd");
+  private static String STR_RE = com.CH_cl.lang.Lang.rb.getString("msg_Re");
+  private static String STR_FWD = com.CH_cl.lang.Lang.rb.getString("msg_Fwd");
 
   private MsgComposeManagerI composeMngrI;
   private MsgTypeManagerI msgTypeManagerI;
@@ -278,7 +280,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       for (int i=0; i<tempRecipients.length; i++) {
         tempRecipients[i] = recipients[i];
         if (tempRecipients[i] instanceof UserRecord) {
-          Record converted = MsgPanelUtils.convertUserIdToFamiliarUser(((UserRecord)tempRecipients[i]).userId, true, false);
+          Record converted = CacheUsrUtils.convertUserIdToFamiliarUser(((UserRecord)tempRecipients[i]).userId, true, false);
           tempRecipients[i] = converted != null ? converted : tempRecipients[i];
         }
       }
@@ -482,7 +484,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     });
 
     if (!isChatComposePanel) {
-      jFromLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_From"));
+      jFromLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_From"));
       jFromLine = new JPanel();
       jFromLine.setLayout(new GridBagLayout());
       jSubject = new JUndoableTextField(undoMngrI);
@@ -528,7 +530,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // do for : TO, CC, BCC
       for (int recipientType=MsgComposePanel.TO; recipientType<MsgComposePanel.RECIPIENT_TYPES.length; recipientType++) {
         String label = recipientType==MsgComposePanel.TO ? "button_To" : ( recipientType==MsgComposePanel.CC ? "button_Cc" : "button_Bcc");
-        jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString(label), Images.get(ImageNums.ADDRESS_BOOK16));
+        jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString(label), Images.get(ImageNums.ADDRESS_BOOK16));
         jSelectRecipients[recipientType].setAlignmentX(JButton.LEFT_ALIGNMENT);
         jSelectRecipients[recipientType].setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
         jSelectRecipients[recipientType].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -548,7 +550,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
             if (w instanceof Dialog || w instanceof Frame) {
               UserSelectorDialog d = null;
               String searchString = (String) args;
-              String selectButtonText = com.CH_gui.lang.Lang.rb.getString("button_Select");
+              String selectButtonText = com.CH_cl.lang.Lang.rb.getString("button_Select");
               if (w instanceof Dialog)
                 d = new UserSelectorDialog((Dialog) w, selectButtonText, searchString);
               else
@@ -580,7 +582,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       }
 
       // setup Reply To label
-      jReplyToLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_In_reply_to"));
+      jReplyToLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_In_reply_to"));
       jReplyToLabel.setVisible(false);
       jReplyTo = new JMyLabel();
       jReplyTo.setVisible(false);
@@ -621,7 +623,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         public Object[] provide(Object args) {
           Icon icon = (Icon) composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.MENU_ICON);
           String text = (String) composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.NAME);
-          String tip = "<html>" + composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.TOOL_TIP) + "<br>" + com.CH_gui.lang.Lang.rb.getString("actionTip_Send_mail_button_tip");
+          String tip = "<html>" + composeMngrI.getActions()[MsgComposePanel.SEND_ACTION].getValue(Actions.TOOL_TIP) + "<br>" + com.CH_cl.lang.Lang.rb.getString("actionTip_Send_mail_button_tip");
           JLabel sendLabel = new JMyLabel(text, icon, JLabel.LEFT);
           sendLabel.setToolTipText(tip);
 
@@ -674,7 +676,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jTyping.setFocusable(false);
 
       jRing = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_BELL));
-      jRing.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
+      jRing.setToolTipText(com.CH_cl.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
       //jRing.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
       jRing.setBorder(new EmptyBorder(2, 2, 2, 2));
       jRing.addActionListener(new ActionListener() {
@@ -684,7 +686,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       });
     }
 
-    jSelectAttachments = new JMyButtonNoFocus(com.CH_gui.lang.Lang.rb.getString("button_Attach"), Images.get(ImageNums.ATTACH16));
+    jSelectAttachments = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString("button_Attach"), Images.get(ImageNums.ATTACH16));
     jSelectAttachments.setAlignmentX(JButton.LEFT_ALIGNMENT);
     jSelectAttachments.setBorder(new EtchedBorder());
     jSelectAttachments.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -701,7 +703,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       jAttachments.setBorder(new EmptyBorder(0,0,0,0));
 
       jAttach = new JMyButtonNoFocus(Images.get(ImageNums.EDITOR_ATTACH));
-      jAttach.setToolTipText(com.CH_gui.lang.Lang.rb.getString("actionTip_Attachments"));
+      jAttach.setToolTipText(com.CH_cl.lang.Lang.rb.getString("actionTip_Attachments"));
       //jAttach.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
       jAttach.setBorder(new EmptyBorder(2, 2, 2, 2));
       jAttach.addActionListener(new ActionListener() {
@@ -714,7 +716,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     }
 
     jPriorityLabelStretch = new JLabel();
-    jPriorityLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Priority"));
+    jPriorityLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Priority"));
     jPriority = new JMyListCombo(0, new JLabel[] {
       new JMyLabel("FYI", Images.get(ImageNums.PRIORITY_LOW_SMALL), JLabel.LEFT),
       new JMyLabel("Normal", Images.get(ImageNums.TRANSPARENT16), JLabel.LEFT),
@@ -730,7 +732,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     // "Copy to Sent"
     Icon sentFolderIcon = getSentFolderIcon();
     String sentShareName = getSentFolderName();
-    jCopyToSent = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Copy_To"), false);
+    jCopyToSent = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Copy_To"), false);
 
     jCopyToLabel = new JMyLabel(sentShareName, sentFolderIcon, JLabel.LEFT);
     jCopyToLabel.setBackground(jCopyToSent.getBackground());
@@ -770,7 +772,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     }
     if (sentFolder != null)
       sentShare = cache.getFolderShareRecordMy(sentFolder.folderId, false);
-    String sentShareName = sentShare != null ? sentShare.getFolderName() : com.CH_gui.lang.Lang.rb.getString("folder_Sent");
+    String sentShareName = sentShare != null ? sentShare.getFolderName() : com.CH_cl.lang.Lang.rb.getString("folder_Sent");
     return sentShareName;
   }
 
@@ -893,7 +895,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     // subject label, space and button
     if (!msgTypeArea.isSubjectGenerated()) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Subject")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Subject")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 5, 2, 5), 0, 0));
       panel.add(jSubject, new GridBagConstraints(1, posY, 5, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
@@ -1156,7 +1158,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
               "<td align='left' valign='top' width='1' bgcolor='#666666'> " +
               "</td>" +
               "<td align='left' valign='top'> " +
-              com.CH_gui.lang.Lang.rb.getString("-----_Original_Message_-----") +
+              com.CH_cl.lang.Lang.rb.getString("-----_Original_Message_-----") +
               " <br>" +
               content[1] + content[3] +
               "</td> " +
@@ -1174,7 +1176,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       text =
           "\n\n" +
           (addSignature ? signatureText : "") +
-          com.CH_gui.lang.Lang.rb.getString("-----_Original_Message_-----") +
+          com.CH_cl.lang.Lang.rb.getString("-----_Original_Message_-----") +
           " \n" +
           content[1] + content[3] +
           "\n\n";
@@ -1205,7 +1207,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     String senderEmailFull = (String) senderSet[2];
 
     if (sender != null) {
-      Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients(dataRecord);
+      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
       StringBuffer[] sb = new StringBuffer[recipients.length];
       for (int recipientType=0; recipientType<recipients.length; recipientType++) {
         sb[recipientType] = new StringBuffer();
@@ -1297,14 +1299,14 @@ public class MsgComposeComponents extends Object implements DisposableObj {
             (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") +
 
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_From"),
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_From"),
                 (isForceOutputInHTMLPrintHeader ? Misc.encodePlainIntoHtml(senderEmailFull) : "<A href='mailto:" + senderEmailShort + "'>" + Misc.encodePlainIntoHtml(senderEmailFull) + "</A>"),
                 isForceOutputInHTMLPrintHeader) +
             //(sbReplyTo != null ? ("<b>" + com.CH_gui.lang.Lang.rb.getString("column_Reply_To") + ":</b>  " + Misc.encodePlainIntoHtml(sbReplyTo.toString()) + " <br>") : "") +
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_To"), sb[MsgComposePanel.TO].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Cc"), sb[MsgComposePanel.CC].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_gui.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_To"), sb[MsgComposePanel.TO].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Cc"), sb[MsgComposePanel.CC].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
             (isForceOutputInHTMLPrintHeader ? "</table>" : "");
 
         if (content[2].equalsIgnoreCase("text/html")) {
@@ -1334,11 +1336,11 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       } else {
         content[0] = "text/plain";
         content[1] =
-            com.CH_gui.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
-            (sb[MsgComposePanel.TO].length() > 0 ? (com.CH_gui.lang.Lang.rb.getString("column_To") + ": " + sb[MsgComposePanel.TO].toString() + "\n") : "") +
-            (sb[MsgComposePanel.CC].length() > 0 ? (com.CH_gui.lang.Lang.rb.getString("column_Cc") + ": " + sb[MsgComposePanel.CC].toString() + "\n") : "") +
-            com.CH_gui.lang.Lang.rb.getString("column_Sent") + ": " + new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated) + "\n" +
-            com.CH_gui.lang.Lang.rb.getString("column_Subject") + ": " + quotedSubject + " \n\n";
+            com.CH_cl.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
+            (sb[MsgComposePanel.TO].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_To") + ": " + sb[MsgComposePanel.TO].toString() + "\n") : "") +
+            (sb[MsgComposePanel.CC].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_Cc") + ": " + sb[MsgComposePanel.CC].toString() + "\n") : "") +
+            com.CH_cl.lang.Lang.rb.getString("column_Sent") + ": " + new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated) + "\n" +
+            com.CH_cl.lang.Lang.rb.getString("column_Subject") + ": " + quotedSubject + " \n\n";
         content[3] = quotedMsgBody;
       }
     }

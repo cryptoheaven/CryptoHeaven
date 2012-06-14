@@ -98,9 +98,9 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
    **/
   private class SwitchToFullAction extends AbstractActionTraced {
     public SwitchToFullAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Switch_To_Full_App"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Switch_To_Full_App"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Switch_To_Full_App."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Switch_To_Full_App."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.FRAME_LOCK32));
     }
     public void actionPerformedTraced(ActionEvent event) {

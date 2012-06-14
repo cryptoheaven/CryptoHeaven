@@ -1,22 +1,22 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.userTable;
 
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.cache.event.UserRecordEvent;
 import com.CH_cl.service.cache.event.UserRecordListener;
-import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.filters.SubUserFilter;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -32,21 +32,21 @@ import com.CH_gui.table.RecordTableModel;
 import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.29 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.29 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class UserTableModel extends RecordTableModel {
 
   private UserListener userListener;
@@ -55,9 +55,9 @@ public class UserTableModel extends RecordTableModel {
   /* parentIds for which the sub-account user records has been fetched already */
   private static final ArrayList fetchedIds = new ArrayList();
 
-  private static String STR_USER_NAME = com.CH_gui.lang.Lang.rb.getString("column_Username");
-  private static String STR_USER_ID = com.CH_gui.lang.Lang.rb.getString("column_User_ID");
-  private static String STR_MESSAGING = com.CH_gui.lang.Lang.rb.getString("column_Messaging");
+  private static String STR_USER_NAME = com.CH_cl.lang.Lang.rb.getString("column_Username");
+  private static String STR_USER_ID = com.CH_cl.lang.Lang.rb.getString("column_User_ID");
+  private static String STR_MESSAGING = com.CH_cl.lang.Lang.rb.getString("column_Messaging");
 
   private static String STR_EMAIL_ADDRESS = "Email Address";
   private static String STR_OTHER_CONTACT_ADDRESS = "Other Contact Address";
@@ -144,17 +144,16 @@ public class UserTableModel extends RecordTableModel {
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return null;
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
+  public void clearCachedFetchedFolderIDs() {
   }
 
   /**
-   * Sets auto update mode by listening on the cache user updates.
-   */
+  * Sets auto update mode by listening on the cache user updates.
+  */
   public synchronized void setAutoUpdate(boolean flag) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (flag) {
@@ -171,8 +170,8 @@ public class UserTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model with specified user's sub-user accounts
-   */
+  * Initializes the model with specified user's sub-user accounts
+  */
   public synchronized void initData(Long newParentId) {
     Long parentId = getParentUserId();
     if (parentId == null || !parentId.equals(newParentId)) {
@@ -185,8 +184,8 @@ public class UserTableModel extends RecordTableModel {
   }
 
   /**
-   * @param fetch true if data should be refetched from the database.
-   */
+  * @param fetch true if data should be refetched from the database.
+  */
   public synchronized void refreshData(boolean forceFetch) {
     Long parentId = getParentUserId();
     if (parentId != null) {
@@ -195,8 +194,8 @@ public class UserTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model setting the specified parent user id as its main variable
-   */
+  * Initializes the model setting the specified parent user id as its main variable
+  */
   private synchronized void switchData(Long newParentId) {
     Long parentId = getParentUserId();
     if (parentId == null || !parentId.equals(newParentId)) {
@@ -215,8 +214,8 @@ public class UserTableModel extends RecordTableModel {
 
 
   /**
-   * Forces a refresh of data displayed even if its already displaying the specified data.
-   */
+  * Forces a refresh of data displayed even if its already displaying the specified data.
+  */
   private synchronized void refreshData(Long parentId, boolean forceFetch) {
     if (parentId != null) {
       UserRecord userRec = FetchedDataCache.getSingleInstance().getUserRecord(parentId);
@@ -228,10 +227,10 @@ public class UserTableModel extends RecordTableModel {
   }
 
   /** 
-   * Send a request to fetch files for the <code> parentId </code> from the server
-   * if users were not fetched for this parent, otherwise get them from cache
-   * @param force true to force a fetch from the database
-   */
+  * Send a request to fetch files for the <code> parentId </code> from the server
+  * if users were not fetched for this parent, otherwise get them from cache
+  * @param force true to force a fetch from the database
+  */
   private void fetchUsers(final Long parentId, boolean force) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserTableModel.class, "fetchUsers(final Long parentId, boolean force)");
     if (trace != null) trace.args(parentId);
@@ -304,9 +303,9 @@ public class UserTableModel extends RecordTableModel {
               value = parentUser.shortInfo();
           }
           break;
-           */
+          */
         case 3:
-          String[] emailStrings = UserOps.getCachedDefaultEmail(userRecord, false);
+          String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(userRecord, false);
           String emailAddress = emailStrings != null ? emailStrings[2] : "N/A";
           value = emailAddress;
           break;
@@ -338,8 +337,8 @@ public class UserTableModel extends RecordTableModel {
   /****************************************************************************************/
 
   /** 
-   * Listen on updates to the ContactRecords in the cache.
-   */
+  * Listen on updates to the ContactRecords in the cache.
+  */
   private class UserListener implements UserRecordListener {
     public void userRecordUpdated(UserRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -377,8 +376,8 @@ public class UserTableModel extends RecordTableModel {
   }
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public boolean isContentFetched(Long shareId) {
     return false;
   }

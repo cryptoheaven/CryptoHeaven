@@ -51,9 +51,9 @@ public class TextFieldPopupPasteAdapter extends MouseAdapter {
     private JTextComponent textComp;
     public PasteAction(JTextComponent textComp) {
       this.textComp = textComp;
-      putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
+      putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Paste"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.PASTE16));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Paste"));
     }
     public void actionPerformedTraced(ActionEvent e) {
       textComp.paste();

@@ -12,27 +12,36 @@
 
 package com.CH_gui.groupTable;
 
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.util.Vector;
-import javax.swing.*;
-
-import com.CH_gui.action.*;
-import com.CH_gui.dialog.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.table.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.util.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.records.filters.*;
-
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.Actions;
+import com.CH_gui.dialog.FolderPropertiesDialog;
+import com.CH_gui.frame.MessageFrame;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordActionTable;
+import com.CH_gui.tree.FolderActionTree;
+import com.CH_gui.util.ActionProducerI;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.util.Vector;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.SwingUtilities;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -125,17 +134,17 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
    */
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Invite_to_the_Group_..."), Images.get(ImageNums.MEMBER_ADD16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Group_..."), Images.get(ImageNums.MEMBER_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Invite_to_the_Group_..."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Group_..."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MEMBER_ADD24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Add_Member"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Add_Member"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair fPair = GroupActionTable.this.getTableModel().getParentFolderPair();
       if (fPair != null && fPair.getFolderRecord().isCategoryType()) {
         Window w = SwingUtilities.windowForComponent(GroupActionTable.this);
-        String title = com.CH_gui.lang.Lang.rb.getString("title_Select_Folder_or_Group_to_Share");
+        String title = com.CH_cl.lang.Lang.rb.getString("title_Select_Folder_or_Group_to_Share");
         fPair = FolderActionTree.selectFolder(w, title, new MultiFilter(new RecordFilter[] { FolderFilter.MAIN_VIEW, FolderFilter.NON_LOCAL_FOLDERS }, MultiFilter.AND));
       }
       if (fPair != null) {
@@ -151,12 +160,12 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
    */
   private class NewMessageToGroupAction extends AbstractActionTraced {
     public NewMessageToGroupAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_To_Group"), Images.get(ImageNums.MAIL_COMPOSE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_New_Message_To_Group"), Images.get(ImageNums.MAIL_COMPOSE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Message_Group"));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message_to_selected_Group."));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Message_Group"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Message_to_selected_Group."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE24));
-      putValue(Actions.PARENT_NAME, com.CH_gui.lang.Lang.rb.getString("Message"));
+      putValue(Actions.PARENT_NAME, com.CH_cl.lang.Lang.rb.getString("Message"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       //putValue(Actions.IN_POPUP, Boolean.TRUE);
       //putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -180,12 +189,12 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
    */
   private class NewMessageToMemberAction extends AbstractActionTraced {
     public NewMessageToMemberAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_New_Message_To_Member"), Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_New_Message_To_Member"), Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Message_Member"));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_New_Message"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Message_Member"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Message"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER24));
-      putValue(Actions.PARENT_NAME, com.CH_gui.lang.Lang.rb.getString("Message"));
+      putValue(Actions.PARENT_NAME, com.CH_cl.lang.Lang.rb.getString("Message"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       //putValue(Actions.IN_POPUP, Boolean.TRUE);
       //putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -200,7 +209,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
           FolderShareRecord shareRecord = shares[i];
           if (shareRecord.isOwnedByUser()) {
             UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(shareRecord.ownerUserId);
-            Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
             recipientsV.addElement(rec);
           } else if (shareRecord.isOwnedByGroup()) {
             FolderRecord gRec = FetchedDataCache.getSingleInstance().getFolderRecord(shareRecord.ownerUserId);

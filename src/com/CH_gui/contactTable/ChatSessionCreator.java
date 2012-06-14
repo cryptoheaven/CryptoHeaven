@@ -87,7 +87,7 @@ public class ChatSessionCreator extends ThreadTraced {
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
-    StringBuffer folderName = new StringBuffer(com.CH_gui.lang.Lang.rb.getString("folderName_Chat_Log"));
+    StringBuffer folderName = new StringBuffer(com.CH_cl.lang.Lang.rb.getString("folderName_Chat_Log"));
     String folderDesc = "";
     String ownerHandle = cache.getUserRecord().handle;
     folderName.append(" : ");

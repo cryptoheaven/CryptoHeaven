@@ -1,52 +1,57 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.ops;
 
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.util.GlobalSubProperties;
-
 import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.URLs;
 import java.io.File;
-import java.security.*;
-import java.util.*;
+import java.security.DigestException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.34 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.34 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class UserOps extends Object {
 
 
@@ -305,27 +310,54 @@ public class UserOps extends Object {
   }
 
   /**
-   * @return personal (nullable), short, full parts of default email address for specified user
-   */
-  public static String[] getCachedDefaultEmail(UserRecord userRecord, boolean isGeneratePersonalPart) {
-    String[] emailAddr = null;
-    if (userRecord.defaultEmlId != null && userRecord.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      EmailRecord emlRec = cache.getEmailRecord(userRecord.defaultEmlId);
-      if (emlRec != null) {
-        emailAddr = new String[3];
-        String personal = emlRec.personal;
-        if (isGeneratePersonalPart) {
-          personal = personal != null ? personal : userRecord.handle;
-          emailAddr[2] = personal + " <" + emlRec.emailAddr + ">";
-        } else {
-          emailAddr[2] = emlRec.getEmailAddressFull();
+  * @return converted records into ContactRecords or User records, unwinding Groups as well
+  */
+  public static Record[] getOrFetchFamiliarUsers(ServerInterfaceLayer SIL, Record[] records) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "getOrFetchFamiliarUsers(Record[] records)");
+    if (trace != null) trace.args(records);
+
+    Record[] users = null;
+    ArrayList cRecsL = new ArrayList();
+    ArrayList fRecsL = new ArrayList();
+
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    Long userId = cache.getMyUserId();
+    if (records != null && records.length > 0) {
+      for (int i=0; i<records.length; i++) {
+        if (records[i] instanceof ContactRecord) {
+          ContactRecord cRec = (ContactRecord) records[i];
+          if (!cRecsL.contains(cRec) && cRec.ownerUserId.equals(userId) && cRec.isOfActiveType())
+            cRecsL.add(cRec);
+        } else if (records[i] instanceof FolderPair) {
+          FolderPair fPair = (FolderPair) records[i];
+          if (fPair.getFolderRecord().isGroupType()) {
+            if (!fRecsL.contains(fPair))
+              fRecsL.add(fPair);
+          }
         }
-        emailAddr[0] = personal;
-        emailAddr[1] = emlRec.emailAddr;
       }
     }
-    return emailAddr;
+
+    ArrayList usersL = new ArrayList(cRecsL);
+
+    if (fRecsL.size() > 0) {
+      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_ACCESS_USERS, new Obj_IDList_Co(RecordUtils.getIDs(fRecsL))), 30000);
+      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
+      if (msgAction != null && msgAction.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
+        Usr_UsrHandles_Rp usrSet = (Usr_UsrHandles_Rp) msgAction.getMsgDataSet();
+        UserRecord[] usrRecs = usrSet.userRecords;
+        for (int i=0; i<usrRecs.length; i++) {
+          Record user = CacheUsrUtils.convertUserIdToFamiliarUser(usrRecs[i].userId, true, false);
+          if (!usersL.contains(user))
+            usersL.add(user);
+        }
+      }
+    }
+
+    users = (Record[]) ArrayUtils.toArray(usersL, Record.class);
+
+    if (trace != null) trace.exit(UserOps.class, users);
+    return users;
   }
 
   public static String[] getOrFetchOrMakeDefaultEmail(ServerInterfaceLayer SIL, Long userId, boolean isGeneratePersonalPart) {
@@ -359,16 +391,16 @@ public class UserOps extends Object {
   }
 
   /**
-   * TO-DO: Legacy function because default email addresses are always fetched with User Handles... so remove this stuff...
-   * @return personal (nullable), short, full parts of default email address for specified user
-   */
+  * TO-DO: Legacy function because default email addresses are always fetched with User Handles... so remove this stuff...
+  * @return personal (nullable), short, full parts of default email address for specified user
+  */
   public static String[] getOrFetchDefaultEmail(ServerInterfaceLayer SIL, UserRecord userRecord, boolean isGeneratePersonalPart) {
-    String[] emailAddr = getCachedDefaultEmail(userRecord, isGeneratePersonalPart);
+    String[] emailAddr = CacheUsrUtils.getCachedDefaultEmail(userRecord, isGeneratePersonalPart);
     if (emailAddr == null) {
       if (userRecord.defaultEmlId != null && userRecord.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
         SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userRecord.userId)), 30000);
       }
-      emailAddr = getCachedDefaultEmail(userRecord, isGeneratePersonalPart);
+      emailAddr = CacheUsrUtils.getCachedDefaultEmail(userRecord, isGeneratePersonalPart);
     }
     return emailAddr;
   }
@@ -393,7 +425,7 @@ public class UserOps extends Object {
       sender = FetchedDataCache.getSingleInstance().getUserRecord(dataRecord.senderUserId);
       String[] emls = null;
       if (sender != null)
-        emls = UserOps.getCachedDefaultEmail((UserRecord) sender, true);
+        emls = CacheUsrUtils.getCachedDefaultEmail((UserRecord) sender, true);
       if (emls == null) {
         if (sender != null)
           emls = makeDefaultEmail((UserRecord) sender, true);

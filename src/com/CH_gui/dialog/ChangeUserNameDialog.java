@@ -77,7 +77,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
 
   /** Creates new ChangePasswordDialog */
   public ChangeUserNameDialog(Frame frame) {
-    super(frame, com.CH_gui.lang.Lang.rb.getString("title_Change_Username"));
+    super(frame, com.CH_cl.lang.Lang.rb.getString("title_Change_Username"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChangePasswordDialog.class, "ChangeUserNameDialog(Frame frame)");
 
     serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
@@ -94,12 +94,12 @@ public class ChangeUserNameDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     okButton = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new CancelActionListener());
     cancelButton = buttons[1];
 
@@ -132,7 +132,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
 //    posY ++;
 
     JLabel warningLabel = new JMyLabel(Images.get(ImageNums.SHIELD32));
-    warningLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Change_Username_hint_text"));
+    warningLabel.setText(com.CH_cl.lang.Lang.rb.getString("label_Change_Username_hint_text"));
     warningLabel.setHorizontalAlignment(JLabel.LEFT);
     warningLabel.setVerticalTextPosition(JLabel.TOP);
     warningLabel.setBorder(new LineBorder(warningLabel.getBackground().darker(), 1, true));
@@ -144,20 +144,20 @@ public class ChangeUserNameDialog extends GeneralDialog {
     UserRecord uRec = cache.getUserRecord();
     JLabel currentUserName = new JMyLabel(uRec.handle);
     currentUserName.setIcon(RecordUtilsGui.getIcon(uRec));
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Current_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(currentUserName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_New_Username")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jUserName, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -249,7 +249,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
       BAEncodedPassword ba = getOldBAEncodedPassword();
       if (!cache.getEncodedPassword().equals(ba)) {
         error = true;
-        MessageDialog.showErrorDialog(ChangeUserNameDialog.this, ChangePasswordDialog.OLD_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+        MessageDialog.showErrorDialog(ChangeUserNameDialog.this, ChangePasswordDialog.OLD_PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
         jOldPass.setText("");
       }
 

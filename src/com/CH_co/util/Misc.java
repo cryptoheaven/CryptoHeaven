@@ -438,9 +438,12 @@ public class Misc extends Object {
     * if the date is more than 90 days, format is ex: Jan 22, 2000
     */
   public static String getFormattedDate(Date timestamp) {
-    return getFormattedDate(timestamp, true);
+    return getFormattedDate(timestamp, true, true);
   }
   public static String getFormattedDate(Date timestamp, boolean includeSeconds) {
+    return getFormattedDate(timestamp, true, includeSeconds);
+  }
+  public static String getFormattedDate(Date timestamp, boolean includeTime, boolean includeSeconds) {
     long givenTime = timestamp.getTime();
     Date currDate = new Date();
     long currTime = currDate.getTime();
@@ -451,7 +454,19 @@ public class Misc extends Object {
     if (diff < hoursToMilliseconds(16)) {
       formatter = DateFormat.getTimeInstance(includeSeconds ? DateFormat.MEDIUM : DateFormat.SHORT);
     } else {
-      formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(timestamp);
+      int yearThen = cal.get(Calendar.YEAR);
+      cal.setTimeInMillis(System.currentTimeMillis());
+      int yearNow = cal.get(Calendar.YEAR);
+      boolean sameYear = yearThen == yearNow;
+      StringBuffer sb = new StringBuffer();
+      sb.append("MMM d");
+      if (!sameYear)
+        sb.append(" yyyy");
+      if (includeTime)
+        sb.append(", h:mm aa");
+      formatter = new SimpleDateFormat(sb.toString());
     }
 
     String dateString = formatter.format(timestamp);

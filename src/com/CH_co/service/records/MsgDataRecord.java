@@ -88,7 +88,9 @@ public class MsgDataRecord extends Record {
   public static final short OBJ_TYPE_MSG = 1;
   public static final short OBJ_TYPE_ADDR = 2;
 
-  public static final String WARNING_BACKGROUND_COLOR = "FFFF99";
+  public static final String BACKGROUND_COLOR_INFO = "dfe0cd";
+  public static final String BACKGROUND_COLOR_WARNING = "FFFF99";
+  public static final String BACKGROUND_COLOR_ERROR = "ffaaaa";
 
   public Long msgId;
   public Short objType;   // either OBJ_TYPE_MSG or OBJ_TYPE_ADDR, if address, use importance FYI/NORMAL/HIGH in PLAIN only for compatibility with older clients
@@ -206,7 +208,7 @@ public class MsgDataRecord extends Record {
   }
   public ImageText getExpirationIconAndText(Long forUserId, boolean isShortForm) {
     int icon = ImageNums.IMAGE_NONE;
-    String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired, false) : Misc.getFormattedTimestamp(dateExpired));
+    String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired, true, false) : Misc.getFormattedTimestamp(dateExpired));
     String note = "";
     if (dateExpired != null) {
       if (dateExpired.getTime() > System.currentTimeMillis())
@@ -630,7 +632,7 @@ public class MsgDataRecord extends Record {
     String tablePre = isPlain ? "" :
             "<table border='0' cellspacing='0' cellpadding='0'>"
               +"<tr>"
-                +"<td width='100%' bgcolor='#"+WARNING_BACKGROUND_COLOR+"'>";
+                +"<td width='100%' bgcolor='#"+BACKGROUND_COLOR_WARNING+"'>";
     String tablePost = isPlain ? "" :
                 "</td>"
               +"</tr>"

@@ -57,7 +57,7 @@ public class ChangePasswordDialog extends GeneralDialog {
   private static final int DEFAULT_CANCEL_BUTTON_INDEX = 1;
 
   // Error messages
-  public static final String OLD_PASSWORD_ERROR = com.CH_gui.lang.Lang.rb.getString("msg_Old_Password_does_not_match");
+  public static final String OLD_PASSWORD_ERROR = com.CH_cl.lang.Lang.rb.getString("msg_Old_Password_does_not_match");
 
   private JMyPasswordKeyboardField jOldPass;
   private JMyPasswordKeyboardField jNewPass;
@@ -75,7 +75,7 @@ public class ChangePasswordDialog extends GeneralDialog {
 
   /** Creates new ChangePasswordDialog */
   public ChangePasswordDialog(Frame frame, boolean isSetMode) {
-    super(frame, isSetMode ? com.CH_gui.lang.Lang.rb.getString("title_Set_Password") : com.CH_gui.lang.Lang.rb.getString("title_Change_Password"));
+    super(frame, isSetMode ? com.CH_cl.lang.Lang.rb.getString("title_Set_Password") : com.CH_cl.lang.Lang.rb.getString("title_Change_Password"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChangePasswordDialog.class, "ChangePasswordDialog(Frame frame)");
 
     this.isSetMode = isSetMode;
@@ -93,12 +93,12 @@ public class ChangePasswordDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     okButton = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new CancelActionListener());
     cancelButton = buttons[1];
 
@@ -141,20 +141,20 @@ public class ChangePasswordDialog extends GeneralDialog {
     posY ++;
 
     if (!isSetMode) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Old_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Old_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       panel.add(jOldPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_New_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_New_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jNewPass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Re-type_Password")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(jRePass, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -254,7 +254,7 @@ public class ChangePasswordDialog extends GeneralDialog {
       BAEncodedPassword ba = getBAEncodedPassword(jOldPass);
       if (!cache.getEncodedPassword().equals(ba)) {
         error = true;
-        MessageDialog.showErrorDialog(ChangePasswordDialog.this, OLD_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+        MessageDialog.showErrorDialog(ChangePasswordDialog.this, OLD_PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
         jOldPass.setText("");
       }
 
@@ -265,7 +265,7 @@ public class ChangePasswordDialog extends GeneralDialog {
         char[] pass2 = jRePass.getPassword();
         /* Password and re-typed password do not match */
         if (!Arrays.equals(pass1, pass2)) {
-          MessageDialog.showErrorDialog(ChangePasswordDialog.this, LoginFrame.RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+          MessageDialog.showErrorDialog(ChangePasswordDialog.this, LoginFrame.RETYPE_PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           jNewPass.setText(""); jRePass.setText("");
           error = true;
           jNewPass.requestFocusInWindow();

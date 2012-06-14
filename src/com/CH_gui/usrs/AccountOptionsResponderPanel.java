@@ -182,7 +182,7 @@ public class AccountOptionsResponderPanel extends JPanel implements DisposableOb
 
   private void createComponents(UserRecord[] userRecs, ChangeListener checkBoxListener) {
     if (userRecs.length > 1) {
-      jIncludeChangesToResponder = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
+      jIncludeChangesToResponder = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
       jIncludeChangesToResponder.setFont(jIncludeChangesToResponder.getFont().deriveFont(Font.BOLD));
       jIncludeChangesToResponder.addChangeListener(checkBoxListener);
     }

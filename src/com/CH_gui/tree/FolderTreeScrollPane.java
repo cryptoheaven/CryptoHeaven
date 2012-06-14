@@ -1,52 +1,61 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.tree;
 
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
-import java.awt.dnd.*;
-import java.util.*;
-import javax.swing.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.DisposableObj;
+import com.CH_gui.frame.ChatTableFrame;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.util.Nudge;
+import com.CH_gui.util.OpenChatFolders;
+import com.CH_gui.util.PopupWindowManager;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.util.Collection;
+import java.util.EventObject;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.32 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.32 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 
 public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
 
@@ -64,49 +73,49 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
 
 
   /**
-   * Creates new FolderTreeScrollPane
-   * With Actions, No Filter, Auto Fetch.
-   */
+  * Creates new FolderTreeScrollPane
+  * With Actions, No Filter, Auto Fetch.
+  */
   public FolderTreeScrollPane() {
     this(new FolderActionTree(), true);
   }
   /**
-   * Creates new FolderTreeScrollPane
-   * With Actions, No Filter, Auto Fetch.
-   */
+  * Creates new FolderTreeScrollPane
+  * With Actions, No Filter, Auto Fetch.
+  */
   public FolderTreeScrollPane(RecordFilter filter) {
     this(new FolderActionTree(filter), true);
   }
   /**
-   * Creates new FolderTreeScrollPane
-   * No Filter, Auto Fetch.
-   * @param withAction If true, action packed tree will be used, false for no action tree.
-   */
+  * Creates new FolderTreeScrollPane
+  * No Filter, Auto Fetch.
+  * @param withAction If true, action packed tree will be used, false for no action tree.
+  */
   public FolderTreeScrollPane(boolean withAction) {
     this(withAction ? new FolderActionTree() : new FolderTree(), true);
   }
   /**
-   * Creates new FolderTreeScrollPane
-   * @param withAction If true, action packed tree will be used, false for no action tree.
-   * @param filter Sets the tree to be filtered.
-   */
+  * Creates new FolderTreeScrollPane
+  * @param withAction If true, action packed tree will be used, false for no action tree.
+  * @param filter Sets the tree to be filtered.
+  */
   public FolderTreeScrollPane(boolean withAction, RecordFilter filter) {
     this(withAction ? new FolderActionTree(filter) : new FolderTree(filter), true);
   }
   /**
-   * Creates new FolderTreeScrollPane
-   * @param withAction If true, action packed tree will be used, false for no action tree.
-   * @param filter Sets the tree to be filtered.
-   * @param initialFolderPairs initial folders -- automated fetch is suppressed
-   */
+  * Creates new FolderTreeScrollPane
+  * @param withAction If true, action packed tree will be used, false for no action tree.
+  * @param filter Sets the tree to be filtered.
+  * @param initialFolderPairs initial folders -- automated fetch is suppressed
+  */
   public FolderTreeScrollPane(boolean withAction, RecordFilter filter, FolderPair[] initialFolderPairs) {
     this(withAction ? new FolderActionTree(filter, initialFolderPairs) : new FolderTree(filter, initialFolderPairs), false);
   }
   /**
-   * Creates new FolderTreeScrollPane with a specified FolderTree.
-   * @param tree The underlying folder tree in this pane.
-   * @param autoFetch If true, request to fetch all folders is sent to the server.
-   */
+  * Creates new FolderTreeScrollPane with a specified FolderTree.
+  * @param tree The underlying folder tree in this pane.
+  * @param autoFetch If true, request to fetch all folders is sent to the server.
+  */
   public FolderTreeScrollPane(FolderTree tree, boolean autoFetch) {
     super(tree);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeScrollPane.class, "FolderTreeScrollPane()");
@@ -147,8 +156,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   }
 
   /**
-   * @return the content tree
-   */
+  * @return the content tree
+  */
   public FolderTree getFolderTree() {
     return tree;
   }
@@ -197,9 +206,9 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
 
 
   /** Listen on updates to the FolderShareRecords in the cache.
-   *
-   * If the event happens, set or remove shares
-   */
+  *
+  * If the event happens, set or remove shares
+  */
   private class FolderShareListener implements FolderShareRecordListener {
     public void folderShareRecordUpdated(FolderShareRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -209,8 +218,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   }
 
   /** Listen on updates to the FolderRecords in the cache.
-   * If the event happens, set or remove records
-   */
+  * If the event happens, set or remove records
+  */
   private class FolderListener implements FolderRecordListener {
     public void folderRecordUpdated(FolderRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -220,7 +229,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   }
 
   /** Listen on updates to Folder Rings in the cache.
-   */
+  */
   private class FolderRingingListener implements FolderRingListener {
     public void fldRingRingUpdate(EventObject event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -230,8 +239,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   }
 
   /**
-   * Listen on updates to the users in the cache and change the visible folder names if necessary.
-   */
+  * Listen on updates to the users in the cache and change the visible folder names if necessary.
+  */
   private class UserListener implements UserRecordListener {
     public void userRecordUpdated(UserRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -241,8 +250,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   }
 
   /**
-   * Listen on updates to the contacts in the cache and change the visible folder names if necessary.
-   */
+  * Listen on updates to the contacts in the cache and change the visible folder names if necessary.
+  */
   private class ContactListener implements ContactRecordListener {
     public void contactRecordUpdated(ContactRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -252,8 +261,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
   }
 
   /**
-   * Listen on updates to message links to make a dispatcher for new chatting frames.
-   */
+  * Listen on updates to message links to make a dispatcher for new chatting frames.
+  */
   private static class MsgLinkListener implements MsgLinkRecordListener {
     public void msgLinkRecordUpdated(MsgLinkRecordEvent event) {
       // Exec on event thread since we must preserve selected rows and don't want visuals
@@ -378,7 +387,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
         if (event.getEventType() == RecordEvent.REMOVE) {
           removeFoldersFromTree((FolderRecord[]) records);
         } else if (event.getEventType() == RecordEvent.SET) {
-          setFoldersInTree(CacheUtilities.convertRecordsToPairs(records));
+          setFoldersInTree(CacheFldUtils.convertRecordsToPairs(records));
         }
       }
       else if (event instanceof FolderShareRecordEvent) {
@@ -386,7 +395,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
         if (event.getEventType() == RecordEvent.REMOVE) {
           // removal of shares does nothing to the tree
         } else {
-          setFoldersInTree(CacheUtilities.convertRecordsToPairs(records));
+          setFoldersInTree(CacheFldUtils.convertRecordsToPairs(records));
         }
       }
       else if (event instanceof UserRecordEvent) {
@@ -409,8 +418,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
 
 
   /**
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
   */
   public void disposeObj() {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();

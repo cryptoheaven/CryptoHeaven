@@ -132,7 +132,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     okButton = buttons[0];
@@ -410,7 +410,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
         BAEncodedPassword ba = getBAEncodedPassword(jOldPass);
         if (!error && !cache.getEncodedPassword().equals(ba)) {
           error = true;
-          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Please enter your account password.  You must confirm your account password to disable existing Password Recovery settings.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Please enter your account password.  You must confirm your account password to disable existing Password Recovery settings.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           jOldPass.setText("");
         }
       }
@@ -419,13 +419,13 @@ public class PassRecoverySetupDialog extends GeneralDialog {
       if (!error && jEnableRecovery.isSelected()) {
         if (jOldPass.getPassword().length == 0) {
           error = true;
-          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Please specify current account password.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Please specify current account password.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
         }
         // check if old password matches
         BAEncodedPassword ba = getBAEncodedPassword(jOldPass);
         if (!error && !cache.getEncodedPassword().equals(ba)) {
           error = true;
-          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Specified password does not match the current account password.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Specified password does not match the current account password.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           jOldPass.setText("");
         }
       }
@@ -433,13 +433,13 @@ public class PassRecoverySetupDialog extends GeneralDialog {
       // Enabling recovery requires at least one method to be enabled
       if (!error && jEnableRecovery.isSelected() && !jEnableHint.isSelected() && !jEnableQA.isSelected()) {
         error = true;
-        MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "To enable Password Recovery, please select at least one recovery option.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+        MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "To enable Password Recovery, please select at least one recovery option.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
       }
 
       // Password Hint must not contain the password
       if (!error && jEnableRecovery.isSelected() && jEnableHint.isSelected() && jPassHint.getText().length() > 0 && jPassHint.getText().indexOf(new String(jOldPass.getPassword())) >= 0) {
         error = true;
-        MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Password hint must not contain the password.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+        MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Password hint must not contain the password.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
       }
 
       // check if all questions have answers
@@ -453,7 +453,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
           }
         }
         if (!allAnswerd) {
-          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Please provide answers to all chosen questions.", com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
+          MessageDialog.showErrorDialog(PassRecoverySetupDialog.this, "Please provide answers to all chosen questions.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Input"));
           error = true;
         }
       }

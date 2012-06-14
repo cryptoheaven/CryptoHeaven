@@ -1,19 +1,19 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.traceTable;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
@@ -37,21 +37,21 @@ import com.CH_gui.table.RecordTableModel;
 import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.27 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.27 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class TraceTableModel extends RecordTableModel {
 
   // Parent is either MsgLinkRecord or FileLinkRecord
@@ -64,17 +64,17 @@ public class TraceTableModel extends RecordTableModel {
   public static final int MODE_MSG = 1;
   public static final int MODE_MULTI = 2;
 
-  private static String STR_NAME = com.CH_gui.lang.Lang.rb.getString("column_Name");
-  private static String STR_PRIVILEGE = com.CH_gui.lang.Lang.rb.getString("column_Privilege");
-  private static String STR_HISTORY = com.CH_gui.lang.Lang.rb.getString("column_History");
-  private static String STR_USER = com.CH_gui.lang.Lang.rb.getString("column_User");
-  private static String STR_FIRST_SEEN = com.CH_gui.lang.Lang.rb.getString("column_First_Seen");
-  private static String STR_RECEIVED = com.CH_gui.lang.Lang.rb.getString("column_Received");
-  private static String STR_RETRIEVED = com.CH_gui.lang.Lang.rb.getString("column_Retrieved");
-  private static String STR_READ = com.CH_gui.lang.Lang.rb.getString("column_Read");
+  private static String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Name");
+  private static String STR_PRIVILEGE = com.CH_cl.lang.Lang.rb.getString("column_Privilege");
+  private static String STR_HISTORY = com.CH_cl.lang.Lang.rb.getString("column_History");
+  private static String STR_USER = com.CH_cl.lang.Lang.rb.getString("column_User");
+  private static String STR_FIRST_SEEN = com.CH_cl.lang.Lang.rb.getString("column_First_Seen");
+  private static String STR_RECEIVED = com.CH_cl.lang.Lang.rb.getString("column_Received");
+  private static String STR_RETRIEVED = com.CH_cl.lang.Lang.rb.getString("column_Retrieved");
+  private static String STR_READ = com.CH_cl.lang.Lang.rb.getString("column_Read");
 
-  private static String STR_TIP__READ_ACCESS_PRIVILEGE = com.CH_gui.lang.Lang.rb.getString("columnTip_Read_Access_Privilege");
-  private static String STR_TIP__READ_ACCESS_HISTORY = com.CH_gui.lang.Lang.rb.getString("columnTip_Read_Access_History");
+  private static String STR_TIP__READ_ACCESS_PRIVILEGE = com.CH_cl.lang.Lang.rb.getString("columnTip_Read_Access_Privilege");
+  private static String STR_TIP__READ_ACCESS_HISTORY = com.CH_cl.lang.Lang.rb.getString("columnTip_Read_Access_History");
 
   private static final ColumnHeaderData[] columnHeaderDatas = {
     new ColumnHeaderData(new Object[][]
@@ -126,7 +126,7 @@ public class TraceTableModel extends RecordTableModel {
 
   /** Creates new TraceTableModel */
   public TraceTableModel(Record[] parentObjLinks) {
-    super(columnHeaderDatas[parentObjLinks.length > 1 || CacheUtilities.hasAttachments(parentObjLinks[0]) ? MODE_MULTI : (parentObjLinks[0] instanceof MsgLinkRecord ? (MODE_MSG):(MODE_FILE))]);
+    super(columnHeaderDatas[parentObjLinks.length > 1 || CacheMsgUtils.hasAttachments(parentObjLinks[0]) ? MODE_MULTI : (parentObjLinks[0] instanceof MsgLinkRecord ? (MODE_MSG):(MODE_FILE))]);
     initialize(parentObjLinks);
   }
   private void initialize(Record[] parentObjLinks) {
@@ -138,24 +138,23 @@ public class TraceTableModel extends RecordTableModel {
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return null;
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
+  public void clearCachedFetchedFolderIDs() {
   }
 
   /**
-   * Sets auto update mode by listening on the cache stat updates.
-   */
+  * Sets auto update mode by listening on the cache stat updates.
+  */
   public void setAutoUpdate(boolean flag) {
   }
 
   /**
-   * Sets the interface to be notified when stats arrive...
-   * @param callback
-   */
+  * Sets the interface to be notified when stats arrive...
+  * @param callback
+  */
   public void setStatCallback(CallbackI callback) {
     statsRecivedCallback = callback;
   }
@@ -316,15 +315,15 @@ public class TraceTableModel extends RecordTableModel {
   }
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public boolean isContentFetched(Long shareId) {
     return false;
   }
 
   /**
-   * Return the Record being traced by link id.
-   */
+  * Return the Record being traced by link id.
+  */
   public Record getTracedObjRecord(Long objId) {
     Record rec = null;
     if (objId != null) {

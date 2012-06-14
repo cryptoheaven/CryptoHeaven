@@ -1,52 +1,61 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.ops;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.actions.file.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-
-import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.file.FileAGetFilesData;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.FolderRecordEvent;
+import com.CH_cl.service.cache.event.FolderRecordListener;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.monitor.ProgMonitorFactory;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.ProgMonitorPool;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
 import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.14 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.14 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 
 
 public class DownloadUtilities extends Object { // implicit no-argument constructor
@@ -65,8 +74,8 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
   /**
-   * @return The default download directory as specified in the properties, or current directory if default is invalid.
-   */
+  * @return The default download directory as specified in the properties, or current directory if default is invalid.
+  */
   public static File getDefaultDestDir() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "getDefaultDestDir()");
     File dir = getDefaultDir(PROPERTY_NAME__LOCAL_FILE_DEST_DIR);
@@ -109,16 +118,16 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
   /**
-   * @return Directory for specified property name or null if unknown or directory DNE.
-   */
+  * @return Directory for specified property name or null if unknown or directory DNE.
+  */
   private static File getDirForPropertyName(String propertyName) {
     String pathName = GlobalProperties.getProperty(propertyName);
     return getDirForPathName(pathName);
   }
 
   /**
-   * @return Directory for specified path name or null if directory DNE.
-   */
+  * @return Directory for specified path name or null if directory DNE.
+  */
   private static File getDirForPathName(String pathName) {
     File dir = null;
     if (pathName != null && pathName.length() > 0) {
@@ -130,8 +139,8 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
   /**
-   * Sets the new default download directory in the properties.
-   */
+  * Sets the new default download directory in the properties.
+  */
   public static void setDefaultDestDir(File dir) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "setDefaultDestDir(File dir)");
     setDefaultDir(PROPERTY_NAME__LOCAL_FILE_DEST_DIR, dir);
@@ -150,9 +159,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
 
   /**
-   * @param fileLink is the file to fetch
-   * @param parentMsgLink if the file is an attachment, this specifies parent message
-   */
+  * @param fileLink is the file to fetch
+  * @param parentMsgLink if the file is an attachment, this specifies parent message
+  */
   public static void downloadAndOpen(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "downloadAndOpen(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose)");
     if (trace != null) trace.args(fileLink, parentMsgLinks, SIL);
@@ -170,9 +179,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
   /**
-   * @param fileLink is the file to fetch
-   * @param parentMsgLink if the file is an attachment, this specifies parent message
-   */
+  * @param fileLink is the file to fetch
+  * @param parentMsgLink if the file is an attachment, this specifies parent message
+  */
   public static File download(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean suppressDownloadSoundsAndAutoClose) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "download(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose)");
     if (trace != null) trace.args(fileLink, parentMsgLinks, SIL);
@@ -225,11 +234,11 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   *  Private class   D o w n l o a d C o o r d i n a t o r  *
   **********************************************************/
   /**
-   * Coordinates download of files/messages and directory trees.
-   * Searches recursively through download file tree, and creates required directories
-   * on the local system and launches a file download thread to carry on downloads into
-   * those directories.
-   */
+  * Coordinates download of files/messages and directory trees.
+  * Searches recursively through download file tree, and creates required directories
+  * on the local system and launches a file download thread to carry on downloads into
+  * those directories.
+  */
   public static class DownloadCoordinator extends ThreadTraced {
 
     private Record[] toDownload;
@@ -440,7 +449,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       Long folderId = fldShares[i].folderId;
       Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
       // Gather messages already fetched so we don't re-fetch all items if not necessary
-      MsgLinkRecord[] existingMsgLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
+      MsgLinkRecord[] existingMsgLinks = CacheMsgUtils.getMsgLinkRecordsWithFetchedDatas(folderId);
       request.exceptLinkIDs = RecordUtils.getIDs(existingMsgLinks);
       MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_FULL, request);
       SIL.submitAndReturn(msgAction, 30000);
@@ -526,11 +535,11 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
 
   /**
-   * Sets a request to download a file to the destination, batches up the files in groups of 10.
-   * @param files Remote files to download.
-   * @param fromMsgs is the message parent to specified files or is NULL if downloading from a folder.
-   * @param destDir is the Local destination directory to which to download the files
-   **/
+  * Sets a request to download a file to the destination, batches up the files in groups of 10.
+  * @param files Remote files to download.
+  * @param fromMsgs is the message parent to specified files or is NULL if downloading from a folder.
+  * @param destDir is the Local destination directory to which to download the files
+  **/
   private static void runDownloadFiles(FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "runDownloadFile(FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
     if (trace != null) trace.args(files, fromMsgs, destDir, SIL);

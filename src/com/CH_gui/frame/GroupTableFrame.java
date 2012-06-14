@@ -12,14 +12,13 @@
 
 package com.CH_gui.frame;
 
-import java.awt.*;
-
+import com.CH_cl.service.cache.TextRenderer;
+import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
-import com.CH_co.service.records.*;
-
 import com.CH_gui.actionGui.JActionFrameClosable;
-import com.CH_gui.groupTable.*;
-import com.CH_gui.tree.FolderTree;
+import com.CH_gui.groupTable.GroupTableComponent;
+import com.CH_gui.groupTable.GroupTableComponent4Frame;
+import java.awt.BorderLayout;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -41,7 +40,7 @@ public class GroupTableFrame extends JActionFrameClosable {
 
   /** Creates new GroupTableFrame */
   public GroupTableFrame(FolderPair folderPair) {
-    super(FolderTree.getFolderAndShareNames(folderPair, true), true, true);
+    super(TextRenderer.getFolderAndShareNames(folderPair, true), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableFrame.class, "GroupTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 

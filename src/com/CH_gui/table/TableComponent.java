@@ -204,19 +204,19 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
   }
 
   public void clearCachedFetchedFolderIDs() {
-    try { getAddressTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getWhiteListTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getFileTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getPostTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getChatTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getMsgTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getMsgInboxTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getMsgSentTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getMsgSpamTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getMsgDraftsTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getKeyTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getGroupTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
-    try { getRecycleTableComponent().getRecordTableScrollPane().getTableModel().getCachedFetchedFolderIDs().clear(); } catch (Throwable t) { }
+    try { getAddressTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getWhiteListTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getFileTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getPostTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getChatTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getMsgTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getMsgInboxTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getMsgSentTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getMsgSpamTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getMsgDraftsTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getKeyTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getGroupTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
+    try { getRecycleTableComponent().getRecordTableScrollPane().getTableModel().clearCachedFetchedFolderIDs(); } catch (Throwable t) { }
   }
 
   public AddressTableComponent getAddressTableComponent() {

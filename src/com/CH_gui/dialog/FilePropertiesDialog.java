@@ -83,18 +83,18 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
   private ServerInterfaceLayer serverInterfaceLayer;
 
-  private static String FETCHING_DATA = com.CH_gui.lang.Lang.rb.getString("Fetching_Data...");
+  private static String FETCHING_DATA = com.CH_cl.lang.Lang.rb.getString("Fetching_Data...");
 
   private DocumentChangeListener documentChangeListener;
 
 
   /** Creates new FilePropertiesDialog */
   public FilePropertiesDialog(Frame owner, FileLinkRecord fileLink) {
-    super(owner, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_OBJECT_-_File_Properties"), new Object[] {fileLink.getFileName()}));
+    super(owner, java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_OBJECT_-_File_Properties"), new Object[] {fileLink.getFileName()}));
     constructDialog(owner, fileLink);
   }
   public FilePropertiesDialog(Dialog owner, FileLinkRecord fileLink) {
-    super(owner, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_OBJECT_-_File_Properties"), new Object[] {fileLink.getFileName()}));
+    super(owner, java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_OBJECT_-_File_Properties"), new Object[] {fileLink.getFileName()}));
     constructDialog(owner, fileLink);
   }
   private void constructDialog(Component owner, FileLinkRecord fileLink) {
@@ -116,7 +116,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
@@ -125,7 +125,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     jOk = buttons[0];
     jOk.setEnabled(false);
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Transcript"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Transcript"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedTranscript();
@@ -134,7 +134,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     jTranscript = buttons[1];
     jTranscript.setEnabled(false);
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -146,8 +146,8 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
   private JTabbedPane createTabbedPane() {
     JTabbedPane pane = new JMyTabbedPane();
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_General"), createLinkPanel());
-    pane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Data"), createDataPanel());
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_General"), createLinkPanel());
+    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Data"), createDataPanel());
     return pane;
   }
 
@@ -172,18 +172,18 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Link_ID")), new GridBagConstraints(0, 2, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_File_Link_ID")), new GridBagConstraints(0, 2, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(fileLink.fileLinkId.toString()), new GridBagConstraints(1, 2, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Type")), new GridBagConstraints(0, 3, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_File_Type")), new GridBagConstraints(0, 3, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     JLabel jFileType = new JMyLabel(fileLink.getFileType(), RecordUtilsGui.getIcon(fileLink), JLabel.LEFT);
     panel.add(jFileType, new GridBagConstraints(1, 3, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, 4, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, 4, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
     Record locationRecord = FileLinkRecUtil.getLocationRecord(fileLink);
@@ -197,11 +197,11 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
         jLocationRecord = new JMyLabel(locationRecord.toString());
     }
     else
-      jLocationRecord = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("unknown"));
+      jLocationRecord = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("unknown"));
     panel.add(jLocationRecord, new GridBagConstraints(1, 4, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Original_Size")), new GridBagConstraints(0, 5, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Original_Size")), new GridBagConstraints(0, 5, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     long size = fileLink.origSize.longValue();
     String oSize = Misc.getFormattedSize(size, 3, 2);
@@ -216,14 +216,14 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Created")), new GridBagConstraints(0, 7, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Link_Created")), new GridBagConstraints(0, 7, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     //SimpleDateFormat dateFormat = new SimpleDateFormat("MMMMM dd, yyyyy, HH:mm:ss.SSS");
     //String dateCreated = dateFormat.format(fileLink.recordCreated);
     panel.add(new JMyLabel(Misc.getFormattedTimestamp(fileLink.recordCreated)), new GridBagConstraints(1, 7, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Link_Updated")), new GridBagConstraints(0, 8, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Link_Updated")), new GridBagConstraints(0, 8, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     //String dateUpdated = fileLink.recordUpdated != null ? dateFormat.format(fileLink.recordUpdated) : "";
     String dateUpdated = Misc.getFormattedTimestamp(fileLink.recordUpdated);
@@ -236,13 +236,13 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, 10, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Encryption")), new GridBagConstraints(0, 10, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel("AES(256)"), new GridBagConstraints(1, 10, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, 11, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, 11, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     String desc = fileLink.getFileDesc();
     jFileDesc = new JMyTextArea(desc != null ? desc : "", 3, 20);
@@ -263,13 +263,13 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     panel.setLayout(new GridBagLayout());
 
     int posY = 0;
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_File_Data_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_File_Data_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(fileLink.fileId.toString()), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Size_on_Disk")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jSizeOnDisk = new JMyLabel(FETCHING_DATA);
     panel.add(jSizeOnDisk, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -284,21 +284,21 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_User")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Signing_User")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataUser = new JMyLabel(FETCHING_DATA);
     panel.add(jDataUser, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Signing_Key_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataKeyID = new JMyLabel(FETCHING_DATA);
     panel.add(jDataKeyID, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Signing_Key_Info")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Signing_Key_Info")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataKeyInfo = new JMyLabel(FETCHING_DATA);
     panel.add(jDataKeyInfo, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -314,7 +314,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Verification")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Verification")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jVerifyOK = new JMyLabel(FETCHING_DATA);
     panel.add(jVerifyOK, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -322,7 +322,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Original_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Digest_of_Original_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     jDataOriginalDigest = new JMyTextField(FETCHING_DATA, 32);
@@ -331,7 +331,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Digest_of_Encrypted_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Digest_of_Encrypted_Data_(SHA-256)")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     jDataEncryptedDigest = new JMyTextField(FETCHING_DATA, 32);
@@ -348,14 +348,14 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Data_Uploaded")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Data_Uploaded")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataCreated = new JMyLabel(FETCHING_DATA);
     panel.add(jDataCreated, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Record_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Record_Updated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jDataUpdated = new JMyLabel(FETCHING_DATA);
     panel.add(jDataUpdated, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -507,7 +507,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
         d.dispose();
       }
     });
-    new GeneralDialog(this, com.CH_gui.lang.Lang.rb.getString("title_File_Transcript"), new JButton[] { jClose }, -1, 0, new JScrollPane(textArea));
+    new GeneralDialog(this, com.CH_cl.lang.Lang.rb.getString("title_File_Transcript"), new JButton[] { jClose }, -1, 0, new JScrollPane(textArea));
   }
 
 
@@ -566,7 +566,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
             jDataUser.setText(uRec.shortInfo());
             jDataUser.setIcon(RecordUtilsGui.getIcon(uRec));
           } else {
-            jDataUser.setText(com.CH_gui.lang.Lang.rb.getString("label_Unknown_User_Account"));
+            jDataUser.setText(com.CH_cl.lang.Lang.rb.getString("label_Unknown_User_Account"));
             jDataUser.setIcon(Images.get(ImageNums.PERSON_SMALL));
           }
 
@@ -577,16 +577,16 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
             jDataKeyInfo.setIcon(RecordUtilsGui.getIcon(kRec));
           }
           else {
-            jDataKeyInfo.setText(com.CH_gui.lang.Lang.rb.getString("Key_is_not_available"));
+            jDataKeyInfo.setText(com.CH_cl.lang.Lang.rb.getString("Key_is_not_available"));
             jDataKeyInfo.setIcon(Images.get(ImageNums.KEY16));
           }
 
           // since we were able to decrypt the digests, they verified OK
           if (fileData.isVerifiedPlainDigest()) {
             jVerifyOK.setIcon(Images.get(ImageNums.SEAL8_15));
-            jVerifyOK.setText(com.CH_gui.lang.Lang.rb.getString("Digest_signatures_verified."));
+            jVerifyOK.setText(com.CH_cl.lang.Lang.rb.getString("Digest_signatures_verified."));
           } else {
-            jVerifyOK.setText(com.CH_gui.lang.Lang.rb.getString("Digest_signatures_could_not_be_verified."));
+            jVerifyOK.setText(com.CH_cl.lang.Lang.rb.getString("Digest_signatures_could_not_be_verified."));
             jVerifyOK.setIcon(Images.get(ImageNums.PRIORITY_HIGH_SMALL));
           }
 

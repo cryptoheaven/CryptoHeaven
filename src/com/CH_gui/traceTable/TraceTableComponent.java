@@ -12,14 +12,12 @@
 
 package com.CH_gui.traceTable;
 
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
-
-import com.CH_gui.gui.*;
-import com.CH_gui.table.*;
+import com.CH_co.trace.Trace;
+import com.CH_gui.gui.Template;
+import com.CH_gui.table.RecordTableComponent;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -42,7 +40,7 @@ public class TraceTableComponent extends RecordTableComponent {
 
   /** Creates new TraceTableComponent */
   public TraceTableComponent(Record[] parentObjLinks) {
-    super(parentObjLinks != null && (parentObjLinks.length > 1 || CacheUtilities.hasAttachments(parentObjLinks[0])) ?  new TraceActionMultiTable(parentObjLinks) : new TraceActionTable(parentObjLinks), Template.get(Template.NONE));
+    super(parentObjLinks != null && (parentObjLinks.length > 1 || CacheMsgUtils.hasAttachments(parentObjLinks[0])) ?  new TraceActionMultiTable(parentObjLinks) : new TraceActionTable(parentObjLinks), Template.get(Template.NONE));
     initialize(parentObjLinks);
   }
   private void initialize(Record[] parentObjLinks) {
@@ -70,19 +68,19 @@ public class TraceTableComponent extends RecordTableComponent {
       if (parentObjLinks.length == 1) {
         Record rec = parentObjLinks[0];
         if (rec instanceof FileLinkRecord) {
-          setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_file_ID_FILEID"), new Object[] {((FileLinkRecord)rec).fileId}));
+          setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_file_ID_FILEID"), new Object[] {((FileLinkRecord)rec).fileId}));
         } else if (rec instanceof MsgLinkRecord) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(((MsgLinkRecord) rec).msgId);
           if (msgData != null && msgData.isTypeAddress())
-            setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_address_ID_ADDRID"), new Object[] {((MsgLinkRecord)rec).msgId}));
+            setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_address_ID_ADDRID"), new Object[] {((MsgLinkRecord)rec).msgId}));
           else
-            setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_message_ID_MSGID"), new Object[] {((MsgLinkRecord)rec).msgId}));
+            setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_message_ID_MSGID"), new Object[] {((MsgLinkRecord)rec).msgId}));
         } else if (rec instanceof FolderPair) {
-          setTitle(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_folder_ID_FOLDERID"), new Object[] {((FolderPair)rec).getId()}));
+          setTitle(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_folder_ID_FOLDERID"), new Object[] {((FolderPair)rec).getId()}));
         }
       } else if (parentObjLinks.length >= 2) {
-        setTitle(com.CH_gui.lang.Lang.rb.getString("title_Access_History_for_multiple_objects."));
+        setTitle(com.CH_cl.lang.Lang.rb.getString("title_Access_History_for_multiple_objects."));
       }
     }
   }

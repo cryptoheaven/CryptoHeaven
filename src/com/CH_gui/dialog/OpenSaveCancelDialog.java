@@ -1,55 +1,63 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.border.*;
-import javax.swing.*;
-
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheEmlUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.util.*;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.util.FileTypesIcons;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.3 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.3 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class OpenSaveCancelDialog extends GeneralDialog {
 
   private static final int DEFAULT_OPEN_INDEX = 0;
@@ -112,7 +120,7 @@ public class OpenSaveCancelDialog extends GeneralDialog {
           fromEmailAddress = parentMsgData.getFromEmailAddress();
         if (parentMsgData != null && (parentMsgData.isEmail() || fromEmailAddress != null)) {
           // email delivered from outside
-          emailSender = CacheUtilities.convertToFamiliarEmailRecord(fromEmailAddress);
+          emailSender = CacheEmlUtils.convertToFamiliarEmailRecord(fromEmailAddress);
           jFromText.setText(ListRenderer.getRenderedText(emailSender, false, false, true));
           jFromText.setIcon(ListRenderer.getRenderedIcon(emailSender));
           jOriginalSignerText.setText("Mail Server");
@@ -122,10 +130,10 @@ public class OpenSaveCancelDialog extends GeneralDialog {
           // internal Mail message or File from folder
           if (parentMsgData != null) {
             Long senderUserId = parentMsgData.senderUserId;
-            msgOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
+            msgOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
             if (msgOriginator == null) {
               SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(senderUserId)), 30000);
-              msgOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
+              msgOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
             }
             jFromText.setText(ListRenderer.getRenderedText(msgOriginator));
             jFromText.setIcon(ListRenderer.getRenderedIcon(msgOriginator));
@@ -168,10 +176,10 @@ public class OpenSaveCancelDialog extends GeneralDialog {
               keyRec = cache.getKeyRecord(keyId);
             }
             if (keyRec != null) {
-              fileOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
+              fileOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
               if (fileOriginator == null) {
                 SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(keyRec.ownerUserId)), 30000);
-                fileOriginator = MsgPanelUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
+                fileOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
               }
               jOriginalSignerText.setText(ListRenderer.getRenderedText(fileOriginator));
               jOriginalSignerText.setIcon(ListRenderer.getRenderedIcon(fileOriginator));
@@ -195,21 +203,21 @@ public class OpenSaveCancelDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Open"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Open"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOpen();
       }
     });
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Download"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Download"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedSave();
       }
     });
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[2].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -267,7 +275,7 @@ public class OpenSaveCancelDialog extends GeneralDialog {
     jOriginalSignerLabel = new JMyLabel("File Signed By:");
     panel.add(jOriginalSignerLabel, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 15, 5, 5), 0, 0));
-    jOriginalSignerText = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("Fetching_Data..."));
+    jOriginalSignerText = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("Fetching_Data..."));
     panel.add(jOriginalSignerText, new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
     posY ++;

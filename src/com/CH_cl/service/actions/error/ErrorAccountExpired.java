@@ -56,7 +56,7 @@ public class ErrorAccountExpired extends ClientMessageAction {
       pm.jobKilled();
 
     // Check individual action GUI suppression, global flag will be checked by NotificationCenter
-    if (isGUIsuppressed) {
+    if (!isGUIsuppressed) {
       Str_Rp reply = (Str_Rp) getMsgDataSet();
       String title = "Account Expired";
       String msg = reply.message;

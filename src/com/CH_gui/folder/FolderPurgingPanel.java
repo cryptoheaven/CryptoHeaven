@@ -135,11 +135,11 @@ public class FolderPurgingPanel extends JPanel {
     String purgeMsg;
 
     if (!amIOwner)
-      purgeMsg = com.CH_gui.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_folder_and_cannot_alter_auto_purging_settings.");
+      purgeMsg = com.CH_cl.lang.Lang.rb.getString("label_You_have_been_granted_access_to_this_folder_and_cannot_alter_auto_purging_settings.");
     else if (isSharableType)
-      purgeMsg = com.CH_gui.lang.Lang.rb.getString("label_You_can_use_folder_auto_purging_settings_to_limit_the_number_of_records_it_contains...");
+      purgeMsg = com.CH_cl.lang.Lang.rb.getString("label_You_can_use_folder_auto_purging_settings_to_limit_the_number_of_records_it_contains...");
     else
-      purgeMsg = com.CH_gui.lang.Lang.rb.getString("label_Folders_of_this_type_do_not_support_auto_purging.");
+      purgeMsg = com.CH_cl.lang.Lang.rb.getString("label_Folders_of_this_type_do_not_support_auto_purging.");
 
     jPurgeMsg.setText(purgeMsg);
   }

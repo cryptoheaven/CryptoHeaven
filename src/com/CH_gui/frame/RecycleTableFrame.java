@@ -12,14 +12,12 @@
 
 package com.CH_gui.frame;
 
-import java.awt.*;
-
+import com.CH_cl.service.cache.TextRenderer;
+import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
-import com.CH_co.service.records.*;
-
 import com.CH_gui.actionGui.JActionFrameClosable;
-import com.CH_gui.recycleTable.*;
-import com.CH_gui.tree.FolderTree;
+import com.CH_gui.recycleTable.RecycleTableComponent;
+import java.awt.BorderLayout;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -41,7 +39,7 @@ public class RecycleTableFrame extends JActionFrameClosable {
 
   /** Creates new RecycleTableFrame */
   public RecycleTableFrame(FolderPair folderPair) {
-    super(FolderTree.getFolderAndShareNames(folderPair, true), true, true);
+    super(TextRenderer.getFolderAndShareNames(folderPair, true), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableFrame.class, "RecycleTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 

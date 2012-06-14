@@ -45,7 +45,7 @@ public class AboutSecurityDialog extends GeneralDialog implements VisualsSavable
 
   /** Creates new AboutSecurityDialog */
   public AboutSecurityDialog(Dialog parent) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_About_Security"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_About_Security"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AboutSecurityDialog.class, "AboutSecurityDialog(Dialog parent)");
     JButton[] buttons = createButtons();
     JPanel panel = createMainPanel();
@@ -57,7 +57,7 @@ public class AboutSecurityDialog extends GeneralDialog implements VisualsSavable
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[1];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Close"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
     return buttons;
@@ -70,10 +70,10 @@ public class AboutSecurityDialog extends GeneralDialog implements VisualsSavable
 //    panel.add(new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
 //        GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(0, 0, 5, 0), 0, 0));
 
-    String aboutText = com.CH_gui.lang.Lang.rb.getString("text_CryptoHeaven_Security");
+    String aboutText = com.CH_cl.lang.Lang.rb.getString("text_CryptoHeaven_Security");
 
     if (!URLs.get(URLs.SERVICE_SOFTWARE_NAME).startsWith("CryptoHeaven")) {
-      String preAboutText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
+      String preAboutText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
       aboutText = "<p>"+preAboutText+"</p><br>" + aboutText;
     }
 

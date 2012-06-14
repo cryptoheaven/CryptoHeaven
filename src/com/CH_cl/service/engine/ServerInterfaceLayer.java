@@ -1984,7 +1984,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             sleepDetected();
           }
           stampLast = stampNow;
-          Thread.sleep(1000);
+          long sleepSome = Math.max(100, ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE/5);
+          Thread.sleep(sleepSome);
         } catch (Throwable t) {
         }
       }

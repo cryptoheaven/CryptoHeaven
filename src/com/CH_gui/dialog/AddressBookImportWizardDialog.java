@@ -1,67 +1,81 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.nanoxml.XMLElement;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
+import com.CH_co.service.msg.dataSets.msg.Msg_New_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.Misc;
 import com.CH_gui.addressBook.*;
-import com.CH_gui.csv.*;
-import com.CH_gui.frame.*;
+import com.CH_gui.csv.CSVParser;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
-import com.CH_gui.msgs.*;
-import com.CH_gui.tree.*;
-import com.CH_gui.util.*;
-
+import com.CH_gui.msgs.SendMessageRunner;
+import com.CH_gui.tree.FolderTree;
+import com.CH_gui.tree.FolderTreeModelGui;
+import com.CH_gui.util.ExtensionFileFilter;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.MessageDialog;
+import com.CH_guiLib.gui.JMyComboBox;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.sql.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Timestamp;
+import java.util.EventObject;
+import java.util.StringTokenizer;
+import java.util.Vector;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.13 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.13 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class AddressBookImportWizardDialog extends WizardDialog {
 
   private static final int PAGE_SOURCE = 0;
@@ -130,7 +144,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
 
   /** Creates new AddressBookImportWizardDialog */
   public AddressBookImportWizardDialog(Frame parent) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Import_Address_Book_Wizard"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Import_Address_Book_Wizard"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AddressBookImportWizardDialog.class, "AddressBookImportWizardDialog()");
     init();
     if (trace != null) trace.exit(AddressBookImportWizardDialog.class);
@@ -264,10 +278,10 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   public String[] getWizardTabNames() {
-    return new String[] { com.CH_gui.lang.Lang.rb.getString("tab_Source"), 
-                          com.CH_gui.lang.Lang.rb.getString("tab_Destination"), 
-                          com.CH_gui.lang.Lang.rb.getString("tab_Mapping"), 
-                          com.CH_gui.lang.Lang.rb.getString("tab_Summary") };
+    return new String[] { com.CH_cl.lang.Lang.rb.getString("tab_Source"), 
+                          com.CH_cl.lang.Lang.rb.getString("tab_Destination"), 
+                          com.CH_cl.lang.Lang.rb.getString("tab_Mapping"), 
+                          com.CH_cl.lang.Lang.rb.getString("tab_Summary") };
   }
 
   public boolean goFromTab(int tabIndex) {
@@ -477,7 +491,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
     FolderFilter filter = FolderFilter.NON_LOCAL_FOLDERS;
     FolderTreeModelGui treeModel = new FolderTreeModelGui(filter);
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheUtilities.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
     allFolderPairs = (FolderPair[]) filter.filterInclude(allFolderPairs);
     treeModel.addNodes(allFolderPairs);
     filteredTree = new FolderTree(treeModel);
@@ -504,7 +518,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
     /*
     panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 1, 1, 10, 10, 
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
-     */
+    */
 
     return panel;
   }
@@ -619,7 +633,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
     /*
     panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 1, 1, 10, 10, 
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
-     */
+    */
 
     return panel;
   }
@@ -688,8 +702,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   /**
-   * Apply the default mapping onto the JTable data model
-   */
+  * Apply the default mapping onto the JTable data model
+  */
   private void makeDefaultMappingCodes() {
     //System.out.println("Available headers are " + Misc.objToStr(availableHeaders));
     Vector rowsV = ((DefaultTableModel) jMappingTable.getModel()).getDataVector();
@@ -719,8 +733,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   /**
-   * Find a set of default mappings for a given header name.
-   */
+  * Find a set of default mappings for a given header name.
+  */
   private static String[][] findHeaderMapping(String destHeader, String[][][] availableHeaderMappings) {
     String[][] mapping = null;
     for (int i=0; i<availableHeaderMappings.length; i++) {
@@ -734,8 +748,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   /**
-   * @return generated String representation of column mappings with appropriate separators.
-   */
+  * @return generated String representation of column mappings with appropriate separators.
+  */
   private static String makeMapCode(String[] headerMapping, String[] availableHeaders) {
     StringBuffer mapCodeBuf = new StringBuffer();
     String lastSeparator = null;
@@ -773,8 +787,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   /**
-   * @return user readable meaning of map code.
-   */
+  * @return user readable meaning of map code.
+  */
   private static String decodeMapCode(String mapCode, String[] availableHeaders) {
     StringTokenizer st = new StringTokenizer(mapCode, "" + 's' + 'n' + ',' + '|', true);
     StringBuffer strBuf = new StringBuffer();
@@ -797,8 +811,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   /**
-   * @return Vector of data representing a row of JTable with specified destination header.
-   */
+  * @return Vector of data representing a row of JTable with specified destination header.
+  */
   private Vector getDataRow(String destinationHeader) {
     Vector dataRowV = null;
     DefaultTableModel model = (DefaultTableModel) jMappingTable.getModel();
@@ -815,8 +829,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
   }
 
   /**
-   * @return All destination fields from rowData and current mapping.
-   */
+  * @return All destination fields from rowData and current mapping.
+  */
   private String[] makeDestinationDataFromRowData(String[] rowData) {
     String[] mappedData = new String[destinationFields.length];
 
@@ -900,8 +914,8 @@ public class AddressBookImportWizardDialog extends WizardDialog {
 
 
   /**
-   * Test Blank Wizard
-   */
+  * Test Blank Wizard
+  */
   public static void main(String[] args) {
     com.CH_gui.frame.MainFrameStarter.initLookAndFeelComponentDefaults();
     new AddressBookImportWizardDialog((Frame) null);

@@ -56,7 +56,10 @@ public class MsgAGet extends ClientMessageAction {
 
   public static int MAX_BATCH_MILLIS = 5000;
   public static boolean suppressAutoFetchContinuation = false;
-  public static HashMap nextFetchActionsHM;
+
+  private static final Object monitor = new Object();
+  private static HashMap nextFetchActionsHM;
+  private static ArrayList nextFetchProgressingIDsL;
 
   /** Creates new MsgAGet */
   public MsgAGet() {
@@ -489,14 +492,48 @@ public class MsgAGet extends ClientMessageAction {
     return null;
   }
 
-  public static boolean sendNextFetchRequest(ServerInterfaceLayer SIL, Long folderId) {
+  public static boolean hasNextFetchRequest(Long folderId) {
+    synchronized (monitor) {
+      return nextFetchActionsHM != null && nextFetchActionsHM.containsKey(folderId);
+    }
+  }
+
+  public static boolean hasNextOrFetching(Long folderId) {
+    synchronized (monitor) {
+      return hasNextFetchRequest(folderId) || isFetchingNext(folderId);
+    }
+  }
+
+  public static boolean isFetchingNext(Long folderId) {
+    synchronized (monitor) {
+      return nextFetchProgressingIDsL != null && nextFetchProgressingIDsL.contains(folderId);
+    }
+  }
+
+  public static boolean sendNextFetchRequest(ServerInterfaceLayer SIL, final Long folderId, final Runnable afterJob) {
     boolean anySent = false;
-    MessageAction msgAction = (MessageAction) nextFetchActionsHM.get(folderId);
-    if (msgAction != null) {
-      msgAction.restamp();
-      SIL.submitAndReturn(msgAction);
-      anySent = true;
+    synchronized (monitor) {
+      // take off the request from pending to avoid client to repedetly sending the same request
+      final MessageAction msgAction = (MessageAction) nextFetchActionsHM.remove(folderId);
+      if (msgAction != null) {
+        if (nextFetchProgressingIDsL == null) nextFetchProgressingIDsL = new ArrayList();
+        nextFetchProgressingIDsL.add(folderId);
+        msgAction.restamp();
+        // take off the request from pending to avoid client to repedetly sending the same request
+        Runnable reinsert = new Runnable() {
+          public void run() {
+            // We'll reinsert the request right after reciving a reply or interrupt.
+            // Proper execution of reply will remove this action from pending.
+            // After-Job handles next request so it should not reinsert.
+            nextFetchActionsHM.put(folderId, msgAction);
+            nextFetchProgressingIDsL.remove(folderId);
+          }
+        };
+        SIL.submitAndReturn(msgAction, 120000, reinsert, afterJob, reinsert);
+        anySent = true;
+      }
     }
     return anySent;
   }
+
 }

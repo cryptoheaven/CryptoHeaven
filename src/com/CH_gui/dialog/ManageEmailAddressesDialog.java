@@ -107,14 +107,14 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
 
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOk();
       }
     });
     jOk = buttons[0];
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -148,7 +148,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
                     setDefaultEml(0);
                 }
               } else {
-                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate Email Address '" + text + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
+                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate Email Address '" + text + "'.", com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"), true);
               }
             }
           }
@@ -197,7 +197,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
                   jEmlList.repaint();
                 }
               } else {
-                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate Email Address '" + text + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
+                MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Duplicate Email Address '" + text + "'.", com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"), true);
               }
             }
           }
@@ -507,7 +507,7 @@ public class ManageEmailAddressesDialog extends GeneralDialog {
           OKActionListener.actionPerformed(new ActionEvent(event.getSource(), 0, fullEmlAddr));
         } else {
           jInput.getTextField().selectAll();
-          MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Invalid Email Address '" + emlAddr + "'.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), true);
+          MessageDialog.showErrorDialog(ManageEmailAddressesDialog.this, "Invalid Email Address '" + emlAddr + "'.", com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"), true);
         }
       }
     });

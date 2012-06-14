@@ -12,8 +12,9 @@
 
 package com.CH_gui.fileTable;
 
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FileFilter;
@@ -27,7 +28,6 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.ImageNums;
 import com.CH_gui.file.FileUtilities;
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.recycleTable.RecycleTableModel;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
@@ -60,22 +60,22 @@ public class FileTableModel extends RecordTableModel {
   /* folderShareIds for which the files has been fetched already */
   private static final ArrayList fetchedIds = new ArrayList();
 
-  protected static final String STR_FILE_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_File_Folder");
-  protected static final String STR_SHARED_FOLDER = com.CH_gui.lang.Lang.rb.getString("folder_Shared_Folder");
-  protected static final String STR_FLAG = com.CH_gui.lang.Lang.rb.getString("column_Flag");
-  protected static final String STR_FILE_NAME = com.CH_gui.lang.Lang.rb.getString("column_File_Name");
-  protected static final String STR_TYPE = com.CH_gui.lang.Lang.rb.getString("column_Type");
-  protected static final String STR_SIZE = com.CH_gui.lang.Lang.rb.getString("Size");
-  protected static final String STR_CREATED = com.CH_gui.lang.Lang.rb.getString("column_Created");
-  protected static final String STR_UPDATED = com.CH_gui.lang.Lang.rb.getString("column_Updated");
-  protected static final String STR_LINK_ID = com.CH_gui.lang.Lang.rb.getString("column_Link_ID");
-  protected static final String STR_DATA_ID = com.CH_gui.lang.Lang.rb.getString("column_Data_ID");
+  protected static final String STR_FILE_FOLDER = com.CH_cl.lang.Lang.rb.getString("folder_File_Folder");
+  protected static final String STR_SHARED_FOLDER = com.CH_cl.lang.Lang.rb.getString("folder_Shared_Folder");
+  protected static final String STR_FLAG = com.CH_cl.lang.Lang.rb.getString("column_Flag");
+  protected static final String STR_FILE_NAME = com.CH_cl.lang.Lang.rb.getString("column_File_Name");
+  protected static final String STR_TYPE = com.CH_cl.lang.Lang.rb.getString("column_Type");
+  protected static final String STR_SIZE = com.CH_cl.lang.Lang.rb.getString("Size");
+  protected static final String STR_CREATED = com.CH_cl.lang.Lang.rb.getString("column_Created");
+  protected static final String STR_UPDATED = com.CH_cl.lang.Lang.rb.getString("column_Updated");
+  protected static final String STR_LINK_ID = com.CH_cl.lang.Lang.rb.getString("column_Link_ID");
+  protected static final String STR_DATA_ID = com.CH_cl.lang.Lang.rb.getString("column_Data_ID");
 
   static final ColumnHeaderData columnHeaderData =
       new ColumnHeaderData(new Object[][]
         { { null, STR_FILE_NAME, STR_TYPE, STR_SIZE, STR_CREATED, STR_UPDATED, STR_LINK_ID, STR_DATA_ID },
           { STR_FLAG, STR_FILE_NAME, STR_TYPE, STR_SIZE, STR_CREATED, STR_UPDATED, STR_LINK_ID, STR_DATA_ID },
-          { com.CH_gui.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag"), null, null, null, null, null },
+          { com.CH_cl.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag"), null, null, null, null, null },
           { new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null },
           { new Integer(16), new Integer(141), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
           { new Integer(16), new Integer(141), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
@@ -102,8 +102,8 @@ public class FileTableModel extends RecordTableModel {
   * user switches focus to another folder...
   * This vector should also be cleared when users are switched...
   */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return fetchedIds;
+  public void clearCachedFetchedFolderIDs() {
+    fetchedIds.clear();
   }
 
   /**
@@ -217,7 +217,7 @@ public class FileTableModel extends RecordTableModel {
 
   public Collection getSearchableCharSequencesFor(Object searchableObj) {
     if (searchableObj instanceof Record)
-      return RecycleTableModel.getSearchTextFor((Record) searchableObj, true);
+      return TextRenderer.getSearchTextFor((Record) searchableObj, true);
     else
       return null;
   }
@@ -526,7 +526,7 @@ public class FileTableModel extends RecordTableModel {
       if (halfPairPicksL.size() > 0) {
         halfPairPicks = new Record[halfPairPicksL.size()];
         halfPairPicksL.toArray(halfPairPicks);
-        pairPicks = CacheUtilities.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
+        pairPicks = CacheFldUtils.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
       }
 
       if (linksPicksL.size() > 0) {

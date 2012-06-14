@@ -13,7 +13,9 @@
 package com.CH_gui.msgs;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgTypingListener;
 import com.CH_cl.service.engine.DefaultReplyRunner;
@@ -251,17 +253,24 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     }
 
     Component[] components = MiscGui.getComponentsRecursively(this);
-    addDND(components);
+    addPopupsAndDND(components);
 
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
 
-  private void addDND(Component[] components) {
+  private void addPopupsAndDND(Component[] components) {
     if (components != null) {
       for (int i=0; i<components.length; i++) {
         Component c = components[i];
+        //addPopup(c); -- it stopped working in newer Java
         addDND(c);
       }
+    }
+  }
+  private void addPopup(Component c) {
+    if (c != null && !componentsForPopupL.contains(c)) {
+      c.addMouseListener(new PopupMouseAdapter(c, this));
+      componentsForPopupL.add(c);
     }
   }
   private void addDND(Component c) {
@@ -497,7 +506,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
     // Initialize selected recipients for mail and anything in Drafts folder
     if (dataRecord.isTypeMessage() || (draftMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER && draftMsgLink.ownerObjId.equals(userRecord.draftFolderId))) {
-      Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients(dataRecord);
+      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
       for (int i=0; i<selectedRecipients.length && i<recipients.length; i++) {
         selectedRecipients[i] = recipients[i];
       }
@@ -505,7 +514,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       // For addresses, initialize recipient to be the folder of the link
       if (draftMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
         FolderRecord toFolder = cache.getFolderRecord(draftMsgLink.ownerObjId);
-        selectedRecipients[TO] = CacheUtilities.convertRecordToPairs(toFolder);
+        selectedRecipients[TO] = CacheFldUtils.convertRecordToPairs(toFolder);
       }
     }
 
@@ -889,18 +898,18 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SendAction extends AbstractActionTraced {
     public SendAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Send_message"), Images.get(ImageNums.MAIL_SEND16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Send_message"), Images.get(ImageNums.MAIL_SEND16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Send_composed_message."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Send_composed_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_SEND24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Send"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Send"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Save"));
-        putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Save_composed_address."));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Save"));
+        putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Save_composed_address."));
         putValue(Actions.MENU_ICON, Images.get(ImageNums.ADDRESS_SAVE16));
         putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_SAVE24));
-        putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Save"));
+        putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Save"));
       }
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -1128,8 +1137,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       String title = "Additional Send Options...";
 
       JButton[] buttons = new JButton[2];
-      buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Send"));
-      buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+      buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Send"));
+      buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
       buttons[0].addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           if (jSendPlain.isSelected() || jSendEncrypted.isSelected()) {
@@ -1165,8 +1174,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       if (trace != null) trace.args(emlAddrs);
       String hrefStart = "<a href=\""+URLs.get(URLs.TELL_A_FRIEND_PAGE)+"\">";
       String hrefEnd = "</a>";
-      String warnMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Delivery_to_regular_email_recipients_will_be_send_through_unencrypted_mail..."), new Object[] {hrefStart, hrefEnd, hrefStart, hrefEnd});
-      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Regular_email_warning.");
+      String warnMsg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Delivery_to_regular_email_recipients_will_be_send_through_unencrypted_mail..."), new Object[] {hrefStart, hrefEnd, hrefStart, hrefEnd});
+      String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Regular_email_warning.");
       JTextPane warnPane = new HTML_ClickablePane(warnMsg);
       JScrollPane warnScrollPane = new JScrollPane(warnPane);
       warnPane.addMouseListener(new MouseAdapter() {
@@ -1187,9 +1196,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         }
       });
       JButton[] buttons = new JButton[3];
-      buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Always_Proceed"));
-      buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Proceed"));
-      buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+      buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Always_Proceed"));
+      buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Proceed"));
+      buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
       final JDialog warningDialog = MessageDialog.showDialog(MsgComposePanel.this, warnScrollPane, title, NotificationCenter.WARNING_MESSAGE, buttons, null, false);
       warningDialog.addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
@@ -1230,11 +1239,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SaveAsDraftAction extends AbstractActionTraced {
     public SaveAsDraftAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Save_as_Draft"), Images.get(ImageNums.SAVE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Save_as_Draft"), Images.get(ImageNums.SAVE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Save_composition_in_the_Drafts_folder_for_future_editing."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Save_composition_in_the_Drafts_folder_for_future_editing."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.SAVE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Save_Draft"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Save_Draft"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       actionPerformed();
@@ -1250,11 +1259,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SelectRecipientsAction extends AbstractActionTraced {
     public SelectRecipientsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.ADDRESS_BOOK16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Select_Recipients"), Images.get(ImageNums.ADDRESS_BOOK16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_Recipients,_this_can_be_users,_folders_or_posting_boards."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Select_Recipients,_this_can_be_users,_folders_or_posting_boards."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_BOOK24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Address_Book"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Address_Book"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       selectRecipientsPressed(TO);
@@ -1267,11 +1276,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SelectAttachmentsAction extends AbstractActionTraced {
     public SelectAttachmentsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Select_Attachments,_this_could_be_a_file_or_a_message."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Select_Attachments,_this_could_be_a_file_or_a_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ATTACH24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Attach"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Attach"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       selectAttachmentsPressed();
@@ -1284,12 +1293,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class CutAction extends DefaultEditorKit.CutAction {
     public CutAction(int actionId) {
-      putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Cut"));
+      putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Cut"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.CUT16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Cut_selected_text."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Cut_selected_text."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.CUT24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Cut"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Cut"));
     }
     public void actionPerformed(ActionEvent event) {
       super.actionPerformed(event);
@@ -1303,12 +1312,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class CopyAction extends DefaultEditorKit.CopyAction {
     public CopyAction(int actionId) {
-      putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Copy"));
+      putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Copy"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.COPY16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Copy_selected_text."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Copy_selected_text."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Copy"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Copy"));
     }
     public void actionPerformed(ActionEvent event) {
       super.actionPerformed(event);
@@ -1322,12 +1331,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class PasteAction extends DefaultEditorKit.PasteAction {
     public PasteAction(int actionId) {
-      putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
+      putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Paste"));
       putValue(Actions.MENU_ICON, Images.get(ImageNums.PASTE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Paste"));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.PASTE24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("action_Paste"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("action_Paste"));
     }
     public void actionPerformed(ActionEvent event) {
       super.actionPerformed(event);
@@ -1343,24 +1352,24 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       switch (code) {
         case MsgDataRecord.IMPORTANCE_FYI_HTML:
           priorityIndex = PRIORITY_INDEX_FYI;
-          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("priority_FYI"));
+          putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("priority_FYI"));
           putValue(Actions.MENU_ICON, Images.get(ImageNums.PRIORITY_LOW_SMALL));
           putValue(Actions.SELECTED_RADIO, Boolean.FALSE);
           break;
         case MsgDataRecord.IMPORTANCE_NORMAL_HTML:
           priorityIndex = PRIORITY_INDEX_NORMAL;
-          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("priority_Normal"));
+          putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("priority_Normal"));
           putValue(Actions.MENU_ICON, Images.get(ImageNums.TRANSPARENT16));
           putValue(Actions.SELECTED_RADIO, Boolean.TRUE);
           break;
         case MsgDataRecord.IMPORTANCE_HIGH_HTML:
           priorityIndex = PRIORITY_INDEX_HIGH;
-          putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("priority_High"));
+          putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("priority_High"));
           putValue(Actions.MENU_ICON, Images.get(ImageNums.PRIORITY_HIGH_SMALL));
           putValue(Actions.SELECTED_RADIO, Boolean.FALSE);
           break;
       }
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Sets_the_priority."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Sets_the_priority."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.BUTTON_GROUP, group);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -1377,11 +1386,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class UndoAction extends AbstractActionTraced {
     public UndoAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Undo"), Images.get(ImageNums.UNDO16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Undo"), Images.get(ImageNums.UNDO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Undo_the_last_document_change."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Undo_the_last_document_change."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.UNDO24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Undo"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Undo"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       // We did experiance some NullPointerException being thrown here for no reason,
@@ -1401,7 +1410,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         putValue(Actions.NAME, undoMngr.getUndoPresentationName());
       } else {
         setEnabled(false);
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Undo"));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Undo"));
       }
     }
   }
@@ -1411,11 +1420,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class RedoAction extends AbstractActionTraced {
     public RedoAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Redo"), Images.get(ImageNums.REDO16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Redo"), Images.get(ImageNums.REDO16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Redo_the_last_document_change."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Redo_the_last_document_change."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REDO24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Redo"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Redo"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       // We did experiance some NullPointerException being thrown here for no reason,
@@ -1435,7 +1444,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         putValue(Actions.NAME, undoMngr.getRedoPresentationName());
       } else {
         setEnabled(false);
-        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Redo"));
+        putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Redo"));
       }
     }
   }
@@ -1446,12 +1455,12 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private class ShowAllHeaders extends AbstractActionTraced {
     private String propertyName = null;
     public ShowAllHeaders(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Show_Advanced"));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Show_Advanced"));
 //      super(com.CH_gui.lang.Lang.rb.getString("action_Show_BCC"));
 //      if (objType == MsgDataRecord.OBJ_TYPE_ADDR)
 //        putValue(Actions.NAME, com.CH_gui.lang.Lang.rb.getString("action_Show_CC_and_BCC"));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Show_All_Headers"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Show_All_Headers"));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       // Initialize the state of showing headers
       propertyName = MiscGui.getVisualsKeyName("MsgComposePanel", null, PROPERTY_NAME__SHOW_ALL_HEADERS + "_" + objType);
@@ -1471,11 +1480,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SpellCheckAction extends AbstractActionTraced {
     public SpellCheckAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_..."), Images.get(ImageNums.SPELL16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Spelling_..."), Images.get(ImageNums.SPELL16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       //putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Redo_the_last_document_change."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.SPELL24));
-      putValue(Actions.TOOL_NAME, com.CH_gui.lang.Lang.rb.getString("actionTool_Spelling"));
+      putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Spelling"));
     }
     public void actionPerformedTraced(ActionEvent event) {
       Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);
@@ -1508,7 +1517,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SpellCheckEditDictionaryAction extends AbstractActionTraced {
     public SpellCheckEditDictionaryAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Edit_user_dictionary_..."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Edit_user_dictionary_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.REMOVABLE_MENU, Boolean.FALSE);
@@ -1542,7 +1551,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SpellCheckOptionsAction extends AbstractActionTraced {
     public SpellCheckOptionsAction(int actionId) {
-      super(com.CH_gui.lang.Lang.rb.getString("action_Spelling_preferences_..."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Spelling_preferences_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.REMOVABLE_MENU, Boolean.FALSE);
@@ -1588,7 +1597,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     public RingBellAction(int actionId) {
       super("Ring the bell", Images.get(ImageNums.RING_BELL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_gui.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Ring_the_bell"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -1676,11 +1685,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       }
     }
     StringBuffer errorSB = new StringBuffer();
-    appendInvalidRecipientErrMsg(errorSB, badContactsL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
-    appendInvalidRecipientErrMsg(errorSB, badAddressesL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
-    appendInvalidRecipientErrMsg(errorSB, badFoldersL, com.CH_gui.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
+    appendInvalidRecipientErrMsg(errorSB, badContactsL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
+    appendInvalidRecipientErrMsg(errorSB, badAddressesL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
+    appendInvalidRecipientErrMsg(errorSB, badFoldersL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
     if (errorSB.length() > 0) {
-      String title = com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
+      String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
       MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, NotificationCenter.WARNING_MESSAGE, false);
     }
     Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsL.length][];
@@ -1830,7 +1839,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
           if (userID != null) {
             boolean includeWebUsers = convertNotHostedEmailsToWebAccounts || isEmailHosted;
-            Record familiar = MsgPanelUtils.convertUserIdToFamiliarUser(userID, true, false, includeWebUsers);
+            Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(userID, true, false, includeWebUsers);
             if (trace != null) trace.data(100, familiar);
             if (familiar != null) {
               recipients[i] = familiar;
@@ -1856,7 +1865,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "selectRecipients(int recipientType, boolean waitForResults)");
     if (trace != null) trace.args(recipientType);
     if (trace != null) trace.args(waitForResults);
-    String titlePostfix = com.CH_gui.lang.Lang.rb.getString(recipientType==TO ? "button_To" : ( recipientType==CC ? "button_Cc" : "button_Bcc"));
+    String titlePostfix = com.CH_cl.lang.Lang.rb.getString(recipientType==TO ? "button_To" : ( recipientType==CC ? "button_Cc" : "button_Bcc"));
     RecipientsDialog d = null;
     boolean isOKed = false;
     boolean rc = false;
@@ -1962,8 +1971,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     if (w instanceof Frame || w instanceof Dialog) {
       RecordChooserDialog d = null;
       short[] folderTypes = new short[] { FolderRecord.CATEGORY_MAIL_FOLDER, FolderRecord.CATEGORY_FILE_FOLDER, FolderRecord.CATEGORY_CHAT_FOLDER, FolderRecord.LOCAL_FILES_FOLDER, FolderRecord.FILE_FOLDER, FolderRecord.MESSAGE_FOLDER, FolderRecord.POSTING_FOLDER, FolderRecord.CHATTING_FOLDER, FolderRecord.ADDRESS_FOLDER };
-      String title = com.CH_gui.lang.Lang.rb.getString("title_File_and_Message_Attachment_Chooser");
-      String mainLabel = com.CH_gui.lang.Lang.rb.getString("label_Select_objects_from_table");
+      String title = com.CH_cl.lang.Lang.rb.getString("title_File_and_Message_Attachment_Chooser");
+      String mainLabel = com.CH_cl.lang.Lang.rb.getString("label_Select_objects_from_table");
       if (w instanceof Frame)
         d = new RecordChooserDialog((Frame) w, title, mainLabel, folderTypes, selectedAttachments);
       else
@@ -2432,7 +2441,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                   FetchedDataCache cache = FetchedDataCache.getSingleInstance();
                   BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
                   request.contactRecord.setOwnerNote(uRec.handle.trim());
-                  request.contactRecord.setOtherNote(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle}));
+                  request.contactRecord.setOtherNote(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle}));
                   request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
                   request.contactRecord.seal(folderSymKey, otherKeyRec);
 
@@ -2615,7 +2624,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TypingGUIUpdater.class, "TypingGUIUpdater.run()");
 
-      Record r = MsgPanelUtils.convertUserIdToFamiliarUser(userId, false, true);
+      Record r = CacheUsrUtils.convertUserIdToFamiliarUser(userId, false, true);
       final String name = ListRenderer.getRenderedText(r);
 
       Timer timer = new Timer(0, new ActionListener() {

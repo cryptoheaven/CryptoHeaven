@@ -1,19 +1,21 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgTable;
 
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.ops.FileLinkOps;
 import com.CH_cl.service.ops.MsgLinkOps;
@@ -30,14 +32,13 @@ import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.HTML_Ops;
+import com.CH_co.util.HTML_utils;
 import com.CH_co.util.ImageNums;
 import com.CH_co.util.Misc;
 import com.CH_gui.addressBook.AddressTableCellRenderer;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.postTable.PostTableCellRenderer;
-import com.CH_gui.recycleTable.RecycleTableModel;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
@@ -46,21 +47,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.54 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.54 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgTableModel extends RecordTableModel {
 
   // FolderShareIds for which records have been fetched already.
@@ -86,41 +87,41 @@ public class MsgTableModel extends RecordTableModel {
   public static final int COLUMN_INDEX__POSTING = 5; // reflects the model index of "Posting" column
   public static final int COLUMN_INDEX__SENT = 6; // reflects the model index of "Sent" column
 
-  private static String STR_PRIORITY = com.CH_gui.lang.Lang.rb.getString("column_Priority");
-  private static String STR_SECURE_LOCK = com.CH_gui.lang.Lang.rb.getString("column_Secure_Lock");
-  private static String STR_ATTACHMENT = com.CH_gui.lang.Lang.rb.getString("column_Attachment");
-  private static String STR_FLAG = com.CH_gui.lang.Lang.rb.getString("column_Flag");
+  private static String STR_PRIORITY = com.CH_cl.lang.Lang.rb.getString("column_Priority");
+  private static String STR_SECURE_LOCK = com.CH_cl.lang.Lang.rb.getString("column_Secure_Lock");
+  private static String STR_ATTACHMENT = com.CH_cl.lang.Lang.rb.getString("column_Attachment");
+  private static String STR_FLAG = com.CH_cl.lang.Lang.rb.getString("column_Flag");
 
-  private static String STR_FROM = com.CH_gui.lang.Lang.rb.getString("column_From");
+  private static String STR_FROM = com.CH_cl.lang.Lang.rb.getString("column_From");
 
-  private static String STR_TO = com.CH_gui.lang.Lang.rb.getString("column_To");
-  private static String STR_E_MAIL_ADDRESS = com.CH_gui.lang.Lang.rb.getString("column_E_Mail_Address");
+  private static String STR_TO = com.CH_cl.lang.Lang.rb.getString("column_To");
+  private static String STR_E_MAIL_ADDRESS = com.CH_cl.lang.Lang.rb.getString("column_E_Mail_Address");
 
-  private static String STR_SUBJECT = com.CH_gui.lang.Lang.rb.getString("column_Subject");
-  private static String STR_POSTING = com.CH_gui.lang.Lang.rb.getString("column_Posting");
-  private static String STR_MESSAGE = com.CH_gui.lang.Lang.rb.getString("column_Message");
-  private static String STR_NAME = com.CH_gui.lang.Lang.rb.getString("column_Name");
+  private static String STR_SUBJECT = com.CH_cl.lang.Lang.rb.getString("column_Subject");
+  private static String STR_POSTING = com.CH_cl.lang.Lang.rb.getString("column_Posting");
+  private static String STR_MESSAGE = com.CH_cl.lang.Lang.rb.getString("column_Message");
+  private static String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Name");
 
-  private static String STR_SENT = com.CH_gui.lang.Lang.rb.getString("column_Sent");
-  private static String STR_LINK_ID = com.CH_gui.lang.Lang.rb.getString("column_Link_ID");
-  private static String STR_DATA_ID = com.CH_gui.lang.Lang.rb.getString("column_Data_ID");
-  private static String STR_FETCH_COUNT = com.CH_gui.lang.Lang.rb.getString("column_Fetch_count");
-  private static String STR_CREATED = com.CH_gui.lang.Lang.rb.getString("column_Created");
-  private static String STR_DELIVERED = com.CH_gui.lang.Lang.rb.getString("column_Delivered");
-  private static String STR_EXPIRY = com.CH_gui.lang.Lang.rb.getString("column_Expiration");
-  private static String STR_PASSWORD = com.CH_gui.lang.Lang.rb.getString("column_Password");
-  private static String STR_UPDATED = com.CH_gui.lang.Lang.rb.getString("column_Updated");
-  private static String STR_SIZE_ON_DISK = com.CH_gui.lang.Lang.rb.getString("column_Size_on_Disk");
-  private static String STR_IN_REPLY_TO = com.CH_gui.lang.Lang.rb.getString("column_In_reply_to");
+  private static String STR_SENT = com.CH_cl.lang.Lang.rb.getString("column_Sent");
+  private static String STR_LINK_ID = com.CH_cl.lang.Lang.rb.getString("column_Link_ID");
+  private static String STR_DATA_ID = com.CH_cl.lang.Lang.rb.getString("column_Data_ID");
+  private static String STR_FETCH_COUNT = com.CH_cl.lang.Lang.rb.getString("column_Fetch_count");
+  private static String STR_CREATED = com.CH_cl.lang.Lang.rb.getString("column_Created");
+  private static String STR_DELIVERED = com.CH_cl.lang.Lang.rb.getString("column_Delivered");
+  private static String STR_EXPIRY = com.CH_cl.lang.Lang.rb.getString("column_Expiration");
+  private static String STR_PASSWORD = com.CH_cl.lang.Lang.rb.getString("column_Password");
+  private static String STR_UPDATED = com.CH_cl.lang.Lang.rb.getString("column_Updated");
+  private static String STR_SIZE_ON_DISK = com.CH_cl.lang.Lang.rb.getString("column_Size_on_Disk");
+  private static String STR_IN_REPLY_TO = com.CH_cl.lang.Lang.rb.getString("column_In_reply_to");
 
-  private static String STR_BUSINESS_PHONE = com.CH_gui.lang.Lang.rb.getString("column_Business_Phone");
-  private static String STR_HOME_PHONE = com.CH_gui.lang.Lang.rb.getString("column_Home_Phone");
+  private static String STR_BUSINESS_PHONE = com.CH_cl.lang.Lang.rb.getString("column_Business_Phone");
+  private static String STR_HOME_PHONE = com.CH_cl.lang.Lang.rb.getString("column_Home_Phone");
 
-  private static String STR_TIP_MESSAGE_PRIORITY = com.CH_gui.lang.Lang.rb.getString("columnTip_Message_Priority");
-  private static String STR_TIP_MESSAGE_ATTACHMENTS = com.CH_gui.lang.Lang.rb.getString("columnTip_Message_Attachments");
-  private static String STR_TIP_NEW_OLD_STATUS_FLAG = com.CH_gui.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag");
-  private static String STR_TIP_PASSWORD = com.CH_gui.lang.Lang.rb.getString("columnTip_Password");
-  private static String STR_TIP_SECURE_LOCK = com.CH_gui.lang.Lang.rb.getString("columnTip_Secure_Lock");
+  private static String STR_TIP_MESSAGE_PRIORITY = com.CH_cl.lang.Lang.rb.getString("columnTip_Message_Priority");
+  private static String STR_TIP_MESSAGE_ATTACHMENTS = com.CH_cl.lang.Lang.rb.getString("columnTip_Message_Attachments");
+  private static String STR_TIP_NEW_OLD_STATUS_FLAG = com.CH_cl.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag");
+  private static String STR_TIP_PASSWORD = com.CH_cl.lang.Lang.rb.getString("columnTip_Password");
+  private static String STR_TIP_SECURE_LOCK = com.CH_cl.lang.Lang.rb.getString("columnTip_Secure_Lock");
 
   static final ColumnHeaderData[] columnHeaderDatas = new ColumnHeaderData[] {
       // mail
@@ -273,10 +274,10 @@ public class MsgTableModel extends RecordTableModel {
 
 
   /**
-   * Creates new MsgTableModel
-   * @param folderId specifies the folder for which this table will display data.
-   * @param mode can either be MODE_MSG, MODE_MSG_SENT, MODE_POST, MODE_CHAT
-   */
+  * Creates new MsgTableModel
+  * @param folderId specifies the folder for which this table will display data.
+  * @param mode can either be MODE_MSG, MODE_MSG_SENT, MODE_POST, MODE_CHAT
+  */
   public MsgTableModel(Long folderId, int mode) {
     super(columnHeaderDatas[mode], new FixedFilter(false));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "MsgTableModel()");
@@ -297,17 +298,18 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return fetchedIds;
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
+  public void clearCachedFetchedFolderIDs() {
+    fetchedIds.clear();
+    fetchedIdsFull.clear();
   }
 
   /**
-   * Sets auto update mode by listening on the cache contact updates.
-   */
+  * Sets auto update mode by listening on the cache contact updates.
+  */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "setAutoUpdate(boolean flag)");
     if (trace != null) trace.args(flag);
@@ -331,8 +333,8 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model setting the specified folderId as its main variable
-   */
+  * Initializes the model setting the specified folderId as its main variable
+  */
   public synchronized void initData(Long folderId) {
     initData(folderId, false);
     setCollapseFileVersions(true);
@@ -352,8 +354,8 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model setting the specified folderId as its main variable
-   */
+  * Initializes the model setting the specified folderId as its main variable
+  */
   private synchronized void switchData(Long folderId, boolean forceSwitch) {
     FolderPair folderPair = getParentFolderPair();
     if (forceSwitch || folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
@@ -384,8 +386,8 @@ public class MsgTableModel extends RecordTableModel {
 
 
   /**
-   * @param fetch true if data should be re-fetched from the database.
-   */
+  * @param fetch true if data should be re-fetched from the database.
+  */
   public synchronized void refreshData(boolean forceFetch) {
     FolderPair folderPair = getParentFolderPair();
     if (folderPair != null) {
@@ -394,8 +396,8 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   /**
-   * Forces a refresh of data displayed even if its already displaying the specified folder data.
-   */
+  * Forces a refresh of data displayed even if its already displaying the specified folder data.
+  */
   private synchronized void refreshData(Long folderId, boolean forceFetch) {
     if (folderId != null) {
       FolderShareRecord shareRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(folderId, true);
@@ -424,7 +426,7 @@ public class MsgTableModel extends RecordTableModel {
           getSubjectColumnValue(this, msgLink, msgData, null, cache);
         }
       }
-      return RecycleTableModel.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
+      return TextRenderer.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
     } else {
       return null;
     }
@@ -499,7 +501,7 @@ public class MsgTableModel extends RecordTableModel {
               value = fromEmailAddress;
             } else {
               if (forSortOnly) {
-                value = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
               } else {
                 value = msgData.senderUserId;
               }
@@ -512,7 +514,7 @@ public class MsgTableModel extends RecordTableModel {
             if (forSortOnly) {
               String sortStr = null;
               // just get the second token because it is usually the first recipient
-              Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);
+              Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);
               for (int i=0; sortStr==null && i<recipients.length; i++)
                 for (int k=0; sortStr==null && k<recipients[i].length; k++)
                   if (recipients[i][k] != null)
@@ -529,12 +531,11 @@ public class MsgTableModel extends RecordTableModel {
             String text = null;
             if (msgData != null) {
               if (msgData.isTypeAddress()) {
-                if (forSortOnly) {
-                  if (getColumnHeaderData().convertRawColumnToModel(16) == -1)
-                    text = msgData.fileAs + msgData.email;
-                  else
-                    text = msgData.fileAs;
-                }
+                // sorting by fileAs
+                if (getColumnHeaderData().convertRawColumnToModel(16) == -1)
+                  text = msgData.fileAs + msgData.email;
+                else
+                  text = msgData.fileAs;
               } else if (messageMode != MODE_POST && messageMode != MODE_CHAT) {
                 text = msgData.getSubject();
               } else {
@@ -677,8 +678,8 @@ public class MsgTableModel extends RecordTableModel {
           boolean isHTML = msgData.isHtml();
           StringBuffer sb = new StringBuffer();
 
-          sb.append(MsgPanelUtils.HTML_START);
-          sb.append(MsgPanelUtils.HTML_BODY_START);
+          sb.append(HTML_utils.HTML_START);
+          sb.append(HTML_utils.HTML_BODY_START);
 
           boolean toAddFrom = false;
           boolean toAddSent = false;
@@ -735,7 +736,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom || toAddSent) {
-            sb.append(MsgPanelUtils.HTML_FONT_START);
+            sb.append(HTML_utils.HTML_FONT_START);
           }
 
           if (toAddFrom) {
@@ -765,7 +766,6 @@ public class MsgTableModel extends RecordTableModel {
             }
             if (numOfAttachments > 0) {
               String linkNames = "";
-              String summary = "(";
               FileLinkRecord[] fLinks = cache.getFileLinkRecordsOwnerAndType(msgData.msgId, new Short(Record.RECORD_TYPE_MESSAGE));
               if (fLinks != null && fLinks.length > 0) {
                 for (int i=0; i<fLinks.length; i++) {
@@ -798,18 +798,18 @@ public class MsgTableModel extends RecordTableModel {
             sb.append("<font size=\"-2\" color=\"#777777\">");
             if (toAddFrom)
               sb.append(' ');
-            String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, false) : "";
-            String dateStr = Misc.getFormattedDate(msgLink.dateCreated, false);
+            String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, true, false) : "";
+            String dateStr = Misc.getFormattedDate(msgLink.dateCreated, true, false);
             if (!dateStr.equals(prevDateStr))
               sb.append(dateStr);
           }
 
           if (toAddFrom || toAddSent) {
             sb.append("</font> ");
-            sb.append(MsgPanelUtils.HTML_FONT_END);
+            sb.append(HTML_utils.HTML_FONT_END);
           }
 
-          sb.append(MsgPanelUtils.HTML_FONT_START);
+          sb.append(HTML_utils.HTML_FONT_START);
 
           boolean subjectAppended = false;
           // append subject
@@ -844,9 +844,9 @@ public class MsgTableModel extends RecordTableModel {
             }
             sb.append(messageText);
           }
-          sb.append(MsgPanelUtils.HTML_FONT_END);
-          sb.append(MsgPanelUtils.HTML_BODY_END);
-          sb.append(MsgPanelUtils.HTML_END);
+          sb.append(HTML_utils.HTML_FONT_END);
+          sb.append(HTML_utils.HTML_BODY_END);
+          sb.append(HTML_utils.HTML_END);
           value = sb;
           msgLink.setPostRenderingCache(sb.toString());
         }
@@ -868,7 +868,7 @@ public class MsgTableModel extends RecordTableModel {
       if (msgData.isEmail() || fromEmailAddress != null) {
         fromName = fromEmailAddress;
       } else {
-        fromName = ListRenderer.getRenderedText(MsgPanelUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+        fromName = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
       }
     }
     return fromName;
@@ -904,11 +904,11 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   /**
-   * Send a request to fetch message briefs or full (depending on messages or postings)
-   * for the <code> shareId </code> from the server
-   * if messages were not fetched for this folder, otherwise get them from cache.
-   * @param force true to force a fetch from the database
-   */
+  * Send a request to fetch message briefs or full (depending on messages or postings)
+  * for the <code> shareId </code> from the server
+  * if messages were not fetched for this folder, otherwise get them from cache.
+  * @param force true to force a fetch from the database
+  */
   private void fetchMsgs(final Long shareId, final Long folderId, boolean force) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableModel.class, "fetchMsgs(Long shareId, Long folderId, boolean force)");
     if (trace != null) trace.args(shareId, folderId);
@@ -962,7 +962,7 @@ public class MsgTableModel extends RecordTableModel {
           // Gather items already fetched so we don't re-fetch all items if not necessary.
           // Useful when performing fetch for content searches when user clicks body filtering on and off a few times -- it will skip previously fetched bodies and continue on...
           if (_action == CommandCodes.MSG_Q_GET_FULL) {
-            MsgLinkRecord[] existingLinks = CacheUtilities.getMsgLinkRecordsWithFetchedDatas(folderId);
+            MsgLinkRecord[] existingLinks = CacheMsgUtils.getMsgLinkRecordsWithFetchedDatas(folderId);
             request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
           } else {
             MsgLinkRecord[] existingLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(folderId);
@@ -1022,8 +1022,8 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public boolean isContentFetched(Long shareId) {
     synchronized (fetchedIds) {
       return fetchedIds.contains(shareId);

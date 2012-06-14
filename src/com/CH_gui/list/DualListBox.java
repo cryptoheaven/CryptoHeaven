@@ -52,15 +52,15 @@ import javax.swing.event.*;
 public class DualListBox extends JPanel implements StringHighlighterI, ListUpdatableI {
 
   private static final DataFlavor OBJECT_ARRAY_FLAVOUR = new DataFlavor(ListTransferableData.class, "Object array");
-  protected static final String ADD_BUTTON_LABEL = com.CH_gui.lang.Lang.rb.getString("button_Add") + " >>";
-  protected static final String ADD_ALL_BUTTON_LABEL = com.CH_gui.lang.Lang.rb.getString("button_Add_All") + " >>";
-  protected static final String REMOVE_BUTTON_LABEL = "<< " + com.CH_gui.lang.Lang.rb.getString("button_Remove");
-  protected static final String REMOVE_ALL_BUTTON_LABEL = "<< " + com.CH_gui.lang.Lang.rb.getString("button_Remove_All");
-  protected static final String RESET_BUTTON_LABEL = com.CH_gui.lang.Lang.rb.getString("button_Reset");
-  protected static final String UP_BUTTON_LABEL = com.CH_gui.lang.Lang.rb.getString("button_Move_Up");
-  protected static final String DOWN_BUTTON_LABEL = com.CH_gui.lang.Lang.rb.getString("button_Move_Down");
-  protected static final String DEFAULT_SOURCE_CHOICE_LABEL = com.CH_gui.lang.Lang.rb.getString("label_Available_Choices");
-  protected static final String DEFAULT_DEST_CHOICE_LABEL = com.CH_gui.lang.Lang.rb.getString("label_Your_Choices");
+  protected static final String ADD_BUTTON_LABEL = com.CH_cl.lang.Lang.rb.getString("button_Add") + " >>";
+  protected static final String ADD_ALL_BUTTON_LABEL = com.CH_cl.lang.Lang.rb.getString("button_Add_All") + " >>";
+  protected static final String REMOVE_BUTTON_LABEL = "<< " + com.CH_cl.lang.Lang.rb.getString("button_Remove");
+  protected static final String REMOVE_ALL_BUTTON_LABEL = "<< " + com.CH_cl.lang.Lang.rb.getString("button_Remove_All");
+  protected static final String RESET_BUTTON_LABEL = com.CH_cl.lang.Lang.rb.getString("button_Reset");
+  protected static final String UP_BUTTON_LABEL = com.CH_cl.lang.Lang.rb.getString("button_Move_Up");
+  protected static final String DOWN_BUTTON_LABEL = com.CH_cl.lang.Lang.rb.getString("button_Move_Down");
+  protected static final String DEFAULT_SOURCE_CHOICE_LABEL = com.CH_cl.lang.Lang.rb.getString("label_Available_Choices");
+  protected static final String DEFAULT_DEST_CHOICE_LABEL = com.CH_cl.lang.Lang.rb.getString("label_Your_Choices");
   protected static final int UP = -1;
   protected static final int DOWN = 1;
 

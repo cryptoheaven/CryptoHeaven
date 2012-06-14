@@ -1,59 +1,72 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.gui;
 
+import com.CH_co.util.BrowserLauncher;
+import com.CH_co.util.HTML_utils;
 import com.CH_gui.util.MessageDialog;
-import java.awt.*;
-import java.awt.event.*;
+import com.CH_gui.util.URLLauncher;
+import java.awt.Cursor;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 
-import com.CH_co.gui.*;
-import com.CH_co.util.*;
-
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.7 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.7 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class JMyLinkLabel extends JMyLabel {
 
   private URL link;
+  private URLLauncher launcher;
 
   /** Creates new JMyLinkLabel */
   public JMyLinkLabel(String label, URL urlLink) {
     this(label, urlLink, "+0");
   }
+  public JMyLinkLabel(String label, URL urlLink, URLLauncher customLauncher) {
+    this(label, urlLink, "+0", customLauncher);
+  }
   public JMyLinkLabel(String label, URL urlLink, String fontRelativeSize) {
+    this(label, urlLink, fontRelativeSize, null);
+  }
+  public JMyLinkLabel(String label, URL urlLink, String fontRelativeSize, URLLauncher customLauncher) {
     super("<html><body><font face="+HTML_utils.DEFAULT_FONTS_QUOTED+" size='"+fontRelativeSize+"'>"+(urlLink != null ? "<a href=\""+urlLink.toExternalForm()+"\">"+label+"</a>" : label)+"</font></body></html>");
     if (urlLink != null) {
       this.link = urlLink;
+      this.launcher = customLauncher;
       setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
       addMouseListener(new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
           try {
             if (!e.isConsumed()) {
-              BrowserLauncher.openURL(link.toExternalForm());
+              if (launcher != null) {
+                launcher.openURL(new URL(link.toExternalForm()), JMyLinkLabel.this);
+              } else {
+                BrowserLauncher.openURL(link.toExternalForm());
+              }
             }
           } catch (Throwable t) {
             MessageDialog.showErrorDialog(JMyLinkLabel.this, t.getMessage(), "URL error", true);

@@ -77,11 +77,11 @@ public class ExpiryRevocationDialog extends GeneralDialog {
 
   /** Creates new ExpiryRevocationDialog */
   public ExpiryRevocationDialog(Frame owner, MsgLinkRecord[] msgLinks) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Expiry_and_Revocation"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Expiry_and_Revocation"));
     constructDialog(owner, msgLinks);
   }
   public ExpiryRevocationDialog(Dialog owner, MsgLinkRecord[] msgLinks) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Expiry_and_Revocation"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Expiry_and_Revocation"));
     constructDialog(owner, msgLinks);
   }
   private void constructDialog(Component owner, MsgLinkRecord[] msgLinks) {
@@ -131,7 +131,7 @@ public class ExpiryRevocationDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOK();
@@ -139,7 +139,7 @@ public class ExpiryRevocationDialog extends GeneralDialog {
     });
     jOk = buttons[0];
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();

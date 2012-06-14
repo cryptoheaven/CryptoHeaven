@@ -164,7 +164,7 @@ public class FolderTreeComponent extends JPanel implements FolderSelectionListen
 
     int posY = 0;
 
-    jTitleLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("title_Folders"));
+    jTitleLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("title_Folders"));
     add(jTitleLabel, new GridBagConstraints(0, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 0, 5), 0, 0));
     JLabel minRowHeight = new JLabel(" ");

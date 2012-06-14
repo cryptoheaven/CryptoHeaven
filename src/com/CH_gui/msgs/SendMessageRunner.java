@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgs;
 
@@ -21,6 +21,7 @@ import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.ops.UploadUtilities;
 import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_cl.service.records.MsgUtil;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -46,21 +47,21 @@ import java.util.LinkedList;
 import java.util.Locale;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.19 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.19 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class SendMessageRunner extends ThreadTraced {
 
   private static final short TO = MsgLinkRecord.RECIPIENT_TYPE_TO;
@@ -355,9 +356,9 @@ public class SendMessageRunner extends ThreadTraced {
 
 
   /**
-   * Adjusts the recipient list to include the CC is selected.
-   * Call only when CC checkbox is selected.
-   */
+  * Adjusts the recipient list to include the CC is selected.
+  * Call only when CC checkbox is selected.
+  */
   private static Record[] addOutgoingToRecipients(Record[] recipients) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "addOutgoingToRecipients(Record[] recipients)");
     if (trace != null) trace.args(recipients);
@@ -411,10 +412,10 @@ public class SendMessageRunner extends ThreadTraced {
     return prepareMsgLinkRecords(new Record[][] { recipientsTO }, symmetricKey, false, null, parent, null);
   }
   /**
-   * Prepares links for sending...
-   * @param isSavingAsDraft If in draft mode then use user's default draft folder as recipient, and output original recipient list in the StringBuffer
-   * @param recipientsSB Buffer for original recipient list when in draft mode
-   */
+  * Prepares links for sending...
+  * @param isSavingAsDraft If in draft mode then use user's default draft folder as recipient, and output original recipient list in the StringBuffer
+  * @param recipientsSB Buffer for original recipient list when in draft mode
+  */
   public static MsgLinkRecord[] prepareMsgLinkRecords(Record[][] recipientsAll, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Component parent, Object[] errBuffer) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgLinkRecords(Record[][] recipientsAll, Record[] recipientsCC, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Object[] errBuffer)");
     if (trace != null) trace.args(recipientsAll, symmetricKey);
@@ -429,7 +430,7 @@ public class SendMessageRunner extends ThreadTraced {
 
     if (isSavingAsDraft) {
       // gather the recipient list
-      recipientsSB.append(MsgPanelUtils.gatherAllMsgRecipients(recipientsAll));
+      recipientsSB.append(MsgUtil.gatherAllMsgRecipients(recipientsAll));
       // switch the recipients to the draft folder only
       FolderPair draftPair = FolderOps.getOrCreateDraftFolder(SIL);
       recipientsAll = new Record[][] { new FolderPair[] { draftPair } };
@@ -558,9 +559,9 @@ public class SendMessageRunner extends ThreadTraced {
 
 
   /**
-   * Clone and encrypt message links to create message attachments links.
-   * Fills the share ID vector with involved shares from where the attachments are taken.
-   */
+  * Clone and encrypt message links to create message attachments links.
+  * Fills the share ID vector with involved shares from where the attachments are taken.
+  */
   private static MsgLinkRecord[] prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsV, ArrayList fromShareIDsV) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL)");
     if (trace != null) trace.args(selectedMsgLinks, symmetricKey, fromMsgLinkIDsV, fromShareIDsV);
@@ -613,9 +614,9 @@ public class SendMessageRunner extends ThreadTraced {
 
 
   /**
-   * Clone and encrypt file links to create message attachment file links.
-   * Fills the share ID vector with involved shares from where the attachments are taken.
-   */
+  * Clone and encrypt file links to create message attachment file links.
+  * Fills the share ID vector with involved shares from where the attachments are taken.
+  */
   private static FileLinkRecord[] prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL)");
     if (trace != null) trace.args(selectedFileLinks, symmetricKey, fromMsgLinkIDsL, fromShareIDsL);

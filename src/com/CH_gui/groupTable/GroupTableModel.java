@@ -54,9 +54,9 @@ public class GroupTableModel extends RecordTableModel {
 
   private FolderShareListener shareListener;
 
-  private static String STR_NAME = com.CH_gui.lang.Lang.rb.getString("column_Member");
-  private static String STR_ADD = com.CH_gui.lang.Lang.rb.getString("column_Add_Members");
-  private static String STR_REMOVE = com.CH_gui.lang.Lang.rb.getString("column_Remove_Members");
+  private static String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Member");
+  private static String STR_ADD = com.CH_cl.lang.Lang.rb.getString("column_Add_Members");
+  private static String STR_REMOVE = com.CH_cl.lang.Lang.rb.getString("column_Remove_Members");
 
   static final ColumnHeaderData columnHeaderData = 
       new ColumnHeaderData(new Object[][] 
@@ -101,8 +101,8 @@ public class GroupTableModel extends RecordTableModel {
    * user switches focus to another folder...
    * This vector should also be cleared when users are switched...
    */
-  public ArrayList getCachedFetchedFolderIDs() {
-    return fetchedIds;
+  public void clearCachedFetchedFolderIDs() {
+    fetchedIds.clear();
   }
 
   /**

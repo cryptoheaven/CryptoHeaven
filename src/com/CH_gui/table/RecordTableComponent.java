@@ -14,7 +14,7 @@
 package com.CH_gui.table;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.DefaultReplyRunner;
@@ -28,22 +28,21 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
-import com.CH_co.util.DisposableObj;
-import com.CH_co.util.GlobalProperties;
-import com.CH_co.util.ImageNums;
+import com.CH_co.util.*;
 import com.CH_gui.action.ActionUtilities;
 import com.CH_gui.action.Actions;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.chatTable.ChatActionTable;
+import com.CH_gui.contactTable.ContactTableComponent4Frame;
 import com.CH_gui.contactTable.ContactTableModel;
+import com.CH_gui.fileTable.FileTableModel;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.msgTable.MsgInboxTableComponent;
 import com.CH_gui.msgTable.MsgTableModel;
-import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.recycleTable.RecycleTableModel;
 import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_gui.util.*;
@@ -55,6 +54,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.*;
 import javax.swing.*;
@@ -95,6 +97,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private JPanel jDescriptionPanel1;
   private JPanel jDescriptionPanel2;
   private JPanel jOfflinePanel;
+  private JPanel jPurchasePanel;
   private JPanel jUtilityButtonPanel;
   private JMyLinkLikeLabel jShowVersionsLink;
   private ToolBarModel toolBarModel;
@@ -169,7 +172,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     });
     jFilterGoButton = new JMyButton(Images.get(ImageNums.GO16));
     jFilterGoButton.setBorder(new EmptyBorder(0,0,0,0));
-    jFilterGoButton.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jFilterGoButton.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
     jFilterGoButton.setOpaque(true);
     jFilterGoButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     jFilterGoButton.addActionListener(new ActionListener() {
@@ -180,7 +183,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       }
     });
     jFilterMsgBodyCheck = new JMyCheckBox();
-    jFilterMsgBodyCheck.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jFilterMsgBodyCheck.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
     jFilterMsgBodyCheck.setOpaque(true);
     RecordTableModel tableModel = recordTableScrollPane.getTableModel();
     if (tableModel instanceof MsgTableModel) {
@@ -213,7 +216,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     jTopPanel = new JPanel(new GridBagLayout());
     jFilterPanel = new JPanel(new GridBagLayout());
     jFilterPanel.setVisible(false);
-    jFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jFilterPanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
     jFilterPanel.add(new JMyLabel("Look for:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jFilterPanel.add(jFilterField, new GridBagConstraints(1, 0, 1, 1, 10, 0,
@@ -233,13 +236,16 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     isDescriptionLabelShown = true;
     jDescriptionPanel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     jDescriptionPanel2.setVisible(false);
+
     jOfflinePanel = new JPanel(new BorderLayout(0, 0));
     jOfflinePanel.setVisible(false);
-    //jOfflinePanel.setBorder(new LineBorder(Color.BLACK, 1));
-    jOfflinePanel.setBackground(Color.decode("0x"+MsgDataRecord.WARNING_BACKGROUND_COLOR));
+    jOfflinePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
     JMyLabel label = new JMyLabel("All participants are offline, new messages will be delivered when they sign in.");
     label.setBorder(new EmptyBorder(3, 3, 3, 3));
     jOfflinePanel.add(label, BorderLayout.CENTER);
+
+    jPurchasePanel = new JPanel(new BorderLayout(0, 0));
+    jPurchasePanel.setVisible(false);
 
     if (!suppressUtilityBar)
       jUtilityButtonPanel = new JPanel(new GridBagLayout());
@@ -312,10 +318,140 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
     else if (lastFolderId != null)
       changeTitle(lastFolderId);
+    updatePurchasePanel();
   }
+
   public void setTitleIcon(Icon icon) {
     jTitleLabel.setIcon(icon);
   }
+
+  private boolean isDateInThePast(Timestamp date, int byNumOfDays) {
+    boolean inThePast = false;
+    if (date != null)
+      inThePast = System.currentTimeMillis()-(byNumOfDays*24L*60L*60L*1000L) > date.getTime();
+    return inThePast;
+  }
+
+  public boolean updatePurchasePanel() {
+    boolean showExpired = false;
+    boolean showExpiredSub = false;
+    boolean showOverQuota = false;
+    boolean showOverQuotaSub = false;
+    boolean showOverTransfer = false;
+    boolean showOverTransferSub = false;
+    boolean showCloseToCapacity = false;
+    boolean showCloseToCapacitySub = false;
+    boolean showPurchase = false;
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    UserRecord uRec = cache.getUserRecord();
+    if (uRec != null) {
+      if (this instanceof ContactTableComponent4Frame || 
+              (recordTableScrollPane != null && (recordTableScrollPane.getTableModel() instanceof MsgTableModel || recordTableScrollPane.getTableModel() instanceof FileTableModel))) 
+      {
+        if (uRec.isPersonalAccount() || uRec.isBusinessMasterAccount()) {
+          showExpired = isDateInThePast(uRec.dateExpired, 3);
+        } else if (uRec.isBusinessSubAccount()) {
+          showExpiredSub = isDateInThePast(uRec.dateExpired, 3);
+        } else if (uRec.isFreePromoAccount()) {
+          showPurchase = isDateInThePast(uRec.dateCreated, 3);
+        }
+        // over quota warning is independent of expiry
+        if (uRec.isStorageLimitExceeded()) {
+          if (uRec.isBusinessSubAccount())
+            showOverQuotaSub = true;
+          else
+            showOverQuota = true;
+        }
+        if (uRec.isTransferLimitExceeded()) {
+          if (uRec.isBusinessSubAccount())
+            showOverTransferSub = true;
+          else
+            showOverTransfer = true;
+        }
+        if (uRec.isStorageAboveWarning()) {
+          if (uRec.isBusinessSubAccount())
+            showCloseToCapacitySub = true;
+          else
+            showCloseToCapacity = true;
+        }
+      }
+    }
+    boolean show = showExpired || showExpiredSub || showOverQuota || showOverQuotaSub || showOverTransfer || showOverTransferSub || showCloseToCapacity || showCloseToCapacitySub || showPurchase;
+    if (jPurchasePanel.isVisible() != show) {
+      if (show) {
+        jPurchasePanel.removeAll();
+        JMyLabel label = null;
+        String signupUrl = URLs.get(URLs.SIGNUP_PAGE) +"?UserID="+ uRec.userId;
+        if (showExpired) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+          try {
+            label = new JMyLinkLabel("Warning: service subscription expired! Click here to renew.", new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showExpiredSub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+          try {
+            label = new JMyLinkLabel("Your account is past due for renewal, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverQuota) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+          try {
+            label = new JMyLinkLabel("Warning: storage limit exceeded! Click here to upgrade.", new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverQuotaSub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+          try {
+            label = new JMyLinkLabel("Storage limit exceeded, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverTransfer) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+          try {
+            label = new JMyLinkLabel("Warning: bandwidth usage limit exceeded! Please contact support.", new URL("mailto:support@cryptoheaven.com"), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverTransferSub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+          try {
+            label = new JMyLinkLabel("Bandwidth usage limit exceeded, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+          
+        } else if (showCloseToCapacity) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+          try {
+            int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
+            label = new JMyLinkLabel("Storage limit is near capacity, " + percent +"% used. Click here to upgrade.", new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showCloseToCapacitySub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+          try {
+            int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
+            label = new JMyLinkLabel("Storage limit is near capacity, " + percent +"% used, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+          
+          
+        } else if (showPurchase) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+          try {
+            label = new JMyLinkLabel("Please support our developers by purchasing a subscription.", new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        }
+        if (label != null) {
+          label.setBorder(new EmptyBorder(3, 3, 3, 3));
+          jPurchasePanel.add(label, BorderLayout.CENTER);
+        }
+      }
+      jPurchasePanel.setVisible(show);
+    }
+    return show;
+  }
+
 //  /**
 //   * Setting the description overwrites the default description construction when initData() is called.
 //   * Setting it to 'null' resets the custom title setting.
@@ -485,6 +621,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       posY ++;
     }
     jTopPanel.add(jOfflinePanel, new GridBagConstraints(0, posY, 4, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+    posY ++;
+    jTopPanel.add(jPurchasePanel, new GridBagConstraints(0, posY, 4, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY ++;
     jTopPanel.add(jDescriptionPanel2, new GridBagConstraints(0, posY, 4, 1, 0, 0,
@@ -827,6 +966,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     }
     jTitleLabel.revalidate();
     jTitleLabel.repaint();
+    updatePurchasePanel();
   }
   /**
   * Sets the description of the folder to reflect the description of the given folder.
@@ -856,7 +996,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
             String shareDesc = null;
             if (share != null)
               shareDesc = share.getFolderDesc();
-            String originalDesc = com.CH_gui.lang.Lang.rb.getString("folderDesc_Chat_Log_common_beginning");
+            String originalDesc = com.CH_cl.lang.Lang.rb.getString("folderDesc_Chat_Log_common_beginning");
             if (shareDesc != null &&
                 shareDesc.length() > 0 &&
                 !shareDesc.startsWith(originalDesc)) {
@@ -866,7 +1006,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               //desc = "Participants: " + notes[0] + " " + notes[1];
               // correct the Chat Log title to ommit the participants...
               String name  = share.getFolderName();
-              String defaultChatFolderName = com.CH_gui.lang.Lang.rb.getString("folderName_Chat_Log");
+              String defaultChatFolderName = com.CH_cl.lang.Lang.rb.getString("folderName_Chat_Log");
               if (name == null || name.startsWith(defaultChatFolderName))
                 jTitleLabel.setText("Chat");
             }
@@ -884,7 +1024,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 if (fRec.ownerUserId.equals(cache.getMyUserId()))
                   desc = "Your shared " + fRec.getFolderType();
                 else {
-                  Record owner = MsgPanelUtils.convertUserIdToFamiliarUser(fRec.ownerUserId, true, false, true);
+                  Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(fRec.ownerUserId, true, false, true);
                   if (owner == null) {
                     owner = new UserRecord();
                     ((UserRecord) owner).userId = fRec.ownerUserId;
@@ -962,9 +1102,9 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 FolderRecord fldRec = (FolderRecord) participants[i];
                 if (fldRec.isGroupType()) {
                   // look inside the group for online/offline contacts
-                  Long[] accessUsers = CacheUtilities.findAccessUsers(cache.getFolderShareRecordsForFolder(fldRec.folderId));
+                  Long[] accessUsers = CacheUsrUtils.findAccessUsers(cache.getFolderShareRecordsForFolder(fldRec.folderId));
                   for (int a=0; a<accessUsers.length; a++) {
-                    Record accessUser = MsgPanelUtils.convertUserIdToFamiliarUser(accessUsers[a], true, true);
+                    Record accessUser = CacheUsrUtils.convertUserIdToFamiliarUser(accessUsers[a], true, true);
                     if (accessUser instanceof ContactRecord) {
                       ContactRecord cRec = (ContactRecord) accessUser;
                       boolean isOnline = cRec.isOnlineStatus();
@@ -1039,6 +1179,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       jDescriptionPanel2.revalidate();
       jDescriptionPanel2.repaint();
     }
+    updatePurchasePanel();
   }
 
   /**
@@ -1050,7 +1191,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long ownerUserId = fRec.ownerUserId;
     ArrayList participantsL = new ArrayList();
-    participantsL.add(MsgPanelUtils.convertUserIdToFamiliarUser(ownerUserId, true, true));
+    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, true));
     FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
     for (int i=0; i<allShares.length; i++) {
       FolderShareRecord share = allShares[i];
@@ -1058,7 +1199,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       if (share.isOwnedByGroup() || !share.isOwnedBy(ownerUserId, (Long[]) null)) {
         Record recipient = null;
         if (share.isOwnedByUser())
-          recipient = MsgPanelUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, true);
+          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, true);
         else
           recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
         if (recipient != null)

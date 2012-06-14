@@ -66,11 +66,11 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
 
   /** Creates new KeyGenerationOptionsDialog */
   public KeyGenerationOptionsDialog(Dialog parent, int keyLength, int certainty, Boolean storeRemoteFlag) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Key_Generation_Advanced_Options"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Key_Generation_Advanced_Options"));
     init(parent, keyLength, certainty, storeRemoteFlag);
   }
   public KeyGenerationOptionsDialog(Frame parent, int keyLength, int certainty, Boolean storeRemoteFlag) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Key_Generation_Advanced_Options"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Key_Generation_Advanced_Options"));
     init(parent, keyLength, certainty, storeRemoteFlag);
   }
 
@@ -107,11 +107,11 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
   private JButton[] createButtons() {
 
     JButton[] buttons = new JButton[2];
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0] .addActionListener(new OKActionListener());
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new CancelActionListener());
 
     return buttons;
@@ -194,11 +194,11 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
     jCert.setEditable(false);
 
     if (storeRemoteFlag != null)
-      jStoreRemoteFlag = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Store_encrypted_Private_Key_on_the_server."), storeRemoteFlag.booleanValue());
+      jStoreRemoteFlag = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Store_encrypted_Private_Key_on_the_server."), storeRemoteFlag.booleanValue());
 
     int posY = 0;
 
-    String keyStr = com.CH_gui.lang.Lang.rb.getString("text_Longer_keys_will_provide_higher_level_of_security");
+    String keyStr = com.CH_cl.lang.Lang.rb.getString("text_Longer_keys_will_provide_higher_level_of_security");
     panel.add(new JMyLabel(Images.get(ImageNums.KEY_LENGTH32)), new GridBagConstraints(0, posY, 1, 2, 0, 0, 
         GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
@@ -206,7 +206,7 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_RSA_Key_Length")), new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_RSA_Key_Length")), new GridBagConstraints(1, posY, 1, 1, 0, 0, 
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     panel.add(jKeyLength, new GridBagConstraints(2, posY, 1, 1, 8, 0, 
@@ -222,7 +222,7 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
 
 
 
-    String certaintyStr = com.CH_gui.lang.Lang.rb.getString("text_The_strength_of_the_generated_key_pair");
+    String certaintyStr = com.CH_cl.lang.Lang.rb.getString("text_The_strength_of_the_generated_key_pair");
     panel.add(new JMyLabel(Images.get(ImageNums.PRIME_CERTEINTY32)), new GridBagConstraints(0, posY, 1, 2, 0, 0, 
         GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
@@ -230,7 +230,7 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
         GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Certainty")), new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Certainty")), new GridBagConstraints(1, posY, 1, 1, 0, 0, 
         GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     panel.add(jCertainty, new GridBagConstraints(2, posY, 1, 1, 8, 0, 
@@ -245,7 +245,7 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
-      String storeStr = com.CH_gui.lang.Lang.rb.getString("text_The_strength_of_the_overall_system");
+      String storeStr = com.CH_cl.lang.Lang.rb.getString("text_The_strength_of_the_overall_system");
       panel.add(new JMyLabel(Images.get(ImageNums.STORE_REMOTE32)), new GridBagConstraints(0, posY, 1, 2, 0, 0, 
           GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 

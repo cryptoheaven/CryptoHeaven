@@ -102,9 +102,9 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
   private static final int DEFAULT_BUTTON_INDEX = 0;
   private static final int DEFAULT_CANCEL_BUTTON_INDEX = 1;
-  private static final String FLD_NAME_EMPTY = com.CH_gui.lang.Lang.rb.getString("msg_Folder_Name_must_be_at_least_one_character_long");
-  private static final String CHATTING_FOLDER_INVALID_INPUT = com.CH_gui.lang.Lang.rb.getString("msg_To_create_a_Chatting_Folder...");
-  private static final String SHARE_FOLDER_NAME_EMPTY = com.CH_gui.lang.Lang.rb.getString("msg_Please_assign_a_folder_share_name.");
+  private static final String FLD_NAME_EMPTY = com.CH_cl.lang.Lang.rb.getString("msg_Folder_Name_must_be_at_least_one_character_long");
+  private static final String CHATTING_FOLDER_INVALID_INPUT = com.CH_cl.lang.Lang.rb.getString("msg_To_create_a_Chatting_Folder...");
+  private static final String SHARE_FOLDER_NAME_EMPTY = com.CH_cl.lang.Lang.rb.getString("msg_Please_assign_a_folder_share_name.");
 
   FetchedDataCache  cache = null;
   Fld_NewFld_Rq     newFolderRequest;   // create new folder request
@@ -260,13 +260,13 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     Short folderType = getFolderType();
 
     if (isChooseDestination) {
-      jTreeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_a_folder"));
+      jTreeLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Select_a_folder"));
     } else {
 
       jFolderType = new JMyComboBox(new FolderTypeComboBoxModel());
 
       if (isNewFolder) {
-        String folderName = newFolderType == FolderRecord.GROUP_FOLDER ? com.CH_gui.lang.Lang.rb.getString("folder_Group_Name") : com.CH_gui.lang.Lang.rb.getString("folder_Folder_Name");
+        String folderName = newFolderType == FolderRecord.GROUP_FOLDER ? com.CH_cl.lang.Lang.rb.getString("folder_Group_Name") : com.CH_cl.lang.Lang.rb.getString("folder_Folder_Name");
         jFolderName = new JMyTextField(folderName);
         jFolderName.selectAll();
         documentChangeListener = new DocumentChangeListener();
@@ -277,7 +277,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
         folderTypeActionListener = new FolderTypeActionListener();
         jFolderType.addActionListener(folderTypeActionListener);
 
-        jTreeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_a_folder_in_which_to_create_the_new_folder"));
+        jTreeLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Select_a_folder_in_which_to_create_the_new_folder"));
 
         // sharing
         folderSharingPanel = new FolderSharingPanel(baSymmetricKey, jFolderName, jFolderDesc, addInitialContacts);
@@ -285,7 +285,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
         folderPurgingPanel = new FolderPurgingPanel();
       } else {
         jFolderType.setEnabled(false);
-        jTreeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_a_folder_to_which_the_folder_should_be_moved"));
+        jTreeLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Select_a_folder_to_which_the_folder_should_be_moved"));
         jFolderName = new JMyTextField(selectedFolderPair.getFolderShareRecord().getFolderName());
         jFolderName.setEnabled(false);
         jFolderDesc = new JMyTextArea(selectedFolderPair.getFolderShareRecord().getFolderDesc());
@@ -379,14 +379,14 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     JComponent mainComponent = null;
     if (isNewFolder) {
       tabbedPane = new JMyTabbedPane();
-      tabbedPane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_General"), createMainPanel());
-      tabbedPane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Sharing"), folderSharingPanel);
-      tabbedPane.addTab(com.CH_gui.lang.Lang.rb.getString("tab_Purging"), folderPurgingPanel);
+      tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_General"), createMainPanel());
+      tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Sharing"), folderSharingPanel);
+      tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Purging"), folderPurgingPanel);
       tabbedPane.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
           if (isOkNextAction && tabbedPane.getSelectedIndex() == 1) {
             isOkNextAction = false;
-            okButton.setText(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+            okButton.setText(com.CH_cl.lang.Lang.rb.getString("button_OK"));
           }
         }
       });
@@ -408,7 +408,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
     int posY = 0;
     if (jFolderName != null) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Name")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
       panel.add(jFolderName, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -417,7 +417,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     }
 
     if (jFolderDesc != null) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Comment")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
       panel.add(new JScrollPane(jFolderDesc), new GridBagConstraints(1, posY, 1, 3, 10, 2,
@@ -426,7 +426,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     }
 
     if (jFolderType != null) {
-      panel.add(new JLabel (com.CH_gui.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
+      panel.add(new JLabel (com.CH_cl.lang.Lang.rb.getString("label_Type")), new GridBagConstraints(0, posY, 1, 1, 5, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
       panel.add(jFolderType, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -469,16 +469,16 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     JButton[] buttons = new JButton[2];
     if (isNewFolder) {
       isOkNextAction = true;
-      okButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Next"));
+      okButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Next"));
     } else {
-      okButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+      okButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     }
     okButton.setDefaultCapable(true);
     okButton.addActionListener(new OKActionListener());
 
     buttons[0] = okButton;
 
-    JButton cancelButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    JButton cancelButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     cancelButton.addActionListener(new CancelActionListener());
     buttons[1] = cancelButton;
 
@@ -521,7 +521,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
     // if destinationNode cannot be descendant of forbidenSubtrees, if so, show an error dialog
     if (isDestinationForbiden(destinationNode)) {
-      MessageDialog.showErrorDialog(this, com.CH_gui.lang.Lang.rb.getString("msg_Selected_destination_folder_is_not_a_valid_choice."), com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showErrorDialog(this, com.CH_cl.lang.Lang.rb.getString("msg_Selected_destination_folder_is_not_a_valid_choice."), com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
     } else {
       if (destinationNode != null)
         chosenFolderPair = destinationNode.getFolderObject();
@@ -530,9 +530,9 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
       // if moving to root
       if (chosenFolderPair == null) {
         JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        msgPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Category_folder_is_an_invalid_choice.")));
-        msgPanel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("msg_Please_select_another_folder.")));
-        MessageDialog.showInfoDialog(this, msgPanel, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"), false);
+        msgPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("msg_Category_folder_is_an_invalid_choice.")));
+        msgPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("msg_Please_select_another_folder.")));
+        MessageDialog.showInfoDialog(this, msgPanel, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"), false);
       } else {
         success = true;
       }
@@ -548,9 +548,9 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     }
     if (tabbedPane != null) {
       if (folderType == FolderRecord.GROUP_FOLDER) {
-        tabbedPane.setTitleAt(TAB_SHARING, com.CH_gui.lang.Lang.rb.getString("tab_Members"));
+        tabbedPane.setTitleAt(TAB_SHARING, com.CH_cl.lang.Lang.rb.getString("tab_Members"));
       } else {
-        tabbedPane.setTitleAt(TAB_SHARING, com.CH_gui.lang.Lang.rb.getString("tab_Sharing"));
+        tabbedPane.setTitleAt(TAB_SHARING, com.CH_cl.lang.Lang.rb.getString("tab_Sharing"));
       }
       if (folderType == FolderRecord.GROUP_FOLDER || FolderRecord.isAddressType(folderType)) {
         tabbedPane.setEnabledAt(TAB_PURGING, false);
@@ -589,23 +589,23 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     Integer keepAsOldAs = folderPurgingPanel.folderAttributesPanel.getKeepAsOldAs();
 
     if (jFolderName.getText() == null || jFolderName.getText().trim().length() == 0) {
-      MessageDialog.showErrorDialog(this, FLD_NAME_EMPTY, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showErrorDialog(this, FLD_NAME_EMPTY, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
       jFolderName.requestFocusInWindow();
     } else if (folderSharingPanel.shareTableModel.getRowCount() > 0 && folderSharingPanel.jShareName.getText().length() == 0) {
-      MessageDialog.showErrorDialog(this, SHARE_FOLDER_NAME_EMPTY, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showErrorDialog(this, SHARE_FOLDER_NAME_EMPTY, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
     } else if (
               isSelectedChatting() &&
               (numToKeep == null || numToKeep.shortValue() == 0) &&
               (keepAsOldAs == null || keepAsOldAs.intValue() == 0)
               )
     {
-      MessageDialog.showErrorDialog(this, CHATTING_FOLDER_INVALID_INPUT, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showErrorDialog(this, CHATTING_FOLDER_INVALID_INPUT, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
     } else if (
               isSelectedChatting() &&
               folderSharingPanel.shareTableModel.getRowCount() == 0
             )
     {
-      MessageDialog.showErrorDialog(this, CHATTING_FOLDER_INVALID_INPUT, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showErrorDialog(this, CHATTING_FOLDER_INVALID_INPUT, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
     } else {
 
       FolderShareRecord[] additionalShares = null;
@@ -662,7 +662,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
     // if destinationNode cannot be descendant of selectedNode, if so, show an error dialog
     if (isDestinationForbiden(destinationNode)) {
-      MessageDialog.showErrorDialog(this, com.CH_gui.lang.Lang.rb.getString("msg_Destination_folder_cannot_be_the_one_being_moved_or_one_of_its_descendants."), com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showErrorDialog(this, com.CH_cl.lang.Lang.rb.getString("msg_Destination_folder_cannot_be_the_one_being_moved_or_one_of_its_descendants."), com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
     } else {
       Long newParentId = null;
       Long newParentShareId = null;
@@ -718,7 +718,7 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
     public void actionPerformed (ActionEvent event) {
       if (isOkNextAction) {
         isOkNextAction = false;
-        okButton.setText(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+        okButton.setText(com.CH_cl.lang.Lang.rb.getString("button_OK"));
         tabbedPane.setSelectedIndex(1);
       } else {
         // seperate AWT Thread from any potention network request in set request methods

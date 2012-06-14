@@ -1,22 +1,22 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.filters.SubUserFilter;
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.cryptx.BASymmetricKey;
@@ -52,21 +52,21 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.16 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.16 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class CreateSubAccountsWizardDialog extends WizardDialog implements Interrupter {
 
   private static final int PAGE_ACCOUNTS = 0;
@@ -109,11 +109,11 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
   /** Creates new CreateSubAccountsWizardDialog */
   public CreateSubAccountsWizardDialog(Frame parent) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Account_Management"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Account_Management"));
     init();
   }
   public CreateSubAccountsWizardDialog(Dialog parent) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Account_Management"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Account_Management"));
     init();
   }
 
@@ -137,19 +137,19 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
 
   /**
-   * Overwrite to return tab names for the pages in wizard.
-   * @return names for tabs
-   */
+  * Overwrite to return tab names for the pages in wizard.
+  * @return names for tabs
+  */
   public String[] getWizardTabNames() {
-    return new String[] { com.CH_gui.lang.Lang.rb.getString("tab_User_Accounts"),
-                          com.CH_gui.lang.Lang.rb.getString("tab_Options"),
-                          com.CH_gui.lang.Lang.rb.getString("tab_Permissions"),
-                          com.CH_gui.lang.Lang.rb.getString("tab_Summary") };
+    return new String[] { com.CH_cl.lang.Lang.rb.getString("tab_User_Accounts"),
+                          com.CH_cl.lang.Lang.rb.getString("tab_Options"),
+                          com.CH_cl.lang.Lang.rb.getString("tab_Permissions"),
+                          com.CH_cl.lang.Lang.rb.getString("tab_Summary") };
   }
   /**
-   * Overwrite to return panels for the pages in wizard
-   * Makes panels to be displayed on wizard pages.
-   */
+  * Overwrite to return panels for the pages in wizard
+  * Makes panels to be displayed on wizard pages.
+  */
   public JComponent[] createWizardPages() {
     checks = new AccountOptionPermitChecks();
     checks.isUpdatePermitsMode = true;
@@ -174,10 +174,10 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
   }
 
   /**
-   * Overwrite to check if tab is ready to be left for another tab.
-   * Informs the wizard that tab is about to change from the current one.
-   * @returns fales if choices on current tab are invalid or incomplete
-   */
+  * Overwrite to check if tab is ready to be left for another tab.
+  * Informs the wizard that tab is about to change from the current one.
+  * @returns fales if choices on current tab are invalid or incomplete
+  */
   public boolean goFromTab(int tabIndex) {
     boolean rc = true;
     if (tabIndex == PAGE_ACCOUNTS) {
@@ -189,8 +189,8 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     return rc;
   }
   /**
-   * Overwrite to be informed when new tab is about to become visible.
-   */
+  * Overwrite to be informed when new tab is about to become visible.
+  */
   public void goToTab(int tabIndex) {
     if (tabIndex == PAGE_SUMMARY) {
       // prepare the summary page
@@ -228,42 +228,42 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
   }
 
   /**
-   * Overwrite if you need to interrupt actions when Cancel button is pressed.
-   * This action should interrupt thread inside the finishTaskRunner() if any.
-   */
+  * Overwrite if you need to interrupt actions when Cancel button is pressed.
+  * This action should interrupt thread inside the finishTaskRunner() if any.
+  */
   public void setInterruptProgress(boolean interrupt) {
     interrupted = interrupt;
   }
   /**
-   * Method of Interrupter interface.
-   */
+  * Method of Interrupter interface.
+  */
   public boolean isInterrupted() {
     return interrupted;
   }
 
   /**
-   * Overwrite to specify when Finish button is eligible to become enabled.
-   * @return true iff Finish button should enable and all required inputs are satisfied.
-   */
+  * Overwrite to specify when Finish button is eligible to become enabled.
+  * @return true iff Finish button should enable and all required inputs are satisfied.
+  */
   public boolean isFinishActionReady() {
     return accountsV.size() > 0;
   }
 
   /**
-   * Overwrite if you need to set enablement of components during Finish action.
-   * Invoked to disable inputs when finishTaskRunner() is in progress,
-   * or enable inputs when it is done running.
-   */
+  * Overwrite if you need to set enablement of components during Finish action.
+  * Invoked to disable inputs when finishTaskRunner() is in progress,
+  * or enable inputs when it is done running.
+  */
   public void setEnabledInputComponents(boolean enable) {
     jCheckContactsForUsers.setEnabled(enable);
     jCheckContactsToMe.setEnabled(enable);
   }
 
   /**
-   * Overwrite to specify action which needs to be taken when Finish button is pressed.
-   * Invoked by FinishThread to do the main action of the wizard.
-   * @return true iff success
-   */
+  * Overwrite to specify action which needs to be taken when Finish button is pressed.
+  * Invoked by FinishThread to do the main action of the wizard.
+  * @return true iff success
+  */
   public boolean finishTaskRunner() {
     // error flag for running this task
     boolean error = false;
@@ -440,7 +440,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
                 break;
               }
             }
-            String[] emailStrings = UserOps.getCachedDefaultEmail(uRec, false);
+            String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(uRec, false);
             String emailAddress = emailStrings != null ? emailStrings[2] : "N/A";
             bodyBuf.append("  login name: \"");
             bodyBuf.append(handle);
@@ -599,8 +599,8 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
 
   /**
-   * @return true if successful, false if error.
-   */
+  * @return true if successful, false if error.
+  */
   private boolean gatherAccounts(Vector accountsV) {
     // start fresh
     accountsV.clear();
@@ -666,7 +666,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     }
 
     if (!isValid) {
-      MessageDialog.showWarningDialog(CreateSubAccountsWizardDialog.this, sb.toString(), com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+      MessageDialog.showWarningDialog(CreateSubAccountsWizardDialog.this, sb.toString(), com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
     }
     return isValid;
   }
@@ -694,8 +694,8 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
 
   /**
-   * <shareId>   <ownerUserId> <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
-   */
+  * <shareId>   <ownerUserId> <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
+  */
   private static Cnt_NewCnt_Rq createNewContactRequest(Long ownerUserId, Long contactWithId, Long creatorId, String ownerNote, String otherNote, BASymmetricKey owner_folderSymKey, BASymmetricKey contactWith_cntSymKey) {
     Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
     request.contactRecord = new ContactRecord();
@@ -753,10 +753,10 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
       public void runTraced() {
         synchronized (estimateMonitor) {
           if (estimatedTime == null) {
-            jExpectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
+            jExpectedTime.setText(com.CH_cl.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
             validate();
             estimatedTime = new Integer(estimateKeyGenerationTimeNow(keyLength, certainty)+1);
-            jExpectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] { estimatedTime }));
+            jExpectedTime.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] { estimatedTime }));
             validate();
           }
         }

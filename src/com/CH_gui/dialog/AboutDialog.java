@@ -45,7 +45,7 @@ public class AboutDialog extends GeneralDialog implements VisualsSavable {
 
   /** Creates new AboutDialog */
   public AboutDialog(Frame frame) {
-    super(frame, java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("title_About__SERVICE_SOFTWARE_NAME"), 
+    super(frame, java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("title_About__SERVICE_SOFTWARE_NAME"), 
       new Object[] {  URLs.get(URLs.SERVICE_SOFTWARE_NAME), 
                       GlobalProperties.PROGRAM_VERSION_STR, 
                       new Short(GlobalProperties.PROGRAM_BUILD_NUMBER)
@@ -68,13 +68,13 @@ public class AboutDialog extends GeneralDialog implements VisualsSavable {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AboutDialog.class, "createButtons()");
     JButton[] buttons = new JButton[3];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_License"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_License"));
     buttons[0].addActionListener(new LicenseActionListener());
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_About_Security"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_About_Security"));
     buttons[1].addActionListener(new SecurityActionListener());
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Close"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Close"));
     buttons[2].setDefaultCapable(true);
     buttons[2].addActionListener(new OKActionListener());
 
@@ -90,10 +90,10 @@ public class AboutDialog extends GeneralDialog implements VisualsSavable {
 //    panel.add(new JMyLabel(Images.get(ImageNums.LOGO_BANNER_MAIN)), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
 //        GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(0, 0, 5, 0), 0, 0));
 
-    String aboutText = com.CH_gui.lang.Lang.rb.getString("text_CryptoHeaven_software_is_developed");
+    String aboutText = com.CH_cl.lang.Lang.rb.getString("text_CryptoHeaven_software_is_developed");
 
     if (!URLs.get(URLs.SERVICE_SOFTWARE_NAME).startsWith("CryptoHeaven")) {
-      String preAboutText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
+      String preAboutText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("text_Powered_by..."), new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) });
       aboutText = "<p>"+preAboutText+"</p><br>" + aboutText;
     }
 

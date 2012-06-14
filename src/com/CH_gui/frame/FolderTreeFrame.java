@@ -12,16 +12,16 @@
 
 package com.CH_gui.frame;
 
-import java.awt.*;
-
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-
-import com.CH_cl.service.cache.*;
-
 import com.CH_gui.actionGui.JActionFrameClosable;
-import com.CH_gui.tree.*;
+import com.CH_gui.tree.FolderTreeComponent;
+import com.CH_gui.tree.FolderTreeComponent4Frame;
+import java.awt.BorderLayout;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -43,13 +43,13 @@ public class FolderTreeFrame extends JActionFrameClosable {
 
   /** Creates new FolderTreeFrame */
   public FolderTreeFrame(RecordFilter recordFilter) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Folders"), true, true);
+    super(com.CH_cl.lang.Lang.rb.getString("title_Folders"), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeFrame.class, "FolderTreeFrame(FolderFilter folderFilter)");
     if (trace != null) trace.args(recordFilter);
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord[] fRecs = cache.getFolderRecords();
-    FolderPair[] fPairs = CacheUtilities.convertRecordsToPairs(fRecs);
+    FolderPair[] fPairs = CacheFldUtils.convertRecordsToPairs(fRecs);
     FolderTreeComponent mainComponent = new FolderTreeComponent4Frame(true, recordFilter, fPairs, true);
     setMainTreeComponent(mainComponent);
     this.getContentPane().add(mainComponent, BorderLayout.CENTER);

@@ -53,7 +53,7 @@ import javax.swing.*;
  */
 public class InviteByEmailDialog extends GeneralDialog {
 
-  JLabel jInviteHeader = new JMyLabel("<html><body><font size='+1'>"+com.CH_gui.lang.Lang.rb.getString("label_Invite_Your_Friends_and_Associates.")+"</font></body></html>");
+  JLabel jInviteHeader = new JMyLabel("<html><body><font size='+1'>"+com.CH_cl.lang.Lang.rb.getString("label_Invite_Your_Friends_and_Associates.")+"</font></body></html>");
   JLabel jFromLabel = new JMyLabel("<html><body>From:</body></html>");
   //JLabel jToLabel = new JMyLabel("<html><p ALIGN='RIGHT'>To:<br><font size='-2'>(use&nbsp;commas&nbsp;to<br>separate&nbsp;emails)</font></html>");
   JLabel jToLabel = new JMyLabel("<html><body><p ALIGN='RIGHT'>To:</p></body></html>");
@@ -75,7 +75,7 @@ public class InviteByEmailDialog extends GeneralDialog {
 
   /** Creates new InviteByEmailDialog */
   public InviteByEmailDialog(Frame owner, String initialEmails) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Invite_Your_Friends_and_Associates"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Invite_Your_Friends_and_Associates"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InviteByEmailDialog.class, "InviteByEmailDialog(Frame owner, String initialEmails)");
     if (trace != null) trace.args(owner, initialEmails);
     initialize(owner, initialEmails);
@@ -83,7 +83,7 @@ public class InviteByEmailDialog extends GeneralDialog {
   }
   /** Creates new InviteByEmailDialog */
   public InviteByEmailDialog(Dialog owner, String initialEmails) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Invite_Your_Friends_and_Associates"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Invite_Your_Friends_and_Associates"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InviteByEmailDialog.class, "InviteByEmailDialog(Dialog owner, String initialEmails)");
     if (trace != null) trace.args(owner, initialEmails);
     initialize(owner, initialEmails);
@@ -102,14 +102,14 @@ public class InviteByEmailDialog extends GeneralDialog {
   private JButton[] createButtons() {
     JButton[] jButtons = new JButton[2];
 
-    jButtons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Invite"));
+    jButtons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Invite"));
     jButtons[0].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedSend();
       }
     });
 
-    jButtons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    jButtons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     jButtons[1].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -228,7 +228,7 @@ public class InviteByEmailDialog extends GeneralDialog {
           Long myUserId = myUser.userId;
           Long shareId = cache.getFolderShareRecordMy(myUser.contactFolderId, false).shareId;
           BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
-          String contactReason = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
+          String contactReason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
 
           for (int i=0; i<emailAddressesL.size(); i++) {
             String emlAddr = (String) emailAddressesL.get(i);

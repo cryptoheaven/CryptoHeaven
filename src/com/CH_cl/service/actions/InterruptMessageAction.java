@@ -1,38 +1,44 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.actions;
 
-import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
+import com.CH_co.monitor.DefaultProgMonitor;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.ProgMonitorPool;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.NotificationCenter;
+import com.CH_co.util.SingleTokenArbiter;
+import com.CH_co.util.URLs;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.22 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.22 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class InterruptMessageAction extends ClientMessageAction {
 
   // Only one message dialog per interrupted action, issue tokens for the dialogs to 
@@ -48,9 +54,9 @@ public class InterruptMessageAction extends ClientMessageAction {
   }
 
   /** 
-   * The action handler performs all actions related to the received message (reply),
-   * and optionally returns a request Message.  If there is no request, null is returned.
-   */
+  * The action handler performs all actions related to the received message (reply),
+  * and optionally returns a request Message.  If there is no request, null is returned.
+  */
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InterruptMessageAction.class, "runAction()");
 
@@ -64,7 +70,9 @@ public class InterruptMessageAction extends ClientMessageAction {
         // Display 'interrupt' messages only when logged in... skip them when logout is in progress
         if (getServerInterfaceLayer().isLastLoginMsgActionSet()) {
           String title = "Interrupted";
-          String msg = MessageActionNameSwitch.getActionInfoName(actionCode) + " operation was interrupted.";
+          String interruptedSuffix = " operation was interrupted.";
+          String msg = MessageActionNameSwitch.getActionInfoName(actionCode) + interruptedSuffix;
+          Object key = interruptedSuffix; // show 1 interrupted msg at a time, and skip the other
           // if initial login failed, give better help message
           if (!getServerInterfaceLayer().hasPersistantMainWorker() && (actionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || actionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION)) {
             title = "Login failed";
@@ -80,8 +88,8 @@ public class InterruptMessageAction extends ClientMessageAction {
             msg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server" + (server.length() > 0 ? (" at " + server + " on port " + port) : "") + ".  "
                 + "Please verify your computer network and/or modem cables are plugged-in and your computer is currently connected to the Internet.  When you have established and verified your Internet connectivity, please try connecting to "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" again.  "
                 + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
-          } 
-          Integer key = new Integer(actionCode);
+            key = new Integer(actionCode);
+          }
           NotificationCenter.show(singleInterruptedDialogArbiter, key, NotificationCenter.ERROR_MESSAGE, title, msg);
         } else {
           if (trace != null) trace.data(100, "suppress interrupt msg");

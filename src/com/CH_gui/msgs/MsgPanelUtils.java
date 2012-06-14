@@ -12,28 +12,17 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.cache.CacheUtilities;
+import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.engine.DefaultReplyRunner;
-import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.EmailAddressRecord;
-import com.CH_cl.service.records.InternetAddressRecord;
-import com.CH_cl.service.records.NewsAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymCipherBulk;
-import com.CH_co.service.msg.CommandCodes;
-import com.CH_co.service.msg.MessageAction;
-import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
-import com.CH_co.service.msg.dataSets.usr.Usr_UsrHandles_Rp;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
-import com.CH_co.util.HTML_Ops;
-import com.CH_co.util.Hasher;
-import com.CH_co.util.Misc;
+import com.CH_co.util.*;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyHTMLEditor;
@@ -46,7 +35,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultStyledDocument;
@@ -70,214 +62,6 @@ import javax.swing.text.JTextComponent;
 * @version
 */
 public class MsgPanelUtils extends Object {
-
-  //public static String HTML_FONT_START = "<font face='Arial' size='-1'>";
-  //public static final String HTML_FONT_START = "<font face='Arial' size='-1'>";
-  public static final String HTML_FONT_START = "<font face=\"Dialog, Arial\">";
-  public static final String HTML_FONT_END = "</font>";
-
-  public static final String HTML_START = "<html>";
-  public static final String HTML_END = "</html>";
-
-  public static final String HTML_BODY_START = "<body>";
-  public static final String HTML_BODY_END = "</body>";
-
-  /**
-  * @return an acknowledged contact record or user record.
-  */
-  public static Record convertUserIdToFamiliarUser(Long userId, boolean recipientOk, boolean senderOk) {
-    return convertUserIdToFamiliarUser(userId, recipientOk, senderOk, true);
-  }
-  public static Record convertUserIdToFamiliarUser(Long userId, boolean recipientOk, boolean senderOk, boolean includeWebUsers) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "convertUserIdToFamiliarUser(Long userId, boolean recipientOk, boolean senderOk, boolean includeWebUsers)");
-    if (trace != null) trace.args(userId);
-    if (trace != null) trace.args(recipientOk);
-    if (trace != null) trace.args(senderOk);
-    if (trace != null) trace.args(includeWebUsers);
-
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    Long myUserId = cache.getMyUserId();
-    Record familiarUser = null;
-    if (recipientOk) {
-      ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, userId);
-      if (cRec != null && (cRec.isOfActiveTypeAnyState() || cRec.isOfInitiatedType()))
-        familiarUser = cRec;
-    }
-    if (familiarUser == null && senderOk) {
-      ContactRecord cRec = cache.getContactRecordOwnerWith(userId, myUserId);
-      if (cRec != null && cRec.isOfActiveTypeAnyState())
-        familiarUser = cRec;
-    }
-    ContactRecord cRec = (ContactRecord) familiarUser;
-    if (cRec != null && cRec.isOfActiveTypeAnyState()) {
-      // good contact
-    } else if (cRec != null && cRec.ownerUserId.equals(myUserId) && cRec.isOfInitiatedType()) {
-      // Ok, my initiated contact has meaningful name.
-      // Owner check is necessary, because someone elses initiated contact with me doesn't have a meaningful name.
-    } else if (cRec == null ||
-          // or not acknowledged, only acknowledged contacts have meaningful names...
-          (!cRec.isOfActiveType() &&
-          cRec.status != null && cRec.status.shortValue() != ContactRecord.STATUS_DECLINED_ACKNOWLEDGED)
-        )
-    {
-      UserRecord uRec = cache.getUserRecord(userId);
-      if (uRec != null) {
-        if (includeWebUsers || uRec.status == null || !uRec.isWebAccount())
-          familiarUser = uRec;
-      }
-    }
-
-    if (trace != null) trace.exit(MsgPanelUtils.class, familiarUser);
-    return familiarUser;
-  }
-
-
-  /**
-  * Gather all recipients into a String
-  */
-  public static String gatherAllMsgRecipients(Record[][] recipients) {
-    StringBuffer sb = new StringBuffer();
-    for (int i=0; recipients!= null && i<recipients.length; i++) {
-      for (int k=0; recipients[i]!=null && k<recipients[i].length; k++) {
-        if (i == 1) {
-          sb.append(MsgDataRecord.RECIPIENT_COPY);
-        } else if (i == 2) {
-          sb.append(MsgDataRecord.RECIPIENT_COPY_BLIND);
-        }
-        Record rec = recipients[i][k];
-        if (rec instanceof UserRecord) {
-          sb.append(MsgDataRecord.RECIPIENT_USER);
-          sb.append(' ');
-          sb.append(((UserRecord) rec).userId);
-        } else if (rec instanceof ContactRecord) {
-          sb.append(MsgDataRecord.RECIPIENT_USER);
-          sb.append(' ');
-          sb.append(((ContactRecord) rec).contactWithId);
-        } else if (rec instanceof FolderPair) {
-          sb.append(MsgDataRecord.RECIPIENT_BOARD);
-          sb.append(' ');
-          sb.append(((FolderPair) rec).getId());
-        } else if (rec instanceof InternetAddressRecord) {
-          sb.append(MsgDataRecord.RECIPIENT_EMAIL_INTERNET);
-          sb.append(' ');
-          sb.append(Misc.escapeWhiteEncode(((InternetAddressRecord) rec).address));
-        } else if (rec instanceof NewsAddressRecord) {
-          sb.append(MsgDataRecord.RECIPIENT_EMAIL_NEWS);
-          sb.append(' ');
-          sb.append(Misc.escapeWhiteEncode(((NewsAddressRecord) rec).address));
-        } else if (rec instanceof MsgDataRecord && ((MsgDataRecord) rec).isTypeAddress()) {
-          sb.append(MsgDataRecord.RECIPIENT_EMAIL_INTERNET);
-          sb.append(' ');
-          sb.append(Misc.escapeWhiteEncode(((MsgDataRecord) rec).getEmailAddress()));
-        } else {
-          throw new IllegalArgumentException("Don't know how to handle rec from family " + Misc.getPackageName(rec.getClass()) + " and of type " + Misc.getClassNameWithoutPackage(rec.getClass()));
-        }
-        sb.append(' ');
-      }
-    }
-    return sb.toString().trim();
-  }
-
-
-  /**
-  * Gathers all recipients into a Record[]
-  */
-  public static Record[][] gatherAllMsgRecipients(MsgDataRecord dataRecord) {
-    if (dataRecord != null)
-      return gatherAllMsgRecipients(dataRecord.getRecipients());
-    return null;
-  }
-  public static Record[][] gatherAllMsgRecipients(String recipients) {
-    return gatherAllMsgRecipients(recipients, -1);
-  }
-  public static Record[][] gatherAllMsgRecipients(String recipients, int gatherFirst_N_only) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "gatherAllMsgRecipients(String recipients, int gatherFirst_N_only)");
-    if (trace != null) trace.args(recipients);
-    if (trace != null) trace.args(gatherFirst_N_only);
-
-    ArrayList recsLto = new ArrayList();
-    ArrayList recsLcc = new ArrayList();
-    ArrayList recsLbcc = new ArrayList();
-    int countGathered = 0;
-    if (recipients != null && recipients.length() > 0) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      StringTokenizer st = new StringTokenizer(recipients);
-      try { // If recipient list is invalid, skip them all together
-        while (st.hasMoreTokens() && (gatherFirst_N_only == -1 || countGathered <= gatherFirst_N_only)) {
-
-          String type = st.nextToken();
-          char typeChar = type.charAt(0);
-          boolean isCopy = typeChar == MsgDataRecord.RECIPIENT_COPY;
-          boolean isCopyBlind = typeChar == MsgDataRecord.RECIPIENT_COPY_BLIND;
-          if (isCopy || isCopyBlind) {
-            typeChar = type.charAt(1);
-          }
-
-          // depending if TO: or CC: collect to a different set
-          ArrayList recsL = isCopy ? recsLcc : recsLto;
-          recsL = isCopyBlind ? recsLbcc : recsL;
-
-          String sId = st.nextToken();
-          Record rec = null;
-          if (typeChar == MsgDataRecord.RECIPIENT_USER || typeChar == MsgDataRecord.RECIPIENT_BOARD) {
-            Long lId = Long.valueOf(sId);
-            if (typeChar == MsgDataRecord.RECIPIENT_USER) {
-              rec = convertUserIdToFamiliarUser(lId, true, false);
-              if (rec != null) {
-                recsL.add(rec);
-              } else {
-                UserRecord uRec = new UserRecord();
-                uRec.userId = lId;
-                uRec.handle = com.CH_gui.lang.Lang.rb.getString("User");
-                recsL.add(uRec);
-              }
-              countGathered ++;
-            } // end "u"
-            else if (typeChar == MsgDataRecord.RECIPIENT_BOARD) {
-              FolderShareRecord sRec = cache.getFolderShareRecordMy(lId, true);
-              FolderRecord fRec = cache.getFolderRecord(lId);
-              if (sRec != null && fRec != null) {
-                recsL.add(new FolderPair(sRec, fRec));
-              } else {
-                fRec = new FolderRecord();
-                fRec.folderId = lId;
-                fRec.folderType = new Short(FolderRecord.FILE_FOLDER);
-                fRec.numOfShares = new Short((short)1);
-                recsL.add(fRec);
-              }
-              countGathered ++;
-            } // end "b"
-          } else if (typeChar == MsgDataRecord.RECIPIENT_EMAIL_INTERNET) {
-            recsL.add(new EmailAddressRecord(Misc.escapeWhiteDecode(sId)));
-            countGathered ++;
-          } else if (typeChar == MsgDataRecord.RECIPIENT_EMAIL_NEWS) {
-            recsL.add(new NewsAddressRecord(Misc.escapeWhiteDecode(sId)));
-            countGathered ++;
-          }
-        } // end while
-      } catch (Throwable t) {
-        if (trace != null) trace.data(99, "Invalid recipients list, skipping recipients", recipients);
-        if (trace != null) trace.exception(MsgPanelUtils.class, 100, t);
-      }
-    }
-
-    Record[][] recs = new Record[3][];
-    recs[MsgLinkRecord.RECIPIENT_TYPE_TO] = new Record[recsLto.size()];
-    recs[MsgLinkRecord.RECIPIENT_TYPE_CC] = new Record[recsLcc.size()];
-    recs[MsgLinkRecord.RECIPIENT_TYPE_BCC] = new Record[recsLbcc.size()];
-    if (recsLto.size() > 0) {
-      recsLto.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_TO]);
-    }
-    if (recsLcc.size() > 0) {
-      recsLcc.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_CC]);
-    }
-    if (recsLbcc.size() > 0) {
-      recsLbcc.toArray(recs[MsgLinkRecord.RECIPIENT_TYPE_BCC]);
-    }
-
-    if (trace != null) trace.exit(MsgPanelUtils.class, recs);
-    return recs;
-  }
 
 
   /**
@@ -306,7 +90,7 @@ public class MsgPanelUtils extends Object {
       Record[] groups = (Record[]) groupFilter.filterInclude(recipients);
       recipients = groupFilter.filterExclude(recipients);
       // gather group members for the group folders selected
-      Record[] members = getOrFetchFamiliarUsers(groups);
+      Record[] members = UserOps.getOrFetchFamiliarUsers(MainFrame.getServerInterfaceLayer(), groups);
       // add members from selected groups to the list of recipients
       recipients = RecordUtils.concatinate(recipients, members);
     }
@@ -314,58 +98,6 @@ public class MsgPanelUtils extends Object {
     return recipients;
   }
 
-
-  /**
-  * @return converted records into ContactRecords or User records, unwinding Groups as well
-  */
-  public static Record[] getOrFetchFamiliarUsers(Record[] records) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getOrFetchFamiliarUsers(Record[] records)");
-    if (trace != null) trace.args(records);
-
-    Record[] users = null;
-    ArrayList cRecsL = new ArrayList();
-    ArrayList fRecsL = new ArrayList();
-
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    Long userId = cache.getMyUserId();
-    if (records != null && records.length > 0) {
-      for (int i=0; i<records.length; i++) {
-        if (records[i] instanceof ContactRecord) {
-          ContactRecord cRec = (ContactRecord) records[i];
-          if (!cRecsL.contains(cRec) && cRec.ownerUserId.equals(userId) && cRec.isOfActiveType())
-            cRecsL.add(cRec);
-        } else if (records[i] instanceof FolderPair) {
-          FolderPair fPair = (FolderPair) records[i];
-          if (fPair.getFolderRecord().isGroupType()) {
-            if (!fRecsL.contains(fPair))
-              fRecsL.add(fPair);
-          }
-        }
-      }
-    }
-
-    ArrayList usersL = new ArrayList(cRecsL);
-
-    if (fRecsL.size() > 0) {
-      ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_GET_ACCESS_USERS, new Obj_IDList_Co(RecordUtils.getIDs(fRecsL))), 30000);
-      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-      if (msgAction != null && msgAction.getActionCode() == CommandCodes.USR_A_GET_HANDLES) {
-        Usr_UsrHandles_Rp usrSet = (Usr_UsrHandles_Rp) msgAction.getMsgDataSet();
-        UserRecord[] usrRecs = usrSet.userRecords;
-        for (int i=0; i<usrRecs.length; i++) {
-          Record user = MsgPanelUtils.convertUserIdToFamiliarUser(usrRecs[i].userId, true, false);
-          if (!usersL.contains(user))
-            usersL.add(user);
-        }
-      }
-    }
-
-    users = (Record[]) ArrayUtils.toArray(usersL, Record.class);
-
-    if (trace != null) trace.exit(MsgPanelUtils.class, users);
-    return users;
-  }
 
 
   /**
@@ -382,7 +114,7 @@ public class MsgPanelUtils extends Object {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       EmailRecord[] emlRecs = cache.getEmailRecords(cache.getMyUserId());
       if (emlRecs.length > 0) {
-        Record[][] recipients = gatherAllMsgRecipients(originalMsg);
+        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(originalMsg);
         for (int recipientType=0; recipientType<recipients.length; recipientType++) {
           if (recipients[recipientType] != null) {
             for (int i=0; i<recipients[recipientType].length; i++) {
@@ -425,10 +157,10 @@ public class MsgPanelUtils extends Object {
 
     Record[][] recipients = null;
     if (dataRecord != null)
-      recipients = gatherAllMsgRecipients(dataRecord);
+      recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
     drawRecordFlowPanel(recipients,
                         new Boolean[] { Boolean.valueOf(includeTO), Boolean.valueOf(includeCC), Boolean.valueOf(includeBCC) },
-                        includeLabels ? new String[] { com.CH_gui.lang.Lang.rb.getString("label_To"), com.CH_gui.lang.Lang.rb.getString("label_Cc"), com.CH_gui.lang.Lang.rb.getString("label_Bcc") } : null,
+                        includeLabels ? new String[] { com.CH_cl.lang.Lang.rb.getString("label_To"), com.CH_cl.lang.Lang.rb.getString("label_Cc"), com.CH_cl.lang.Lang.rb.getString("label_Bcc") } : null,
                         jRecipients, null, null, maxSize);
     if (trace != null) trace.exit(MsgPanelUtils.class);
   }
@@ -473,7 +205,7 @@ public class MsgPanelUtils extends Object {
               } else {
                 label = new JMyLabel();
               }
-              label.setText(HTML_START + "<b>"+setHeader+"</b>" + HTML_END);
+              label.setText(HTML_utils.HTML_START + "<b>"+setHeader+"</b>" + HTML_utils.HTML_END);
               label.setBorder(new EmptyBorder(2,0,2,5));
               label.setIcon(null);
               label.setIconTextGap(5);
@@ -665,7 +397,7 @@ public class MsgPanelUtils extends Object {
       try {
         if (trace != null) trace.data(15, MsgPanelUtils.class, "try 1");
         if (isHTML)
-          text = HTML_START + HTML_BODY_START + content + HTML_BODY_END + HTML_END;
+          text = HTML_utils.HTML_START + HTML_utils.HTML_BODY_START + content + HTML_utils.HTML_BODY_END + HTML_utils.HTML_END;
         setText(jMessage, text);
         contentSet(text, jMessage);
         if (trace != null) trace.data(16, "setText length", text.length());
@@ -678,7 +410,7 @@ public class MsgPanelUtils extends Object {
       try {
         if (trace != null) trace.data(20, MsgPanelUtils.class, "try 2");
         if (isHTML)
-          text = HTML_START + content + HTML_END;
+          text = HTML_utils.HTML_START + content + HTML_utils.HTML_END;
         setText(jMessage, text);
         contentSet(text, jMessage);
         if (trace != null) trace.data(21, "setText length", text.length());
@@ -688,7 +420,7 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (!displayedOk && isHTML) {
-      text = HTML_START + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>" + content + "</td></tr></table>" + HTML_END;
+      text = HTML_utils.HTML_START + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>" + content + "</td></tr></table>" + HTML_utils.HTML_END;
       try {
         if (trace != null) trace.data(30, MsgPanelUtils.class, "try 3");
         setText(jMessage, text);
@@ -700,7 +432,7 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (!displayedOk && isHTML) {
-      text = HTML_START + "<body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>" + content + "</td></tr></table></body>" + HTML_END;
+      text = HTML_utils.HTML_START + "<body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>" + content + "</td></tr></table></body>" + HTML_utils.HTML_END;
       try {
         if (trace != null) trace.data(40, MsgPanelUtils.class, "try 4");
         setText(jMessage, text);
@@ -715,15 +447,15 @@ public class MsgPanelUtils extends Object {
       //System.out.println("failed content="+content);
       try {
         if (content == null) {
-          String t = com.CH_gui.lang.Lang.rb.getString("msg_Message_Body_could_not_be_fetched.");
+          String t = com.CH_cl.lang.Lang.rb.getString("msg_Message_Body_could_not_be_fetched.");
           setText(jMessage, t);
           //displayedOk = true;
         } else if (isHTML) {
-          String t = com.CH_gui.lang.Lang.rb.getString("msg_This_message_contains_an_invalid_HTML_code_and_cannot_be_displayed...");
+          String t = com.CH_cl.lang.Lang.rb.getString("msg_This_message_contains_an_invalid_HTML_code_and_cannot_be_displayed...");
           setText(jMessage, t);
           //displayedOk = true;
         } else {
-          String t = com.CH_gui.lang.Lang.rb.getString("msg_This_message_contains_invalid_content_and_cannot_be_displayed...");
+          String t = com.CH_cl.lang.Lang.rb.getString("msg_This_message_contains_invalid_content_and_cannot_be_displayed...");
           setText(jMessage, t);
           //displayedOk = true;
         }
@@ -1053,10 +785,10 @@ public class MsgPanelUtils extends Object {
                             boolean isRemoveStyles = false;
                             boolean isRemoveHead = false;
                             boolean isRemoveRemoteLoading = !skipRemoteLoadingCleaning;
-                            
+
                             text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, isRemoveStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
                           }
-                          
+
                           // Eliminate flickering and improve performance by skipping duplicate requests
                           // that maybe caused due to message updates where body remains the same.
                           if (messageViewer != lastMsgViewer || !text.equals(lastText)) {
@@ -1133,7 +865,7 @@ public class MsgPanelUtils extends Object {
       if (encText != null && encText.size() > 0 && msgDataRecord.getTextBody() == null) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         cache.addMsgBodyKey(matchingSet);
-        CacheUtilities.unlockPassProtectedMsg(msgDataRecord, matchingSet);
+        CacheMsgUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
       }
     }
   }

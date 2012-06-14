@@ -56,12 +56,12 @@ public class CustomizeColumnsDialog extends GeneralDialog implements VisualsSava
 
   /** Creates new CustomizeColumnsDialog */
   public CustomizeColumnsDialog(Frame parent, ColumnHeaderData columnHeaderData) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Choose_Columns"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Choose_Columns"));
     init(parent, columnHeaderData);
   }
   /** Creates new CustomizeColumnsDialog */
   public CustomizeColumnsDialog(Dialog parent, ColumnHeaderData columnHeaderData) {
-    super(parent, com.CH_gui.lang.Lang.rb.getString("title_Choose_Columns"));
+    super(parent, com.CH_cl.lang.Lang.rb.getString("title_Choose_Columns"));
     init(parent, columnHeaderData);
   }
   private void init(Component parent, ColumnHeaderData columnHeaderData) {
@@ -121,11 +121,11 @@ public class CustomizeColumnsDialog extends GeneralDialog implements VisualsSava
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[2];
 
-    buttons[0] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     buttons[0].setDefaultCapable(true);
     buttons[0].addActionListener(new OKActionListener());
 
-    buttons[1] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[1].addActionListener(new CancelActionListener());
 
     return buttons;

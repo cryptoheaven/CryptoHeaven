@@ -12,23 +12,26 @@
 
 package com.CH_gui.fileTable;
 
-import com.CH_co.trace.Trace;
-import com.CH_co.service.records.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.UploadUtilities;
 import com.CH_cl.service.records.filters.FileFilter;
-
-import com.CH_gui.frame.*;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
-
-import java.awt.*;
+import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.frame.MessageFrame;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableModel;
+import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import javax.swing.ListSelectionModel;
 
 /** 
@@ -172,14 +175,14 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
         FileDND_TransferableData fileRecs = (FileDND_TransferableData) tr.getTransferData(FileDND_Transferable.FILE_RECORD_FLAVOR);
         event.acceptDrop(DnDConstants.ACTION_MOVE);
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        FolderPair moveToPair = CacheUtilities.convertRecordToPair(uploadShareRec);
+        FolderPair moveToPair = CacheFldUtils.convertRecordToPair(uploadShareRec);
         FileLinkRecord[] fLinks = null;
         if (fileRecs.fileRecordIDs[2] != null)
           fLinks = cache.getFileLinkRecords(fileRecs.fileRecordIDs[2]);
         else 
           fLinks = cache.getFileLinkRecords(fileRecs.fileRecordIDs[1]);
         FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
-        fileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheUtilities.convertRecordsToPairs(cache.getFolderRecords(fileRecs.fileRecordIDs[0])));
+        fileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(fileRecs.fileRecordIDs[0])));
         event.getDropTargetContext().dropComplete(true);
       }
 

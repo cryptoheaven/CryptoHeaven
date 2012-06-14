@@ -79,7 +79,7 @@ public class FolderAttributesPanel extends JPanel {
 
   private void initComponents(FolderRecord initialDataRecord, boolean isEditable) {
     jNumToKeepCheck = new JMyCheckBox();
-    jNumToKeepLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Automatically_purge_oldest_records..."));
+    jNumToKeepLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Automatically_purge_oldest_records..."));
     jNumToKeep = new JMyTextField("", 4);
     jNumToKeep.setEditable(isEditable);
     jNumToKeep.setMinimumSize(new Dimension(55, 18));
@@ -89,7 +89,7 @@ public class FolderAttributesPanel extends JPanel {
       }
     });
     jKeepAsOldAsCheck = new JMyCheckBox();
-    jKeepAsOldAsLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Automatically_purge_records_which_are_older_than"));
+    jKeepAsOldAsLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Automatically_purge_records_which_are_older_than"));
     jKeepAsOldAs = new JMyTextField("", 4);
     jKeepAsOldAs.setEditable(isEditable);
     jKeepAsOldAs.setMinimumSize(new Dimension(55, 18));
@@ -98,7 +98,7 @@ public class FolderAttributesPanel extends JPanel {
         keepAsOldAsUsed = true;
       }
     });
-    jKeepAsOldAsCombo = new JMyComboBox(new String[] {com.CH_gui.lang.Lang.rb.getString("seconds"), com.CH_gui.lang.Lang.rb.getString("minutes"), com.CH_gui.lang.Lang.rb.getString("hours"), com.CH_gui.lang.Lang.rb.getString("days"), com.CH_gui.lang.Lang.rb.getString("weeks")});
+    jKeepAsOldAsCombo = new JMyComboBox(new String[] {com.CH_cl.lang.Lang.rb.getString("seconds"), com.CH_cl.lang.Lang.rb.getString("minutes"), com.CH_cl.lang.Lang.rb.getString("hours"), com.CH_cl.lang.Lang.rb.getString("days"), com.CH_cl.lang.Lang.rb.getString("weeks")});
     // combo editable is always false, but selecting values 'editing' is controlled by 'setEnabled()'
     jKeepAsOldAsCombo.setEditable(false);
     jKeepAsOldAsCombo.setEnabled(isEditable);
@@ -131,13 +131,13 @@ public class FolderAttributesPanel extends JPanel {
     jNumToKeep.addKeyListener(new KeyAdapter() {
       public void keyReleased(KeyEvent e) {
         if (getNumToKeep() == null)
-          MessageDialog.showErrorDialog(SwingUtilities.windowForComponent(FolderAttributesPanel.this), com.CH_gui.lang.Lang.rb.getString("msg_Invalid_value_specified.__Please_enter_an_integer_value_in_the_range_[0_-_32,767]."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Value"));
+          MessageDialog.showErrorDialog(SwingUtilities.windowForComponent(FolderAttributesPanel.this), com.CH_cl.lang.Lang.rb.getString("msg_Invalid_value_specified.__Please_enter_an_integer_value_in_the_range_[0_-_32,767]."), com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Value"));
       }
     });
     jKeepAsOldAs.addKeyListener(new KeyAdapter() {
       public void keyReleased(KeyEvent e) {
         if (getKeepAsOldAs() == null)
-          MessageDialog.showErrorDialog(SwingUtilities.windowForComponent(FolderAttributesPanel.this), com.CH_gui.lang.Lang.rb.getString("msg_Invalid_value_specified.__Value_specified_must_be_an_integer_in_the_range_of_[0_-_2,147,483,647]_seconds."), com.CH_gui.lang.Lang.rb.getString("msgTitle_Invalid_Value"));
+          MessageDialog.showErrorDialog(SwingUtilities.windowForComponent(FolderAttributesPanel.this), com.CH_cl.lang.Lang.rb.getString("msg_Invalid_value_specified.__Value_specified_must_be_an_integer_in_the_range_of_[0_-_2,147,483,647]_seconds."), com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_Value"));
       }
     });
 

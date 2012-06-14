@@ -1,64 +1,79 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.file.File_MoveCopy_Rq;
+import com.CH_co.service.msg.dataSets.msg.Msg_MoveCopy_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.fileTable.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.msgTable.*;
-import com.CH_gui.service.records.*;
-import com.CH_gui.util.*;
-
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.fileTable.FileDND_DragSourceListener;
+import com.CH_gui.fileTable.FileDND_Transferable;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.frame.MsgPreviewFrame;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListComparator;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.msgTable.MsgDND_DragSourceListener;
+import com.CH_gui.msgTable.MsgDND_Transferable;
+import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.util.FileChooser;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
 import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Arrays;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.31 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.31 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureListener {
 
 
@@ -96,7 +111,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   private static final String PROPERTY_NAME__MSG_DEST_FOLDER = "SaveAttachmentsDialog_msgDestinationFolder";
   private static final String PROPERTY_NAME__FILE_DEST_FOLDER = "SaveAttachmentsDialog_fileDestinationFolder";
 
-  private static final String FETCHING_ATTACHMENTS = com.CH_gui.lang.Lang.rb.getString("Fetching_Attachments...");
+  private static final String FETCHING_ATTACHMENTS = com.CH_cl.lang.Lang.rb.getString("Fetching_Attachments...");
 
   private MsgLinkListener msgLinkListener;
   private FileLinkListener fileLinkListener;
@@ -104,33 +119,33 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
 
   /**
-   * Creates new SaveAttachmentsDialog.
-   * Displays the specified attachments.
-   * If attachments array is null or empty, the attachments are fetched from
-   * specified message parents.
-   */
+  * Creates new SaveAttachmentsDialog.
+  * Displays the specified attachments.
+  * If attachments array is null or empty, the attachments are fetched from
+  * specified message parents.
+  */
   public SaveAttachmentsDialog(Frame owner, Record[] attachments, MsgLinkRecord[] fromMsgLinkRecords) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, attachments, fromMsgLinkRecords);
   }
   /** Creates new SaveAttachmentsDialog */
   public SaveAttachmentsDialog(Dialog owner, Record[] attachments, MsgLinkRecord[] fromMsgLinkRecords) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, attachments, fromMsgLinkRecords);
   }
 
   /**
-   * Creates new SaveAttachmentsDialog.
-   * The attachments array is null and the attachments are fetched from
-   * specified message parents.
-   */
+  * Creates new SaveAttachmentsDialog.
+  * The attachments array is null and the attachments are fetched from
+  * specified message parents.
+  */
   public SaveAttachmentsDialog(Frame owner, MsgLinkRecord[] msgLinksToFetchAttachmentsFrom) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, null, msgLinksToFetchAttachmentsFrom);
   }
   /** Creates new SaveAttachmentsDialog */
   public SaveAttachmentsDialog(Dialog owner, MsgLinkRecord[] msgLinksToFetchAttachmentsFrom) {
-    super(owner, com.CH_gui.lang.Lang.rb.getString("title_Attachments"));
+    super(owner, com.CH_cl.lang.Lang.rb.getString("title_Attachments"));
     constructDialog(owner, null, msgLinksToFetchAttachmentsFrom);
   }
 
@@ -188,32 +203,32 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     jLocalFileDestination = new JMyLabel(localFileDestination.getAbsolutePath());
     jLocalFileDestination.setIcon(Images.get(ImageNums.FLD_CLOSED16));
 
-    jMsgLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Copy_Messages_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
-    jFileLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Copy_Files_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
-    jLocalFileLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Download_to"), Images.get(ImageNums.IMPORT_FILE16), JLabel.LEADING);
+    jMsgLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Copy_Messages_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
+    jFileLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Copy_Files_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
+    jLocalFileLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Download_to"), Images.get(ImageNums.IMPORT_FILE16), JLabel.LEADING);
 
-    jMsgBrowse = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Browse_..."));
+    jMsgBrowse = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Browse_..."));
     jMsgBrowse.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedMsgBrowse();
       }
     });
 
-    jFileBrowse = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Browse_..."));
+    jFileBrowse = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Browse_..."));
     jFileBrowse.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedFileBrowse();
       }
     });
 
-    jLocalFileBorwse = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Browse_..."));
+    jLocalFileBorwse = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Browse_..."));
     jLocalFileBorwse.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedLocalFileBrowse();
       }
     });
 
-    jCopy = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Copy"));
+    jCopy = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Copy"));
     jCopy.setIcon(Images.get(ImageNums.COPY16));
     jCopy.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -221,7 +236,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       }
     });
 
-    jOpen = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Open"));
+    jOpen = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Open"));
     jOpen.setIcon(Images.get(ImageNums.CLONE16));
     jOpen.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -229,7 +244,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       }
     });
 
-    jDownload = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Download"));
+    jDownload = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Download"));
     jDownload.setIcon(Images.get(ImageNums.IMPORT_FILE16));
     jDownload.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -272,8 +287,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   }
 
   /**
-   * @return the dialog 'Search' and 'Cancel' buttons
-   */
+  * @return the dialog 'Search' and 'Cancel' buttons
+  */
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[4];
 
@@ -281,7 +296,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     buttons[1] = jOpen;
     buttons[2] = jDownload;
 
-    buttons[3] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[3] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[3].addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedCancel();
@@ -299,7 +314,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     panel.setLayout(new GridBagLayout());
     int posY = 0;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Select_Attachments")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Select_Attachments")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -350,8 +365,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
 
   /**
-   * Set button enablement as appropriate.
-   */
+  * Set button enablement as appropriate.
+  */
   private void setEnabledButtons() {
 
     Object[] selections = jList.getSelectedValues();
@@ -408,9 +423,9 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 //    File destDir = new File(fd.getDirectory());
 
     FileChooser fileChooser = FileChooser.makeNew(this, true, localFileDestination,
-      com.CH_gui.lang.Lang.rb.getString("title_Select_Download_Destination"),
-      com.CH_gui.lang.Lang.rb.getString("button_Select"), new Character('S'),
-      com.CH_gui.lang.Lang.rb.getString("actionTip_Approve_the_current_directory_selection."));
+      com.CH_cl.lang.Lang.rb.getString("title_Select_Download_Destination"),
+      com.CH_cl.lang.Lang.rb.getString("button_Select"), new Character('S'),
+      com.CH_cl.lang.Lang.rb.getString("actionTip_Approve_the_current_directory_selection."));
     File destDir = fileChooser.getSelectedDir();
 
     if (destDir != null && destDir.isDirectory()) {
@@ -529,8 +544,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
   }
 
   /**
-   * Overwrite closeDialog to remove listeners on the cache.
-   */
+  * Overwrite closeDialog to remove listeners on the cache.
+  */
   public void closeDialog() {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (msgLinkListener != null)
@@ -544,8 +559,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
 
   /**
-   * Show a Copy dialog and get the chosen destination FolderPair.
-   */
+  * Show a Copy dialog and get the chosen destination FolderPair.
+  */
   private FolderPair getCopyDestination(FolderFilter filter, FolderPair selectedFolder) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SaveAttachmentsDialog.class, "getCopyDestination(filter, selectedFolder)");
     if (trace != null) trace.args(filter, selectedFolder);
@@ -553,7 +568,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheUtilities.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
     allFolderPairs = (FolderPair[]) FolderFilter.MOVE_FOLDER.filterInclude(allFolderPairs);
 
     // An invalid destinations are filtered out
@@ -562,7 +577,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     // Since we are moving messages/postings only, not folders, descendant destination folders are always ok.
     boolean isDescendantOk = true;
 
-    String title = com.CH_gui.lang.Lang.rb.getString("title_Copy_to_Folder");
+    String title = com.CH_cl.lang.Lang.rb.getString("title_Copy_to_Folder");
 
     Move_NewFld_Dialog d = new Move_NewFld_Dialog(this, allFolderPairs, forbidenPairs, selectedFolder, title, isDescendantOk, cache, filter);
 
@@ -577,8 +592,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
 
   /**
-   * Send a request to fetch msg link attachments and file link attachments.
-   */
+  * Send a request to fetch msg link attachments and file link attachments.
+  */
   private void sendFetchAttachmentsRequest(MsgLinkRecord[] parentMsgLinks) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SaveAttachmentsDialog.class, "sendFetchAttachmentsRequest(MsgLinkRecord[] parentMsgLinks)");
     if (trace != null) trace.args(parentMsgLinks);
@@ -717,8 +732,8 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
 
 
   /****************************************************************
-   * D R A G   G E S T U R E   L I S T E N E R   i n t e r f a c e
-   ***************************************************************/
+  * D R A G   G E S T U R E   L I S T E N E R   i n t e r f a c e
+  ***************************************************************/
   public void dragGestureRecognized(DragGestureEvent event) {
     Object[] selections = jList.getSelectedValues();
     MsgLinkRecord[] mLinks = (MsgLinkRecord[]) ArrayUtils.gatherAllOfType(selections, MsgLinkRecord.class);

@@ -58,7 +58,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
   public boolean isChangingMyUserRecord;
 
-  private static String FETCHING_DATA = com.CH_gui.lang.Lang.rb.getString("Fetching_Data...");
+  private static String FETCHING_DATA = com.CH_cl.lang.Lang.rb.getString("Fetching_Data...");
 
   /** Creates new AccountOptionsQuotasPanel */
   public AccountOptionsQuotasPanel(ChangeListener checkBoxListener, UserRecord[] userRecords, boolean isMyUserRec, boolean includePricingInfo) {
@@ -83,7 +83,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
     int posY = 0;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Creation_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Creation_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(Misc.getFormattedTimestamp(userRecord.dateCreated)), new GridBagConstraints(1, posY, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -92,17 +92,17 @@ public class AccountOptionsQuotasPanel extends JPanel {
     if ((userRecord.isFreePromoAccount() || userRecord.isGuestAccount()) && System.currentTimeMillis() < userRecord.dateCreated.getTime() + 2L*7L*24L*60L*60L*1000L) {
       // skip displaying expiry date in the 1st 2 weeks of free accounts...
     } else {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Expiry_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Expiry_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       Timestamp now = new Timestamp(System.currentTimeMillis());
       String expDate = Misc.getFormattedTimestamp(userRecord.dateExpired);
       if (now.compareTo(userRecord.dateExpired) > 0)
-        expDate += "   " + com.CH_gui.lang.Lang.rb.getString("(Expired)");
+        expDate += "   " + com.CH_cl.lang.Lang.rb.getString("(Expired)");
       else {
         long moreMillis = userRecord.dateExpired.getTime() - now.getTime();
         long moreDays = moreMillis / 1000 / 60 / 60 / 24;
         moreDays = Math.max(moreDays, 0);
-        expDate += "   " + java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("(###_days)"), new Object[] {new Long(moreDays)});
+        expDate += "   " + java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("(###_days)"), new Object[] {new Long(moreDays)});
       }
       panel.add(new JMyLabel(expDate), new GridBagConstraints(1, posY, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -115,7 +115,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Storage_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Storage_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     String storageLimit = "Unlimited";
     if (userRecord.storageLimit != null && userRecord.storageLimit.longValue() != UserRecord.UNLIMITED_AMOUNT)
@@ -131,7 +131,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Storage_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Storage_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jStorageUsed = new JMyLabel(FETCHING_DATA);
     panel.add(jStorageUsed, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -139,7 +139,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
     posY ++;
 
     if (!userRecord.isCapableToManageUserAccounts()) {
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Calculated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Calculated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
       jStorageCalcDate = new JMyLabel(FETCHING_DATA);
       panel.add(jStorageCalcDate, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -155,7 +155,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Bandwidth_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Bandwidth_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     String bandwidthLimit = "Unlimited";
     if (userRecord.transferLimit != null && userRecord.transferLimit.longValue() != UserRecord.UNLIMITED_AMOUNT)
@@ -172,7 +172,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Bandwidth_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Bandwidth_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jBandwidthUsed = new JMyLabel(FETCHING_DATA);
     panel.add(jBandwidthUsed, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -187,7 +187,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_Accounts_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_Accounts_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       JLabel jAccountsLimit = new JMyLabel();
       if (userRecord.maxSubAccounts.shortValue() == UserRecord.UNLIMITED_AMOUNT)
@@ -200,7 +200,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
-      panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_User_Accounts_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_Accounts_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       jAccountsUsed = new JMyLabel(FETCHING_DATA);
       panel.add(jAccountsUsed, new GridBagConstraints(1, posY, 1, 1, 10, 0,
@@ -210,13 +210,13 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
     if (includePricingInfo) {
       // seperator
-      panel.add(AccountOptionsSignaturesPanel.makeDivider(com.CH_gui.lang.Lang.rb.getString("tab_Pricing")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+      panel.add(AccountOptionsSignaturesPanel.makeDivider(com.CH_cl.lang.Lang.rb.getString("tab_Pricing")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
       Long userId = userRecord.userId;
       String link = "<i><a href=\""+URLs.get(URLs.SIGNUP_PAGE)+"?UserID="+userId+"\">"+URLs.get(URLs.SIGNUP_PAGE)+"</a></i>";
-      String pricingHtmlText = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("text_Various_accounts_are_available"), new Object[] { link });
+      String pricingHtmlText = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("text_Various_accounts_are_available"), new Object[] { link });
 
       HTML_ClickablePane jPane = new HTML_ClickablePane(pricingHtmlText);
       jPane.setCaretPosition(0);
@@ -244,14 +244,14 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
     int posY = 0;
 
-    jIncludeChangesToQuotas = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
+    jIncludeChangesToQuotas = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Include_the_following_settings_in_this_update"));
     jIncludeChangesToQuotas.setFont(jIncludeChangesToQuotas.getFont().deriveFont(Font.BOLD));
     jIncludeChangesToQuotas.addChangeListener(checkBoxListener);
     panel.add(jIncludeChangesToQuotas, new GridBagConstraints(0, posY, 2, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Storage_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Storage_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     String storageLimit = "Unlimited";
     Long commonStorageLimit = getCommonStorageLimit(userRecs);
@@ -262,7 +262,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Bandwidth_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Bandwidth_Limit")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     String bandwidthLimit = "Unlimited";
     Long commonBandwidthLimit = getCommonBandwidthLimit(userRecs);

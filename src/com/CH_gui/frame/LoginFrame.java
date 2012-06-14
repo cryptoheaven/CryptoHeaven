@@ -93,7 +93,7 @@ public class LoginFrame extends JFrame {
   private static final String PROPERTY_USER_NAME_LIST = "LastUserNameList";
   private static final String PROPERTY_SERVER_LIST = "ServerList";
   private static final String PROPERTY_REMEMBER_USER_NAME = "RememberUserName";
-  private static final String DEFAULT_USER_NAME = com.CH_gui.lang.Lang.rb.getString("Username");
+  private static final String DEFAULT_USER_NAME = com.CH_cl.lang.Lang.rb.getString("Username");
 
   public static final String MODE_LOGIN = "login";
   public static final String MODE_SIGNUP = "signup";
@@ -175,11 +175,11 @@ public class LoginFrame extends JFrame {
   private int usedCertainty = -1;
 
   // Error messages
-  public static final String RETYPE_PASSWORD_ERROR = com.CH_gui.lang.Lang.rb.getString("msg_Re-typed_Password_does_not_match...");
-  private static final String EMAIL_NULL = com.CH_gui.lang.Lang.rb.getString("msg_Proceed_without_Email_address...");
+  public static final String RETYPE_PASSWORD_ERROR = com.CH_cl.lang.Lang.rb.getString("msg_Re-typed_Password_does_not_match...");
+  private static final String EMAIL_NULL = com.CH_cl.lang.Lang.rb.getString("msg_Proceed_without_Email_address...");
 
-  private static String OK_BUTTON_LOGIN_MODE = com.CH_gui.lang.Lang.rb.getString("button_Login");
-  private static String OK_BUTTON_NEW_ACCOUNT_MODE = com.CH_gui.lang.Lang.rb.getString("button_Create");
+  private static String OK_BUTTON_LOGIN_MODE = com.CH_cl.lang.Lang.rb.getString("button_Login");
+  private static String OK_BUTTON_NEW_ACCOUNT_MODE = com.CH_cl.lang.Lang.rb.getString("button_Create");
   private TypeAheadPopupList typeAheadPopupList;
 
   private JWindow keyGenSplash = null;
@@ -198,7 +198,7 @@ public class LoginFrame extends JFrame {
 
   /** Creates new LoginFrame */
   public LoginFrame(LoginCoordinatorI loginCoordinator, Window splashWindow) {
-    super(com.CH_gui.lang.Lang.rb.getString("title_Login_Window"));
+    super(com.CH_cl.lang.Lang.rb.getString("title_Login_Window"));
 
     if (KeyRecord.DEBUG__ALLOW_SHORT_KEYS) {
       keyLength = KeyRecord.DEBUG__SHORTEST_KEY;
@@ -345,15 +345,15 @@ public class LoginFrame extends JFrame {
   private void changeModeToLogin() {
 
     isNewAccountDialog = false;
-    setTitle(com.CH_gui.lang.Lang.rb.getString("title_Login_Dialog"));
+    setTitle(com.CH_cl.lang.Lang.rb.getString("title_Login_Dialog"));
 //    switchModeLink.setText("Sign up for a new account");
     userName.selectAll();
     userName.requestFocusInWindow();
-    passwordLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Password"));
+    passwordLabel.setText(com.CH_cl.lang.Lang.rb.getString("label_Password"));
     recoveryLabel.setText("Forgot your password?");
     recoveryLabel.setVisible(true);
     if (switchModeButton != null) {
-      switchModeButton.setText(com.CH_gui.lang.Lang.rb.getString("button_New_Account"));
+      switchModeButton.setText(com.CH_cl.lang.Lang.rb.getString("button_New_Account"));
       switchModeButton.setEnabled(isNewAccountOptionEnabled);
     }
     okButton.setText(OK_BUTTON_LOGIN_MODE);
@@ -411,23 +411,23 @@ public class LoginFrame extends JFrame {
     if (passwordConditionLabel == null)
       passwordConditionLabel = getPasswordHint();
     if (reTypeLabel == null)
-      reTypeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Re-type_Password"));
+      reTypeLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Re-type_Password"));
     if (retypePassword == null) {
-      retypePassword = new JMyPasswordKeyboardField(com.CH_gui.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."));
+      retypePassword = new JMyPasswordKeyboardField(com.CH_cl.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."));
     }
     if (currentEmailLabel == null)
-      currentEmailLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Current_Email_Address"));
+      currentEmailLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Current_Email_Address"));
     if (currentEmail == null)
       currentEmail = new JMyTextField(defaultSignupEmail);
     if (advancedLabel == null)
-      advancedLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Advanced_Options"));
+      advancedLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Advanced_Options"));
     if (advancedButton == null) {
-      advancedButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Customize..."));
+      advancedButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Customize..."));
       advancedButton.addActionListener(new AdvancedListener());
     }
     if (accountCodeLabel == null) {
       try {
-        accountCodeLabel = new JMyLinkLikeLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code"), 0);
+        accountCodeLabel = new JMyLinkLikeLabel(com.CH_cl.lang.Lang.rb.getString("label_Activation_Code"), 0);
         accountCodeLabel.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent event) {
             try {
@@ -437,7 +437,7 @@ public class LoginFrame extends JFrame {
           }
         });
       } catch (Throwable t) {
-        accountCodeLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Activation_Code"));
+        accountCodeLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Activation_Code"));
       }
     }
     if (accountCode == null) {
@@ -446,12 +446,12 @@ public class LoginFrame extends JFrame {
       accountCode.setText(URLs.get(URLs.ACTIVATION_CODE_DEFAULT));
     }
     if (expectedTime == null)
-      expectedTime = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately"));
+      expectedTime = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately"));
 
     if (licenseConditionLabel == null)
-      licenseConditionLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Please_read_and_indicate_your_acceptance_of_the_License_Agreement..."));
+      licenseConditionLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Please_read_and_indicate_your_acceptance_of_the_License_Agreement..."));
     if (licenseButton == null) {
-      licenseButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Read_License_Agreement"));
+      licenseButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Read_License_Agreement"));
       licenseButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
           new LicenseDialog(LoginFrame.this);
@@ -459,7 +459,7 @@ public class LoginFrame extends JFrame {
       });
     }
     if (licenseCheck == null) {
-      licenseCheck = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_I_Accept"), false);
+      licenseCheck = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_I_Accept"), false);
       licenseCheck.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent event) {
           // Always enable the ok Button, check for validity of input alter its pressed.
@@ -469,17 +469,17 @@ public class LoginFrame extends JFrame {
     }
 
     isNewAccountDialog = true;
-    setTitle(com.CH_gui.lang.Lang.rb.getString("title_Create_New_Account"));
+    setTitle(com.CH_cl.lang.Lang.rb.getString("title_Create_New_Account"));
 //    switchModeLink.setText("Sign in to an existing account");
     userName.selectAll();
     userName.requestFocusInWindow();
-    passwordLabel.setText(com.CH_gui.lang.Lang.rb.getString("label_Unique_Password"));
+    passwordLabel.setText(com.CH_cl.lang.Lang.rb.getString("label_Unique_Password"));
     recoveryLabel.setText("To setup optional Password Recovery settings click here.");
     recoveryLabel.setVisible(false);
     retypePassword.setText("");
     licenseCheck.setSelected(false);
     if (switchModeButton != null) {
-      switchModeButton.setText(com.CH_gui.lang.Lang.rb.getString("button_Switch_to_Login"));
+      switchModeButton.setText(com.CH_cl.lang.Lang.rb.getString("button_Switch_to_Login"));
       switchModeButton.setEnabled(true);
     }
 
@@ -564,9 +564,9 @@ public class LoginFrame extends JFrame {
       public void runTraced() {
         synchronized (estimateMonitor) {
           if (estimatedTime == null) {
-            expectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
+            expectedTime.setText(com.CH_cl.lang.Lang.rb.getString("label_Estimating_Key_Generation_time..."));
             int expecTime = estimateKeyGenerationTimeNow(keyLength, certainty)+1;
-            expectedTime.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] {new Integer(expecTime)}));
+            expectedTime.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("label_Key_Generation_will_take_approximately_###_seconds."), new Object[] {new Integer(expecTime)}));
             estimatedTime = new Integer(expecTime);
           }
         }
@@ -590,9 +590,9 @@ public class LoginFrame extends JFrame {
     if (ENABLE_PASSWORD_LENGTH_NOTE && ENABLE_PASSWORD_NON_RECOVERY_WARNING)
       throw new IllegalStateException("Please use one warning note only!");
     if (ENABLE_PASSWORD_LENGTH_NOTE) {
-      warningLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password_length_recommendation..."));
+      warningLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Password_length_recommendation..."));
     } else if (ENABLE_PASSWORD_NON_RECOVERY_WARNING) {
-      warningLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password_non-recovery_warning..."));
+      warningLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Password_non-recovery_warning..."));
     }
     if (warningLabel != null) {
       warningLabel.setIcon(Images.get(ImageNums.SHIELD32));
@@ -874,7 +874,7 @@ public class LoginFrame extends JFrame {
       }
     }, true);
     userName.addKeyListener(typeAheadPopupList);
-    password = new JMyPasswordKeyboardField(com.CH_gui.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."), defaultPassword);
+    password = new JMyPasswordKeyboardField(com.CH_cl.lang.Lang.rb.getString("actionTip_Use_Virtual_Keyboard_for_key-less_entry."), defaultPassword);
     try {
       boolean capsLockState = getToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
       capsLockWarning = new JMyLabel("Caps Lock is ON");
@@ -903,7 +903,7 @@ public class LoginFrame extends JFrame {
 //    });
 
     // new account stuff
-    passwordLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Password"));
+    passwordLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Password"));
     recoveryLabel = new JMyLinkLikeLabel("Forgot your password?", -1);
     recoveryLabel.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent event) {
@@ -922,7 +922,7 @@ public class LoginFrame extends JFrame {
         LoginFrame.this.pack();
       }
     });
-    serverLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Server"));
+    serverLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Server"));
     serverCombo = new JMyComboBox();
     serverCombo.setEditable(true);
     proxySettingsLabel = new JMyLinkLikeLabel("Proxy", -1);
@@ -964,10 +964,10 @@ public class LoginFrame extends JFrame {
       //public void actionPerformed(ActionEvent event) {
         //jSocksProxyUsed = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Socks"), socksProxyUsed != null ? socksProxyUsed.booleanValue() : false);
         //jHttpProxyUsed = new JMyCheckBox(com.CH_gui.lang.Lang.rb.getString("check_Http"), httpProxyUsed != null ? httpProxyUsed.booleanValue() : false);
-        jSocksProxyUsed = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("check_Socks"));
+        jSocksProxyUsed = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("check_Socks"));
         jSocksProxyAddress = new JMyTextField(socksProxyAddress != null ? socksProxyAddress : "", 20);
         jSocksProxyPort = new JMyTextField(socksProxyPort != null ? socksProxyPort.toString() : "", 5);
-        jHttpProxyUsed = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("check_Http"));
+        jHttpProxyUsed = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("check_Http"));
         jHttpProxyAddress = new JMyTextField(httpProxyAddress != null ? httpProxyAddress : "", 20);
         jHttpProxyPort = new JMyTextField(httpProxyPort != null ? httpProxyPort.toString() : "", 5);
         jProxyAuthentication = new JMyCheckBox("Use Proxy Authentication", proxyAuthentication != null ? proxyAuthentication.booleanValue() : false);
@@ -1006,7 +1006,7 @@ public class LoginFrame extends JFrame {
 
         int posY = 0;
 
-        panel.add(com.CH_gui.usrs.AccountOptionsSignaturesPanel.makeDivider(com.CH_gui.lang.Lang.rb.getString("title_Proxy_server")), new GridBagConstraints(0, posY, 4, 1, 0, 0,
+        panel.add(com.CH_gui.usrs.AccountOptionsSignaturesPanel.makeDivider(com.CH_cl.lang.Lang.rb.getString("title_Proxy_server")), new GridBagConstraints(0, posY, 4, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         posY ++;
 
@@ -1014,13 +1014,13 @@ public class LoginFrame extends JFrame {
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
         posY ++;
 
-        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Server_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+        panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Server_Type")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 25, 2, 5), 0, 0));
-        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Proxy_address_to_use")), new GridBagConstraints(1, posY, 1, 1, 10, 0,
+        panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Proxy_address_to_use")), new GridBagConstraints(1, posY, 1, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
         panel.add(new JMyLabel(), new GridBagConstraints(2, posY, 1, 1, 0, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-        panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Port")), new GridBagConstraints(3, posY, 1, 1, 5, 0,
+        panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Port")), new GridBagConstraints(3, posY, 1, 1, 5, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 2, 5), 0, 0));
         posY ++;
 
@@ -1064,9 +1064,9 @@ public class LoginFrame extends JFrame {
         posY ++;
 
 
-        JButton[] buttons = new JButton[] { new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK")) };
+        JButton[] buttons = new JButton[] { new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK")) };
 
-        final GeneralDialog dialog = new GeneralDialog(LoginFrame.this, com.CH_gui.lang.Lang.rb.getString("title_Proxy_Configuration"), buttons, 0, panel);
+        final GeneralDialog dialog = new GeneralDialog(LoginFrame.this, com.CH_cl.lang.Lang.rb.getString("title_Proxy_Configuration"), buttons, 0, panel);
         buttons[0].addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent event) {
             try {
@@ -1136,7 +1136,7 @@ public class LoginFrame extends JFrame {
 //    newEmail = new JMyTextComboBox("", new String[] { "@"+URLs.get(URLs.DOMAIN_MAIL) });
 //    newEmail.setEditable(true);
 
-    String rememberStr = com.CH_gui.lang.Lang.rb.getString("check_Remember_my_Username_on_this_computer.");
+    String rememberStr = com.CH_cl.lang.Lang.rb.getString("check_Remember_my_Username_on_this_computer.");
     rememberUserName = new JMyCheckBox(rememberStr, defaultRememberUserName);
 
     versionLabel = new JMyLabel(GlobalProperties.PROGRAM_VERSION_STR);// + " b" + GlobalProperties.PROGRAM_BUILD_NUMBER);
@@ -1179,7 +1179,7 @@ public class LoginFrame extends JFrame {
 //    mainPanel.add(switchModeLink, new GridBagConstraints(1, 0, 4, 1, 10, 0, 
 //        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jUsernameLabel = new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Username"));
+    jUsernameLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Username"));
     panel.add(jUsernameLabel, new GridBagConstraints(1, 1, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 5, 5, 5), 0, 0));
 
@@ -1267,14 +1267,14 @@ public class LoginFrame extends JFrame {
     buttonsL.add(okButton);
 
     if (includeSwitchModeButton) {
-      switchModeButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_New_Account"));
+      switchModeButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_New_Account"));
       switchModeButton.setEnabled(isNewAccountOptionEnabled);
       switchModeButton.addActionListener(new NewAccountSignInActionListener());
       buttonsL.add(switchModeButton);
     }
 
     if (includeCancel) {
-      cancelButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+      cancelButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
       cancelButton.addActionListener(new CancelActionListener());
       buttonsL.add(cancelButton);
     }
@@ -1300,7 +1300,7 @@ public class LoginFrame extends JFrame {
   * @return error message if input is not valid, else return NULL for valid.
   */
   private String isInputValid() {
-    String errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Invalid_input,_please_recheck_your_entry_fields");
+    String errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Invalid_input,_please_recheck_your_entry_fields");
     boolean rc = false;
     char[] pass1 = null;
     char[] pass2 = null;
@@ -1315,25 +1315,25 @@ public class LoginFrame extends JFrame {
                 if (!isNewAccountDialog || licenseCheck.isSelected()) {
                   errorMsg = null;
                 } else {
-                  errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_You_must_accept_the_License_Agreement...");
+                  errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_You_must_accept_the_License_Agreement...");
                 }
               } else {
-                errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
+                errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
               }
             } else {
-              errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
+              errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
             }
           } else {
-            errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_The_retyped_password_does_not_match_the_entered_password.");
+            errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_The_retyped_password_does_not_match_the_entered_password.");
           }
         } else {
-          errorMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
+          errorMsg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
         }
       } else {
-        errorMsg = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
+        errorMsg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
       }
     } else {
-      errorMsg = com.CH_gui.lang.Lang.rb.getString("msg_Username_must_have_at_least_1_non_blank_character...");
+      errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Username_must_have_at_least_1_non_blank_character...");
     }
 
     for (int i=0; pass1!=null && i<pass1.length; i++)
@@ -1505,7 +1505,7 @@ public class LoginFrame extends JFrame {
       String errorMsg = isInputValid();
       if (errorMsg != null) {
         LoginFrame.this.setVisible(true);
-        MessageDialog.showErrorDialog(LoginFrame.this, errorMsg, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+        MessageDialog.showErrorDialog(LoginFrame.this, errorMsg, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
       } else {
         setEnabledInputs(false);
         // Run the long parts in a seperate thread
@@ -1553,7 +1553,7 @@ public class LoginFrame extends JFrame {
         if (!Arrays.equals(pass1, pass2)) {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-              MessageDialog.showErrorDialog(LoginFrame.this, RETYPE_PASSWORD_ERROR, com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+              MessageDialog.showErrorDialog(LoginFrame.this, RETYPE_PASSWORD_ERROR, com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
             }
           });
           password.setText(""); retypePassword.setText("");
@@ -1577,7 +1577,7 @@ public class LoginFrame extends JFrame {
           if (eName == null) {
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
-                MessageDialog.showErrorDialog(LoginFrame.this, "You have entered an invalid Username.  Please choose another Username.", com.CH_gui.lang.Lang.rb.getString("title_Invalid_Input"));
+                MessageDialog.showErrorDialog(LoginFrame.this, "You have entered an invalid Username.  Please choose another Username.", com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
               }
             });
             error = true;
@@ -1588,7 +1588,7 @@ public class LoginFrame extends JFrame {
 
         // empty email warning
         if (!error && (currentEmail.getText() == null || currentEmail.getText().trim().length() == 0)) {
-          String title = com.CH_gui.lang.Lang.rb.getString("title_No_Email_Specified");
+          String title = com.CH_cl.lang.Lang.rb.getString("title_No_Email_Specified");
           boolean option = MessageDialog.showDialogYesNo(LoginFrame.this, EMAIL_NULL, title);
           if (option == false) {
             error = true;
@@ -1637,7 +1637,7 @@ public class LoginFrame extends JFrame {
             usedKeyLength = keyLength;
             usedCertainty = certainty;
 
-            expectedTime.setText(com.CH_gui.lang.Lang.rb.getString("label_Key_Generation_has_completed_successfuly."));
+            expectedTime.setText(com.CH_cl.lang.Lang.rb.getString("label_Key_Generation_has_completed_successfuly."));
 
             mainPanel.remove(jProgressBar);
             mainPanel.add(expectedTime, new GridBagConstraints(1, 15, 4, 1, 10, 0,
@@ -1780,11 +1780,11 @@ public class LoginFrame extends JFrame {
         // HTTP fetch server list and create ServerInterfaceLayer
         performConnect(getServer());
         // try to login...
-        loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_gui.lang.Lang.rb.getString("title_Secure_Login"),
-                new String[] {  com.CH_gui.lang.Lang.rb.getString("label_Open_Secure_Channel"),
-                                com.CH_gui.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
+        loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_cl.lang.Lang.rb.getString("title_Secure_Login"),
+                new String[] {  com.CH_cl.lang.Lang.rb.getString("label_Open_Secure_Channel"),
+                                com.CH_cl.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
                                 //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"),
-                                com.CH_gui.lang.Lang.rb.getString("label_Load_Main_Program") },
+                                com.CH_cl.lang.Lang.rb.getString("label_Load_Main_Program") },
                                 isUsernameInRetry ? "Retrying with username: " + userName.getText() : null);
         loginCoordinator.setLoginProgMonitor(loginProgMonitor);
         loginSuccess = login(request, loginProgMonitor);
@@ -1907,25 +1907,25 @@ public class LoginFrame extends JFrame {
         {
           String newRelease = "";
           if (reply.serverRelease == GlobalProperties.PROGRAM_RELEASE_ALPHA)
-            newRelease = com.CH_gui.lang.Lang.rb.getString("version_alpha");
+            newRelease = com.CH_cl.lang.Lang.rb.getString("version_alpha");
           else if (reply.serverRelease == GlobalProperties.PROGRAM_RELEASE_BETA)
-            newRelease = com.CH_gui.lang.Lang.rb.getString("version_beta");
+            newRelease = com.CH_cl.lang.Lang.rb.getString("version_beta");
           else if (reply.serverRelease == GlobalProperties.PROGRAM_RELEASE_FINAL)
             newRelease = "";
 
           String currentRelease = "";
           if (GlobalProperties.PROGRAM_RELEASE == GlobalProperties.PROGRAM_RELEASE_ALPHA)
-            currentRelease = com.CH_gui.lang.Lang.rb.getString("version_alpha");
+            currentRelease = com.CH_cl.lang.Lang.rb.getString("version_alpha");
           else if (GlobalProperties.PROGRAM_RELEASE == GlobalProperties.PROGRAM_RELEASE_BETA)
-            currentRelease = com.CH_gui.lang.Lang.rb.getString("version_beta");
+            currentRelease = com.CH_cl.lang.Lang.rb.getString("version_beta");
           else if (GlobalProperties.PROGRAM_RELEASE == GlobalProperties.PROGRAM_RELEASE_FINAL)
             currentRelease = "";
 
           String hrefStart = "<a href=\""+URLs.get(URLs.DOWNLOAD_PAGE)+"\">";
           String hrefEnd = "</a>";
-          String text = java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("msg_Newer_version_is_now_available_for_download..."), new Object[] {String.valueOf(reply.serverVersion), newRelease, hrefStart, hrefEnd, String.valueOf(GlobalProperties.PROGRAM_VERSION), currentRelease, URLs.get(URLs.SERVICE_SOFTWARE_NAME), URLs.get(URLs.DOMAIN_WEB)});
+          String text = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Newer_version_is_now_available_for_download..."), new Object[] {String.valueOf(reply.serverVersion), newRelease, hrefStart, hrefEnd, String.valueOf(GlobalProperties.PROGRAM_VERSION), currentRelease, URLs.get(URLs.SERVICE_SOFTWARE_NAME), URLs.get(URLs.DOMAIN_WEB)});
 
-          MessageDialog.showInfoDialog(null, text, com.CH_gui.lang.Lang.rb.getString("msgTitle_Newer_Version_Available"), false);
+          MessageDialog.showInfoDialog(null, text, com.CH_cl.lang.Lang.rb.getString("msgTitle_Newer_Version_Available"), false);
           try {
             Thread.sleep(5000);
           } catch (InterruptedException e) {
@@ -1944,7 +1944,7 @@ public class LoginFrame extends JFrame {
       success = false;
       if (trace != null) trace.data(200, "closing prog monitor, exception during login");
       loginProgMonitor.allDone();
-      MessageDialog.showErrorDialog(null, e.getMessage(), com.CH_gui.lang.Lang.rb.getString("msgTitle_Login_Error"));
+      MessageDialog.showErrorDialog(null, e.getMessage(), com.CH_cl.lang.Lang.rb.getString("msgTitle_Login_Error"));
     }
 
     if (trace != null) trace.exit(LoginFrame.class, success);
@@ -2099,12 +2099,12 @@ public class LoginFrame extends JFrame {
           String msg = "Private key could not be stored " + where + "!";
           if (errorBuffer.length() > 0)
             msg += errorBuffer.toString();
-          MessageDialog.showErrorDialog(null, msg, com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"), true);
+          MessageDialog.showErrorDialog(null, msg, com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"), true);
         }
       }
     } catch (Throwable t) {
       if (trace != null) trace.exception(LoginFrame.class, 100, t);
-      MessageDialog.showErrorDialog(null, t.getMessage(), com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
+      MessageDialog.showErrorDialog(null, t.getMessage(), com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"));
     }
 
     if (trace != null) trace.exit(LoginFrame.class);
@@ -2138,7 +2138,7 @@ public class LoginFrame extends JFrame {
       if (replyChkAction2 != null && replyChkAction2.getActionCode() >= 0) {
         chkEmailOk = true;
       } else if (replyChkAction2 != null && replyChkAction2.getActionCode() < 0) {
-        MessageDialog.showWarningDialog(null, "Email address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.", com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
+        MessageDialog.showWarningDialog(null, "Email address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.", com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"));
         // Suppress the generic error because we have a more user-friendly version below,
         // and we still want to run the reply action to comply with SIL rules and progress monitors, etc.
         if (replyChkAction2.getMsgDataSet() instanceof Str_Rp)
@@ -2162,7 +2162,7 @@ public class LoginFrame extends JFrame {
       }
     } catch (Throwable t) {
       if (trace != null) trace.exception(LoginFrame.class, 100, t);
-      MessageDialog.showErrorDialog(null, t.getMessage(), com.CH_gui.lang.Lang.rb.getString("title_New_Account_Error"));
+      MessageDialog.showErrorDialog(null, t.getMessage(), com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"));
       success = false;
     }
 
@@ -2204,71 +2204,71 @@ public class LoginFrame extends JFrame {
 
     // fileShareRecord
     newUser_request.fileShareRecord = new FolderShareRecord();
-    newUser_request.fileShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_My_Files"));
-    newUser_request.fileShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Files_on_remote_system"));
+    newUser_request.fileShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_My_Files"));
+    newUser_request.fileShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Files_on_remote_system"));
     newUser_request.fileShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.fileShareRecord.seal(symKeyFldShares);
 
     // addrShareRecord
     newUser_request.addrShareRecord = new FolderShareRecord();
-    newUser_request.addrShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Address_Book"));
-    newUser_request.addrShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Saved_Email_Addresses"));
+    newUser_request.addrShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Address_Book"));
+    newUser_request.addrShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Saved_Email_Addresses"));
     newUser_request.addrShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.addrShareRecord.seal(symKeyFldShares);
 
     // whiteShareRecord
     newUser_request.whiteShareRecord = new FolderShareRecord();
-    newUser_request.whiteShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_WhiteList"));
-    newUser_request.whiteShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_WhiteList"));
+    newUser_request.whiteShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_WhiteList"));
+    newUser_request.whiteShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_WhiteList"));
     newUser_request.whiteShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.whiteShareRecord.seal(symKeyFldShares);
 
     // draftShareRecord
     newUser_request.draftShareRecord = new FolderShareRecord();
-    newUser_request.draftShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Drafts"));
-    newUser_request.draftShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Saved_Drafts_for_future_editing"));
+    newUser_request.draftShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Drafts"));
+    newUser_request.draftShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Saved_Drafts_for_future_editing"));
     newUser_request.draftShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.draftShareRecord.seal(symKeyFldShares);
 
     // msgShareRecord
     newUser_request.msgShareRecord = new FolderShareRecord();
-    newUser_request.msgShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Inbox"));
-    newUser_request.msgShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_My_default_inbox_message_folder"));
+    newUser_request.msgShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Inbox"));
+    newUser_request.msgShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_My_default_inbox_message_folder"));
     newUser_request.msgShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.msgShareRecord.seal(symKeyFldShares);
 
     // junkShareRecord
     newUser_request.junkShareRecord = new FolderShareRecord();
-    newUser_request.junkShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Spam"));
-    newUser_request.junkShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Suspected_spam_email_is_deposited_here"));
+    newUser_request.junkShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Spam"));
+    newUser_request.junkShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Suspected_spam_email_is_deposited_here"));
     newUser_request.junkShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.junkShareRecord.seal(symKeyFldShares);
 
     // sentShareRecord
     newUser_request.sentShareRecord = new FolderShareRecord();
-    newUser_request.sentShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Sent"));
-    newUser_request.sentShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_My_default_sent_message_folder"));
+    newUser_request.sentShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Sent"));
+    newUser_request.sentShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_My_default_sent_message_folder"));
     newUser_request.sentShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.sentShareRecord.seal(symKeyFldShares);
 
     // contactShareRecord
     newUser_request.contactShareRecord = new FolderShareRecord();
-    newUser_request.contactShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Contacts"));
-    newUser_request.contactShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Contact_folder"));
+    newUser_request.contactShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Contacts"));
+    newUser_request.contactShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Contact_folder"));
     newUser_request.contactShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.contactShareRecord.seal(symKeyFldShares);
 
     // keyShareRecord
     newUser_request.keyShareRecord = new FolderShareRecord();
-    newUser_request.keyShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_Keys"));
-    newUser_request.keyShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_Key_folder"));
+    newUser_request.keyShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Keys"));
+    newUser_request.keyShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Key_folder"));
     newUser_request.keyShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.keyShareRecord.seal(symKeyFldShares);
 
     // recycleShareRecord
     newUser_request.recycleShareRecord = new FolderShareRecord();
-    newUser_request.recycleShareRecord.setFolderName(com.CH_gui.lang.Lang.rb.getString("folder_RecycleBin"));
-    newUser_request.recycleShareRecord.setFolderDesc(com.CH_gui.lang.Lang.rb.getString("folderDesc_RecycleBin"));
+    newUser_request.recycleShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_RecycleBin"));
+    newUser_request.recycleShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_RecycleBin"));
     newUser_request.recycleShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.recycleShareRecord.seal(symKeyFldShares);
 

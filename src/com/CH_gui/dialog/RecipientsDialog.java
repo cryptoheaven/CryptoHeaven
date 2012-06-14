@@ -94,7 +94,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
   }
   /** Creates new RecipientsDialog */
   public RecipientsDialog(Frame frame, String titlePostfix, Record[] initialChoices, String selectedStringsDelimited, String searchString, boolean skipDialogIfPerfectMatch) {
-    super(frame, com.CH_gui.lang.Lang.rb.getString("title_Select_Recipients") + (titlePostfix != null && titlePostfix.length() > 0 ? (" - " + titlePostfix):""));
+    super(frame, com.CH_cl.lang.Lang.rb.getString("title_Select_Recipients") + (titlePostfix != null && titlePostfix.length() > 0 ? (" - " + titlePostfix):""));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecipientsDialog.class, "RecipientsDialog(Frame frame, String titlePostfix, Record[] initialChoices, String selectedStringsDelimited, String searchString, boolean skipDialogIfPerfectMatch)");
     if (trace != null) trace.args(frame);
     if (trace != null) trace.args(titlePostfix);
@@ -208,15 +208,15 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
-    jOkButton = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_OK"));
+    jOkButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_OK"));
     jOkButton.addActionListener(new OKActionListener());
     buttons[0] = jOkButton;
 
-    jOtherUsers = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Other_Users_..."));
+    jOtherUsers = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Other_Users_..."));
     jOtherUsers.addActionListener(new OtherUsersActionListener());
     buttons[1] = jOtherUsers;
 
-    buttons[2] = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Cancel"));
+    buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
     buttons[2].addActionListener(new CancelActionListener());
 
     return buttons;
@@ -227,7 +227,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
 
     panel.setLayout(new GridBagLayout());
 
-    panel.add(new JMyLabel(com.CH_gui.lang.Lang.rb.getString("label_Search_by_name,_select_from_list,_or_enter_an_email_address")), new GridBagConstraints(0, 0, 2, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Search_by_name,_select_from_list,_or_enter_an_email_address")), new GridBagConstraints(0, 0, 2, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     jSearchName = new JMyTextField(40);
@@ -238,7 +238,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
     panel.add(jSearchName, new GridBagConstraints(0, 1, 1, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jAddInput = new JMyButton(com.CH_gui.lang.Lang.rb.getString("button_Add_Recipients"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
+    jAddInput = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Add_Recipients"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
     jAddInput.setEnabled(jSearchName.getText().length() > 0);
     jAddInput.addActionListener(new AddInputActionListener());
     panel.add(jAddInput, new GridBagConstraints(1, 1, 1, 1, 0, 0, 
@@ -247,8 +247,8 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
     dualListBox = new DualListBox(false, false, false, false);
     navigateKeyListener = new ListNavigator(dualListBox.getSourceList());
     jSearchName.addKeyListener(navigateKeyListener);
-    dualListBox.setSourceChoicesTitle(com.CH_gui.lang.Lang.rb.getString("label_Available_Recipients"));
-    dualListBox.setDestinationChoicesTitle(com.CH_gui.lang.Lang.rb.getString("label_Chosen_Recipients"));
+    dualListBox.setSourceChoicesTitle(com.CH_cl.lang.Lang.rb.getString("label_Available_Recipients"));
+    dualListBox.setDestinationChoicesTitle(com.CH_cl.lang.Lang.rb.getString("label_Chosen_Recipients"));
     dualBoxChangeListener = new DualBoxChangeListener();
     dualListBox.addChangeListener(dualBoxChangeListener);
 
@@ -386,7 +386,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
 
   private void otherUsersAction() {
     // select other users
-    String buttonName = com.CH_gui.lang.Lang.rb.getString("button_Select");
+    String buttonName = com.CH_cl.lang.Lang.rb.getString("button_Select");
     UserSelectorDialog d = new UserSelectorDialog(RecipientsDialog.this, buttonName, jSearchName.getText().trim());
     d.registerForUpdates(new ListUpdatableI() {
       public void update(Object[] objects) {

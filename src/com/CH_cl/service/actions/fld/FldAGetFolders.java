@@ -12,19 +12,24 @@
 
 package com.CH_cl.service.actions.fld;
 
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.fld.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.fld.Fld_Folders_Rp;
+import com.CH_co.service.msg.dataSets.fld.Fld_ToSymEnc_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.FolderShareRecord;
+import com.CH_co.service.records.RecordUtils;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.SingleTokenArbiter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -84,7 +89,7 @@ public class FldAGetFolders extends ClientMessageAction {
       if (cache.countFolderRecords() == 0) {
         ArrayList foldersBufferL = new ArrayList();
         ArrayList sharesBufferL = new ArrayList();
-        CacheUtilities.makeFolderCategories(userId, foldersBufferL, sharesBufferL);
+        CacheFldUtils.makeFolderCategories(userId, foldersBufferL, sharesBufferL);
         FolderRecord[] foldersBuffer = (FolderRecord[]) ArrayUtils.toArray(foldersBufferL, FolderRecord.class);
         FolderShareRecord[] sharesBuffer = (FolderShareRecord[]) ArrayUtils.toArray(sharesBufferL, FolderShareRecord.class);
         folderRecords = (FolderRecord[]) ArrayUtils.concatinate(foldersBuffer, folderRecords);

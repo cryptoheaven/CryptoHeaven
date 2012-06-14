@@ -1,50 +1,59 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.msgTable;
 
-import com.CH_cl.service.cache.*;
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
+import com.CH_cl.service.cache.CacheEmlUtils;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.StatRecord;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.ImageText;
+import com.CH_co.util.Misc;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.table.*;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.util.Images;
-
 import java.awt.*;
 import java.sql.Timestamp;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
+import javax.swing.border.Border;
+import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.33 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.33 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgTableCellRenderer extends RecordTableCellRenderer {
 
   private static Color regularMsgAltColor = new Color(236, 251, 232);
@@ -167,9 +176,9 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                   if (numOfAttachments > 0) {
                     icon = Images.get(ImageNums.ATTACH16);
                     if (numOfAttachments == 1)
-                      toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
+                      toolTip = com.CH_cl.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
                     else
-                      toolTip = "" + numOfAttachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
+                      toolTip = "" + numOfAttachments + " " + com.CH_cl.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
                   }
                 }
               }
@@ -191,11 +200,11 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             //text = "" + value;
             icon = Images.get(ImageNums.ATTACH16);
             if (numOfAttachments == 1)
-              toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
+              toolTip = com.CH_cl.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
             else
-              toolTip = "" + numOfAttachments + " " + com.CH_gui.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
+              toolTip = "" + numOfAttachments + " " + com.CH_cl.lang.Lang.rb.getString("rowTip_Message_Attachments_Present");
           } else {
-            toolTip = com.CH_gui.lang.Lang.rb.getString("rowTip_No_Attachments_Present");
+            toolTip = com.CH_cl.lang.Lang.rb.getString("rowTip_No_Attachments_Present");
             // since no attachments present, maybe we can put other useful info here
             if (!isDoubleLineView) {
               // if Importance column is not visible
@@ -292,20 +301,20 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         setHorizontalAlignment(LEFT);
         // The From field is the contact name or user's short info, whichever is available
         Long userId = (Long) value;
-        Record rec = MsgPanelUtils.convertUserIdToFamiliarUser(userId, false, true);
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(userId, false, true);
         if (rec != null) {
           setIcon(ListRenderer.getRenderedIcon(rec));
           setText(ListRenderer.getRenderedText(rec));
         }
         else {
-          setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {userId}));
+          setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {userId}));
           setIcon(Images.get(ImageNums.PERSON_SMALL));
         }
       }
       // From (email)
       else if (value instanceof String) {
         setHorizontalAlignment(LEFT);
-        Record sender = CacheUtilities.convertToFamiliarEmailRecord((String) value);
+        Record sender = CacheEmlUtils.convertToFamiliarEmailRecord((String) value);
         setIcon(ListRenderer.getRenderedIcon(sender));
         setText(ListRenderer.getRenderedText(sender));
       }
@@ -368,7 +377,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       if (value != null) {
 
         StringBuffer toolTipBuf = new StringBuffer();
-        Record[][] recipients = MsgPanelUtils.gatherAllMsgRecipients((String) value);
+        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients((String) value);
 
         JPanel jFlowPanel = jRecipientPanelRenderer;
         jFlowPanel.removeAll();
@@ -386,7 +395,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         if (recipients != null && recipients.length > 0) {
           for (int recipientType=MsgLinkRecord.RECIPIENT_TYPE_TO; recipientType<=MsgLinkRecord.RECIPIENT_TYPE_BCC; recipientType++) {
             if (recipients[recipientType] != null && recipients[recipientType].length > 0) {
-              MsgPanelUtils.drawRecordFlowPanel(recipients, new Boolean[] { Boolean.TRUE, Boolean.TRUE, Boolean.TRUE }, new String[] { null, com.CH_gui.lang.Lang.rb.getString("label_Cc"), com.CH_gui.lang.Lang.rb.getString("label_Bcc") }, jFlowPanel, jHeaderRenderers, jLabelRenderers);
+              MsgPanelUtils.drawRecordFlowPanel(recipients, new Boolean[] { Boolean.TRUE, Boolean.TRUE, Boolean.TRUE }, new String[] { null, com.CH_cl.lang.Lang.rb.getString("label_Cc"), com.CH_cl.lang.Lang.rb.getString("label_Bcc") }, jFlowPanel, jHeaderRenderers, jLabelRenderers);
             }
           }
         }
@@ -785,8 +794,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
   }
 
   /**
-   * Provide alternate row background colors.
-   */
+  * Provide alternate row background colors.
+  */
   public Color[] getAltBkColors() {
     return altBkColors;
   }
