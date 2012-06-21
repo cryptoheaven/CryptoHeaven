@@ -12,13 +12,13 @@
 
 package com.CH_gui.frame;
 
+import com.CH_cl.service.ops.MsgDataOps;
 import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.actionGui.JActionFrameClosable;
 import com.CH_gui.list.ListRenderer;
-import com.CH_gui.msgs.MsgComposeComponents;
 import com.CH_gui.msgs.MsgComposePanel;
 import com.CH_gui.util.MiscGui;
 import java.awt.BorderLayout;
@@ -137,7 +137,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg) {
-    super(truncate(MsgComposeComponents.getSubjectReply(replyToMsg)), true, true);
+    super(truncate(MsgDataOps.getSubjectReply(replyToMsg)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg)");
     if (trace != null) trace.args(initialRecipients, replyToMsg);
 
@@ -160,7 +160,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, LinkRecordI[] attachments) {
-    super(truncate(MsgComposeComponents.getSubjectForward(attachments)), true, true);
+    super(truncate(MsgDataOps.getSubjectForward(attachments)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, LinkRecordI[] attachments)");
     if (trace != null) trace.args(initialRecipients, attachments);
 
@@ -193,7 +193,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, String subject, String plainBody, File[] attachFiles) {
-    super(truncate(MsgComposeComponents.getSubjectForward(attachFiles)), true, true);
+    super(truncate(MsgDataOps.getSubjectForward(attachFiles)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, String subject, String plainBody, File[] attachFiles)");
     if (trace != null) trace.args(initialRecipients, subject, plainBody, attachFiles);
 

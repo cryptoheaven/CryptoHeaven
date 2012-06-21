@@ -22,6 +22,8 @@ import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.ops.MsgDataOps;
+import com.CH_cl.service.ops.SendMessageInfoProviderI;
+import com.CH_cl.service.ops.SendMessageRunner;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
@@ -109,7 +111,7 @@ import javax.swing.undo.UndoManager;
 * @author  Marcin Kurzawa
 * @version
 */
-public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarProducerI, DropTargetListener, DisposableObj, MsgTypeManagerI, MsgComposeManagerI, MsgSendInfoProviderI, UndoManagerI, VetoRisibleI {
+public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarProducerI, DropTargetListener, DisposableObj, MsgTypeManagerI, MsgComposeManagerI, SendMessageInfoProviderI, UndoManagerI, VetoRisibleI {
 
   public static final String PROPERTY_NAME__SHOW_ALL_HEADERS = "showAllHeaders";
 
@@ -139,15 +141,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   public static final short PRIORITY_INDEX_FYI = 0;
   public static final short PRIORITY_INDEX_NORMAL = 1;
   public static final short PRIORITY_INDEX_HIGH = 2;
-
-  public static final short TO = MsgLinkRecord.RECIPIENT_TYPE_TO;
-  public static final short CC = MsgLinkRecord.RECIPIENT_TYPE_CC;
-  public static final short BCC = MsgLinkRecord.RECIPIENT_TYPE_BCC;
-  public static final short[] RECIPIENT_TYPES = new short[] { TO, CC, BCC };
-
-  public static final short CONTENT_MODE_MAIL_PLAIN = 1;
-  public static final short CONTENT_MODE_MAIL_HTML = 2;
-  public static final short CONTENT_MODE_ADDRESS_BOOK_ENTRY = 3;
 
   private FetchedDataCache cache;
 
@@ -819,7 +812,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             if (distributionUserIDs != null && distributionUserIDs.length == 1 && myUserRec != null && distributionUserIDs[0].equals(myUserRec.userId)) {
               MessageDialog.showInfoDialog(_this, "No one is available to hear your ring...", "Ring, Ring...");
             } else {
-              new SendMessageRunner(new MsgSendInfoProviderI() {
+              ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+              new SendMessageRunner(SIL, new SendMessageInfoProviderI() {
                 public String[] getContent() {
                   return new String[] { "ring...", "" };
                 }
@@ -1014,7 +1008,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                   } else {
                     boolean showRegularEmailQuestion = _anyEmailAddresses && !isSavingAsDraft && !FetchedDataCache.getSingleInstance().getUserRecord().isSkipWarnExternal();
                     if (!showRegularEmailQuestion) {
-                      new SendMessageRunner(MsgComposePanel.this).start();
+                      ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+                      new SendMessageRunner(SIL, MsgComposePanel.this).start();
                     } else {
                       showRegularEmailWarningBeforeAndSend(_emailAddresses);
                     }
@@ -1214,14 +1209,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           request.userRecord.notifyByEmail = new Short((short) Misc.setBit(false, request.userRecord.notifyByEmail, UserRecord.EMAIL_WARN_EXTERNAL));
           MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_ALTER_DATA, request));
           // send message triggered
-          new SendMessageRunner(MsgComposePanel.this).start();
+          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+          new SendMessageRunner(SIL, MsgComposePanel.this).start();
         }
       });
       buttons[1].addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           warningDialog.dispose();
           // send message triggered
-          new SendMessageRunner(MsgComposePanel.this).start();
+          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+          new SendMessageRunner(SIL, MsgComposePanel.this).start();
         }
       });
       buttons[2].addActionListener(new ActionListener() {
@@ -2304,7 +2301,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           countProcessed ++;
 
           BASymmetricKey key = new BASymmetricKey(32);
-          MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(recipients, key, parentComp);
+          MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(SIL, recipients, key);
           MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
           Msg_New_Rq request = new Msg_New_Rq(addrBook.getFolderShareRecord().shareId, null, links[0], data);
           request.hashes = SendMessageRunner.prepareAddrHashes(data);

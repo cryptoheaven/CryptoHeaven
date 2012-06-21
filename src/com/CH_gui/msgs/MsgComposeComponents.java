@@ -15,6 +15,7 @@ package com.CH_gui.msgs;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.MsgDataOps;
 import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.nanoxml.XMLElement;
@@ -64,9 +65,6 @@ import javax.swing.text.JTextComponent;
 * @version
 */
 public class MsgComposeComponents extends Object implements DisposableObj {
-
-  private static String STR_RE = com.CH_cl.lang.Lang.rb.getString("msg_Re");
-  private static String STR_FWD = com.CH_cl.lang.Lang.rb.getString("msg_Fwd");
 
   private MsgComposeManagerI composeMngrI;
   private MsgTypeManagerI msgTypeManagerI;
@@ -1127,9 +1125,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     setFromAccounts(dataRecord);
 
     if (isReply)
-      setSubject(getSubjectReply(dataRecord, 250));
+      setSubject(MsgDataOps.getSubjectReply(dataRecord, 250));
     else if (isForward)
-      setSubject(getSubjectForward(new Object[] { dataRecord }, 250));
+      setSubject(MsgDataOps.getSubjectForward(new Object[] { dataRecord }, 250));
 
     String[] content = makeReplyToContent(quotedMsg, dataRecord, false, false, false);
 
@@ -1412,80 +1410,11 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     return emailSet;
   }
 
-  public static String getSubjectForward(Object[] attachments) {
-    return getSubjectForward(attachments, 0);
-  }
-  private static String getSubjectForward(Object[] attachments, int truncateShort) {
-    StringBuffer sb = new StringBuffer();
-    for (int i=0; i<attachments.length; i++) {
-      sb.append(ListRenderer.getRenderedText(attachments[i]));
-      if (i < attachments.length - 1)
-        sb.append("; ");
-    }
-    String subject = MsgComposeComponents.STR_FWD + " [" + sb.toString() + "]";
-    if (truncateShort > 0 && subject.length() > truncateShort) {
-      subject = subject.substring(0, truncateShort) + "...";
-    }
-    return subject;
-  }
-
-  public static String getSubjectReply(MsgLinkRecord replyToLink) {
-    return getSubjectReply(replyToLink, 0);
-  }
-  private  static String getSubjectReply(MsgLinkRecord replyToLink, int truncateShort) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    MsgDataRecord replyToData = cache.getMsgDataRecord(replyToLink.msgId);
-    return getSubjectReply(replyToData, truncateShort);
-  }
-
-  private static String getSubjectReply(MsgDataRecord replyToData, int truncateShort) {
-    String subject = STR_RE + " " + eliminatePrefixes(replyToData.getSubject());
-    if (truncateShort > 0 && subject.length() > truncateShort) {
-      subject = subject.substring(0, truncateShort) + "...";
-    }
-    return subject;
-  }
-
-
   public void setForward(Object[] selectedAttachments) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "setForward(Record[] selectedAttachments)");
     if (trace != null) trace.args(selectedAttachments);
-    setSubject(getSubjectForward(selectedAttachments, 250));
+    setSubject(MsgDataOps.getSubjectForward(selectedAttachments, 250));
     if (trace != null) trace.exit(MsgComposeComponents.class);
-  }
-
-//  public void setForwardBody(MsgLinkRecord forwardMsg, MsgDataRecord dataRecord) {
-//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "setForwardBody(MsgLinkRecord forwardMsg, MsgDataRecord dataRecord)");
-//    if (trace != null) trace.args(forwardMsg, dataRecord);
-//    if (trace != null) trace.exit(MsgComposeComponents.class);
-//  }
-
-
-  public static String eliminatePrefixes(String str) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "eliminatePrefixes(String str)");
-    if (trace != null) trace.args(str);
-
-    boolean changed = false;
-
-    while (true) {
-      str = str.trim();
-      if (str.startsWith(STR_RE + " ") || str.toUpperCase().startsWith(STR_RE.toUpperCase() + " ")) {
-        str = str.substring(STR_RE.length() + 1);
-        changed = true;
-      }
-      if (str.startsWith(STR_FWD + " ") || str.toUpperCase().startsWith(STR_FWD.toUpperCase() + " ")) {
-        str = str.substring(STR_FWD.length() + 1);
-        changed = true;
-      }
-
-      if (!changed)
-        break;
-      else
-        changed = false;
-    }
-
-    if (trace != null) trace.exit(MsgComposeComponents.class, str);
-    return str;
   }
 
   private void pressedSendButton(ActionEvent event) {

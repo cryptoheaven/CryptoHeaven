@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.cache;
 
@@ -29,21 +29,21 @@ import java.security.*;
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.55 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.55 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FetchedDataCache extends Object {
 
   // in production set DEBUG to false
@@ -94,6 +94,8 @@ public class FetchedDataCache extends Object {
   private ArrayList msgBodyKeys;
   private HashSet requestedAddrHashHS;
 
+  private ArrayList viewIterators;
+
   public static final int STAT_TYPE_FILE = 0;
   public static final int STAT_TYPE_FOLDER = 1;
   public static final int STAT_TYPE_MESSAGE = 2;
@@ -101,8 +103,8 @@ public class FetchedDataCache extends Object {
   EventListenerList myListenerList = new EventListenerList();
 
   /**
-   * @returns a single instance of the cache.
-   */
+  * @returns a single instance of the cache.
+  */
   public static FetchedDataCache getSingleInstance() {
     return SingletonHolder.INSTANCE;
   }
@@ -118,8 +120,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Starts a session for this instance and initializes all variables to empty.
-   */
+  * Starts a session for this instance and initializes all variables to empty.
+  */
   private synchronized void init() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "init()");
     myUserId = null;
@@ -152,8 +154,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Clears the cache to remove all of its data.
-   */
+  * Clears the cache to remove all of its data.
+  */
   public void clear() {
     synchronized (this) {
       removeFileLinkRecords(getFileLinkRecords());
@@ -200,8 +202,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   *  Sets the encoded password for the duration of this connection.
-   */
+  *  Sets the encoded password for the duration of this connection.
+  */
   public synchronized void setEncodedPassword(BAEncodedPassword encPassword) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "setEncodedPassword(BAEncodedPassword)");
     encodedPassword = encPassword;
@@ -209,8 +211,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   *  Gets the encoded password for the duration of this connection.
-   */
+  *  Gets the encoded password for the duration of this connection.
+  */
   public synchronized BAEncodedPassword getEncodedPassword() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getEncodedPassword()");
     if (encodedPassword == null)
@@ -220,21 +222,21 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   *  Sets the private key generated for the new user account.
-   */
+  *  Sets the private key generated for the new user account.
+  */
   public synchronized void setNewUserPrivateKey(RSAPrivateKey rsaPrivateKey) {
     newUserPrivateKey = rsaPrivateKey;
   }
   /**
-   *  Sets the private key generated for the new user account.
-   */
+  *  Sets the private key generated for the new user account.
+  */
   public synchronized RSAPrivateKey getNewUserPrivateKey() {
     return newUserPrivateKey;
   }
 
   /**
-   * @return the userId of the current user.
-   */
+  * @return the userId of the current user.
+  */
   public synchronized Long getMyUserId() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMyUserId()");
     Long myUId = myUserId;
@@ -243,22 +245,22 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return the UserSettingsRecord of the current user.
-   */
+  * @return the UserSettingsRecord of the current user.
+  */
   public synchronized UserSettingsRecord getMyUserSettingsRecord() {
     return myUserSettingsRecord;
   }
 
   /**
-   * @return the PassRecoveryRecord of the current user.
-   */
+  * @return the PassRecoveryRecord of the current user.
+  */
   public synchronized PassRecoveryRecord getMyPassRecoveryRecord() {
     return myPassRecoveryRecord;
   }
 
   /**
-   * @return number of FolderRecords in the cache
-   */
+  * @return number of FolderRecords in the cache
+  */
   public synchronized int countFolderRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "countFolderRecords()");
     int numOfFolders = folderRecordMap.size();
@@ -267,35 +269,35 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Add email address record hash to keep track of already requested ones.
-   */
+  * Add email address record hash to keep track of already requested ones.
+  */
   public synchronized void addRequestedAddrHash(byte[] hash) {
     // Store the hash as string so when comparing different instances of the same data will match.
     requestedAddrHashHS.add(ArrayUtils.toString(hash));
   }
 
   /**
-   * Add email address record hashes in batch mode.
-   */
+  * Add email address record hashes in batch mode.
+  */
   public synchronized void addRequestedAddrHashes(List hashesL) {
     for (int i=0; i<hashesL.size(); i++)
       addRequestedAddrHash((byte[]) hashesL.get(i));
   }
 
   /**
-   * @return true if hash exists in the requested cashe.
-   */
+  * @return true if hash exists in the requested cashe.
+  */
   public synchronized boolean wasRequestedAddrHash(byte[] hash) {
     return requestedAddrHashHS.contains(ArrayUtils.toString(hash));
   }
 
   /*********************************
-   ***   UserRecord operations   ***
-   *********************************/
+  ***   UserRecord operations   ***
+  *********************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addUserRecords(UserRecord[] userRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addUserRecords(UserRecord[])");
     if (trace != null) trace.args(userRecords);
@@ -334,8 +336,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeUserRecords(UserRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeUserRecords(UserRecord[])");
     if (trace != null) trace.args(records);
@@ -352,8 +354,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Sets the logged-in user record and adds it into the cache.  Cannot change the userId during the same session.
-   */
+  * Sets the logged-in user record and adds it into the cache.  Cannot change the userId during the same session.
+  */
   public void setUserRecord(UserRecord userRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "setUserRecord(UserRecord)");
     if (trace != null) trace.args(userRecord);
@@ -370,8 +372,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Sets the logged-in user settings record.  Cannot change the userId during the same session.
-   */
+  * Sets the logged-in user settings record.  Cannot change the userId during the same session.
+  */
   public void setUserSettingsRecord(UserSettingsRecord userSettingsRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "setUserSettingsRecord(UserSettingsRecord)");
     if (trace != null) trace.args(userSettingsRecord);
@@ -404,8 +406,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Sets the password recovery record.
-   */
+  * Sets the password recovery record.
+  */
   public synchronized void setPassRecoveryRecord(PassRecoveryRecord passRecoveryRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "setPassRecoveryRecord(PassRecoveryRecord)");
     if (trace != null) trace.args(passRecoveryRecord);
@@ -419,8 +421,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return stored User Record
-   */
+  * @return stored User Record
+  */
   public synchronized UserRecord getUserRecord() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getUserRecord()");
     UserRecord uRec = null;
@@ -438,8 +440,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all user records stored in the cache
-   */
+  * @return all user records stored in the cache
+  */
   public synchronized UserRecord[] getUserRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getUserRecords()");
 
@@ -450,8 +452,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all users matching specified user IDs
-   */
+  * @return all users matching specified user IDs
+  */
   public synchronized UserRecord[] getUserRecords(Long[] userIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getUserRecords(Long[] userIDs)");
     if (trace != null) trace.args(userIDs);
@@ -471,12 +473,12 @@ public class FetchedDataCache extends Object {
   }
 
   /***********************************
-   ***   FolderRecord operations   ***
-   ***********************************/
+  ***   FolderRecord operations   ***
+  ***********************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addFolderRecords(FolderRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderRecords(FolderRecord[])");
     if (trace != null) trace.args(records);
@@ -497,8 +499,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeFolderRecords(FolderRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFolderRecords(FolderRecord[])");
     if (trace != null) trace.args(records);
@@ -524,8 +526,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all FolderRecords from cache.
-   */
+  * @return all FolderRecords from cache.
+  */
   public synchronized FolderRecord[] getFolderRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecords()");
     FolderRecord[] allFolders = (FolderRecord[]) ArrayUtils.toArray(folderRecordMap.values(), FolderRecord.class);
@@ -534,8 +536,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all FolderRecords from cache with specified IDs
-   */
+  * @return all FolderRecords from cache with specified IDs
+  */
   public synchronized FolderRecord[] getFolderRecords(Long[] folderIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecords(Long[] folderIDs)");
     if (trace != null) trace.args(folderIDs);
@@ -557,8 +559,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all FolderRecords from cache that pass through specified filter
-   */
+  * @return all FolderRecords from cache that pass through specified filter
+  */
   public synchronized FolderRecord[] getFolderRecords(RecordFilter filter) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecords(RecordFilter filter)");
     if (trace != null) trace.args(filter);
@@ -580,8 +582,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all FolderRecords from cache which current user is NOT the owner of.
-   */
+  * @return all FolderRecords from cache which current user is NOT the owner of.
+  */
   public synchronized FolderRecord[] getFolderRecordsNotMine() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsNotMine()");
 
@@ -603,8 +605,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all FolderRecords from cache which match the criteria.
-   */
+  * @return all FolderRecords from cache which match the criteria.
+  */
   public synchronized FolderRecord[] getFolderRecordsForUser(Long userId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsForUser(Long userId)");
 
@@ -624,8 +626,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all FolderRecords from cache which match the criteria.
-   */
+  * @return all FolderRecords from cache which match the criteria.
+  */
   public synchronized FolderRecord[] getFolderRecordsForUsers(Long[] userIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsForUsers(Long[] userIDs)");
 
@@ -651,8 +653,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all chatting FolderRecords from cache
-   */
+  * @return all chatting FolderRecords from cache
+  */
   public synchronized FolderRecord[] getFolderRecordsChatting() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderRecordsChatting()");
 
@@ -672,17 +674,17 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Not traced for performance.
-   * @return a FolderRecord from cache with a given id.
-   */
+  * Not traced for performance.
+  * @return a FolderRecord from cache with a given id.
+  */
   public synchronized FolderRecord getFolderRecord(Long folderId) {
     return folderId != null ? (FolderRecord) folderRecordMap.get(folderId) : null;
   }
 
   /**
-   * Finds all folder records that carry the specified parentFolderId.
-   * @return all children of the parent specified.
-   */
+  * Finds all folder records that carry the specified parentFolderId.
+  * @return all children of the parent specified.
+  */
   public synchronized FolderRecord[] getFoldersChildren(Long parentFolderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFoldersChildren(Long parentFolderId)");
     if (trace != null) trace.args(parentFolderId);
@@ -703,8 +705,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all children of the parents specified.
-   */
+  * @return all children of the parents specified.
+  */
   public synchronized FolderRecord[] getFoldersChildren(FolderRecord[] parentRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFoldersChildren(FolderRecord[] parentRecords)");
     if (trace != null) trace.args(parentRecords);
@@ -733,9 +735,9 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @param parentFolders
-   * @return children in the FolderRecord hierarchy, ignores view hierarchy
-   */
+  * @param parentFolders
+  * @return children in the FolderRecord hierarchy, ignores view hierarchy
+  */
   public synchronized FolderRecord[] getFoldersAllDescending(FolderRecord[] parentFolders) {
     HashSet allDescendantsHS = new HashSet();
     addFoldersAllChildren(allDescendantsHS, parentFolders);
@@ -760,8 +762,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return table of all Group Folders to which specified user belongs (recursively too)
-   */
+  * @return table of all Group Folders to which specified user belongs (recursively too)
+  */
   public synchronized Long[] getFolderGroupIDsMy() {
     return getFolderGroupIDs(getMyUserId());
   }
@@ -812,8 +814,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Clears all Folder Records from the cache no events are fired.
-   */
+  * Clears all Folder Records from the cache no events are fired.
+  */
   private synchronized void clearFolderRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "clearFolderRecords()");
     folderRecordMap.clear();
@@ -832,12 +834,12 @@ public class FetchedDataCache extends Object {
 
 
   /****************************************
-   ***   FolderShareRecord operations   ***
-   ****************************************/
+  ***   FolderShareRecord operations   ***
+  ****************************************/
 
   /**
-   * Adds new records or record updates into the cache, unseals them and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache, unseals them and fires appropriate event.
+  */
   public void addFolderShareRecords(FolderShareRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderShareRecords(FolderShareRecord[])");
     if (trace != null) trace.args(records);
@@ -943,8 +945,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeFolderShareRecords(FolderShareRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFolderShareRecords(FolderShareRecord[])");
     if (trace != null) trace.args(records);
@@ -989,16 +991,16 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return a FolderShareRecord from cache with a given id.
-   */
+  * @return a FolderShareRecord from cache with a given id.
+  */
   public synchronized FolderShareRecord getFolderShareRecord(Long shareId) {
     return (FolderShareRecord) folderShareRecordMap.get(shareId);
   }
 
 
   /**
-   * @return all FolderShareRecords from cache.
-   */
+  * @return all FolderShareRecords from cache.
+  */
   public synchronized FolderShareRecord[] getFolderShareRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecords()");
 
@@ -1009,8 +1011,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return specified FolderShareRecords from cache.
-   */
+  * @return specified FolderShareRecords from cache.
+  */
   public synchronized FolderShareRecord[] getFolderShareRecords(Long[] shareIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecords(Long[] shareIDs)");
 
@@ -1031,8 +1033,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return a FolderShareRecord from cache for a given folderId and current user.
-   */
+  * @return a FolderShareRecord from cache for a given folderId and current user.
+  */
   private synchronized FolderShareRecord getFolderShareRecordMy(Long folderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId)");
     if (trace != null) trace.args(folderId);
@@ -1104,8 +1106,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return a FolderShareRecords from cache for a given folderId and current user.
-   */
+  * @return a FolderShareRecords from cache for a given folderId and current user.
+  */
   public synchronized FolderShareRecord[] getFolderShareRecordsMy(Long folderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordsMy(Long folderId)");
     if (trace != null) trace.args(folderId);
@@ -1137,8 +1139,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all shares (only 1 per folder) that belong to current user.
-   */
+  * @return all shares (only 1 per folder) that belong to current user.
+  */
   public synchronized FolderShareRecord[] getFolderSharesMy(boolean includeGroupOwned) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderSharesMy(boolean includeGroupOwned)");
     if (trace != null) trace.args(includeGroupOwned);
@@ -1175,8 +1177,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all of my folder shares that belong to specified folders.
-   */
+  * @return all of my folder shares that belong to specified folders.
+  */
   public synchronized FolderShareRecord[] getFolderSharesMyForFolders(Long[] folderIDs, boolean includeGroupOwned) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderSharesMyForFolders(Long[] folderIDs, boolean includeGroupOwned)");
     if (trace != null) trace.args(folderIDs);
@@ -1195,8 +1197,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all of my folder shares that belong to specified folders.
-   */
+  * @return all of my folder shares that belong to specified folders.
+  */
   public synchronized FolderShareRecord[] getFolderSharesMyForFolders(Long[] folderIDs, Set groupIDsSet) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderSharesMyForFolders(Long[] folderIDs, Set groupIDsSet)");
     if (trace != null) trace.args(folderIDs);
@@ -1266,8 +1268,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return FolderShareRecords from cache for a given folderId.
-   */
+  * @return FolderShareRecords from cache for a given folderId.
+  */
   public synchronized FolderShareRecord[] getFolderShareRecordsForFolder(Long folderId) {
 
     Collection sharesV = folderShareRecordMap_byFldId.getAll(folderId);
@@ -1277,8 +1279,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all children of the parents specified.
-   */
+  * @return all children of the parents specified.
+  */
   public synchronized FolderShareRecord[] getFolderShareRecordsForFolders(Long[] folderIDs) {
     ArrayList sharesL = new ArrayList();
     folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs, Long.class);
@@ -1293,8 +1295,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return FolderShareRecords from cache for a given userId EXCLUDING shares accessed through group memberships
-   */
+  * @return FolderShareRecords from cache for a given userId EXCLUDING shares accessed through group memberships
+  */
   public synchronized FolderShareRecord[] getFolderShareRecordsForUsers(Long[] userIDs) {
     ArrayList sharesL = new ArrayList();
     userIDs = (Long[]) ArrayUtils.removeDuplicates(userIDs, Long.class);
@@ -1314,9 +1316,9 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Finds all folder pairs that are descendants in the VIEW tree to specified parents.
-   * @return all descendant children of the view parents specified.
-   */
+  * Finds all folder pairs that are descendants in the VIEW tree to specified parents.
+  * @return all descendant children of the view parents specified.
+  */
   public synchronized FolderPair[] getFolderPairsViewAllDescending(FolderPair[] parentFolderPairs, boolean includeParents) {
     HashSet allDescendantsHS = new HashSet();
     Set groupIDsSet = getFolderGroupIDsSet(myUserId);
@@ -1352,9 +1354,9 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Finds all folder pairs that are children in the VIEW tree to specified parent.
-   * @return all children of the view parent specified.
-   */
+  * Finds all folder pairs that are children in the VIEW tree to specified parent.
+  * @return all children of the view parent specified.
+  */
   public synchronized FolderPair[] getFolderPairsViewChildren(Long parentFolderId, boolean includeGroupOwned) {
     // exceptional case is when looking for children of Category folder, in that case allow root folders to match
     if (parentFolderId.longValue() < 0)
@@ -1369,15 +1371,15 @@ public class FetchedDataCache extends Object {
     return getFolderPairs(new FolderFilter(RecordUtils.getIDs(parentFolderPairs)), groupIDsSet);
   }
   /**
-   * @return all of My accessible Posting Folder Shares (for ie: message recipients) or other types
-   */
+  * @return all of My accessible Posting Folder Shares (for ie: message recipients) or other types
+  */
   public synchronized FolderPair[] getFolderPairsMyOfType(short folderType, boolean includeGroupOwned) {
     return getFolderPairs(new FolderFilter(folderType), includeGroupOwned);
   }
   /**
-   * @param filter is typically FolderFilter instance type.
-   * @return all of My Folder Shares that pass through the specified filter.
-   */
+  * @param filter is typically FolderFilter instance type.
+  * @return all of My Folder Shares that pass through the specified filter.
+  */
   public synchronized FolderPair[] getFolderPairs(RecordFilter filter, boolean includeGroupOwned) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderPairs(RecordFilter filter, boolean includeGroupOwned)");
     if (trace != null) trace.args(filter);
@@ -1420,8 +1422,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Clears all Folder Share Records from the cache no events are fired.
-   */
+  * Clears all Folder Share Records from the cache no events are fired.
+  */
   private synchronized void clearFolderShareRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "clearFolderShareRecords()");
     folderShareRecordMap.clear();
@@ -1432,12 +1434,12 @@ public class FetchedDataCache extends Object {
 
 
   /*************************************
-   ***   FileLinkRecord operations   ***
-   *************************************/
+  ***   FileLinkRecord operations   ***
+  *************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addFileLinkRecords(FileLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFileLinkRecords(FileLinkRecord[])");
     if (trace != null) trace.args(records);
@@ -1502,8 +1504,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeFileLinkRecords(FileLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFileLinkRecords(FileLinkRecord[])");
     if (trace != null) trace.args(records);
@@ -1529,8 +1531,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public synchronized void removeFileLinkRecords(Long[] fileLinkIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFileLinkRecords(Long[] fileLinkIDs)");
     if (trace != null) trace.args(fileLinkIDs);
@@ -1544,15 +1546,15 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return a FileLinkRecord from cache with a given id.
-   */
+  * @return a FileLinkRecord from cache with a given id.
+  */
   public synchronized FileLinkRecord getFileLinkRecord(Long fileLinkId) {
     return (FileLinkRecord) fileLinkRecordMap.get(fileLinkId);
   }
 
   /**
-   * @return all FileLinkRecords from cache
-   */
+  * @return all FileLinkRecords from cache
+  */
   public synchronized FileLinkRecord[] getFileLinkRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFileLinkRecords()");
 
@@ -1563,10 +1565,10 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all File Link Records for specified file link ids.
-   * The records found in the cache are returned, the IDs which do not have
-   * corresponding records in the cache are ignored.
-   */
+  * @return all File Link Records for specified file link ids.
+  * The records found in the cache are returned, the IDs which do not have
+  * corresponding records in the cache are ignored.
+  */
   public synchronized FileLinkRecord[] getFileLinkRecords(Long[] fileLinkIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFileLinkRecords(Long[] fileLinkIDs)");
     if (trace != null) trace.args(fileLinkIDs);
@@ -1587,8 +1589,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return a collection of FileLinkRecords for specified shareId.
-   */
+  * @return a collection of FileLinkRecords for specified shareId.
+  */
   public synchronized FileLinkRecord[] getFileLinkRecords(Long shareId) {
     // find the corresponding folderId
     Long folderId = getFolderShareRecord(shareId).folderId;
@@ -1596,8 +1598,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all cached links for a given fileId
-   */
+  * @return all cached links for a given fileId
+  */
   public synchronized FileLinkRecord[] getFileLinkRecordsForFile(Long fileId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFileLinkRecordsForFile(Long fileId)");
     if (trace != null) trace.args(fileId);
@@ -1610,9 +1612,9 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Filters the map to collect FileLinkRecords for a given ownerId and ownerType.
-   * @return a collection of FileLinkRecords for specified ownerId and ownerType.
-   */
+  * Filters the map to collect FileLinkRecords for a given ownerId and ownerType.
+  * @return a collection of FileLinkRecords for specified ownerId and ownerType.
+  */
   public synchronized FileLinkRecord[] getFileLinkRecordsOwnerAndType(Long ownerId, Short ownerType) {
     ArrayList fileLinksL = new ArrayList();
     // Collect all file links for this folder
@@ -1628,9 +1630,9 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Filters the map to collect FileLinkRecords for a given ownerIDs and ownerType.
-   * @return a collection of FileLinkRecords for specified ownerId and ownerType.
-   */
+  * Filters the map to collect FileLinkRecords for a given ownerIDs and ownerType.
+  * @return a collection of FileLinkRecords for specified ownerId and ownerType.
+  */
   public synchronized FileLinkRecord[] getFileLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType) {
     ArrayList fileLinksL = new ArrayList();
     // load a lookup with wanted ownerIDs
@@ -1648,12 +1650,12 @@ public class FetchedDataCache extends Object {
 
 
   /*************************************
-   ***   FileDataRecord operations   ***
-   *************************************/
+  ***   FileDataRecord operations   ***
+  *************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addFileDataRecords(FileDataRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFileDataRecords(FileDataRecord[])");
     if (trace != null) trace.args(records);
@@ -1682,12 +1684,12 @@ public class FetchedDataCache extends Object {
 
 
   /***********************************
-   ***   InvEmlRecord operations   ***
-   ***********************************/
+  ***   InvEmlRecord operations   ***
+  ***********************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addInvEmlRecords(InvEmlRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addInvEmlRecords(InvEmlRecord[] invEmlRecords)");
     if (trace != null) trace.args(records);
@@ -1703,8 +1705,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeInvEmlRecords(InvEmlRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeInvEmlRecords(InvEmlRecord[])");
     if (trace != null) trace.args(records);
@@ -1720,8 +1722,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return ALL InvEmlRecords stored in the cache.
-   */
+  * @return ALL InvEmlRecords stored in the cache.
+  */
   public synchronized InvEmlRecord[] getInvEmlRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getInvEmlRecords()");
 
@@ -1732,8 +1734,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all InvEmlRecords matching specified IDs
-   */
+  * @return all InvEmlRecords matching specified IDs
+  */
   public synchronized InvEmlRecord[] getInvEmlRecords(Long[] IDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getInvEmlRecords(Long[] IDs)");
     if (trace != null) trace.args(IDs);
@@ -1753,12 +1755,12 @@ public class FetchedDataCache extends Object {
   }
 
   /********************************
-   ***   KeyRecord operations   ***
-   ********************************/
+  ***   KeyRecord operations   ***
+  ********************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addKeyRecords(KeyRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addKeyRecords(KeyRecord[])");
     if (trace != null) trace.args(records);
@@ -1818,8 +1820,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeKeyRecords(KeyRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeKeyRecords(KeyRecord[])");
     if (trace != null) trace.args(records);
@@ -1835,8 +1837,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return a KeyRecord from cache with a given id.
-   */
+  * @return a KeyRecord from cache with a given id.
+  */
   public synchronized KeyRecord getKeyRecord(Long keyId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getKeyRecord(Long)");
     if (trace != null) trace.args(keyId);
@@ -1850,8 +1852,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return ALL KeyRecords stored in the cache.
-   */
+  * @return ALL KeyRecords stored in the cache.
+  */
   public synchronized KeyRecord[] getKeyRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getKeyRecords()");
 
@@ -1862,8 +1864,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return the current KeyRecord (last key record created by the user -- user.currentKeyId keyId).
-   */
+  * @return the current KeyRecord (last key record created by the user -- user.currentKeyId keyId).
+  */
   public synchronized KeyRecord getKeyRecordMyCurrent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getCurrentKeyRecord()");
 
@@ -1874,8 +1876,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return most recent KeyRecord for a given user
-   */
+  * @return most recent KeyRecord for a given user
+  */
   public synchronized KeyRecord getKeyRecordForUser(Long userId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getKeyRecordForUser(Long userId)");
     if (trace != null) trace.args(userId);
@@ -1898,12 +1900,12 @@ public class FetchedDataCache extends Object {
 
 
   /************************************
-   ***   ContactRecord operations   ***
-   ************************************/
+  ***   ContactRecord operations   ***
+  ************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addContactRecords(ContactRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addContactRecords(ContactRecord[])");
     if (trace != null) trace.args(records);
@@ -1944,8 +1946,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeContactRecords(ContactRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeContactRecords(ContactRecord[])");
     if (trace != null) trace.args(records);
@@ -2035,8 +2037,8 @@ public class FetchedDataCache extends Object {
   } // end unWrapContactRecords()
 
   /**
-   * Clears all Contact Records from the cache no events are fired.
-   */
+  * Clears all Contact Records from the cache no events are fired.
+  */
   public synchronized void clearContactRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "clearContactRecords()");
 
@@ -2046,8 +2048,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return a ContactRecord from cache with a given id.
-   */
+  * @return a ContactRecord from cache with a given id.
+  */
   public synchronized ContactRecord getContactRecord(Long contactId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecord(Long)");
     if (trace != null) trace.args(contactId);
@@ -2059,8 +2061,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all Contact Records.
-   */
+  * @return all Contact Records.
+  */
   public synchronized ContactRecord[] getContactRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecords()");
 
@@ -2071,8 +2073,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all My Active Contact Records.
-   */
+  * @return all My Active Contact Records.
+  */
   public synchronized ContactRecord[] getContactRecords(RecordFilter filter) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecords(RecordFilter filter)");
 
@@ -2090,8 +2092,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all My Active Contact Records.
-   */
+  * @return all My Active Contact Records.
+  */
   public synchronized ContactRecord[] getContactRecordsMyActive(boolean includeInitiated) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecordsMyActive(boolean includeInitiated)");
 
@@ -2112,8 +2114,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return contact matching search criteria.
-   */
+  * @return contact matching search criteria.
+  */
   public synchronized ContactRecord getContactRecordOwnerWith(Long ownerUserId, Long withUserId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecordOwnerWith(Long ownerUserId, Long withUserId)");
 
@@ -2133,8 +2135,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return records matching search criteria.
-   */
+  * @return records matching search criteria.
+  */
   public synchronized ContactRecord[] getContactRecordsForUsers(Long[] userIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecordsForUsers(Long[] userIDs)");
 
@@ -2157,12 +2159,12 @@ public class FetchedDataCache extends Object {
 
 
   /************************************
-   ***   MsgLinkRecord operations   ***
-   ************************************/
+  ***   MsgLinkRecord operations   ***
+  ************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addMsgLinkRecords(MsgLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgLinkRecords(MsgLinkRecord[] records)");
     if (trace != null) trace.args(records);
@@ -2183,8 +2185,8 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
   /**
-   * Called ONLY when new records are added to cache in SET mode.
-   */
+  * Called ONLY when new records are added to cache in SET mode.
+  */
   private void unWrapMsgLinkRecords(MsgLinkRecord[] linkRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapMsgLinkRecords(MsgLinkRecord[] linkRecords)");
     if (trace != null) trace.args(linkRecords);
@@ -2232,10 +2234,10 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Visually notify users that certain folders have modified content, update the
-   * updates' count.
-   * @param records can be instances of StatRecord, FileLinkRecords, MsgLinkRecords
-   */
+  * Visually notify users that certain folders have modified content, update the
+  * updates' count.
+  * @param records can be instances of StatRecord, FileLinkRecords, MsgLinkRecords
+  */
   public void statUpdatesInFoldersForVisualNotification(Record[] records, boolean suppressAudibleNotification) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "statUpdatesInFoldersForVisualNotification(Record[] records, boolean suppressAudibleNotification)");
     if (trace != null) trace.args(records);
@@ -2346,10 +2348,10 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * We need data Records in the cache before the message table can display contents.
-   * For that reason, the event will be fired when we are done with both, links and datas.
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * We need data Records in the cache before the message table can display contents.
+  * For that reason, the event will be fired when we are done with both, links and datas.
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addMsgLinkAndDataRecords(MsgLinkRecord linkRecord, MsgDataRecord dataRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgLinkAndDataRecords(MsgLinkRecord linkRecord, MsgDataRecord dataRecord)");
     addMsgLinkAndDataRecords(new MsgLinkRecord[] { linkRecord }, new MsgDataRecord[] { dataRecord });
@@ -2408,8 +2410,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeMsgLinkRecords(MsgLinkRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeMsgLinkRecords(MsgLinkRecord[] records)");
     if (trace != null) trace.args(records);
@@ -2436,8 +2438,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public synchronized void removeMsgLinkRecords(Long[] msgLinkIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeMsgLinkRecords(Long[] msgLinkIDs)");
     if (trace != null) trace.args(msgLinkIDs);
@@ -2451,15 +2453,15 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return the requested message link object.
-   */
+  * @return the requested message link object.
+  */
   public synchronized MsgLinkRecord getMsgLinkRecord(Long msgLinkId) {
     return (MsgLinkRecord) msgLinkRecordMap.get(msgLinkId);
   }
 
   /**
-   * @return all Message Link Records from cache.
-   */
+  * @return all Message Link Records from cache.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords()");
 
@@ -2470,10 +2472,10 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all Message Link Records for specified message link ids.
-   * The records found in the cache are returned, the IDs which do not have
-   * corresponding records in the cache are ignored.
-   */
+  * @return all Message Link Records for specified message link ids.
+  * The records found in the cache are returned, the IDs which do not have
+  * corresponding records in the cache are ignored.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecords(Long[] msgLinkIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords(Long[] msgLinkIDs)");
     if (trace != null) trace.args(msgLinkIDs);
@@ -2493,9 +2495,9 @@ public class FetchedDataCache extends Object {
   }
 
 /**
-   * @return all Message Link Records created between specified times.
-   * The records found in the cache are returned.
-   */
+  * @return all Message Link Records created between specified times.
+  * The records found in the cache are returned.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecords(Date dateCreatedFrom, Date dateCreatedTo, Long ownerObjId, Short ownerObjType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecords(Date dateCreatedFrom, Date dateCreatedTo, Long ownerObjId, Short ownerObjType)");
     if (trace != null) trace.args(dateCreatedFrom, dateCreatedTo, ownerObjId, ownerObjType);
@@ -2526,8 +2528,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all Message Link Records for a given folder id.
-   */
+  * @return all Message Link Records for a given folder id.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsForFolder(Long folderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForFolder(Long folderId)");
     if (trace != null) trace.args(folderId);
@@ -2550,8 +2552,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all Message Link Records for a given folder IDs.
-   */
+  * @return all Message Link Records for a given folder IDs.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsForFolders(Long[] folderIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForFolder(Long[] folderIDs)");
     if (trace != null) trace.args(folderIDs);
@@ -2578,8 +2580,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all Message Link Records for a given msg id.
-   */
+  * @return all Message Link Records for a given msg id.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsForMsg(Long msgId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForMsg(Long msgId)");
     if (trace != null) trace.args(msgId);
@@ -2593,8 +2595,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all of my folder shares that belong to specified folders.
-   */
+  * @return all of my folder shares that belong to specified folders.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsForMsgs(Long[] msgIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsForMsgs(Long[] msgIDs)");
     if (trace != null) trace.args(msgIDs);
@@ -2615,8 +2617,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all Message Link Records that are owned by ownerId and type ownerType.
-   */
+  * @return all Message Link Records that are owned by ownerId and type ownerType.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsOwnerAndType(Long ownerId, Short ownerType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsOwnerAndType(Long ownerId, Short ownerType)");
     if (trace != null) trace.args(ownerId, ownerType);
@@ -2642,8 +2644,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all Message Link Records that are owned by ownerIDs and type ownerType.
-   */
+  * @return all Message Link Records that are owned by ownerIDs and type ownerType.
+  */
   public synchronized MsgLinkRecord[] getMsgLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgLinkRecordsOwnersAndType(Long[] ownerIDs, Short ownerType)");
     if (trace != null) trace.args(ownerIDs, ownerType);
@@ -2674,12 +2676,12 @@ public class FetchedDataCache extends Object {
 
 
   /************************************
-   ***   MsgDataRecord operations   ***
-   ************************************/
+  ***   MsgDataRecord operations   ***
+  ************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addMsgDataRecords(MsgDataRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgDataRecords(MsgDataRecord[] records)");
     if (trace != null) trace.args(records);
@@ -2734,8 +2736,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeMsgDataRecords(MsgDataRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeMsgDataRecords(MsgDataRecord[] records)");
     if (trace != null) trace.args(records);
@@ -2755,9 +2757,9 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   *
-   * @return copy of our message body keys collection
-   */
+  *
+  * @return copy of our message body keys collection
+  */
   public synchronized List getMsgBodyKeys() {
     ArrayList list = new ArrayList(msgBodyKeys.size());
     list.addAll(msgBodyKeys);
@@ -2768,8 +2770,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return Message Data Record for a given message ID.
-   */
+  * @return Message Data Record for a given message ID.
+  */
   public synchronized MsgDataRecord getMsgDataRecord(Long msgId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecord(Long msgId)");
     if (trace != null) trace.args(msgId);
@@ -2783,8 +2785,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all Message Data Records from cache.
-   */
+  * @return all Message Data Records from cache.
+  */
   public synchronized MsgDataRecord[] getMsgDataRecords() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecords()");
 
@@ -2796,8 +2798,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return Message Data Record for a given message ID.
-   */
+  * @return Message Data Record for a given message ID.
+  */
   public synchronized MsgDataRecord[] getMsgDataRecords(Long[] msgIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecords(Long[] msgIDs)");
     if (trace != null) trace.args(msgIDs);
@@ -2817,8 +2819,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return Message Data Record for a given filter.
-   */
+  * @return Message Data Record for a given filter.
+  */
   public synchronized MsgDataRecord[] getMsgDataRecords(MsgFilter msgFilter) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecords(MsgFilter msgFilter)");
     if (trace != null) trace.args(msgFilter);
@@ -2838,8 +2840,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all Message Data Records for specified Message Links.
-   */
+  * @return all Message Data Records for specified Message Links.
+  */
   public synchronized MsgDataRecord[] getMsgDataRecordsForLinks(Long[] msgLinkIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getMsgDataRecordsForLinks(Long[] msgLinkIDs)");
     if (trace != null) trace.args(msgLinkIDs);
@@ -2853,12 +2855,12 @@ public class FetchedDataCache extends Object {
   }
 
   /************************************
-   ***   StatRecord operations      ***
-   ************************************/
+  ***   StatRecord operations      ***
+  ************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addStatRecords(StatRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addStatRecords(StatRecord[])");
     if (trace != null) trace.args(records);
@@ -2881,8 +2883,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeStatRecords(StatRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeStatRecords(StatRecord[] records)");
     if (trace != null) trace.args(records);
@@ -2916,23 +2918,23 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Not traced for performance.
-   * @return Stat Record for a given Link ID (statId is the linkId for client purposes)
-   */
+  * Not traced for performance.
+  * @return Stat Record for a given Link ID (statId is the linkId for client purposes)
+  */
   public synchronized StatRecord getStatRecord(Long statId, int statType) {
     return (StatRecord) statRecordMaps[statType].get(statId);
   }
 
   /**
-   * @return all StatRecords from cache for a given type
-   */
+  * @return all StatRecords from cache for a given type
+  */
   public synchronized StatRecord[] getStatRecords(int statType) {
     return (StatRecord[]) ArrayUtils.toArray(statRecordMaps[statType].values(), StatRecord.class);
   }
 
   /**
-   * @return all StatRecords from cache
-   */
+  * @return all StatRecords from cache
+  */
   public synchronized StatRecord[] getStatRecords() {
     int statCount = 0;
     for (int i=0; i<3; i++)
@@ -2946,8 +2948,8 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * @return all StatRecords from cache with specified IDs
-   */
+  * @return all StatRecords from cache with specified IDs
+  */
   public synchronized StatRecord[] getStatRecords(Long[] statIDs, int statType) {
     ArrayList statsL = new ArrayList();
     if (statIDs != null) {
@@ -2964,12 +2966,12 @@ public class FetchedDataCache extends Object {
 
 
   /************************************
-   ***   EmailRecord operations     ***
-   ************************************/
+  ***   EmailRecord operations     ***
+  ************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addEmailRecords(EmailRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addEmailRecords(EmailRecord[])");
     if (trace != null) trace.args(records);
@@ -2985,8 +2987,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeEmailRecords(EmailRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeEmailRecords(EmailRecord[] records)");
     if (trace != null) trace.args(records);
@@ -3002,8 +3004,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event.
-   */
+  * Removes records from the cache and fires appropriate event.
+  */
   public void removeEmailRecords(Long[] emlIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeEmailRecords(Long[] emlIDs)");
     if (trace != null) trace.args(emlIDs);
@@ -3015,8 +3017,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return EmailRecord for a given ID
-   */
+  * @return EmailRecord for a given ID
+  */
   public synchronized EmailRecord getEmailRecord(Long emlId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getEmailRecord(Long emlId)");
     if (trace != null) trace.args(emlId);
@@ -3028,8 +3030,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return EmailRecord for a given ID
-   */
+  * @return EmailRecord for a given ID
+  */
   public synchronized EmailRecord getEmailRecord(String emlAddr) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getEmailRecord(String emlAddr)");
     if (trace != null) trace.args(emlAddr);
@@ -3049,15 +3051,15 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all EmailRecords from cache
-   */
+  * @return all EmailRecords from cache
+  */
   public synchronized EmailRecord[] getEmailRecords() {
     return (EmailRecord[]) ArrayUtils.toArray(emailRecordMap.values(), EmailRecord.class);
   }
 
   /**
-   * @return all EmailRecords from cache with specified IDs
-   */
+  * @return all EmailRecords from cache with specified IDs
+  */
   public synchronized EmailRecord[] getEmailRecords(Long userId) {
     ArrayList emailsL = new ArrayList();
     if (userId != null) {
@@ -3073,8 +3075,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return all EmailRecords from cache with specified IDs
-   */
+  * @return all EmailRecords from cache with specified IDs
+  */
   public synchronized EmailRecord[] getEmailRecords(Long[] emailIDs) {
     ArrayList emailsL = new ArrayList();
     if (emailIDs != null) {
@@ -3090,12 +3092,12 @@ public class FetchedDataCache extends Object {
 
 
   /***************************************
-   ***   AddrHashRecord operations     ***
-   ***************************************/
+  ***   AddrHashRecord operations     ***
+  ***************************************/
 
   /**
-   * Adds new records or record updates into the cache and fires appropriate event.
-   */
+  * Adds new records or record updates into the cache and fires appropriate event.
+  */
   public void addAddrHashRecords(AddrHashRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addAddrHashRecords(AddrHashRecord[] records)");
     if (trace != null) trace.args(records);
@@ -3114,8 +3116,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * Removes records from the cache and fires appropriate event. -- this is difficult because of 1 to many relationship between msgId and hash... leave this for now
-   */
+  * Removes records from the cache and fires appropriate event. -- this is difficult because of 1 to many relationship between msgId and hash... leave this for now
+  */
   public void removeAddrHashRecords(Long[] msgIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeAddrHashRecords(Long[] msgIDs)");
     if (trace != null) trace.args(msgIDs);
@@ -3138,8 +3140,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return AddrHashRecord for a given ID
-   */
+  * @return AddrHashRecord for a given ID
+  */
   public synchronized AddrHashRecord[] getAddrHashRecordsForMsgId(Long msgId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrHashRecordsForMsgId(Long msgId)");
     if (trace != null) trace.args(msgId);
@@ -3152,8 +3154,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return AddrHashRecord for a given hash
-   */
+  * @return AddrHashRecord for a given hash
+  */
   public synchronized AddrHashRecord[] getAddrHashRecords(byte[] hash) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrHashRecords(byte[] hash)");
     if (trace != null) trace.args(hash);
@@ -3167,8 +3169,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return AddrHashRecord for a given hash
-   */
+  * @return AddrHashRecord for a given hash
+  */
   public synchronized AddrHashRecord[] getAddrHashRecords(BADigestBlock hash) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrHashRecords(BADigestBlock hash)");
     if (trace != null) trace.args(hash);
@@ -3182,8 +3184,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return AddrHashRecord for a given email string
-   */
+  * @return AddrHashRecord for a given email string
+  */
   public synchronized AddrHashRecord[] getAddrHashRecords(String emailAddr) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrHashRecords(String emailAddr)");
     if (trace != null) trace.args(emailAddr);
@@ -3198,8 +3200,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return Address Record for a given hash
-   */
+  * @return Address Record for a given hash
+  */
   public synchronized MsgDataRecord[] getAddrRecords(byte[] hash) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrRecords(byte[] hash)");
     if (trace != null) trace.args(hash);
@@ -3216,8 +3218,8 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return Address Record for a given hash looking between specified msgIDs
-   */
+  * @return Address Record for a given hash looking between specified msgIDs
+  */
   public synchronized MsgDataRecord[] getAddrRecords(byte[] hash, Long[] fromMsgIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrRecords(byte[] hash, Long[] fromMsgIDs)");
     if (trace != null) trace.args(hash, fromMsgIDs);
@@ -3256,15 +3258,15 @@ public class FetchedDataCache extends Object {
   }
 
   /**
-   * @return Address Record for a given email string
-   */
+  * @return Address Record for a given email string
+  */
   public synchronized MsgDataRecord[] getAddrRecords(String emailAddr) {
     return getAddrRecords(emailAddr, null);
   }
 
   /**
-   * @return Address Record for a given email string
-   */
+  * @return Address Record for a given email string
+  */
   public synchronized MsgDataRecord[] getAddrRecords(String emailAddr, Long[] fromMsgIDs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getAddrRecords(String emailAddr, Long[] fromMsgIDs)");
     if (trace != null) trace.args(emailAddr);
@@ -3302,8 +3304,8 @@ public class FetchedDataCache extends Object {
   //===========================================================================
 
   /****************************************
-   ***   UserRecord Listener handling   ***
-   ****************************************/
+  ***   UserRecord Listener handling   ***
+  ****************************************/
 
   public synchronized void addUserRecordListener(UserRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addUserRecordListener(UserRecordListener)");
@@ -3321,11 +3323,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireUserRecordUpdated(UserRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireUserRecordUpdated(UserRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3352,8 +3354,8 @@ public class FetchedDataCache extends Object {
 
 
   /************************************************
-   ***   UserSettingsRecord Listener handling   ***
-   ************************************************/
+  ***   UserSettingsRecord Listener handling   ***
+  ************************************************/
 
   public synchronized void addUserSettingsRecordListener(UserSettingsRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addUserSettingsRecordListener(UserSettingsRecordListener)");
@@ -3371,11 +3373,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireUserSettingsRecordUpdated(UserSettingsRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireUserSettingsRecordUpdated(UserSettingsRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3402,8 +3404,8 @@ public class FetchedDataCache extends Object {
 
 
   /******************************************
-   ***   FolderRecord Listener handling   ***
-   ******************************************/
+  ***   FolderRecord Listener handling   ***
+  ******************************************/
 
   public synchronized void addFolderRecordListener(FolderRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderRecordListener(FolderRecordListener)");
@@ -3421,11 +3423,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   public void fireFolderRecordUpdated(FolderRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireFolderRecordUpdated(FolderRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3453,8 +3455,8 @@ public class FetchedDataCache extends Object {
 
 
   /***********************************************
-   ***   FolderShareRecord Listener handling   ***
-   ***********************************************/
+  ***   FolderShareRecord Listener handling   ***
+  ***********************************************/
 
   public synchronized void addFolderShareRecordListener(FolderShareRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderShareRecordListener(FolderShareRecordListener)");
@@ -3472,11 +3474,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireFolderShareRecordUpdated(FolderShareRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireFolderShareRecordUpdated(FolderShareRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3504,8 +3506,8 @@ public class FetchedDataCache extends Object {
 
 
   /******************************************
-   ***   FileLinkRecord Listener handling   ***
-   ******************************************/
+  ***   FileLinkRecord Listener handling   ***
+  ******************************************/
 
   public synchronized void addFileLinkRecordListener(FileLinkRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFileLinkRecordListener(FileLinkRecordListener)");
@@ -3523,11 +3525,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireFileLinkRecordUpdated(FileLinkRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireFileLinkRecordUpdated(FileLinkRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3555,8 +3557,8 @@ public class FetchedDataCache extends Object {
 
 
   /******************************************
-   ***   InvEmlRecord Listener handling   ***
-   ******************************************/
+  ***   InvEmlRecord Listener handling   ***
+  ******************************************/
 
   public synchronized void addInvEmlRecordListener(InvEmlRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addInvEmlRecordListener(InvEmlRecordListener)");
@@ -3574,11 +3576,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireInvEmlRecordUpdated(InvEmlRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireInvEmlRecordUpdated(InvEmlRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3606,8 +3608,8 @@ public class FetchedDataCache extends Object {
 
 
   /***************************************
-   ***   KeyRecord Listener handling   ***
-   ***************************************/
+  ***   KeyRecord Listener handling   ***
+  ***************************************/
 
   public synchronized void addKeyRecordListener(KeyRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addKeyRecordListener(KeyRecordListener)");
@@ -3625,11 +3627,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireKeyRecordUpdated(KeyRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireKeyRecordUpdated(KeyRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3657,8 +3659,8 @@ public class FetchedDataCache extends Object {
 
 
   /*******************************************
-   ***   ContactRecord Listener handling   ***
-   *******************************************/
+  ***   ContactRecord Listener handling   ***
+  *******************************************/
 
   public synchronized void addContactRecordListener(ContactRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addContactRecordListener(ContactRecordListener)");
@@ -3676,11 +3678,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireContactRecordUpdated(ContactRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireContactRecordUpdated(ContactRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3709,8 +3711,8 @@ public class FetchedDataCache extends Object {
 
 
   /*******************************************
-   ***   MsgLinkRecord Listener handling   ***
-   *******************************************/
+  ***   MsgLinkRecord Listener handling   ***
+  *******************************************/
 
   public synchronized void addMsgLinkRecordListener(MsgLinkRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgLinkRecordListener(MsgLinkRecordListener l)");
@@ -3728,12 +3730,12 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   * Mostly called internally when records are added or removed.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  * Mostly called internally when records are added or removed.
+  */
   public void fireMsgLinkRecordUpdated(MsgLinkRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireMsgLinkRecordUpdated(MsgLinkRecord[] records, int eventType)");
     if (trace != null) trace.args(records);
@@ -3761,8 +3763,8 @@ public class FetchedDataCache extends Object {
 
 
   /*******************************************
-   ***   MsgDataRecord Listener handling   ***
-   *******************************************/
+  ***   MsgDataRecord Listener handling   ***
+  *******************************************/
 
   public synchronized void addMsgDataRecordListener(MsgDataRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgDataRecordListener(MsgDataRecordListener l)");
@@ -3780,12 +3782,12 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   * Mostly called internally when records are added or removed.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  * Mostly called internally when records are added or removed.
+  */
   public void fireMsgDataRecordUpdated(MsgDataRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireMsgDataRecordUpdated(MsgDataRecord[] records, int eventType)");
     if (trace != null) trace.args(records);
@@ -3811,8 +3813,8 @@ public class FetchedDataCache extends Object {
   }
 
   /*******************************************
-   ***   StatRecord Listener handling      ***
-   *******************************************/
+  ***   StatRecord Listener handling      ***
+  *******************************************/
 
   public synchronized void addStatRecordListener(StatRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addStatRecordListener(StatRecordListener)");
@@ -3830,11 +3832,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireStatRecordUpdated(StatRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireStatRecordUpdated(StatRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3861,8 +3863,8 @@ public class FetchedDataCache extends Object {
 
 
   /*******************************************
-   ***   EmailRecord Listener handling     ***
-   *******************************************/
+  ***   EmailRecord Listener handling     ***
+  *******************************************/
 
   public synchronized void addEmailRecordListener(EmailRecordListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addEmailRecordListener(EmailRecordListener)");
@@ -3880,11 +3882,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   protected void fireEmailRecordUpdated(EmailRecord[] records, int eventType) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireEmailRecordUpdated(EmailRecord[], int eventType)");
     if (trace != null) trace.args(records);
@@ -3911,8 +3913,8 @@ public class FetchedDataCache extends Object {
 
 
   /*********************************************
-   ***   FldRingRing Listener handling       ***
-   *********************************************/
+  ***   FldRingRing Listener handling       ***
+  *********************************************/
 
   public synchronized void addFolderRingListener(FolderRingListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addFolderRingListener(FolderRingListener))");
@@ -3930,11 +3932,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   public void fireFolderRingEvent(Obj_List_Co source) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireFolderRingEvent(Obj_List_Co source)");
     if (trace != null) trace.args(source);
@@ -3958,8 +3960,8 @@ public class FetchedDataCache extends Object {
 
 
   /*******************************************
-   ***   MsgPopup Listener handling       ***
-   *******************************************/
+  ***   MsgPopup Listener handling       ***
+  *******************************************/
 
   public synchronized void addMsgPopupListener(MsgPopupListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgPopupListener(MsgPopupListener)");
@@ -3977,11 +3979,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   public void fireMsgPopupEvent(String htmlText) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireMsgPopupEvent(String htmlText)");
     if (trace != null) trace.args(htmlText);
@@ -4005,8 +4007,8 @@ public class FetchedDataCache extends Object {
 
 
   /*******************************************
-   ***   MsgTyping Listener handling       ***
-   *******************************************/
+  ***   MsgTyping Listener handling       ***
+  *******************************************/
 
   public synchronized void addMsgTypingListener(MsgTypingListener l) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "addMsgTypingListener(MsgTypingListener)");
@@ -4024,11 +4026,11 @@ public class FetchedDataCache extends Object {
 
 
   /**
-   * Notify all listeners that have registered interest for
-   * notification on this event type.  The event instance
-   * is lazily created using the parameters passed into
-   * the fire method.
-   */
+  * Notify all listeners that have registered interest for
+  * notification on this event type.  The event instance
+  * is lazily created using the parameters passed into
+  * the fire method.
+  */
   public void fireMsgTypingEvent(Obj_List_Co source) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireMsgTypingEvent(Obj_List_Co source)");
     if (trace != null) trace.args(source);
@@ -4050,4 +4052,77 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
+  /****************************************
+  ***   RecordIteratorI handling       ***
+  ****************************************/
+
+  public synchronized void addViewIterator(RecordIteratorI viewIterator) {
+    if (viewIterators == null)
+      viewIterators = new ArrayList();
+    viewIterators.add(viewIterator);
+  }
+
+  public synchronized void removeViewIterator(RecordIteratorI viewIterator) {
+    if (viewIterators != null) {
+      int lastIndex = viewIterators.lastIndexOf(viewIterator);
+      if (lastIndex >= 0)
+        viewIterators.remove(lastIndex);
+    }
+  }
+
+  public synchronized Record getNextItem(Record item, int direction) {
+    Record next = null;
+    if (viewIterators != null) {
+      for (int i=viewIterators.size()-1; i>=0; i--) {
+        RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
+        int position = iter.getPosition(item);
+        if (position != -1) {
+          next = iter.getItemNext(item, direction);
+          break;
+        }
+      }
+    }
+    return next;
+  }
+
+  public synchronized int getViewPosition(Record item) {
+    int position = -1;
+    if (viewIterators != null) {
+      for (int i=viewIterators.size()-1; i>=0; i--) {
+        RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
+        position = iter.getPosition(item);
+        if (position != -1) {
+          // see if we need to adjust for "LOADING" rendering items
+          Record first = iter.getItem(0);
+          if (first != null && first.getId().longValue() < 0)
+            position --;
+          break;
+        }
+      }
+    }
+    return position;
+  }
+
+  public synchronized int getViewCount(Record item) {
+    int count = -1;
+    int position = -1;
+    if (viewIterators != null) {
+      for (int i=viewIterators.size()-1; i>=0; i--) {
+        RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
+        position = iter.getPosition(item);
+        if (position != -1) {
+          count = iter.getCount();
+          // see if we need to adjust for "LOADING" rendering items
+          Record first = iter.getItem(0);
+          Record last = iter.getItem(count-1);
+          if (first != null && first.getId().longValue() < 0)
+            count --;
+          if (last != null && last.getId().longValue() < 0)
+            count --;
+          break;
+        }
+      }
+    }
+    return count;
+  }
 }

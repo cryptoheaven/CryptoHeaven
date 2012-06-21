@@ -10,7 +10,7 @@
 * you entered into with CryptoHeaven Corp.
 */
 
-package com.CH_gui.msgs;
+package com.CH_cl.service.ops;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.actions.msg.MsgAGet;
@@ -18,8 +18,6 @@ import com.CH_cl.service.actions.sys.SysANoop;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.FolderOps;
-import com.CH_cl.service.ops.UploadUtilities;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.MsgUtil;
 import com.CH_co.cryptx.BASymmetricKey;
@@ -35,9 +33,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.Hasher;
 import com.CH_co.util.Misc;
-import com.CH_gui.frame.MainFrame;
-import com.CH_gui.util.MessageDialog;
-import java.awt.Component;
+import com.CH_co.util.NotificationCenter;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -68,7 +64,8 @@ public class SendMessageRunner extends ThreadTraced {
   private static final short CC = MsgLinkRecord.RECIPIENT_TYPE_CC;
   private static final short BCC = MsgLinkRecord.RECIPIENT_TYPE_BCC;
 
-  private MsgSendInfoProviderI msgSendInfoProvider;
+  private ServerInterfaceLayer SIL;
+  private SendMessageInfoProviderI msgSendInfoProvider;
 
   private Record[][] selectedRecipients;
   private Object[] selectedAndInlineAttachments;
@@ -78,11 +75,12 @@ public class SendMessageRunner extends ThreadTraced {
 
 
   /** Creates new SendMessageRunner */
-  public SendMessageRunner(MsgSendInfoProviderI msgSendInfoProvider) {
+  public SendMessageRunner(ServerInterfaceLayer SIL, SendMessageInfoProviderI msgSendInfoProvider) {
     super("Send Message Runner");
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "SendMessageRunner(MsgSendInfoProviderI msgSendInfoProvider)");
     if (trace != null) trace.args(msgSendInfoProvider);
 
+    this.SIL = SIL;
     this.msgSendInfoProvider = msgSendInfoProvider;
 
     selectedRecipients = msgSendInfoProvider.getSelectedRecipients();
@@ -108,7 +106,6 @@ public class SendMessageRunner extends ThreadTraced {
   public void runTraced() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "SendMessageRunner.runTraced()");
 
-    ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     FetchedDataCache cache = SIL.getFetchedDataCache();
 
     msgSendInfoProvider.setSendMessageInProgress(true);
@@ -197,10 +194,9 @@ public class SendMessageRunner extends ThreadTraced {
           recipientsSB.append(MsgDataRecord.RECIPIENT_FROM_EMAIL + " " + Misc.escapeWhiteEncode(fromEmlRec.getEmailAddressFull()) + " ");
         }
       }
-      Component parent = msgSendInfoProvider instanceof Component ? (Component) msgSendInfoProvider : (Component) null;
       // create Msg Link Records
       Object[] errBuffer = new Object[1];
-      MsgLinkRecord[] linkRecords = prepareMsgLinkRecords(selectedRecipients, symmetricKey, isSavingAsDraft, recipientsSB, parent, errBuffer);
+      MsgLinkRecord[] linkRecords = prepareMsgLinkRecords(SIL, selectedRecipients, symmetricKey, isSavingAsDraft, recipientsSB, errBuffer);
 
       if (errBuffer[0] == null) {
 
@@ -280,7 +276,7 @@ public class SendMessageRunner extends ThreadTraced {
               subject = content[0];
               body = content[1];
               short msgType = msgSendInfoProvider.getContentMode();
-              if (msgType == MsgComposePanel.CONTENT_MODE_MAIL_HTML) {
+              if (msgType == SendMessageInfoProviderI.CONTENT_MODE_MAIL_HTML) {
                 contentType = "text/html";
               } else {
                 contentType = "text/plain";
@@ -408,15 +404,15 @@ public class SendMessageRunner extends ThreadTraced {
     return hashSet;
   }
 
-  public static MsgLinkRecord[] prepareMsgLinkRecords(Record[] recipientsTO, BASymmetricKey symmetricKey, Component parent) {
-    return prepareMsgLinkRecords(new Record[][] { recipientsTO }, symmetricKey, false, null, parent, null);
+  public static MsgLinkRecord[] prepareMsgLinkRecords(ServerInterfaceLayer SIL, Record[] recipientsTO, BASymmetricKey symmetricKey) {
+    return prepareMsgLinkRecords(SIL, new Record[][] { recipientsTO }, symmetricKey, false, null, null);
   }
   /**
   * Prepares links for sending...
   * @param isSavingAsDraft If in draft mode then use user's default draft folder as recipient, and output original recipient list in the StringBuffer
   * @param recipientsSB Buffer for original recipient list when in draft mode
   */
-  public static MsgLinkRecord[] prepareMsgLinkRecords(Record[][] recipientsAll, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Component parent, Object[] errBuffer) {
+  public static MsgLinkRecord[] prepareMsgLinkRecords(ServerInterfaceLayer SIL, Record[][] recipientsAll, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Object[] errBuffer) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgLinkRecords(Record[][] recipientsAll, Record[] recipientsCC, BASymmetricKey symmetricKey, boolean isSavingAsDraft, StringBuffer recipientsSB, Object[] errBuffer)");
     if (trace != null) trace.args(recipientsAll, symmetricKey);
     if (trace != null) trace.args(isSavingAsDraft);
@@ -425,7 +421,6 @@ public class SendMessageRunner extends ThreadTraced {
     // create new Msg Link Records
     ArrayList linkRecordsL = new ArrayList();
 
-    ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
     FetchedDataCache cache = SIL.getFetchedDataCache();
 
     if (isSavingAsDraft) {
@@ -505,7 +500,7 @@ public class SendMessageRunner extends ThreadTraced {
             sb.append("\n");
           }
           sb.append("\nPlease check your recipients list.");
-          MessageDialog.showErrorDialog(parent, sb.toString(), "Message not sent", true);
+          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Message not sent", sb.toString());
           if (errBuffer != null) errBuffer[0] = "error";
           break;
         }

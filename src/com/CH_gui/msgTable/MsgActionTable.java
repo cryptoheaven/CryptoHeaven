@@ -18,6 +18,7 @@ import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.MsgLinkOps;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
@@ -28,7 +29,6 @@ import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.msg.Msg_MoveCopy_Rq;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
-import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.service.records.filters.MultiFilter;
@@ -1360,7 +1360,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (trace != null) trace.args(newMark);
 
     MsgLinkRecord[] records = (MsgLinkRecord[]) getSelectedRecords();
-    markRecordsAs(records, newMark);
+    MsgLinkOps.markRecordsAs(MainFrame.getServerInterfaceLayer(), records, newMark);
 
     if (trace != null) trace.exit(MsgActionTable.class);
   }
@@ -1376,39 +1376,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (linksL.size() > 0) {
       MsgLinkRecord[] links = new MsgLinkRecord[linksL.size()];
       linksL.toArray(links);
-      markRecordsAs(links, newMark);
-    }
-
-    if (trace != null) trace.exit(MsgActionTable.class);
-  }
-  private void markRecordsAs(MsgLinkRecord[] records, Short newMark) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgActionTable.class, "markRecordsAs(MsgLinkRecord[] records, Short newMark)");
-    if (trace != null) trace.args(records, newMark);
-
-    if (records != null && records.length > 0) {
-      // gather all stats which need to be updated
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      ArrayList statsL = new ArrayList();
-      for (int i=0; i<records.length; i++) {
-        StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
-        if (statRecord != null && !statRecord.mark.equals(newMark))
-          statsL.add(statRecord);
-      }
-      if (statsL.size() > 0) {
-        StatRecord[] stats = new StatRecord[statsL.size()];
-        statsL.toArray(stats);
-        // clone the stats to send the request
-        StatRecord[] statsClones = (StatRecord[]) RecordUtils.cloneRecords(stats);
-
-        // set mark to "newMark" on the clones
-        for (int i=0; i<statsClones.length; i++)
-          statsClones[i].mark = newMark;
-
-        Stats_Update_Rq request = new Stats_Update_Rq(statsClones);
-
-        ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-        serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
-      }
+      MsgLinkOps.markRecordsAs(MainFrame.getServerInterfaceLayer(), links, newMark);
     }
 
     if (trace != null) trace.exit(MsgActionTable.class);

@@ -17,6 +17,7 @@ import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.SendMessageRunner;
 import com.CH_cl.service.records.filters.SubUserFilter;
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.cryptx.BASymmetricKey;
@@ -38,7 +39,6 @@ import com.CH_co.util.Misc;
 import com.CH_gui.frame.LoginFrame;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.msgs.SendMessageRunner;
 import com.CH_gui.usrs.AccountOptionPermitChecks;
 import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.MiscGui;
@@ -711,7 +711,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
   private static void sendMessageToSelf(ServerInterfaceLayer SIL, String subject, String body) {
     BASymmetricKey ba = new BASymmetricKey(32);
-    MsgLinkRecord[] linkRecords = SendMessageRunner.prepareMsgLinkRecords(new UserRecord[] { SIL.getFetchedDataCache().getUserRecord() }, ba, null);
+    MsgLinkRecord[] linkRecords = SendMessageRunner.prepareMsgLinkRecords(SIL, new UserRecord[] { SIL.getFetchedDataCache().getUserRecord() }, ba);
     MsgDataRecord dataRecord = SendMessageRunner.prepareMsgDataRecord(ba, new Short(MsgDataRecord.IMPORTANCE_HIGH_PLAIN), subject, body, null);
     Msg_New_Rq newMsgRequest = new Msg_New_Rq(null, null, null, linkRecords, dataRecord, null, null, null, null);
     MessageAction requestMessageAction = new MessageAction(CommandCodes.MSG_Q_NEW, newMsgRequest);

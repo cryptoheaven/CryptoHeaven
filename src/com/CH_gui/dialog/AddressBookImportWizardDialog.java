@@ -16,6 +16,7 @@ import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.SendMessageRunner;
 import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
@@ -33,7 +34,6 @@ import com.CH_gui.addressBook.*;
 import com.CH_gui.csv.CSVParser;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
-import com.CH_gui.msgs.SendMessageRunner;
 import com.CH_gui.tree.FolderTree;
 import com.CH_gui.tree.FolderTreeModelGui;
 import com.CH_gui.util.ExtensionFileFilter;
@@ -239,7 +239,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
               if (!isDuplicate || allowDuplicates) {
                 XMLElement[] address = makeAddressFromData(mappedLine, destinationFields.length);
                 BASymmetricKey key = new BASymmetricKey(32);
-                MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(recipient, key, AddressBookImportWizardDialog.this);
+                MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(SIL, recipient, key);
                 MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), address[0].toString(), address[1].toString(), null);
                 Msg_New_Rq request = new Msg_New_Rq(shareId, null, links[0], data);
                 request.hashes = SendMessageRunner.prepareAddrHashes(data);
