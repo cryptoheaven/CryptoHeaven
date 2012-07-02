@@ -340,7 +340,7 @@ public class TextRenderer {
   /**
   * @return name of the folder owner and all participants in a String[2] array with first being the owner.
   */
-  public static String[] getFolderNote(FolderRecord fRec, boolean includeAllParticipants) {
+  private static String[] getFolderNote(FolderRecord fRec, boolean includeAllParticipants) {
     FetchedDataCache cache = null;
     Long myUserId = null;
     Long ownerUserId = null;
@@ -470,7 +470,7 @@ public class TextRenderer {
   */
   public static String getFolderAndShareNames(FolderPair fPair, boolean includeAllParticipants) {
     FolderRecord fRec = fPair.getFolderRecord();
-    String[] notes = TextRenderer.getFolderNote(fRec, includeAllParticipants);
+    String[] notes = getFolderNote(fRec, includeAllParticipants);
     String additionalNote = notes[0].length() > 0 ? notes[0] + " " + notes[1] : notes[1];
     additionalNote = additionalNote.trim();
     String title = fPair.getMyName();

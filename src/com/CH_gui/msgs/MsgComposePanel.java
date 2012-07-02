@@ -20,10 +20,7 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgTypingListener;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.FolderOps;
-import com.CH_cl.service.ops.MsgDataOps;
-import com.CH_cl.service.ops.SendMessageInfoProviderI;
-import com.CH_cl.service.ops.SendMessageRunner;
+import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
@@ -39,7 +36,6 @@ import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.msg.dataSets.obj.Obj_ID_Rq;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
-import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
 import com.CH_co.service.msg.dataSets.usr.Usr_AltUsrData_Rq;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.RecordFilter;
@@ -2872,27 +2868,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           // clear red flags
           Record[] toRecipients = getSelectedRecipients(MsgLinkRecord.RECIPIENT_TYPE_TO);
           if (toRecipients != null && toRecipients.length == 1 && toRecipients[0] instanceof FolderPair) {
-            FolderPair toFolderPair = (FolderPair) toRecipients[0];
-            MsgLinkRecord[] msgLinks = cache.getMsgLinkRecordsForFolder(toFolderPair.getId());
-            if (msgLinks != null && msgLinks.length > 0) {
-              ArrayList statUpdatesL = new ArrayList();
-              for (int i=0; i<msgLinks.length; i++) {
-                StatRecord stat = cache.getStatRecord(msgLinks[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
-                if (stat != null && stat.mark.equals(StatRecord.FLAG_NEW)) {
-                  // clone the stats to send the request
-                  StatRecord statClone = (StatRecord) stat.clone();
-                  // set mark to "old" on the clone
-                  statClone.mark = StatRecord.FLAG_OLD;
-                  statUpdatesL.add(statClone);
-                }
-              }
-              if (!statUpdatesL.isEmpty()) {
-                StatRecord[] statUpdates = new StatRecord[statUpdatesL.size()];
-                statUpdatesL.toArray(statUpdates);
-                Stats_Update_Rq request = new Stats_Update_Rq(statUpdates);
-                MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
-              }
-            }
+            StatOps.markOldCachedMsgsInFolder(MainFrame.getServerInterfaceLayer(), toRecipients[0].getId());
           }
         }
 

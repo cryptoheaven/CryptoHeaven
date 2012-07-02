@@ -1,38 +1,42 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.actions.cnt;
 
-import java.util.*;
-
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.cnt.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.cnt.Cnt_AcceptDecline_Rq;
+import com.CH_co.service.msg.dataSets.cnt.Cnt_GetCnts_Rp;
+import com.CH_co.service.msg.dataSets.cnt.Cnt_Rename_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.records.ContactRecord;
+import com.CH_co.service.records.InvEmlRecord;
+import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.ArrayUtils;
+import java.util.ArrayList;
+import java.util.Set;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class CntAGetContacts extends ClientMessageAction {
 
   /** Creates new CntAGetContacts */
@@ -40,9 +44,9 @@ public class CntAGetContacts extends ClientMessageAction {
   }
 
   /**
-   * The action handler performs all actions related to the received message (reply),
-   * and optionally returns a request Message.  If there is no request, null is returned.
-   */
+  * The action handler performs all actions related to the received message (reply),
+  * and optionally returns a request Message.  If there is no request, null is returned.
+  */
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CntAGetContacts.class, "runAction(Connection)");
 
@@ -63,7 +67,7 @@ public class CntAGetContacts extends ClientMessageAction {
     // and do need any unsealing, do not fetch shares for them.
 
     // Gather all necessary folders for incoming contacts.
-    Vector folderIDsV = null;
+    ArrayList folderIDsL = null;
     for (int i=0; contactRecords!=null && i<contactRecords.length; i++) {
       ContactRecord cRec = contactRecords[i];
       if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
@@ -72,39 +76,39 @@ public class CntAGetContacts extends ClientMessageAction {
           cRec.getEncOwnerNote() != null && // if enc note is null, no point fetching a share to decrypt it.
           cache.getFolderShareRecordMy(cRec.folderId, groupIDsSet) == null)
       {
-        if (folderIDsV == null) folderIDsV = new Vector();
-        folderIDsV.addElement(cRec.folderId);
+        if (folderIDsL == null) folderIDsL = new ArrayList();
+        folderIDsL.add(cRec.folderId);
       }
     }
-    if (folderIDsV != null && folderIDsV.size() > 0) {
-      Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsV, Long.class);
+    if (folderIDsL != null && folderIDsL.size() > 0) {
+      Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
       getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
 
     // See if we got any contacts for which we don't have user handles fetched
     if (contactRecords != null) {
-      Vector unknownUserIDsV = null;
+      ArrayList unknownUserIDsL = null;
       for (int i=0; i<contactRecords.length; i++) {
         ContactRecord cRec = contactRecords[i];
         Long uId = cRec.ownerUserId;
         if (cache.getUserRecord(uId) == null) {
-          if (unknownUserIDsV == null) unknownUserIDsV = new Vector();
-          if (!unknownUserIDsV.contains(uId)) unknownUserIDsV.addElement(uId);
+          if (unknownUserIDsL == null) unknownUserIDsL = new ArrayList();
+          if (!unknownUserIDsL.contains(uId)) unknownUserIDsL.add(uId);
         }
         uId = cRec.contactWithId;
         if (cache.getUserRecord(uId) == null) {
-          if (unknownUserIDsV == null) unknownUserIDsV = new Vector();
-          if (!unknownUserIDsV.contains(uId)) unknownUserIDsV.addElement(uId);
+          if (unknownUserIDsL == null) unknownUserIDsL = new ArrayList();
+          if (!unknownUserIDsL.contains(uId)) unknownUserIDsL.add(uId);
         }
         uId = cRec.creatorId;
         if (cache.getUserRecord(uId) == null) {
-          if (unknownUserIDsV == null) unknownUserIDsV = new Vector();
-          if (!unknownUserIDsV.contains(uId)) unknownUserIDsV.addElement(uId);
+          if (unknownUserIDsL == null) unknownUserIDsL = new ArrayList();
+          if (!unknownUserIDsL.contains(uId)) unknownUserIDsL.add(uId);
         }
       }
-      if (unknownUserIDsV != null && unknownUserIDsV.size() > 0) {
-        Long[] unknownUserIDs = (Long[]) ArrayUtils.toArray(unknownUserIDsV, Long.class);
+      if (unknownUserIDsL != null && unknownUserIDsL.size() > 0) {
+        Long[] unknownUserIDs = (Long[]) ArrayUtils.toArray(unknownUserIDsL, Long.class);
         getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDs)), 30000);
       }
     }
@@ -119,7 +123,7 @@ public class CntAGetContacts extends ClientMessageAction {
     if (contactRecords != null && contactRecords.length > 0) {
       InvEmlRecord[] allInvEmls = cache.getInvEmlRecords();
       if (allInvEmls != null && allInvEmls.length > 0) {
-        Vector updatedInvEmlsV = new Vector();
+        ArrayList updatedInvEmlsL = new ArrayList();
         for (int i=0; i<contactRecords.length; i++) {
           ContactRecord cRec = contactRecords[i];
           if (cRec.ownerUserId.equals(userId) && cRec.isOfActiveTypeAnyState()) {
@@ -127,14 +131,14 @@ public class CntAGetContacts extends ClientMessageAction {
               InvEmlRecord invEml = allInvEmls[k];
               if (!invEml.removed.booleanValue() && invEml.sentByUID.equals(userId) && invEml.emailAddr.equalsIgnoreCase(cRec.getOwnerNote())) {
                 invEml.removed = Boolean.TRUE;
-                updatedInvEmlsV.addElement(invEml);
+                updatedInvEmlsL.add(invEml);
               }
             }
           }
         }
         // update matching InvEmlRecords in the cache so that listeners can register the change
-        if (updatedInvEmlsV.size() > 0) {
-          InvEmlRecord[] updatedInvEmls = (InvEmlRecord[]) ArrayUtils.toArray(updatedInvEmlsV, InvEmlRecord.class);
+        if (updatedInvEmlsL.size() > 0) {
+          InvEmlRecord[] updatedInvEmls = (InvEmlRecord[]) ArrayUtils.toArray(updatedInvEmlsL, InvEmlRecord.class);
           cache.addInvEmlRecords(updatedInvEmls);
         }
       }
@@ -142,7 +146,7 @@ public class CntAGetContacts extends ClientMessageAction {
 
     // Add InvEmlRecords but HIDE the invitations which are not Removed and have Active contacts with the same name
     if (invEmlRecords != null && invEmlRecords.length > 0) {
-      Vector filteredInvEmlRecordsV = new Vector();
+      ArrayList filteredInvEmlRecordsL = new ArrayList();
       ContactRecord[] allMyContactRecords = cache.getContactRecordsForUsers(new Long[] { userId });
       for (int i=0; i<invEmlRecords.length; i++) {
         InvEmlRecord invEmlRec = invEmlRecords[i];
@@ -157,26 +161,26 @@ public class CntAGetContacts extends ClientMessageAction {
           }
         }
         if (shouldKeep)
-          filteredInvEmlRecordsV.addElement(invEmlRec);
+          filteredInvEmlRecordsL.add(invEmlRec);
       }
-      if (filteredInvEmlRecordsV.size() > 0) {
-        InvEmlRecord[] filteredInvEmlRecs = (InvEmlRecord[]) ArrayUtils.toArray(filteredInvEmlRecordsV, InvEmlRecord.class);
+      if (filteredInvEmlRecordsL.size() > 0) {
+        InvEmlRecord[] filteredInvEmlRecs = (InvEmlRecord[]) ArrayUtils.toArray(filteredInvEmlRecordsL, InvEmlRecord.class);
         cache.addInvEmlRecords(filteredInvEmlRecs);
       }
     }
 
     // See if we got any new contacts that need to be recrypted.
     if (contactRecords != null) {
-      Vector recryptedContactsWithMeV = null;
-      Vector recryptedContactsMineV = null;
+      ArrayList recryptedContactsWithMeL = null;
+      ArrayList recryptedContactsMineL = null;
       for (int i=0; i<contactRecords.length; i++) {
         ContactRecord cRec = contactRecords[i];
         // Recrypt assymetrically encrypted contacts
         if (cRec.contactWithId.equals(userId) && cRec.getOtherKeyId() != null && cRec.getEncOtherNote() != null) {
           ContactRecord cRecClone = (ContactRecord) cRec.clone();
           cRecClone.sealRecrypt(myUser.getSymKeyCntNotes());
-          if (recryptedContactsWithMeV == null) recryptedContactsWithMeV = new Vector();
-          recryptedContactsWithMeV.addElement(cRecClone);
+          if (recryptedContactsWithMeL == null) recryptedContactsWithMeL = new ArrayList();
+          recryptedContactsWithMeL.add(cRecClone);
         }
         // Encrypt (with me) contact which was created by someone else for me and given to me without specifying the note.  Use handle as default name.
         else if (cRec.contactWithId.equals(userId)) {
@@ -184,8 +188,8 @@ public class CntAGetContacts extends ClientMessageAction {
             ContactRecord cRecClone = (ContactRecord) cRec.clone();
             cRecClone.setOtherNote(cache.getUserRecord(cRecClone.ownerUserId).handle);
             cRecClone.sealRecrypt(myUser.getSymKeyCntNotes());
-            if (recryptedContactsWithMeV == null) recryptedContactsWithMeV = new Vector();
-            recryptedContactsWithMeV.addElement(cRecClone);
+            if (recryptedContactsWithMeL == null) recryptedContactsWithMeL = new ArrayList();
+            recryptedContactsWithMeL.add(cRecClone);
           }
         }
         // Encrypt (my) contact which was created by someone else for me and given to me without specifying the note.  Use handle as default name.
@@ -194,40 +198,40 @@ public class CntAGetContacts extends ClientMessageAction {
             ContactRecord cRecClone = (ContactRecord) cRec.clone();
             cRecClone.setOwnerNote(cache.getUserRecord(cRecClone.contactWithId).handle);
             cRecClone.seal(cache.getFolderShareRecordMy(cRecClone.folderId, groupIDsSet).getSymmetricKey());
-            if (recryptedContactsMineV == null) recryptedContactsMineV = new Vector();
-            recryptedContactsMineV.addElement(cRecClone);
+            if (recryptedContactsMineL == null) recryptedContactsMineL = new ArrayList();
+            recryptedContactsMineL.add(cRecClone);
           }
         }
       }
-      if (recryptedContactsWithMeV != null && recryptedContactsWithMeV.size() > 0) {
-        ContactRecord[] recryptedContacts = (ContactRecord[]) ArrayUtils.toArray(recryptedContactsWithMeV, ContactRecord.class);
+      if (recryptedContactsWithMeL != null && recryptedContactsWithMeL.size() > 0) {
+        ContactRecord[] recryptedContacts = (ContactRecord[]) ArrayUtils.toArray(recryptedContactsWithMeL, ContactRecord.class);
         getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME, new Cnt_AcceptDecline_Rq(recryptedContacts)));
       }
-      if (recryptedContactsMineV != null && recryptedContactsMineV.size() > 0) {
-        for (int i=0; i<recryptedContactsMineV.size(); i++) {
-          ContactRecord cRec = (ContactRecord) recryptedContactsMineV.elementAt(i);
+      if (recryptedContactsMineL != null && recryptedContactsMineL.size() > 0) {
+        for (int i=0; i<recryptedContactsMineL.size(); i++) {
+          ContactRecord cRec = (ContactRecord) recryptedContactsMineL.get(i);
           getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_RENAME_MY_CONTACT, new Cnt_Rename_Rq(cRec)));
         }
       }
     }
 
-    Vector toAcknowledgeV = null;
+    ArrayList toAcknowledgeL = null;
 
     for (int i=0; contactRecords!=null && i<contactRecords.length; i++) {
       final ContactRecord cRec = contactRecords[i];
       if (cRec.status != null) {
         short status = cRec.status.shortValue();
         if (cRec.ownerUserId != null && cRec.ownerUserId.equals(getFetchedDataCache().getMyUserId()) &&
-           (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
-          if (toAcknowledgeV == null) toAcknowledgeV = new Vector();
-          toAcknowledgeV.addElement(cRec.contactId);
+          (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
+          if (toAcknowledgeL == null) toAcknowledgeL = new ArrayList();
+          toAcknowledgeL.add(cRec.contactId);
         }
       }
     }
 
-    if (toAcknowledgeV != null) {
+    if (toAcknowledgeL != null) {
       Obj_IDList_Co reply = new Obj_IDList_Co();
-      reply.IDs = (Long[]) ArrayUtils.toArray(toAcknowledgeV, Long.class);
+      reply.IDs = (Long[]) ArrayUtils.toArray(toAcknowledgeL, Long.class);
       MessageAction replyMsg = new MessageAction(CommandCodes.CNT_Q_ACKNOWLEDGE_CONTACTS, reply);
       getServerInterfaceLayer().submitAndReturn(replyMsg);
     }

@@ -263,8 +263,9 @@ public class GlobalProperties extends Object {
   // build 686 Fix for reconnection updates and folder validation when computer is put to 'sleep'
   // build 688 Zoom-in and Zoom-out in message preview and email composer.
   // build 690 Language files moved to client side package, and extensive code remodeling for android. Added info/warning/error status bar on top of tables.
+  // build 692 Changed the way file and message dates look in the tables.
 
-  public static final short PROGRAM_BUILD_NUMBER = 690;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 692;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
