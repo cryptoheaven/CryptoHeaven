@@ -132,7 +132,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
 
     // Date
     if (value instanceof Timestamp) {
-      setText(Misc.getFormattedDate((Timestamp) value, true, false));
+      setText(Misc.getFormattedDate((Timestamp) value, true, true, false));
     }
     // Numbers
     else if (value instanceof Number) {

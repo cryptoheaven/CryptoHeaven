@@ -23,7 +23,6 @@ import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.DisposableObj;
 import com.CH_co.util.GlobalProperties;
-import com.CH_co.util.Misc;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.JBottomStickViewport;
 import com.CH_gui.msgTable.MsgTableModel;
@@ -44,7 +43,6 @@ import java.awt.event.ComponentEvent;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
@@ -607,7 +605,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
         boolean viewInvalidated = FolderRecUtil.wasFolderViewInvalidated(folderId);
         if (folder != null && viewInvalidated) {
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-          if (SIL.hasPersistantMainWorker()) {
+          if (SIL.hasPersistentMainWorker()) {
             if (folder.isFileType() || folder.isRecycleType()) {
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
               File_GetFiles_Rq request = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
