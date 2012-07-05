@@ -1,42 +1,50 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- * 
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+* 
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 package com.CH_cl.service.ops;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.cryptx.BADigestBlock;
+import com.CH_co.cryptx.SHA256;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.msg.dataSets.Str_Rp;
-import com.CH_co.service.msg.dataSets.file.*;
+import com.CH_co.service.msg.dataSets.file.File_GetLinks_Rp;
+import com.CH_co.service.msg.dataSets.file.File_NewFiles_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import java.io.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Digester;
+import com.CH_co.util.Misc;
+import com.CH_co.util.NotificationCenter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Monitors a local file for changes and re-uploads edited documents.
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Monitors a local file for changes and re-uploads edited documents.
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FileLobUpEditMonitor {
 
   private static boolean ENABLE_SYNCH_CONFIRMATION = false;
@@ -129,10 +137,10 @@ public class FileLobUpEditMonitor {
   }
 
   /**
-   * Register a local file with remote link to be watched for local editing changes.
-   * @param localFile
-   * @param remoteFile 
-   */
+  * Register a local file with remote link to be watched for local editing changes.
+  * @param localFile
+  * @param remoteFile 
+  */
   public static void registerForMonitoring(File localFile, FileLinkRecord remoteFile, FileDataRecord remoteData) {
     Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(FileLobUpEditMonitor.class, "registerForMonitoring(File localFile, FileLinkRecord remoteFile, FileDataRecord remoteData)");
     if (trace != null) trace.args(localFile, remoteFile, remoteData);
@@ -293,7 +301,7 @@ public class FileLobUpEditMonitor {
           // Use specific error message if available.
           errMsg = ((Str_Rp) dataSet).message;
         }
-        errMsg += " - retry scheduled for "+Misc.getFormattedDate(new Date(set.timestampNextRetry), true, false);
+        errMsg += " - retry scheduled for "+Misc.getFormattedDate(new Date(set.timestampNextRetry), true, false, false);
         set.setError(errMsg);
         fileEditsMap.put(set.remoteFile.fileLinkId, set);
       }
