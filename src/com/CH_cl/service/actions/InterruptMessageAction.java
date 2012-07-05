@@ -74,7 +74,7 @@ public class InterruptMessageAction extends ClientMessageAction {
           String msg = MessageActionNameSwitch.getActionInfoName(actionCode) + interruptedSuffix;
           Object key = interruptedSuffix; // show 1 interrupted msg at a time, and skip the other
           // if initial login failed, give better help message
-          if (!getServerInterfaceLayer().hasPersistantMainWorker() && (actionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || actionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION)) {
+          if (!getServerInterfaceLayer().hasPersistentMainWorker() && (actionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || actionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION)) {
             title = "Login failed";
             String server = "";
             String port = "";
