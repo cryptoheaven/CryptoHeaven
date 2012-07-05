@@ -798,8 +798,8 @@ public class MsgTableModel extends RecordTableModel {
             sb.append("<font size=\"-2\" color=\"#777777\">");
             if (toAddFrom)
               sb.append(' ');
-            String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, true, false) : "";
-            String dateStr = Misc.getFormattedDate(msgLink.dateCreated, true, false);
+            String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, true, true, false) : "";
+            String dateStr = Misc.getFormattedDate(msgLink.dateCreated, true, true, false);
             if (!dateStr.equals(prevDateStr))
               sb.append(dateStr);
           }
