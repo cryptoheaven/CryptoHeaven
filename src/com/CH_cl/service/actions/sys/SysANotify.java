@@ -87,13 +87,13 @@ public class SysANotify extends ClientMessageAction {
             }
 
             // if connection is still active then request update
-            if (SIL.hasPersistantMainWorker()) {
+            if (SIL.hasPersistentMainWorker()) {
               getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE), 60000);
               // get updated new object counts
               FolderShareRecord[] allShares = cache.getFolderSharesMy(true);
               if (allShares != null && allShares.length > 0) {
                 // if connection is still active then request update
-                if (SIL.hasPersistantMainWorker()) {
+                if (SIL.hasPersistentMainWorker()) {
                   getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.FLD_Q_RED_FLAG_COUNT, new Obj_IDList_Co(RecordUtils.getIDs(allShares))));
                 }
               }
