@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
@@ -22,26 +22,27 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.40 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.40 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MsgDataRecord extends Record {
 
   public static final short MAX_RECIPIENTS_LEN = 255;
@@ -211,7 +212,7 @@ public class MsgDataRecord extends Record {
   }
   public ImageText getExpirationIconAndText(Long forUserId, boolean isShortForm) {
     int icon = ImageNums.IMAGE_NONE;
-    String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired, true, false) : Misc.getFormattedTimestamp(dateExpired));
+    String expiration = dateExpired == null ? (isShortForm ? "" : "Never") : (isShortForm ? Misc.getFormattedDate(dateExpired, true, false, false) : Misc.getFormattedTimestamp(dateExpired));
     String note = "";
     if (dateExpired != null) {
       if (dateExpired.getTime() > System.currentTimeMillis())
@@ -254,10 +255,10 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Seals the <code> subject and text </code> to <code> encSubject and encText </code>
-   * using the sealant object which is the message's symmetric key from corresponding message link.
-   * Sealing also sets the signed digests and sender's private key id.
-   */
+  * Seals the <code> subject and text </code> to <code> encSubject and encText </code>
+  * using the sealant object which is the message's symmetric key from corresponding message link.
+  * Sealing also sets the signed digests and sender's private key id.
+  */
   public void seal(BASymmetricKey symmetricKey, KeyRecord signingPrivKey) {
     seal(symmetricKey, null, signingPrivKey);
   }
@@ -279,7 +280,7 @@ public class MsgDataRecord extends Record {
         cText = null;
 
       SymmetricBulkCipher symCipher = new SymmetricBulkCipher(symmetricKey);
-      SymmetricBulkCipher symBodyCipher = null;
+      SymmetricBulkCipher symBodyCipher;
       if (bodyKey == null || bodyKey.encodedPassword == null)
         symBodyCipher = symCipher;
       else {
@@ -287,12 +288,12 @@ public class MsgDataRecord extends Record {
         symmetricBodyKey.XOR(bodyKey.encodedPassword);
         symBodyCipher = new SymmetricBulkCipher(symmetricBodyKey);
       }
-      BASymCipherBulk tempEncSubject = null;
+      BASymCipherBulk tempEncSubject;
       if (cSubject != null)
         tempEncSubject = new BASymCipherBulk(symCipher.bulkEncrypt(cSubject, 0, cSubject.length));
       else
         tempEncSubject = symCipher.bulkEncrypt(subject);
-      BASymCipherBulk tempEncText = null;
+      BASymCipherBulk tempEncText;
       if (cText != null)
         tempEncText = new BASymCipherBulk(symBodyCipher.bulkEncrypt(cText, 0, cText.length));
       else
@@ -301,9 +302,8 @@ public class MsgDataRecord extends Record {
       // The subject and body of the message is digested, then encrypted with message's symmetric key.
       //MessageDigest md = MessageDigest.getInstance("SHA-1");
       MessageDigest md = new SHA256();
-      byte[] msgHash = null;
       md.update(Misc.convStrToBytes(subject));
-      msgHash = md.digest(Misc.convStrToBytes(textBody));
+      byte[] msgHash = md.digest(Misc.convStrToBytes(textBody));
 
       if (trace != null) trace.data(10, "Signing message ...");
       AsymmetricBlockCipher asyCipher = new AsymmetricBlockCipher();
@@ -370,7 +370,7 @@ public class MsgDataRecord extends Record {
       if (recipients != null) {
         String[] recips = recipients.split("[ ]+");
         int recipsIndex = recips[0].equals("") ? 1 : 0; // ignore leading delimited blanks
-        Vector replyToAddressesV = null;
+        ArrayList replyToAddressesL = null;
         while (recips.length > recipsIndex) {
           String type = recips[recipsIndex++];
           char typeChar = type.charAt(0);
@@ -384,14 +384,14 @@ public class MsgDataRecord extends Record {
               fromEmailAddress = Misc.escapeWhiteDecode(token);
               if (trace != null) trace.data(52, "FROM address found", fromEmailAddress);
             } else if (isReplyTo && typeChar == MsgDataRecord.RECIPIENT_EMAIL_INTERNET) {
-              if (replyToAddressesV == null) replyToAddressesV = new Vector();
+              if (replyToAddressesL == null) replyToAddressesL = new ArrayList();
               String addr = Misc.escapeWhiteDecode(token);
-              replyToAddressesV.addElement(addr);
+              replyToAddressesL.add(addr);
               if (trace != null) trace.data(62, "Reply-To address found", addr);
             }
           }
         }
-        replyToAddresses = (String[]) ArrayUtils.toArray(replyToAddressesV, String.class);
+        replyToAddresses = (String[]) ArrayUtils.toArray(replyToAddressesL, String.class);
       }
     } else {
       if (trace != null) trace.data(200, "rawRecipients were null");
@@ -401,9 +401,9 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Decrypt specified encText using a matching password set from the specified array.
-   * @return Object[] { BASymPlainBulk and BASymmetricKey } ie: the decrypted text and symmetric body key
-   */
+  * Decrypt specified encText using a matching password set from the specified array.
+  * @return Object[] { BASymPlainBulk and BASymmetricKey } ie: the decrypted text and symmetric body key
+  */
   private static Object[] decryptBody(BASymCipherBulk encText, SymmetricBulkCipher symCipher, BASymmetricKey symmetricKey, Long bodyPassHash, List bodyKeys) throws DigestException, NoSuchAlgorithmException, InvalidKeyException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "decryptBody(BASymCipherBulk encText, SymmetricBulkCipher symCipher, BASymmetricKey symmetricKey, Long bodyPassHash, List bodyKeys)");
     if (trace != null) trace.args(encText, symCipher, symmetricKey, bodyPassHash, bodyKeys);
@@ -447,9 +447,9 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Unseals the <code> encSubject, encText, encSignedDigest, encEncDigest </code> into <code> subject, text, digest, encDigest </code>
-   * using the unSealant object which is the message's symmetric key and signers public key.
-   */
+  * Unseals the <code> encSubject, encText, encSignedDigest, encEncDigest </code> into <code> subject, text, digest, encDigest </code>
+  * using the unSealant object which is the message's symmetric key and signers public key.
+  */
   public void unSeal(BASymmetricKey symmetricKey, List bodyKeys, KeyRecord keyRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSeal(BASymmetricKey symmetricKey, List bodyKeys, KeyRecord keyRecord)");
 
@@ -518,9 +518,9 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Unseals the <code> encSubject, encText, encEncDigest </code> into <code> subject, text, encDigest </code>
-   * using the unSealant object which is the message's symmetric key -- DOES NOT verify signatures!
-   */
+  * Unseals the <code> encSubject, encText, encEncDigest </code> into <code> subject, text, encDigest </code>
+  * using the unSealant object which is the message's symmetric key -- DOES NOT verify signatures!
+  */
   public void unSealWithoutVerify(BASymmetricKey symmetricKey, List bodyKeys) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSealWithoutVerify(BASymmetricKey symmetricKey, List bodyKeys)");
 
@@ -580,9 +580,9 @@ public class MsgDataRecord extends Record {
 
 
   /**
-   * Unseals the <code> encSubject </code> into <code> subject</code>
-   * using the unSealant object which is the message's symmetric key.
-   */
+  * Unseals the <code> encSubject </code> into <code> subject</code>
+  * using the unSealant object which is the message's symmetric key.
+  */
   public void unSealSubject(BASymmetricKey symmetricKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgDataRecord.class, "unSealSubject(BASymmetricKey symmetricKey)");
 
@@ -609,7 +609,6 @@ public class MsgDataRecord extends Record {
 
 
   private String makeBodyUnavailableContent() {
-    String text = null;
     int impPlain = importance.shortValue() & IMPORTANCE_PLAIN_MASK;
     boolean isPlain = impPlain != 0;
     String imgName = ImageNums.getImageName(ImageNums.STOPWATCH_ALERT16);
@@ -640,9 +639,7 @@ public class MsgDataRecord extends Record {
                 "</td>"
               +"</tr>"
             +"</table>";
-    text =  tablePre + str + tablePost;
-
-    return text;
+    return tablePre + str + tablePost;
   }
 
 
@@ -887,8 +884,8 @@ public class MsgDataRecord extends Record {
 
 
   /**
-   * return true if this is an Internet Email or Web Email
-   */
+  * return true if this is an Internet Email or Web Email
+  */
   public boolean isEmail() {
     return isEmail(importance);
   }
@@ -982,9 +979,9 @@ public class MsgDataRecord extends Record {
 
 
   /**
-   * Should user have access to message body?
-   * @return true iff user should have access to message body or user is UNSPECIFIED
-   */
+  * Should user have access to message body?
+  * @return true iff user should have access to message body or user is UNSPECIFIED
+  */
   public boolean isPrivilegedBodyAccess(Long userId, Date currentTime) {
     boolean access = false;
     // null is allowed, used in server-server communications
@@ -1063,12 +1060,12 @@ public class MsgDataRecord extends Record {
   }
 
   /**
-   * Encodes and caches the message text for display in HTML renderers
-   * where it should look like PLAIN.
-   */
+  * Encodes and caches the message text for display in HTML renderers
+  * where it should look like PLAIN.
+  */
   public String getEncodedHTMLData() {
     if (encodedHTMLData == null || encodedHTMLData.length() == 0) {
-     encodedHTMLData = Misc.encodePlainIntoHtml(getText());
+    encodedHTMLData = Misc.encodePlainIntoHtml(getText());
     }
     return encodedHTMLData;
   }
