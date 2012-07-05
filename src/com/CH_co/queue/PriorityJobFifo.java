@@ -94,6 +94,7 @@ public class PriorityJobFifo extends PriorityFifo {
       switch (code) {
         case CommandCodes.SYS_Q_VERSION :
         case CommandCodes.USR_Q_LOGIN_SECURE_SESSION :
+        case CommandCodes.USR_Q_LOGOUT :
           priority = MAIN_WORKER_HIGHEST_PRIORITY;
           break;
         case CommandCodes.SYS_Q_NOTIFY :

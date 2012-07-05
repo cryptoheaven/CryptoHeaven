@@ -13,10 +13,9 @@
 package com.CH_co.queue;
 
 import com.CH_co.trace.ThreadTraced;
-import java.util.LinkedList;
-import java.util.Iterator;
-
 import com.CH_co.trace.Trace;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
