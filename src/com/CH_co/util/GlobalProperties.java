@@ -68,7 +68,7 @@ public class GlobalProperties extends Object {
   // build 248 Reduced number of concurrent db connections
   // build 250 Password protected email
   // build 252 Pickup link
-  // build 254 Persistant preview mode
+  // build 254 Persistent preview mode
   // build 260 Online Status
   // build 262 Online Status - Away timeout setting
   // build 264 Recipient's Dialog list auto-completion
@@ -264,8 +264,9 @@ public class GlobalProperties extends Object {
   // build 688 Zoom-in and Zoom-out in message preview and email composer.
   // build 690 Language files moved to client side package, and extensive code remodeling for android. Added info/warning/error status bar on top of tables.
   // build 692 Changed the way file and message dates look in the tables.
+  // build 694 Remove time from message/file table when record has last year's date or older, fix contact ordering for online contacts that never changed state to available/away/etc
 
-  public static final short PROGRAM_BUILD_NUMBER = 692;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 694;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

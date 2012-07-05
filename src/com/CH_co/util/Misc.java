@@ -12,14 +12,21 @@
 
 package com.CH_co.util;
 
-import com.CH_co.unicode.*;
-
+import com.CH_co.unicode.Compress;
+import com.CH_co.unicode.EndOfInputException;
+import com.CH_co.unicode.Expand;
+import com.CH_co.unicode.IllegalInputException;
 import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.text.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.net.Socket;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -438,12 +445,10 @@ public class Misc extends Object {
     * if the date is more than 90 days, format is ex: Jan 22, 2000
     */
   public static String getFormattedDate(Date timestamp) {
-    return getFormattedDate(timestamp, true, true);
+    return getFormattedDate(timestamp, true, true, true);
   }
-  public static String getFormattedDate(Date timestamp, boolean includeSeconds) {
-    return getFormattedDate(timestamp, true, includeSeconds);
-  }
-  public static String getFormattedDate(Date timestamp, boolean includeTime, boolean includeSeconds) {
+
+  public static String getFormattedDate(Date timestamp, boolean includeTime, boolean includeTimeOnlyIfSameYear, boolean includeSeconds) {
     long givenTime = timestamp.getTime();
     Date currDate = new Date();
     long currTime = currDate.getTime();
@@ -464,8 +469,10 @@ public class Misc extends Object {
       sb.append("MMM d");
       if (!sameYear)
         sb.append(" yyyy");
-      if (includeTime)
-        sb.append(", h:mm aa");
+      if (includeTime) {
+        if (!includeTimeOnlyIfSameYear || includeTimeOnlyIfSameYear && sameYear)
+          sb.append(", h:mm aa");
+      }
       formatter = new SimpleDateFormat(sb.toString());
     }
 
