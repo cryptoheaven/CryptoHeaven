@@ -826,7 +826,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     // Run update to the server and so we don't hold up the GUI, update the local cached copy right away.  This is done to make the GUI very responsive
     if (msgLinkRecord != null && msgDataRecord != null) {
       msgLinkRecord.status = (Short) Misc.setBitObj(newHTMLstate == msgDataRecord.isHtmlMail(), msgLinkRecord.status, MsgLinkRecord.STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE);
-      // Make the setting persistant
+      // Make the setting persistent
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { msgLinkRecord.msgLinkId, msgLinkRecord.status })), 30000);
     }
 
