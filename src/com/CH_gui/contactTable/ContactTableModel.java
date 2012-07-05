@@ -22,7 +22,6 @@ import com.CH_co.util.ImageNums;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
-import java.util.ArrayList;
 import java.util.Vector;
 
 /** 
@@ -165,6 +164,8 @@ public class ContactTableModel extends RecordTableModel {
             status = ContactRecord.STATUS_ACCEPTED;
           else if (status == ContactRecord.STATUS_DECLINED_ACKNOWLEDGED)
             status = ContactRecord.STATUS_DECLINED;
+          else if (status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE)
+            status = ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE;
           int alphaStatus = -status + ((int) 'x');
           value = "" + ((char) alphaStatus) + value;
           break;
