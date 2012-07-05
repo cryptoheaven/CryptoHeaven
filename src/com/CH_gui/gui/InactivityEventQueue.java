@@ -122,7 +122,7 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
     UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord();
     if (uRec != null) {
       ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-      if (SIL.hasPersistantMainWorker()) {
+      if (SIL.hasPersistentMainWorker()) {
         if (ContactRecord.onlineCharToFlag(uRec.online).shortValue() == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE) {
           Character onlineFlag = ContactRecord.onlineFlagToChar(ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE);
           // mark our local user record online so that we don't try sending another request if we are disconnected and interval passes
