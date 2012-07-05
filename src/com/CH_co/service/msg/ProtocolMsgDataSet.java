@@ -12,15 +12,13 @@
 
 package com.CH_co.service.msg;
 
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.util.Misc;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
-
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.util.Misc;
-
-import com.CH_co.io.DataInputStream2; 
-import com.CH_co.io.DataOutputStream2;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012

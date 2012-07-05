@@ -364,7 +364,7 @@ public class MessageActionNameSwitch extends Object {
       // Client provides Version info and requests Server Version info reply
       { new Integer(CommandCodes.SYS_Q_VERSION), "Version Info" },
 
-      { new Integer(CommandCodes.SYS_Q_NOTIFY), "Register Persistant Connection" },
+      { new Integer(CommandCodes.SYS_Q_NOTIFY), "Register Persistent Connection" },
 
       { new Integer(CommandCodes.SYS_Q_GET_AUTO_UPDATE), "Auto Update" },
 
@@ -548,7 +548,7 @@ public class MessageActionNameSwitch extends Object {
       // Server replies with Version information
       { new Integer(CommandCodes.SYS_A_VERSION), "Version Info" },
 
-      { new Integer(CommandCodes.SYS_A_NOTIFY), "Register Persistant Connection Reply" },
+      { new Integer(CommandCodes.SYS_A_NOTIFY), "Register Persistent Connection Reply" },
 
       // Connection timeout
       { new Integer(CommandCodes.SYS_A_CONNECTION_TIMEOUT), "Connection Timeout" },

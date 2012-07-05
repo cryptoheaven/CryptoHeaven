@@ -12,12 +12,12 @@
 
 package com.CH_co.service.msg;
 
-import java.io.*;
-
-import com.CH_co.trace.Trace;
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
 import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.util.*;
-import com.CH_co.io.*;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
+import java.io.IOException;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
