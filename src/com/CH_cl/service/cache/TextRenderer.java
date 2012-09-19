@@ -189,7 +189,7 @@ public class TextRenderer {
           sb.add(TextRenderer.getRenderedText(fromUser));
       }
 
-      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);
+      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(msgData.getRecipients());
       for (int i=0; i<recipients.length; i++)
         for (int k=0; k<recipients[i].length; k++)
           if (recipients[i][k] != null && !(recipients[i][k] instanceof FolderPair) && !(recipients[i][k] instanceof FolderRecord) && !(recipients[i][k] instanceof FolderShareRecord))
