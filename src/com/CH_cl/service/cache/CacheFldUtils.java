@@ -102,7 +102,29 @@ public class CacheFldUtils {
     if (trace != null) trace.exit(CacheFldUtils.class, folderPairs);
     return folderPairs;
   }
-
+  
+  public static void getKnownGroupMembers(Long groupId, ArrayList targetUIDsL) {
+    ArrayList processedGroupIDsL = new ArrayList();
+    getKnownGroupMembers_loop(groupId, targetUIDsL, processedGroupIDsL);
+  }
+  private static void getKnownGroupMembers_loop(Long groupId, ArrayList targetUIDsL, ArrayList processedGroupIDsL) {
+    processedGroupIDsL.add(groupId);
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FolderShareRecord[] shares = cache.getFolderShareRecordsForFolder(groupId);
+    if (shares != null) {
+      for (int i=0; i<shares.length; i++) {
+        FolderShareRecord share = shares[i];
+        if (share.isOwnedByUser()) {
+          if (!targetUIDsL.contains(share.ownerUserId))
+            targetUIDsL.add(share.ownerUserId);
+        } else {
+          if (!processedGroupIDsL.contains(share.ownerUserId))
+            getKnownGroupMembers_loop(share.ownerUserId, targetUIDsL, processedGroupIDsL);
+        }
+      }
+    }
+  }
+  
   public static void makeFolderCategories(Long userId, List foldersBufferL, List sharesBufferL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "makeFolderCategories(List folderRecordBufferL, List shareRecordBufferL)");
     if (userId != null) {
