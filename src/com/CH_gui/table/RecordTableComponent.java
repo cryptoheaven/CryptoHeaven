@@ -41,7 +41,6 @@ import com.CH_gui.gui.*;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.menuing.PopupMouseAdapter;
 import com.CH_gui.menuing.ToolBarModel;
-import com.CH_gui.msgTable.MsgInboxTableComponent;
 import com.CH_gui.msgTable.MsgTableModel;
 import com.CH_gui.recycleTable.RecycleTableModel;
 import com.CH_gui.service.records.ContactRecUtil;
@@ -89,6 +88,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private JTextField jFilterField;
   private JButton jFilterGoButton;
   private JCheckBox jFilterMsgBodyCheck;
+  private JToggleButton jFilterPinButton;
   private JButton jFilterCloseButton;
 
   private JPanel jTopPanel;
@@ -98,6 +98,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private JPanel jDescriptionPanel2;
   private JPanel jOfflinePanel;
   private JPanel jPurchasePanel;
+  private String purchasePanelLabelStr;
   private JPanel jUtilityButtonPanel;
   private JMyLinkLikeLabel jShowVersionsLink;
   private ToolBarModel toolBarModel;
@@ -126,6 +127,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   private boolean suppressVisualsSavable;
   private FolderShareListener folderShareListener;
   private ContactListener contactListener;
+  private UserListener userListener;
 
   private Thread timedScrollerThread;
 
@@ -170,18 +172,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         jFilterField.selectAll();
       }
     });
-    jFilterGoButton = new JMyButton(Images.get(ImageNums.GO16));
-    jFilterGoButton.setBorder(new EmptyBorder(0,0,0,0));
-    jFilterGoButton.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-    jFilterGoButton.setOpaque(true);
-    jFilterGoButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    jFilterGoButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-        setFilterNarrowing(jFilterField.getText(), jFilterMsgBodyCheck.isSelected());
-        jFilterField.selectAll();
-        jFilterField.requestFocusInWindow();
-      }
-    });
     jFilterMsgBodyCheck = new JMyCheckBox();
     jFilterMsgBodyCheck.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
     jFilterMsgBodyCheck.setOpaque(true);
@@ -203,8 +193,27 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         jFilterField.requestFocusInWindow();
       }
     });
+    jFilterGoButton = new JMyButton(Images.get(ImageNums.GO16));
+    jFilterGoButton.setBorder(new EmptyBorder(0,0,0,0));
+    jFilterGoButton.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+    jFilterGoButton.setOpaque(true);
+    jFilterGoButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    jFilterGoButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+        setFilterNarrowing(jFilterField.getText(), jFilterMsgBodyCheck.isSelected());
+        jFilterField.selectAll();
+        jFilterField.requestFocusInWindow();
+      }
+    });
+    jFilterPinButton = new JMyToggleButton(Images.get(ImageNums.PIN15));
+    jFilterPinButton.setBorder(new LineBorder(Color.lightGray, 1));
+    jFilterPinButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    jFilterPinButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+      }
+    });
     jFilterCloseButton = new JMyButton(Images.get(ImageNums.X15));
-    jFilterCloseButton.setBorder(new LineBorder(Color.darkGray, 1));
+    jFilterCloseButton.setBorder(new LineBorder(Color.lightGray, 1));
     jFilterCloseButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     jFilterCloseButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -221,13 +230,13 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jFilterPanel.add(jFilterField, new GridBagConstraints(1, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(3, 3, 3, 3), 0, 0));
-    jFilterPanel.add(jFilterGoButton, new GridBagConstraints(2, 0, 1, 1, 0, 0,
+    jFilterPanel.add(jFilterMsgBodyCheck, new GridBagConstraints(2, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
-    jFilterPanel.add(jFilterMsgBodyCheck, new GridBagConstraints(4, 0, 1, 1, 10, 0,
+    jFilterPanel.add(jFilterGoButton, new GridBagConstraints(3, 0, 1, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
-    jFilterPanel.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    jFilterPanel.add(jFilterCloseButton, new GridBagConstraints(6, 0, 1, 1, 0, 0,
+    jFilterPanel.add(jFilterPinButton, new GridBagConstraints(4, 0, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
+    jFilterPanel.add(jFilterCloseButton, new GridBagConstraints(5, 0, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(3, 3, 3, 3), 0, 0));
     jTitlePanel = new JPanel(new BorderLayout(0, 0));
     jTitlePanel.add(jTitleLabel, BorderLayout.CENTER);
@@ -264,6 +273,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     FetchedDataCache.getSingleInstance().addFolderShareRecordListener(folderShareListener = new FolderShareListener());
     // Listen on Contact changes so we can adjust participants
     FetchedDataCache.getSingleInstance().addContactRecordListener(contactListener = new ContactListener());
+    // Listen on User changes so we can adjust expiry/over limit panel
+    FetchedDataCache.getSingleInstance().addUserRecordListener(userListener = new UserListener());
 
     if (toolBarModel != null)
       toolBarModel.addComponentActions(this);
@@ -282,6 +293,10 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     if (contactListener != null) {
       FetchedDataCache.getSingleInstance().removeContactRecordListener(contactListener);
       contactListener = null;
+    }
+    if (userListener != null) {
+      FetchedDataCache.getSingleInstance().removeUserRecordListener(userListener);
+      userListener = null;
     }
   }
 
@@ -377,76 +392,89 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       }
     }
     boolean show = showExpired || showExpiredSub || showOverQuota || showOverQuotaSub || showOverTransfer || showOverTransferSub || showCloseToCapacity || showCloseToCapacitySub || showPurchase;
-    if (jPurchasePanel.isVisible() != show) {
-      if (show) {
-        jPurchasePanel.removeAll();
-        JMyLabel label = null;
-        String signupUrl = URLs.get(URLs.SIGNUP_PAGE) +"?UserID="+ uRec.userId;
-        if (showExpired) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
-          try {
-            label = new JMyLinkLabel("Warning: service subscription expired! Click here to renew.", new URL(signupUrl), "-1");
-          } catch (MalformedURLException ex) {
-          }
-        } else if (showExpiredSub) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-          try {
-            label = new JMyLinkLabel("Your account is past due for renewal, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-          } catch (MalformedURLException ex) {
-          }
-        } else if (showOverQuota) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
-          try {
-            label = new JMyLinkLabel("Warning: storage limit exceeded! Click here to upgrade.", new URL(signupUrl), "-1");
-          } catch (MalformedURLException ex) {
-          }
-        } else if (showOverQuotaSub) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-          try {
-            label = new JMyLinkLabel("Storage limit exceeded, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-          } catch (MalformedURLException ex) {
-          }
-        } else if (showOverTransfer) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
-          try {
-            label = new JMyLinkLabel("Warning: bandwidth usage limit exceeded! Please contact support.", new URL("mailto:support@cryptoheaven.com"), "-1", new URLLauncherMAILTO());
-          } catch (MalformedURLException ex) {
-          }
-        } else if (showOverTransferSub) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-          try {
-            label = new JMyLinkLabel("Bandwidth usage limit exceeded, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-          } catch (MalformedURLException ex) {
-          }
-          
-        } else if (showCloseToCapacity) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
-          try {
-            int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
-            label = new JMyLinkLabel("Storage limit is near capacity, " + percent +"% used. Click here to upgrade.", new URL(signupUrl), "-1");
-          } catch (MalformedURLException ex) {
-          }
-        } else if (showCloseToCapacitySub) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
-          try {
-            int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
-            label = new JMyLinkLabel("Storage limit is near capacity, " + percent +"% used, please contact your administrator.", new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-          } catch (MalformedURLException ex) {
-          }
-          
-          
-        } else if (showPurchase) {
-          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
-          try {
-            label = new JMyLinkLabel("Please support our developers by purchasing a subscription.", new URL(signupUrl), "-1");
-          } catch (MalformedURLException ex) {
-          }
+    if (show) {
+      JMyLabel label = null;
+      String labelStr = "";
+      String signupUrl = URLs.get(URLs.SIGNUP_PAGE) +"?UserID="+ uRec.userId;
+      if (showExpired) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+        try {
+          labelStr = "Warning: service subscription expired! Click here to renew.";
+          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+        } catch (MalformedURLException ex) {
         }
-        if (label != null) {
-          label.setBorder(new EmptyBorder(3, 3, 3, 3));
-          jPurchasePanel.add(label, BorderLayout.CENTER);
+      } else if (showExpiredSub) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+        try {
+          labelStr = "Your account is past due for renewal, please contact your administrator.";
+          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+        } catch (MalformedURLException ex) {
+        }
+      } else if (showOverQuota) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+        try {
+          labelStr = "Warning: storage limit exceeded! Click here to upgrade.";
+          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+        } catch (MalformedURLException ex) {
+        }
+      } else if (showOverQuotaSub) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+        try {
+          labelStr = "Storage limit exceeded, please contact your administrator.";
+          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+        } catch (MalformedURLException ex) {
+        }
+      } else if (showOverTransfer) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+        try {
+          labelStr = "Warning: bandwidth usage limit exceeded! Please contact support.";
+          label = new JMyLinkLabel(labelStr, new URL("mailto:support@cryptoheaven.com"), "-1", new URLLauncherMAILTO());
+        } catch (MalformedURLException ex) {
+        }
+      } else if (showOverTransferSub) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+        try {
+          labelStr = "Bandwidth usage limit exceeded, please contact your administrator.";
+          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+        } catch (MalformedURLException ex) {
+        }
+
+      } else if (showCloseToCapacity) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+        try {
+          int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
+          labelStr = "Storage limit is near capacity, " + percent +"% used. Click here to upgrade.";
+          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+        } catch (MalformedURLException ex) {
+        }
+      } else if (showCloseToCapacitySub) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+        try {
+          int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
+          labelStr = "Storage limit is near capacity, " + percent +"% used, please contact your administrator.";
+          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+        } catch (MalformedURLException ex) {
+        }
+      } else if (showPurchase) {
+        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+        try {
+          labelStr = "Please support our developers by purchasing a subscription.";
+          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+        } catch (MalformedURLException ex) {
         }
       }
+      if (label != null) {
+        if (purchasePanelLabelStr == null || !purchasePanelLabelStr.equals(labelStr)) {
+          purchasePanelLabelStr = labelStr;
+          label.setBorder(new EmptyBorder(3, 3, 3, 3));
+          jPurchasePanel.removeAll();
+          jPurchasePanel.add(label, BorderLayout.CENTER);
+          jPurchasePanel.revalidate();
+          jPurchasePanel.repaint();
+        }
+      }
+    }
+    if (jPurchasePanel.isVisible() != show) {
       jPurchasePanel.setVisible(show);
     }
     return show;
@@ -916,6 +944,23 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public void initData(Long folderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableComponent.class, "initData(Long folderId)");
 
+    // Since clicking between different folder of the same type doesn't copy over the search panel settings,
+    // we must do it here to have the same cancelling behaviour if search is not 'pinned'.
+    FolderPair parentPair = getRecordTableScrollPane().getTableModel().getParentFolderPair();
+    if (parentPair != null && !parentPair.getId().equals(folderId)) {
+      Boolean isEnabled = isFilterEnabled();
+      if (isEnabled != null && isEnabled.booleanValue()) {
+        if (!isFilterPinned()) {
+          // Don't carry over the filter when switching folders when filter panel is not 'pinned'.
+          setFilterEnabled(Boolean.FALSE);
+          recordTableScrollPane.getTableModel().setFilterNarrowing(null);
+        }
+      } else if (isFilterPinned()) {
+        // Always unpin when switching folders and filtering is disabled.
+        setFilterPinned(false);
+      }
+    }
+
     initDataModel(folderId);
     if (recordTableScrollPane instanceof RecordActionTable) {
       ((RecordActionTable) recordTableScrollPane).setEnabledActions();
@@ -1241,6 +1286,16 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       javax.swing.SwingUtilities.invokeLater(new GUIUpdater(event));
     }
   }
+  
+  /**
+  * User listener to update overlimit panel.
+  */
+  private class UserListener implements UserRecordListener {
+    public void userRecordUpdated(UserRecordEvent event) {
+      // to prevent deadlocks, run in seperate thread
+      javax.swing.SwingUtilities.invokeLater(new GUIUpdater(event));
+    }
+  }
 
   private class GUIUpdater implements Runnable {
     private RecordEvent event;
@@ -1279,6 +1334,13 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
           }
         }
       }
+      if (event instanceof UserRecordEvent) {
+        UserRecord[] uRecs = (UserRecord[]) event.getRecords();
+        Long myUserId = FetchedDataCache.getSingleInstance().getMyUserId();
+        if (myUserId != null && uRecs != null && uRecs.length > 0 && RecordUtils.contains(uRecs, myUserId)) {
+          updatePurchasePanel();
+        }
+      }
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
       if (trace != null) trace.exit(GUIUpdater.class);
     }
@@ -1302,17 +1364,24 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public void setFilterFromComponent(RecordTableComponent tableComp) {
     setFilterString(tableComp.getFilterString());
     setFilterIncludeMsgBodies(tableComp.getFilterIncludeMsgBodies());
-    setFilterEnabled(tableComp.isFilterEnabled());
-    RecordFilter filter = tableComp.recordTableScrollPane.getTableModel().getFilterNarrowing();
-    if (filter instanceof TextSearchFilter) {
-      RecordTableModel tableModel = recordTableScrollPane.getTableModel();
-      boolean includingMsgBodies = getFilterIncludeMsgBodies(); // take default from GUI
-      if (tableModel instanceof MsgTableModel) {
-        if (((MsgTableModel) tableModel).isModeMsgBody())
-          includingMsgBodies = true;
+    Boolean newEnabled = tableComp.isFilterPinned() ? tableComp.isFilterEnabled() : Boolean.FALSE;
+    setFilterEnabled(newEnabled);
+    RecordFilter filter = null;
+    if (newEnabled != null && newEnabled.booleanValue()) {
+      filter = tableComp.recordTableScrollPane.getTableModel().getFilterNarrowing();
+      if (filter instanceof TextSearchFilter) {
+        RecordTableModel tableModel = recordTableScrollPane.getTableModel();
+        boolean includingMsgBodies = getFilterIncludeMsgBodies(); // take default from GUI
+        if (tableModel instanceof MsgTableModel) {
+          if (((MsgTableModel) tableModel).isModeMsgBody())
+            includingMsgBodies = true;
+        }
+        ((TextSearchFilter) filter).setIncludingMsgBodies(includingMsgBodies);
+        ((TextSearchFilter) filter).setSearchTextProvider(tableModel);
       }
-      ((TextSearchFilter) filter).setIncludingMsgBodies(includingMsgBodies);
-      ((TextSearchFilter) filter).setSearchTextProvider(tableModel);
+      setFilterPinned(tableComp.isFilterPinned());
+    } else {
+      setFilterPinned(false);
     }
     recordTableScrollPane.getTableModel().setFilterNarrowing(filter);
     showTableOrDelayedTemplate();
@@ -1332,9 +1401,15 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public Boolean isFilterEnabled() {
     return Boolean.valueOf(jFilterPanel.isVisible());
   }
+  public boolean isFilterPinned() {
+    return jFilterPinButton.isSelected();
+  }
   public void setFilterEnabled(Boolean enableFilter) {
     if (enableFilter != null)
       ((RecordActionTable) RecordTableComponent.this.recordTableScrollPane).getFilterAction().putValue(Actions.STATE_CHECK, enableFilter);
+  }
+  public void setFilterPinned(boolean isPinned) {
+    jFilterPinButton.setSelected(isPinned);
   }
   public void setFilterNarrowing(String filterStr, boolean includeMsgBodies) {
     // reset any prior delayed scrollers

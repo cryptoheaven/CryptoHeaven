@@ -34,8 +34,8 @@ public class MsgDraftsTableCellRenderer extends MsgTableCellRenderer {
 
   //private static Color sentMsgAltColor = new Color(233, 238, 251);
   //private static Color sentMsgAltColorSelected = new Color(188, 193, 207);
-  private static Color sentMsgAltColor = new Color(241, 255, 231);
-  private static Color sentMsgAltColorSelected = new Color(202, 214, 194);
+  private static Color sentMsgAltColor = new Color(241, 255, 231, ALPHA);
+  private static Color sentMsgAltColorSelected = new Color(202, 214, 194, ALPHA);
   private static Color[] altBkColors = new Color[] { sentMsgAltColor, sentMsgAltColorSelected };
 
 //  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

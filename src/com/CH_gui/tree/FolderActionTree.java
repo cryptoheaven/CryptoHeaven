@@ -234,7 +234,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     return actions[OPEN_IN_SEPERATE_WINDOW_ACTION];
   }
   public Action getExploreAction() {
-    return actions[EXPLORE_FOLDER_ACTION];
+    return null;
+    //return actions[EXPLORE_FOLDER_ACTION];
   }
   // Double Click used to activate ExploreAction, but it is pretty useless, right now it expands the tree as swing default...
   public Action getDoubleClickAction() {
@@ -561,7 +562,9 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Refresh_Folder_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
+      putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new FolderTreeRefreshRunner(FolderActionTree.this).start();
@@ -573,12 +576,14 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   */
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Folder_View"), Images.get(ImageNums.CLONE_FOLDER16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Folder_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_folder_tree_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FOLDER24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new FolderTreeFrame(FolderActionTree.this.getFolderTreeModel().getFilter());
@@ -603,37 +608,35 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       for (int i=0; i<folderPairs.length; i++) {
         FolderPair fPair = folderPairs[i];
         if (fPair.getFolderRecord() != null) {
-          short folderType = fPair.getFolderRecord().folderType.shortValue();
-          if (folderType == FolderRecord.FILE_FOLDER) {
-            new FileTableFrame(fPair);
-          } else if (folderType == FolderRecord.MESSAGE_FOLDER) {
-            new MsgTableFrame(fPair);
-          } else if (folderType == FolderRecord.POSTING_FOLDER) {
-            new PostTableFrame(fPair);
-          } else if (folderType == FolderRecord.CHATTING_FOLDER) {
-            new ChatTableFrame(fPair);
-          } else if (folderType == FolderRecord.LOCAL_FILES_FOLDER) {
-            new LocalFileTableFrame("Browse");
-          } else if (folderType == FolderRecord.ADDRESS_FOLDER) {
-            new AddressTableFrame(fPair);
-          } else if (folderType == FolderRecord.WHITELIST_FOLDER) {
-            new WhiteListTableFrame(fPair);
-          } else if (folderType == FolderRecord.GROUP_FOLDER) {
-            new GroupTableFrame(fPair);
-          } else if (folderType == FolderRecord.RECYCLE_FOLDER) {
-            new RecycleTableFrame(fPair);
+          RecordTableFrame openFrame = RecordTableFrame.getOpenRecordTableFrame(fPair);
+          if (openFrame != null) {
+            RecordTableFrame.toFrontAnimation(openFrame);
+          } else {
+            short folderType = fPair.getFolderRecord().folderType.shortValue();
+            if (folderType == FolderRecord.FILE_FOLDER) {
+              new FileTableFrame(fPair);
+            } else if (folderType == FolderRecord.MESSAGE_FOLDER) {
+              new MsgTableFrame(fPair);
+            } else if (folderType == FolderRecord.POSTING_FOLDER) {
+              new PostTableFrame(fPair);
+            } else if (folderType == FolderRecord.CHATTING_FOLDER) {
+              new ChatTableFrame(fPair);
+            } else if (folderType == FolderRecord.LOCAL_FILES_FOLDER) {
+              new LocalFileTableFrame("Browse");
+            } else if (folderType == FolderRecord.ADDRESS_FOLDER) {
+              new AddressTableFrame(fPair);
+            } else if (folderType == FolderRecord.WHITELIST_FOLDER) {
+              new WhiteListTableFrame(fPair);
+            } else if (folderType == FolderRecord.GROUP_FOLDER) {
+              new GroupTableFrame(fPair);
+            } else if (folderType == FolderRecord.RECYCLE_FOLDER) {
+              new RecycleTableFrame(fPair);
+            }
           }
         }
       }
     }
     private void updateIcon(FolderPair[] selectedFolderPairs) {
-      ImageIcon icon16 = Images.get(ImageNums.CLONE16);
-      ImageIcon icon24 = Images.get(ImageNums.CLONE24);
-      boolean isAddrType = false;
-      boolean isFileType = false;
-      boolean isLocalType = false;
-      boolean isMsgType = false;
-      boolean isGroupType = false;
       if (selectedFolderPairs != null && selectedFolderPairs.length > 1) {
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Explore_Folders"));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_selected_folders_in_their_own_windows."));
@@ -641,38 +644,6 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Explore_Folder"));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_folder_in_its_own_window."));
       }
-      if (selectedFolderPairs != null && selectedFolderPairs.length > 0) {
-        for (int i=0; i<selectedFolderPairs.length; i++) {
-          FolderPair fPair = selectedFolderPairs[i];
-          short folderType = fPair.getFolderRecord().folderType.shortValue();
-          if (folderType == FolderRecord.FILE_FOLDER) {
-            isFileType = true;
-          } else if (FolderRecord.isMailType(folderType)) {
-            isMsgType = true;
-          } else if (folderType == FolderRecord.LOCAL_FILES_FOLDER) {
-            isLocalType = true;
-          } else if (FolderRecord.isAddressType(folderType)) {
-            isAddrType = true;
-          } else if (folderType == FolderRecord.GROUP_FOLDER) {
-            isGroupType = true;
-          }
-        }
-      }
-      if (isFileType && !isMsgType && !isLocalType) {
-        icon16 = Images.get(ImageNums.CLONE_FILE16);
-        icon24 = Images.get(ImageNums.CLONE_FILE24);
-      } else if (isMsgType && !isFileType && !isLocalType) {
-        icon16 = Images.get(ImageNums.CLONE_MSG16);
-        icon24 = Images.get(ImageNums.CLONE_MSG24);
-      } else if (isAddrType) {
-        icon16 = Images.get(ImageNums.CLONE_ADDR16);
-        icon24 = Images.get(ImageNums.CLONE_ADDR24);
-      } else if (isGroupType) {
-        icon16 = Images.get(ImageNums.CLONE_GROUP16);
-        icon24 = Images.get(ImageNums.CLONE_GROUP24);
-      }
-      putValue(Actions.MENU_ICON, icon16);
-      putValue(Actions.TOOL_ICON, icon24);
     }
   }
 
@@ -982,10 +953,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   */
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.SHARE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       putValue(Actions.IN_MENU, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
@@ -1004,10 +975,10 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   */
   private class InvitePopupAction extends AbstractActionTraced {
     public InvitePopupAction (int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.SHARE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.TRUE);
@@ -1045,20 +1016,20 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     if (selectedFolderPairs == null || selectedFolderPairs.length != 1) {
       action.putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
       action.putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       action.putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
     } else if (selectedFolderPairs[0].getFolderRecord().isAddressType()) {
       action.putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Share_Address_Book_..."));
       action.putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Address_Book_..."));
-      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED16, true));
-      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED24));
+      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       action.putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
     } else if (selectedFolderPairs[0].getFolderRecord().isChatting()) {
       action.putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Conversation_..."));
       action.putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Conversation_..."));
-      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_CHAT_CLOSED_SHARED16, true));
-      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CHAT_CLOSED_SHARED24));
+      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       action.putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Invite"));
     } else if (selectedFolderPairs[0].getFolderRecord().isGroupType()) {
       action.putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Group_..."));
@@ -1069,8 +1040,8 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
     } else {
       action.putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
       action.putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      action.putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+      action.putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       action.putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
     }
   }

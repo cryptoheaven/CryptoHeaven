@@ -12,31 +12,40 @@
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.util.MiscGui;
-import com.CH_gui.util.Images;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.RecordUtils;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.ImageText;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyCalendarDropdownField;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.usrs.AccountOptionsSignaturesPanel;
 import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MiscGui;
+import com.CH_guiLib.gui.JMyRadioButton;
 import java.awt.*;
-import java.awt.event.*;
-import java.sql.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Vector;
 import javax.swing.*;
-import javax.swing.border.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.engine.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.usrs.*;
+import javax.swing.border.EmptyBorder;
 
 /**
  * <b>Copyright</b> &copy; 2001-2012
@@ -229,7 +238,7 @@ public class ExpiryRevocationDialog extends GeneralDialog {
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 5, 5), 0, 0));
     posY ++;
 
-    panel.add(new JMyLabel(Images.get(ImageNums.AUTO_RESPONDER32)), new GridBagConstraints(0, posY, 1, 4, 0, 0,
+    panel.add(new JMyLabel(Images.get(ImageNums.STOPWATCH_WARN32)), new GridBagConstraints(0, posY, 1, 4, 0, 0,
         GridBagConstraints.NORTH, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 2), 0, 0));
     panel.add(new JMyLabel("I would like to..."), new GridBagConstraints(1, posY, 2, 1, 20, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 2, 2, 5), 0, 0));

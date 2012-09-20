@@ -238,7 +238,7 @@ public class RecipientsDialog extends GeneralDialog implements DisposableObj, Vi
     panel.add(jSearchName, new GridBagConstraints(0, 1, 1, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    jAddInput = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Add_Recipients"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
+    jAddInput = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Add_Recipients"), Images.get(ImageNums.EMAIL_SYMBOL16));
     jAddInput.setEnabled(jSearchName.getText().length() > 0);
     jAddInput.addActionListener(new AddInputActionListener());
     panel.add(jAddInput, new GridBagConstraints(1, 1, 1, 1, 0, 0, 

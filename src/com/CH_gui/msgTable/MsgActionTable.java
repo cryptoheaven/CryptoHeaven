@@ -505,10 +505,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   */
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.SHARE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
@@ -530,26 +530,26 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       if (fPair == null) {
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-        putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-        putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+        putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+        putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
         putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       } else if (fPair.getFolderRecord().isAddressType()) {
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Share_Address_Book_..."));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Address_Book_..."));
-        putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED16, true));
-        putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_ADDR_CLOSED_SHARED24));
+        putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+        putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
         putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       } else if (fPair.getFolderRecord().isChatting()) {
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Conversation_..."));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Invite_to_the_Conversation_..."));
-        putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_CHAT_CLOSED_SHARED16, true));
-        putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CHAT_CLOSED_SHARED24));
+        putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+        putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
         putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Invite"));
       } else {
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-        putValue(Actions.MENU_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
-        putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+        putValue(Actions.MENU_ICON, Images.get(ImageNums.SHARE16));
+        putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
         putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       }
     }
@@ -947,7 +947,9 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       RecordTableModel tableModel = getTableModel();
       if (tableModel instanceof MsgTableModel) {
         if (((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_ADDRESS ||
@@ -1042,12 +1044,14 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   */
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Message_View"), Images.get(ImageNums.CLONE_MSG16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Message_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_message_table_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_MSG24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       RecordTableModel tableModel = getTableModel();
       if (tableModel instanceof MsgTableModel) {
         if (((MsgTableModel) tableModel).getMode() == MsgTableModel.MODE_ADDRESS ||
@@ -1055,8 +1059,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         ) {
           putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Clone_Address_View"));
           putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_address_table_in_its_own_window."));
-          putValue(Actions.MENU_ICON, Images.get(ImageNums.CLONE_ADDR16));
-          putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_ADDR24));
+          putValue(Actions.MENU_ICON, Images.get(ImageNums.CLONE16));
+          putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
         }
       }
     }
@@ -1103,10 +1107,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   */
   private class InviteSenderAction extends AbstractActionTraced {
     public InviteSenderAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Invite_Sender"), Images.get(ImageNums.HANDSHAKE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Invite_Sender"), Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Invite_Message_Sender_to_Contact_List"));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.HANDSHAKE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Invite"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -1242,10 +1246,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   */
   private class PostReplyOrEditAction extends AbstractActionTraced {
     public PostReplyOrEditAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Post_Reply_to_Folder_..."), Images.get(ImageNums.REPLY_TO_MSG16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Post_Reply_to_Folder_..."), Images.get(ImageNums.POST_REPLY16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Post_a_reply_for_the_selected_message_into_the_folder."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.REPLY_TO_MSG24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.POST_REPLY24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Post_Reply"));
       RecordTableModel tableModel = getTableModel();
       if (tableModel instanceof MsgTableModel) {
@@ -1334,12 +1338,14 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
   */
   private class OpenInSeperateViewAction extends AbstractActionTraced {
     public OpenInSeperateViewAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Open_the_selected_object_in_its_own_view."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Open"));
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((MsgTableModel) getTableModel()).getParentFolderPair();
@@ -1398,7 +1404,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_UPDATE_STATUS, new Obj_List_Co(new Object[] { link.getId(), link.status })), 30000);
         }
       }
-//      // immediatelly update the cache without waiting on the results from the server
+//      // immediately update the cache without waiting on the results from the server
 //      // Commented out immediate cache update because it caused some flashing with various message updates comming from the server.
 //      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 //      cache.addMsgLinkRecords(records);
@@ -1469,7 +1475,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           };
         }
 
-        // if Move then immediatelly remove links so that source GUI table responds FAST, when action comes back from server destination folder will update
+        // if Move then immediately remove links so that source GUI table responds FAST, when action comes back from server destination folder will update
         if (isMove && sourceFolder != null) {
           FolderShareRecord sourceShare = cache.getFolderShareRecordMy(sourceFolder.folderId, true);
           FolderShareRecord chosenShare = chosenFolderPair.getFolderShareRecord();
@@ -2067,8 +2073,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         if (selectionObjType == MsgDataRecord.OBJ_TYPE_MSG) {
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Post_Reply_to_Folder_..."));
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Post_a_reply_for_the_selected_message_into_the_folder."));
-          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.MENU_ICON, Images.get(ImageNums.REPLY_TO_MSG16));
-          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.REPLY_TO_MSG24));
+          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.MENU_ICON, Images.get(ImageNums.POST_REPLY16));
+          actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_ICON, Images.get(ImageNums.POST_REPLY24));
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Post_Reply"));
         } else if (selectionObjType == MsgDataRecord.OBJ_TYPE_ADDR) {
           actions[POST_REPLY__OR__EDIT_ACTION].putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Edit_..."));

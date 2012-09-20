@@ -54,7 +54,7 @@ public class InvEmlRecord extends Record {
    * @return the default icon to represent this Record type.
    */
   public int getIcon() {
-    return ImageNums.EMAIL_SYMBOL_SMALL;
+    return ImageNums.EMAIL_SYMBOL16;
   }
 
   public void merge(Record updated) {

@@ -39,7 +39,7 @@ public class FileTypesIcons implements FileTypeI {
 
   public static Icon getFileIcon(File file) {
     if (file.isDirectory()) {
-      return Images.get(ImageNums.FLD_CLOSED16);
+      return Images.get(ImageNums.FLD_FILE16);
     } else {
       return (Icon) getFileIconAndType(file.getName())[0];
     }

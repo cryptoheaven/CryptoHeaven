@@ -89,7 +89,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public int getIcon() {
     int icon = ImageNums.IMAGE_NONE;
     if (ownerType.shortValue() == Record.RECORD_TYPE_GROUP)
-      icon = ImageNums.PEOPLE16;
+      icon = ImageNums.PEOPLE_SECURE16;
     return icon;
   }
 
@@ -212,21 +212,17 @@ public class FolderShareRecord extends Record implements LinkRecordI {
         // if the folder does not decrypt correctly, show some default title anyway...
         folderName = "unknown (encrypted data)";
         folderDesc = "unknown (encrypted data)";
-        BASymmetricKey tempSymmetricKey = new BASymmetricKey(new BAAsyCipherBlock(encSymmetricKey.toByteArray()).decrypt(privateKey));
-        symmetricKey = tempSymmetricKey;
-        SymmetricBulkCipher symCipher = new SymmetricBulkCipher(tempSymmetricKey);
-        if (trace != null) trace.data(20, "symCipher", symCipher);
-        String tempFolderName = symCipher.bulkDecrypt(encFolderName).toByteStr();
-        folderName = tempFolderName;
-        if (trace != null) trace.data(30, "tempFolderName", tempFolderName);
-        if (trace != null) trace.data(38, "encFolderDesc", encFolderDesc);
-        String tempFolderDesc = (encFolderDesc != null) ? symCipher.bulkDecrypt(encFolderDesc).toByteStr() : null;
-        folderDesc = tempFolderDesc;
-        if (trace != null) trace.data(40, "tempFolderDesc", tempFolderDesc);
 
-        //symmetricKey = tempSymmetricKey;
-        //folderName = tempFolderName;
-        //folderDesc = tempFolderDesc;
+        BASymmetricKey tempSymmetricKey = new BASymmetricKey(new BAAsyCipherBlock(encSymmetricKey.toByteArray()).decrypt(privateKey));
+        SymmetricBulkCipher symCipher = new SymmetricBulkCipher(tempSymmetricKey);
+        String tempFolderName = symCipher.bulkDecrypt(encFolderName).toByteStr();
+        String tempFolderDesc = (encFolderDesc != null) ? symCipher.bulkDecrypt(encFolderDesc).toByteStr() : null;
+
+        super.unSeal();
+
+        symmetricKey = tempSymmetricKey;
+        folderName = tempFolderName;
+        folderDesc = tempFolderDesc;
       } catch (Throwable t) {
         if (trace != null) trace.exception(FolderShareRecord.class, 100, t);
         throw new SecurityException(t.getMessage());
@@ -258,6 +254,8 @@ public class FolderShareRecord extends Record implements LinkRecordI {
           tempFolderDesc = symCipher.bulkDecrypt(encFolderDesc).toByteStr();
         }
 
+        super.unSeal();
+        
         symmetricKey = tempSymmetricKey;
         folderName = tempFolderName;
         folderDesc = tempFolderDesc;

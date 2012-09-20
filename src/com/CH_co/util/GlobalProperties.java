@@ -265,13 +265,17 @@ public class GlobalProperties extends Object {
   // build 690 Language files moved to client side package, and extensive code remodeling for android. Added info/warning/error status bar on top of tables.
   // build 692 Changed the way file and message dates look in the tables.
   // build 694 Remove time from message/file table when record has last year's date or older, fix contact ordering for online contacts that never changed state to available/away/etc
+  // build 696 Fix unwrapping of folder shares given through group memberships when they come in out of sequence with their parent dependencies
+  // build 698 Simply status bar, update Sferyx v11 -> v12, fix interrupted errors when going from sleep to alive.
+  // build 700 Icon changes
+  // build 702 icon lock issues in From/To and recipient panels
 
-  public static final short PROGRAM_BUILD_NUMBER = 694;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 702;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.6f;
-  public static final short PROGRAM_VERSION_MINOR = 3;
+  public static final float PROGRAM_VERSION = 3.7f;
+  public static final short PROGRAM_VERSION_MINOR = 0;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

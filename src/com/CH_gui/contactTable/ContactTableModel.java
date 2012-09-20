@@ -195,7 +195,8 @@ public class ContactTableModel extends RecordTableModel {
       FolderPair groupRecord = (FolderPair) record;
       switch (column) {
         case 1:
-          value = "y" + groupRecord.getMyName();
+          // groups on top
+          value = "a" + groupRecord.getMyName();
           break;
       }
     } else if (record instanceof InvEmlRecord) {

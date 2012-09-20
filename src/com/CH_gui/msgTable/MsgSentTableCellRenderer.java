@@ -32,8 +32,8 @@ import java.awt.*;
  */
 public class MsgSentTableCellRenderer extends MsgTableCellRenderer {
 
-  private static Color sentMsgAltColor = new Color(253, 242, 230);
-  private static Color sentMsgAltColorSelected = new Color(202, 194, 184);
+  private static Color sentMsgAltColor = new Color(253, 242, 230, ALPHA);
+  private static Color sentMsgAltColorSelected = new Color(202, 194, 184, ALPHA);
   private static Color[] altBkColors = new Color[] { sentMsgAltColor, sentMsgAltColorSelected };
 
 //  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

@@ -70,7 +70,7 @@ public class EmailInvitationPanel extends JPanel implements ActionProducerI {
     setBorder(new EmptyBorder(0,0,0,0));
 
     JLabel label = new JMyLabel("If your Friends and Associates have not registered yet - invite them.");
-    label.setIcon(Images.get(ImageNums.PEOPLE32));
+    label.setIcon(Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER32));
     add(label, new GridBagConstraints(0, 0, 1, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, withInviteActions ? 1 : 10, 10), 0, 0));
 

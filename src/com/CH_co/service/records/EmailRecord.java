@@ -54,7 +54,7 @@ public class EmailRecord extends Record {
   }
 
   public int getIcon() {
-    return ImageNums.EMAIL_SYMBOL_SMALL;
+    return ImageNums.EMAIL_SYMBOL_SECURE_SMALL;
   }
 
   public String getEmailAddressFull() {

@@ -1,79 +1,88 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.usrs;
 
-import com.CH_gui.actionGui.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.usr.UsrAGetHandles;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.usr.Usr_Search_Rq;
+import com.CH_co.service.msg.dataSets.usr.Usr_UsrHandles_Rp;
+import com.CH_co.service.records.RecordUtils;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.NotificationCenter;
+import com.CH_co.util.URLs;
+import com.CH_gui.actionGui.JActionButton;
+import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.menuing.*;
-import com.CH_gui.table.*;
-import com.CH_gui.userTable.*;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.actions.usr.*;
-import com.CH_cl.service.engine.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.usr.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.StringHighlighter;
+import com.CH_gui.list.StringHighlighterI;
+import com.CH_gui.menuing.ToolBarModel;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.userTable.PassRecoveryUserActionTable;
+import com.CH_gui.userTable.UserActionTable;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.MiscGui;
+import com.CH_gui.util.ToolBarProducerI;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.StringTokenizer;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
+import javax.swing.border.LineBorder;
+import javax.swing.table.TableCellRenderer;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.33 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.33 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
   private boolean suppressToolBar;
   private ServerInterfaceLayer SIL;
 
-  JTextField jNickname;
-  JTextField jUserID;
+  JTextField jSearchField;
   public UserActionTable userActionTable;
   public EmailInvitationPanel emailInvitationPanel;
   private ToolBarModel toolBarModel;
 
-  JRadioButton jRadioNicExact;
-  JRadioButton jRadioNicNoCase;
-  JRadioButton jRadioNicPartial;
-  JRadioButton jRadioNicPhonetic;
-
-  JRadioButton jRadioIDExact;
-  JRadioButton jRadioIDPartial;
+  JRadioButton jRadioExact;
+  JRadioButton jRadioNoCase;
+  JRadioButton jRadioPartial;
+  JRadioButton jRadioPhonetic;
 
   JButton jSearch;
 
@@ -104,15 +113,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       toolBarModel.addComponentActions(this);
 
     if (searchString != null && searchString.length() > 0) {
-      Long userId = null;
-      try {
-        userId = Long.valueOf(searchString);
-      } catch (Throwable t) {
-      }
-      if (userId != null)
-        jUserID.setText(userId.toString());
-      else
-        jNickname.setText(searchString);
+      jSearchField.setText(searchString);
       searchAction(true);
     }
 
@@ -128,8 +129,8 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
   }
 
   /**
-   * @return create and return 'Search' button
-   */
+  * @return create and return 'Search' button
+  */
   private JButton createSearchButton() {
     jSearch = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Search"));
     jSearch.addActionListener(new ActionListener() {
@@ -143,8 +144,8 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
 
   /**
-   * Create the dialog's main panel.
-   */
+  * Create the dialog's main panel.
+  */
   private void createPanel(boolean withUserActions, boolean withInviteActions, String customSearchHeader, boolean isPassRecoveryMode) {
     JPanel mainPanel = new JPanel();
     mainPanel.setLayout(new GridBagLayout());
@@ -167,24 +168,16 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     }
 
     // create radio buttons first
-    jRadioNicExact = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Exact"));
-    jRadioNicNoCase = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Ignore_Case"));
-    jRadioNicNoCase.setSelected(true);
-    jRadioNicPartial = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Partial"));
-    jRadioNicPhonetic = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Phonetic"));
+    jRadioExact = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Exact"));
+    jRadioNoCase = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Ignore_Case"));
+    jRadioNoCase.setSelected(true);
+    jRadioPartial = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Partial"));
+    jRadioPhonetic = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Phonetic"));
 
-    ButtonGroup g1 = new ButtonGroup();
-    g1.add(jRadioNicExact); g1.add(jRadioNicNoCase); g1.add(jRadioNicPartial); g1.add(jRadioNicPhonetic);
+    ButtonGroup group = new ButtonGroup();
+    group.add(jRadioExact); group.add(jRadioNoCase); group.add(jRadioPartial); group.add(jRadioPhonetic);
 
-    jRadioIDExact = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Exact"));
-    jRadioIDExact.setSelected(true);
-    jRadioIDPartial = new JMyRadioButton(com.CH_cl.lang.Lang.rb.getString("searchMatch_Partial"));
-
-    ButtonGroup g2 = new ButtonGroup();
-    g2.add(jRadioIDExact); g2.add(jRadioIDPartial);
-
-    jNickname = new JMyTextField();
-    jUserID = new JMyTextField();
+    jSearchField = new JMyTextField();
 
     if (isPassRecoveryMode) {
       userActionTable = new PassRecoveryUserActionTable();
@@ -222,8 +215,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       });
     }
 
-    jNickname.setColumns(15);
-    jUserID.setColumns(15);
+    jSearchField.setColumns(15);
 
     int posY = 0;
 
@@ -235,7 +227,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     }
 
     if (isPassRecoveryMode) {
-       mainPanel.add(MiscGui.createLogoHeader(), new GridBagConstraints(0, posY, 7, 1, 0, 0,
+      mainPanel.add(MiscGui.createLogoHeader(), new GridBagConstraints(0, posY, 7, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
@@ -249,39 +241,24 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 10, 10), 0, 0));
     posY ++;
 
-    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Username(s)")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    mainPanel.add(new JMyLabel("Search for:"), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 5), 0, 0));
-    mainPanel.add(jNickname, new GridBagConstraints(2, posY, 5, 1, 10, 0,
+    mainPanel.add(jSearchField, new GridBagConstraints(2, posY, 5, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
     posY ++;
 
     mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
       GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 8, 5), 0, 0));
-    mainPanel.add(jRadioNicExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
+    mainPanel.add(jRadioExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioNicNoCase, new GridBagConstraints(3, posY, 1, 1, 10, 0,
+    mainPanel.add(jRadioNoCase, new GridBagConstraints(3, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioNicPartial, new GridBagConstraints(4, posY, 1, 1, 10, 0,
+    mainPanel.add(jRadioPartial, new GridBagConstraints(4, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioNicPhonetic, new GridBagConstraints(5, posY, 2, 1, 10, 0,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    posY ++;
-
-    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_ID")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
-      GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 0, 5), 0, 0));
-    mainPanel.add(jUserID, new GridBagConstraints(2, posY, 5, 1, 10, 0,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
-    posY ++;
-
-    // Two radio buttons combined in one row.
-    mainPanel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Match")), new GridBagConstraints(0, posY, 2, 1, 0, 0,
-      GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 8, 5), 0, 0));
-    mainPanel.add(jRadioIDExact, new GridBagConstraints(2, posY, 1, 1, 10, 0,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
-    mainPanel.add(jRadioIDPartial, new GridBagConstraints(3, posY, 1, 1, 10, 0,
+    mainPanel.add(jRadioPhonetic, new GridBagConstraints(5, posY, 1, 1, 10, 0,
       GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 2, 8, 2), 0, 0));
     // Search button
-    mainPanel.add(createSearchButton(), new GridBagConstraints(4, posY, 3, 2, 0, 0,
+    mainPanel.add(createSearchButton(), new GridBagConstraints(6, posY, 1, 2, 0, 0,
       GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
     posY ++; // search button takes 2 vertical lines
@@ -312,7 +289,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       }
     }
     if (invitePanel != null) {
-      emailInvitationPanel = new EmailInvitationPanel(jNickname, withInviteActions);
+      emailInvitationPanel = new EmailInvitationPanel(jSearchField, withInviteActions);
       invitePanel.add(emailInvitationPanel, new GridBagConstraints(0, 0, 1, 1, 10, 0,
           GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     }
@@ -326,16 +303,33 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
   }
   private void searchAction(boolean broaderSearchIfNoResults) {
     boolean inputValid = true;
-    String sId = jUserID.getText().trim();
-    String nick = jNickname.getText().trim();
+    String sId = null;
+    String searchStr = jSearchField.getText().trim();
+    StringBuilder searchTextSB = new StringBuilder();
 
-    StringTokenizer st = new StringTokenizer(nick + "," + sId, ",;");
+    StringTokenizer st = new StringTokenizer(searchStr, ",;");
     lastSearchStrings = new String[st.countTokens()];
     int tokenIndex = 0;
     while (st.hasMoreTokens()) {
-      lastSearchStrings[tokenIndex] = st.nextToken().trim();
+      String token = st.nextToken().trim();
+      lastSearchStrings[tokenIndex] = token;
+      boolean isNumeric = false;
+      // first numeric value will be our USER-ID search number
+      if (sId == null) {
+        try {
+          Long id = Long.valueOf(token);
+          sId = token;
+          isNumeric = true;
+        } catch (NumberFormatException e) {
+        }
+      }
+      if (!isNumeric) {
+        searchTextSB.append(token);
+        searchTextSB.append(";");
+      }
       tokenIndex ++;
     }
+    searchStr = searchTextSB.toString();
 
     Long uID = null;
     if (sId != null && sId.length() > 0) {
@@ -343,39 +337,36 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
         uID = Long.valueOf(sId);
       } catch (NumberFormatException e) {
         inputValid = false;
-        String messageText = com.CH_cl.lang.Lang.rb.getString("msg_User_ID_must_have_a_numeric_value.");
-        String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_User_ID");
-        MessageDialog.showErrorDialog(this, messageText, title);
       }
     }
 
     // no input at all
-    if (uID == null && (nick == null || nick.length() == 0)) {
+    if (uID == null && (searchStr == null || searchStr.length() == 0)) {
       inputValid = false;
     }
 
     // if input is valid
     if (inputValid) {
       Usr_Search_Rq request = new Usr_Search_Rq();
-      request.handle = nick;
-      if (nick == null || nick.length() == 0) {
+      request.handle = searchStr;
+      if (searchStr == null || searchStr.length() == 0) {
         request.handleMode = 0;
-      } else if (jRadioNicExact.isSelected()) {
+      } else if (jRadioExact.isSelected()) {
         request.handleMode = 1;
-      } else if (jRadioNicPartial.isSelected()) {
+      } else if (jRadioPartial.isSelected()) {
         request.handleMode = 2;
-      } else if (jRadioNicPhonetic.isSelected()) {
+      } else if (jRadioPhonetic.isSelected()) {
         request.handleMode = 3;
-      } else if (jRadioNicNoCase.isSelected()) {
+      } else if (jRadioNoCase.isSelected()) {
         request.handleMode = 4;
       }
 
       request.userId = uID;
       if (uID == null) {
         request.idMode = 0;
-      } else if (jRadioIDExact.isSelected()) {
+      } else if (jRadioExact.isSelected()) {
         request.idMode = 1;
-      } else if (jRadioIDPartial.isSelected()) {
+      } else if (jRadioPartial.isSelected() || jRadioPhonetic.isSelected() || jRadioNoCase.isSelected()) {
         request.idMode = 2;
       }
       request.includeEmailRecords = true;
@@ -436,8 +427,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
           querySatisfied = true;
           userActionTable.getJSortedTable().getSelectionModel().setSelectionInterval(0, 0);
         }
-        jNickname.selectAll();
-        jUserID.selectAll();
+        jSearchField.selectAll();
         if (isResultTruncated)
           MessageDialog.showInfoDialog(UserSearchPanel.this, "Displaying first few hits only.  Please narrow down your search.", "Search too broad.", false);
       }
@@ -445,11 +435,11 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
       if (!querySatisfied) {
         if (broaderSearchIfNoResults && (request.idMode == 1 || request.handleMode ==  4)) {
           if (request.idMode == 1) {
-            jRadioIDPartial.setSelected(true);
+            jRadioPartial.setSelected(true);
             request.idMode = 2;
           }
           if (request.handleMode == 4) {
-            jRadioNicPartial.setSelected(true);
+            jRadioPartial.setSelected(true);
             request.handleMode = 2;
           }
           runTraced(false);

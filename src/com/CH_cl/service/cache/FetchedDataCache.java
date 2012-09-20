@@ -849,7 +849,10 @@ public class FetchedDataCache extends Object {
       // unsealing process to have complete and upto-date shares in the cache.
       Long myUId = null;
       Set groupIDsSet = null;
+      HashSet sharesChanged = null;
       synchronized (this) {
+        // gather all stored shares for potential unsealing;
+        FolderShareRecord[] prevShares = getFolderShareRecords();
         // Merge so that cached valued become updated, this is required for the
         // unsealing process to have complete and upto-date shares in the cache.
         records = (FolderShareRecord[]) RecordUtils.merge(folderShareRecordMap, records);
@@ -859,39 +862,60 @@ public class FetchedDataCache extends Object {
         myUId = getMyUserId();
         groupIDsSet = getFolderGroupIDsSet(myUId);
         ArrayList toUnsealL = new ArrayList(Arrays.asList(records));
+        sharesChanged = new HashSet();
+        for (int i=0; i<records.length; i++) {
+          sharesChanged.add(records[i]);
+        }
+        // also add any previous shares that may need unsealing (nested encryption dependent on the new additions)
+        if (prevShares != null) {
+          for (int i=0; i<prevShares.length; i++) {
+            FolderShareRecord prevShare = prevShares[i];
+            if (!prevShare.isUnSealed() || prevShare.getSymmetricKey() == null)
+              toUnsealL.add(prevShare);
+          }
+        }
         ArrayList exceptionL = new ArrayList();
         while (toUnsealL.size() > 0) {
+          boolean anyUnsealed = false;
           for (int i=0; i<toUnsealL.size(); i++) {
             FolderShareRecord sRec = (FolderShareRecord) toUnsealL.get(i);
-            if (sRec.isOwnedBy(myUId, groupIDsSet)) { // group changes
-              // local folder
-              if (sRec.shareId.longValue() == FolderShareRecord.SHARE_LOCAL_ID) {
-                sRec.setFolderName(FolderShareRecord.SHARE_LOCAL_NAME);
-                sRec.setFolderDesc(FolderShareRecord.SHARE_LOCAL_DESC);
-              } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_FILE_ID) {
-                sRec.setFolderName(FolderShareRecord.CATEGORY_FILE_NAME);
-                sRec.setFolderDesc(FolderShareRecord.CATEGORY_FILE_DESC);
-              } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_MAIL_ID) {
-                sRec.setFolderName(FolderShareRecord.CATEGORY_MAIL_NAME);
-                sRec.setFolderDesc(FolderShareRecord.CATEGORY_MAIL_DESC);
-              } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_CHAT_ID) {
-                sRec.setFolderName(FolderShareRecord.CATEGORY_CHAT_NAME);
-                sRec.setFolderDesc(FolderShareRecord.CATEGORY_CHAT_DESC);
-              } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_GROUP_ID) {
-                sRec.setFolderName(FolderShareRecord.CATEGORY_GROUP_NAME);
-                sRec.setFolderDesc(FolderShareRecord.CATEGORY_GROUP_DESC);
-              }
-              try {
-                attemptUnsealShare(sRec, exceptionL, groupIDsSet);
-              } catch (Throwable t) {
-                if (trace != null) trace.data(100, "Exception occured while attempting to unseal FolderShare", sRec);
-                if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
+            if (sRec.getSymmetricKey() == null) {
+              if (sRec.isOwnedBy(myUId, groupIDsSet)) { // group changes
+                // local folder
+                if (sRec.shareId.longValue() == FolderShareRecord.SHARE_LOCAL_ID) {
+                  sRec.setFolderName(FolderShareRecord.SHARE_LOCAL_NAME);
+                  sRec.setFolderDesc(FolderShareRecord.SHARE_LOCAL_DESC);
+                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_FILE_ID) {
+                  sRec.setFolderName(FolderShareRecord.CATEGORY_FILE_NAME);
+                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_FILE_DESC);
+                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_MAIL_ID) {
+                  sRec.setFolderName(FolderShareRecord.CATEGORY_MAIL_NAME);
+                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_MAIL_DESC);
+                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_CHAT_ID) {
+                  sRec.setFolderName(FolderShareRecord.CATEGORY_CHAT_NAME);
+                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_CHAT_DESC);
+                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_GROUP_ID) {
+                  sRec.setFolderName(FolderShareRecord.CATEGORY_GROUP_NAME);
+                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_GROUP_DESC);
+                }
+                try {
+                  if (attemptUnsealShare(sRec, exceptionL, groupIDsSet)) {
+                    anyUnsealed = true;
+                    if (!sharesChanged.contains(sRec))
+                      sharesChanged.add(sRec);
+                  }
+                } catch (Throwable t) {
+                  if (trace != null) trace.data(100, "Exception occured while attempting to unseal FolderShare", sRec);
+                  if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
+                }
+              } else {
+                // maybe this wasn't owned by me or so-far-known my groups... but maybe in next iteration a parent dependency will solve this one
+                exceptionL.add(sRec);
               }
             }
           } // end for
-          int origSize = toUnsealL.size();
           toUnsealL.clear();
-          if (exceptionL.size() > 0 && exceptionL.size() < origSize) {
+          if (exceptionL.size() > 0 && anyUnsealed) {
             // another iteration
             toUnsealL.addAll(exceptionL);
           }
@@ -899,6 +923,9 @@ public class FetchedDataCache extends Object {
         } // end while
       } // end synchronized - don't want other threads to take records if we are not done unsealing them...
 
+      // use the changed shares instead of just the ones added
+      records = (FolderShareRecord[]) ArrayUtils.toArray(sharesChanged, FolderShareRecord.class);
+      
       for (int i=0; i<records.length; i++) {
         // Clear folder cached data if applicable.
         FolderShareRecord sRec = records[i];
@@ -917,31 +944,38 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
-  private void attemptUnsealShare(FolderShareRecord sRec, Collection exceptionList, Set groupIDsSet) {
+  private boolean attemptUnsealShare(FolderShareRecord sRec, Collection exceptionList, Set groupIDsSet) {
+    boolean wasUnsealed = false;
     // if anything to unseal
     if (sRec.getEncFolderName() != null) {
       // un-seal with user's global-folder symmetric key
       if (sRec.isOwnedByUser() && sRec.getPubKeyId() == null) {
         sRec.unSeal(getUserRecord().getSymKeyFldShares());
+        wasUnsealed = true;
       }
       // un-seal with symmetric key of the group
       else if (sRec.isOwnedByGroup()) {
         FolderShareRecord myGroupShare = getFolderShareRecordMy(sRec.ownerUserId, groupIDsSet);
         BASymmetricKey symmetricKey = myGroupShare != null ? myGroupShare.getSymmetricKey() : null;
-        if (symmetricKey != null)
+        if (symmetricKey != null) {
           sRec.unSeal(symmetricKey);
-        else
+          wasUnsealed = true;
+        } else {
           exceptionList.add(sRec);
+        }
       }
       // un-seal new folder share with private key
       else if (sRec.getPubKeyId() != null) {
         KeyRecord keyRec = getKeyRecord(sRec.getPubKeyId());
-        if (keyRec != null)
+        if (keyRec != null) {
           sRec.unSeal(keyRec.getPrivateKey());
-        else
+          wasUnsealed = true;
+        } else {
           exceptionList.add(sRec);
+        }
       }
     } // end if anything to unseal
+    return wasUnsealed;
   }
 
   /**
@@ -2203,8 +2237,15 @@ public class FetchedDataCache extends Object {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
             FolderShareRecord sRec = getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
-            if (sRec != null)
+            if (sRec != null) {
+              if (sRec.getSymmetricKey() == null) {
+                // Last desperate attempt to unwrap the parent folder, maybe we got it last minute
+                // as a request due to the incomming link which had no prior known parent folder.
+                ArrayList exceptionL = new ArrayList();
+                attemptUnsealShare(sRec, exceptionL, groupIDsSet);
+              }
               link.unSeal(sRec.getSymmetricKey());
+            }
           } else if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
             // any password protected message has the key
             MsgDataRecord msgDataRecord = getMsgDataRecord(link.ownerObjId);

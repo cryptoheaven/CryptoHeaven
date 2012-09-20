@@ -41,7 +41,6 @@ import com.CH_gui.list.ListComparator;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgTable.MsgDND_DragSourceListener;
 import com.CH_gui.msgTable.MsgDND_Transferable;
-import com.CH_gui.service.records.RecordUtilsGui;
 import com.CH_gui.util.FileChooser;
 import com.CH_gui.util.GeneralDialog;
 import com.CH_gui.util.Images;
@@ -195,13 +194,13 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     localFileDestination = DownloadUtilities.getDefaultDestDir();
 
     jMsgDestination = new JMyLabel(msgDestination.getMyName());
-    jMsgDestination.setIcon(RecordUtilsGui.getIcon(msgDestination));
+    jMsgDestination.setIcon(ListRenderer.getRenderedIcon(msgDestination));
 
     jFileDestination = new JMyLabel(fileDestination.getMyName());
-    jFileDestination.setIcon(RecordUtilsGui.getIcon(fileDestination));
+    jFileDestination.setIcon(ListRenderer.getRenderedIcon(fileDestination));
 
     jLocalFileDestination = new JMyLabel(localFileDestination.getAbsolutePath());
-    jLocalFileDestination.setIcon(Images.get(ImageNums.FLD_CLOSED16));
+    jLocalFileDestination.setIcon(Images.get(ImageNums.FLD_FILE16));
 
     jMsgLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Copy_Messages_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
     jFileLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Copy_Files_to"), Images.get(ImageNums.COPY16), JLabel.LEADING);
@@ -237,7 +236,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     });
 
     jOpen = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Open"));
-    jOpen.setIcon(Images.get(ImageNums.CLONE16));
+    jOpen.setIcon(Images.get(ImageNums.OPEN16));
     jOpen.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         pressedOpen();
@@ -264,7 +263,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       listModel.addElement(FETCHING_ATTACHMENTS);
       sendFetchAttachmentsRequest(paramParentMsgLinkRecords);
     }
-    jList.setCellRenderer(new ListRenderer(true, false, false, true));
+    jList.setCellRenderer(new ListRenderer(true, false, false, true, false));
     jList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(ListSelectionEvent event) {
         setEnabledButtons();
@@ -400,7 +399,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       msgDestination = fPair;
       GlobalProperties.setProperty(PROPERTY_NAME__MSG_DEST_FOLDER, msgDestination.getId().toString());
       jMsgDestination.setText(msgDestination.getMyName());
-      jMsgDestination.setIcon(RecordUtilsGui.getIcon(msgDestination));
+      jMsgDestination.setIcon(ListRenderer.getRenderedIcon(msgDestination));
     }
   }
 
@@ -410,7 +409,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       fileDestination = fPair;
       GlobalProperties.setProperty(PROPERTY_NAME__FILE_DEST_FOLDER, fileDestination.getId().toString());
       jFileDestination.setText(fileDestination.getMyName());
-      jFileDestination.setIcon(RecordUtilsGui.getIcon(fileDestination));
+      jFileDestination.setIcon(ListRenderer.getRenderedIcon(fileDestination));
     }
   }
 

@@ -1,32 +1,33 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
-import java.sql.Timestamp;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import java.sql.Timestamp;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>  
- *
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>  
+*
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class UserRecord extends Record implements MemberRecordI { // implicit no-argument constructor
 
   public static final short STATUS_WEB = 0;
@@ -236,7 +237,7 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
   }
 
   public int getIcon() {
-    return ImageNums.PERSON_SMALL;
+    return ImageNums.PERSON16;
   }
 
   public void setEncSymKeys       (BAAsyCipherBlock encSymKeys)     { this.encSymKeys       = encSymKeys;       }
@@ -249,10 +250,10 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
 
 
   /**
-   * Called often by renderers, make this method efficiently return String
-   * representation of User and cache the value instead of generating it every time.
-   * @return User's short info name.
-   */
+  * Called often by renderers, make this method efficiently return String
+  * representation of User and cache the value instead of generating it every time.
+  * @return User's short info name.
+  */
   public String shortInfo() {
     String rc = null;
     if (userId == null) {
@@ -274,9 +275,9 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
 
 
   /**
-   * Seals the <code> symKey* </code> to <code> encSymKeys </code> 
-   * using the sealant object which is the user's public key.
-   */
+  * Seals the <code> symKey* </code> to <code> encSymKeys </code> 
+  * using the sealant object which is the user's public key.
+  */
   public void seal(KeyRecord publicKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserRecord.class, "seal(KeyRecord publicKey)");
     if (symKeyFldShares == null || symKeyCntNotes == null)
@@ -300,9 +301,9 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
 
 
   /**
-   * Unseals the <code> encSymKeys </code> into <code> symKey* </code> 
-   * using the unSealant object which is the user's private key.
-   */
+  * Unseals the <code> encSymKeys </code> into <code> symKey* </code> 
+  * using the unSealant object which is the user's private key.
+  */
   public void unSeal(KeyRecord privateKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserRecord.class, "unSeal(KeyRecord privateKey)");
     if (!privateKey.keyId.equals(pubKeyId))
@@ -326,8 +327,8 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
 
 
   /**
-   * Encode users password
-   */
+  * Encode users password
+  */
   public static BAEncodedPassword getBAEncodedPassword(char[] pass, String userName) {
     return getBAEncodedPassword(pass, userName, true);
   }
@@ -423,12 +424,13 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
     return limit != UserRecord.UNLIMITED_AMOUNT && used+additionalBytes > limit;
   }
   /**
-   * return true is warning level (within 2Kb of the limit or 10% whichever hits first)
-   */
+  * return true is warning level (within 2Kb of the limit or 10% whichever hits first)
+  */
   public boolean isStorageAboveWarning() {
     long limit = storageLimit != null ? storageLimit.longValue() : 0L;
     long used = storageUsed != null ? storageUsed.longValue() : 0L;
-    return limit != UserRecord.UNLIMITED_AMOUNT && (limit < used+(1024*1024) || limit < used+(limit*0.1));
+    boolean isAbove = limit != UserRecord.UNLIMITED_AMOUNT && used > limit*0.90; // above 90% used
+    return isAbove;
   }
 
 
@@ -556,10 +558,10 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
       case STATUS_WEB:
       case STATUS_PROMO:
         notify = EMAIL_NOTIFY_YES | 
-                 EMAIL_WARN_EXTERNAL | 
-                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS |
-                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS__NO_UPDATE |
-                 EMAIL_MASK__NO_GRANT;
+                EMAIL_WARN_EXTERNAL | 
+                EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS |
+                EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS__NO_UPDATE |
+                EMAIL_MASK__NO_GRANT;
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL | 
                   ACC_SPAM_YES_INTER | 
@@ -578,9 +580,9 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
       case STATUS_GUEST:
       case STATUS_PAID:
         notify = EMAIL_NOTIFY_YES | 
-                 EMAIL_WARN_EXTERNAL | 
-                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
-                 EMAIL_MASK__NO_GRANT;
+                EMAIL_WARN_EXTERNAL | 
+                EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
+                EMAIL_MASK__NO_GRANT;
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL | 
                   ACC_SPAM_YES_INTER | 
@@ -607,8 +609,8 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
         break;
       case STATUS_BUSINESS:
         notify = EMAIL_NOTIFY_YES | 
-                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
-                 EMAIL_WARN_EXTERNAL;
+                EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
+                EMAIL_WARN_EXTERNAL;
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL |
                   ACC_SPAM_YES_INTER;
@@ -634,8 +636,8 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
         break;
       case STATUS_BUSINESS_SUB:
         notify = EMAIL_NOTIFY_YES | 
-                 EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
-                 EMAIL_WARN_EXTERNAL;
+                EMAIL_NOTIFY_INCLUDE_SUBJECT_AND_FROM_ADDRESS | 
+                EMAIL_WARN_EXTERNAL;
         accSpam = ACC_SPAM_YES_REG_EMAIL | 
                   ACC_SPAM_YES_SSL_EMAIL | 
                   ACC_SPAM_YES_INTER;

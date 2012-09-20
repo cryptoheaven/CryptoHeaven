@@ -1,69 +1,83 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.engine;
 
-import java.io.IOException;
-import java.net.*;
-import java.util.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.monitor.*;
-import com.CH_co.queue.*;
-import com.CH_co.io.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientActionSwitch;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.InterruptMessageAction;
 import com.CH_cl.service.actions.sys.SysANullAction;
+import com.CH_co.cryptx.RSAPublicKey;
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.DefaultProgMonitor;
+import com.CH_co.monitor.Interruptible;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.monitor.ProgMonitorPool;
+import com.CH_co.queue.FifoWriterI;
+import com.CH_co.queue.PriorityFifoReaderI;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.MessageActionNameSwitch;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.PingPong_Cm;
+import com.CH_co.service.msg.dataSets.obj.Obj_EncSet_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.usr.Usr_LoginSecSess_Rq;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.Misc;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details: Two inner classes: ReaderThread and WriteProcessor
- *
- *
- * Wire
- * | |         |----------------------|
- * | |         | ClientSessionContext |
- * | |         |----------------------|
- * | |
- * | |                _______
- * | |              /        \                 ===| Reply
- * | |------------->| Reader  |---------------->  |FifoWriterI
- * | |              \________/                 ===|
- * | |
- * | |                _______
- * | |              /        \                  |=== Request
- * | |<-------------| Writer  |<----------------|    FifoReaderI
- * | |              \________/                  |===
- * | |
- * | |
- *
- *
- * <b>$Revision: 1.44 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details: Two inner classes: ReaderThread and WriteProcessor
+*
+*
+* Wire
+* | |         |----------------------|
+* | |         | ClientSessionContext |
+* | |         |----------------------|
+* | |
+* | |                _______
+* | |              /        \                 ===| Reply
+* | |------------->| Reader  |---------------->  |FifoWriterI
+* | |              \________/                 ===|
+* | |
+* | |                _______
+* | |              /        \                  |=== Request
+* | |<-------------| Writer  |<----------------|    FifoReaderI
+* | |              \________/                  |===
+* | |
+* | |
+*
+*
+* <b>$Revision: 1.44 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public final class ServerInterfaceWorker extends Object implements Interruptible {
 
   private static final boolean DEBUG_ON__REQUEST_PACKET_DROP_ENABLED = false;
@@ -105,24 +119,24 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private final Object busyMonitor = new Object();
   private int busyCount = 0;
 
-  private boolean isPersistantWorker = false;
+  private boolean isPersistentWorker = false;
 
   /**
-   * Monitor completion of HEAVY jobs so that requests for heavy jobs are sent one at a time and replies read
-   * before the same worker can send a request for a heavy job.
-   */
+  * Monitor completion of HEAVY jobs so that requests for heavy jobs are sent one at a time and replies read
+  * before the same worker can send a request for a heavy job.
+  */
   private final Object readerDoneMonitor = new Object();
 
   private long creationTimestamp;
 
   /**
-   * Creates new ServerInterfaceWorker
-   * @param connectedSocket is the socket through which this client worker will communicate with the server.
-   * @param workerManager notifications between other workers
-   * @param replyFifoWriterI Where the replies should be placed.
-   * @param requestPriorityFifoReaderI Where the requests for sending are taken from.
-   * @param loginMsgAction Message to be used for login.
-   */
+  * Creates new ServerInterfaceWorker
+  * @param connectedSocket is the socket through which this client worker will communicate with the server.
+  * @param workerManager notifications between other workers
+  * @param replyFifoWriterI Where the replies should be placed.
+  * @param requestPriorityFifoReaderI Where the requests for sending are taken from.
+  * @param loginMsgAction Message to be used for login.
+  */
   public ServerInterfaceWorker(Socket connectedSocket, WorkerManagerI workerManager,
         RequestSubmitterI requestSubmitter, FifoWriterI replyFifoWriterI,
         PriorityFifoReaderI requestPriorityFifoReaderI,
@@ -164,15 +178,15 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     return sessionContext.calculateRate();
   }
 
-  private void markPersistant() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "markPersistant()");
-    isPersistantWorker = true;
+  private void markPersistent() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "markPersistent()");
+    isPersistentWorker = true;
     if (trace != null) trace.exit(ServerInterfaceWorker.class);
   }
 
-  protected boolean isPersistant() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "isPersistant()");
-    boolean rc = isPersistantWorker;
+  protected boolean isPersistent() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "isPersistent()");
+    boolean rc = isPersistentWorker;
     if (trace != null) trace.exit(ServerInterfaceWorker.class, rc);
     return rc;
   }
@@ -256,8 +270,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
 
   /**
-   * Interruptable interface method.
-   */
+  * Interruptable interface method.
+  */
   public void interrupt() {
     sessionContext.interrupt();
   }
@@ -355,7 +369,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
             // Don't want dumping monitor here on the client side, server side would be ok.
             if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
-              if (!workerManager.isDestroyed()) {
+              if (!workerManager.isDestroyed() && !workerManager.isDestroying()) {
                 progressMonitor = new DefaultProgMonitor(false);
                 ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
               }
@@ -365,16 +379,14 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             msgAction = ClientMessageAction.readActionFromStream(dataIn, sessionContext, msgActionCode, msgActionStamp);
 
             // response speed monitoring
-            if (trace != null) {
-              long startTime = msgAction.getStampTime();
-              long endTime = System.currentTimeMillis();
-              long ms = endTime-startTime;
-              if (ms >= 0 && ms < 90000) {
-                if (trace != null) trace.data(50, "Round trip time for " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()) + " took " + (endTime-startTime)+" ms. ");
-                //System.out.println(""+(endTime-startTime)+" ms. " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()));
-              }
+            long startTime = msgAction.getStampTime();
+            long endTime = System.currentTimeMillis();
+            long ms = endTime-startTime;
+            if (startTime != 0 && ms < 100*1000L && ms >= 0) { // sometimes stamps don't represent real time so this would be missleading
+              if (trace != null) trace.data(50, "Round trip time for " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()) + " took " + (endTime-startTime)+" ms. ");
+              //System.out.println(""+(endTime-startTime)+" ms. " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()));
             }
-
+            
             progressMonitor.setCancellable(msgAction);
 
             // Since the reply has been read, there is no communication error and we can remove the interruptable message.
@@ -406,7 +418,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           // If this was logout or connection timeout, do some cleanup
           if (msgActionCode == CommandCodes.USR_A_LOGOUT ||
               msgActionCode == CommandCodes.SYS_A_CONNECTION_TIMEOUT
-             )
+            )
           {
             cleanBreak = true;
             break;
@@ -489,7 +501,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       int msgActionCode = msgAction.getActionCode() ;
 
       if (msgActionCode == CommandCodes.SYS_A_NOTIFY) {
-        markPersistant();
+        markPersistent();
       }
 
       // monitor last activity Stamp -- skip null actions that maybe caused by connection errors
@@ -598,7 +610,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       if (requestPriorityFifoReaderI.size() > 0) {
         // NOTE: highest priority is 0
         if (isMainWorker() && workerManager.getMaxHeavyWorkerCount() > 0) {
-          msgAction = (MessageAction) requestPriorityFifoReaderI.remove(JobFifo.MAIN_WORKER_HIGH_PRIORITY, JobFifo.MAIN_WORKER_LOW_PRIORITY);
+          msgAction = (MessageAction) requestPriorityFifoReaderI.remove(JobFifo.MAIN_WORKER_REAL_TIME_PRIORITY, JobFifo.MAIN_WORKER_LOW_PRIORITY);
         } else {
           msgAction = (MessageAction) requestPriorityFifoReaderI.remove();
         }
@@ -614,7 +626,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         int msgActionCode = msgAction.getActionCode();
         ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
         if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
-          if (!workerManager.isDestroyed()) {
+          if (!workerManager.isDestroyed() && !workerManager.isDestroying()) {
             progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
             ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
           }
@@ -669,20 +681,10 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               // if we have nothing to act-on, we will wait.
               else {
                 if (trace != null) trace.data(20, "no message available, lets wait");
+
+                // Check if we need to wait before doing ping-pong.
                 long currentDate = System.currentTimeMillis();
-                // if we already waited for requests in the queue, send ping-pong
-                if (round > 1 && (currentDate - idleStartDate) > PING_PONG_INTERVAL) {
-                  if (trace != null) trace.data(21, "already waiting a while, ping-pong interval reached");
-                  if (isMainWorker() || pingPongStreakCount < PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK) {
-                    msgAction = new MessageAction(CommandCodes.SYS_Q_PING, new PingPong_Cm());
-                  } else {
-                    // not main workers after sometime should quit, cleanly
-                    if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " chose not to send ping!  Finishing! isMainWorker()=" + isMainWorker() + ", pingPongStreakCount=" + pingPongStreakCount);
-                    finished = true;
-                    cleanLogout = true;
-                  }
-                }
-                else {
+                if (currentDate - idleStartDate < PING_PONG_INTERVAL) {
                   if (trace != null) trace.data(25, "wait for requests in the queue");
                   // we must idle waiting for requests in the queue
                   try {
@@ -692,6 +694,22 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
                     pingPongRemainder = Math.min(PING_PONG_INTERVAL, pingPongRemainder); // PING_PONG_INTERVAL is maximum incase clock changed
                     requestPriorityFifoReaderI.wait(pingPongRemainder + 100); // 100ms extra
                   } catch (InterruptedException e) { }
+                }
+
+                // If the computer was suspended, the sleep would be much longer than asked for... 
+                // Check time passed to see if we need to ping-pong again to keep connection alive, 
+                // or to recheck the condition of our connection after extended sleeps.
+                currentDate = System.currentTimeMillis();
+                if (currentDate - idleStartDate >= PING_PONG_INTERVAL) {
+                  if (trace != null) trace.data(21, "already waiting a while, ping-pong interval reached");
+                  if (isMainWorker() || pingPongStreakCount < PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK) {
+                    msgAction = new MessageAction(CommandCodes.SYS_Q_PING, new PingPong_Cm());
+                  } else {
+                    // not main workers after sometime should quit, cleanly
+                    if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " chose not to send ping!  Finishing! isMainWorker()=" + isMainWorker() + ", pingPongStreakCount=" + pingPongStreakCount);
+                    finished = true;
+                    cleanLogout = true;
+                  }
                 }
               }
 
@@ -727,7 +745,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(msgActionStamp);
           // if no progress monitor, assign a default one... this case could be useful for just created PING request
           if (ProgMonitorPool.isDummy(progressMonitor) && !Misc.isAllGUIsuppressed()) {
-            if (!workerManager.isDestroyed()) {
+            if (!workerManager.isDestroyed() && !workerManager.isDestroying()) {
               progressMonitor = new DefaultProgMonitor(!DefaultProgMonitor.isSuppressProgressDialog(msgActionCode));
               ProgMonitorPool.registerProgMonitor(progressMonitor, msgActionStamp);
             }
@@ -823,18 +841,18 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         t.printStackTrace();
       }
 
+      // Wait a little for the pipes to clear so that all incoming messages (if any)
+      // get a chance to be read.
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException x) { }
+
       // If not pushedback, then kill it, pushing back would set it to null...
       if (msgAction != null) {
         ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
         if (pm != null)
           pm.jobKilled();
       }
-
-      // Wait a little for the pipes to clear so that all incoming messages (if any)
-      // get a chance to be read.
-      try {
-        Thread.sleep(3000);
-      } catch (InterruptedException x) { }
 
       if (cleanLogout)
         finishWriting(cleanLogout);
@@ -967,6 +985,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             // When login is successful or fails with UsrALoginFailed, thread will be unblocked immediately.
             // Login request may unexpectadly fail with general IO error, or succeed, lets keep a timeout.
             if (trace != null) trace.data(30, "Wait till stream is secured or threads released.");
+            dataOut.flush(); // flush the synchronized requests to make sure they go out ASAP
             dataOut.wait(120000); // wait for 2 minutes MAXIMUM
           } catch (InterruptedException e) {
             if (trace != null) trace.data(45, "We got an Interrupt Exception -- this is OK, quit waiting now.");

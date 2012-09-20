@@ -1022,13 +1022,13 @@ public class MsgDataRecord extends Record {
     int icon = ImageNums.IMAGE_NONE;
     if (isImpHigh(imp)) {
       text = "High Priority";
-      icon = ImageNums.PRIORITY_HIGH_SMALL;
+      icon = ImageNums.PRIORITY_HIGH16;
     } else if (isImpFYI(imp)) {
       text = "Low Priority";
-      icon = ImageNums.PRIORITY_LOW_SMALL;
+      icon = ImageNums.PRIORITY_LOW16;
     } else if (isImpSystem(imp)) {
       text = "System Notification";
-      icon = ImageNums.LIGHT_ON_SMALL;
+      icon = ImageNums.PRIORITY_FIRE16;
     } else if (isImpNormal(imp)) {
       text = "Normal Priority";
       icon = ImageNums.IMAGE_NONE;

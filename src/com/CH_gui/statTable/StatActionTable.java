@@ -90,6 +90,9 @@ public class StatActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Refresh_Stat_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       StatTableModel tableModel = (StatTableModel) getTableModel();

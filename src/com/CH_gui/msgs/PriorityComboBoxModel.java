@@ -44,9 +44,9 @@ public class PriorityComboBoxModel extends AbstractListModel implements ComboBox
   public PriorityComboBoxModel() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityComboBoxModel.class, "PriorityComboBoxModel()");
     images = new ImageIcon[3]; 
-    images[0] = Images.get(ImageNums.PRIORITY_LOW_SMALL);
+    images[0] = Images.get(ImageNums.PRIORITY_LOW16);
     images[1] = Images.get(ImageNums.TRANSPARENT16);
-    images[2] = Images.get(ImageNums.PRIORITY_HIGH_SMALL);
+    images[2] = Images.get(ImageNums.PRIORITY_HIGH16);
     cache = new Hashtable[getSize()];
     if (trace != null) trace.exit(PriorityComboBoxModel.class);
   }

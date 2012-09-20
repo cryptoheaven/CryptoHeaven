@@ -545,7 +545,8 @@ public class ContactRecord extends Record implements MemberContactRecordI {
     return isOnlineStatus(status);
   }
   public static boolean isOnlineStatus(Short status) {
-    return isOnlineStatus(status.shortValue());
+    // status maybe nullified when for example server doesn't want to report status to the client
+    return status != null ? isOnlineStatus(status.shortValue()) : false;
   }
   public static boolean isOnlineStatus(short status) {
     return    status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE ||

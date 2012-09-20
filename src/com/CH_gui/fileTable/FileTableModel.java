@@ -76,7 +76,7 @@ public class FileTableModel extends RecordTableModel {
         { { null, STR_FILE_NAME, STR_TYPE, STR_SIZE, STR_CREATED, STR_UPDATED, STR_LINK_ID, STR_DATA_ID },
           { STR_FLAG, STR_FILE_NAME, STR_TYPE, STR_SIZE, STR_CREATED, STR_UPDATED, STR_LINK_ID, STR_DATA_ID },
           { com.CH_cl.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag"), null, null, null, null, null },
-          { new Integer(ImageNums.FLAG_GRAY_SMALL), null, null, null, null, null },
+          { new Integer(ImageNums.FLAG_BLANK_SMALL), null, null, null, null, null },
           { new Integer(16), new Integer(141), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
           { new Integer(16), new Integer(141), new Integer(85), new Integer( 74), TIMESTAMP_PRL, TIMESTAMP_PRL, new Integer( 60), new Integer( 60) },
           { new Integer(16), new Integer(141), new Integer(85), new Integer( 74), TIMESTAMP_PRS, TIMESTAMP_PRS, new Integer( 60), new Integer( 60) },

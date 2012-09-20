@@ -12,18 +12,21 @@
 
 package com.CH_gui.tree;
 
-import com.CH_cl.service.cache.*;
-
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.TextRenderer;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.tree.*;
-import com.CH_co.util.*;
-import com.CH_co.service.records.*;
-
-import com.CH_gui.gui.*;
+import com.CH_co.tree.FolderTreeNode;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.gui.MyDefaultTreeCellRenderer;
+import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.util.Images;
-
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.Font;
+import javax.swing.Icon;
+import javax.swing.JTree;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -46,9 +49,10 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
   /** Creates new FolderTreeCellRenderer */
   public FolderTreeCellRenderer() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeCellRenderer.class, "FolderTreeCellRenderer()");
-    setLeafIcon(Images.get(ImageNums.FLD_CLOSED16));
-    setOpenIcon(Images.get(ImageNums.FLD_CLOSED16));
-    setClosedIcon(Images.get(ImageNums.FLD_CLOSED16));
+    setLeafIcon(Images.get(ImageNums.FLD_FILE16));
+    setOpenIcon(Images.get(ImageNums.FLD_FILE16));
+    setClosedIcon(Images.get(ImageNums.FLD_FILE16));
+    setBackgroundSelectionColor(RecordTableCellRenderer.defaultAltColorSelectedGray);
     if (trace != null) trace.exit(FolderTreeCellRenderer.class);
   }
 
@@ -92,9 +96,9 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
 
       if (fRec.folderType.shortValue() == FolderRecord.MESSAGE_FOLDER) {
         UserRecord myUserRec = FetchedDataCache.getSingleInstance().getUserRecord();
-        icon = Images.get(fRec.getIcon(selected, myUserRec));
+        icon = Images.get(fRec.getIcon(selected, myUserRec, false));
       } else {
-        icon = Images.get(fRec.getIcon(selected, null));
+        icon = Images.get(fRec.getIcon(selected, null, false));
       }
 
       // Render update count so the user is notified that folder content changed while he wasn't looking at it.

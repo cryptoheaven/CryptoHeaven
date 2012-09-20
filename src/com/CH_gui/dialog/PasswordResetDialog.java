@@ -283,7 +283,7 @@ public class PasswordResetDialog extends GeneralDialog {
                 if (index >= 0) {
                   anyAvailable = true;
                   jSubAccountsNotes[index].setText("(reset available)");
-                  jSubAccountsNotes[index].setIcon(Images.get(ImageNums.STATUS_ONLINE16));
+                  jSubAccountsNotes[index].setIcon(Images.get(ImageNums.OPTION_CHECK16));
                 }
               }
             }
@@ -295,10 +295,10 @@ public class PasswordResetDialog extends GeneralDialog {
                 UserRecord uRec = cache.getUserRecord(uID);
                 if (!Misc.isBitSet(uRec.flags, UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY)) {
                   jSubAccountsNotes[i].setText("(option disabled)");
-                  jSubAccountsNotes[i].setIcon(Images.get(ImageNums.STATUS_OFFLINE16));
+                  jSubAccountsNotes[i].setIcon(Images.get(ImageNums.OPTION_X16));
                 } else {
-                  jSubAccountsNotes[i].setText("(option enabled, user setup pending)");
-                  jSubAccountsNotes[i].setIcon(Images.get(ImageNums.STATUS_AWAY16));
+                  jSubAccountsNotes[i].setText("(pending, waiting for user login)");
+                  jSubAccountsNotes[i].setIcon(Images.get(ImageNums.OPTION_CHECK_DISABLED16));
                 }
               }
             }
@@ -306,7 +306,7 @@ public class PasswordResetDialog extends GeneralDialog {
               jNote1.setText("Note:");
               jNote2.setText("Password Reset is available only for the accounts marked with ");
               jNote3.setText("");
-              jNote3.setIcon(Images.get(ImageNums.STATUS_ONLINE16));
+              jNote3.setIcon(Images.get(ImageNums.OPTION_CHECK16));
             } else if (anyAvailable) {
               jNote1.setText("Summary:");
               if (subAccountsToManage.length == 1)

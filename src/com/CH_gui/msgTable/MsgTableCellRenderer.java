@@ -16,11 +16,11 @@ import com.CH_cl.service.cache.CacheEmlUtils;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.service.records.MsgDataRecord;
 import com.CH_co.service.records.MsgLinkRecord;
 import com.CH_co.service.records.Record;
 import com.CH_co.service.records.StatRecord;
-import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.ImageNums;
 import com.CH_co.util.ImageText;
 import com.CH_co.util.Misc;
@@ -29,13 +29,13 @@ import com.CH_gui.gui.MyInsets;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.sortedTable.JSortedTable;
-import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.util.Images;
 import java.awt.*;
 import java.sql.Timestamp;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 
 /** 
@@ -56,8 +56,8 @@ import javax.swing.table.TableModel;
 */
 public class MsgTableCellRenderer extends RecordTableCellRenderer {
 
-  private static Color regularMsgAltColor = new Color(236, 251, 232);
-  private static Color regularMsgAltColorSelected = new Color(189, 201, 186);
+  private static Color regularMsgAltColor = new Color(236, 251, 232, ALPHA);
+  private static Color regularMsgAltColorSelected = new Color(189, 201, 186, ALPHA);
   private static Color[] altBkColors = new Color[] { regularMsgAltColor, regularMsgAltColorSelected };
 
   private JPanel jRecipientPanelRenderer = null;
@@ -84,10 +84,15 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
   public MsgTableCellRenderer() {
     jRecipientPanelRenderer = new JPanel();
     jTwoLinesRendererFrom = new JPanel();
+    jTwoLinesRendererFrom.setBorder(new EmptyBorder(3,3,3,3));
     jTwoLinesRendererSent = new JPanel();
+    jTwoLinesRendererSent.setBorder(new EmptyBorder(3,3,3,3));
     jTwoLinesRendererSubject = new JPanel();
+    jTwoLinesRendererSubject.setBorder(new EmptyBorder(3,3,3,3));
     jTwoLinesRendererTo = new JPanel();
+    jTwoLinesRendererTo.setBorder(new EmptyBorder(3,3,3,3));
     jTwoLinesRenderer = new JPanel();
+    jTwoLinesRenderer.setBorder(new EmptyBorder(3,3,3,3));
     jIconSetRenderer = new JPanel();
     jHeaderRenderers = new JMyLabel[3];
     for (int i=0; i<jHeaderRenderers.length; i++)
@@ -101,7 +106,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
     jTwoLinesRendererSubject.setOpaque(true);
     jTwoLinesRendererTo.setOpaque(true);
     jTwoLinesRenderer.setOpaque(true);
-    jIconSetRenderer.setOpaque(true);
+    jIconSetRenderer.setOpaque(false);
     jIconSetRenderer.setLayout(new GridLayout());
     jRendererSmallPlainIconized = makeLabel(RecordTableCellRenderer.BORDER_ICONIZED, Images.get(ImageNums.TRANSPARENT16), -1, Font.PLAIN, Color.gray);
     jRendererSmallPlainIconized2 = makeLabel(RecordTableCellRenderer.BORDER_ICONIZED, Images.get(ImageNums.TRANSPARENT16), -1, Font.PLAIN, Color.gray);
@@ -174,7 +179,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                     }
                   }
                   if (numOfAttachments > 0) {
-                    icon = Images.get(ImageNums.ATTACH16);
+                    icon = Images.get(ImageNums.ATTACH_SMALL);
                     if (numOfAttachments == 1)
                       toolTip = com.CH_cl.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
                     else
@@ -198,7 +203,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           //setHorizontalAlignment(RIGHT);
           if (numOfAttachments > 0) {
             //text = "" + value;
-            icon = Images.get(ImageNums.ATTACH16);
+            icon = Images.get(ImageNums.ATTACH_SMALL);
             if (numOfAttachments == 1)
               toolTip = com.CH_cl.lang.Lang.rb.getString("rowTip_Message_Attachment_Present");
             else
@@ -308,14 +313,25 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         }
         else {
           setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {userId}));
-          setIcon(Images.get(ImageNums.PERSON_SMALL));
+          setIcon(Images.get(ImageNums.PERSON16));
         }
       }
       // From (email)
       else if (value instanceof String) {
         setHorizontalAlignment(LEFT);
         Record sender = CacheEmlUtils.convertToFamiliarEmailRecord((String) value);
-        setIcon(ListRenderer.getRenderedIcon(sender));
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
+        MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
+        // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
+        if (!mData.isRegularEmail() && (sender instanceof EmailAddressRecord || sender instanceof MsgDataRecord)) {
+          if (sender instanceof EmailAddressRecord)
+            setIcon(Images.get(ImageNums.EMAIL_SYMBOL_SECURE_SMALL));
+          else if (sender instanceof MsgDataRecord)
+            setIcon(Images.get(ImageNums.CONTACT16));
+        } else {
+          setIcon(ListRenderer.getRenderedIcon(sender));
+        }
         setText(ListRenderer.getRenderedText(sender));
       }
       setDefaultBackground(this, row, isSelected);
@@ -337,13 +353,14 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         thisCloned.setIcon(getIcon());
         thisCloned.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         thisCloned.setForeground(getForeground());
-        thisCloned.setBackground(getBackground());
+        //thisCloned.setBackground(getBackground());
+        thisCloned.setOpaque(false);
         // for Address objects, change the first line to "Name" because we know this column is hidden
         if (mData != null && mData.isTypeAddress())
           thisCloned.setText(ListRenderer.getRenderedText(mData));
         Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, cache);
         JComponent subjectComp = (JComponent) getTableCellRendererComponent(table, subjectValue, isSelected, hasFocus, row, -1, 5);
-        subjectComp.setOpaque(true);
+        subjectComp.setOpaque(false);
         if (subjectComp instanceof JLabel) {
           JLabel secondLine = (JLabel) subjectComp;
           secondLine.setIcon(Images.get(ImageNums.TRANSPARENT16));
@@ -385,19 +402,13 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         jFlowPanel.setBorder(null);
 
         if (isSelected) {
-          jFlowPanel.setBackground(table.getSelectionBackground());
           jFlowPanel.setForeground(table.getSelectionForeground());
         } else {
-          jFlowPanel.setBackground(table.getBackground());
           jFlowPanel.setForeground(table.getForeground());
         }
 
         if (recipients != null && recipients.length > 0) {
-          for (int recipientType=MsgLinkRecord.RECIPIENT_TYPE_TO; recipientType<=MsgLinkRecord.RECIPIENT_TYPE_BCC; recipientType++) {
-            if (recipients[recipientType] != null && recipients[recipientType].length > 0) {
-              MsgPanelUtils.drawRecordFlowPanel(recipients, new Boolean[] { Boolean.TRUE, Boolean.TRUE, Boolean.TRUE }, new String[] { null, com.CH_cl.lang.Lang.rb.getString("label_Cc"), com.CH_cl.lang.Lang.rb.getString("label_Bcc") }, jFlowPanel, jHeaderRenderers, jLabelRenderers);
-            }
-          }
+          MsgPanelUtils.drawRecordFlowPanel(recipients, new Boolean[] { Boolean.TRUE, Boolean.TRUE, Boolean.TRUE }, new String[] { null, com.CH_cl.lang.Lang.rb.getString("label_Cc"), com.CH_cl.lang.Lang.rb.getString("label_Bcc") }, jFlowPanel, jHeaderRenderers, jLabelRenderers);
         }
         setDefaultToolTip(toolTipBuf.toString(), jFlowPanel, table, row, column);
         setDefaultBackground(jFlowPanel, row, isSelected);
@@ -406,6 +417,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         boolean col_5 = isColumnVisible(table, 5);
         TableModel rawModel = null;
         if (!col_3 && !col_5 && table instanceof JSortedTable && (rawModel = ((JSortedTable) table).getRawModel()) instanceof MsgTableModel) {
+          jFlowPanel.setOpaque(false);
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
           MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
@@ -425,13 +437,13 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             if (icon == null)
               icon = Images.get(mLink.getIcon());
             jAddrRenderer.setIcon(icon);
-            setDefaultBackground(jAddrRenderer, row, isSelected);
+            jAddrRenderer.setOpaque(false);
             jFlowPanel.removeAll();
             jFlowPanel.add(jAddrRenderer);
           }
           Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, cache);
           JComponent subjectComp = (JComponent) getTableCellRendererComponent(table, subjectValue, isSelected, hasFocus, row, -1, 5);
-          subjectComp.setOpaque(true);
+          subjectComp.setOpaque(false);
           if (subjectComp instanceof JLabel) {
             JLabel secondLine = (JLabel) subjectComp;
             secondLine.setIcon(Images.get(ImageNums.TRANSPARENT16));
@@ -451,6 +463,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           }
           renderer = jTwoLinesRendererTo;
         } else {
+          jFlowPanel.setOpaque(true);
           renderer = jFlowPanel;
         }
       }
@@ -525,13 +538,15 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                     JLabel thisCloned = (JLabel) renderer;
                     thisCloned.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
                     thisCloned.setForeground(getForeground());
-                    thisCloned.setBackground(getBackground());
+                    //thisCloned.setBackground(getBackground());
+                    thisCloned.setOpaque(false);
                     jTwoLinesRendererSubject.removeAll();
                     jTwoLinesRendererSubject.setLayout(new GridLayout(2, 1));
                     jTwoLinesRendererSubject.add(thisCloned);
                     jRendererSmallPlainIconized2.setText(mData.email);
+                    jRendererSmallPlainIconized2.setOpaque(false);
                     jTwoLinesRendererSubject.add(jRendererSmallPlainIconized2);
-                    setDefaultBackground(jRendererSmallPlainIconized2, row, isSelected);
+                    //setDefaultBackground(jRendererSmallPlainIconized2, row, isSelected);
                     setDefaultBackground(jTwoLinesRendererSubject, row, isSelected);
                     renderer = jTwoLinesRendererSubject;
                   }
@@ -569,10 +584,11 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         JLabel sent = jRendererSmallPlainText;
         jRendererSmallPlainText.setText(getText());
         jRendererSmallPlainText.setIcon(null);
+        jRendererSmallPlainText.setOpaque(false);
         setDefaultBackground(sent, row, isSelected);
 
         jIconSetRenderer.removeAll();
-        setDefaultBackground(jIconSetRenderer, row, isSelected);
+        jIconSetRenderer.setOpaque(false);
         int iconIndex = 0;
 
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -611,19 +627,20 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         }
         // Secure Lock
         if (!isColumnVisible(table, 15)) {
-          // if the long version includes "Secure Lock" add it here
-          // do not add blank filler icon if this table doesn't show the lock icon at all
           if (mData != null) {
             if (table instanceof JSortedTable) {
               JSortedTable sTable = (JSortedTable) table;
               TableModel rawModel = sTable.getRawModel();
               if (rawModel instanceof MsgTableModel) {
-                MsgTableModel tableModel = (MsgTableModel) rawModel;
-                if (ArrayUtils.find(tableModel.getColumnHeaderData().data[ColumnHeaderData.I_VIEWABLE_SEQUENCE_DEFAULT_LONG], new Integer(15)) > -1) {
+                // ALWAYS SHOW LOCK IN 2-LINE MODE
+                // if the long version includes "Secure Lock" add it here
+                // do not add blank filler icon if this table doesn't show the lock icon at all
+                //MsgTableModel tableModel = (MsgTableModel) rawModel;
+                //if (ArrayUtils.find(tableModel.getColumnHeaderData().data[ColumnHeaderData.I_VIEWABLE_SEQUENCE_DEFAULT_LONG], new Integer(15)) > -1) {
                   ImageText security = mData.getSecurityTextAndIcon();
                   JLabel icon = new JLabel(Images.get(security));
                   jIconSetRenderer.add(icon);
-                }
+                //}
               }
             }
           }
@@ -637,7 +654,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               numOfAttachments --;
             }
             if (numOfAttachments > 0) {
-              JLabel icon = new JLabel(Images.get(ImageNums.ATTACH16));
+              JLabel icon = new JLabel(Images.get(ImageNums.ATTACH_SMALL));
               jIconSetRenderer.add(icon);
             } else {
               jIconSetRenderer.add(jNoIcon3);
@@ -767,14 +784,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
     JComponent renderer = jRendererSmallPlainText;
     jRendererSmallPlainText.setText(from.getText());
     jRendererSmallPlainText.setIcon(from.getIcon());
+    jRendererSmallPlainText.setOpaque(true);
     setDefaultBackground(renderer, row, isSelected);
-//    JComponent renderer = jTwoLinesRenderer;
-//    jRendererSmallPlainText.setText(from.getText());
-//    jRendererSmallPlainText.setIcon(from.getIcon());
-//    jTwoLinesRenderer.removeAll();
-//    jTwoLinesRenderer.setLayout(new GridLayout(2, 1));
-//    jTwoLinesRenderer.add(jRendererSmallPlainText);
-//    setDefaultBackground(renderer, row, isSelected);
     return renderer;
   }
 

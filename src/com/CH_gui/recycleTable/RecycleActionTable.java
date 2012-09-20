@@ -249,10 +249,10 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   */
   private class OpenFileAction extends AbstractActionTraced {
     public OpenFileAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.OPEN16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Transfer and Open remote file on local system using default file type association.");
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.OPEN24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Open"));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -426,6 +426,9 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       ((RecycleTableModel) getTableModel()).refreshData(true);
@@ -486,11 +489,14 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   */
   private class OpenFilesInSeperateWindowAction extends AbstractActionTraced {
     public OpenFilesInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((RecycleTableModel) getTableModel()).getParentFolderPair();
@@ -504,11 +510,14 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   */
   private class OpenMsgsInSeperateWindowAction extends AbstractActionTraced {
     public OpenMsgsInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Message_View"), Images.get(ImageNums.CLONE_MSG16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Message_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_message_table_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_MSG24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((RecycleTableModel) getTableModel()).getParentFolderPair();
@@ -522,7 +531,7 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   */
   private class OpenRecycleBinInSeperateWindowAction extends AbstractActionTraced {
     public OpenRecycleBinInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Recycle_Bin_View"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Recycle_Bin_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_Recycle_Bin_in_its_own_window."));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -584,10 +593,10 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   */
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.SHARE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
     }
     public void actionPerformedTraced(ActionEvent event) {

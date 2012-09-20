@@ -12,6 +12,7 @@
 
 package com.CH_gui.dialog;
 
+import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgDataRecordEvent;
@@ -364,11 +365,11 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
     Icon iconSamll = null;
     String typeText = "";
     if (isMail) {
-      iconLarge = Images.get(ImageNums.MAIL_CERT32);
+      iconLarge = Images.get(msgData.isRegularEmail() ? ImageNums.MAIL32 : ImageNums.MAIL_CERT32);
       iconSamll = Images.get(ImageNums.MAIL_READ16);
       typeText = com.CH_cl.lang.Lang.rb.getString("msgType_Mail_Message");
     } else if (isPosting) {
-      iconLarge = Images.get(ImageNums.POSTING_CERT32);
+      iconLarge = Images.get(msgData.isRegularEmail() ? ImageNums.MAIL32 : ImageNums.POSTING_CERT32);
       iconSamll = Images.get(ImageNums.POSTING16);
       typeText = com.CH_cl.lang.Lang.rb.getString("msgType_Posting_Message");
     } else if (isAddress) {
@@ -796,23 +797,26 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
     jSizeOnDisk.setText(oSize);
 
     // jFrom email address, contact or user
-    Record fromRec = null;
+    Record sender = CacheMsgUtils.getFromAsFamiliar(dataRecord);
     Record signRec = CacheUsrUtils.convertUserIdToFamiliarUser(dataRecord.senderUserId, false, true);
-    if (dataRecord.isEmail()) {
-      fromRec = new EmailAddressRecord(dataRecord.getFromEmailAddress());
-    } else {
-      fromRec = signRec;
-    }
-    if (fromRec != null) {
-      jFrom.setIcon(ListRenderer.getRenderedIcon(fromRec));
-      String text = ListRenderer.getRenderedText(fromRec);
-      if (fromRec instanceof ContactRecord)
+    if (sender != null) {
+      // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
+      if (!dataRecord.isRegularEmail() && (sender instanceof EmailAddressRecord || sender instanceof MsgDataRecord)) {
+        if (sender instanceof EmailAddressRecord)
+          jFrom.setIcon(Images.get(ImageNums.EMAIL_SYMBOL_SECURE_SMALL));
+        else if (sender instanceof MsgDataRecord)
+          jFrom.setIcon(Images.get(ImageNums.CONTACT16));
+      } else {
+        jFrom.setIcon(ListRenderer.getRenderedIcon(sender));
+      }
+      String text = ListRenderer.getRenderedText(sender, false, false, true);
+      if (!(sender instanceof UserRecord) && !dataRecord.isRegularEmail())
         jFrom.setText(text + " (user ID: " + dataRecord.senderUserId + ")");
       else
         jFrom.setText(text);
     } else {
       jFrom.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {dataRecord.senderUserId}));
-      jFrom.setIcon(Images.get(ImageNums.PERSON_SMALL));
+      jFrom.setIcon(Images.get(ImageNums.PERSON16));
     }
 
     String[] replyTos = dataRecord.getReplyToAddresses();
@@ -839,7 +843,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
         jSigningUser.setText(text);
     } else {
       jSigningUser.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {dataRecord.senderUserId}));
-      jSigningUser.setIcon(Images.get(ImageNums.PERSON_SMALL));
+      jSigningUser.setIcon(Images.get(ImageNums.PERSON16));
     }
 
 

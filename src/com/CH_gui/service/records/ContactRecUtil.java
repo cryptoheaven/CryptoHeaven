@@ -81,7 +81,7 @@ public class ContactRecUtil extends Object {
         iconCode = ImageNums.DELETE16;
         break;
       default :
-        iconCode = ImageNums.PRIORITY_HIGH_SMALL;
+        iconCode = ImageNums.PRIORITY_HIGH16;
     }
     return iconCode;
   }

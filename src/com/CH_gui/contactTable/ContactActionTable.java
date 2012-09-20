@@ -12,6 +12,7 @@
 
 package com.CH_gui.contactTable;
 
+import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
@@ -59,6 +60,7 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
@@ -145,6 +147,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
     addDND(getJSortedTable());
     addDND(getViewport());
+
+    // skip lines in the contact list
+    getJSortedTable().setShowHorizontalLines(false);
 
     if (trace != null) trace.exit(ContactActionTable.class);
   }
@@ -524,7 +529,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Refresh_Contact_List_from_the_server."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
+      putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       ContactTableModel tableModel = (ContactTableModel) getTableModel();
@@ -630,16 +637,18 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
 
 
   /**
-  * Open in seperate window
+  * Open in separate window
   */
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Contact_List_View"), Images.get(ImageNums.CLONE_CONTACT16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_Contact_List_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_contact_list_table_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new ContactTableFrame();
@@ -666,10 +675,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   */
   private class SendEmailInvitationAction extends AbstractActionTraced {
     public SendEmailInvitationAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.PEOPLE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Invite_Friends_and_Associates_..."), Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_New_Email_Message_to_invite_others_to_join_the_service."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.PEOPLE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.MAIL_COMPOSE_TO_MEMBER24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Invite"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
     }
@@ -714,10 +723,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     */
   private class CreateSharedSpaceAction extends AbstractActionTraced {
     public CreateSharedSpaceAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Create_Shared_Space_..."), Images.get(ImageNums.FOLDER_NEW_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Create_Shared_Space_..."), Images.get(ImageNums.SHARE_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Create_New_Shared_Space"));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FOLDER_NEW_SHARED24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE_ADD24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Create_Shared_Space"));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -788,6 +797,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   public static void chatOrShareSpace(final Component parent, MemberContactRecordI[] selectedRecords, boolean useSelected, final boolean isChat, final short folderType) {
     CallbackI selectionCallback = new CallbackI() {
       public void callback(Object value) {
+        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "callback(Object value)");
+        if (trace != null) trace.args(value);
+
         MemberContactRecordI[] selectedRecords = (MemberContactRecordI[]) value;
         if (selectedRecords != null && selectedRecords.length > 0) {
           boolean createSharedSpaceOk = true;
@@ -802,13 +814,98 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
             }
           }
           if (isChat) {
-            doChat(selectedRecords);
+            // Gather possible chat folder matches in a broad search
+            ArrayList suitableChatsL = new ArrayList();
+            FolderPair perfectMatch = null;
+
+            ArrayList userIDsL = new ArrayList();
+            // add self to list of required members
+            userIDsL.add(cache.getMyUserId());
+            ArrayList groupIDsL = new ArrayList();
+            ArrayList targetUIDsL = new ArrayList();
+            for (int i=0; i<selectedRecords.length; i++) {
+              MemberContactRecordI member = selectedRecords[i];
+              short memberType = member.getMemberType();
+              Long memberId = member.getMemberId();
+              if (memberType == Record.RECORD_TYPE_GROUP)
+                groupIDsL.add(member.getMemberId());
+              else if (memberType == Record.RECORD_TYPE_USER)
+                userIDsL.add(memberId);
+              else {
+                // not a Contact and not a Group
+                if (trace != null) trace.data(10, "Not a contact and Not a group!");
+              }
+            }
+            targetUIDsL.addAll(userIDsL);
+            for (int i=0; i<groupIDsL.size(); i++)
+              CacheFldUtils.getKnownGroupMembers((Long) groupIDsL.get(i), targetUIDsL);
+            Collections.sort(targetUIDsL);
+            if (trace != null) trace.data(20, "target UIDs are: ", Misc.objToStr(targetUIDsL));
+
+
+            if (trace != null) trace.data(30, "userIDsL=", Misc.objToStr(userIDsL));
+            if (trace != null) trace.data(31, "groupIDsL=", Misc.objToStr(groupIDsL));
+
+            // Gather all chat folders to see if we have a single exact match or other possible sessions involving selected members...
+            ArrayList chatUserIDsL = new ArrayList();
+            ArrayList lvl1userIDsL = new ArrayList();
+            ArrayList lvl1groupIDsL = new ArrayList();
+            FolderRecord[] chats = cache.getFolderRecordsChatting();
+            for (int i=0; i<chats.length; i++) {
+              FolderRecord chat = chats[i];
+              if (trace != null) trace.data(40, ListRenderer.getRenderedText(chat));
+              FolderShareRecord[] shares = cache.getFolderShareRecordsForFolder(chat.folderId);
+              // find all users of each chat
+              chatUserIDsL.clear();
+              lvl1userIDsL.clear();
+              lvl1groupIDsL.clear();
+              for (int j=0; j<shares.length; j++) {
+                FolderShareRecord share = shares[j];
+                if (share.isOwnedByUser()) {
+                  lvl1userIDsL.add(share.ownerUserId);
+                  if (!chatUserIDsL.contains(share.ownerUserId))
+                    chatUserIDsL.add(share.ownerUserId);
+                  if (trace != null) trace.data(41, "u"+share.ownerUserId+"("+cache.getUserRecord(share.ownerUserId) != null ? cache.getUserRecord(share.ownerUserId).handle : "null" +")");
+                } else if (share.isOwnedByGroup()) {
+                  lvl1groupIDsL.add(share.ownerUserId);
+                  if (trace != null) trace.data(42, "g"+share.ownerUserId+"("+ListRenderer.getRenderedText(cache.getFolderRecord(share.ownerUserId))+")");
+                  CacheFldUtils.getKnownGroupMembers(share.ownerUserId, chatUserIDsL);
+                }
+              }
+              Collections.sort(chatUserIDsL);
+              if (trace != null) trace.data(50, " found UIDs are: ", Misc.objToStr(chatUserIDsL));
+              if (chatUserIDsL.containsAll(targetUIDsL)) {
+                if (trace != null) trace.data(60, "lvl1userIDsL=", Misc.objToStr(lvl1userIDsL));
+                if (trace != null) trace.data(61, "lvl1groupIDsL=", Misc.objToStr(lvl1groupIDsL));
+                FolderPair suitableChat = CacheFldUtils.convertRecordToPair(chat);
+                if (perfectMatch == null 
+                        && userIDsL.containsAll(lvl1userIDsL) && lvl1userIDsL.containsAll(userIDsL) 
+                        && groupIDsL.containsAll(lvl1groupIDsL) && lvl1groupIDsL.containsAll(groupIDsL)) 
+                {
+                  if (trace != null) trace.data(70, " found PERFECT MATCH is ", ListRenderer.getRenderedText(suitableChat));
+                  perfectMatch = suitableChat;
+                } else {
+                  if (trace != null) trace.data(71, " found SUITABLE FOLDER is ", ListRenderer.getRenderedText(suitableChat));
+                  suitableChatsL.add(suitableChat);
+                }
+              }
+            }
+
+            if (suitableChatsL.size() > 0) {
+              Window w = SwingUtilities.windowForComponent(parent);
+              if (w == null || !(w instanceof Frame))
+                w = MainFrame.getSingleInstance();
+              new ChatSessionChooserDialog((Frame) w, selectedRecords, perfectMatch, suitableChatsL);
+            } else {
+              doChat(selectedRecords);
+            }
           } else if (createSharedSpaceOk) {
             doSharedSpace(parent, selectedRecords, folderType);
           } else {
             MessageDialog.showInfoDialog(parent, com.CH_cl.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_cl.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
           }
         }
+        if (trace != null) trace.exit(getClass());
       }
     };
     if (!useSelected || selectedRecords == null || selectedRecords.length == 0) {

@@ -12,13 +12,11 @@
 
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.cache.CacheFldUtils;
-import com.CH_cl.service.cache.CacheMsgUtils;
-import com.CH_cl.service.cache.CacheUsrUtils;
-import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.queue.Fifo;
 import com.CH_co.queue.ProcessingFunctionI;
@@ -944,9 +942,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
             if (recipients != null) {
               for (int i=0; i<recipients.length; i++) {
+                Record recipient = recipients[i];
                 JLabel label = new JMyLabel();
-                label.setText(ListRenderer.getRenderedText(recipients[i]));
-                label.setIcon(ListRenderer.getRenderedIcon(recipients[i]));
+                // just for display convert any EmailAddressRecord to familiar Address Book entry
+                if (recipient instanceof EmailAddressRecord) {
+                  recipient = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) recipient).address);
+                }
+                label.setText(ListRenderer.getRenderedText(recipient, false, false, true));
+                label.setIcon(ListRenderer.getRenderedIcon(recipient));
                 label.setIconTextGap(2);
                 labelsL.add(label);
               }
@@ -1150,16 +1153,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             final Object _clipDownloadMonitor = new Object();
             if (FileLauncher.isAudioWaveFilename(fileLink.getFileName())) {
               //play.setIcon(Images.get(ImageNums.VOLUME16));
-              play.setIcon(Images.get(ImageNums.PLAY16));
+              play.setIcon(Images.get(ImageNums.SOUND_PLAY16));
               stopTmp = new JMyLabel();
-              stopTmp.setIcon(Images.get(ImageNums.STOP16));
+              stopTmp.setIcon(Images.get(ImageNums.SOUND_STOP16));
               stopTmp.setBorder(new EmptyBorder(0,2,0,0));
               stopTmp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
               sliderTmp = new JSlider(0, 10000, 0);
               sliderTmp.setBorder(new EmptyBorder(0,2,0,0));
               sliderTmp.setEnabled(false);
             } else if (FileLauncher.isImageFilename(fileLink.getFileName())) {
-              play.setIcon(Images.get(ImageNums.FIND16));
+              play.setIcon(Images.get(ImageNums.FIND_PREVIEW16));
             }
             final JLabel stop = stopTmp;
             if (stop != null)
@@ -1199,16 +1202,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                                 if (value instanceof String) {
                                   String command = (String) value;
                                   if (command.equals("play")) {
-                                    play.setIcon(Images.get(ImageNums.PAUSE16));
+                                    play.setIcon(Images.get(ImageNums.SOUND_PAUSE16));
                                     //stop.setIcon(Images.get(ImageNums.STOP16));
                                     //slider.setVisible(true);
                                   } else if (command.equals("pause")) {
-                                    play.setIcon(Images.get(ImageNums.PLAY16));
+                                    play.setIcon(Images.get(ImageNums.SOUND_PLAY16));
                                     //stop.setIcon(Images.get(ImageNums.STOP16));
                                     //slider.setVisible(true);
                                   } else if (command.equals("close")) {
                                     //play.setIcon(Images.get(ImageNums.VOLUME16));
-                                    play.setIcon(Images.get(ImageNums.PLAY16));
+                                    play.setIcon(Images.get(ImageNums.SOUND_PLAY16));
                                     //stop.setIcon(null);
                                     //stop.setIcon(Images.get(ImageNums.STOP16));
                                     if (millisecondLength > 0) {
@@ -1241,7 +1244,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                           if (millisecondLength == -1) {
                             DecodingAudioClipPlayer.play(file, callback);
                           } else {
-                            if (play.getIcon().equals(Images.get(ImageNums.PLAY16)))
+                            if (play.getIcon().equals(Images.get(ImageNums.SOUND_PLAY16)))
                               DecodingAudioClipPlayer.play(file, callback, slider.getValue());
                             else
                               DecodingAudioClipPlayer.pause(file, callback);
@@ -1922,12 +1925,20 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                               msgLink.ownerObjId.equals(cache.getUserRecord().junkFolderId));
 
           // Set text and icon for the From field in the preview.
-          Record fromRec = CacheMsgUtils.getFromAsFamiliar(msgData);
-          if (fromRec != null) {
-            jFromName.setIcon(ListRenderer.getRenderedIcon(fromRec));
-            jFromName.setText(ListRenderer.getRenderedText(fromRec, false, false, true));
+          Record sender = CacheMsgUtils.getFromAsFamiliar(msgData);
+          if (sender != null) {
+            // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
+            if (!msgData.isRegularEmail() && (sender instanceof EmailAddressRecord || sender instanceof MsgDataRecord)) {
+              if (sender instanceof EmailAddressRecord)
+                jFromName.setIcon(Images.get(ImageNums.EMAIL_SYMBOL_SECURE_SMALL));
+              else if (sender instanceof MsgDataRecord)
+                jFromName.setIcon(Images.get(ImageNums.CONTACT16));
+            } else {
+              jFromName.setIcon(ListRenderer.getRenderedIcon(sender));
+            }
+            jFromName.setText(ListRenderer.getRenderedText(sender, false, false, true));
           } else {
-            jFromName.setIcon(Images.get(ImageNums.PERSON_SMALL));
+            jFromName.setIcon(Images.get(ImageNums.PERSON16));
             jFromName.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {msgData.senderUserId}));
           }
 

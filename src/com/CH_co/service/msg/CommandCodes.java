@@ -249,6 +249,8 @@ public class CommandCodes extends Object {
   public static final int FLD_A_GET_SIZE_SUMMARY = 1191; // bad return code but keep it for compatibility
   // Get Access Users
   public static final int FLD_Q_GET_ACCESS_USERS = 1192;
+  // Get Last Content Update (Msg or File)
+  public static final int FLD_Q_GET_LAST_UPDATE = 1193;
   // Get Folder Red Flag Count
   public static final int FLD_Q_RED_FLAG_COUNT = 1195;
   public static final int FLD_A_RED_FLAG_COUNT = 10195;

@@ -16,10 +16,7 @@ import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FileLobUp;
 import com.CH_cl.service.records.FolderRecUtil;
-import com.CH_co.monitor.DefaultProgMonitor;
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.monitor.ProgMonitorPool;
-import com.CH_co.monitor.Stats;
+import com.CH_co.monitor.*;
 import com.CH_co.queue.Fifo;
 import com.CH_co.queue.FifoWriterI;
 import com.CH_co.queue.PriorityFifoReaderI;
@@ -76,7 +73,7 @@ import java.util.*;
 */
 public final class ServerInterfaceLayer extends Object implements WorkerManagerI, RequestSubmitterI {
 
-  private static final boolean DEBUG_ON__SUPPERSS_RETRIES = false;
+  private static final boolean DEBUG_ON__SUPPRESS_RETRIES = false;
 
   private static final String PROPERTY_LAST_ENGINE_HOST = "lastEngineHost";
   private static final String PROPERTY_LAST_ENGINE_PORT = "lastEnginePort";
@@ -384,7 +381,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "submitAndReturnNow(MessageAction)");
     if (trace != null) trace.args(msgAction);
 
-    if (!destroyed || msgAction.getActionCode() == CommandCodes.USR_Q_LOGOUT) {
+    if (!destroyed) {
       if (msgAction == null)
         throw new IllegalArgumentException("MessageAction cannot be null.");
 
@@ -476,7 +473,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       connectionRetryCount = 0;
     } catch (RuntimeException e) {
       // If we don't destroy server or its not already destroyed, the exception will be re-thrown...
-      if (!destroyed) {
+      if (!destroyed && !destroying) {
         connectionRetryCount ++;
         if (MAX_CONNECTION_RETRY_COUNT > -1 && connectionRetryCount > MAX_CONNECTION_RETRY_COUNT) {
           if (trace != null) trace.data(10, "SIL: DESTROY, connectionRetryCount", connectionRetryCount);
@@ -498,7 +495,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "ensureEnoughAllWorkersExist.TimerTask.run()");
               if (trace != null) trace.data(10, "SIL: RETRY WOKE UP");
               try {
-                if (destroyed) {
+                if (destroyed || destroying) {
                   if (trace != null) trace.data(11, "While sleeping, we got destroyed, so we will not try to create a worker!");
                 }
                 else {
@@ -563,7 +560,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     ClientMessageAction replyMsg = null;
 
-    if (!destroyed || msgAction.getActionCode() == CommandCodes.USR_Q_LOGOUT) {
+    if (!destroyed) {
       warnIfOnAWTthread();
 
       Stamp lStamp = new Stamp(msgAction.getStamp());
@@ -572,7 +569,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         // register a stamp so that executor returns the reply message to the done list
         if (stampList.contains(lStamp)) {
           if (trace != null) trace.data(5, "stampList already contains " + lStamp);
-          System.out.println("stampList already contains " + lStamp);
+          //System.out.println("stampList already contains " + lStamp);
         }
         stampList.add(lStamp);
         stampList.notifyAll();
@@ -596,7 +593,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           synchronized (stampList2) {
             if (stampList2.contains(lStamp)) {
               if (trace != null) trace.data(15, "stampList2 already contains " + lStamp);
-              System.out.println("stampList2 already contains " + lStamp);
+              //System.out.println("stampList2 already contains " + lStamp);
             }
             stampList2.add(lStamp);
           } // end synchronized (stampList2)
@@ -650,7 +647,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.args(msgAction);
     if (trace != null) trace.args(timeout);
     if (trace != null) trace.args(maxRetries);
-    if (DEBUG_ON__SUPPERSS_RETRIES)
+    if (DEBUG_ON__SUPPRESS_RETRIES)
       maxRetries = 0;
     if (timeout == 0 && maxRetries > 0)
       throw new IllegalArgumentException("Timeout must be > 0 if maxRetries > 0");
@@ -791,7 +788,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ensureEnoughFreeWorkers(boolean forceAdditionalConnection)");
     if (trace != null) trace.args(forceAdditionalConnection);
 
-    if (workers.size() >= getMaxConnectionCount() || destroyed) {
+    if (workers.size() >= getMaxConnectionCount() || destroyed || destroying) {
       if (trace != null) trace.exit(ServerInterfaceLayer.class);
       return;
     }
@@ -881,7 +878,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       // If previously logged in, but no workers exist and no workers to create (due to no new requests),
       // just create the main one so he can register for notify again.
       if (countWorkersToCreate == 0 && countAllWorkers == 0 && lastLoginMessageAction != null) {
-        if (trace != null) trace.data(60, "increasing countWorkersToCreate from 0 to 1 so that persistant connection can be established");
+        if (trace != null) trace.data(60, "increasing countWorkersToCreate from 0 to 1 so that persistent connection can be established");
         countWorkersToCreate = 1;
       }
 
@@ -893,7 +890,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
 
   /**
-  * Make sure that at least one additional worker aside from the persistant connection
+  * Make sure that at least one additional worker aside from the persistent connection
   * worker exists.  Useful as a preparation for file upload to establish a connection
   * prior to having the transaction ready to minimize the delay.
   */
@@ -922,7 +919,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   */
   private void createWorkers(int numberOfWorkersToCreate) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "createWorkers(int numberOfWorkersToCreate)");
-    if (!destroyed) {
+    if (!destroyed && !destroying) {
       synchronized (workers) {
         int countAllWorkers = workers.size();
         if (trace != null) trace.data(10, "numberOfWorkersToCreate", numberOfWorkersToCreate);
@@ -1082,9 +1079,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               }
             } catch (Throwable t) {
               if (trace != null) trace.exception(ServerInterfaceLayer.class, 70, t);
-              String errMsg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server at " + hostsAndPorts[hostIndexCompletedFirst][0] + " on port " + hostsAndPorts[hostIndexCompletedFirst][1] + ".  "
-                + "Please verify your computer network and/or modem cables are plugged-in and your computer is currently connected to the Internet.  When you have established and verified your Internet connectivity, please try connecting to "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" again.  "
-                + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
+              String errMsg = "<html>Network error. "
+                      + " Could not connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server at " + hostsAndPorts[hostIndexCompletedFirst][0] + " on port " + hostsAndPorts[hostIndexCompletedFirst][1] + ".  "
+                      + "Please verify your internet connectivity.  "
+                      + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
               // Only at the last round process the exception, else ignore and try another host.
               if (workerTrial+1 == maxWorkerTrials) {
 
@@ -1115,7 +1113,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           if (worker != null) {// null when createWorker() failed!
             workers.add(worker);
             // destroyed worker could be replaced by new one which should now be updating connection counts
-            if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
+            if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
           }
         } // end for
       } // end synchronized
@@ -1197,7 +1195,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     Socket socket = null;
 
-    if (!destroyed) {
+    if (!destroyed && !destroying) {
       // Create the workers for serving connecitons
       // This could throw exceptions if connection to server is not established!
       final Socket[] socketBuffer = new Socket[1];
@@ -1308,108 +1306,114 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
 
-
-
+  private boolean destroying = false;
   private boolean destroyed = false;
   public boolean isDestroyed() {
     return destroyed;
   }
+  public boolean isDestroying() {
+    return destroying;
+  }
 
   /** Destroys this object and invalidates its state releasing all resources. */
-  public synchronized void destroyServer() {
+  public void destroyServer() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "destroy()");
 
-    destroyed = true;
-
-    try {
-      if (loginCompletionNotifier != null)
-        loginCompletionNotifier.serverDestroyed(this);
-    } catch (Throwable t) {
-    }
+    destroying = true;
 
     try {
       disconnectAndClear();
     } catch (Throwable t) {
     }
 
-    // clear the job queue, killing and removing all jobs
-    try {
-      if (jobFifo != null) {
-        while (true) {
-          Object o = jobFifo.remove();
-          if (o instanceof MessageAction) {
-            MessageAction msgAction = (MessageAction) o;
-            ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+    synchronized (this) {
+      destroyed = true;
+
+      try {
+        if (loginCompletionNotifier != null)
+          loginCompletionNotifier.serverDestroyed(this);
+      } catch (Throwable t) {
+      }
+
+      // clear the job queue, killing and removing all jobs
+      try {
+        if (jobFifo != null) {
+          while (true) {
+            Object o = jobFifo.remove();
+            if (o instanceof MessageAction) {
+              MessageAction msgAction = (MessageAction) o;
+              ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+              if (pm != null)
+                pm.jobKilled();
+            }
+            if (jobFifo.size() == 0)
+              break;
+          }
+        }
+      } catch (Throwable t) {
+      }
+
+      // in case there are any progress monitors left over somewhere, kill them
+      try {
+        ProgMonitorPool.killAll();
+      } catch (Throwable t) {
+      }
+
+      // kill the reply queue (execution queue)
+      if (trace != null) trace.data(31, "killing execution queue");
+      try {
+        executionQueue.clear();
+        executionQueue.close();
+        executionQueue = null;
+      } catch (Throwable t) {
+      }
+      if (trace != null) trace.data(32, "execution queue killed");
+
+      // kill the independentExecutionQueue
+      if (trace != null) trace.data(33, "killing independent execution queue");
+      try {
+        independentExecutionQueue.clear();
+        independentExecutionQueue.close();
+        independentExecutionQueue = null;
+      } catch (Throwable t) {
+      }
+      if (trace != null) trace.data(34, "execution queue killed");
+
+      // release all threads waiting on the stamps
+      if (trace != null) trace.data(51, "releasing all threads waiting on stamps");
+      ArrayList tempStampList = new ArrayList();
+      try {
+        synchronized (stampList) {
+          // avoid deadlock by copying stamps and notifying threads outside of "stampList" synchronized block
+          tempStampList.addAll(stampList);
+          stampList.clear();
+          synchronized (stampList2) {
+            stampList2.clear();
+          }
+          synchronized (doneList) {
+            doneList.clear();
+          }
+          stampList.notifyAll();
+        } // end synchronized (stampList)
+        for (int i=0; i<tempStampList.size(); i++) {
+          Stamp stamp = (Stamp) tempStampList.get(i);
+          synchronized (stamp) {
+            stamp.notifyAll();
+            // In case outstanding jobs were not in the queue, but already sent to server,
+            // kill corresponding progress monitors so they don't popup in a few seconds.
+            ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
             if (pm != null)
               pm.jobKilled();
           }
-          if (jobFifo.size() == 0)
-            break;
         }
+      } catch (Throwable t) {
       }
-    } catch (Throwable t) {
-    }
+      if (trace != null) trace.data(70, "all threads released and stamps cleared.");
 
-    // in case there are any progress monitors left over somewhere, kill them
-    try {
-      ProgMonitorPool.killAll();
-    } catch (Throwable t) {
+      if (trace != null) trace.data(71, "clearing data cach");
+      FetchedDataCache.getSingleInstance().clear();
+      if (trace != null) trace.data(80, "data cach cleared");
     }
-
-    // kill the reply queue (execution queue)
-    if (trace != null) trace.data(31, "killing execution queue");
-    try {
-      executionQueue.clear();
-      executionQueue.close();
-      executionQueue = null;
-    } catch (Throwable t) {
-    }
-    if (trace != null) trace.data(32, "execution queue killed");
-
-    // kill the independentExecutionQueue
-    if (trace != null) trace.data(33, "killing independent execution queue");
-    try {
-      independentExecutionQueue.clear();
-      independentExecutionQueue.close();
-      independentExecutionQueue = null;
-    } catch (Throwable t) {
-    }
-    if (trace != null) trace.data(34, "execution queue killed");
-
-    // release all threads waiting on the stamps
-    if (trace != null) trace.data(51, "releasing all threads waiting on stamps");
-    ArrayList tempStampList = new ArrayList();
-    try {
-      synchronized (stampList) {
-        // avoid deadlock by copying stamps and notifying threads outside of "stampList" synchronized block
-        tempStampList.addAll(stampList);
-        stampList.clear();
-        synchronized (stampList2) {
-          stampList2.clear();
-        }
-        synchronized (doneList) {
-          doneList.clear();
-        }
-        stampList.notifyAll();
-      } // end synchronized (stampList)
-      for (int i=0; i<tempStampList.size(); i++) {
-        Stamp stamp = (Stamp) tempStampList.get(i);
-        synchronized (stamp) {
-          stamp.notifyAll();
-          // In case outstanding jobs were not in the queue, but already sent to server,
-          // kill corresponding progress monitors so they don't popup in a few seconds.
-          ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
-          if (pm != null)
-            pm.jobKilled();
-        }
-      }
-    } catch (Throwable t) {
-    }
-    if (trace != null) trace.data(70, "all threads released and stamps cleared.");
-
-    if (trace != null) trace.data(71, "clearing data cach");
-    FetchedDataCache.getSingleInstance().clear();
-    if (trace != null) trace.data(80, "data cach cleared");
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
@@ -1434,15 +1438,26 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * Disconnects the application and prevents workers from automatically
   * establishing any new connections.
   */
-  public void disconnect() {
+  private void disconnect() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "disconnect()");
 
     // clear last login action so no worker can automatically login
     if (lastLoginMessageAction != null) {
       lastLoginMessageAction = null;
       try {
-        if (workers.size() > 0)
-          submitAndWait(new MessageAction(CommandCodes.USR_Q_LOGOUT), 3000);
+        if (workers.size() > 0) {
+          int countWorkers = workers.size();
+          for (int i=0; i<countWorkers; i++) {
+            submitAndReturn(new MessageAction(CommandCodes.USR_Q_LOGOUT));
+          }
+          if (countWorkers > 0) {
+            // wait max 3 seconds for LOGOUT request to have a change to be sent
+            for (int i=0; i<300; i++) {
+              if (workers.size() > 0)
+                Thread.sleep(10);
+            }
+          }
+        }
       } catch (Throwable t) {
       }
     }
@@ -1479,7 +1494,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       }
       workers.clear();
       // destroyed worker could be replaced by new one which should now be updating connection counts
-      if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
+      if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
     }
 
     if (trace != null) trace.data(20, "workers killed");
@@ -1549,7 +1564,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     synchronized (workers) {
       workerRemoved = workers.remove(worker);
       // destroyed worker could be replaced by new one which should now be updating connection counts
-      if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
+      if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
     }
 
     if (workerRemoved) {
@@ -1608,7 +1623,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (mainWorker == null) {
         if (trace != null) trace.data(20, "Main worker submission cycle done.");
         mainWorkerSubmition = false;
-        // since workers submitting NOTIFY requests claim Main Persistant status, this cycle cannot break when there is a comm failure
+        // since workers submitting NOTIFY requests claim Main Persistent status, this cycle cannot break when there is a comm failure
         mainWorker = worker;
       }
       // Allow multiple main workers because this can happen briefly when main worker connection is being recycled
@@ -1629,7 +1644,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private void triggerCheckForMainWorker() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "triggerCheckForMainWorker()");
 
-    if (!destroyed) {
+    if (!destroyed && !destroying) {
       boolean submitNow = false;
       synchronized (mainWorkerMonitor) {
         if (mainWorker == null && mainWorkerSubmition == false) {
@@ -1681,6 +1696,21 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     return rc;
   }
 
+  /**
+  * @return true if the specified worker is registered as the Main Worker.
+  */
+  public boolean isPersistentMainWorker(ServerInterfaceWorker worker) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "isPersistentMainWorker(ServerInterfaceWorker worker)");
+    if (trace != null) trace.args(worker);
+
+    boolean rc;
+    synchronized (mainWorkerMonitor) {
+      rc = worker != null && mainWorker == worker && mainWorker.isPersistent();
+    }
+
+    if (trace != null) trace.exit(ServerInterfaceLayer.class, rc);
+    return rc;
+  }
 
   /**
   * @return true if there is a designated Main Worker.
@@ -1700,10 +1730,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * @return true if there is a main worker which is persistent;
   * Main Worker becomes persistent when it retrieves a NOTIFY reply from the server allowing it to become persistent.
   */
-  public boolean hasPersistantMainWorker() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "hasPersistantMainWorker()");
+  public boolean hasPersistentMainWorker() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "hasPersistentMainWorker()");
     ServerInterfaceWorker mWorker = mainWorker;
-    boolean rc = mWorker != null ? mWorker.isPersistant() : false;
+    boolean rc = mWorker != null ? mWorker.isPersistent() : false;
     if (trace != null) trace.exit(ServerInterfaceLayer.class, rc);
     return rc;
   }
@@ -1734,7 +1764,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.args(loginSuccessful);
     synchronized (workers) {
       // destroyed worker could be replaced by new one which should now be updating connection counts
-      if (!destroyed) Stats.setConnections(workers.size(), getWorkerCounts());
+      if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
     }
     // Notify of successful login.
     if (loginSuccessful && loginCompletionNotifier != null)
@@ -1783,7 +1813,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         long waitStart = System.currentTimeMillis();
         while (submitterPrepared && !submitterReady) {
           if (System.currentTimeMillis() - waitStart > 10000) {
-            System.out.println("Waited for submitter prepared-ready state over 10s, escaping!");
+            //System.out.println("Waited for submitter prepared-ready state over 10s, escaping!");
+            if (trace != null) trace.data(15, "Waited for submitter prepared-ready state over 10s, escaping!");
             break;
           }
           if (trace != null) trace.data(20, "synchronizing on stampList to check if prepared");
@@ -1893,6 +1924,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 if (trace != null) trace.data(11, "waiting in jobs scanner done");
               } catch (InterruptedException e) {
                 if (trace != null) trace.data(12, "waiting in jobs scanner interrupted");
+                triggeredMonitor = true;
               }
               delay = DELAY_NORMAL;
             }
@@ -1936,7 +1968,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               boolean forceAdditionalConnection = true;
               // Don't want this thread to retry connection if the general connectivity is totally broken.
               // Another mechanizm is meant for that.
-              if (hasPersistantMainWorker()) {
+              if (hasPersistentMainWorker()) {
                 ensureEnoughAllWorkersExist(forceAdditionalConnection);
                 delay = DELAY_AFTER_CHECK;
               }
@@ -1948,7 +1980,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // If client with no prior login encounters a connection exception, it has to exit.
           if (isClient && lastLoginMessageAction == null && t instanceof SILConnectionException) {
             destroyServer();
-            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Error", t.getMessage());
+            NotificationCenter.show(NotificationCenter.ERROR_CONNECTION, "No Connection", t.getMessage());
           }
           // Delay before we do anything with re-connectivity.
           try { Thread.sleep(DELAY_NEW_CONNECTION_AFTER_NET_ERROR); } catch (InterruptedException e) { }

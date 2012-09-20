@@ -12,6 +12,8 @@
 
 package com.CH_gui.util;
 
+import com.CH_co.monitor.Stats;
+import com.CH_co.monitor.StatsListenerI;
 import com.CH_gui.gui.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
@@ -83,7 +85,7 @@ public class MessageDialog extends Object {
 
     JDialog dialog = null;
     if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
-      Component message = prepareMessage(messageText);
+      Component message = prepareMessage(messageText, messageType);
       if (message != null) {
         dialog = showDialog(parent, message, title, messageType, buttons, -1, -1, defaultButtonAction, modal, true, true, true, disposable);
       }
@@ -156,6 +158,9 @@ public class MessageDialog extends Object {
         case NotificationCenter.ERROR_MESSAGE:
           icon = new JMyLabel((Icon) UIManager.getLookAndFeelDefaults().get("OptionPane.errorIcon"));
           break;
+        case NotificationCenter.ERROR_CONNECTION:
+          icon = new JMyLabel(Images.get(ImageNums.CONNECTION_CLOSED48));
+          break;
         case NotificationCenter.RECYCLE_MESSAGE:
           icon = new JMyLabel(Images.get(ImageNums.FLD_RECYCLE48));
           break;
@@ -224,6 +229,38 @@ public class MessageDialog extends Object {
         });
       }
     }
+    
+    // For connection errors, hide them when back online
+    if (messageType == NotificationCenter.ERROR_CONNECTION) {
+      final GeneralDialog _connectionDialog = dialog;
+      Stats.addStatsListener(new StatsListenerI() {
+        public void setStatsConnections(Integer connectionsPlain, Integer connectionsHTML) {
+          int connections = 0;
+          if (connectionsPlain != null)
+            connections += connectionsPlain.intValue();
+          if (connectionsHTML != null)
+            connections += connectionsHTML.intValue();
+          if (connections > 0) {
+            try { _connectionDialog.dispose(); } catch (Throwable t) { }
+            try { Stats.removeStatsListener(this); } catch (Throwable t) { }
+          }
+        }
+        public void setStatsGlobeMove(Boolean isMoving) {
+        }
+        public void setStatsLastStatus(String status) {
+        }
+        public void setStatsPing(Long pingMS) {
+        }
+        public void setStatsSizeBytes(Long sizeBytes) {
+        }
+        public void setStatsTransferRate(Long transferRate) {
+        }
+        public void setStatsTransferRateIn(Long transferRateIn) {
+        }
+        public void setStatsTransferRateOut(Long transferRateOut) {
+        }
+      });
+    }
 
     if (trace != null) trace.exit(MessageDialog.class, dialog);
     return dialog;
@@ -249,7 +286,7 @@ public class MessageDialog extends Object {
 
     boolean rc = false;
     if (!Misc.isAllGUIsuppressed() && !Misc.isMsgDialogsGUIsuppressed()) {
-      Component message = prepareMessage(messageText);
+      Component message = prepareMessage(messageText, messageType);
       rc = showDialogYesNo(parent, message, title, messageType, true, strYes, strNo, highlightButtonYes, null, null);
     }
 
@@ -369,6 +406,9 @@ public class MessageDialog extends Object {
         case NotificationCenter.ERROR_MESSAGE :
           Sounds.playAsynchronous(Sounds.DIALOG_ERROR);
           break;
+        case NotificationCenter.ERROR_CONNECTION :
+          Sounds.playAsynchronous(Sounds.NO_CONNECTION);
+          break;
         case NotificationCenter.WARNING_MESSAGE :
         case NotificationCenter.EMPTY_RECYCLE_FOLDER :
         case NotificationCenter.EMPTY_SPAM_FOLDER :
@@ -387,9 +427,10 @@ public class MessageDialog extends Object {
     }
   }
 
-  public static Component prepareMessage(String messageText) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "prepareMessage(String messageText)");
+  public static Component prepareMessage(String messageText, int messageType) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageDialog.class, "prepareMessage(String messageText, int messageType)");
     if (trace != null) trace.args(messageText);
+    if (trace != null) trace.args(messageType);
 
     JComponent comp = null;
     if (messageText != null) {
@@ -418,6 +459,9 @@ public class MessageDialog extends Object {
       }
       comp = new JScrollPane(textComp);
       comp.setPreferredSize(new Dimension(420, 240));
+
+      if (messageType == NotificationCenter.ERROR_CONNECTION)
+        textComp.setOpaque(false);
     }
 
     if (trace != null) trace.exit(MessageDialog.class, comp);

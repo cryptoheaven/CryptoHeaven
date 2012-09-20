@@ -12,7 +12,10 @@
 
 package com.CH_co.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
 * <b>Copyright</b> &copy; 2001-2012
@@ -49,59 +52,41 @@ public class ImageNums extends Object {
   public static final int STOPWATCH_ALERT16;
   public static final int STOPWATCH_ALERT24;
   public static final int STOPWATCH_WARN16;
+  public static final int STOPWATCH_WARN32;
   public static final int WARNING16;
 
   public static final int MY_COMPUTER16;
 
-  public static final int SHARE_HAND_L;
-  public static final int FLD_ADDR_OPEN16;
-  public static final int FLD_ADDR_CLOSED16;
-  public static final int FLD_ADDR_OPEN_SHARED16;
-  public static final int FLD_ADDR_CLOSED_SHARED16;
-  public static final int FLD_ADDR_CLOSED_SHARED24;
+  public static final int SHARE16;
+  public static final int SHARE24;
+  public static final int SHARE32;
+  public static final int SHARE48;
+  public static final int SHARE_ADD16;
+  public static final int SHARE_ADD24;
+  public static final int SHARE_OVERLAY;
+
+  public static final int FLD_ADDR16;
+  public static final int FLD_ADDR_SHARED16;
   public static final int FLD_CHAT16;
-  public static final int FLD_CHAT_OPEN16;
-  public static final int FLD_CHAT_CLOSED16;
-  public static final int FLD_CHAT_CLOSED_SHARED16;
-  public static final int FLD_CHAT_CLOSED_SHARED24;
+  public static final int FLD_CHAT_SHARED16;
   public static final int FLD_CNT_OPEN16;
   public static final int FLD_CNT_CLOSED16;
   public static final int FLD_FILES16;
-  public static final int FLD_GROUPS16;
   public static final int FLD_KEY_OPEN16;
   public static final int FLD_KEY_CLOSED16;
 
-  public static final int FLD_MAIL18_12;
-
-  public static final int FLD_MAIL_OPEN16;
-  public static final int FLD_MAIL_CLOSED16;
-  public static final int FLD_MAIL_OPEN_SHARED16;
-  public static final int FLD_MAIL_CLOSED_SHARED16;
-
-  public static final int FLD_MAIL_DRAFT_OPEN16;
-  public static final int FLD_MAIL_DRAFT_CLOSED16;
-  public static final int FLD_MAIL_DRAFT_OPEN_SHARED16;
-  public static final int FLD_MAIL_DRAFT_CLOSED_SHARED16;
-
-  public static final int FLD_MAIL_INBOX_OPEN16;
-  public static final int FLD_MAIL_INBOX_CLOSED16;
-  public static final int FLD_MAIL_INBOX_OPEN_SHARED16;
-  public static final int FLD_MAIL_INBOX_CLOSED_SHARED16;
-
-  public static final int FLD_MAIL_JUNK_OPEN16;
-  public static final int FLD_MAIL_JUNK_CLOSED16;
-  public static final int FLD_MAIL_JUNK_OPEN_SHARED16;
-  public static final int FLD_MAIL_JUNK_CLOSED_SHARED16;
-
-  public static final int FLD_MAIL_SENT_OPEN16;
-  public static final int FLD_MAIL_SENT_CLOSED16;
-  public static final int FLD_MAIL_SENT_OPEN_SHARED16;
-  public static final int FLD_MAIL_SENT_CLOSED_SHARED16;
-
-  public static final int FLD_MAIL_POST_OPEN16;
-  public static final int FLD_MAIL_POST_CLOSED16;
-  public static final int FLD_MAIL_POST_OPEN_SHARED16;
-  public static final int FLD_MAIL_POST_CLOSED_SHARED16;
+  public static final int FLD_MAIL16;
+  public static final int FLD_MAIL_SHARED16;
+  public static final int FLD_MAIL_DRAFT16;
+  public static final int FLD_MAIL_DRAFT_SHARED16;
+  public static final int FLD_MAIL_INBOX16;
+  public static final int FLD_MAIL_INBOX_SHARED16;
+  public static final int FLD_MAIL_JUNK16;
+  public static final int FLD_MAIL_JUNK_SHARED16;
+  public static final int FLD_MAIL_SENT16;
+  public static final int FLD_MAIL_SENT_SHARED16;
+  public static final int FLD_MAIL_POST16;
+  public static final int FLD_MAIL_POST_SHARED16;
 
   public static final int FLD_CLEAR16;
   public static final int FLD_CLEAR48;
@@ -112,21 +97,15 @@ public class ImageNums extends Object {
   public static final int FLD_RECYCLE_EMPTY16;
   public static final int FLD_RECYCLE_EMPTY_SHARED16;
 
-  public static final int FLD_OPEN16;
-  public static final int FLD_CLOSED16;
-  public static final int FLD_OPEN_SHARED16;
-  public static final int FLD_CLOSED_SHARED16;
-  public static final int FLD_CLOSED_SHARED24;
+  public static final int FLD_FILE16;
+  public static final int FLD_FILE_SHARED16;
+  public static final int FLD_FILE_OPEN16;
+  public static final int FLD_FILE_OPEN_SHARED16;
 
-  //public static final int FOLDER24;
   public static final int FOLDER32;
   public static final int FOLDER48;
-  public static final int FOLDER_SHARED32;
-  public static final int FOLDER_SHARED48;
   public static final int FOLDER_NEW16;
   public static final int FOLDER_NEW24;
-  public static final int FOLDER_NEW_SHARED16;
-  public static final int FOLDER_NEW_SHARED24;
   public static final int FOLDER_MOVE16;
   public static final int FOLDER_MOVE24;
   public static final int FOLDER_DELETE16;
@@ -134,20 +113,10 @@ public class ImageNums extends Object {
 
   public static final int FILE_TYPE_OTHER;
 
-  public static final int CLONE_ADDR16;
-  public static final int CLONE_ADDR24;
-  public static final int CLONE_FILE16;
-  public static final int CLONE_FILE24;
-  public static final int CLONE_FOLDER16;
-  public static final int CLONE_FOLDER24;
-  public static final int CLONE_GROUP16;
-  public static final int CLONE_GROUP24;
-  public static final int CLONE_MSG16;
-  public static final int CLONE_MSG24;
-  public static final int CLONE_CONTACT16;
-  public static final int CLONE_CONTACT24;
   public static final int CLONE16;
   public static final int CLONE24;
+  public static final int OPEN16;
+  public static final int OPEN24;
 
   public static final int SPLIT_LEFT_RIGHT16;
   public static final int SPLIT_TOP_BOTTOM16;
@@ -164,19 +133,20 @@ public class ImageNums extends Object {
   public static final int REPLY24;
   public static final int REPLY_TO_ALL16;
   public static final int REPLY_TO_ALL24;
-  public static final int REPLY_TO_MSG16;
-  public static final int REPLY_TO_MSG24;
+  public static final int POST_REPLY16;
+  public static final int POST_REPLY24;
   public static final int REPLY_ARROW16;
   public static final int FORWARD16;
   public static final int FORWARD24;
-  public static final int FORWARD_FILE16;
-  public static final int FORWARD_FILE24;
 
-  public static final int PRIORITY_HIGH_SMALL;
-  public static final int PRIORITY_LOW_SMALL;
-  public static final int PRIORITY_HIGH_12;
-  public static final int PRIORITY_LOW_12;
-  public static final int PRIORITY_SMALL;
+  public static final int PRIORITY_FIRE16;
+  public static final int PRIORITY_HIGH16;
+  public static final int PRIORITY_LOW16;
+  public static final int PRIORITY_FIRE12;
+  public static final int PRIORITY_HIGH12;
+  public static final int PRIORITY_LOW12;
+  public static final int PRIORITY_BLANK_SMALL;
+
   public static final int LOCK_CLOSED_BLACK_SMALL;
   public static final int LOCK_CLOSED_SMALL;
   public static final int LOCK_CLOSED_WEB_SMALL;
@@ -188,8 +158,6 @@ public class ImageNums extends Object {
 
   public static final int FLAG_BLANK_SMALL;
   public static final int FLAG_BLANK_TOOL;
-
-  public static final int FLAG_GRAY_SMALL;
 
   public static final int FLAG_RED_SMALL;
   public static final int FLAG_RED_TOOL;
@@ -205,14 +173,17 @@ public class ImageNums extends Object {
 
   public static final int DELETE16;
   public static final int DELETE24;
-  public static final int ADD14;
+  public static final int ADD16;
   public static final int GO16;
+  public static final int PIN15;
   public static final int X15;
   public static final int GO_NEXT16;
   public static final int GO_NEXT24;
   public static final int GO_PREV16;
   public static final int GO_PREV24;
   public static final int EMAIL_SYMBOL_SMALL;
+  public static final int EMAIL_SYMBOL_SECURE_SMALL;
+  public static final int EMAIL_SYMBOL16;
 
   public static final int PRINT16;
   public static final int PRINT24;
@@ -220,10 +191,11 @@ public class ImageNums extends Object {
   public static final int TOOLS24;
   public static final int TOOLS_FIX16;
   public static final int TOOLS_FIX32;
-  public static final int ATTACH16;
-  public static final int ATTACH_14x12;
-  public static final int ATTACH24;
+  //public static final int ATTACH16;
+  //public static final int ATTACH_14x12;
   public static final int ATTACH_SMALL;
+  public static final int ATTACH_SMALL_BLANK;
+  public static final int ATTACH24;
   public static final int DETACH16;
   public static final int DETACH24;
 
@@ -246,6 +218,7 @@ public class ImageNums extends Object {
   public static final int MAIL_COMPOSE_TO_FOLDER24;
   public static final int MAIL_COMPOSE_TO_MEMBER16;
   public static final int MAIL_COMPOSE_TO_MEMBER24;
+  public static final int MAIL_COMPOSE_TO_MEMBER32;
   public static final int MAIL_SEND16;
   public static final int MAIL_SEND24;
   public static final int MAIL_SEND_INVITE_16;
@@ -254,7 +227,6 @@ public class ImageNums extends Object {
   public static final int ADDRESS_BOOK16;
   public static final int ADDRESS_BOOK24;
   public static final int ADDRESS_BOOK48;
-  public static final int ADDRESS_BOOK_SHARED48;
   public static final int MAIL_COPY16;
   public static final int MAIL_COPY24;
   public static final int MAIL_DELETE16;
@@ -265,11 +237,13 @@ public class ImageNums extends Object {
   public static final int SAVE24;
   public static final int CHAT16;
   public static final int CHAT24;
+  public static final int CHAT48;
+  public static final int CHAT_GROUP48;
   public static final int CHAT_BUBBLE48;
-  public static final int CHAT_BUBBLE_SHARED48;
 
-  public static final int PERSON_SMALL;
+  public static final int PERSON16;
   public static final int PEOPLE16;
+  public static final int PEOPLE_SECURE16;
   public static final int PEOPLE24;
   public static final int PEOPLE32;
   public static final int PEOPLE48;
@@ -300,8 +274,6 @@ public class ImageNums extends Object {
   public static final int ADDRESS_EDIT24;
   public static final int ADDRESS_MOVE16;
   public static final int ADDRESS_MOVE24;
-  public static final int ADDRESS_SAVE16;
-  public static final int ADDRESS_SAVE24;
   public static final int CONTACT16;
   public static final int CONTACT32;
   public static final int CONTACT_ADD16;
@@ -325,9 +297,17 @@ public class ImageNums extends Object {
   public static final int ORDER_DESCENDING;
   public static final int ORDER_DESCENDING2;
 
+  public static final int HELP16;
   public static final int INFO16;
-  public static final int ANIM_GLOBE_FIRST16;
-  public static final int ANIM_GLOBE16;
+  public static final int OPTIONS16;
+  public static final int QUESTION16;
+
+  public static final int OPTION_CHECK16;
+  public static final int OPTION_CHECK_DISABLED16;
+  public static final int OPTION_X16;
+
+  public static final int ANIM_SMALL_FIRST16;
+  public static final int ANIM_SMALL16;
   public static final int ANIM_KEY;
   public static final int ANIM_LOCK;
   public static final int ANIM_TRANSFER;
@@ -340,6 +320,7 @@ public class ImageNums extends Object {
   public static final int PHONE32;
   public static final int MAIL32;
   public static final int WEB32;
+  public static final int CONNECTION_CLOSED48;
 
   public static final int STATUS_AWAY16;
   public static final int STATUS_DND16;
@@ -349,11 +330,9 @@ public class ImageNums extends Object {
   public static final int STATUS_ONLINE16;
   public static final int STATUS_QUESTION16;
   public static final int STATUS_WAITING16;
-  public static final int LIGHT_ON_SMALL;
-  public static final int LIGHT_ON_12;
-  public static final int LIGHT_OFF_SMALL;
-  public static final int LIGHT_GREEN_SMALL;
-  public static final int LIGHT_X_SMALL;
+  public static final int LIGHT_ON16;
+  public static final int LIGHT_OFF16;
+  public static final int LIGHT_X16;
 
   public static final int FILE32; // little modification of ADD24
   public static final int FILE_LOCKED32; // little modification of ADD24
@@ -377,6 +356,7 @@ public class ImageNums extends Object {
   public static final int EXPORT16;
   public static final int EXPORT24;
   public static final int FIND16;
+  public static final int FIND_PREVIEW16;
   public static final int FIND24;
 
   public static final int PASTE16;
@@ -400,14 +380,12 @@ public class ImageNums extends Object {
 
   public static final int PENCIL16;
   public static final int RING_BELL;
-  public static final int VOLUME16;
-  public static final int VOLUME24;
-  public static final int RECORD16;
-  public static final int RECORD24;
-  public static final int PLAY16;
-  public static final int PAUSE16;
-  public static final int PLAY_PAUSE16;
-  public static final int STOP16;
+
+  public static final int SOUND_RECORD16;
+  public static final int SOUND_RECORD24;
+  public static final int SOUND_PLAY16;
+  public static final int SOUND_PAUSE16;
+  public static final int SOUND_STOP16;
 
   public static final int EDITOR_ALIGN;
   public static final int EDITOR_ATTACH;
@@ -523,7 +501,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[368+50]; // plus emotions
+    images = new String[344+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -559,22 +537,25 @@ public class ImageNums extends Object {
     images[i] = "clear-pixel.gif"; i++;
 
     TRANSPARENT16 = i;
-    images[i] = "Transparent16.gif"; i++;
+    images[i] = "transparent16.png"; i++;
 
     //WAIT16 = i;
     //images[i] = "Wait16.png"; i++;
 
     STOPWATCH16 = i;
-    images[i] = "Stopwatch16.png"; i++;
+    images[i] = "stopwatch16.png"; i++;
 
     STOPWATCH_ALERT16 = i;
-    images[i] = "StopwatchAlert16.png"; i++;
+    images[i] = "stopwatch-alert16.png"; i++;
 
     STOPWATCH_ALERT24 = i;
-    images[i] = "StopwatchAlert24.png"; i++;
+    images[i] = "stopwatch-alert24.png"; i++;
 
     STOPWATCH_WARN16 = i;
-    images[i] = "StopwatchWarn16.png"; i++;
+    images[i] = "stopwatch-warn16.png"; i++;
+
+    STOPWATCH_WARN32 = i;
+    images[i] = "stopwatch-warn32.png"; i++;
 
     WARNING16 = i;
     images[i] = "Warning16.png"; i++;
@@ -583,40 +564,32 @@ public class ImageNums extends Object {
     MY_COMPUTER16 = i;
     images[i] = "MyComputer16.png"; i++;
 
-    SHARE_HAND_L = i;
-    images[i] = "ShareHand_L.gif"; i++;
+    SHARE16 = i;
+    images[i] = "share16.png"; i++;
+    SHARE24 = i;
+    images[i] = "share24.png"; i++;
+    SHARE32 = i;
+    images[i] = "share32.png"; i++;
+    SHARE48 = i;
+    images[i] = "share48.png"; i++;
+    SHARE_ADD16 = i;
+    images[i] = "share-add16.png"; i++;
+    SHARE_ADD24 = i;
+    images[i] = "share-add24.png"; i++;
+    SHARE_OVERLAY = i;
+    images[i] = "share-overlay.png"; i++;
 
-    FLD_ADDR_OPEN16 = i;
-    images[i] = "FldAddrOpen16.gif"; i++;
+    FLD_ADDR16 = i;
+    images[i] = "FldAddr16.gif"; i++;
 
-    FLD_ADDR_CLOSED16 = i;
-    images[i] = "FldAddrClosed16.gif"; i++;
-
-    FLD_ADDR_OPEN_SHARED16 = i;
-    images[i] = "FldAddrOpen16.gif"; i++;
-    //images[i] = "FldAddrOpenShared16.png"; i++;
-
-    FLD_ADDR_CLOSED_SHARED16 = i;
-    images[i] = "FldAddrClosed16.gif"; i++;
-    //images[i] = "FldAddrClosedShared16.png"; i++;
-
-    FLD_ADDR_CLOSED_SHARED24 = i;
-    images[i] = "FldAddrClosedShared24.png"; i++;
+    FLD_ADDR_SHARED16 = i;
+    images[i] = "FldAddr16.gif"; i++;
 
     FLD_CHAT16 = i;
-    images[i] = "Chat16.png"; i++;
+    images[i] = "FldChat16.png"; i++;
 
-    FLD_CHAT_OPEN16 = i;
-    images[i] = "FldChatClosed16.png"; i++;
-
-    FLD_CHAT_CLOSED16 = i;
-    images[i] = "FldChatClosed16.png"; i++;
-
-    FLD_CHAT_CLOSED_SHARED16 = i;
-    images[i] = "FldChatClosed16.png"; i++;
-
-    FLD_CHAT_CLOSED_SHARED24 = i;
-    images[i] = "FldChatClosedShared24.png"; i++;
+    FLD_CHAT_SHARED16 = i;
+    images[i] = "FldChat16.png"; i++;
 
     FLD_CNT_OPEN16 = i;
     images[i] = "FldCntOpen16.png"; i++;
@@ -627,9 +600,6 @@ public class ImageNums extends Object {
     FLD_FILES16 = i;
     images[i] = "FldFiles16.png"; i++;
 
-    FLD_GROUPS16 = i;
-    images[i] = "FldGroups16.png"; i++;
-
     FLD_KEY_OPEN16 = i;
     images[i] = "FldKeyOpen16.png"; i++;
 
@@ -637,87 +607,35 @@ public class ImageNums extends Object {
     images[i] = "FldKeyClosed16.png"; i++;
 
 
-    FLD_MAIL18_12 = i;
-    images[i] = "FldMail18_12.gif"; i++;
+    FLD_MAIL16 = i;
+    images[i] = "FldMail16.png"; i++;
+    FLD_MAIL_SHARED16 = i;
+    images[i] = "FldMail16.png"; i++;
 
+    FLD_MAIL_DRAFT16 = i;
+    images[i] = "FldMailDraft16.png"; i++;
+    FLD_MAIL_DRAFT_SHARED16 = i;
+    images[i] = "FldMailDraft16.png"; i++;
 
-    FLD_MAIL_OPEN16 = i;
-    images[i] = "FldMailOpen16.png"; i++;
+    FLD_MAIL_INBOX16 = i;
+    images[i] = "FldMailInbox16.png"; i++;
+    FLD_MAIL_INBOX_SHARED16 = i;
+    images[i] = "FldMailInbox16.png"; i++;
 
-    FLD_MAIL_CLOSED16 = i;
-    images[i] = "FldMailClosed16.png"; i++;
+    FLD_MAIL_JUNK16 = i;
+    images[i] = "FldMailJunk16.png"; i++;
+    FLD_MAIL_JUNK_SHARED16 = i;
+    images[i] = "FldMailJunk16.png"; i++;
 
-    FLD_MAIL_OPEN_SHARED16 = i;
-    images[i] = "FldMailOpen16.png"; i++;
+    FLD_MAIL_SENT16 = i;
+    images[i] = "FldMailSent16.png"; i++;
+    FLD_MAIL_SENT_SHARED16 = i;
+    images[i] = "FldMailSent16.png"; i++;
 
-    FLD_MAIL_CLOSED_SHARED16 = i;
-    images[i] = "FldMailClosed16.png"; i++;
-
-
-    FLD_MAIL_DRAFT_OPEN16 = i;
-    images[i] = "FldMailDraftOpen16.png"; i++;
-
-    FLD_MAIL_DRAFT_CLOSED16 = i;
-    images[i] = "FldMailDraftClosed16.png"; i++;
-
-    FLD_MAIL_DRAFT_OPEN_SHARED16 = i;
-    images[i] = "FldMailDraftOpen16.png"; i++;
-
-    FLD_MAIL_DRAFT_CLOSED_SHARED16 = i;
-    images[i] = "FldMailDraftClosed16.png"; i++;
-
-
-    FLD_MAIL_INBOX_OPEN16 = i;
-    images[i] = "FldMailInboxOpen16.png"; i++;
-
-    FLD_MAIL_INBOX_CLOSED16 = i;
-    images[i] = "FldMailInboxClosed16.png"; i++;
-
-    FLD_MAIL_INBOX_OPEN_SHARED16 = i;
-    images[i] = "FldMailInboxOpen16.png"; i++;
-
-    FLD_MAIL_INBOX_CLOSED_SHARED16 = i;
-    images[i] = "FldMailInboxClosed16.png"; i++;
-
-
-    FLD_MAIL_JUNK_OPEN16 = i;
-    images[i] = "FldMailJunkOpen16.png"; i++;
-
-    FLD_MAIL_JUNK_CLOSED16 = i;
-    images[i] = "FldMailJunkClosed16.png"; i++;
-
-    FLD_MAIL_JUNK_OPEN_SHARED16 = i;
-    images[i] = "FldMailJunkOpen16.png"; i++;
-
-    FLD_MAIL_JUNK_CLOSED_SHARED16 = i;
-    images[i] = "FldMailJunkClosed16.png"; i++;
-
-
-    FLD_MAIL_SENT_OPEN16 = i;
-    images[i] = "FldMailSentOpen16.png"; i++;
-
-    FLD_MAIL_SENT_CLOSED16 = i;
-    images[i] = "FldMailSentClosed16.png"; i++;
-
-    FLD_MAIL_SENT_OPEN_SHARED16 = i;
-    images[i] = "FldMailSentOpen16.png"; i++;
-
-    FLD_MAIL_SENT_CLOSED_SHARED16 = i;
-    images[i] = "FldMailSentClosed16.png"; i++;
-
-
-    FLD_MAIL_POST_OPEN16 = i;
-    images[i] = "FldMailPostOpen16.png"; i++;
-
-    FLD_MAIL_POST_CLOSED16 = i;
-    images[i] = "FldMailPostClosed16.png"; i++;
-
-    FLD_MAIL_POST_OPEN_SHARED16 = i;
-    images[i] = "FldMailPostOpen16.png"; i++;
-
-    FLD_MAIL_POST_CLOSED_SHARED16 = i;
-    images[i] = "FldMailPostClosed16.png"; i++;
-
+    FLD_MAIL_POST16 = i;
+    images[i] = "FldMailPost16.png"; i++;
+    FLD_MAIL_POST_SHARED16 = i;
+    images[i] = "FldMailPost16.png"; i++;
 
     FLD_CLEAR16 = i;
     images[i] = "FldClear16.png"; i++;
@@ -743,24 +661,18 @@ public class ImageNums extends Object {
     FLD_RECYCLE_EMPTY_SHARED16 = i;
     images[i] = "FldRecycleEmpty16.png"; i++;
 
-    FLD_OPEN16 = i;
-    images[i] = "FldOpen16.png"; i++;
+    FLD_FILE16 = i;
+    images[i] = "FldFile16.png"; i++;
 
-    FLD_CLOSED16 = i;
-    images[i] = "FldClosed16.png"; i++;
+    FLD_FILE_SHARED16 = i;
+    images[i] = "FldFile16.png"; i++;
 
-    FLD_OPEN_SHARED16 = i;
-    images[i] = "FldOpen16.png"; i++;
+    FLD_FILE_OPEN16 = i;
+    images[i] = "FldFileOpen16.png"; i++;
 
-    FLD_CLOSED_SHARED16 = i;
-    images[i] = "FldClosed16.png"; i++;
-    //images[i] = "FldClosedShared16.png"; i++; // special pre-rendered version for MiscGui types
+    FLD_FILE_OPEN_SHARED16 = i;
+    images[i] = "FldFileOpen16.png"; i++;
 
-    FLD_CLOSED_SHARED24 = i;
-    images[i] = "FldClosedShared24.png"; i++;
-
-    //FOLDER24 = i;
-    //images[i] = "Folder24.png"; i++;
 
     FOLDER32 = i;
     images[i] = "Folder32.png"; i++;
@@ -769,24 +681,11 @@ public class ImageNums extends Object {
     images[i] = "folder-48.png"; i++;
 
 
-    FOLDER_SHARED32 = i;
-    images[i] = "FolderShared32.png"; i++;
-
-    FOLDER_SHARED48 = i;
-    images[i] = "folder-shared-48.png"; i++;
-
     FOLDER_NEW16 = i;
     images[i] = "FolderNew16.png"; i++;
 
     FOLDER_NEW24 = i;
     images[i] = "FolderNew24.png"; i++;
-
-    FOLDER_NEW_SHARED16 = i;
-    images[i] = "FolderNew16.png"; i++;
-    //images[i] = "FolderNewShared16.png"; i++;
-
-    FOLDER_NEW_SHARED24 = i;
-    images[i] = "FolderNewShared24.png"; i++;
 
     FOLDER_MOVE16 = i;
     images[i] = "FolderMove16.png"; i++;
@@ -804,34 +703,14 @@ public class ImageNums extends Object {
     images[i] = "file_type_other.png"; i++;
 
 
-    CLONE_ADDR16 = i;
-    images[i] = "CloneAddr16.png"; i++;
-    CLONE_ADDR24 = i;
-    images[i] = "CloneAddr24.png"; i++;
-    CLONE_FILE16 = i;
-    images[i] = "CloneFile16.png"; i++;
-    CLONE_FILE24 = i;
-    images[i] = "CloneFile24.png"; i++;
-    CLONE_FOLDER16 = i;
-    images[i] = "CloneFolder16.png"; i++;
-    CLONE_FOLDER24 = i;
-    images[i] = "CloneFolder24.png"; i++;
-    CLONE_GROUP16 = i;
-    images[i] = "CloneGroup16.png"; i++;
-    CLONE_GROUP24 = i;
-    images[i] = "CloneGroup24.png"; i++;
-    CLONE_MSG16 = i;
-    images[i] = "CloneMsg16.png"; i++;
-    CLONE_MSG24 = i;
-    images[i] = "CloneMsg24.png"; i++;
-    CLONE_CONTACT16 = i;
-    images[i] = "CloneContact16.png"; i++;
-    CLONE_CONTACT24 = i;
-    images[i] = "CloneContact24.png"; i++;
     CLONE16 = i;
     images[i] = "Clone16.png"; i++;
     CLONE24 = i;
     images[i] = "Clone24.png"; i++;
+    OPEN16 = i;
+    images[i] = "open16.png"; i++;
+    OPEN24 = i;
+    images[i] = "open24.png"; i++;
 
 
     SPLIT_LEFT_RIGHT16 = i;
@@ -870,11 +749,11 @@ public class ImageNums extends Object {
     REPLY_TO_ALL24 = i;
     images[i] = "ReplyToAll24.png"; i++;
 
-    REPLY_TO_MSG16 = i;
-    images[i] = "ReplyToMsg16.png"; i++;
+    POST_REPLY16 = i;
+    images[i] = "PostReply16.png"; i++;
 
-    REPLY_TO_MSG24 = i;
-    images[i] = "ReplyToMsg24.png"; i++;
+    POST_REPLY24 = i;
+    images[i] = "PostReply24.png"; i++;
 
     REPLY_ARROW16 = i;
     images[i] = "ReplyArrow16.gif"; i++;
@@ -885,31 +764,27 @@ public class ImageNums extends Object {
     FORWARD24 = i;
     images[i] = "Forward24.png"; i++;
 
-    FORWARD_FILE16 = i;
-    images[i] = "ForwardFile16.png"; i++;
 
-    FORWARD_FILE24 = i;
-    images[i] = "ForwardFile24.png"; i++;
+    PRIORITY_FIRE16 = i;
+    images[i] = "priority-fire16.png"; i++;
 
+    PRIORITY_HIGH16 = i;
+    images[i] = "priority-high16.png"; i++;
 
-    //PRINT = i;
-    //images[i] = "print.png"; i++;
+    PRIORITY_LOW16 = i;
+    images[i] = "priority-low16.png"; i++;
 
+    PRIORITY_FIRE12 = i;
+    images[i] = "priority-fire12.png"; i++;
 
-    PRIORITY_HIGH_SMALL = i;
-    images[i] = "priority-high-small.png"; i++;
+    PRIORITY_HIGH12 = i;
+    images[i] = "priority-high12.png"; i++;
 
-    PRIORITY_LOW_SMALL = i;
-    images[i] = "priority-low-small.png"; i++;
+    PRIORITY_LOW12 = i;
+    images[i] = "priority-low12.png"; i++;
 
-    PRIORITY_HIGH_12 = i;
-    images[i] = "priority-high-12.png"; i++;
-
-    PRIORITY_LOW_12 = i;
-    images[i] = "priority-low-12.png"; i++;
-
-    PRIORITY_SMALL = i;
-    images[i] = "priority-small.png"; i++;
+    PRIORITY_BLANK_SMALL = i;
+    images[i] = "priority-blank-small.png"; i++;
 
     LOCK_CLOSED_BLACK_SMALL = i;
     images[i] = "lock-closed-black-small.png"; i++;
@@ -937,9 +812,6 @@ public class ImageNums extends Object {
 
     FLAG_BLANK_TOOL = i;
     images[i] = "flag-blank-tool.png"; i++;
-
-    FLAG_GRAY_SMALL = i;
-    images[i] = "flag-gray-small.png"; i++;
 
     FLAG_RED_SMALL = i;
     images[i] = "flag-red-small.png"; i++;
@@ -976,11 +848,14 @@ public class ImageNums extends Object {
     DELETE24 = i;
     images[i] = "Delete24.png"; i++;
 
-    ADD14 = i;
-    images[i] = "add14.png"; i++;
+    ADD16 = i;
+    images[i] = "add16.png"; i++;
 
     GO16 = i;
-    images[i] = "Go16.png"; i++;
+    images[i] = "go16.png"; i++;
+
+    PIN15 = i;
+    images[i] = "pin15.png"; i++;
 
     X15 = i;
     images[i] = "X15.gif"; i++;
@@ -996,6 +871,12 @@ public class ImageNums extends Object {
 
     EMAIL_SYMBOL_SMALL = i;
     images[i] = "email-symbol-small.png"; i++;
+
+    EMAIL_SYMBOL_SECURE_SMALL = i;
+    images[i] = "email-symbol-secure-small.png"; i++;
+
+    EMAIL_SYMBOL16 = i;
+    images[i] = "email-symbol16.png"; i++;
 
 
     PRINT16 = i;
@@ -1016,17 +897,14 @@ public class ImageNums extends Object {
     TOOLS_FIX32 = i;
     images[i] = "ToolsFix32.png"; i++;
 
-    ATTACH16 = i;
+    ATTACH_SMALL = i;
     images[i] = "attach-small.png"; i++;
 
-    ATTACH_14x12 = i;
-    images[i] = "attach-14x12.png"; i++;
+    ATTACH_SMALL_BLANK = i;
+    images[i] = "attach-small-blank.png"; i++;
 
     ATTACH24 = i;
     images[i] = "Attach24.png"; i++;
-
-    ATTACH_SMALL = i;
-    images[i] = "attach-small-black.png"; i++;
 
     DETACH16 = i;
     images[i] = "Detach16.png"; i++;
@@ -1084,12 +962,13 @@ public class ImageNums extends Object {
     MAIL_COMPOSE_TO_MEMBER24 = i;
     images[i] = "ComposeMailToMember24.png"; i++;
 
+    MAIL_COMPOSE_TO_MEMBER32 = i;
+    images[i] = "ComposeMailToMember32.png"; i++;
+
     MAIL_SEND16 = i;
-    //images[i] = "mail_send16.png"; i++;
     images[i] = "SendMail16.png"; i++;
 
     MAIL_SEND24 = i;
-    //images[i] = "mail_send24.png"; i++;
     images[i] = "SendMail24.png"; i++;
 
 
@@ -1111,9 +990,6 @@ public class ImageNums extends Object {
 
     ADDRESS_BOOK48 = i;
     images[i] = "address-book-48.png"; i++;
-
-    ADDRESS_BOOK_SHARED48 = i;
-    images[i] = "address-book-shared-48.png"; i++;
 
 
     MAIL_COPY16 = i;
@@ -1146,17 +1022,23 @@ public class ImageNums extends Object {
     CHAT24 = i;
     images[i] = "Chat24.png"; i++;
 
+    CHAT48 = i;
+    images[i] = "chat-48.png"; i++;
+
+    CHAT_GROUP48 = i;
+    images[i] = "chat-group-48.png"; i++;
+
     CHAT_BUBBLE48 = i;
     images[i] = "chat-bubble-48.png"; i++;
 
-    CHAT_BUBBLE_SHARED48 = i;
-    images[i] = "chat-bubble-shared-48.png"; i++;
-
-    PERSON_SMALL = i;
-    images[i] = "person-small.png"; i++;
+    PERSON16 = i;
+    images[i] = "person16.png"; i++;
 
     PEOPLE16 = i;
     images[i] = "People16.png"; i++;
+
+    PEOPLE_SECURE16 = i;
+    images[i] = "PeopleSecure16.png"; i++;
 
     PEOPLE24 = i;
     images[i] = "People24.png"; i++;
@@ -1218,7 +1100,7 @@ public class ImageNums extends Object {
     images[i] = "Address16.png"; i++;
 
     ADDRESS32 = i;
-    images[i] = "Address32.gif"; i++;
+    images[i] = "Address32.png"; i++;
 
     ADDRESS_ADD16 = i;
     images[i] = "AddressAdd16.png"; i++;
@@ -1250,17 +1132,11 @@ public class ImageNums extends Object {
     ADDRESS_MOVE24 = i;
     images[i] = "AddressMove24.png"; i++;
 
-    ADDRESS_SAVE16 = i;
-    images[i] = "AddressSave16.gif"; i++;
-
-    ADDRESS_SAVE24 = i;
-    images[i] = "AddressSave24.gif"; i++;
-
     CONTACT16 = i;
     images[i] = "Contact16.png"; i++;
 
     CONTACT32 = i;
-    images[i] = "Contact32.gif"; i++;
+    images[i] = "Contact32.png"; i++;
 
     CONTACT_ADD16 = i;
     images[i] = "ContactAdd16.png"; i++;
@@ -1281,7 +1157,7 @@ public class ImageNums extends Object {
     images[i] = "ContactDelete24.png"; i++;
 
     CONTACT_NEW32 = i;
-    images[i] = "ContactNew32.gif"; i++;
+    images[i] = "ContactNew32.png"; i++;
 
     GROUP_ADD16 = i;
     images[i] = "GroupAdd16.png"; i++;
@@ -1290,10 +1166,10 @@ public class ImageNums extends Object {
     images[i] = "GroupAdd24.png"; i++;
 
     MEMBER_ADD16 = i;
-    images[i] = "MemberAdd16.png"; i++;
+    images[i] = "share16.png"; i++;
 
     MEMBER_ADD24 = i;
-    images[i] = "MemberAdd24.png"; i++;
+    images[i] = "share24.png"; i++;
 
 
     POSTING16 = i;
@@ -1315,13 +1191,30 @@ public class ImageNums extends Object {
     ORDER_DESCENDING2 = i;
     images[i] = "order_descending2.png"; i++;
 
-    INFO16 = i;
-    images[i] = "Info16.png"; i++;
+    HELP16 = i;
+    images[i] = "help16.png"; i++;
 
-    ANIM_GLOBE_FIRST16 = i;
-    images[i] = "AnimGlobeFirst16.png"; i++;
-    ANIM_GLOBE16 = i;
-    images[i] = "AnimGlobe16.gif"; i++;
+    INFO16 = i;
+    images[i] = "info16.png"; i++;
+
+    OPTIONS16 = i;
+    images[i] = "options16.png"; i++;
+
+    QUESTION16 = i;
+    images[i] = "question16.png"; i++;
+
+    OPTION_CHECK16 = i;
+    images[i] = "option-check16.png"; i++;
+    OPTION_CHECK_DISABLED16 = i;
+    images[i] = "option-check-disabled16.png"; i++;
+
+    OPTION_X16 = i;
+    images[i] = "option-x16.png"; i++;
+
+    ANIM_SMALL_FIRST16 = i;
+    images[i] = "transparent16.png"; i++;
+    ANIM_SMALL16 = i;
+    images[i] = "anim-small16.gif"; i++;
     ANIM_KEY = i;
     images[i] = "anim_key.gif"; i++;
     ANIM_LOCK = i;
@@ -1336,13 +1229,15 @@ public class ImageNums extends Object {
     PERSON32 = i;
     images[i] = "Person32.png"; i++;
     HOME32 = i;
-    images[i] = "Home32.gif"; i++;
+    images[i] = "Home32.png"; i++;
     PHONE32 = i;
-    images[i] = "Phone32.gif"; i++;
+    images[i] = "Phone32.png"; i++;
     MAIL32 = i;
     images[i] = "Mail32.png"; i++;
     WEB32 = i;
     images[i] = "Web32.png"; i++;
+    CONNECTION_CLOSED48 = i;
+    images[i] = "connection-closed48.png"; i++;
 
 
     STATUS_AWAY16 = i;
@@ -1361,16 +1256,12 @@ public class ImageNums extends Object {
     images[i] = "StatusQuestion16.png"; i++;
     STATUS_WAITING16 = i;
     images[i] = "StatusWaiting16.png"; i++;
-    LIGHT_ON_SMALL = i;
-    images[i] = "light-on-small.png"; i++;
-    LIGHT_ON_12 = i;
-    images[i] = "light-on-12.png"; i++;
-    LIGHT_OFF_SMALL = i;
-    images[i] = "light-off-small.png"; i++;
-    LIGHT_GREEN_SMALL = i;
-    images[i] = "light-green-small.png"; i++;
-    LIGHT_X_SMALL = i;
-    images[i] = "light-x-small.png"; i++;
+    LIGHT_ON16 = i;
+    images[i] = "light-on16.png"; i++;
+    LIGHT_OFF16 = i;
+    images[i] = "light-off16.png"; i++;
+    LIGHT_X16 = i;
+    images[i] = "light-x16.png"; i++;
 
     FILE32 = i; // little modification of ADD24
     images[i] = "File32.png"; i++;
@@ -1434,6 +1325,9 @@ public class ImageNums extends Object {
     FIND16 = i;
     images[i] = "Find16.png"; i++;
 
+    FIND_PREVIEW16 = i;
+    images[i] = "FindPreview16.png"; i++;
+
     FIND24 = i;
     images[i] = "Find24.png"; i++;
 
@@ -1476,7 +1370,7 @@ public class ImageNums extends Object {
     images[i] = "Signature32.png"; i++;
 
     SHIELD32 = i;
-    images[i] = "Shield32.gif"; i++;
+    images[i] = "Shield32.png"; i++;
 
     HTML_IMAGE_DELAYED = i;
     images[i] = "image-delayed.png"; i++;
@@ -1494,29 +1388,22 @@ public class ImageNums extends Object {
     RING_BELL = i;
     images[i] = "Bell16.png"; i++;
 
-    VOLUME16 = i;
-    images[i] = "Volume16.gif"; i++;
 
-    VOLUME24 = i;
-    images[i] = "Volume24.gif"; i++;
+    SOUND_RECORD16 = i;
+    images[i] = "sound-record16.png"; i++;
 
-    RECORD16 = i;
-    images[i] = "Record16.gif"; i++;
+    SOUND_RECORD24 = i;
+    images[i] = "sound-record24.png"; i++;
 
-    RECORD24 = i;
-    images[i] = "Record24.gif"; i++;
+    SOUND_PLAY16 = i;
+    images[i] = "sound-play16.gif"; i++;
 
-    PLAY16 = i;
-    images[i] = "Play16.gif"; i++;
+    SOUND_PAUSE16 = i;
+    images[i] = "sound-pause16.gif"; i++;
 
-    PAUSE16 = i;
-    images[i] = "Pause16.gif"; i++;
+    SOUND_STOP16 = i;
+    images[i] = "sound-stop16.gif"; i++;
 
-    PLAY_PAUSE16 = i;
-    images[i] = "PlayPause16.gif"; i++;
-
-    STOP16 = i;
-    images[i] = "Stop16.gif"; i++;
 
     EDITOR_ALIGN = i;
     images[i] = "editor-align.png"; i++;

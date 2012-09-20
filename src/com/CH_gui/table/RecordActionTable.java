@@ -41,6 +41,7 @@ import com.CH_gui.msgTable.MsgTableModel;
 import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.sortedTable.TableSorter;
+import com.CH_gui.tree.FolderActionTree;
 import com.CH_gui.util.*;
 import java.awt.*;
 import java.awt.dnd.*;
@@ -366,9 +367,10 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
       this.switchPercentageMin = switchPercentageMin;
       this.switchPercentageMax = switchPercentageMax;
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.TOOL_TIP, "Split Left-Right");
+      putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       init();
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -747,7 +749,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
                         public void mouseClicked(MouseEvent e) {
                           if (!_isProcessed[0]) {
                             _isProcessed[0] = true;
-                            new ChatSessionCreator(_cRec).start();
+                            ContactActionTable.chatOrShareSpace(RecordActionTable.this, new MemberContactRecordI[] {_cRec}, true, true, (short) 0);
                           }
                         }
                       };

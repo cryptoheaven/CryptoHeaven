@@ -567,7 +567,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
             jDataUser.setIcon(RecordUtilsGui.getIcon(uRec));
           } else {
             jDataUser.setText(com.CH_cl.lang.Lang.rb.getString("label_Unknown_User_Account"));
-            jDataUser.setIcon(Images.get(ImageNums.PERSON_SMALL));
+            jDataUser.setIcon(Images.get(ImageNums.PERSON16));
           }
 
           jDataKeyID.setText(fileData.getSigningKeyId().toString());
@@ -587,7 +587,7 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
             jVerifyOK.setText(com.CH_cl.lang.Lang.rb.getString("Digest_signatures_verified."));
           } else {
             jVerifyOK.setText(com.CH_cl.lang.Lang.rb.getString("Digest_signatures_could_not_be_verified."));
-            jVerifyOK.setIcon(Images.get(ImageNums.PRIORITY_HIGH_SMALL));
+            jVerifyOK.setIcon(Images.get(ImageNums.PRIORITY_HIGH16));
           }
 
           if (fileData.getOrigDataDigest() != null)

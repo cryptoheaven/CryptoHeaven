@@ -71,8 +71,10 @@ public class InterruptMessageAction extends ClientMessageAction {
         if (getServerInterfaceLayer().isLastLoginMsgActionSet()) {
           String title = "Interrupted";
           String interruptedSuffix = " operation was interrupted.";
-          String msg = MessageActionNameSwitch.getActionInfoName(actionCode) + interruptedSuffix;
           Object key = interruptedSuffix; // show 1 interrupted msg at a time, and skip the other
+          int msgType = NotificationCenter.ERROR_MESSAGE;
+          String msg = null;
+
           // if initial login failed, give better help message
           if (!getServerInterfaceLayer().hasPersistentMainWorker() && (actionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || actionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION)) {
             title = "Login failed";
@@ -88,9 +90,18 @@ public class InterruptMessageAction extends ClientMessageAction {
             msg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server" + (server.length() > 0 ? (" at " + server + " on port " + port) : "") + ".  "
                 + "Please verify your computer network and/or modem cables are plugged-in and your computer is currently connected to the Internet.  When you have established and verified your Internet connectivity, please try connecting to "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" again.  "
                 + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
+            msgType = NotificationCenter.ERROR_CONNECTION;
             key = new Integer(actionCode);
+          } else if (!getServerInterfaceLayer().hasPersistentMainWorker()) {
+            // if action failed due to connection problem, give offline notice
+            title = "No Connection";
+            msg = "Could not communicate with the server.  Please check your internet connectivity.\n\n"+MessageActionNameSwitch.getActionInfoName(actionCode)+" failed.";
+            msgType = NotificationCenter.ERROR_CONNECTION;
+          } else {
+            msg = MessageActionNameSwitch.getActionInfoName(actionCode) + interruptedSuffix;
           }
-          NotificationCenter.show(singleInterruptedDialogArbiter, key, NotificationCenter.ERROR_MESSAGE, title, msg);
+
+          NotificationCenter.show(singleInterruptedDialogArbiter, key, msgType, title, msg);
         } else {
           if (trace != null) trace.data(100, "suppress interrupt msg");
         }

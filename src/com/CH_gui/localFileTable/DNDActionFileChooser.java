@@ -160,15 +160,17 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   }
 
   /**
-   * Open in seperate window
+   * Open in separate window
    */
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       new LocalFileTableFrame("Browse");

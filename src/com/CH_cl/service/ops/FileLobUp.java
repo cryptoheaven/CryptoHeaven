@@ -338,13 +338,19 @@ public class FileLobUp {
               cache.addMsgLinkRecordListener(msgListener);
               isUploadInProgress = true;
               boolean isRetry = false;
+              long QUICK_FAILURE = 10 * 1000L;
+              long DELAY_FAILURE_MIN = 5 * 1000L;
+              long DELAY_FAILURE_MAX = 10 * 60 * 1000L;
+              long delayFailure = DELAY_FAILURE_MIN;
               while (!isUploaded) {
+                long timeStart = System.currentTimeMillis();
                 try {
                   if (DEBUG_CONSOLE) System.out.println("doUpload: trigger for "+plainDataFile);
                   if (trace != null) trace.data(10, "doUpload: trigger", plainDataFile);
                   // If retrying start from unknown byte count.
-                  if (ServerInterfaceLayer.lastSIL.isLoggedIn())
+                  if (ServerInterfaceLayer.lastSIL.isLoggedIn()) {
                     isUploaded = doUpload(isRetry ? -1 : startFromByte);
+                  }
                 } catch (Throwable t) {
                   if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
                   if (trace != null) trace.exception(getClass(), 100, t);
@@ -360,7 +366,15 @@ public class FileLobUp {
                     isRetry = true;
                     // Any exception or failure should hit this delay.
                     if (trace != null) trace.data(200, "waiting to retry in triggerUploading()", plainDataFile);
-                    try { Thread.sleep(3000); } catch (InterruptedException interX) { }
+                    long timeElapsed = System.currentTimeMillis() - timeStart;
+                    // for quick failures, increase the sleep time and cap it off at DELAY_FAILURE_MAX
+                    if (timeElapsed < QUICK_FAILURE) {
+                      delayFailure = (long) (delayFailure * 1.5);
+                      delayFailure = Math.min(delayFailure, DELAY_FAILURE_MAX);
+                    } else {
+                      delayFailure = DELAY_FAILURE_MIN;
+                    }
+                    try { Thread.sleep(delayFailure); } catch (InterruptedException interX) { }
                     if (trace != null) trace.data(201, "woke up from waiting to retry in triggerUploading()", plainDataFile);
                   }
                 }

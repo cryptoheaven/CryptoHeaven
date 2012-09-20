@@ -845,11 +845,11 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
 
     public FolderTypeComboBoxModel() {
       images = new ImageIcon[6];
-      images[0] = Images.get(ImageNums.FLD_CLOSED16);
-      images[1] = Images.get(ImageNums.FLD_MAIL_CLOSED16);
-      images[2] = Images.get(ImageNums.FLD_MAIL_POST_CLOSED16);
-      images[3] = Images.get(ImageNums.FLD_CHAT_CLOSED16);
-      images[4] = Images.get(ImageNums.FLD_ADDR_CLOSED16);
+      images[0] = Images.get(ImageNums.FLD_FILE16);
+      images[1] = Images.get(ImageNums.FLD_MAIL16);
+      images[2] = Images.get(ImageNums.FLD_MAIL_POST16);
+      images[3] = Images.get(ImageNums.FLD_CHAT16);
+      images[4] = Images.get(ImageNums.FLD_ADDR16);
       images[5] = Images.get(ImageNums.PEOPLE16);
 
       //images[3] = Images.get(ImageNums.FLD_CNT_CLOSED16);

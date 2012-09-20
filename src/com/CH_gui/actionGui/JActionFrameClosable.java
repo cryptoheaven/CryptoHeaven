@@ -1,61 +1,68 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.actionGui;
 
+import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.action.*;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.action.ActionUtilities;
+import com.CH_gui.action.Actions;
 import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import com.CH_gui.gui.VetoRisibleI;
+import com.CH_gui.gui.VetoableI;
+import com.CH_gui.util.ActionProducerI;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MiscGui;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import javax.swing.Action;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.23 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.23 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public abstract class JActionFrameClosable extends JActionFrame implements ActionProducerI, VetoableI {
 
   private Action[] actions;
   private static final int CLOSE_ACTION = 0;
 
-  private static Vector allClosableFrames;
-  private Vector vetoRisiblesV = null;
+  protected static ArrayList allClosableFramesL;
+  private ArrayList vetoRisiblesL = null;
 
   /** Creates new JActionFrameClosable */
   public JActionFrameClosable(String title, boolean withMenuBar, boolean withToolBar) {
     super(title, withMenuBar, withToolBar);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrameClosable.class, "JActionFrameClosable()");
-    if (allClosableFrames == null)
-      allClosableFrames = new Vector();
-    allClosableFrames.addElement(this);
+    if (allClosableFramesL == null)
+      allClosableFramesL = new ArrayList();
+    allClosableFramesL.add(this);
     if (trace != null) trace.exit(JActionFrameClosable.class);
   }
 
@@ -77,22 +84,22 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
 
 
   /**
-   * Closes all frames if no veto is raised.
-   * @return true is all frames closed.
-   */
+  * Closes all frames if no veto is raised.
+  * @return true is all frames closed.
+  */
   public static boolean closeAllClosableFramesVetoable() {
     boolean closed = true;
-    if (allClosableFrames != null) {
+    if (allClosableFramesL != null) {
       boolean closeOK = true;
-      for (int i=allClosableFrames.size()-1; i>=0; i--) {
-        JActionFrameClosable f = (JActionFrameClosable) allClosableFrames.elementAt(i);
+      for (int i=allClosableFramesL.size()-1; i>=0; i--) {
+        JActionFrameClosable f = (JActionFrameClosable) allClosableFramesL.get(i);
         closeOK = f.closeAction(true);
         if (!closeOK)
           break;
       }
       if (closeOK) {
-        for (int i=allClosableFrames.size()-1; i>=0; i--) {
-          JActionFrameClosable f = (JActionFrameClosable) allClosableFrames.elementAt(i);
+        for (int i=allClosableFramesL.size()-1; i>=0; i--) {
+          JActionFrameClosable f = (JActionFrameClosable) allClosableFramesL.get(i);
           f.closeFrame();
         }
       }
@@ -102,9 +109,9 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   }
 
   public static void closeAllClosableFramesLeaveNonUserSensitive() {
-    if (allClosableFrames != null) {
-      for (int i=allClosableFrames.size()-1; i>=0; i--) {
-        JActionFrameClosable f = (JActionFrameClosable) allClosableFrames.elementAt(i);
+    if (allClosableFramesL != null) {
+      for (int i=allClosableFramesL.size()-1; i>=0; i--) {
+        JActionFrameClosable f = (JActionFrameClosable) allClosableFramesL.get(i);
         if (f instanceof ContactTableFrame || 
             f instanceof FolderTreeFrame || 
             f instanceof LocalFileTableFrame ||
@@ -120,13 +127,13 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
 
   public static Point getSpreadWindowLocation(Window w) {
     Point newP = null;
-    if (allClosableFrames != null) {
+    if (allClosableFramesL != null) {
       Point wP = w.getLocation();
       Dimension wD = w.getSize();
       Dimension screen = MiscGui.getScreenUsableSize(wP.x, wP.y, w);
       // traverse existing frames backwards
-      for (int i=allClosableFrames.size()-1; i>=0; i--) {
-        Window c = (Window) allClosableFrames.elementAt(i);
+      for (int i=allClosableFramesL.size()-1; i>=0; i--) {
+        Window c = (Window) allClosableFramesL.get(i);
         Point cP = c.getLocation();
         Dimension cD = c.getSize();
         if (w != c && w.getClass().equals(c.getClass()) && wP.equals(cP) && wD.equals(cD)) {
@@ -149,22 +156,22 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   }
 
   /**
-   * Check if this frame was already closed.  Closed frames are disposed and should not be shown again.
-   * @return true if this frame was already closed
-   */
+  * Check if this frame was already closed.  Closed frames are disposed and should not be shown again.
+  * @return true if this frame was already closed
+  */
   public boolean isClosed() {
-    return !allClosableFrames.contains(this);
+    return !allClosableFramesL.contains(this);
   }
 
   /**
-   * Closes the frame and saves its properties.  Triggered with the Close Action Menu Item or by pressing 'x'.
-   */
+  * Closes the frame and saves its properties.  Triggered with the Close Action Menu Item or by pressing 'x'.
+  */
   public void closeFrame() {
     saveFrameProperties();
 
     // remove this frame from closable collection
     try {
-      allClosableFrames.remove(this);
+      allClosableFramesL.remove(this);
     } catch (Exception t) { }
 
     try {
@@ -173,7 +180,7 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
       dispose();
     } catch (Exception t) { }
     // if last Closable Frame closed and no MainFrame, exit
-    if (allClosableFrames.size() == 0 && MainFrame.getSingleInstance() == null) {
+    if (allClosableFramesL.size() == 0 && MainFrame.getSingleInstance() == null) {
       MainFrame.exitAction(null);
     }
   } // end closeFrame()
@@ -184,9 +191,9 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   }
   private boolean closeAction(boolean probeOnly) {
     boolean veto = false;
-    if (vetoRisiblesV != null) {
-      for (int i=0; i<vetoRisiblesV.size(); i++) {
-        VetoRisibleI v = (VetoRisibleI) vetoRisiblesV.elementAt(i);
+    if (vetoRisiblesL != null) {
+      for (int i=0; i<vetoRisiblesL.size(); i++) {
+        VetoRisibleI v = (VetoRisibleI) vetoRisiblesL.get(i);
         if (v.isVetoRaised(VetoRisibleI.TYPE_WINDOW_CLOSE)) {
           veto = true;
           break;
@@ -214,7 +221,7 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   /*********************************************/
 
   /** @return all the actions that this objects produces.
-   */
+  */
   public Action[] getActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JActionFrameClosable.class, "getActions()");
     if (actions == null)
@@ -229,8 +236,8 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   // =====================================================================
 
   /** 
-   * Close the frame.
-   **/
+  * Close the frame.
+  **/
   private class CloseAction extends AbstractActionTraced {
     public CloseAction(int actionId) {
       super(com.CH_cl.lang.Lang.rb.getString("action_Close"), Images.get(ImageNums.DELETE16));
@@ -245,13 +252,13 @@ public abstract class JActionFrameClosable extends JActionFrame implements Actio
   }
 
   /*****************************************************************
-   * I N T E R F A C E   M E T H O D  ---   V e t o a b l e I  *****
-   ****************************************************************/
+  * I N T E R F A C E   M E T H O D  ---   V e t o a b l e I  *****
+  ****************************************************************/
   public void addVetoRisibleI(VetoRisibleI vetoRisibleI) {
-    if (vetoRisiblesV == null)
-      vetoRisiblesV = new Vector();
-    if (!vetoRisiblesV.contains(vetoRisibleI))
-      vetoRisiblesV.addElement(vetoRisibleI);
+    if (vetoRisiblesL == null)
+      vetoRisiblesL = new ArrayList();
+    if (!vetoRisiblesL.contains(vetoRisibleI))
+      vetoRisiblesL.add(vetoRisibleI);
   }
 
 }

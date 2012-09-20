@@ -56,6 +56,7 @@ public class Sounds extends Object {
   public static final int YOU_WERE_AUTHORIZED;
   public static final int WINDOW_POPUP;
   public static final int RING_BELL;
+  public static final int NO_CONNECTION;
   //public static final int RING_OUT;
 
   private static final String clipNames[];
@@ -65,7 +66,7 @@ public class Sounds extends Object {
 
   static {
     int i = 0;
-    clipNames = new String[13];
+    clipNames = new String[14];
     clipPlayStamps = new long[13];
 
     DIALOG_ERROR = i;
@@ -103,6 +104,9 @@ public class Sounds extends Object {
 
     RING_BELL = i;
     clipNames[i] = "ringBell.wav"; i++;
+    
+    NO_CONNECTION = i;
+    clipNames[i] = "no-connection.wav"; i++;
 
   }
 

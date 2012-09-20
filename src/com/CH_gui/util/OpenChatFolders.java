@@ -13,7 +13,6 @@
 package com.CH_gui.util;
 
 import com.CH_co.util.MultiHashtable;
-
 import java.awt.Component;
 import java.util.Collection;
 

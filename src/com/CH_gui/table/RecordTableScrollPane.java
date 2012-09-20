@@ -32,10 +32,7 @@ import com.CH_gui.sortedTable.TableModelSortListener;
 import com.CH_gui.sortedTable.TableSorter;
 import com.CH_gui.util.MiscGui;
 import com.CH_gui.util.VisualsSavable;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
@@ -180,9 +177,13 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
   private void init() {
     RecordTableCellRenderer renderer = recordTableModel.createRenderer();
-    jSTable.setSelectionBackground(renderer.getAltBkColors()[RecordTableCellRenderer.ALT_BK_SELECTED_COLOR_I]);
+    Color[] bkColors = renderer.getAltBkColors();
+    if (bkColors != null)
+      jSTable.setSelectionBackground(bkColors[RecordTableCellRenderer.ALT_BK_SELECTED_COLOR_I]);
     jSTable.setDefaultRenderer(Object.class, renderer);
     jSTable.setShowGrid(false);
+//    jSTable.setShowHorizontalLines(true);
+//    jSTable.setGridColor(RecordTableCellRenderer.defaultAltColorSelected);
     jSTable.getColumnModel().setColumnMargin(0);
     jSTable.addTableModelSortListener(sortListener);
 

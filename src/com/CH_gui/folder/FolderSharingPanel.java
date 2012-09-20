@@ -13,30 +13,40 @@
 package com.CH_gui.folder;
 
 import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.dialog.*;
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.shareTable.*;
-import com.CH_gui.table.*;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import com.CH_gui.dialog.ContactSelectDialog;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.list.ListRenderer;
+import com.CH_gui.shareTable.ShareTableModel;
+import com.CH_gui.table.RecordTableScrollPane;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -181,7 +191,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     setLayout(new GridBagLayout());
 
     int posY = 0;
-    jShareIcon = new JMyLabel(Images.get(ImageNums.FOLDER_SHARED48));
+    jShareIcon = new JMyLabel(Images.get(ImageNums.SHARE48));
     add(jShareIcon, new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     jShareMsg = new JMyLabel();
@@ -587,7 +597,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
     String labelText2 = com.CH_cl.lang.Lang.rb.getString("label_Input_Share_Name_here");
     if (folderType == FolderRecord.GROUP_FOLDER) {
       ShareTableModel.columnHeaderDatas[1].applyToTable(tablePane.getJSortedTable());
-      jShareIcon.setIcon(Images.get(ImageNums.PEOPLE48));
+//      jShareIcon.setIcon(Images.get(ImageNums.PEOPLE48));
       if (jRadioInheritSharing != null)
         jRadioInheritSharing.setText(com.CH_cl.lang.Lang.rb.getString("radio_Inherit_membership_properties_from_parent_folder."));
       jRadioDoNotShare.setText(com.CH_cl.lang.Lang.rb.getString("radio_Do_not_share_this_group."));
@@ -596,12 +606,12 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
       labelText = labelText1;
     } else {
       ShareTableModel.columnHeaderDatas[0].applyToTable(tablePane.getJSortedTable());
-      if (FolderRecord.isAddressType(folderType))
-        jShareIcon.setIcon(Images.get(ImageNums.ADDRESS_BOOK_SHARED48));
-      else if(folderType == FolderRecord.CHATTING_FOLDER)
-        jShareIcon.setIcon(Images.get(ImageNums.CHAT_BUBBLE_SHARED48));
-      else
-        jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED48));
+//      if (FolderRecord.isAddressType(folderType))
+//        jShareIcon.setIcon(Images.get(ImageNums.ADDRESS_BOOK_SHARED48));
+//      else if(folderType == FolderRecord.CHATTING_FOLDER)
+//        jShareIcon.setIcon(Images.get(ImageNums.CHAT_BUBBLE_SHARED48));
+//      else
+//        jShareIcon.setIcon(Images.get(ImageNums.FOLDER_SHARED48));
       if (jRadioInheritSharing != null)
         jRadioInheritSharing.setText(com.CH_cl.lang.Lang.rb.getString("radio_Inherit_sharing_properties_from_parent_folder."));
       jRadioDoNotShare.setText(com.CH_cl.lang.Lang.rb.getString("radio_Do_not_share_this_folder."));

@@ -263,10 +263,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   */
   private class OpenFileAction extends AbstractActionTraced {
     public OpenFileAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Open"), Images.get(ImageNums.OPEN16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Transfer and Open remote file on local system using default file type association.");
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.OPEN24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Open"));
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -377,7 +377,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           };
         }
 
-        // if Move then immediatelly remove links so that source GUI table responds FAST, when action comes back from server destination folder will update
+        // if Move then immediately remove links so that source GUI table responds FAST, when action comes back from server destination folder will update
         if (actionCode == CommandCodes.FILE_Q_MOVE_FILES && sourceFolder != null) {
           FolderShareRecord sourceShare = cache.getFolderShareRecordMy(sourceFolder.folderId, true);
           FolderShareRecord chosenShare = chosenFolderPair.getFolderShareRecord();
@@ -511,7 +511,9 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.REFRESH24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Refresh"));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       ((FileTableModel) getTableModel()).refreshData(true);
@@ -597,12 +599,14 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   */
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE_FILE16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Display_file_table_in_its_own_window."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_FILE24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
       putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FolderPair parentFolderPair = ((FileTableModel) getTableModel()).getParentFolderPair();
@@ -639,10 +643,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   */
   private class InviteAction extends AbstractActionTraced {
     public InviteAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.FLD_CLOSED_SHARED16, true));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."), Images.get(ImageNums.SHARE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("action_Share_Folder_..."));
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.FLD_CLOSED_SHARED24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SHARE24));
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Share"));
       putValue(Actions.IN_POPUP, Boolean.FALSE);
     }
@@ -777,7 +781,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         }
       }
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.FILE_Q_UPDATE_STATUS, new Obj_List_Co(newStats)), 30000);
-//      // immediatelly update the cache without waiting on the results from the server
+//      // immediately update the cache without waiting on the results from the server
 //      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 //      cache.addFileLinkRecords(records);
     }

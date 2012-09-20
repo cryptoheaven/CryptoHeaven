@@ -149,7 +149,7 @@ public class TypeAheadPopupList extends Object implements KeyListener, StringHig
           }
         }
       });
-      list.setCellRenderer(new ListRenderer(false, true, true, false, this));
+      list.setCellRenderer(new ListRenderer(false, true, true, false, true, this));
       fullListModel = new DefaultListModel();
       for (int i=0; i<objs.length; i++)
         fullListModel.addElement(objs[i]);

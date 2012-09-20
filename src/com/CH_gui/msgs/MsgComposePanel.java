@@ -230,6 +230,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     if (this.selectedAttachments != null && this.selectedAttachments.length > 1)
       Arrays.sort(this.selectedAttachments, new ListComparator());
 
+    // convert initial recipients to familiar contacts
+    convertSelectedRecipientsToFamiliar_Threaded(true);
+
     init();
 
     if (selectedAttachments != null && selectedAttachments.length > 0) {
@@ -245,6 +248,31 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     addPopupsAndDND(components);
 
     if (trace != null) trace.exit(MsgComposePanel.class);
+  }
+
+  private void convertSelectedRecipientsToFamiliar_Threaded(final boolean markAsOriginalContent) {
+    Thread th = new ThreadTraced("MsgComposePanel Selected Recipient To Familiar Converter") {
+      public void runTraced() {
+        // convert all email addresses and address contacts to users or contacts if possible
+        for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
+          try {
+            if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
+              boolean anyConverted = false;
+              // This will also trigger fetch of any EmailRecord that we might be sending to
+              // and panel renderer will be able to substitute it to show that encryption is possible.
+              anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], false);
+              if (anyConverted)
+                redrawRecipients(i);
+              if (markAsOriginalContent)
+                markCurrentContentAndAttachmentsAsOriginal();
+            }
+          } catch (Throwable t) {
+          }
+        }
+      }
+    };
+    th.setDaemon(true);
+    th.start();
   }
 
   private void addPopupsAndDND(Component[] components) {
@@ -531,6 +559,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     initCopyToSent();
     revalidate();
 
+    // previous email address maybe convertible to contacts ...
+    convertSelectedRecipientsToFamiliar_Threaded(true);
+
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
 
@@ -688,6 +719,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
     initCopyToSent();
     revalidate();
+
+    // previous email address maybe convertible to contacts...
+    convertSelectedRecipientsToFamiliar_Threaded(true);
 
     if (trace != null) trace.exit(MsgComposePanel.class);
   }
@@ -897,8 +931,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
         putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("action_Save"));
         putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Save_composed_address."));
-        putValue(Actions.MENU_ICON, Images.get(ImageNums.ADDRESS_SAVE16));
-        putValue(Actions.TOOL_ICON, Images.get(ImageNums.ADDRESS_SAVE24));
+        putValue(Actions.MENU_ICON, Images.get(ImageNums.SAVE16));
+        putValue(Actions.TOOL_ICON, Images.get(ImageNums.SAVE24));
         putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Save"));
       }
     }
@@ -1269,7 +1303,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class SelectAttachmentsAction extends AbstractActionTraced {
     public SelectAttachmentsAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Select_Attachments"), Images.get(ImageNums.ATTACH_SMALL));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Select_Attachments,_this_could_be_a_file_or_a_message."));
       putValue(Actions.TOOL_ICON, Images.get(ImageNums.ATTACH24));
@@ -1346,7 +1380,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         case MsgDataRecord.IMPORTANCE_FYI_HTML:
           priorityIndex = PRIORITY_INDEX_FYI;
           putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("priority_FYI"));
-          putValue(Actions.MENU_ICON, Images.get(ImageNums.PRIORITY_LOW_SMALL));
+          putValue(Actions.MENU_ICON, Images.get(ImageNums.PRIORITY_LOW16));
           putValue(Actions.SELECTED_RADIO, Boolean.FALSE);
           break;
         case MsgDataRecord.IMPORTANCE_NORMAL_HTML:
@@ -1358,7 +1392,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         case MsgDataRecord.IMPORTANCE_HIGH_HTML:
           priorityIndex = PRIORITY_INDEX_HIGH;
           putValue(Actions.NAME, com.CH_cl.lang.Lang.rb.getString("priority_High"));
-          putValue(Actions.MENU_ICON, Images.get(ImageNums.PRIORITY_HIGH_SMALL));
+          putValue(Actions.MENU_ICON, Images.get(ImageNums.PRIORITY_HIGH16));
           putValue(Actions.SELECTED_RADIO, Boolean.FALSE);
           break;
       }
@@ -1572,10 +1606,10 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   */
   private class RecordPanelAction extends AbstractActionTraced {
     public RecordPanelAction(int actionId) {
-      super("Voice Recording Panel", Images.get(ImageNums.RECORD16));
+      super("Voice Recording Panel", Images.get(ImageNums.SOUND_RECORD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Show Voice Recording Panel");
-      putValue(Actions.TOOL_ICON, Images.get(ImageNums.RECORD24));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.SOUND_RECORD24));
       putValue(Actions.TOOL_NAME, "Record");
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -1883,6 +1917,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         if (selectedRecipients[recipientType] == null) selectedRecipients[recipientType] = new Record[0];
         checkValidityOfRecipients(false);
         redrawRecipients(recipientType);
+        // See if any entered email addresses could become Contact Records
+        convertSelectedRecipientsToFamiliar_Threaded(false);
       }
     };
     if (waitForResults) {

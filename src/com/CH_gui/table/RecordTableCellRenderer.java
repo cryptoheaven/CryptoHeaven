@@ -1,47 +1,53 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.table;
 
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
-import com.CH_gui.list.*;
-import com.CH_gui.sortedTable.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
+import com.CH_co.service.records.Record;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyDefaultTableCellRenderer;
+import com.CH_gui.list.StringHighlighter;
+import com.CH_gui.list.StringHighlighterI;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.util.Images;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.sql.Timestamp;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.21 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.21 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer {
 
   private JPanel jIndentAreaRenderer = new JPanel();
@@ -55,21 +61,24 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   public static final int ALT_BK_SELECTED_COLOR_I = 1;
 
   private static Color defaultAltColor = new Color(245, 243, 233, ALPHA);
-  private static Color defaultAltColorSelected = new Color(202, 200, 192, ALPHA);
+  public static Color defaultAltColorSelected = new Color(202, 200, 192, ALPHA);
+
+  public static Color defaultAltColorSelectedGray = new Color(200, 200, 200, ALPHA);
+
   private static Color[] defaultAltBkColors = new Color[] { defaultAltColor, defaultAltColorSelected };
 
   /**
-   * Provide alternate row background colors.
-   */
+  * Provide alternate row background colors.
+  */
   public Color[] getAltBkColors() {
     return defaultAltBkColors;
   }
 
 
-  public static final Border BORDER_ICON = null;
-  public static final Border BORDER_ICONIZED = new EmptyBorder(0,1,0,5);
-  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(0,5,0,5);
-  public static final Border BORDER_TEXT = new EmptyBorder(0,5,0,5);
+  public static final Border BORDER_ICON = new EmptyBorder(2,1,2,1);
+  public static final Border BORDER_ICONIZED = new EmptyBorder(2,1,2,5);
+  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(2,5,2,5);
+  public static final Border BORDER_TEXT = new EmptyBorder(2,5,2,5);
   public static Border[] BORDERS_INDENTED_ICONIZED = null;
   public static Border[] BORDERS_INDENTED_TEXT = null;
   public static final int BORDER_INDENT_PIXELS = 16;
@@ -86,12 +95,6 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
       BORDERS_INDENTED_TEXT[i] = makeIndentedBorder(i, false);
     }
   }
-
-//  public static Color makeAlphaAdjustedColor(int r, int g, int b, int a, Color commonBack) {
-//    Color inverse = new Color(255-commonBack.getRed(), 255-commonBack.getGreen(), 255-commonBack.getBlue());
-//    int percent = (int) (((double) a) / 2.55);
-//    return getInBetweenColor(new Color(r, g, b), inverse, percent);
-//  }
 
   public static Border makeIndentedBorder(int numOfIndents, boolean iconized) {
     return new EmptyBorder(0, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? 1 : 5), 0, 5);
@@ -191,28 +194,31 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
 
 
   /**
-   * Classes that wish to handle their own alternative color background should overwrite this method.
-   * @return false by default
-   */
+  * Classes that wish to handle their own alternative color background should overwrite this method.
+  * @return false by default
+  */
   public boolean isSubClassManagingRowColors() {
     return false;
   }
 
   /**
-   * @return background color for the row if alternative color exists, null otherwise.
-   */
+  * @return background color for the row if alternative color exists, null otherwise.
+  */
   public Color getDefaultBackground(int row, boolean isSelected) {
     Color bgColor = null;
     Color[] altBkColors = getAltBkColors();
     if (altBkColors == null)
       altBkColors = defaultAltBkColors;
     if (isSelected) {
-      if (altBkColors != null)
-        bgColor = altBkColors[ALT_BK_SELECTED_COLOR_I];
+      if (altBkColors != null) {
+        bgColor = defaultAltColorSelectedGray; // don't use alternate selection colors
+        //bgColor = altBkColors[ALT_BK_SELECTED_COLOR_I];
+      }
     } else if ((row % 2) == 0) {
       bgColor = defaultWhite;
     } else if (altBkColors != null) {
-      bgColor = altBkColors[ALT_BK_DEFAULT_COLOR_I];
+      bgColor = defaultWhite; // don't use alternate color -- go to white
+      //bgColor = altBkColors[ALT_BK_DEFAULT_COLOR_I];
     }
     return bgColor;
   } // end getDefaultBackground()
@@ -225,10 +231,10 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   }
 
   /**
-   * Usually all tables have two background colors defined.  This method gets other color than
-   * one specified.  Used in alteration of background colors.
-   * @return another color to the one specified but from the list of available background colors.
-   */
+  * Usually all tables have two background colors defined.  This method gets other color than
+  * one specified.  Used in alteration of background colors.
+  * @return another color to the one specified but from the list of available background colors.
+  */
   public Color getOtherColor(Color color) {
     Color bgColor = null;
     Color[] altBkColors = getAltBkColors();
@@ -283,10 +289,13 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
       panel.setBorder(new EmptyBorder(0, 0, 0, 0));
       JLabel arrow = jIndentLabelRenderer;
       arrow.setIcon(Images.get(ImageNums.REPLY_ARROW16));
-      arrow.setOpaque(true);
       arrow.setForeground(fw);
-      arrow.setBackground(bk);
+//      arrow.setBackground(bk);
       arrow.setVerticalAlignment(SwingConstants.TOP);
+
+      arrow.setOpaque(false);
+      if (renderer instanceof JComponent)
+        ((JComponent) renderer).setOpaque(false);
 
       panel.add(arrow, BorderLayout.WEST);
       panel.add(renderer, BorderLayout.CENTER);

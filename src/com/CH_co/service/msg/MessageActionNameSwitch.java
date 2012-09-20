@@ -187,6 +187,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FLD_Q_GET_SIZE_SUMMARY), "Get Folder Size Summary" },
       // Get All Access Users for specified Folder IDs
       { new Integer(CommandCodes.FLD_Q_GET_ACCESS_USERS), "Fetch Group Members" },
+      // Get Last Content Update (Msg or File)
+      { new Integer(CommandCodes.FLD_Q_GET_LAST_UPDATE), "Fetch Last Update" },
       // Get Folder Red Flag Count
       { new Integer(CommandCodes.FLD_Q_RED_FLAG_COUNT), "Count New Objects for Folder(s)" },
       // Ring Ring

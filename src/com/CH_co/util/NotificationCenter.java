@@ -28,10 +28,11 @@ public class NotificationCenter {
   public static final int INFORMATION_MESSAGE = 9002;
   public static final int WARNING_MESSAGE = 9003;
   public static final int ERROR_MESSAGE = 9004;
-  public static final int RECYCLE_MESSAGE = 9005;
-  public static final int DELETE_MESSAGE = 9006;
-  public static final int EMPTY_RECYCLE_FOLDER = 9007;
-  public static final int EMPTY_SPAM_FOLDER = 9008;
+  public static final int ERROR_CONNECTION = 9005;
+  public static final int RECYCLE_MESSAGE = 9006;
+  public static final int DELETE_MESSAGE = 9007;
+  public static final int EMPTY_RECYCLE_FOLDER = 9008;
+  public static final int EMPTY_SPAM_FOLDER = 9009;
 
   private static Class implNotificationCenterI;
 

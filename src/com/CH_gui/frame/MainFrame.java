@@ -753,7 +753,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class AboutAction extends AbstractActionTraced {
     public AboutAction(int actionId) {
       super(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("action_About__SERVICE_SOFTWARE_NAME"),
-            new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) }), Images.get(ImageNums.INFO16));
+            new Object[] { URLs.get(URLs.SERVICE_SOFTWARE_NAME) }));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
       putValue(Actions.GENERATED_NAME, Boolean.TRUE);
@@ -919,7 +919,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLGeneralFAQAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_FAQ_PAGE);
     public URLGeneralFAQAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_General_FAQ"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_General_FAQ"), Images.get(ImageNums.QUESTION16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -939,7 +939,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLQuickTourAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_QUICK_TOUR_PAGE);
     public URLQuickTourAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Quick_Tour"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Quick_Tour"), Images.get(ImageNums.INFO16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -959,7 +959,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLUsersGuideAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.HELP_USER_GUIDE_PAGE);
     public URLUsersGuideAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_User's_Guide"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_User's_Guide"), Images.get(ImageNums.HELP16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -979,7 +979,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   protected static class URLAccountUpgradeAction extends AbstractActionTraced {
     private String url = URLs.get(URLs.SIGNUP_PAGE);
     public URLAccountUpgradeAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Account_Upgrade"), Images.get(ImageNums.ANIM_GLOBE_FIRST16));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Account_Upgrade"), Images.get(ImageNums.OPTIONS16));
       putValue(Actions.TOOL_TIP, url);
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
@@ -1056,7 +1056,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   private class EmailSupportAction extends AbstractActionTraced {
     public EmailSupportAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Email_Support"), Images.get(ImageNums.EMAIL_SYMBOL_SMALL));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Email_Support"), Images.get(ImageNums.EMAIL_SYMBOL16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
@@ -1261,7 +1261,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
           if (trace != null) trace.exit(getClass());
         } // end run()
       };
-      th.setDaemon(true);
+      th.setDaemon(false);
       th.start();
     }
     if (trace != null) trace.exit(MainFrame.class);

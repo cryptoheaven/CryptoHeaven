@@ -69,7 +69,7 @@ public class StatTableCellRenderer extends RecordTableCellRenderer {
         }
         else {
           setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {statRecord.ownerUserId}));
-          setIcon(Images.get(ImageNums.PERSON_SMALL));
+          setIcon(Images.get(ImageNums.PERSON16));
         }
 
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);

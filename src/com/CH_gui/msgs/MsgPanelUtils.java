@@ -12,6 +12,7 @@
 
 package com.CH_gui.msgs;
 
+import com.CH_cl.service.cache.CacheEmlUtils;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.UserOps;
@@ -147,7 +148,7 @@ public class MsgPanelUtils extends Object {
   public static void drawMsgRecipientsPanel(MsgDataRecord dataRecord, JPanel jRecipients, boolean includeLabels, boolean includeTO, boolean includeCC, boolean includeBCC) {
     drawMsgRecipientsPanel(dataRecord, jRecipients, null, includeLabels, includeTO, includeCC, includeBCC);
   }
-  public static void drawMsgRecipientsPanel(MsgDataRecord dataRecord, JPanel jRecipients, Dimension maxSize, boolean includeLabels, boolean includeTO, boolean includeCC, boolean includeBCC) {
+  private static void drawMsgRecipientsPanel(MsgDataRecord dataRecord, JPanel jRecipients, Dimension maxSize, boolean includeLabels, boolean includeTO, boolean includeCC, boolean includeBCC) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "drawMsgRecipientsPanel(MsgDataRecord dataRecord, JPanel jRecipients, Dimension maxSize, boolean includeLabels, boolean includeTO, boolean includeCC, boolean includeBCC)");
     if (trace != null) trace.args(dataRecord, jRecipients, maxSize);
     if (trace != null) trace.args(includeLabels);
@@ -223,7 +224,11 @@ public class MsgPanelUtils extends Object {
                   label = new JMyLabel();
                 }
                 label.setBorder(new EmptyBorder(2,0,2,5));
-                label.setIcon(ListRenderer.getRenderedIcon(obj));
+                // just for display convert any EmailAddressRecord to familiar Address Book entry
+                if (obj instanceof EmailAddressRecord) {
+                  obj = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) obj).address);
+                }
+                label.setIcon(ListRenderer.getRenderedIcon(obj, true));
                 label.setText(ListRenderer.getRenderedText(obj, false, true, true));
                 label.setIconTextGap(2);
                 jFlowPanel.add(label);

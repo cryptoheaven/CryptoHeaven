@@ -13,11 +13,13 @@
 package com.CH_cl.service.actions.msg;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgDataRecordEvent;
 import com.CH_cl.service.cache.event.MsgLinkRecordEvent;
 import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -368,7 +370,7 @@ public class MsgAGet extends ClientMessageAction {
     }
 
 
-    // see if any email message has unknown from address, or any Address Record has unknown hash, if so, request it from the server
+    // see if any email message has unknown FROM or TO address, or any Address Record has unknown hash, if so, request it from the server
     {
       ArrayList hashesL = null;
       for (int i=0; i<dataRecords.length; i++) {
@@ -391,6 +393,21 @@ public class MsgAGet extends ClientMessageAction {
           {
             if (hashesL == null) hashesL = new ArrayList();
             hashesL.add(hash);
+          }
+        }
+        // now gather all Recipient email addresses
+        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
+        for (int j=0; j<recipients.length; j++) {
+          for (int k=0; k<recipients[j].length; k++) {
+            Record recipient = recipients[j][k];
+            if (recipient instanceof EmailAddressRecord) {
+              String emlAddr = ((EmailAddressRecord) recipient).address;
+              hash = cache.getAddrHashForEmail(emlAddr);
+              if (hash != null && cache.getAddrHashRecords(hash) == null && !cache.wasRequestedAddrHash(hash)) {
+                if (hashesL == null) hashesL = new ArrayList();
+                hashesL.add(hash);
+              }
+            }
           }
         }
       }
@@ -522,11 +539,13 @@ public class MsgAGet extends ClientMessageAction {
         // take off the request from pending to avoid client to repedetly sending the same request
         Runnable reinsert = new Runnable() {
           public void run() {
-            // We'll reinsert the request right after reciving a reply or interrupt.
-            // Proper execution of reply will remove this action from pending.
-            // After-Job handles next request so it should not reinsert.
-            nextFetchActionsHM.put(folderId, msgAction);
-            nextFetchProgressingIDsL.remove(folderId);
+            synchronized (monitor) {
+              // We'll reinsert the request right after reciving a reply or interrupt.
+              // Proper execution of reply will remove this action from pending.
+              // After-Job handles next request so it should not reinsert.
+              nextFetchActionsHM.put(folderId, msgAction);
+              nextFetchProgressingIDsL.remove(folderId);
+            }
           }
         };
         SIL.submitAndReturn(msgAction, 120000, reinsert, afterJob, reinsert);

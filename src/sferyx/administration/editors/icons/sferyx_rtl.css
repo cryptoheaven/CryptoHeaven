@@ -1,0 +1,271 @@
+body  {font-size: 12pt;
+       font-family: Serif;
+       font-weight: normal;
+       margin-left: 0;
+       margin-right: 0;
+       color: black}
+
+
+rt  {font-size: 8pt;}
+
+td p   {margin-top: 0; margin-bottom: 15}
+/*td p-implied   {margin-top: 0;margin-bottom: 0}
+p-implied   {margin-top: 0;margin-bottom: 15}*/
+p {margin-top: 15; margin-bottom: 15}
+
+h1  {font-size: xx-large;
+     font-weight: bold;
+     margin-top: 0;
+     margin-bottom: 15}
+
+h2 {font-size: x-large;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 15}
+
+h3 {font-size: large;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 15}
+
+h4 {font-size: medium;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 15}
+
+h5 {font-size: small;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 15}
+
+h6 {font-size: xx-small;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 15}
+
+li p {margin-top: 0;
+    margin-bottom: 0}
+
+menu li p {margin-top: 0;
+    margin-bottom: 0}
+
+menu li {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+menu {margin-left-ltr: 40;
+    margin-left: 40;
+    margin-right-rtl: 40;
+    margin-top: 10;
+    margin-bottom: 10}
+
+dir li p {margin-top: 0;
+    margin-bottom: 0}
+
+dir li {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+dir {margin-left-ltr: 40;
+    margin-right-rtl: 40;
+    margin-top: 10;
+    margin-bottom: 10}
+
+dd {padding-left: 40;
+    margin-left-ltr: 40;
+    margin-right-rtl: 40;
+    margin-top: 0;
+    margin-bottom: 0}
+
+dd p {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+dt {margin-top: 0;
+    margin-bottom: 0}
+
+dl {margin-left: 0;
+    margin-top: 10;
+    margin-bottom: 10}
+
+ol li {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+ol {
+    margin-top: 15;
+    margin-bottom: 15;
+    padding-right: 40;
+    -padding-left-ltr: 40;
+    -margin-right-rtl: 40;
+    -margin-left: 40;
+    -margin-left-ltr: 40;
+    -margin-right-rtl: 40;
+    list-style-type: decimal
+}
+
+ol li ol {
+    margin-left: 10;
+    margin-left-ltr: 10;
+    margin-right-rtl: 10;
+    margin-top: 0;
+    margin-bottom: 0}
+
+ol li p {margin-top: 0;
+    margin-bottom:0}
+
+ul li {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+ul {margin-top: 15;
+    margin-bottom: 15;
+    padding-right: 40;
+    -padding-left-ltr: 40;
+    -margin-right-rtl: 40;
+    -margin-left: 40;
+    -margin-left-ltr: 40;
+    -margin-right-rtl: 40;
+    list-style-type: disc;
+    -bullet-gap: 10}
+
+ul li ul li {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+ul li ul {list-style-type: circle;
+    margin-left: 10;
+    margin-left-ltr: 10;
+    margin-right-rtl: 10;
+    margin-top: 0;
+    margin-bottom: 0}
+
+ul li ul li ul li {margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0}
+
+ul li ul li ul {list-style-type: square;
+    margin-left: 25;
+    margin-left-ltr: 25;
+    margin-right-rtl: 25}
+
+ul li menu {list-style-type: circle;
+    margin-left: 25;
+    margin-left-ltr: 25;
+    margin-right-rtl: 25;}
+
+ul li p {margin-top: 0;
+    margin-bottom:0}
+
+a {color: blue;
+   text-decoration: underline}
+
+big {font-size: x-large}
+
+small {font-size: x-small}
+
+samp {font-size: small;
+      font-family: Monospaced}
+
+cite {font-style: italic}
+
+code {font-size: small;
+      font-family: Monospaced}
+
+dfn {font-style: italic}
+
+em {font-style: italic}
+
+i  {font-style: italic}
+
+b  {font-weight: bold}
+
+kbd {font-size: small;
+     font-family: Monospaced}
+
+s {text-decoration: line-through}
+
+strike {text-decoration: line-through}
+
+strong {font-weight: bold}
+
+sub {vertical-align: sub}
+
+sup {vertical-align: sup}
+
+tt {font-family: Monospaced}
+
+u {text-decoration: underline}
+
+var {font-weight: bold;
+     font-style: italic}
+
+table {
+	/*border-color: Silver;
+	border-style: inset;*/
+        margin-top: 0;
+        margin-bottom: 0
+}
+
+tr {
+	text-align: right
+}
+
+td {
+	/*border-color: Silver;
+	border-style: inset;*/
+	padding-left: 3;
+	padding-right: 3;
+	padding-top: 3;
+	padding-bottom: 3
+
+}
+
+th {
+	text-align: center;
+	font-weight: bold;
+	border-color: Silver;
+	border-style: inset;
+	padding-left: 3;
+	padding-right: 3;
+	padding-top: 3;
+	padding-bottom: 3
+}
+
+address {
+	color: blue;
+	font-style: italic
+}
+
+blockquote {
+	padding-top: 5;
+	padding-bottom: 15;
+	padding-left: 35;
+	padding-right: 35
+}
+
+center {text-align: center}
+
+pre {margin-top: 5;
+     margin-bottom: 5;
+     font-family: Monospaced}
+
+pre p {margin-top: 0}
+
+caption {
+    caption-side: top;
+    text-align: center
+}
+
+nobr { white-space: nowrap }
+
+
+
+

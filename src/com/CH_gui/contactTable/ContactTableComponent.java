@@ -99,8 +99,8 @@ public class ContactTableComponent extends RecordTableComponent {
 
   private void initialize(boolean suppressUtilityComponent) {
     JLabel titleLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("compTitle_Contacts"));
-    titleLabel.setIcon(Images.get(ImageNums.FLD_CNT_CLOSED16));
     setTitle(titleLabel);
+    setTitleIcon(null);
     if (!suppressUtilityComponent)
       addUtilityComponent();
     userListener = new UserListener();
@@ -194,7 +194,7 @@ public class ContactTableComponent extends RecordTableComponent {
 
   private class AddEmailAddressAction extends AbstractActionTraced {
     public AddEmailAddressAction() {
-      super("Add", Images.get(ImageNums.ADD14));
+      super("Add", Images.get(ImageNums.ADD16));
     }
     public void actionPerformedTraced(ActionEvent event) {
       if (MainFrame.isLoggedIn()) {

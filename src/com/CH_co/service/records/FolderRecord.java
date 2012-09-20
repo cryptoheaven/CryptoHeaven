@@ -14,6 +14,7 @@ package com.CH_co.service.records;
 
 import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
+import com.CH_gui.util.Images;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -103,10 +104,10 @@ public class FolderRecord extends Record {
   }
 
   public int getIcon() {
-    return getIcon(false, null);
+    return getIcon(false, null, false);
   }
 
-  public int getIcon(boolean selected, UserRecord uRec) {
+  public int getIcon(boolean selected, UserRecord uRec, boolean forSendReceive) {
     int icon = ImageNums.IMAGE_NONE;
     switch (folderType.shortValue()) {
       case LOCAL_FILES_FOLDER :
@@ -115,15 +116,9 @@ public class FolderRecord extends Record {
       case ADDRESS_FOLDER :
       case WHITELIST_FOLDER :
         if (numOfShares.shortValue() > 1) {
-          if (selected)
-            icon = ImageNums.FLD_ADDR_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-          else
-            icon = ImageNums.FLD_ADDR_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+          icon = ImageNums.FLD_ADDR_SHARED16 + ImageNums.SHARED_OFFSET;
         } else {
-          if (selected)
-            icon = ImageNums.FLD_ADDR_OPEN16;
-          else
-            icon = ImageNums.FLD_ADDR_CLOSED16;
+          icon = ImageNums.FLD_ADDR16;
         }
         break;
       case FILE_FOLDER :
@@ -131,58 +126,46 @@ public class FolderRecord extends Record {
           icon = ImageNums.FLD_FILES16;
         } else if (numOfShares.shortValue() > 1) {
           if (selected)
-            icon = ImageNums.FLD_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_FILE_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
           else
-            icon = ImageNums.FLD_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_FILE_SHARED16 + ImageNums.SHARED_OFFSET;
         } else {
           if (selected)
-            icon = ImageNums.FLD_OPEN16;
+            icon = ImageNums.FLD_FILE_OPEN16;
           else
-            icon = ImageNums.FLD_CLOSED16;
+            icon = ImageNums.FLD_FILE16;
         }
         break;
       case MESSAGE_FOLDER :
         if (folderId.longValue() == CATEGORY_MAIL_ID) {
-          icon = ImageNums.FLD_MAIL18_12;
+          icon = ImageNums.FLD_MAIL16;
         } else if (numOfShares.shortValue() > 1) {
           if (uRec == null) {
-            if (selected) icon = ImageNums.FLD_MAIL_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else icon = ImageNums.FLD_MAIL_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.draftFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_DRAFT_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else icon = ImageNums.FLD_MAIL_DRAFT_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_DRAFT_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.msgFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_INBOX_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else icon = ImageNums.FLD_MAIL_INBOX_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_INBOX_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.junkFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_JUNK_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else icon = ImageNums.FLD_MAIL_JUNK_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_JUNK_SHARED16 + ImageNums.SHARED_OFFSET;
           } else if (folderId.equals(uRec.sentFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_SENT_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else icon = ImageNums.FLD_MAIL_SENT_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_SENT_SHARED16 + ImageNums.SHARED_OFFSET;
           } else { // catch all
-            if (selected) icon = ImageNums.FLD_MAIL_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else icon = ImageNums.FLD_MAIL_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_SHARED16 + ImageNums.SHARED_OFFSET;
           }
         } else {
           if (uRec == null) {
-            if (selected) icon = ImageNums.FLD_MAIL_OPEN16;
-            else icon = ImageNums.FLD_MAIL_CLOSED16;
+            icon = ImageNums.FLD_MAIL16;
           } else if (folderId.equals(uRec.draftFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_DRAFT_OPEN16;
-            else icon = ImageNums.FLD_MAIL_DRAFT_CLOSED16;
+            icon = ImageNums.FLD_MAIL_DRAFT16;
           } else if (folderId.equals(uRec.msgFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_INBOX_OPEN16;
-            else icon = ImageNums.FLD_MAIL_INBOX_CLOSED16;
+            icon = ImageNums.FLD_MAIL_INBOX16;
           } else if (folderId.equals(uRec.junkFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_JUNK_OPEN16;
-            else icon = ImageNums.FLD_MAIL_JUNK_CLOSED16;
+            icon = ImageNums.FLD_MAIL_JUNK16;
           } else if (folderId.equals(uRec.sentFolderId)) {
-            if (selected) icon = ImageNums.FLD_MAIL_SENT_OPEN16;
-            else icon = ImageNums.FLD_MAIL_SENT_CLOSED16;
+            icon = ImageNums.FLD_MAIL_SENT16;
           } else { // catch all
-            if (selected) icon = ImageNums.FLD_MAIL_OPEN16;
-            else icon = ImageNums.FLD_MAIL_CLOSED16;
+            icon = ImageNums.FLD_MAIL16;
           }
         }
         break;
@@ -192,21 +175,12 @@ public class FolderRecord extends Record {
           icon = ImageNums.CHAT16;
         } else if (numOfShares.shortValue() > 1) {
           if (isChatting()) {
-            if (selected)
-              icon = ImageNums.FLD_CHAT_OPEN16;
-            else
-              icon = ImageNums.FLD_CHAT_CLOSED16;
+            icon = ImageNums.FLD_CHAT16;
           } else {
-            if (selected)
-              icon = ImageNums.FLD_MAIL_POST_OPEN_SHARED16 + ImageNums.SHARED_OFFSET;
-            else
-              icon = ImageNums.FLD_MAIL_POST_CLOSED_SHARED16 + ImageNums.SHARED_OFFSET;
+            icon = ImageNums.FLD_MAIL_POST_SHARED16 + ImageNums.SHARED_OFFSET;
           }
         } else { // includes chatting archives too which are no longer shared...
-          if (selected)
-            icon = ImageNums.FLD_MAIL_POST_OPEN16;
-          else
-            icon = ImageNums.FLD_MAIL_POST_CLOSED16;
+          icon = ImageNums.FLD_MAIL_POST16;
         }
         break;
       case CONTACT_FOLDER :
@@ -223,9 +197,12 @@ public class FolderRecord extends Record {
         break;
       case GROUP_FOLDER :
         if (folderId.longValue() == CATEGORY_GROUP_ID) {
-          icon = ImageNums.FLD_GROUPS16;
-        } else {
           icon = ImageNums.PEOPLE16;
+        } else {
+          if (forSendReceive)
+            icon = ImageNums.PEOPLE_SECURE16;
+          else
+            icon = ImageNums.PEOPLE16;
         }
         break;
       case RECYCLE_FOLDER :
@@ -236,7 +213,7 @@ public class FolderRecord extends Record {
         }
         break;
       case CATEGORY_MAIL_FOLDER :
-        icon = ImageNums.FLD_MAIL18_12;
+        icon = ImageNums.FLD_MAIL16;
         break;
       case CATEGORY_FILE_FOLDER :
         icon = ImageNums.FLD_FILES16;
@@ -245,7 +222,7 @@ public class FolderRecord extends Record {
         icon = ImageNums.FLD_CHAT16;
         break;
       case CATEGORY_GROUP_FOLDER :
-        icon = ImageNums.FLD_GROUPS16;
+        icon = ImageNums.PEOPLE16;
         break;
     }
     return icon;

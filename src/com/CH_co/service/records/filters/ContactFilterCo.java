@@ -136,7 +136,7 @@ public class ContactFilterCo extends AbstractRecordFilter implements RecordFilte
           }
         }
         if (!keep && keepOnlineStatuses != null) {
-          keep = ContactRecord.isOnlineStatus(contact.status) == keepOnlineStatuses.booleanValue();
+          keep = contact.status != null && ContactRecord.isOnlineStatus(contact.status) == keepOnlineStatuses.booleanValue();
         }
       }
       if (keep == true && keepOwners != null && keepOwners.length > 0) {

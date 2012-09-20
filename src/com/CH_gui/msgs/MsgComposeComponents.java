@@ -27,6 +27,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 import com.CH_gui.action.Actions;
 import com.CH_gui.actionGui.JActionCheckBoxMenuItem;
+import com.CH_gui.dialog.AccountOptionsDialog;
 import com.CH_gui.dialog.UserSelectorDialog;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.*;
@@ -118,6 +119,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   private JButton jShowBcc;
   private boolean isShownBcc = false;
   private MsgTypeArea msgTypeArea;
+  private JButton jSetupSignatures;
 
   private KeyListener enterKeyListener;
   private MsgTypeListener msgTypeListener;
@@ -528,7 +530,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // do for : TO, CC, BCC
       for (int recipientType=MsgComposePanel.TO; recipientType<MsgComposePanel.RECIPIENT_TYPES.length; recipientType++) {
         String label = recipientType==MsgComposePanel.TO ? "button_To" : ( recipientType==MsgComposePanel.CC ? "button_Cc" : "button_Bcc");
-        jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString(label), Images.get(ImageNums.ADDRESS_BOOK16));
+        jSelectRecipients[recipientType] = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString(label));
         jSelectRecipients[recipientType].setAlignmentX(JButton.LEFT_ALIGNMENT);
         jSelectRecipients[recipientType].setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
         jSelectRecipients[recipientType].setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -615,6 +617,18 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         });
       }
 
+      jSetupSignatures = new JMyButtonNoFocus("Setup Email Signatures...");
+      jSetupSignatures.setVisible(false);
+      jSetupSignatures.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+          Window w = SwingUtilities.windowForComponent(jSetupSignatures);
+          if (w instanceof Frame) {
+            AccountOptionsDialog optionsDialog = new AccountOptionsDialog((Frame) w, cache.getUserRecord());
+            optionsDialog.navigateToSignaturesTab();
+          }
+        }
+      });
+
     } else {
 
       ObjectsProviderI sendObjectsProvider = new ObjectsProviderI() {
@@ -684,7 +698,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       });
     }
 
-    jSelectAttachments = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString("button_Attach"), Images.get(ImageNums.ATTACH16));
+    jSelectAttachments = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString("button_Attach"), Images.get(ImageNums.ATTACH_SMALL));
     jSelectAttachments.setAlignmentX(JButton.LEFT_ALIGNMENT);
     jSelectAttachments.setBorder(new EtchedBorder());
     jSelectAttachments.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -716,9 +730,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     jPriorityLabelStretch = new JLabel();
     jPriorityLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Priority"));
     jPriority = new JMyListCombo(0, new JLabel[] {
-      new JMyLabel("FYI", Images.get(ImageNums.PRIORITY_LOW_SMALL), JLabel.LEFT),
+      new JMyLabel("FYI", Images.get(ImageNums.PRIORITY_LOW16), JLabel.LEFT),
       new JMyLabel("Normal", Images.get(ImageNums.TRANSPARENT16), JLabel.LEFT),
-      new JMyLabel("High", Images.get(ImageNums.PRIORITY_HIGH_SMALL), JLabel.LEFT)
+      new JMyLabel("High", Images.get(ImageNums.PRIORITY_HIGH16), JLabel.LEFT)
     });
     jPriority.setSelectedIndex(MsgComposePanel.PRIORITY_INDEX_NORMAL);
     jPriority.addActionListener(new ActionListener() {
@@ -757,7 +771,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (myUser != null) {
       sentFolder = cache.getFolderRecord(cache.getUserRecord().sentFolderId);
     }
-    Icon sentFolderIcon = sentFolder != null ? Images.get(sentFolder.getIcon(false, myUser)) : Images.get(ImageNums.FLD_MAIL_SENT_CLOSED16);
+    Icon sentFolderIcon = sentFolder != null ? Images.get(sentFolder.getIcon(false, myUser, false)) : Images.get(ImageNums.FLD_MAIL_SENT16);
     return sentFolderIcon;
   }
 
@@ -781,6 +795,8 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (!isChatComposePanel && objType == MsgDataRecord.OBJ_TYPE_MSG) {
       UserSettingsRecord userSettingsRecord = cache.getMyUserSettingsRecord();
       if (userSettingsRecord != null) {
+        String sig = userSettingsRecord.getDefaultSig();
+        jSetupSignatures.setVisible(sig == null || sig.trim().length() == 0);
         if ((!isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToNew)) ||
             (isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToReFwd))
             ) {
@@ -878,7 +894,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     for (int i=0; i<jSelectRecipients.length; i++) {
       panel.add(jSelectRecipients[i], new GridBagConstraints(0, posY, 1, 1, 0, 0,
-            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 5, 0));
       boolean addShowBccLink = i == 0 && !msgTypeArea.isSubjectGenerated();
       int gridWidth = 6;
       if (addShowBccLink)
@@ -949,7 +965,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     // space for attachments panel;
     if (!msgTypeArea.isAttachmentPanelEmbeded()) {
       panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 5, 2, 5), 5, 0));
       panel.add(jAttachments, new GridBagConstraints(1, posY, 6, 1, 100, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 5, 2, 5), 0, 0));
       posY ++;
@@ -957,6 +973,11 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
     panel.add(msgTypeArea, new GridBagConstraints(0, posY, 7, 1, 10, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(3, 5, 5, 5), 0, 0));
+    posY ++;
+
+    panel.add(jSetupSignatures, new GridBagConstraints(0, posY, 7, 1, 0, 0,
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 5, 5), 0, 0));
+
   }
 
 
@@ -1022,7 +1043,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (!msgTypeArea.isAttachmentPanelEmbeded()) {
       // this row was for Attachments in mail mode
       panel.add(jSelectAttachments, new GridBagConstraints(0, posY, 1, 1, 0, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 2, 2, 2), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 2, 2, 2), 5, 0));
       panel.add(jAttachments, new GridBagConstraints(1, posY, 8, 1, 100, 0,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(2, 2, 2, 2), 0, 0));
     }
@@ -1074,7 +1095,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
 
   private void setReplyLabel(MsgDataRecord dataRecord) {
     if (dataRecord != null) {
-      jReplyTo.setIcon(ListRenderer.getRenderedIcon(dataRecord));
+      jReplyTo.setIcon(ListRenderer.getRenderedIcon(dataRecord, true));
       jReplyTo.setText(ListRenderer.getRenderedText(dataRecord));
       jReplyToLabel.setVisible(true);
       jReplyTo.setVisible(true);

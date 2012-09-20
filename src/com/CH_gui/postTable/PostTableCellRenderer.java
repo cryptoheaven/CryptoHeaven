@@ -238,7 +238,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
 //      editor.setPreferredWidthLimit(usableColumnWidth);
 
       editor.setMinimumSize(new Dimension(usableColumnWidth, table.getRowHeight()));
-      editor.setSize(usableColumnWidth, 16);
+      editor.setSize(usableColumnWidth, 21);
       int desiredHeight = Math.max(editor.getPreferredSize().height+2, table.getRowHeight());
       // don't lower the estimate from the superclass, only bump it up
       desiredHeight = Math.max(desiredHeight, renderer.getPreferredSize().height);

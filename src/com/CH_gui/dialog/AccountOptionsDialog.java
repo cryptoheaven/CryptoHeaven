@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
@@ -62,21 +62,21 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.50 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.50 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class AccountOptionsDialog extends GeneralDialog {
 
   private static final int DEFAULT_OK_INDEX = 0;
@@ -92,6 +92,10 @@ public class AccountOptionsDialog extends GeneralDialog {
   private JCheckBox jResetLocalSettings;
 
   private JCheckBox jIncludeChangesToAccounts;
+
+  // holder for all the tabs
+  private JTabbedPane tabbedPane;
+  private int tabSignatures = -1;
 
   private AccountOptionPermitChecks checks;
   private AccountOptionsSignaturesPanel jPanelSignatures;
@@ -340,7 +344,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 
 
   private JPanel createMainPanel(UserRecord myUserRec, UserRecord[] userRecs) {
-    JTabbedPane pane = new JMyTabbedPane(JTabbedPane.TOP);
+    tabbedPane = new JMyTabbedPane(JTabbedPane.TOP);
 
     documentChangeListener = new DocumentChangeListener();
     boolean includePricingInfo = isChangingMyUserRecord && !myUserRec.isBusinessSubAccount();
@@ -370,9 +374,9 @@ public class AccountOptionsDialog extends GeneralDialog {
     JComponent accountComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(panelAccount) : (JComponent) panelAccount;
     JComponent optionsComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(panelOptions) : (JComponent) panelOptions;
     JComponent permitsComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(panelPermissions) : (JComponent) panelPermissions;
-    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Account"), accountComp);
-    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Options"), optionsComp);
-    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Permissions"), permitsComp);
+    tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Account"), accountComp);
+    tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Options"), optionsComp);
+    tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Permissions"), permitsComp);
 
     if (isChangingMyUserRecord) {
       UserSettingsRecord userSettingsRecord = cache.getMyUserSettingsRecord();
@@ -381,14 +385,15 @@ public class AccountOptionsDialog extends GeneralDialog {
       } else {
         jPanelSignatures = new AccountOptionsSignaturesPanel();
       }
-      pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Signatures"), jPanelSignatures);
+      tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Signatures"), jPanelSignatures);
+      tabSignatures = tabbedPane.getTabCount()-1;
       jPanelSignatures.addDocumentListener(documentChangeListener);
     }
     jPanelResponder = new AccountOptionsResponderPanel(userRecs, jPanelSignatures, checkBoxListener);
     jPanelResponder.addDocumentListener(documentChangeListener);
     JComponent responderComp = MiscGui.isSmallScreen() ? (JComponent) new JScrollPane(jPanelResponder) : (JComponent) jPanelResponder;
-    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Auto-Responder"), responderComp);
-    pane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Quotas"), jPanelQuotas);
+    tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Auto-Responder"), responderComp);
+    tabbedPane.addTab(com.CH_cl.lang.Lang.rb.getString("tab_Quotas"), jPanelQuotas);
 
     JPanel panel = new JPanel();
     panel.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -400,7 +405,7 @@ public class AccountOptionsDialog extends GeneralDialog {
 
 //    panel.add(new JMyLabel(logoBanner), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
 //        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
-    panel.add(pane, new GridBagConstraints(0, 1, 1, 1, 10, 10,
+    panel.add(tabbedPane, new GridBagConstraints(0, 1, 1, 1, 10, 10,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
     return panel;
@@ -587,6 +592,7 @@ public class AccountOptionsDialog extends GeneralDialog {
       jEnableAntialiasing = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Enable_anti-aliasing_on_this_computer."), isAntialiasingEnabled);
       jEnableAntialiasing.addChangeListener(checkBoxListener);
       jEnableAntialiasing.setEnabled(MiscGui.isAntiAliasingCapable());
+      jEnableAntialiasing.setVisible(false); // this is depreciated option
       bottomPanel.add(jEnableAntialiasing, new GridBagConstraints(0, posY, 4, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
@@ -716,6 +722,11 @@ public class AccountOptionsDialog extends GeneralDialog {
       }
     };
     return checks.createPermissionsPanel(checkBoxListener, myUserRecord, userRecords);
+  }
+
+  public void navigateToSignaturesTab() {
+    if (tabSignatures > -1)
+      tabbedPane.setSelectedIndex(tabSignatures);
   }
 
   private class OKActionListener implements ActionListener {
@@ -1076,7 +1087,7 @@ public class AccountOptionsDialog extends GeneralDialog {
               (jPanelSignatures != null && jPanelSignatures.isChangeAttempted()) ||
               (jPanelResponder != null && jPanelResponder.isChangeAttempted())
             )
-         )
+        )
       {
         // When there is no email provided, notify must be off too.
         boolean ok = ((newEmail.length() == 0 && !checks.jNotify.isSelected()) || newEmail.length() > 0);
@@ -1098,8 +1109,8 @@ public class AccountOptionsDialog extends GeneralDialog {
   }
 
   /**
-   * If my email is 'given-to-me' and I am not allowed to change it, then set enabled false
-   */
+  * If my email is 'given-to-me' and I am not allowed to change it, then set enabled false
+  */
   private void setEditableDefaultEmail(UserRecord myUserRecord, EmailRecord emlRecord) {
     // if 'given-to-me' email and not allowed to change it, then set enabled false
     if (emlRecord.isGiven() && (myUserRecord.flags.longValue() & UserRecord.FLAG_ENABLE_GIVEN_EMAILS_ALTER) == 0)

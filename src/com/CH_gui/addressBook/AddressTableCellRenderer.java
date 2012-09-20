@@ -40,8 +40,8 @@ public class AddressTableCellRenderer extends MsgTableCellRenderer {
 
   //private static Color addressAltColor = new Color(241, 255, 231);
   //private static Color addressAltColorSelected = new Color(202, 214, 194);
-  private static Color addressAltColor = new Color(234, 244, 252);
-  private static Color addressAltColorSelected = new Color(198, 206, 213);
+  private static Color addressAltColor = new Color(234, 244, 252, ALPHA);
+  private static Color addressAltColorSelected = new Color(198, 206, 213, ALPHA);
   private static Color[] altBkColors = new Color[] { addressAltColor, addressAltColorSelected };
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

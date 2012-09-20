@@ -303,7 +303,7 @@ public class HTTP_Socket extends Socket {
 
   public void close() throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTTP_Socket.class, "close()");
-    // closing client input pipe would immediatelly shut down our SendingConverter causing closed() to be called before we get a change to sendDisconnect()...
+    // closing client input pipe would immediately shut down our SendingConverter causing closed() to be called before we get a change to sendDisconnect()...
     // ommit closing this, it will be donw in the close() method.
     //try { sendPipeOut_Public.close(); } catch (Throwable t) { t.printStackTrace(); }
     try { recvPipeIn_Public.close(); } catch (Throwable t) { t.printStackTrace(); }

@@ -118,17 +118,17 @@ public class Images extends Object {
             // only modify the icon if we have the base image loaded
             if (imageIcons[imageCode] != null) {
               // add a small share hand to the icon
-              ImageIcon shareHandSmallImage = get(ImageNums.SHARE_HAND_L, false);
-              if (shareHandSmallImage != null) {
+              ImageIcon shareOverlayImage = get(ImageNums.SHARE_OVERLAY, false);
+              if (shareOverlayImage != null) {
                 int newHeight = imageIcons[imageCode].getIconHeight() + 2;
                 BufferedImage total = new BufferedImage(imageIcons[imageCode].getIconWidth(), newHeight, BufferedImage.TYPE_INT_ARGB_PRE);
                 Graphics2D g = total.createGraphics();
                 g.drawImage(imageIcons[imageCode].getImage(), 0, 0, null);
-                double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareHandSmallImage.getIconWidth());
-                double moveDownBy = ((double) newHeight - (scale * (double) shareHandSmallImage.getIconHeight())) / scale;
+                double scale = ((double) imageIcons[imageCode].getIconWidth()) / ((double) shareOverlayImage.getIconWidth());
+                double moveDownBy = ((double) newHeight - (scale * (double) shareOverlayImage.getIconHeight())) / scale;
                 AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
                 xform.translate(0.0, moveDownBy);
-                g.drawImage(shareHandSmallImage.getImage(), xform, null);
+                g.drawImage(shareOverlayImage.getImage(), xform, null);
                 imageIcons[imageCode] = new ImageIcon(total);
               }
             }

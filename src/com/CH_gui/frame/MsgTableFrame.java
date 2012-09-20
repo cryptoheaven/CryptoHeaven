@@ -51,9 +51,7 @@ import javax.swing.JSplitPane;
 * @author  Marcin Kurzawa
 * @version
 */
-public class MsgTableFrame extends JActionFrameClosable implements DisposableObj {
-
-  private RecordTableComponent mainTableComponent = null;
+public class MsgTableFrame extends RecordTableFrame implements DisposableObj {
 
   /** Creates new MsgTableFrame */
   public MsgTableFrame(FolderPair folderPair) {
@@ -230,10 +228,6 @@ public class MsgTableFrame extends JActionFrameClosable implements DisposableObj
 
   private JSplitPane createSplitPane(String propertyName, int defaultOrientation, double resizeWeightH, double resizeWeightV) {
     return TableComponent.createSplitPane(propertyName, defaultOrientation, resizeWeightH, resizeWeightV);
-  }
-
-  public RecordTableComponent getTableComponent() {
-    return mainTableComponent;
   }
 
   /**

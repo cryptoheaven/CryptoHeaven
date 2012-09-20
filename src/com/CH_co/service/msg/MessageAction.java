@@ -184,6 +184,8 @@ public class MessageAction extends Message implements Cancellable {
   /** Output this Message to a specified stream. */
   public void writeToStream(DataOutputStream2 out, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "writeToStream(DataOutputStream2, short clientBuild, short serverBuild)");
+    if (trace != null) trace.args(clientBuild);
+    if (trace != null) trace.args(serverBuild);
     // Other thread may try to push notification as well, so
     // MessageAction synchronizes write to ensure than massages are atomic.
 

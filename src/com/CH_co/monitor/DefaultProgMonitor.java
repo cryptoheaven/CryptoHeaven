@@ -35,8 +35,8 @@ import com.CH_co.util.Misc;
  */
 public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonitorI {
 
-  private static int DELAY_DECIDE = 10000;
-  private static int DELAY_POPUP = 5000;
+  private static int DELAY_DECIDE = 20000;
+  private static int DELAY_POPUP = 15000;
 
   private static int MIN_VALUE = 0;
   private static int MAX_VALUE = 7;

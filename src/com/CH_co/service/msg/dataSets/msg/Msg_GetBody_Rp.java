@@ -101,7 +101,7 @@ public class Msg_GetBody_Rp extends ProtocolMsgDataSet {
     if (dataRecord.getEncText() == null) {
       dataOut.writeBytes((BA) null);
     } else {
-      // in engine-engine communication the privilage check is done by the last destination peer
+      // in engine-engine communication the privilege check is done by the last destination peer
       if (isEngineToEngine()) {
         dataOut.writeBytes(dataRecord.getEncText());
       } else {

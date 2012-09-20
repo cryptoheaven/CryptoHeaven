@@ -243,14 +243,17 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
   }
 
   /**
-   * Open in seperate window
+   * Open in separate window
    */
   private class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
-      super("Clone Account List View", Images.get(ImageNums.CLONE_CONTACT16));
+      super("Clone Account List View", Images.get(ImageNums.CLONE16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, "Display account list table in its own window.");
-      //putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE_CONTACT24));
+      //putValue(Actions.TOOL_ICON, Images.get(ImageNums.CLONE24));
+      putValue(Actions.IN_POPUP, Boolean.FALSE);
+      putValue(Actions.IN_MENU, Boolean.FALSE);
+      putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();

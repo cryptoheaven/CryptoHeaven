@@ -12,8 +12,10 @@
 
 package com.CH_gui.list;
 
+import com.CH_cl.service.cache.CacheEmlUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
@@ -48,6 +50,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   private boolean withFolderParticipants;
   private boolean withFullEmailAddresses;
   private boolean withUploadPendingNote;
+  private boolean forSendReceive;
   private StringHighlighterI stringHighlighter;
 
   private boolean suppressSelectionRendering;
@@ -55,16 +58,17 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   public ListRenderer() {
   }
   public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses) {
-    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, false, null);
+    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, false, false, null);
   }
-  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote) {
-    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, withUploadPendingNote, null);
+  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, boolean forSendReceive) {
+    this(withFileSizes, withFolderParticipants, withFullEmailAddresses, withUploadPendingNote, forSendReceive, null);
   }
-  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, StringHighlighterI stringHighlighter) {
+  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, boolean forSendReceive, StringHighlighterI stringHighlighter) {
     this.withFileSizes = withFileSizes;
     this.withFolderParticipants = withFolderParticipants;
     this.withFullEmailAddresses = withFullEmailAddresses;
     this.withUploadPendingNote = withUploadPendingNote;
+    this.forSendReceive = forSendReceive;
     this.stringHighlighter = stringHighlighter;
   }
 
@@ -203,6 +207,10 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
 
 
   public static Icon getRenderedIcon(Object value) {
+    return getRenderedIcon(value, false);
+  }
+
+  public static Icon getRenderedIcon(Object value, boolean forSendReceive) {
     Icon icon = null;
 
     // get label and icon
@@ -248,7 +256,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
       }
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       UserRecord uRec = cache.getUserRecord();
-      icon = Images.get(fRec.getIcon(false, uRec));
+      icon = Images.get(fRec.getIcon(false, uRec, forSendReceive));
     }
     else if (value instanceof Record) {
       Record rec = (Record) value;
@@ -272,8 +280,14 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     Icon icon = null;
     String toolTip = null;
 
+    if (forSendReceive) {
+      // just for display convert any EmailAddressRecord to familiar Address Book entry
+      if (value instanceof EmailAddressRecord) {
+        value = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) value).address);
+      }
+    }
     label = getRenderedText(value, withFileSizes, withFolderParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
-    icon = getRenderedIcon(value);
+    icon = getRenderedIcon(value, forSendReceive);
 
     // get tool tip
     if (value instanceof MenuActionItem) {
