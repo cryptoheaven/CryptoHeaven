@@ -12,12 +12,12 @@
 
 package com.CH_co.service.records;
 
-import com.CH_co.util.*;
 import com.CH_co.trace.Trace;
-import com.CH_gui.util.Images;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Sounds;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -305,7 +305,7 @@ public class FolderRecord extends Record {
   }
 
   public String getFolderType() {
-    String typeName = null;
+    String typeName;
 
     if (isChatting())
       typeName = CHATTING_FOLDER_STR;
@@ -386,7 +386,7 @@ public class FolderRecord extends Record {
     return isMsgType(folderType.shortValue());
   }
   public static boolean isMsgType(short type) {
-    boolean rc = false;
+    boolean rc;
     switch (type) {
       case FolderRecord.MESSAGE_FOLDER :
       case FolderRecord.POSTING_FOLDER :

@@ -270,7 +270,7 @@ public class GlobalProperties extends Object {
   // build 700 Icon changes
   // build 702 icon lock issues in From/To and recipient panels
 
-  public static final short PROGRAM_BUILD_NUMBER = 702;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 704;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
