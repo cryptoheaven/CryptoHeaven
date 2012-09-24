@@ -1719,7 +1719,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         boolean simplifyHTML = msgDataRecord.isHtmlMail() && isForceSimpleHTML;
         String[] contentParts = MsgComposeComponents.makeReplyToContent(msgLinkRecord, msgDataRecord, simplifyHTML, true, false);
         StringBuffer sb = new StringBuffer();
+        // start the html printed body
         sb.append("<html><body>");
+        // Overload default color to black for printing
+        sb.append("<div style=\"color:black\">");
         if (contentParts[0].equalsIgnoreCase("text/html")) {
           sb.append("<p>").append(contentParts[1]).append("</p>\n");
         } else {
@@ -1730,6 +1733,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         } else {
           sb.append("<p><font size='-1'>").append(Misc.encodePlainIntoHtml(contentParts[3])).append("</font></p>");
         }
+        // close the default color overload
+        sb.append("</div>");
+        // close the entire body
         sb.append("</body></html>");
 
         boolean isRemoveStyles = false;

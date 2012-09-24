@@ -744,6 +744,7 @@ public class MsgTableModel extends RecordTableModel {
             sb.append("<strong>");
             sb.append(fromName);
             sb.append("</strong>");
+            sb.append("</font>");
           }
 
           if (toAddPriority) {

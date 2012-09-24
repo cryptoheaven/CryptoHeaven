@@ -34,6 +34,8 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JTable;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
@@ -54,6 +56,14 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   //private static Color postingAltColor = new Color(230, 242, 255);
   //private static Color postingAltColorSelected = new Color(184, 194, 204);
   //private static Color[] altBkColors = new Color[] { postingAltColor, postingAltColorSelected };
+
+  // POST and CHAT have a little taller borders
+  private static final int BORDER_TOP = 5;
+  private static final int BORDER_BOTTOM = 5;
+  private static final Border BORDER_ICON = new EmptyBorder(BORDER_TOP,1,BORDER_BOTTOM,1);
+  private static final Border BORDER_ICONIZED = new EmptyBorder(BORDER_TOP,1,BORDER_BOTTOM,5);
+  private static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
+  private static final Border BORDER_TEXT = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
 
   // User is the key, value is the Color object
   private static final HashMap altBkUserAssignedColors;
@@ -141,6 +151,17 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column, boolean forPrint) {
     Object v = value instanceof StringBuffer ? "" : value;
     Component renderer = super.getTableCellRendererComponent(table, v, isSelected, hasFocus, row, column);
+
+    Border border = getBorder();
+    if (border == RecordTableCellRenderer.BORDER_TEXT) {
+      setBorder(PostTableCellRenderer.BORDER_TEXT);
+    } else if (border == RecordTableCellRenderer.BORDER_ICON) {
+      setBorder(PostTableCellRenderer.BORDER_ICON);
+    } else if (border == RecordTableCellRenderer.BORDER_ICONIZED) {
+      setBorder(PostTableCellRenderer.BORDER_ICONIZED);
+    } else if (border == RecordTableCellRenderer.BORDER_ICONIZED_FIRST) {
+      setBorder(PostTableCellRenderer.BORDER_ICONIZED_FIRST);
+    }
 
     // Determine color of the message, white or none-white?
     {

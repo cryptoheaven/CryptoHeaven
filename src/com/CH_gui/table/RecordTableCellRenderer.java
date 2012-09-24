@@ -74,11 +74,13 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
     return defaultAltBkColors;
   }
 
+  private static final int BORDER_TOP = 2;
+  private static final int BORDER_BOTTOM = 2;
 
-  public static final Border BORDER_ICON = new EmptyBorder(2,1,2,1);
-  public static final Border BORDER_ICONIZED = new EmptyBorder(2,1,2,5);
-  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(2,5,2,5);
-  public static final Border BORDER_TEXT = new EmptyBorder(2,5,2,5);
+  public static final Border BORDER_ICON = new EmptyBorder(BORDER_TOP,1,BORDER_BOTTOM,1);
+  public static final Border BORDER_ICONIZED = new EmptyBorder(BORDER_TOP,1,BORDER_BOTTOM,5);
+  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
+  public static final Border BORDER_TEXT = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
   public static Border[] BORDERS_INDENTED_ICONIZED = null;
   public static Border[] BORDERS_INDENTED_TEXT = null;
   public static final int BORDER_INDENT_PIXELS = 16;
@@ -97,7 +99,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   }
 
   public static Border makeIndentedBorder(int numOfIndents, boolean iconized) {
-    return new EmptyBorder(0, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? 1 : 5), 0, 5);
+    return new EmptyBorder(BORDER_TOP, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? 1 : 5), BORDER_BOTTOM, 5);
   }
 
   public static Border getIndentedBorder(int numOfIndents, boolean iconized) {
@@ -120,17 +122,25 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   }
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-    setHorizontalAlignment(LEADING);
-    setHorizontalTextPosition(TRAILING);
-    setVerticalAlignment(TOP);
-    setVerticalTextPosition(CENTER);
+    //Reset content
     setToolTipText(null);
     setText(null);
     setIcon(null);
-    setEnabled(true);
-    setBorder(BORDER_TEXT);
+
+    //Get default rendering from the parent
     //super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+
+    //Set the position of the text, relative to the icon:
+    setHorizontalTextPosition(TRAILING);
+    setVerticalTextPosition(CENTER);
+
+    //Set alignment of the item in the table cell
+    setHorizontalAlignment(LEADING);
+    setVerticalAlignment(TOP);
+
+    //    setEnabled(true);
+    setBorder(BORDER_TEXT);
     setOpaque(true);
 
     // Date

@@ -24,11 +24,13 @@ package com.CH_co.util;
 */
 public class HTML_utils {
 
-  public static final String DEFAULT_FONTS = "Dialog, Arial, Helvetica, Verdana, sans-serif";
-  public static final String DEFAULT_FONTS_QUOTED = "\"" + DEFAULT_FONTS + "\"";
+  public static final String DEFAULT_FONTS_QUOTED = "\"Dialog, 'lucida grande', tahoma, verdana, arial, sans-serif\"";
 
-  public static final String HTML_FONT_START = "<font face=\"Dialog, Arial\">";
-  public static final String HTML_FONT_END = "</font>";
+//  public static final String HTML_FONT_START = "<font face="+DEFAULT_FONTS_QUOTED+">";
+//  public static final String HTML_FONT_END = "</font>";
+  
+  public static final String HTML_FONT_START = "";
+  public static final String HTML_FONT_END = "";
 
   public static final String HTML_START = "<html>";
   public static final String HTML_END = "</html>";

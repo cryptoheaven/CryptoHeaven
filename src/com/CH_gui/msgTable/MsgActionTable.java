@@ -768,9 +768,13 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
 
           StringBuffer sb = new StringBuffer();
 
+          // start the html printed body
           sb.append("<html><body>");
-          sb.append("<font size='-1'><b>").append(ListRenderer.getRenderedText(model.getParentFolderPair())).append("</b></font>");
-          sb.append("<hr color=#000000 noshade size=2>");
+          // Overload default color to black for printing
+          sb.append("<div style=\"color:black\">");
+          // continue with the header
+          sb.append("<font color=\"black\" size=\"-1\"><b>").append(ListRenderer.getRenderedText(model.getParentFolderPair())).append("</b></font>");
+          sb.append("<hr color=\"black\" noshade size=\"2\">");
           sb.append("<table cellpadding='0' cellspacing='0' border='0'>");
           sb.append("<tr>");
           for (int c=0; c<columns; c++) {
@@ -778,7 +782,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
             int modelCol = table.convertColumnIndexToModel(viewCol);
             int rawCol = chd.convertColumnToRawModel(modelCol);
             String headerName = chd.getRawColumnName(rawCol);
-            sb.append("<td NOWRAP align='left' valign='top'><font size='-1'><b>");
+            sb.append("<td NOWRAP align=\"left\" valign=\"top\"><font color=\"black\" size=\"-1\"><b>");
             sb.append(headerName != null && headerName.trim().length() > 0 ? Misc.encodePlainIntoHtml(headerName + "  ") : "&nbsp;");
             sb.append("</b></td>");
           }
@@ -857,14 +861,22 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
               }
               // make short columns not wrapable
               if (isNOwrap)
-                sb.append("<td NOWRAP align='left' valign='top'>");
+                sb.append("<td NOWRAP align=\"left\" valign=\"top\">");
               else
-                sb.append("<td align='left' valign='top'>");
-              // set cell font
-              sb.append("<font size='-2'>");
+                sb.append("<td align=\"left\" valign=\"top\">");
               //set cell data
               if (s != null && s.trim().length() > 0) {
+
+                // Overload default color to black for printing in the DIV, not in FONT tag to avoid black printing of URL links
+                sb.append("<div style=\"color:black\">");
+                // set cell font
+                sb.append("<font size=\"-2\">");
+
                 if (isHTMLformatted) {
+                  boolean isRemoveStyles = false;
+                  boolean isRemoveHead = true; // avoid many HEAD tags in the generated table
+                  boolean isRemoveRemoteLoading = false;
+                  s = HTML_Ops.clearHTMLheaderAndConditionForDisplay(s, isRemoveStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
                   s = ArrayUtils.replaceKeyWords(s,
                       new String[][] {
                         {"<body>", ""},
@@ -880,26 +892,31 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
                 } else {
                   sb.append(Misc.encodePlainIntoHtml(s));
                 }
+
+                sb.append("</font>");
+                sb.append("</div>");
+
               } else {
                 sb.append("&nbsp;");
               }
-              sb.append("</font>");
               sb.append("</td>");
             }
             sb.append("</tr>");
           }
-          sb.append("</table></body></html>");
+          sb.append("</table>");
+          // close the default color overload
+          sb.append("</div>");
+          // close the entire body
+          sb.append("</body></html>");
 
           String content = sb.toString();
           com.CH_gui.print.DocumentRenderer renderer = new com.CH_gui.print.DocumentRenderer();
-          JEditorPane normalization = new JEditorPane("text/html", content);
-          String normalizedText = normalization.getText();
-          normalization = null; // this may take a lot of memory so make it available for cleanup asap
           // Use our own pane to fix display of internal icons because it will adjust document base
           //JEditorPane pane = new JEditorPane("text/html", "<html></html>");
-          JEditorPane pane = new HTML_ClickablePane("");
-          MsgPanelUtils.setMessageContent(normalizedText, true, pane, true);
+          JEditorPane pane = new HTML_ClickablePane(""); // Sferyx produces BLANK rendering for this odd table structure
+          MsgPanelUtils.setMessageContent(content, true, pane, true);
           renderer.setDocument(pane);
+
           Window w = SwingUtilities.windowForComponent(MsgActionTable.this);
           if (w instanceof Dialog)
             new com.CH_gui.print.PrintPreview(renderer, "Print Preview", (Dialog) w);

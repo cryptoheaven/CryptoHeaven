@@ -69,6 +69,8 @@ public class InterruptMessageAction extends ClientMessageAction {
       if (!DefaultProgMonitor.isSuppressProgressDialog(actionCode)) {
         // Display 'interrupt' messages only when logged in... skip them when logout is in progress
         if (getServerInterfaceLayer().isLastLoginMsgActionSet()) {
+          boolean isSuppressed = false;
+
           String title = "Interrupted";
           String interruptedSuffix = " operation was interrupted.";
           Object key = interruptedSuffix; // show 1 interrupted msg at a time, and skip the other
@@ -87,8 +89,8 @@ public class InterruptMessageAction extends ClientMessageAction {
             } catch (Throwable t) {
               if (trace != null) trace.exception(InterruptMessageAction.class, 100, t);
             }
-            msg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server" + (server.length() > 0 ? (" at " + server + " on port " + port) : "") + ".  "
-                + "Please verify your computer network and/or modem cables are plugged-in and your computer is currently connected to the Internet.  When you have established and verified your Internet connectivity, please try connecting to "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" again.  "
+            msg = "<html>Error occurred while trying to connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server" + (server.length() > 0 ? (" at " + server + " on port " + port) : "") + ". "
+                + "Please verify your internet connectivity. "
                 + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
             msgType = NotificationCenter.ERROR_CONNECTION;
             key = new Integer(actionCode);
@@ -97,11 +99,16 @@ public class InterruptMessageAction extends ClientMessageAction {
             title = "No Connection";
             msg = "Could not communicate with the server.  Please check your internet connectivity.\n\n"+MessageActionNameSwitch.getActionInfoName(actionCode)+" failed.";
             msgType = NotificationCenter.ERROR_CONNECTION;
+          } else if (getServerInterfaceLayer().hasPersistentMainWorker() && (actionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION || actionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION)) {
+            // Suppress login errors if we already have at least one working connection.
+            isSuppressed = true;
+            if (trace != null) trace.data(50, "suppressing login error, we already have a valid connection");
           } else {
             msg = MessageActionNameSwitch.getActionInfoName(actionCode) + interruptedSuffix;
           }
 
-          NotificationCenter.show(singleInterruptedDialogArbiter, key, msgType, title, msg);
+          if (!isSuppressed)
+            NotificationCenter.show(singleInterruptedDialogArbiter, key, msgType, title, msg);
         } else {
           if (trace != null) trace.data(100, "suppress interrupt msg");
         }
