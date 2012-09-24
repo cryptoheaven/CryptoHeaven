@@ -269,6 +269,7 @@ public class GlobalProperties extends Object {
   // build 698 Simply status bar, update Sferyx v11 -> v12, fix interrupted errors when going from sleep to alive.
   // build 700 Icon changes
   // build 702 icon lock issues in From/To and recipient panels
+  // build 704 Message print rendering should default to black, remove deadlock related to logging out workers
 
   public static final short PROGRAM_BUILD_NUMBER = 704;  // even
   public static final boolean IS_BETA = false;

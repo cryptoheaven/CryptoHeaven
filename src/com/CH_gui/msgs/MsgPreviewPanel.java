@@ -562,9 +562,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jPriorityLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Priority"));
     jLinePriority.add(jPriorityLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLinePriority.add(jPriority, new GridBagConstraints(2, 0, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 3, 2, 3), 0, 0));
 
 
     JLabel jMinHeight2 = new JMyLabel(" ");
@@ -572,11 +572,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jFromLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_From"));
     jLineFrom.add(jFromLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineFrom.add(jFromName, new GridBagConstraints(2, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineFrom.add(jFromNameAddContact, new GridBagConstraints(3, 0, 1, 1, 1, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineFrom.add(new JLabel(), new GridBagConstraints(4, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 //    jLineFrom.add(jNotSpam, new GridBagConstraints(5, 0, 1, 1, 0, 0,
@@ -590,22 +590,22 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 //    jLineFrom.add(jPrint, new GridBagConstraints(9, 0, 1, 1, 0, 0,
 //          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 1, 1, 1), 0, 0));
     jLineFrom.add(jMsgDate, new GridBagConstraints(5, 0, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
 
     JLabel jMinHeight3 = new JMyLabel(" ");
     jLineReplyTo.add(jMinHeight3, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jReplyToLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Reply_To"));
     jLineReplyTo.add(jReplyToLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineReplyTo.add(jReplyTo, new GridBagConstraints(2, 0, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 3, 2, 3), 0, 0));
 
     JLabel jMinHeight4 = new JMyLabel(" ");
     jLineRecipients.add(jMinHeight4, new GridBagConstraints(0, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 0), 0, 0));
     jLineRecipients.add(jRecipients, new GridBagConstraints(1, 0, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 3, 2, 3), 0, 0));
 //    jLineRecipients.add(jFullView, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
 //          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
 //    jLineRecipients.add(new JLabel(), new GridBagConstraints(2, 0, 1, 1, 10, 0, 
@@ -619,18 +619,18 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 3, 0, 3), 0, 0));
     jSubject.setFont(jSubject.getFont().deriveFont(Font.BOLD));
     jLineSubject.add(jSubject, new GridBagConstraints(2, 0, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     // when "Loading" label is visible we want it to fill max space and be left justified
     jLineSubject.add(jLoadingLabel, new GridBagConstraints(3, 0, 1, 1, 1000000, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
 //    jLineSubject.add(jMsgDate, new GridBagConstraints(3, 0, 1, 1, 0, 0,
 //          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineSubject.add(jNotSpam, new GridBagConstraints(5, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineSubject.add(jFullView, new GridBagConstraints(6, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineSubject.add(jLoadImages, new GridBagConstraints(7, 0, 1, 1, 0, 0,
-          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.EAST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineSubject.add(jAttachment, new GridBagConstraints(8, 0, 1, 1, 0, 0,
           GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new MyInsets(0, 0, 0, 0), 0, 0));
     if (jZoomIn != null && jZoomOut != null) {
@@ -650,7 +650,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 //    jLineAttachments.add(jAttachmentsLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
 //          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
     jLineAttachments.add(jAttachments, new GridBagConstraints(2, 0, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 3, 2, 3), 0, 0));
 
 
     JLabel jMinHeight6 = new JMyLabel(" ");
@@ -659,9 +659,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jExpirationLabel = new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Expiry_Date"));
     jExpirationLabel.setFont(jExpirationLabel.getFont().deriveFont(Font.BOLD));
     jLineExpiration.add(jExpirationLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLineExpiration.add(jExpiration, new GridBagConstraints(2, 0, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 3, 2, 3), 0, 0));
 
     JLabel jMinHeight7 = new JMyLabel(" ");
     jLinePassword.add(jMinHeight7, new GridBagConstraints(0, 0, 1, 1, 0, 0,
@@ -673,13 +673,13 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     JLabel jPasswordAnswerLabel = new JMyLabel("Answer:");
     jPasswordAnswerLabel.setFont(jPasswordAnswerLabel.getFont().deriveFont(Font.BOLD));
     jLinePassword.add(jPasswordHintLabel, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLinePassword.add(jPasswordHintText, new GridBagConstraints(2, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 10), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 10), 0, 0));
     jLinePassword.add(jPasswordAnswerLabel, new GridBagConstraints(3, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLinePassword.add(jPasswordField, new GridBagConstraints(4, 0, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(1, 3, 1, 3), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(2, 3, 2, 3), 0, 0));
     jLinePassword.add(new JLabel(), new GridBagConstraints(5, 0, 1, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
 
@@ -964,7 +964,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         for (posX=0; posX<labelsL.size(); posX++) {
           JLabel label = (JLabel) labelsL.get(posX);
           panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
-            GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, 5), 0, 0));
+            GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new MyInsets(2, 0, 2, 8), 0, 0));
         }
         if (lineRecipientsVisibilityAllowed && jParentLineRecipients != null) {
           jParentLineRecipients.setVisible(labelsL.size() > 0);
@@ -1326,7 +1326,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           labelsL.add(panel);
         }
       }
-      setFlowGridPanel(jAttachments, labelsL, 5, 4);
+      setFlowGridPanel(jAttachments, labelsL, 8, 4);
       visible = true;
     }
     jLineAttachments.setVisible(visible);
@@ -1381,7 +1381,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         sPane.getVerticalScrollBar().setUnitIncrement(5);
         panel.add(sPane, BorderLayout.CENTER);
         JLabel labelSizer = new JLabel("Height SIZER");
-        Dimension dim = new Dimension(panel.getSize().width, 4+(MAX_VISIBLE_ROWS-1)*VERT_GAP+labelSizer.getPreferredSize().height*MAX_VISIBLE_ROWS);
+        Dimension dim = new Dimension(panel.getSize().width, 6+(MAX_VISIBLE_ROWS-1)*(VERT_GAP+2)+labelSizer.getPreferredSize().height*MAX_VISIBLE_ROWS);
         panel.setPreferredSize(dim);
         panel.setMinimumSize(dim);
         panel.setMaximumSize(dim);
@@ -1398,6 +1398,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     int posX = 0;
     for (posX=0; posX<labelsL.size(); posX++) {
       JComponent label = (JComponent) labelsL.get(posX);
+      label.setBorder(new EmptyBorder(1,0,1,0));
       if (!isMultiRowMode && gridMode) {
         panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, HORIZ_INSET_SPACE), 0, 0));

@@ -1486,18 +1486,23 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     // kill all workers
     if (trace != null) trace.data(10, "killing all workers");
 
+    // avoid blocking the thread on the 'workers' list
+    ArrayList workersToDestroyL = new ArrayList();
     synchronized (workers) {
-      int size = workers.size();
-      for (int i=0; i<size; i++) {
-        ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
-        try {
-          worker.destroyWorker();
-        } catch (Throwable t) {
-        }
-      }
+      workersToDestroyL.addAll(workers);
       workers.clear();
       // destroyed worker could be replaced by new one which should now be updating connection counts
       if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
+    }
+
+    // do the destroying without-blocking
+    int size = workersToDestroyL.size();
+    for (int i=0; i<size; i++) {
+      ServerInterfaceWorker worker = (ServerInterfaceWorker) workersToDestroyL.get(i);
+      try {
+        worker.destroyWorker();
+      } catch (Throwable t) {
+      }
     }
 
     if (trace != null) trace.data(20, "workers killed");
