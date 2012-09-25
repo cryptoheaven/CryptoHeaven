@@ -204,7 +204,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
       FolderShareRecord[] shares = (FolderShareRecord[]) getSelectedRecords();
       if (shares != null) {
         Vector recipientsV = new Vector();
-        StringBuffer errorBuffer = new StringBuffer();
+        StringBuffer errBuffer = new StringBuffer();
         for (int i=0; i<shares.length; i++) {
           FolderShareRecord shareRecord = shares[i];
           if (shareRecord.isOwnedByUser()) {
@@ -218,7 +218,7 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
               FolderPair fPair = new FolderPair(share, gRec);
               recipientsV.addElement(fPair);
             } else {
-              errorBuffer.append("You cannot send messages to Group (" + shareRecord.ownerUserId + ") because you are not a member.\n");
+              errBuffer.append("You cannot send messages to Group (" + shareRecord.ownerUserId + ") because you are not a member.\n");
             }
           }
         }
@@ -227,8 +227,8 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
           Record[] recipients = (Record[]) ArrayUtils.toArray(recipientsV, Record.class);
           parent = new MessageFrame(recipients);
         }
-        if (errorBuffer.length() > 0) {
-          MessageDialog.showWarningDialog(parent, errorBuffer.toString(), "Not a member", false);
+        if (errBuffer.length() > 0) {
+          MessageDialog.showWarningDialog(parent, errBuffer.toString(), "Not a member", false);
         }
       }
     }

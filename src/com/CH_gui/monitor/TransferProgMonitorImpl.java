@@ -12,22 +12,30 @@
 
 package com.CH_gui.monitor;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.ops.*;
-
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl.service.ops.FileLobUpEditMonitor;
 import com.CH_co.monitor.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
+import com.CH_co.service.records.FileDataRecord;
+import com.CH_co.service.records.FileLinkRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
-
-import java.awt.event.*;
-import java.awt.*;
-import java.io.*;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MiscGui;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
-
 import javax.swing.*;
 
 /** 
@@ -135,7 +143,11 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     }
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
-      setIconImage(frameIcon.getImage());
+      try {
+        setIconImage(frameIcon.getImage());
+      } catch (NoSuchMethodError e) {
+        // API since 1.6!!! - ignore it as it is not crytical
+      }
     }
 
     pack();

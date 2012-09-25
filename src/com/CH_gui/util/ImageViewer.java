@@ -1,27 +1,32 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.util;
 
 import com.CH_co.util.ImageNums;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 /**
- *
- * @author Marcin
- */
+*
+* @author Marcin
+*/
 
 public class ImageViewer {
 
@@ -56,7 +61,11 @@ public class ImageViewer {
     }
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
-      frame.setIconImage(frameIcon.getImage());
+      try {
+        frame.setIconImage(frameIcon.getImage());
+      } catch (NoSuchMethodError e) {
+        // API since 1.6!!! - ignore it as it is not crytical
+      }
     }
     MiscGui.setSuggestedWindowLocation(invoker, frame);
     frame.setVisible(true);

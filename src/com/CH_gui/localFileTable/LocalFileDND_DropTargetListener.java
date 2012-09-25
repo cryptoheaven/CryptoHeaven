@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.localFileTable;
 
@@ -34,21 +34,21 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.12 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.12 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class LocalFileDND_DropTargetListener extends Object implements DropTargetListener {
 
   private JFileChooser jFileChooser;
@@ -57,7 +57,7 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
   /** Creates new LocalFileDND_DropTargetListener */
   protected LocalFileDND_DropTargetListener(JFileChooser fileChooser) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LocalFileDND_DropTargetListener.class, "LocalFileDND_DropTargetListener()");
-    if (trace != null) trace.args(fileChooser);
+    if (trace != null) trace.args(fileChooser != null ? fileChooser.getClass().getName() : "null");
     jFileChooser = fileChooser;
     if (trace != null) trace.exit(LocalFileDND_DropTargetListener.class);
   }
@@ -127,7 +127,7 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
             }
           }
       }
-       */
+      */
 
       // Download files or download attachments
       if (typeFileRecs) {

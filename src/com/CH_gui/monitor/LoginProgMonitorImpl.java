@@ -13,15 +13,19 @@
 package com.CH_gui.monitor;
 
 import com.CH_co.monitor.*;
-import com.CH_co.service.msg.*;
+import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.ImageNums;
 import com.CH_gui.frame.LoginFrame;
-
-import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
-
-import java.awt.*;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MiscGui;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import javax.swing.*;
 
 /** 
@@ -75,7 +79,11 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
     getContentPane().add("Center", createMainPanel());
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
-      setIconImage(frameIcon.getImage());
+      try {
+        setIconImage(frameIcon.getImage());
+      } catch (NoSuchMethodError e) {
+        // API since 1.6!!! - ignore it as it is not crytical
+      }
     }
 
     pack();

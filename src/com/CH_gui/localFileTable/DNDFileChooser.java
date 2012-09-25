@@ -1,42 +1,42 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.localFileTable;
 
-import java.awt.dnd.*;
-import java.io.*;
-
+import com.CH_co.trace.Trace;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.io.File;
 import javax.swing.*;
 
-import com.CH_co.trace.Trace;
-
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.12 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.12 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class DNDFileChooser extends JFileChooser {
 
   private LocalFileDND_DropTargetListener dropTargetListener;
@@ -54,7 +54,7 @@ public class DNDFileChooser extends JFileChooser {
 
   private void assignDropAndDragComponents(Component c) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DNDFileChooser.class, "assignDropAndDragComponents(Component c)");
-    if (trace != null) trace.args(c);
+    if (trace != null) trace.args(c != null ? c.getClass().getName() : "null");
 
     if (c != null && 
           (
@@ -80,13 +80,14 @@ public class DNDFileChooser extends JFileChooser {
           assignDropAndDragComponents(cc[i]);
       }
     }
+
     if (trace != null) trace.exit(DNDFileChooser.class);
   }
 
 
   /**
-   * Testing of JFileChooser
-   */
+  * Testing of JFileChooser
+  */
   public static void main(String[] args) {
     try {
       long startTime = new java.util.Date().getTime();

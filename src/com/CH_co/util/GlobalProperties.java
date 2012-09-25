@@ -271,13 +271,15 @@ public class GlobalProperties extends Object {
   // build 702 icon lock issues in From/To and recipient panels
   // build 704 Message print rendering should default to black, remove deadlock related to logging out workers
   // build 706 Limit to 1 connection during initial login stage
+  // build 708 Added a few trace points to SIL
+  // build 710 Fixed runtime compatibility with JRE 1.5 and JRE 1.4.2
 
-  public static final short PROGRAM_BUILD_NUMBER = 706;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 710;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.7f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 2;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

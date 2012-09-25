@@ -109,19 +109,19 @@ public class UserOps extends Object {
     if (trace != null) trace.exit(UserOps.class);
   }
 
-  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, BAEncodedPassword ba, boolean storeKeyOnServer, File privateKeyFile, StringBuffer errorBuffer) {
-    return sendPasswordChange(SIL, null, ba, storeKeyOnServer, null, privateKeyFile, errorBuffer);
+  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, BAEncodedPassword ba, boolean storeKeyOnServer, File privateKeyFile, StringBuffer errBuffer) {
+    return sendPasswordChange(SIL, null, ba, storeKeyOnServer, null, privateKeyFile, errBuffer);
   }
-  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, StringBuffer errorBuffer) {
-    return sendPasswordChange(SIL, newUserName, ba, storeKeyOnServer, null, null, errorBuffer);
+  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, StringBuffer errBuffer) {
+    return sendPasswordChange(SIL, newUserName, ba, storeKeyOnServer, null, null, errBuffer);
   }
-  private static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errorBuffer) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errorBuffer)");
+  private static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errBuffer) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errBuffer)");
     if (trace != null) trace.args(SIL, newUserName, ba);
     if (trace != null) trace.args(storeKeyOnServer);
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(privateKeyFile);
-    if (trace != null) trace.args(errorBuffer);
+    if (trace != null) trace.args(errBuffer);
 
     boolean error = false;
     boolean storeKeyOnLocal = !storeKeyOnServer;
@@ -152,7 +152,7 @@ public class UserOps extends Object {
         UsrALoginSecureSession.addPathToLastPrivKeyPaths(keyProperties.getPropertiesFullFileName());
         storedLocally = true;
       } catch (Throwable t) {
-        if (errorBuffer != null) errorBuffer.append("\n\n"+t.getLocalizedMessage());
+        if (errBuffer != null) errBuffer.append("\n\n"+t.getLocalizedMessage());
         error = true;
       }
     }
@@ -162,7 +162,7 @@ public class UserOps extends Object {
       MessageAction updateKeyAction = new MessageAction(actionCode.intValue(), updateKeyRequest);
       ClientMessageAction msgAction = SIL.submitAndFetchReply(updateKeyAction, 60000);
       if (msgAction == null || msgAction.getActionCode() <= 0) {
-        if (errorBuffer != null) errorBuffer.append("\n\nserver failed to respond");
+        if (errBuffer != null) errBuffer.append("\n\nserver failed to respond");
         error = true;
       } else {
         cache.setEncodedPassword(ba);

@@ -301,7 +301,7 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
 
       // stopping requires a delayed filter to prevent flickering
       if (moveGlobeTimer == null)
-        moveGlobeTimer = new java.util.Timer("Status Moving Icon Update Timer");
+        moveGlobeTimer = new java.util.Timer(); // for compatibility with JRE 1.4, don't privide "name" param as it is API level 1.5
 
       moveGlobeTask = new TimerTask() {
         public void run() {

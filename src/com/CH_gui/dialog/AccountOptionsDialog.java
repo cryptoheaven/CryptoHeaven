@@ -852,7 +852,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         final boolean storeKeyOnServer = checks.jKeyOnServer.isSelected();
         Thread th = new ThreadTraced("Private Key Location Changer") {
           public void runTraced() {
-            StringBuffer errorBuffer = new StringBuffer();
+            StringBuffer errBuffer = new StringBuffer();
             boolean error = false;
             try {
               if (!storeKeyOnServer) {
@@ -860,16 +860,16 @@ public class AccountOptionsDialog extends GeneralDialog {
                 String defaultFileName = keyProps.getPropertiesFullFileName();
                 File chosenFile = LoginFrame.choosePrivKeyStorageFile(new File(defaultFileName));
                 if (chosenFile != null) {
-                  error = !UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), storeKeyOnServer, chosenFile, errorBuffer);
+                  error = !UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), storeKeyOnServer, chosenFile, errBuffer);
                 }
               } else {
-                error = !UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), storeKeyOnServer, null, errorBuffer);
+                error = !UserOps.sendPasswordChange(SIL, cache.getEncodedPassword(), storeKeyOnServer, null, errBuffer);
               }
               if (error) {
                 String where = storeKeyOnServer ? "on the server" : "locally";
                 String msg = "Private key could not be stored " + where + "!";
-                if (errorBuffer.length() > 0)
-                  msg += errorBuffer.toString();
+                if (errBuffer.length() > 0)
+                  msg += errBuffer.toString();
                 MessageDialog.showErrorDialog(null, msg, "Key Storage Failed", true);
               }
             } catch (Throwable t) {

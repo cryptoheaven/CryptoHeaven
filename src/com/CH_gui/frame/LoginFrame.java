@@ -210,7 +210,11 @@ public class LoginFrame extends JFrame {
     // Icon for the Frame
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
-      setIconImage(frameIcon.getImage());
+      try {
+        setIconImage(frameIcon.getImage());
+      } catch (NoSuchMethodError e) {
+        // API since 1.6!!! - ignore it as it is not crytical
+      }
     }
 
     this.defaultUserName = GlobalProperties.getProperty(PROPERTY_USER_NAME, DEFAULT_USER_NAME);
@@ -2087,18 +2091,18 @@ public class LoginFrame extends JFrame {
 
       // Try uploading the key, if upload fails try to store it on local disk, repeat once if errors continue.
       // It is critical that one of these finishes OK, or else the account will become inoperable.
-      StringBuffer errorBuffer = new StringBuffer();
-      if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer, localPrivKeyFile, errorBuffer)) {
+      StringBuffer errBuffer = new StringBuffer();
+      if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer, localPrivKeyFile, errBuffer)) {
         // do the other operation right away
-        UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer, localPrivKeyFile, errorBuffer);
+        UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer, localPrivKeyFile, errBuffer);
         // retry same operation 2nd time
-        if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer, localPrivKeyFile, errorBuffer)) {
+        if (!UserOps.sendPasswordChange(SIL, baEncPass, storeKeyOnServer, localPrivKeyFile, errBuffer)) {
           // do the other operation 2nd time and show message that key was not stored as it should
-          UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer, localPrivKeyFile, errorBuffer);
+          UserOps.sendPasswordChange(SIL, baEncPass, !storeKeyOnServer, localPrivKeyFile, errBuffer);
           String where = storeKeyOnServer ? "on the server" : "locally";
           String msg = "Private key could not be stored " + where + "!";
-          if (errorBuffer.length() > 0)
-            msg += errorBuffer.toString();
+          if (errBuffer.length() > 0)
+            msg += errBuffer.toString();
           MessageDialog.showErrorDialog(null, msg, com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"), true);
         }
       }

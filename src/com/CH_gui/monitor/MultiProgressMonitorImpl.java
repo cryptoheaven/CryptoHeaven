@@ -1,60 +1,64 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.monitor;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import javax.swing.*;
-
 import com.CH_co.monitor.ProgMonitorMultiI;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
 import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.Images;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
+import java.util.Vector;
+import javax.swing.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- * A class to monitor the progress of some operation(s). If it looks
- * like the operation will take a while, a progress window will be popped up.
- * When the ProgressMonitor is created it is given a numeric range and a
- * descriptive string. As the operation progresses, call the setProgress method
- * to indicate how far along the [min,max] range the operation is.
- * Initially, there is no ProgressDialog. After the first millisToDecideToPopup
- * milliseconds (default 500) the progress monitor will predict how long
- * the operation will take.  If it is longer than millisToPopup (default 2000,
- * 2 seconds) a ProgressDialog will be popped up.
- * <p>
- * From time to time, when the Dialog box is visible, the progress bar will
- * be updated when setProgress is called.  setProgress won't always update
- * the progress bar, it will only be done if the amount of progress is
- * visibly significant.
- * <p>
- * If more than one operation is in progress, multiple progress bars will show.
- *
- *
- * <b>$Revision: 1.2 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+* A class to monitor the progress of some operation(s). If it looks
+* like the operation will take a while, a progress window will be popped up.
+* When the ProgressMonitor is created it is given a numeric range and a
+* descriptive string. As the operation progresses, call the setProgress method
+* to indicate how far along the [min,max] range the operation is.
+* Initially, there is no ProgressDialog. After the first millisToDecideToPopup
+* milliseconds (default 500) the progress monitor will predict how long
+* the operation will take.  If it is longer than millisToPopup (default 2000,
+* 2 seconds) a ProgressDialog will be popped up.
+* <p>
+* From time to time, when the Dialog box is visible, the progress bar will
+* be updated when setProgress is called.  setProgress won't always update
+* the progress bar, it will only be done if the amount of progress is
+* visibly significant.
+* <p>
+* If more than one operation is in progress, multiple progress bars will show.
+*
+*
+* <b>$Revision: 1.2 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MultiProgressMonitorImpl extends Object implements ProgMonitorMultiI {
 
   private static JFrame progressFrame;
@@ -94,26 +98,26 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
   }
 
   /**
-   * Constructs a graphic object that shows progress, typically by filling
-   * in a rectangular bar as the process nears completion.
-   *
-   * @param parentComponent the parent component for the dialog box
-   * @param message a descriptive message that will be shown
-   *        to the user to indicate what operation is being monitored.
-   *        This does not change as the operation progresses.
-   *        See the message parameters to methods in
-   *        {@link JOptionPane#message}
-   *        for the range of values.
-   * @param note a short note describing the state of the
-   *        operation.  As the operation progresses, you can call
-   *        setNote to change the note displayed.  This is used,
-   *        for example, in operations that iterate through a
-   *        list of files to show the name of the file being processes.
-   *        If note is initially null, there will be no note line
-   *        in the dialog box and setNote will be ineffective
-   * @param min the lower bound of the range
-   * @param max the upper bound of the range
-   */
+  * Constructs a graphic object that shows progress, typically by filling
+  * in a rectangular bar as the process nears completion.
+  *
+  * @param parentComponent the parent component for the dialog box
+  * @param message a descriptive message that will be shown
+  *        to the user to indicate what operation is being monitored.
+  *        This does not change as the operation progresses.
+  *        See the message parameters to methods in
+  *        {@link JOptionPane#message}
+  *        for the range of values.
+  * @param note a short note describing the state of the
+  *        operation.  As the operation progresses, you can call
+  *        setNote to change the note displayed.  This is used,
+  *        for example, in operations that iterate through a
+  *        list of files to show the name of the file being processes.
+  *        If note is initially null, there will be no note line
+  *        in the dialog box and setNote will be ineffective
+  * @param min the lower bound of the range
+  * @param max the upper bound of the range
+  */
   public void init(Object parentComponent, Object message, String note, int min, int max) {
     this.min = min;
     this.max = max;
@@ -187,7 +191,11 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
           inFrame = new JFrame(title);
           ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
           if (frameIcon != null) {
-            inFrame.setIconImage(frameIcon.getImage());
+            try {
+              inFrame.setIconImage(frameIcon.getImage());
+            } catch (NoSuchMethodError e) {
+              // API since 1.6!!! - ignore it as it is not crytical
+            }
           }
           progressFrame = inFrame;
           mainPanel = new JPanel(new GridBagLayout());
@@ -240,15 +248,15 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
 
 
   /**
-   * Indicate the progress of the operation being monitored.
-   * If the specified value is >= the maximum, the progress
-   * monitor is closed.
-   * @param nv an int specifying the current value, between the
-   *        maximum and minimum specified for this component
-   * @see #setMinimum
-   * @see #setMaximum
-   * @see #close
-   */
+  * Indicate the progress of the operation being monitored.
+  * If the specified value is >= the maximum, the progress
+  * monitor is closed.
+  * @param nv an int specifying the current value, between the
+  *        maximum and minimum specified for this component
+  * @see #setMinimum
+  * @see #setMaximum
+  * @see #close
+  */
   public void setProgress(final int nv) {
     try {
       SwingUtilities.invokeLater(new Runnable() {
@@ -318,8 +326,8 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
   }
 
   /**
-   * Cancels the progress simulating GUI click on Cancel button.
-   */
+  * Cancels the progress simulating GUI click on Cancel button.
+  */
   public void cancel() {
     if (ENABLE_DEBUG_CANCEL_NOTE)
       com.CH_gui.util.MessageDialog.showInfoDialog(null, debugBuffer.toString(), "Debug Notes");
@@ -328,10 +336,10 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
   }
 
   /**
-   * Indicate that the operation is complete.  This happens automatically
-   * when the value set by setProgress is >= max, but it may be called
-   * earlier if the operation ends early.
-   */
+  * Indicate that the operation is complete.  This happens automatically
+  * when the value set by setProgress is >= max, but it may be called
+  * earlier if the operation ends early.
+  */
   public void close() {
     isClosed = true;
     try {
@@ -401,31 +409,31 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
   }
 
   /**
-   * Returns the minimum value -- the lower end of the progress value.
-   *
-   * @return an int representing the minimum value
-   * @see #setMinimum
-   */
+  * Returns the minimum value -- the lower end of the progress value.
+  *
+  * @return an int representing the minimum value
+  * @see #setMinimum
+  */
   public synchronized int getMinimum() {
     return min;
   }
 
   /**
-   * Specifies the minimum value.
-   *
-   * @param m  an int specifying the minimum value
-   * @see #getMinimum
-   */
+  * Specifies the minimum value.
+  *
+  * @param m  an int specifying the minimum value
+  * @see #getMinimum
+  */
   public synchronized void setMinimum(int m) {
     min = m;
   }
 
   /**
-   * Returns the maximum value -- the higher end of the progress value.
-   *
-   * @return an int representing the maximum value
-   * @see #setMaximum
-   */
+  * Returns the maximum value -- the higher end of the progress value.
+  *
+  * @return an int representing the maximum value
+  * @see #setMaximum
+  */
   public synchronized int getMaximum() {
     return max;
   }
@@ -435,77 +443,77 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
   }
 
   /**
-   * Specifies the maximum value.
-   *
-   * @param m  an int specifying the maximum value
-   * @see #getMaximum
-   */
+  * Specifies the maximum value.
+  *
+  * @param m  an int specifying the maximum value
+  * @see #getMaximum
+  */
   public synchronized void setMaximum(int m) {
     max = m;
   }
 
   /**
-   * Returns true if the user hits the Cancel button in the progress window.
-   */
+  * Returns true if the user hits the Cancel button in the progress window.
+  */
   public boolean isCanceled() {
     return ((value != null) && (cancelOption.length == 1) && (value.equals(cancelOption[0])));
   }
 
   /**
-   * Specifies the amount of time to wait before deciding whether or
-   * not to popup a progress monitor.
-   *
-   * @param millisToDecideToPopup  an int specifying the time to wait,
-   *        in milliseconds
-   * @see #getMillisToDecideToPopup
-   */
+  * Specifies the amount of time to wait before deciding whether or
+  * not to popup a progress monitor.
+  *
+  * @param millisToDecideToPopup  an int specifying the time to wait,
+  *        in milliseconds
+  * @see #getMillisToDecideToPopup
+  */
   public synchronized void setMillisToDecideToPopup(int millisToDecideToPopup) {
     this.millisToDecideToPopup = millisToDecideToPopup;
   }
 
 
   /**
-   * Returns the amount of time this object waits before deciding whether
-   * or not to popup a progress monitor.
-   *
-   * @param millisToDecideToPopup  an int specifying waiting time,
-   *        in milliseconds
-   * @see #setMillisToDecideToPopup
-   */
+  * Returns the amount of time this object waits before deciding whether
+  * or not to popup a progress monitor.
+  *
+  * @param millisToDecideToPopup  an int specifying waiting time,
+  *        in milliseconds
+  * @see #setMillisToDecideToPopup
+  */
   public synchronized int getMillisToDecideToPopup() {
     return millisToDecideToPopup;
   }
 
   /**
-   * Specifies the amount of time it will take for the popup to appear.
-   * (If the predicted time remaining is less than this time, the popup
-   * won't be displayed.)
-   *
-   * @param millisToPopup  an int specifying the time in milliseconds
-   * @see #getMillisToPopup
-   */
+  * Specifies the amount of time it will take for the popup to appear.
+  * (If the predicted time remaining is less than this time, the popup
+  * won't be displayed.)
+  *
+  * @param millisToPopup  an int specifying the time in milliseconds
+  * @see #getMillisToPopup
+  */
   public synchronized void setMillisToPopup(int millisToPopup) {
     this.millisToPopup = millisToPopup;
   }
 
   /**
-   * Returns the amount of time it will take for the popup to appear.
-   *
-   * @param millisToPopup  an int specifying the time in milliseconds
-   * @see #setMillisToPopup
-   */
+  * Returns the amount of time it will take for the popup to appear.
+  *
+  * @param millisToPopup  an int specifying the time in milliseconds
+  * @see #setMillisToPopup
+  */
   public synchronized int getMillisToPopup() {
     return millisToPopup;
   }
 
   /**
-   * Specifies the additional note that is displayed along with the
-   * progress message. Used, for example, to show which file the
-   * is currently being copied during a multiple-file copy.
-   *
-   * @param note  a String specifying the note to display
-   * @see #getNote
-   */
+  * Specifies the additional note that is displayed along with the
+  * progress message. Used, for example, to show which file the
+  * is currently being copied during a multiple-file copy.
+  *
+  * @param note  a String specifying the note to display
+  * @see #getNote
+  */
   public synchronized void setNote(String note) {
     this.note = note;
     if (noteLabel != null) {
@@ -514,12 +522,12 @@ public class MultiProgressMonitorImpl extends Object implements ProgMonitorMulti
   }
 
   /**
-   * Specifies the additional note that is displayed along with the
-   * progress message.
-   *
-   * @return a String specifying the note to display
-   * @see #setNote
-   */
+  * Specifies the additional note that is displayed along with the
+  * progress message.
+  *
+  * @return a String specifying the note to display
+  * @see #setNote
+  */
   public synchronized String getNote() {
     return note;
   }

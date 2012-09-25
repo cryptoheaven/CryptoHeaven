@@ -280,15 +280,15 @@ public class ChangePasswordDialog extends GeneralDialog {
       if (!error) {
         boolean isMyKeyLocal = !Misc.isBitSet(cache.getUserRecord().flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
         //boolean isLocalKey = KeyOps.isKeyStoredLocally(cache.getKeyRecordMyCurrent().keyId);
-        StringBuffer errorBuffer = new StringBuffer();
-        boolean success = UserOps.sendPasswordChange(SIL, ba, !isMyKeyLocal, null, errorBuffer);
+        StringBuffer errBuffer = new StringBuffer();
+        boolean success = UserOps.sendPasswordChange(SIL, ba, !isMyKeyLocal, null, errBuffer);
         error = !success;
 
         if (error) {
           String where = !isMyKeyLocal ? "on the server" : "locally";
           String msg = "Private key could not be stored " + where + "!";
-          if (errorBuffer.length() > 0)
-            msg += errorBuffer.toString();
+          if (errBuffer.length() > 0)
+            msg += errBuffer.toString();
           MessageDialog.showErrorDialog(null, msg, "Key Storage Failed", true);
         }
       }

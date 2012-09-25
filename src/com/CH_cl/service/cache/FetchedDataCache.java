@@ -387,10 +387,10 @@ public class FetchedDataCache extends Object {
 
     KeyRecord kRec = getKeyRecord(userSettingsRecord.pubKeyId);
     if (kRec != null && kRec.getPrivateKey() != null) {
-      StringBuffer errorBuffer = new StringBuffer();
-      userSettingsRecord.unSeal(kRec, errorBuffer);
-      if (errorBuffer.length() > 0)
-        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errorBuffer.toString());
+      StringBuffer errBuffer = new StringBuffer();
+      userSettingsRecord.unSeal(kRec, errBuffer);
+      if (errBuffer.length() > 0)
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errBuffer.toString());
     }
 
     synchronized (this) {
@@ -1800,7 +1800,7 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
-      StringBuffer errorBuffer = new StringBuffer();
+      StringBuffer errBuffer = new StringBuffer();
       synchronized (this) {
         // Unwrap key records.
         for (int i=0; i<records.length; i++) {
@@ -1837,7 +1837,7 @@ public class FetchedDataCache extends Object {
                 myUserSettingsRecord.getXmlText() == null &&
                 myUserSettingsRecord.pubKeyId.equals(records[i].keyId))
             {
-              myUserSettingsRecord.unSeal(records[i], errorBuffer);
+              myUserSettingsRecord.unSeal(records[i], errBuffer);
               fireUserSettingsRecordUpdated(new UserSettingsRecord[] { myUserSettingsRecord }, RecordEvent.SET);
             }
           }
@@ -1845,8 +1845,8 @@ public class FetchedDataCache extends Object {
 
         records = (KeyRecord[]) RecordUtils.merge(keyRecordMap, records);
       }
-      if (errorBuffer.length() > 0)
-        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errorBuffer.toString());
+      if (errBuffer.length() > 0)
+        NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errBuffer.toString());
       fireKeyRecordUpdated(records, RecordEvent.SET);
     }
 

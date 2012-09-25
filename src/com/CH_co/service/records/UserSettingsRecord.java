@@ -137,8 +137,8 @@ public class UserSettingsRecord extends Record {
    * Unseals the <code> encSymKey </code> into <code> symKey </code>
    * using the unSealant object which is the user's private key.
    */
-  public void unSeal(KeyRecord privateKey, StringBuffer errorBuffer) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSettingsRecord.class, "unSeal(KeyRecord privateKey, StringBuffer errorBuffer)");
+  public void unSeal(KeyRecord privateKey, StringBuffer errBuffer) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserSettingsRecord.class, "unSeal(KeyRecord privateKey, StringBuffer errBuffer)");
     if (!privateKey.keyId.equals(pubKeyId))
       throw new IllegalArgumentException("Specified private key record cannot decrypt these symmetric key!");
 
@@ -156,7 +156,7 @@ public class UserSettingsRecord extends Record {
       try {
         tempXML.parseString(Misc.decompressStr(compressedXML.toByteArray()));
       } catch (Throwable th1) {
-        errorBuffer.append("Invalid user settings detected.  This may include default email signatures or spelling preferences.  Please adjust your settings.");
+        errBuffer.append("Invalid user settings detected.  This may include default email signatures or spelling preferences.  Please adjust your settings.");
       }
       // set values when all done
       symKey = tempKey;
@@ -165,9 +165,9 @@ public class UserSettingsRecord extends Record {
       try {
         parseSettings(xmlText);
       } catch (Throwable th1) {
-        if (errorBuffer.length() == 0)
-          errorBuffer.append("Invalid user settings detected.  ");
-        errorBuffer.append("This may include default email signatures or spelling preferences.  Please validate your settings.");
+        if (errBuffer.length() == 0)
+          errBuffer.append("Invalid user settings detected.  ");
+        errBuffer.append("This may include default email signatures or spelling preferences.  Please validate your settings.");
       }
     } catch (Throwable t) {
       if (trace != null) trace.exception(UserSettingsRecord.class, 100, t);

@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.localFileTable;
 
@@ -44,21 +44,21 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.30 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.30 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class DNDActionFileChooser extends DNDFileChooser implements ActionProducerI, VisualsSavable {
 
   private Action[] actions;
@@ -100,7 +100,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   }
   private void assignMousePopupListeners(Component c) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DNDFileChooser.class, "assignDropAndDragComponents(Component c)");
-    if (trace != null) trace.args(c);
+    if (trace != null) trace.args(c != null ? c.getClass().getName() : "null");
 
     if (c != null &&
           (
@@ -120,6 +120,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
           assignMousePopupListeners(cc[i]);
       }
     }
+
     if (trace != null) trace.exit(DNDFileChooser.class);
   }
 
@@ -143,8 +144,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   }
 
   /**
-   * Refresh File List.
-   */
+  * Refresh File List.
+  */
   private class RefreshAction extends AbstractActionTraced {
     public RefreshAction(int actionId) {
       super(com.CH_cl.lang.Lang.rb.getString("action_Refresh_Files"), Images.get(ImageNums.REFRESH16));
@@ -160,8 +161,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   }
 
   /**
-   * Open in separate window
-   */
+  * Open in separate window
+  */
   private static class OpenInSeperateWindowAction extends AbstractActionTraced {
     public OpenInSeperateWindowAction(int actionId) {
       super(com.CH_cl.lang.Lang.rb.getString("action_Clone_File_View"), Images.get(ImageNums.CLONE16));
@@ -178,8 +179,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   }
 
   /**
-   * Securely wipe the contents of selected files and directories.
-   */
+  * Securely wipe the contents of selected files and directories.
+  */
   private class WipeAction extends AbstractActionTraced {
     public WipeAction(int actionId) {
       super(com.CH_cl.lang.Lang.rb.getString("action_Wipe_File"), Images.get(ImageNums.FILE_REMOVE16));
@@ -290,8 +291,8 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
 
 
   /**
-   * Upload dialog and get the chosen destination FolderPair.
-   */
+  * Upload dialog and get the chosen destination FolderPair.
+  */
   private FolderPair getUploadDestination(boolean forCreateFolder, boolean forFileUpload) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DNDActionFileChooser.class, "getUploadDestination(boolean forCreateFolder, boolean forFileUpload)");
     if (trace != null) trace.args(forCreateFolder);
@@ -331,24 +332,24 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
   /****************************************************************************/
 
   /**
-   * @return all the acitons that this objects produces.
-   */
+  * @return all the acitons that this objects produces.
+  */
   public Action[] getActions() {
     if (actions == null) initActions();
     return actions;
   }
 
   /**
-   * Final Action Producers will not be traversed to collect its containing objects' actions.
-   * @return true if this object will gather all actions from its childeren or hide them counciously.
-   */
+  * Final Action Producers will not be traversed to collect its containing objects' actions.
+  * @return true if this object will gather all actions from its childeren or hide them counciously.
+  */
   public boolean isFinalActionProducer() {
     return true;
   }
 
   /**
-   * Enables or Disables actions based on the current state of the Action Producing component.
-   */
+  * Enables or Disables actions based on the current state of the Action Producing component.
+  */
   public void setEnabledActions() {
     if (actions == null) initActions();
     File[] selectedFiles = getSelectedFiles();

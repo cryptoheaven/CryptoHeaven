@@ -176,7 +176,11 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
-      setIconImage(frameIcon.getImage());
+      try {
+        setIconImage(frameIcon.getImage());
+      } catch (NoSuchMethodError e) {
+        // API since 1.6!!! - ignore it as it is not crytical
+      }
     }
     if (trace != null) trace.data(110, "restoring visuals");
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this)));

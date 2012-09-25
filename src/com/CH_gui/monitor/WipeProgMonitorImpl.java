@@ -1,46 +1,51 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.monitor;
 
-import javax.swing.*;
-
-import java.awt.event.*;
-import java.awt.*;
-import java.util.LinkedList;
-
 import com.CH_co.monitor.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_co.util.Sounds;
 import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MiscGui;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.13 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.13 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
 
   private JLabel jImageLabel;
@@ -96,7 +101,11 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
 
     ImageIcon frameIcon = Images.get(ImageNums.FRAME_LOCK32);
     if (frameIcon != null) {
-      setIconImage(frameIcon.getImage());
+      try {
+        setIconImage(frameIcon.getImage());
+      } catch (NoSuchMethodError e) {
+        // API since 1.6!!! - ignore it as it is not crytical
+      }
     }
 
     pack();
@@ -111,8 +120,8 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
 
 
   /**
-   * File Wipe
-   */
+  * File Wipe
+  */
   public void init(Interruptible interruptible) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "init(Interruptible interruptible)");
     init("Secure File Wipe",
@@ -302,8 +311,8 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
   }
 
   /**
-   * only last 'numOfStats' are kept to make current calculations.
-   */
+  * only last 'numOfStats' are kept to make current calculations.
+  */
   private void updateStats(long currentDateMillis, int numOfStats) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "updateStats(long currentDateMillis, int numOfStats)");
     if (trace != null) trace.args(currentDateMillis);
@@ -574,7 +583,7 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "doneTransfer");
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
-   }
+  }
   public void nextTask(String title) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "nextTask");
     if (trace != null) trace.args(title);

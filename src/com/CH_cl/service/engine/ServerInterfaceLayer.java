@@ -1016,7 +1016,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
               final Thread[] ths = new Thread[hostIndexesToTry.length];
               final Socket[][] socketBuffers = new Socket[hostIndexesToTry.length][1];
-              Throwable[][] errorBuffers = new Throwable[hostIndexesToTry.length][1];
+              Throwable[][] errBuffers = new Throwable[hostIndexesToTry.length][1];
 
               StringBuffer sbSocketInfo = new StringBuffer();
               for (int k=0; k<hostIndexesToTry.length; k++) {
@@ -1024,7 +1024,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 sbSocketInfo.append(" port ").append(hostsAndPorts[hostIndexesToTry[k]][1]).append(", ");
                 ths[k] = createSocket_Threaded((String) hostsAndPorts[hostIndexesToTry[k]][0],
                                                 ((Integer) hostsAndPorts[hostIndexesToTry[k]][1]).intValue(),
-                                                socketBuffers[k], errorBuffers[k]);
+                                                socketBuffers[k], errBuffers[k]);
               }
               // Find the first one joined
               // We are interested in first successful or first failure iff all failed.
@@ -1033,7 +1033,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 int joinedIndex = joinAny(ths); // join the first available thread that has completed
                 if (joinedIndexFirst == -1)
                   joinedIndexFirst = joinedIndex;
-                if (errorBuffers[joinedIndex][0] != null) {
+                if (errBuffers[joinedIndex][0] != null) {
                   ths[joinedIndex] = null;
                 } else {
                   joinedIndexFirst = joinedIndex;
@@ -1044,8 +1044,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               hostIndexCompletedFirst = hostIndexesToTry[joinedIndexFirst];
               if (trace != null) trace.data(50, "hostIndexCompletedFirst", hostIndexCompletedFirst);
 
-              if (errorBuffers[joinedIndexFirst][0] != null)
-                throw errorBuffers[joinedIndexFirst][0];
+              if (errBuffers[joinedIndexFirst][0] != null)
+                throw errBuffers[joinedIndexFirst][0];
 
               Socket socket = socketBuffers[joinedIndexFirst][0];
               if (trace != null) trace.data(60, "createWorker() attempted hosts and ports are", sbSocketInfo.toString());
@@ -1181,7 +1181,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * Spawn a thread that will create a new worker.
   * @return the creating thread and worker is returned in the provided buffer.
   */
-  private Thread createSocket_Threaded(final String hostName, final int portNumber, final Socket[] socketBuffer, final Throwable[] errorBuffer) {
+  private Thread createSocket_Threaded(final String hostName, final int portNumber, final Socket[] socketBuffer, final Throwable[] errBuffer) {
     Thread th = new ThreadTraced("Socket Creator") {
       public void runTraced() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "runTraced()");
@@ -1192,7 +1192,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           socketBuffer[0] = socket;
         } catch (Throwable t) {
           if (trace != null) trace.exception(getClass(), 100, t);
-          errorBuffer[0] = t;
+          errBuffer[0] = t;
         }
         if (trace != null) trace.exit(getClass(), socketBuffer[0]);
       }
