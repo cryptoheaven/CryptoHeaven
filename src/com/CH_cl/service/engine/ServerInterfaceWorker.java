@@ -386,7 +386,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               if (trace != null) trace.data(50, "Round trip time for " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()) + " took " + (endTime-startTime)+" ms. ");
               //System.out.println(""+(endTime-startTime)+" ms. " + MessageActionNameSwitch.getActionInfoName(msgAction.getActionCode()));
             }
-            
+
             progressMonitor.setCancellable(msgAction);
 
             // Since the reply has been read, there is no communication error and we can remove the interruptable message.
@@ -568,7 +568,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           if (msgActionCode != CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE) {
             try {
               if (trace != null) trace.data(50, "Wait till stream is secured or threads released.");
-              dataIn.wait(60000);
+              dataIn.wait(15000);
             } catch (InterruptedException e) {
             }
             if (trace != null) trace.data(55, "Woke up from waiting for secured streams or unlock upon login failure.");
@@ -930,15 +930,19 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             sessionContext.generateKeyPairIfDoesntExist(512);
             Obj_List_Co dataSet = new Obj_List_Co(new Object[] { sessionContext.getKeyPairToReceiveWith().getPublicKey().objectToBytes() });
             new MessageAction(CommandCodes.SYS_Q_GET_TEMP_PUB_KEY, dataSet).writeToStream(dataOut, GlobalProperties.PROGRAM_BUILD_NUMBER, sessionContext.serverBuild);
+            long waitStart = System.currentTimeMillis();
             try {
               // When login is successful or fails with UsrALoginFailed, thread will be unblocked immediately.
               // Login request may unexpectadly fail with general IO error, or succeed, lets keep a timeout.
               if (trace != null) trace.data(22, "Wait till key is received or threads released.");
-              dataOut.wait(120000); // wait for 2 minutes MAXIMUM
+              dataOut.flush(); // flush the synchronized requests to make sure they go out ASAP
+              dataOut.wait(15000); // wait for 15 sec MAXIMUM
             } catch (InterruptedException e) {
               if (trace != null) trace.data(23, "We got an Interrupt Exception -- this is OK, quit waiting now.");
             }
-            if (trace != null) trace.data(24, "Woke up from waiting for key or unlock upon recipt.");
+            long waitEnd = System.currentTimeMillis();
+            long waitDiff = waitEnd - waitStart;
+            if (trace != null) trace.data(24, "Woke up from waiting for key or unlock upon recipt. Wait time was "+waitDiff+" ms and key for sending is "+sessionContext.getPublicKeyToSendWith());
           } // end synchronized
           if (trace != null) trace.data(25, "Synchronizing key fetch... done.");
         }
@@ -971,9 +975,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               // make sure the current session context key is used for this login and not the key from another session!
               RSAPublicKey publicKeyToSendWith = sessionContext.getPublicKeyToSendWith();
               if (publicKeyToSendWith != null && encDataSet != null) {
+                if (trace != null) trace.data(27, "will write request login set as enc");
                 msgAction.setMsgDataSet(encDataSet);
                 encDataSet.setPublicKeyToSendWith(publicKeyToSendWith);
               } else {
+                if (trace != null) trace.data(28, "will write request login set as plain");
                 msgAction.setMsgDataSet(loginDataSet);
               }
               msgAction.writeToStream(dataOut, GlobalProperties.PROGRAM_BUILD_NUMBER, sessionContext.serverBuild);

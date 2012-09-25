@@ -126,6 +126,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /** Last successful login message. */
   private MessageAction lastLoginMessageAction;
   private Long remoteSessionID;
+  private boolean hasEverLoggedInSuccessfully;
 
   /** Server host address and port number */
   private Object[][] hostsAndPorts;
@@ -781,7 +782,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     return maxConnectionCount - 1;
   }
   public int getMaxConnectionCount() {
-    return maxConnectionCount;
+    int maxCount = maxConnectionCount;
+    if (!hasEverLoggedInSuccessfully || !hasMainWorker()) {
+      // temporary ceiling of 1 if never logged in or no main worker
+      maxCount = Math.min(1, maxConnectionCount);
+    }
+    return maxCount;
   }
   public void setMaxConnectionCount(int maxConnections) {
     maxConnectionCount = maxConnections;
@@ -1778,8 +1784,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (loginSuccessful && loginCompletionNotifier != null)
       loginCompletionNotifier.loginComplete(this);
     // Each successful login warants check for Main Worker... incase we are doing some kind of auto-re-login due to connection drop etc.
-    if (loginSuccessful)
+    if (loginSuccessful) {
       triggerCheckForMainWorker();
+      hasEverLoggedInSuccessfully = true;
+    }
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
@@ -2010,6 +2018,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
   private class SleepMonitor extends ThreadTraced {
     private long stampLast = 0;
+    private long sleepSomeLast = 0;
     private SleepMonitor() {
       super("SleepMonitor");
       setDaemon(true);
@@ -2020,11 +2029,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         try {
           long stampNow = System.currentTimeMillis();
           boolean invalidStamp = stampLast > stampNow;
-          if (stampLast > 0 && (stampNow - stampLast > ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE || invalidStamp)) {
-            sleepDetected();
+          if (sleepSomeLast > 0) {
+            if (stampLast > 0) {
+              if (stampNow - stampLast > sleepSomeLast + 1000 || invalidStamp) { // lost 1000 ms or more from our clock
+                sleepDetected();
+              }
+            }
           }
           stampLast = stampNow;
-          long sleepSome = Math.max(100, ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE/5);
+          long sleepSome = Math.max(100, ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE/5)+100; // always positive
+          sleepSomeLast = sleepSome;
           Thread.sleep(sleepSome);
         } catch (Throwable t) {
         }

@@ -25,6 +25,7 @@ import com.CH_gui.action.Actions;
 import com.CH_gui.menuing.MenuActionItem;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.util.FileTypesIcons;
 import com.CH_gui.util.Images;
 import com.CH_guiLib.gui.MyDefaultListCellRenderer;
@@ -306,6 +307,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     renderer.setText(label);
     renderer.setIcon(icon);
     renderer.setToolTipText(toolTip);
+    renderer.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
 
     // if (trace != null) trace.exit(ListRenderer.class, renderer);
     return renderer;

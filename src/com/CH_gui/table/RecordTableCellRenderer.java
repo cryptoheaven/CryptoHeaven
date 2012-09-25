@@ -99,7 +99,11 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   }
 
   public static Border makeIndentedBorder(int numOfIndents, boolean iconized) {
-    return new EmptyBorder(BORDER_TOP, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? 1 : 5), BORDER_BOTTOM, 5);
+    // indented border always uses 0-ZERO top and bottom insets as the outer layer will take care of that
+    if (numOfIndents > 0)
+      return new EmptyBorder(0, (iconized ? 1 : 5), 0, 5);
+    else
+      return new EmptyBorder(BORDER_TOP, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? 1 : 5), BORDER_BOTTOM, 5);
   }
 
   public static Border getIndentedBorder(int numOfIndents, boolean iconized) {
@@ -300,7 +304,6 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
       JLabel arrow = jIndentLabelRenderer;
       arrow.setIcon(Images.get(ImageNums.REPLY_ARROW16));
       arrow.setForeground(fw);
-//      arrow.setBackground(bk);
       arrow.setVerticalAlignment(SwingConstants.TOP);
 
       arrow.setOpaque(false);

@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.util;
 
@@ -18,18 +18,18 @@ import java.security.MessageDigest;
 import java.util.*;
 
 /**
- * This class acts as a central repository for an program specific
- * properties. It reads an (program).properties file containing program-
- * specific properties. <p>
- *
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * <b>$Revision: 1.96 $</b>
- * @author  Marcin Kurzawa
- */
+* This class acts as a central repository for an program specific
+* properties. It reads an (program).properties file containing program-
+* specific properties. <p>
+*
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* <b>$Revision: 1.96 $</b>
+* @author  Marcin Kurzawa
+*/
 public class GlobalProperties extends Object {
 
 // Constants and variables with relevant static code
@@ -270,13 +270,14 @@ public class GlobalProperties extends Object {
   // build 700 Icon changes
   // build 702 icon lock issues in From/To and recipient panels
   // build 704 Message print rendering should default to black, remove deadlock related to logging out workers
+  // build 706 Limit to 1 connection during initial login stage
 
-  public static final short PROGRAM_BUILD_NUMBER = 704;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 706;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.7f;
-  public static final short PROGRAM_VERSION_MINOR = 0;
+  public static final short PROGRAM_VERSION_MINOR = 1;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
@@ -295,8 +296,8 @@ public class GlobalProperties extends Object {
   static String[][] defaultProperties = null;
 
   /**
-   * Loads initial properties from file when class is loaded.
-   */
+  * Loads initial properties from file when class is loaded.
+  */
   static {
     try {
       String date = GlobalProperties.class.getPackage().getImplementationVersion();
@@ -373,8 +374,8 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Removes all local properties that are global and for current user.
-   */
+  * Removes all local properties that are global and for current user.
+  */
   public static void resetMyAndGlobalProperties() {
     // reset all stored properties and mark for re-reset on next load to erase settings written at app closing
     resetMyAndGlobalProperties(true);
@@ -404,9 +405,9 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Set a Temporary File to be cleaned up.
-   * Cleanup on request through API call or, first try on JVM Exit, second try on program start.
-   */
+  * Set a Temporary File to be cleaned up.
+  * Cleanup on request through API call or, first try on JVM Exit, second try on program start.
+  */
   public static void addTempFileToCleanup(File tempFile) {
     addTempFileToCleanup(tempFile, "TempFiles");
   }
@@ -420,8 +421,8 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Cleanup all Temporary Files that were added for cleanup
-   */
+  * Cleanup all Temporary Files that were added for cleanup
+  */
   public static void cleanupTempFiles() {
     cleanupTempFiles("TempFiles");
   }
@@ -471,9 +472,9 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Get the value of a property for this key, or return
-   * <i>value</i> if the property was not set.
-   */
+  * Get the value of a property for this key, or return
+  * <i>value</i> if the property was not set.
+  */
   public static String getProperty (String key, String value) {
     return getProperty(key, value, null);
   }
@@ -496,11 +497,11 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Set a property value.  Calls the hashtable method put.
-   * Provided for parallelism with the getProperties method.
-   * Enforces use of strings for property keys and values.
-   * @return the previous value of the specified key, or null if it did not have one.
-   */
+  * Set a property value.  Calls the hashtable method put.
+  * Provided for parallelism with the getProperties method.
+  * Enforces use of strings for property keys and values.
+  * @return the previous value of the specified key, or null if it did not have one.
+  */
   public static String setProperty(String key, String value) {
     return (String) properties.setProperty(key, value);
   }
@@ -515,8 +516,8 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Remove a property value.
-   */
+  * Remove a property value.
+  */
   public static String remove(String key) {
     return (String) properties.remove(key);
   }
@@ -534,8 +535,8 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * @return an enumeration of all the keys in this property list, including the keys in the default property list.
-   */
+  * @return an enumeration of all the keys in this property list, including the keys in the default property list.
+  */
   public static Enumeration propertyNames() {
     return properties.propertyNames();
   }
@@ -585,8 +586,8 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Loading is private because it needs to verify the current hash of all property values.
-   */
+  * Loading is private because it needs to verify the current hash of all property values.
+  */
   private static synchronized void load(InputStream is) throws IOException {
     properties.load(is);
     if (!hashVerify()) {
@@ -595,8 +596,8 @@ public class GlobalProperties extends Object {
   }
 
   /**
-   * Storing is private because it needs to update the current hash of all property values.
-   */
+  * Storing is private because it needs to update the current hash of all property values.
+  */
   private static synchronized void store (OutputStream out, String header) throws IOException {
     hashAdd();
     properties.store(out, header);

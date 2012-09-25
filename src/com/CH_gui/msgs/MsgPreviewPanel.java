@@ -1337,7 +1337,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
   private static void setFlowGridPanel(JPanel panel, ArrayList labelsL, int HORIZ_INSET_SPACE, int MAX_VISIBLE_ROWS) {
-    int VERT_GAP = 2;
+    int VERT_GAP = 3;
     boolean flowMode = false; // don't use flow because even with scroll pane flow panel has difficulty moving components to next line
     boolean gridMode = true;
     // resets previous minimum sizing in case larger multi-row panel was used
@@ -1381,7 +1381,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         sPane.getVerticalScrollBar().setUnitIncrement(5);
         panel.add(sPane, BorderLayout.CENTER);
         JLabel labelSizer = new JLabel("Height SIZER");
-        Dimension dim = new Dimension(panel.getSize().width, 6+(MAX_VISIBLE_ROWS-1)*(VERT_GAP+2)+labelSizer.getPreferredSize().height*MAX_VISIBLE_ROWS);
+        Dimension dim = new Dimension(panel.getSize().width, 6+(MAX_VISIBLE_ROWS-1)*(VERT_GAP)+labelSizer.getPreferredSize().height*MAX_VISIBLE_ROWS);
         panel.setPreferredSize(dim);
         panel.setMinimumSize(dim);
         panel.setMaximumSize(dim);
@@ -1398,7 +1398,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     int posX = 0;
     for (posX=0; posX<labelsL.size(); posX++) {
       JComponent label = (JComponent) labelsL.get(posX);
-      label.setBorder(new EmptyBorder(1,0,1,0));
       if (!isMultiRowMode && gridMode) {
         panel.add(label, new GridBagConstraints(posX, 0, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 0, 0, HORIZ_INSET_SPACE), 0, 0));

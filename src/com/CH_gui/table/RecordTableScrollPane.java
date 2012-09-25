@@ -606,7 +606,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
         boolean viewInvalidated = FolderRecUtil.wasFolderViewInvalidated(folderId);
         if (folder != null && viewInvalidated) {
           ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-          if (SIL.hasPersistentMainWorker()) {
+          if (SIL.hasPersistentMainWorker() && SIL.isLoggedIn()) {
             if (folder.isFileType() || folder.isRecycleType()) {
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
               File_GetFiles_Rq request = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);

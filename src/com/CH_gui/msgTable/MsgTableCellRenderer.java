@@ -520,7 +520,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                   }
                   setDefaultBackground(renderer, row, isSelected);
                 }
-                if  (((MsgTableSorter) sTable.getModel()).isThreaded())
+                if (((MsgTableSorter) sTable.getModel()).isThreaded())
                   indentLevel = mLink.getSortThreadLayer();
                 // set Subject
                 if (subject == null || subject.length() == 0) {
