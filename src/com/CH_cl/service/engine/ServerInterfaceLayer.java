@@ -779,18 +779,26 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   }
 
   public int getMaxHeavyWorkerCount() {
-    return maxConnectionCount - 1;
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getMaxHeavyWorkerCount()");
+    int maxCount = getMaxConnectionCount() - 1;
+    if (trace != null) trace.exit(ServerInterfaceLayer.class, maxCount);
+    return maxCount;
   }
   public int getMaxConnectionCount() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getMaxConnectionCount()");
     int maxCount = maxConnectionCount;
     if (!hasEverLoggedInSuccessfully || !hasMainWorker()) {
-      // temporary ceiling of 1 if never logged in or no main worker
+      if (trace != null) trace.data(10, "temporary ceiling of 1 until logged in with main worker");
       maxCount = Math.min(1, maxConnectionCount);
     }
+    if (trace != null) trace.exit(ServerInterfaceLayer.class, maxCount);
     return maxCount;
   }
   public void setMaxConnectionCount(int maxConnections) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "setMaxConnectionCount(int maxConnections)");
+    if (trace != null) trace.args(maxConnections);
     maxConnectionCount = maxConnections;
+    if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
   private void ensureEnoughFreeWorkers(boolean forceAdditionalConnection) {
