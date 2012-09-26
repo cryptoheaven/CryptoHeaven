@@ -466,7 +466,7 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
       if (node != null) {
         FolderPair pair = node.getFolderObject();
         if (pair != null) {
-          StringBuilder sb = new StringBuilder();
+          StringBuffer sb = new StringBuffer();
           int level = node.getLevel()-1;
           for (int i=0; i<level; i++)
             sb.append('-');
