@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.monitor;
 
@@ -18,21 +18,21 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.25 $</b>
- * @@author  marcin
- * @@version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.25 $</b>
+* @@author  marcin
+* @@version
+*/
 public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonitorI {
 
   private static int DELAY_DECIDE = 20000;
@@ -69,8 +69,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
 
 
   /**
-   * Create the progress bar GUI instance that will display progress.
-   */
+  * Create the progress bar GUI instance that will display progress.
+  */
   private void createProgMonitorGUIifNeeded(int actionCode) {
     if (withProgressDialog && pm == null && !allDone && !killed) {
       actionName = MessageActionNameSwitch.getActionInfoName(actionCode) ;
@@ -394,6 +394,12 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   }
 
   public static boolean isSuppressProgressDialog(int msgActionCode) {
+    return isSuppressProgressInterruptDialog(msgActionCode) || 
+            msgActionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
+            msgActionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION;
+  }
+
+  public static boolean isSuppressProgressInterruptDialog(int msgActionCode) {
     return
             msgActionCode == CommandCodes.SYS_Q_GET_AUTO_UPDATE ||
             msgActionCode == CommandCodes.SYS_A_GET_AUTO_UPDATE ||
@@ -422,7 +428,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   }
 
   public String toString() {
-     return "[DefaultProgMonitor"
+    return "[DefaultProgMonitor"
       + ": actionName="         + actionName
       + ", name="               + name
       + ", value="              + value

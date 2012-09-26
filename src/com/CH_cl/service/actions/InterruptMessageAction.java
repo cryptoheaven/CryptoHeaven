@@ -66,7 +66,7 @@ public class InterruptMessageAction extends ClientMessageAction {
 
     if (!isCancelled()) {
       int actionCode = getActionCode();
-      if (!DefaultProgMonitor.isSuppressProgressDialog(actionCode)) {
+      if (!DefaultProgMonitor.isSuppressProgressInterruptDialog(actionCode)) {
         // Display 'interrupt' messages only when logged in... skip them when logout is in progress
         if (getServerInterfaceLayer().isLastLoginMsgActionSet()) {
           boolean isSuppressed = false;
