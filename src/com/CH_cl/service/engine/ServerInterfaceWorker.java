@@ -116,7 +116,6 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private boolean finished = false;
   private static int workerCount = 0;
 
-  private final Object busyMonitor = new Object();
   private int busyCount = 0;
 
   private boolean isPersistentWorker = false;
@@ -201,18 +200,14 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private void setBusy(boolean state) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "setBusy(boolean state)");
     if (trace != null) trace.args(state);
-    synchronized (busyMonitor) {
-      busyCount += state ? 1 : -1;
-    }
+    busyCount += state ? 1 : -1;
     if (trace != null) trace.exit(ServerInterfaceWorker.class);
   }
 
   public boolean isBusy() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "isBusy()");
     boolean rc = false;
-    synchronized (busyMonitor) {
-      rc = busyCount > 0;
-    }
+    rc = busyCount > 0;
     if (trace != null) trace.exit(ServerInterfaceWorker.class, rc);
     return rc;
   }
@@ -475,7 +470,6 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             }
           } catch (Throwable t) {
             // catch all to allow the rest of the cleanup
-            t.printStackTrace();
           }
           outgoingInterruptableActionsHM.clear();
         }

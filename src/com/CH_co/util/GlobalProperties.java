@@ -273,8 +273,9 @@ public class GlobalProperties extends Object {
   // build 706 Limit to 1 connection during initial login stage
   // build 708 Added a few trace points to SIL
   // build 710 Fixed runtime compatibility with JRE 1.5 and JRE 1.4.2
+  // build 712 Adjusting synchronization/concurrency
 
-  public static final short PROGRAM_BUILD_NUMBER = 710;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 712;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

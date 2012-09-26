@@ -158,7 +158,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
   private static final String STR_SELECT_A_SINGLE_MESSAGE = "<html><p align=\"left\">To view a message in this reading window, click on a message in the list.<br>To select more then one, hold Shift or Control key and click the desired messages.</p></html>";
   private static final String STR_SELECT_A_SINGLE_ADDRESS = "<html><p align=\"left\">To view address details in this reading window, click on an address in the list.<br>To select more then one, hold Shift or Control key and click the desired addresses.</p></html>";
-  private static final String STR_MSG_BODY_UNAVAILABLE = "<html><p align=\"left\">Message content is currently unavailable.  If this is a shared Inbox, folder owner <br>must access these messages before they will become available to other participants.</p></html>";
+  private static final String STR_MSG_BODY_UNAVAILABLE = "Message content is currently unavailable. If this is a shared Inbox, folder owner must access these messages before they will become available to other participants.";
   private static final String STR_LOADING = "Loading...";
   private static final String STR_IMAGES_SHOW = "Show Images";
   private static final String STR_IMAGES_HIDE = "Hide Images";

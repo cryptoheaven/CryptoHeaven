@@ -134,7 +134,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private boolean currentHostShouldIncrement = false;
 
   /** When a worker fails, remember its type to try to delay next one of the same type being created.
-  * Re-connection mechanizm spawns multiple threads trying to connect to different hosts/ports with
+  * Re-connection mechanism spawns multiple threads trying to connect to different hosts/ports with
   * possibly different connection protocols. We will delay the type that failed last to give better chance
   * for other to succeed first before this one connects again.  This should help to fight providers
   * deteriorating and breaking certain connection types.
@@ -172,13 +172,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * Creates new ServerInterfaceLayer
   * @param connectedSocket through which communication will take place
   */
-  public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient) {
+  public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient, boolean isSuppressUploadContinue) {
     this(hostsAndPorts, null, null, isClient);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient, boolean isSuppressUploadContinue)");
     if (trace != null) trace.args(hostsAndPorts);
     if (trace != null) trace.args(isClient);
     this.lastSIL = this;
-    if (isClient)
+    if (isClient && !isSuppressUploadContinue)
       FileLobUp.restoreState();
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
@@ -470,10 +470,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.args(forceAdditionalConnection);
 
     try {
-      synchronized (workers) {
-        ensureEnoughFreeWorkers(forceAdditionalConnection);
-        triggerCheckForMainWorker();
-      }
+      ensureEnoughFreeWorkers(forceAdditionalConnection);
+      triggerCheckForMainWorker();
       connectionRetryCount = 0;
     } catch (RuntimeException e) {
       // If we don't destroy server or its not already destroyed, the exception will be re-thrown...
@@ -805,26 +803,26 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ensureEnoughFreeWorkers(boolean forceAdditionalConnection)");
     if (trace != null) trace.args(forceAdditionalConnection);
 
-    if (workers.size() >= getMaxConnectionCount() || destroyed || destroying) {
-      if (trace != null) trace.exit(ServerInterfaceLayer.class);
-      return;
-    }
-
-    synchronized (workers) {
+    if (workers.size() < getMaxConnectionCount() && !destroyed && !destroying) {
       // count free workers
       int countFreeAllWorkers = 0;
       int countFreeHeavyWorkers = 0;
-      int countAllWorkers = workers.size();
-
-      if (trace != null) trace.data(10, "for all workers, size=", countAllWorkers);
-      for (int i=0; i<countAllWorkers; i++) {
-        ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
-        if (!worker.isBusy())
-          countFreeAllWorkers ++;
-        if (!isMainWorker(worker)) {
-          countFreeHeavyWorkers += worker.isBusy() ? 0 : 1;
+      
+      int countAllWorkers;
+      
+      synchronized (workers) {
+        countAllWorkers = workers.size();
+        if (trace != null) trace.data(10, "for all workers, size=", countAllWorkers);
+        for (int i=0; i<countAllWorkers; i++) {
+          ServerInterfaceWorker worker = (ServerInterfaceWorker) workers.get(i);
+          if (!worker.isBusy())
+            countFreeAllWorkers ++;
+          if (!isMainWorker(worker)) {
+            countFreeHeavyWorkers += worker.isBusy() ? 0 : 1;
+          }
         }
       }
+      
       if (trace != null) trace.data(11, "countFreeAllWorkers", countFreeAllWorkers);
       if (trace != null) trace.data(12, "countFreeHeavyWorkers", countFreeHeavyWorkers);
 
@@ -900,7 +898,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       }
 
       createWorkers(countWorkersToCreate);
-    } // end synchronized
+    }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   } // end ensureEnoughFreeWorkers
@@ -916,12 +914,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Thread th = new ThreadTraced("Additional Worker Ensurer") {
       public void runTraced() {
         Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(getClass(), "ServerInterfaceLayer.ensureAtLeastOneAdditionalWorker_SpawnThread.runTraced()");
-        synchronized (workers) {
-          int countAllWorkers = workers.size();
-          if (trace != null) trace.data(10, "countAllWorkers", countAllWorkers);
-          if (countAllWorkers < 2 && countAllWorkers < getMaxConnectionCount())
-            createWorkers(1);
-        }
+
+        int countAllWorkers = workers.size();
+        if (trace != null) trace.data(10, "countAllWorkers", countAllWorkers);
+        if (countAllWorkers < 2 && countAllWorkers < getMaxConnectionCount())
+          createWorkers(1);
+
         if (trace != null) trace.exit(getClass());
       }
     };
@@ -937,203 +935,202 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private void createWorkers(int numberOfWorkersToCreate) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "createWorkers(int numberOfWorkersToCreate)");
     if (!destroyed && !destroying) {
-      synchronized (workers) {
-        int countAllWorkers = workers.size();
-        if (trace != null) trace.data(10, "numberOfWorkersToCreate", numberOfWorkersToCreate);
-        // Create the calculated number of additional/new workers to
-        // ensure that enough workers are free to handle the job queue.
-        for (int i=0; i<numberOfWorkersToCreate; i++) {
-          // Control throughput of worker creation as a safety mechanism for server connectivity
-          if (burstableMonitorWorkerCreatings == null)
-            burstableMonitorWorkerCreatings = new BurstableBucket(2, 1.0/5.0, true, 100); // max 2 workers in 5 seconds each at least 100ms apart
-          burstableMonitorWorkerCreatings.passThrough();
+      if (trace != null) trace.data(10, "numberOfWorkersToCreate", numberOfWorkersToCreate);
+      // Create the calculated number of additional/new workers to
+      // ensure that enough workers are free to handle the job queue.
+      for (int i=0; i<numberOfWorkersToCreate; i++) {
+        // Control throughput of worker creation as a safety mechanism for server connectivity
+        if (burstableMonitorWorkerCreatings == null)
+          burstableMonitorWorkerCreatings = new BurstableBucket(2, 1.0/5.0, true, 100); // max 2 workers in 5 seconds each at least 100ms apart
+        burstableMonitorWorkerCreatings.passThrough();
 
-          ServerInterfaceWorker worker = null;
-          // roll through the valid hosts to attempt to create a connection
-          // each unique server will get 2 connection trials before we bail out
-          int maxWorkerTrials = hostsAndPorts.length*2;
-          for (int workerTrial=0; workerTrial<maxWorkerTrials; workerTrial++) {
-            // Control throughput of trials as a safety mechanism for server connectivity
-            if (burstableMonitorWorkerCreationTrials == null)
-              burstableMonitorWorkerCreationTrials = new BurstableBucket(10, 1.0/5.0, true, 100); // max 10 trials in 5 seconds each at least 100ms apart
-            burstableMonitorWorkerCreationTrials.passThrough();
+        ServerInterfaceWorker worker = null;
+        // roll through the valid hosts to attempt to create a connection
+        // each unique server will get 2 connection trials before we bail out
+        int maxWorkerTrials = hostsAndPorts.length*2;
+        for (int workerTrial=0; workerTrial<maxWorkerTrials; workerTrial++) {
+          // Control throughput of trials as a safety mechanism for server connectivity
+          if (burstableMonitorWorkerCreationTrials == null)
+            burstableMonitorWorkerCreationTrials = new BurstableBucket(10, 1.0/5.0, true, 100); // max 10 trials in 5 seconds each at least 100ms apart
+          burstableMonitorWorkerCreationTrials.passThrough();
 
-            if (trace != null) trace.data(11, "createWorker workerTrial="+workerTrial);
+          if (trace != null) trace.data(11, "createWorker workerTrial="+workerTrial);
 
-            int[] hostIndexesToTry = null;
-            int hostIndexCompletedFirst = -1;
-            try {
-              // First trial gives perference to previously working host,
-              // subsequest trials we'll look for a better and different working host.
-              // Incase that last tried host was destroyed due to communication error,
-              // then increment to next regardless if it is the first trial.
-              if (workerTrial > 0 || currentHostShouldIncrement) {
-                currentHostIndex = (currentHostIndex + 1) % hostsAndPorts.length;
-                currentHostShouldIncrement = false;
-              }
-              String hostToTry = (String) hostsAndPorts[currentHostIndex][0];
-              if (trace != null) trace.data(15, "hostToTry", hostToTry);
+          int[] hostIndexesToTry = null;
+          int hostIndexCompletedFirst = -1;
+          try {
+            // First trial gives perference to previously working host,
+            // subsequest trials we'll look for a better and different working host.
+            // Incase that last tried host was destroyed due to communication error,
+            // then increment to next regardless if it is the first trial.
+            if (workerTrial > 0 || currentHostShouldIncrement) {
+              currentHostIndex = (currentHostIndex + 1) % hostsAndPorts.length;
+              currentHostShouldIncrement = false;
+            }
+            String hostToTry = (String) hostsAndPorts[currentHostIndex][0];
+            if (trace != null) trace.data(15, "hostToTry", hostToTry);
 
-              // If encountered 'protocoled' host, simultaneously try other non-protocoled host too.
-              int alternateHostIndex = -1;
-              if (hostToTry.indexOf("://") >= 0) {
-                // find next non-protocoled host/port
-                if (trace != null) trace.data(20, "find next non-protocoled host/port");
-                for (int k=0; k<hostsAndPorts.length; k++) {
-                  int indexCandidate = (currentHostIndex+1+k) % hostsAndPorts.length;
-                  String hostCandidate = (String) hostsAndPorts[indexCandidate][0];
-                  if (hostCandidate.indexOf("://") < 0) {
-                    alternateHostIndex = indexCandidate;
-                    break;
-                  }
-                }
-                if (trace != null) trace.data(21, "alternateHostIndex", alternateHostIndex);
-              }
-
-              // If encountered Socket error before, try other non-socket host too.
-              if (Socket.class.equals(penalizedSocketType) && hostToTry.indexOf("://") < 0) {
-                // find next protocoled host/port
-                if (trace != null) trace.data(30, "find next protocoled host/port");
-                for (int k=0; k<hostsAndPorts.length; k++) {
-                  int indexCandidate = (currentHostIndex+1+k) % hostsAndPorts.length;
-                  String hostCandidate = (String) hostsAndPorts[indexCandidate][0];
-                  if (hostCandidate.indexOf("://") >= 0) {
-                    alternateHostIndex = indexCandidate;
-                    break;
-                  }
-                }
-                if (trace != null) trace.data(31, "alternateHostIndex", alternateHostIndex);
-              }
-
-              if (alternateHostIndex >= 0) {
-                hostIndexesToTry = new int[] { currentHostIndex, alternateHostIndex };
-              } else {
-                hostIndexesToTry = new int[] { currentHostIndex };
-              }
-
-              if (trace != null) trace.data(40, "hostIndexesToTry", hostIndexesToTry);
-              if (trace != null) trace.data(41, "hostsAndPorts", hostsAndPorts);
-
-              final Thread[] ths = new Thread[hostIndexesToTry.length];
-              final Socket[][] socketBuffers = new Socket[hostIndexesToTry.length][1];
-              Throwable[][] errBuffers = new Throwable[hostIndexesToTry.length][1];
-
-              StringBuffer sbSocketInfo = new StringBuffer();
-              for (int k=0; k<hostIndexesToTry.length; k++) {
-                sbSocketInfo.append("Socket host ").append(hostsAndPorts[hostIndexesToTry[k]][0]);
-                sbSocketInfo.append(" port ").append(hostsAndPorts[hostIndexesToTry[k]][1]).append(", ");
-                ths[k] = createSocket_Threaded((String) hostsAndPorts[hostIndexesToTry[k]][0],
-                                                ((Integer) hostsAndPorts[hostIndexesToTry[k]][1]).intValue(),
-                                                socketBuffers[k], errBuffers[k]);
-              }
-              // Find the first one joined
-              // We are interested in first successful or first failure iff all failed.
-              int joinedIndexFirst = -1;
-              while (isAnyNonNULL(ths)) {
-                int joinedIndex = joinAny(ths); // join the first available thread that has completed
-                if (joinedIndexFirst == -1)
-                  joinedIndexFirst = joinedIndex;
-                if (errBuffers[joinedIndex][0] != null) {
-                  ths[joinedIndex] = null;
-                } else {
-                  joinedIndexFirst = joinedIndex;
+            // If encountered 'protocoled' host, simultaneously try other non-protocoled host too.
+            int alternateHostIndex = -1;
+            if (hostToTry.indexOf("://") >= 0) {
+              // find next non-protocoled host/port
+              if (trace != null) trace.data(20, "find next non-protocoled host/port");
+              for (int k=0; k<hostsAndPorts.length; k++) {
+                int indexCandidate = (currentHostIndex+1+k) % hostsAndPorts.length;
+                String hostCandidate = (String) hostsAndPorts[indexCandidate][0];
+                if (hostCandidate.indexOf("://") < 0) {
+                  alternateHostIndex = indexCandidate;
                   break;
                 }
               }
+              if (trace != null) trace.data(21, "alternateHostIndex", alternateHostIndex);
+            }
 
-              hostIndexCompletedFirst = hostIndexesToTry[joinedIndexFirst];
-              if (trace != null) trace.data(50, "hostIndexCompletedFirst", hostIndexCompletedFirst);
-
-              if (errBuffers[joinedIndexFirst][0] != null)
-                throw errBuffers[joinedIndexFirst][0];
-
-              Socket socket = socketBuffers[joinedIndexFirst][0];
-              if (trace != null) trace.data(60, "createWorker() attempted hosts and ports are", sbSocketInfo.toString());
-              if (trace != null) trace.data(61, "createWorker() created socket is", socket);
-              if (socket != null) {
-                if (trace != null) trace.data(62, "socketType", socket.getClass());
-              }
-
-              // Clear other sockets that might have been created too
-              // remove socket that we are using so it doesn't get cleaned up here
-              socketBuffers[joinedIndexFirst][0] = null;
-              Thread cleanupOtherSockets = new ThreadTraced("Cleanup Other Sockets") {
-                public void runTraced() {
-                  // join with all socket creating threads...
-                  for (int i=0; i<ths.length; i++) {
-                    if (ths[i] != null) {
-                      try { ths[i].join(60000); } catch (Throwable t) { }
-                      try { socketBuffers[i][0].close(); } catch (Throwable t) { }
-                    }
-                  }
+            // If encountered Socket error before, try other non-socket host too.
+            if (Socket.class.equals(penalizedSocketType) && hostToTry.indexOf("://") < 0) {
+              // find next protocoled host/port
+              if (trace != null) trace.data(30, "find next protocoled host/port");
+              for (int k=0; k<hostsAndPorts.length; k++) {
+                int indexCandidate = (currentHostIndex+1+k) % hostsAndPorts.length;
+                String hostCandidate = (String) hostsAndPorts[indexCandidate][0];
+                if (hostCandidate.indexOf("://") >= 0) {
+                  alternateHostIndex = indexCandidate;
+                  break;
                 }
-              };
-              cleanupOtherSockets.setDaemon(true);
-              cleanupOtherSockets.start();
-
-              if (socket != null) {
-                if (lastLoginMessageAction != null) {
-                  if (trace != null) trace.data(70, "restamp the auto-login message");
-                  lastLoginMessageAction = new MessageAction(lastLoginMessageAction.getActionCode(), lastLoginMessageAction.getMsgDataSet());
-                } else {
-                  if (trace != null) trace.data(71, "no auto-login message to restamp");
-                }
-                worker = new ServerInterfaceWorker(socket, this, this,
-                                                  getReplyFifoWriterI(),
-                                                  getRequestPriorityFifoReaderI(),
-                                                  lastLoginMessageAction);
-                if (trace != null) trace.data(80, "ServerInterfaceWorker instantiated");
               }
+              if (trace != null) trace.data(31, "alternateHostIndex", alternateHostIndex);
+            }
 
-              if (worker != null) {
-                // Remember this host and port for next session as the first to try.
-                // If it is protocoled connection then only remember it if 24h passed from last one.
-                String host = ""+hostsAndPorts[hostIndexCompletedFirst][0];
-                String port = ""+hostsAndPorts[hostIndexCompletedFirst][1];
-                GlobalProperties.setProperty(PROPERTY_LAST_ENGINE_HOST, host);
-                GlobalProperties.setProperty(PROPERTY_LAST_ENGINE_PORT, port);
+            if (alternateHostIndex >= 0) {
+              hostIndexesToTry = new int[] { currentHostIndex, alternateHostIndex };
+            } else {
+              hostIndexesToTry = new int[] { currentHostIndex };
+            }
+
+            if (trace != null) trace.data(40, "hostIndexesToTry", hostIndexesToTry);
+            if (trace != null) trace.data(41, "hostsAndPorts", hostsAndPorts);
+
+            final Thread[] ths = new Thread[hostIndexesToTry.length];
+            final Socket[][] socketBuffers = new Socket[hostIndexesToTry.length][1];
+            Throwable[][] errBuffers = new Throwable[hostIndexesToTry.length][1];
+
+            StringBuffer sbSocketInfo = new StringBuffer();
+            for (int k=0; k<hostIndexesToTry.length; k++) {
+              sbSocketInfo.append("Socket host ").append(hostsAndPorts[hostIndexesToTry[k]][0]);
+              sbSocketInfo.append(" port ").append(hostsAndPorts[hostIndexesToTry[k]][1]).append(", ");
+              ths[k] = createSocket_Threaded((String) hostsAndPorts[hostIndexesToTry[k]][0],
+                                              ((Integer) hostsAndPorts[hostIndexesToTry[k]][1]).intValue(),
+                                              socketBuffers[k], errBuffers[k]);
+            }
+            // Find the first one joined
+            // We are interested in first successful or first failure iff all failed.
+            int joinedIndexFirst = -1;
+            while (isAnyNonNULL(ths)) {
+              int joinedIndex = joinAny(ths); // join the first available thread that has completed
+              if (joinedIndexFirst == -1)
+                joinedIndexFirst = joinedIndex;
+              if (errBuffers[joinedIndex][0] != null) {
+                ths[joinedIndex] = null;
+              } else {
+                joinedIndexFirst = joinedIndex;
                 break;
               }
-            } catch (Throwable t) {
-              if (trace != null) trace.exception(ServerInterfaceLayer.class, 70, t);
-              String errMsg = "<html>Network error. "
-                      + " Could not connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server at " + hostsAndPorts[hostIndexCompletedFirst][0] + " on port " + hostsAndPorts[hostIndexCompletedFirst][1] + ".  "
-                      + "Please verify your internet connectivity.  "
-                      + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
-              // Only at the last round process the exception, else ignore and try another host.
-              if (workerTrial+1 == maxWorkerTrials) {
+            }
 
-                if (t instanceof UnknownHostException) {
-                  throw new SILConnectionException(errMsg + "Specified host is unknown or cannot be resolved.  The error message is: <br>" + t.getMessage());
-                }
-                else if (t instanceof IOException) {
-                  // TO-DO: decide if this is ok, analyze the case of 1 worker active (main worker)
-                  // should this mean System.exit if we have ZERO workers???
-                  // Maybe we should retry if we have at least the main worker!
-                  // throw new error if we have less than 2 workers (1 main, 1 heavy)
-                  if (countAllWorkers == 0) {
-                    if (trace != null) trace.data(90, "Not enough workers to ignore connection problem!");
-                    throw new SILConnectionException(errMsg + "Input/Output error occurred.  The error message is: <br>" + t.getMessage());
+            hostIndexCompletedFirst = hostIndexesToTry[joinedIndexFirst];
+            if (trace != null) trace.data(50, "hostIndexCompletedFirst", hostIndexCompletedFirst);
+
+            if (errBuffers[joinedIndexFirst][0] != null)
+              throw errBuffers[joinedIndexFirst][0];
+
+            Socket socket = socketBuffers[joinedIndexFirst][0];
+            if (trace != null) trace.data(60, "createWorker() attempted hosts and ports are", sbSocketInfo.toString());
+            if (trace != null) trace.data(61, "createWorker() created socket is", socket);
+            if (socket != null) {
+              if (trace != null) trace.data(62, "socketType", socket.getClass());
+            }
+
+            // Clear other sockets that might have been created too
+            // remove socket that we are using so it doesn't get cleaned up here
+            socketBuffers[joinedIndexFirst][0] = null;
+            Thread cleanupOtherSockets = new ThreadTraced("Cleanup Other Sockets") {
+              public void runTraced() {
+                // join with all socket creating threads...
+                for (int i=0; i<ths.length; i++) {
+                  if (ths[i] != null) {
+                    try { ths[i].join(60000); } catch (Throwable t) { }
+                    try { socketBuffers[i][0].close(); } catch (Throwable t) { }
                   }
                 }
-                else {
-                  String msg = errMsg + "The error message is: \n\n" + t.getMessage();
-                  if (trace != null) trace.data(90, "Unsupported exception", t.getMessage());
-                  throw new SILConnectionException(msg);
+              }
+            };
+            cleanupOtherSockets.setDaemon(true);
+            cleanupOtherSockets.start();
+
+            if (socket != null) {
+              if (lastLoginMessageAction != null) {
+                if (trace != null) trace.data(70, "restamp the auto-login message");
+                lastLoginMessageAction = new MessageAction(lastLoginMessageAction.getActionCode(), lastLoginMessageAction.getMsgDataSet());
+              } else {
+                if (trace != null) trace.data(71, "no auto-login message to restamp");
+              }
+              worker = new ServerInterfaceWorker(socket, this, this,
+                                                getReplyFifoWriterI(),
+                                                getRequestPriorityFifoReaderI(),
+                                                lastLoginMessageAction);
+              if (trace != null) trace.data(80, "ServerInterfaceWorker instantiated");
+            }
+
+            if (worker != null) {
+              // Remember this host and port for next session as the first to try.
+              // If it is protocoled connection then only remember it if 24h passed from last one.
+              String host = ""+hostsAndPorts[hostIndexCompletedFirst][0];
+              String port = ""+hostsAndPorts[hostIndexCompletedFirst][1];
+              GlobalProperties.setProperty(PROPERTY_LAST_ENGINE_HOST, host);
+              GlobalProperties.setProperty(PROPERTY_LAST_ENGINE_PORT, port);
+              break;
+            }
+          } catch (Throwable t) {
+            if (trace != null) trace.exception(ServerInterfaceLayer.class, 70, t);
+            String errMsg = "<html>Network error. "
+                    + " Could not connect to the "+URLs.get(URLs.SERVICE_SOFTWARE_NAME)+" Data Server at " + hostsAndPorts[hostIndexCompletedFirst][0] + " on port " + hostsAndPorts[hostIndexCompletedFirst][1] + ".  "
+                    + "Please verify your internet connectivity.  "
+                    + "If the problem persists please visit <a href=\""+URLs.get(URLs.CONNECTIVITY_PAGE)+"\">"+URLs.get(URLs.CONNECTIVITY_PAGE)+"</a> for help. <p>";
+            // Only at the last round process the exception, else ignore and try another host.
+            if (workerTrial+1 == maxWorkerTrials) {
+
+              if (t instanceof UnknownHostException) {
+                throw new SILConnectionException(errMsg + "Specified host is unknown or cannot be resolved.  The error message is: <br>" + t.getMessage());
+              }
+              else if (t instanceof IOException) {
+                // TO-DO: decide if this is ok, analyze the case of 1 worker active (main worker)
+                // should this mean System.exit if we have ZERO workers???
+                // Maybe we should retry if we have at least the main worker!
+                // throw new error if we have less than 2 workers (1 main, 1 heavy)
+                if (workers.size() == 0) {
+                  if (trace != null) trace.data(90, "Not enough workers to ignore connection problem!");
+                  throw new SILConnectionException(errMsg + "Input/Output error occurred.  The error message is: <br>" + t.getMessage());
                 }
+              }
+              else {
+                String msg = errMsg + "The error message is: \n\n" + t.getMessage();
+                if (trace != null) trace.data(90, "Unsupported exception", t.getMessage());
+                throw new SILConnectionException(msg);
+              }
 
-              } // end process last round exception
-            } // end catch Throwable t
-          } // end for workerTrial
+            } // end process last round exception
+          } // end catch Throwable t
+        } // end for workerTrial
 
-          // store the worker in a collection
-          if (worker != null) {// null when createWorker() failed!
+        // store the worker in a collection
+        if (worker != null) {// null when createWorker() failed!
+          synchronized (workers) {
             workers.add(worker);
             // destroyed worker could be replaced by new one which should now be updating connection counts
             if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
           }
-        } // end for
-      } // end synchronized
+        }
+      } // end for
     } // end if !destroyed
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
@@ -1344,92 +1341,94 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
 
     synchronized (this) {
-      destroyed = true;
+      if (!destroyed) {
+        destroyed = true;
 
-      try {
-        if (loginCompletionNotifier != null)
-          loginCompletionNotifier.serverDestroyed(this);
-      } catch (Throwable t) {
-      }
+        try {
+          if (loginCompletionNotifier != null)
+            loginCompletionNotifier.serverDestroyed(this);
+        } catch (Throwable t) {
+        }
 
-      // clear the job queue, killing and removing all jobs
-      try {
-        if (jobFifo != null) {
-          while (true) {
-            Object o = jobFifo.remove();
-            if (o instanceof MessageAction) {
-              MessageAction msgAction = (MessageAction) o;
-              ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+        // clear the job queue, killing and removing all jobs
+        try {
+          if (jobFifo != null) {
+            while (true) {
+              Object o = jobFifo.remove();
+              if (o instanceof MessageAction) {
+                MessageAction msgAction = (MessageAction) o;
+                ProgMonitorI pm = ProgMonitorPool.getProgMonitor(msgAction.getStamp());
+                if (pm != null)
+                  pm.jobKilled();
+              }
+              if (jobFifo.size() == 0)
+                break;
+            }
+          }
+        } catch (Throwable t) {
+        }
+
+        // in case there are any progress monitors left over somewhere, kill them
+        try {
+          ProgMonitorPool.killAll();
+        } catch (Throwable t) {
+        }
+
+        // kill the reply queue (execution queue)
+        if (trace != null) trace.data(31, "killing execution queue");
+        try {
+          executionQueue.clear();
+          executionQueue.close();
+          executionQueue = null;
+        } catch (Throwable t) {
+        }
+        if (trace != null) trace.data(32, "execution queue killed");
+
+        // kill the independentExecutionQueue
+        if (trace != null) trace.data(33, "killing independent execution queue");
+        try {
+          independentExecutionQueue.clear();
+          independentExecutionQueue.close();
+          independentExecutionQueue = null;
+        } catch (Throwable t) {
+        }
+        if (trace != null) trace.data(34, "execution queue killed");
+
+        // release all threads waiting on the stamps
+        if (trace != null) trace.data(51, "releasing all threads waiting on stamps");
+        ArrayList tempStampList = new ArrayList();
+        try {
+          synchronized (stampList) {
+            // avoid deadlock by copying stamps and notifying threads outside of "stampList" synchronized block
+            tempStampList.addAll(stampList);
+            stampList.clear();
+            synchronized (stampList2) {
+              stampList2.clear();
+            }
+            synchronized (doneList) {
+              doneList.clear();
+            }
+            stampList.notifyAll();
+          } // end synchronized (stampList)
+          for (int i=0; i<tempStampList.size(); i++) {
+            Stamp stamp = (Stamp) tempStampList.get(i);
+            synchronized (stamp) {
+              stamp.notifyAll();
+              // In case outstanding jobs were not in the queue, but already sent to server,
+              // kill corresponding progress monitors so they don't popup in a few seconds.
+              ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
               if (pm != null)
                 pm.jobKilled();
             }
-            if (jobFifo.size() == 0)
-              break;
           }
+        } catch (Throwable t) {
         }
-      } catch (Throwable t) {
-      }
+        if (trace != null) trace.data(70, "all threads released and stamps cleared.");
 
-      // in case there are any progress monitors left over somewhere, kill them
-      try {
-        ProgMonitorPool.killAll();
-      } catch (Throwable t) {
+        if (trace != null) trace.data(71, "clearing data cach");
+        FetchedDataCache.getSingleInstance().clear();
+        if (trace != null) trace.data(80, "data cach cleared");
       }
-
-      // kill the reply queue (execution queue)
-      if (trace != null) trace.data(31, "killing execution queue");
-      try {
-        executionQueue.clear();
-        executionQueue.close();
-        executionQueue = null;
-      } catch (Throwable t) {
-      }
-      if (trace != null) trace.data(32, "execution queue killed");
-
-      // kill the independentExecutionQueue
-      if (trace != null) trace.data(33, "killing independent execution queue");
-      try {
-        independentExecutionQueue.clear();
-        independentExecutionQueue.close();
-        independentExecutionQueue = null;
-      } catch (Throwable t) {
-      }
-      if (trace != null) trace.data(34, "execution queue killed");
-
-      // release all threads waiting on the stamps
-      if (trace != null) trace.data(51, "releasing all threads waiting on stamps");
-      ArrayList tempStampList = new ArrayList();
-      try {
-        synchronized (stampList) {
-          // avoid deadlock by copying stamps and notifying threads outside of "stampList" synchronized block
-          tempStampList.addAll(stampList);
-          stampList.clear();
-          synchronized (stampList2) {
-            stampList2.clear();
-          }
-          synchronized (doneList) {
-            doneList.clear();
-          }
-          stampList.notifyAll();
-        } // end synchronized (stampList)
-        for (int i=0; i<tempStampList.size(); i++) {
-          Stamp stamp = (Stamp) tempStampList.get(i);
-          synchronized (stamp) {
-            stamp.notifyAll();
-            // In case outstanding jobs were not in the queue, but already sent to server,
-            // kill corresponding progress monitors so they don't popup in a few seconds.
-            ProgMonitorI pm = ProgMonitorPool.getProgMonitor(stamp.longValue());
-            if (pm != null)
-              pm.jobKilled();
-          }
-        }
-      } catch (Throwable t) {
-      }
-      if (trace != null) trace.data(70, "all threads released and stamps cleared.");
-
-      if (trace != null) trace.data(71, "clearing data cach");
-      FetchedDataCache.getSingleInstance().clear();
-      if (trace != null) trace.data(80, "data cach cleared");
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
@@ -1581,14 +1580,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.args(cleanLogout);
     if (trace != null) trace.args(suppressConnectionTypePenalization);
 
-    boolean workerRemoved = false;
-
+    boolean workerRemoved;
+    // get consistent state using synchronized block
     synchronized (workers) {
       workerRemoved = workers.remove(worker);
       // destroyed worker could be replaced by new one which should now be updating connection counts
       if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
     }
-
+    
     if (workerRemoved) {
       // penalize connection type if it broke and lasted for short time
       if (!suppressConnectionTypePenalization) {
@@ -1618,14 +1617,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           }
         }
       }
+      boolean isTrigger = false;
       // If a MAIN WORKER quits, we need to designate another main worker.
       synchronized (mainWorkerMonitor) {
-        if (isMainWorker(worker)) {
+        if (worker == mainWorker) {
           mainWorker = null;
-          // Try to assign a main worker job to another worker.
-          triggerCheckForMainWorker();
+          isTrigger = true;
         }
       }
+      if (isTrigger)
+        triggerCheckForMainWorker();
       // Since a woker died, trigger the check for waiting jobs.
       jobScanner.triggerCheckToServeNow();
     }
@@ -1709,9 +1710,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "isMainWorker(ServerInterfaceWorker worker)");
     if (trace != null) trace.args(worker);
 
-    boolean rc;
-    synchronized (mainWorkerMonitor) {
-      rc = worker != null && mainWorker == worker;
+    boolean rc = false;
+    if (worker != null) {
+      if (worker == mainWorker) {
+        rc = true;
+      }
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class, rc);
@@ -1725,9 +1728,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "isPersistentMainWorker(ServerInterfaceWorker worker)");
     if (trace != null) trace.args(worker);
 
-    boolean rc;
-    synchronized (mainWorkerMonitor) {
-      rc = worker != null && mainWorker == worker && mainWorker.isPersistent();
+    boolean rc = false;
+    if (worker != null) {
+      if (worker.isPersistent()) {
+        if (worker == mainWorker) {
+          rc = true;
+        }
+      }
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class, rc);
@@ -1740,9 +1747,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   */
   public boolean hasMainWorker() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "hasMainWorker()");
-    boolean rc;
-    synchronized (mainWorkerMonitor) {
-      rc = mainWorker != null;
+    boolean rc = false;
+    if (mainWorker != null) {
+      rc = true;
     }
     if (trace != null) trace.exit(ServerInterfaceLayer.class, rc);
     return rc;
@@ -1906,7 +1913,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             // those jobs are being run, plus it ensures the FCFS order of independent jobs.
             if (!destroyed) {
               synchronized (ServerInterfaceLayer.this) {
-                independentExecutionQueue.add(nextMsgAction);
+                try {
+                  independentExecutionQueue.add(nextMsgAction);
+                } catch (Throwable t) {
+                  // maybe the queue got closed... ignore it then
+                }
               }
             }
           }
