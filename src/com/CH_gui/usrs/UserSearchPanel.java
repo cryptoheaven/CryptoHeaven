@@ -305,7 +305,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     boolean inputValid = true;
     String sId = null;
     String searchStr = jSearchField.getText().trim();
-    StringBuilder searchTextSB = new StringBuilder();
+    StringBuffer searchTextSB = new StringBuffer();
 
     StringTokenizer st = new StringTokenizer(searchStr, ",;");
     lastSearchStrings = new String[st.countTokens()];
