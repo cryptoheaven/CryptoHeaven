@@ -71,7 +71,7 @@ public class DataSetCache extends Object {
       moveRetryPacketsToSend(sendFifo, recivedDS.responseSequenceIdAvailable, recivedDS.responseSequenceIdProcessed);
 //      if (cache.size() > 0) {
 //        synchronized (this) {
-//          StringBuilder sb = new StringBuilder("manageCache: size ");
+//          StringBuffer sb = new StringBuffer("manageCache: size ");
 //          sb.append(cache.size() + " : ");
 //          java.util.Iterator iter = cache.iterator();
 //          while (iter.hasNext())
