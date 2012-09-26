@@ -1731,7 +1731,7 @@ public class LoginFrame extends JFrame {
           hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_3));
           hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, false, URLs.get(URLs.DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1));
         }
-        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true));
+        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true, false));
       } catch (Throwable t) {
         t.printStackTrace();
       }
