@@ -75,12 +75,13 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   }
 
   private static final int BORDER_TOP = 2;
+  private static final int BORDER_LEFT = 5;
   private static final int BORDER_BOTTOM = 2;
 
-  public static final Border BORDER_ICON = new EmptyBorder(BORDER_TOP,1,BORDER_BOTTOM,1);
-  public static final Border BORDER_ICONIZED = new EmptyBorder(BORDER_TOP,1,BORDER_BOTTOM,5);
-  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
-  public static final Border BORDER_TEXT = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
+  public static final Border BORDER_ICON = new EmptyBorder(BORDER_TOP, 1, BORDER_BOTTOM, 1);
+  public static final Border BORDER_ICONIZED = new EmptyBorder(BORDER_TOP, BORDER_LEFT, BORDER_BOTTOM, 5);
+  public static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(BORDER_TOP, BORDER_LEFT, BORDER_BOTTOM, 5);
+  public static final Border BORDER_TEXT = new EmptyBorder(BORDER_TOP, BORDER_LEFT, BORDER_BOTTOM, 5);
   public static Border[] BORDERS_INDENTED_ICONIZED = null;
   public static Border[] BORDERS_INDENTED_TEXT = null;
   public static final int BORDER_INDENT_PIXELS = 16;
@@ -101,9 +102,9 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
   public static Border makeIndentedBorder(int numOfIndents, boolean iconized) {
     // indented border always uses 0-ZERO top and bottom insets as the outer layer will take care of that
     if (numOfIndents > 0)
-      return new EmptyBorder(0, (iconized ? 1 : 5), 0, 5);
+      return new EmptyBorder(0, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? BORDER_LEFT : BORDER_LEFT), 0, 5);
     else
-      return new EmptyBorder(BORDER_TOP, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? 1 : 5), BORDER_BOTTOM, 5);
+      return new EmptyBorder(BORDER_TOP, BORDER_INDENT_PIXELS*numOfIndents+(iconized ? BORDER_LEFT : BORDER_LEFT), BORDER_BOTTOM, 5);
   }
 
   public static Border getIndentedBorder(int numOfIndents, boolean iconized) {
@@ -299,7 +300,7 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
       panel.setForeground(fw);
       panel.setBackground(bk);
       panel.setOpaque(true);
-      panel.setLayout(new BorderLayout());//new GridBagLayout());
+      panel.setLayout(new BorderLayout(0,0));
       panel.setBorder(new EmptyBorder(0, 0, 0, 0));
       JLabel arrow = jIndentLabelRenderer;
       arrow.setIcon(Images.get(ImageNums.REPLY_ARROW16));
@@ -324,12 +325,16 @@ abstract public class RecordTableCellRenderer extends MyDefaultTableCellRenderer
     } else {
       if (renderer instanceof JComponent) {
         Color bk = renderer.getBackground();
-        Border bPart = new CompoundBorder(new MatteBorder(0, 5, 0, 0, bk), new MatteBorder(0, 2, 0, 0, Color.GRAY));
-        Border bSet = bPart;
+        Border bText = new MatteBorder(0, 10, 0, 0, bk);
+        Border bSeparator = new MatteBorder(0, 2, 0, 0, Color.GRAY);
+        Border bPartFirst = new CompoundBorder(new MatteBorder(0, BORDER_LEFT, 0, 0, bk), bSeparator);
+        Border bPartNext = new CompoundBorder(bText, bSeparator);
+        // build blank/separator border-pairs
+        Border bSet = bPartFirst;
         for (int i=1; i<identLevel; i++) {
-          bSet = new CompoundBorder(bSet, bPart);
+          bSet = new CompoundBorder(bSet, bPartNext);
         }
-        ((JComponent) renderer).setBorder(new CompoundBorder(bSet, new MatteBorder(0, 7, 0, 0, bk)));//RecordTableCellRenderer.getIndentedBorder(identLevel, isIconized));
+        ((JComponent) renderer).setBorder(new CompoundBorder(bSet, bText));
       }
     }
     return renderer;

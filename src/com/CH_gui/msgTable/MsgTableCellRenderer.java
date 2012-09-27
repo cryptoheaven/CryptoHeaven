@@ -437,6 +437,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             if (icon == null)
               icon = Images.get(mLink.getIcon());
             jAddrRenderer.setIcon(icon);
+            jAddrRenderer.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
             jAddrRenderer.setOpaque(false);
             jFlowPanel.removeAll();
             jFlowPanel.add(jAddrRenderer);
@@ -507,6 +508,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                     renderer = jRendererBoldIconized;
                     jRendererBoldIconized.setText(getText());
                     jRendererBoldIconized.setIcon(getIcon());
+                    jRendererBoldIconized.setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
                     setDefaultBackground(renderer, row, isSelected);
                   }
                 } else {
