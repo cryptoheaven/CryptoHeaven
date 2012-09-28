@@ -789,7 +789,7 @@ public class MsgTableModel extends RecordTableModel {
                 MsgLinkOps.addToLinkFetchQueue(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
               }
               String strLinked = numOfAttachments == 1 ? linkNames : "("+numOfAttachments+" items)";
-              String strNotLinked = numOfAttachments == 1 ? "" : " "+linkNames+"<br>";
+              String strNotLinked = numOfAttachments == 1 ? "" : " <font size=\"-1\" color=\"#777777\">"+linkNames+"</font><br>";
               sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.ATTACH_SMALL) + "\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"16\"/>"+strLinked+"</a><br>"+strNotLinked);
               if (linkNames.length() > 0)
                 sb.append(" ");
@@ -804,10 +804,10 @@ public class MsgTableModel extends RecordTableModel {
             String dateStr = Misc.getFormattedDate(msgLink.dateCreated, true, true, false);
             if (!dateStr.equals(prevDateStr))
               sb.append(dateStr);
+            sb.append("</font> ");
           }
 
           if (toAddFrom || toAddSent) {
-            sb.append("</font> ");
             sb.append(HTML_utils.HTML_FONT_END);
           }
 

@@ -459,6 +459,9 @@ public class SendMessageRunner extends ThreadTraced {
           else if (recipient instanceof ContactRecord) {
             ContactRecord cRec = (ContactRecord) recipients[i];
             toUserId = cRec.contactWithId;
+            // convert to other userId if this is a 'reciprocal' contact
+            if (toUserId.equals(cache.getMyUserId()))
+              toUserId = cRec.ownerUserId;
           }
           // prepare Msg Link to reside in a folder
           else if (pass == SEALING_MSGS_PASS && recipients[i] instanceof FolderPair) {

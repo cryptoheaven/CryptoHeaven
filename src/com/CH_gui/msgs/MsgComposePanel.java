@@ -1751,6 +1751,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
   /**
   * Convert any EmailAddressRecords in the array to familiar users or contact objects.
+  * Convert any 'reciprocal' contact to our own contact if possible, otherwise to user record.
   * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
   * @return true if anything was converted.
   */
@@ -1807,6 +1808,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             }
           } catch (Exception e) {
           }
+        }
+      }
+
+      if (rec instanceof ContactRecord) {
+        ContactRecord cRec = (ContactRecord) rec;
+        if (!cRec.ownerUserId.equals(cache.getMyUserId())) {
+          Long otherUserId = cRec.ownerUserId;
+          rec = CacheUsrUtils.convertUserIdToFamiliarUser(otherUserId, true, false);
+          recipients[i] = rec;
+          anyConverted = true;
         }
       }
 

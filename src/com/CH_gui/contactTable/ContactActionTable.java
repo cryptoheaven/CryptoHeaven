@@ -794,133 +794,172 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  public static void chatOrShareSpace(final Component parent, MemberContactRecordI[] selectedRecords, boolean useSelected, final boolean isChat, final short folderType) {
-    CallbackI selectionCallback = new CallbackI() {
-      public void callback(Object value) {
-        Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "callback(Object value)");
-        if (trace != null) trace.args(value);
-
-        MemberContactRecordI[] selectedRecords = (MemberContactRecordI[]) value;
-        if (selectedRecords != null && selectedRecords.length > 0) {
-          boolean createSharedSpaceOk = true;
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-          Long userId = cache.getMyUserId();
-          for (int i=0; i<selectedRecords.length; i++) {
-            if (selectedRecords[i].getMemberType() == Record.RECORD_TYPE_CONTACT) {
-              ContactRecord cRec = (ContactRecord) selectedRecords[i];
-              if (!cRec.ownerUserId.equals(userId) || !cRec.isOfActiveType() || (cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) != 0) {
-                createSharedSpaceOk = false;
-              }
+  private static MemberContactRecordI[] checkForValidRecipientsConvertIfPossible(MemberContactRecordI[] recipients, Boolean[] rcBuf) {
+    boolean hasErrors = false;
+    // convert all selected records to proper Contacts instead of Reciprocals
+    if (recipients != null && recipients.length > 0) {
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      Long myUserId = cache.getMyUserId();
+      ArrayList okL = new ArrayList();
+      for (int i=0; i<recipients.length; i++) {
+        MemberContactRecordI member = recipients[i];
+        if (member instanceof ContactRecord) {
+          Long memberId = member.getMemberId();
+          if (memberId.equals(myUserId)) {
+            Long otherUserId = ((ContactRecord) member).ownerUserId;
+            ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, otherUserId);
+            if (cRec != null) {
+              member = cRec;
+            } else {
+              hasErrors = true;
+              NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Please establish a contact first", "Please establish an active contact with " + ListRenderer.getRenderedText(member)+", then retry.");
+              break;
             }
           }
-          if (isChat) {
-            // Gather possible chat folder matches in a broad search
-            ArrayList suitableChatsL = new ArrayList();
-            FolderPair perfectMatch = null;
+        }
+        if (!okL.contains(member))
+          okL.add(member);
+      }
+      if (!hasErrors)
+        recipients = (MemberContactRecordI[]) ArrayUtils.toArray(okL, MemberContactRecordI.class);
+    }
+    rcBuf[0] = Boolean.valueOf(!hasErrors);
+    return recipients;
+  }
 
-            ArrayList userIDsL = new ArrayList();
-            // add self to list of required members
-            userIDsL.add(cache.getMyUserId());
-            ArrayList groupIDsL = new ArrayList();
-            ArrayList targetUIDsL = new ArrayList();
+  public static void chatOrShareSpace(final Component parent, MemberContactRecordI[] selectedRecords, boolean useSelected, final boolean isChat, final short folderType) {
+    Boolean[] rcBuf = new Boolean[1];
+    selectedRecords = checkForValidRecipientsConvertIfPossible(selectedRecords, rcBuf);
+
+    // if check return code is TRUE
+    if (rcBuf[0].booleanValue()) {
+      CallbackI selectionCallback = new CallbackI() {
+        public void callback(Object value) {
+          Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "callback(Object value)");
+          if (trace != null) trace.args(value);
+
+          MemberContactRecordI[] selectedRecords = (MemberContactRecordI[]) value;
+          if (selectedRecords != null && selectedRecords.length > 0) {
+            boolean createSharedSpaceOk = true;
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+            Long userId = cache.getMyUserId();
             for (int i=0; i<selectedRecords.length; i++) {
-              MemberContactRecordI member = selectedRecords[i];
-              short memberType = member.getMemberType();
-              Long memberId = member.getMemberId();
-              if (memberType == Record.RECORD_TYPE_GROUP)
-                groupIDsL.add(member.getMemberId());
-              else if (memberType == Record.RECORD_TYPE_USER)
-                userIDsL.add(memberId);
-              else {
-                // not a Contact and not a Group
-                if (trace != null) trace.data(10, "Not a contact and Not a group!");
+              if (selectedRecords[i].getMemberType() == Record.RECORD_TYPE_CONTACT) {
+                ContactRecord cRec = (ContactRecord) selectedRecords[i];
+                if (!cRec.ownerUserId.equals(userId) || !cRec.isOfActiveType() || (cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) != 0) {
+                  createSharedSpaceOk = false;
+                }
               }
             }
-            targetUIDsL.addAll(userIDsL);
-            for (int i=0; i<groupIDsL.size(); i++)
-              CacheFldUtils.getKnownGroupMembers((Long) groupIDsL.get(i), targetUIDsL);
-            Collections.sort(targetUIDsL);
-            if (trace != null) trace.data(20, "target UIDs are: ", Misc.objToStr(targetUIDsL));
+            if (isChat) {
+              // Gather possible chat folder matches in a broad search
+              ArrayList suitableChatsL = new ArrayList();
+              FolderPair perfectMatch = null;
+
+              ArrayList userIDsL = new ArrayList();
+              // add self to list of required members
+              userIDsL.add(cache.getMyUserId());
+              ArrayList groupIDsL = new ArrayList();
+              ArrayList targetUIDsL = new ArrayList();
+              for (int i=0; i<selectedRecords.length; i++) {
+                MemberContactRecordI member = selectedRecords[i];
+                short memberType = member.getMemberType();
+                Long memberId = member.getMemberId();
+                if (memberType == Record.RECORD_TYPE_GROUP)
+                  groupIDsL.add(member.getMemberId());
+                else if (memberType == Record.RECORD_TYPE_USER)
+                  userIDsL.add(memberId);
+                else {
+                  // not a Contact and not a Group
+                  if (trace != null) trace.data(10, "Not a contact and Not a group!");
+                }
+              }
+              targetUIDsL.addAll(userIDsL);
+              for (int i=0; i<groupIDsL.size(); i++)
+                CacheFldUtils.getKnownGroupMembers((Long) groupIDsL.get(i), targetUIDsL);
+              Collections.sort(targetUIDsL);
+              if (trace != null) trace.data(20, "target UIDs are: ", Misc.objToStr(targetUIDsL));
 
 
-            if (trace != null) trace.data(30, "userIDsL=", Misc.objToStr(userIDsL));
-            if (trace != null) trace.data(31, "groupIDsL=", Misc.objToStr(groupIDsL));
+              if (trace != null) trace.data(30, "userIDsL=", Misc.objToStr(userIDsL));
+              if (trace != null) trace.data(31, "groupIDsL=", Misc.objToStr(groupIDsL));
 
-            // Gather all chat folders to see if we have a single exact match or other possible sessions involving selected members...
-            ArrayList chatUserIDsL = new ArrayList();
-            ArrayList lvl1userIDsL = new ArrayList();
-            ArrayList lvl1groupIDsL = new ArrayList();
-            FolderRecord[] chats = cache.getFolderRecordsChatting();
-            if (chats != null) {
-              for (int i=0; i<chats.length; i++) {
-                FolderRecord chat = chats[i];
-                if (trace != null) trace.data(40, ListRenderer.getRenderedText(chat));
-                FolderShareRecord[] shares = cache.getFolderShareRecordsForFolder(chat.folderId);
-                // find all users of each chat
-                chatUserIDsL.clear();
-                lvl1userIDsL.clear();
-                lvl1groupIDsL.clear();
-                if (shares != null) {
-                  for (int j=0; j<shares.length; j++) {
-                    FolderShareRecord share = shares[j];
-                    if (share.isOwnedByUser()) {
-                      lvl1userIDsL.add(share.ownerUserId);
-                      if (!chatUserIDsL.contains(share.ownerUserId))
-                        chatUserIDsL.add(share.ownerUserId);
-                      if (trace != null) trace.data(41, "u"+share.ownerUserId+"("+cache.getUserRecord(share.ownerUserId) != null ? cache.getUserRecord(share.ownerUserId).handle : "null" +")");
-                    } else if (share.isOwnedByGroup()) {
-                      lvl1groupIDsL.add(share.ownerUserId);
-                      if (trace != null) trace.data(42, "g"+share.ownerUserId+"("+ListRenderer.getRenderedText(cache.getFolderRecord(share.ownerUserId))+")");
-                      CacheFldUtils.getKnownGroupMembers(share.ownerUserId, chatUserIDsL);
+              // Gather all chat folders to see if we have a single exact match or other possible sessions involving selected members...
+              ArrayList chatUserIDsL = new ArrayList();
+              ArrayList lvl1userIDsL = new ArrayList();
+              ArrayList lvl1groupIDsL = new ArrayList();
+              FolderRecord[] chats = cache.getFolderRecordsChatting();
+              if (chats != null) {
+                for (int i=0; i<chats.length; i++) {
+                  FolderRecord chat = chats[i];
+                  if (trace != null) trace.data(40, ListRenderer.getRenderedText(chat));
+                  FolderShareRecord[] shares = cache.getFolderShareRecordsForFolder(chat.folderId);
+                  // find all users of each chat
+                  chatUserIDsL.clear();
+                  lvl1userIDsL.clear();
+                  lvl1groupIDsL.clear();
+                  if (shares != null) {
+                    for (int j=0; j<shares.length; j++) {
+                      FolderShareRecord share = shares[j];
+                      if (share.isOwnedByUser()) {
+                        lvl1userIDsL.add(share.ownerUserId);
+                        if (!chatUserIDsL.contains(share.ownerUserId))
+                          chatUserIDsL.add(share.ownerUserId);
+                        if (trace != null) trace.data(41, "u"+share.ownerUserId+"("+cache.getUserRecord(share.ownerUserId) != null ? cache.getUserRecord(share.ownerUserId).handle : "null" +")");
+                      } else if (share.isOwnedByGroup()) {
+                        lvl1groupIDsL.add(share.ownerUserId);
+                        if (trace != null) trace.data(42, "g"+share.ownerUserId+"("+ListRenderer.getRenderedText(cache.getFolderRecord(share.ownerUserId))+")");
+                        CacheFldUtils.getKnownGroupMembers(share.ownerUserId, chatUserIDsL);
+                      }
+                    }
+                  }
+                  Collections.sort(chatUserIDsL);
+                  if (trace != null) trace.data(50, " found UIDs are: ", Misc.objToStr(chatUserIDsL));
+                  if (chatUserIDsL.containsAll(targetUIDsL)) {
+                    if (trace != null) trace.data(60, "lvl1userIDsL=", Misc.objToStr(lvl1userIDsL));
+                    if (trace != null) trace.data(61, "lvl1groupIDsL=", Misc.objToStr(lvl1groupIDsL));
+                    FolderPair suitableChat = CacheFldUtils.convertRecordToPair(chat);
+                    if (perfectMatch == null 
+                            && userIDsL.containsAll(lvl1userIDsL) && lvl1userIDsL.containsAll(userIDsL) 
+                            && groupIDsL.containsAll(lvl1groupIDsL) && lvl1groupIDsL.containsAll(groupIDsL)) 
+                    {
+                      if (trace != null) trace.data(70, " found PERFECT MATCH is ", ListRenderer.getRenderedText(suitableChat));
+                      perfectMatch = suitableChat;
+                    } else {
+                      if (trace != null) trace.data(71, " found SUITABLE FOLDER is ", ListRenderer.getRenderedText(suitableChat));
+                      suitableChatsL.add(suitableChat);
                     }
                   }
                 }
-                Collections.sort(chatUserIDsL);
-                if (trace != null) trace.data(50, " found UIDs are: ", Misc.objToStr(chatUserIDsL));
-                if (chatUserIDsL.containsAll(targetUIDsL)) {
-                  if (trace != null) trace.data(60, "lvl1userIDsL=", Misc.objToStr(lvl1userIDsL));
-                  if (trace != null) trace.data(61, "lvl1groupIDsL=", Misc.objToStr(lvl1groupIDsL));
-                  FolderPair suitableChat = CacheFldUtils.convertRecordToPair(chat);
-                  if (perfectMatch == null 
-                          && userIDsL.containsAll(lvl1userIDsL) && lvl1userIDsL.containsAll(userIDsL) 
-                          && groupIDsL.containsAll(lvl1groupIDsL) && lvl1groupIDsL.containsAll(groupIDsL)) 
-                  {
-                    if (trace != null) trace.data(70, " found PERFECT MATCH is ", ListRenderer.getRenderedText(suitableChat));
-                    perfectMatch = suitableChat;
-                  } else {
-                    if (trace != null) trace.data(71, " found SUITABLE FOLDER is ", ListRenderer.getRenderedText(suitableChat));
-                    suitableChatsL.add(suitableChat);
-                  }
-                }
               }
-            }
 
-            if (suitableChatsL.size() > 0) {
-              Window w = SwingUtilities.windowForComponent(parent);
-              if (w == null || !(w instanceof Frame))
-                w = MainFrame.getSingleInstance();
-              new ChatSessionChooserDialog((Frame) w, selectedRecords, perfectMatch, suitableChatsL);
+              if (suitableChatsL.size() > 0) {
+                Window w = SwingUtilities.windowForComponent(parent);
+                if (w == null || !(w instanceof Frame))
+                  w = MainFrame.getSingleInstance();
+                new ChatSessionChooserDialog((Frame) w, selectedRecords, perfectMatch, suitableChatsL);
+              } else {
+                doChat(selectedRecords);
+              }
+            } else if (createSharedSpaceOk) {
+              doSharedSpace(parent, selectedRecords, folderType);
             } else {
-              doChat(selectedRecords);
+              MessageDialog.showInfoDialog(parent, com.CH_cl.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_cl.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
             }
-          } else if (createSharedSpaceOk) {
-            doSharedSpace(parent, selectedRecords, folderType);
-          } else {
-            MessageDialog.showInfoDialog(parent, com.CH_cl.lang.Lang.rb.getString("msg_Cannot_create_shared_space"), com.CH_cl.lang.Lang.rb.getString("msgTitle_No_folder_sharing_permission."), false);
           }
+          if (trace != null) trace.exit(getClass());
         }
-        if (trace != null) trace.exit(getClass());
+      };
+      if (!useSelected || selectedRecords == null || selectedRecords.length == 0) {
+        Window w = SwingUtilities.windowForComponent(parent);
+        if (w == null) w = MainFrame.getSingleInstance();
+        if (w instanceof Dialog)
+          new ContactSelectDialog((Dialog) w, true).setSelectionCallback(selectionCallback);
+        else if (w instanceof Frame)
+          new ContactSelectDialog((Frame) w, true).setSelectionCallback(selectionCallback);
+      } else {
+        selectionCallback.callback(selectedRecords);
       }
-    };
-    if (!useSelected || selectedRecords == null || selectedRecords.length == 0) {
-      Window w = SwingUtilities.windowForComponent(parent);
-      if (w == null) w = MainFrame.getSingleInstance();
-      if (w instanceof Dialog)
-        new ContactSelectDialog((Dialog) w, true).setSelectionCallback(selectionCallback);
-      else if (w instanceof Frame)
-        new ContactSelectDialog((Frame) w, true).setSelectionCallback(selectionCallback);
-    } else {
-      selectionCallback.callback(selectedRecords);
     }
   }
 
