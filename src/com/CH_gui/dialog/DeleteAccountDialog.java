@@ -153,7 +153,8 @@ public class DeleteAccountDialog extends GeneralDialog {
       listPanel.setLayout(new GridBagLayout());
       UserRecord[] subUsers = cache.getUserRecords(subAccountsToDelete);
       for (int i=0; i<subUsers.length; i++) {
-        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, true);
+        // use my contact list only, not the reciprocal contacts
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, false);
         listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
       }

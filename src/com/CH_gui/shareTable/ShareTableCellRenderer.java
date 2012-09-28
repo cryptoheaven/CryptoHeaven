@@ -70,7 +70,8 @@ public class ShareTableCellRenderer extends RecordTableCellRenderer {
           }
 
           if (uRec != null) {
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+            // use my contact list only, not the reciprocal contacts
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           } else if (gRec != null) {

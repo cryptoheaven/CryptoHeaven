@@ -1149,7 +1149,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                   // look inside the group for online/offline contacts
                   Long[] accessUsers = CacheUsrUtils.findAccessUsers(cache.getFolderShareRecordsForFolder(fldRec.folderId));
                   for (int a=0; a<accessUsers.length; a++) {
-                    Record accessUser = CacheUsrUtils.convertUserIdToFamiliarUser(accessUsers[a], true, true);
+                    // use my contact list only, not the reciprocal contacts
+                    Record accessUser = CacheUsrUtils.convertUserIdToFamiliarUser(accessUsers[a], true, false);
                     if (accessUser instanceof ContactRecord) {
                       ContactRecord cRec = (ContactRecord) accessUser;
                       boolean isOnline = cRec.isOnlineStatus();
@@ -1236,17 +1237,20 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long ownerUserId = fRec.ownerUserId;
     ArrayList participantsL = new ArrayList();
-    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, true));
+    // use my contact list only, not the reciprocal contacts
+    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false));
     FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
     for (int i=0; i<allShares.length; i++) {
       FolderShareRecord share = allShares[i];
       // all participants other than owner because he is already added
       if (share.isOwnedByGroup() || !share.isOwnedBy(ownerUserId, (Long[]) null)) {
         Record recipient = null;
-        if (share.isOwnedByUser())
-          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, true);
-        else
+        if (share.isOwnedByUser()) {
+          // use my contact list only, not the reciprocal contacts
+          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, false);
+        } else {
           recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
+        }
         if (recipient != null)
           participantsL.add(recipient);
         else {

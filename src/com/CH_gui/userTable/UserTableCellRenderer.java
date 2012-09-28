@@ -62,7 +62,7 @@ public class UserTableCellRenderer extends RecordTableCellRenderer {
           UserRecord uRec = (UserRecord) tm.getRowObject(sTable.convertMyRowIndexToModel(row));
 
           // Convert UserRecord to possibly a ContactRecord if we have one... note the name may change.
-          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
           setIcon(ListRenderer.getRenderedIcon(rec));
           if (rec instanceof UserRecord) {
             // do nothing, username is already there

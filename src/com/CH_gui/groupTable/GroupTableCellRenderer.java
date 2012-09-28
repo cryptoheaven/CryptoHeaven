@@ -69,7 +69,7 @@ public class GroupTableCellRenderer extends RecordTableCellRenderer {
           }
 
           if (uRec != null) {
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           } else if (gRec != null) {

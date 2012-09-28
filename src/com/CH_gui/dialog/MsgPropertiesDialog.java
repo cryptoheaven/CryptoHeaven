@@ -798,7 +798,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
 
     // jFrom email address, contact or user
     Record sender = CacheMsgUtils.getFromAsFamiliar(dataRecord);
-    Record signRec = CacheUsrUtils.convertUserIdToFamiliarUser(dataRecord.senderUserId, false, true);
+    Record signRec = CacheUsrUtils.convertUserIdToFamiliarUser(dataRecord.senderUserId, true, false);
     if (sender != null) {
       // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
       if (!dataRecord.isRegularEmail() && (sender instanceof EmailAddressRecord || sender instanceof MsgDataRecord)) {

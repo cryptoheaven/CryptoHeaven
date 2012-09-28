@@ -61,7 +61,7 @@ public class PopupWindowManager extends Object {
   public static void addForScrolling(final Component[] componentBuffer, MsgDataRecord msgData, boolean suppressIsNewCheck) {
     try {
       if (suppressIsNewCheck || markNewMsgStamp(msgData)) {
-        String user = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true));
+        String user = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
         final String sub = msgData.isTypeAddress() ? msgData.fileAs : msgData.getSubject();
         final boolean addSub = sub != null && sub.length() > 0;
 

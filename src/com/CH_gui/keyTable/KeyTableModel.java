@@ -120,7 +120,8 @@ public class KeyTableModel extends RecordTableModel {
       KeyRecord keyRecord = (KeyRecord) record;
 
       switch (column) {
-        case 0: value = keyRecord.plainPublicKey.shortInfo();
+        case 0: 
+          value = keyRecord.plainPublicKey.shortInfo();
           boolean hasPublic = true; // has Public is TRUE since it was dereferenced in "case 0"
           boolean hasPrivate = keyRecord.getPrivateKey() != null;
           String extras = null;
@@ -134,8 +135,10 @@ public class KeyTableModel extends RecordTableModel {
             extras = " " + com.CH_cl.lang.Lang.rb.getString("key_no_key");
           value = value.toString() + extras;
           break;
-        case 1: value = keyRecord.ownerUserId;
-          Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(keyRecord.ownerUserId, true, true);
+        case 1: 
+          value = keyRecord.ownerUserId;
+          // use my contact list only, not the reciprocal contacts
+          Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(keyRecord.ownerUserId, true, false);
           if (owner == null) {
             UserRecord uRec = new UserRecord();
             uRec.userId = keyRecord.ownerUserId;
@@ -144,11 +147,14 @@ public class KeyTableModel extends RecordTableModel {
           }
           value = ListRenderer.getRenderedText(owner);
           break;
-        case 2: value = keyRecord.dateCreated;
+        case 2: 
+          value = keyRecord.dateCreated;
           break;
-        case 3: value = keyRecord.dateUpdated;
+        case 3: 
+          value = keyRecord.dateUpdated;
           break;
-        case 4: value = keyRecord.keyId;
+        case 4: 
+          value = keyRecord.keyId;
           break;
       }
     }

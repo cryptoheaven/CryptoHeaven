@@ -178,13 +178,11 @@ public class TextRenderer {
         sb.add(TextRenderer.getRenderedText(CacheEmlUtils.convertToFamiliarEmailRecord(fromEmailAddress)));
         sb.add(fromEmailAddress); // also include the email address instead of only the converted Address Contact
       } else {
-        Record fromAsSender = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
-        Record fromAsRecipient = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
+        // use my contact list only, not the reciprocal contacts
+        Record fromAsFamiliar = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
         Record fromUser = cache.getUserRecord(msgData.senderUserId);
-        if (fromAsSender != null)
-          sb.add(TextRenderer.getRenderedText(fromAsSender));
-        if (fromAsRecipient != null)
-          sb.add(TextRenderer.getRenderedText(fromAsRecipient));
+        if (fromAsFamiliar != null)
+          sb.add(TextRenderer.getRenderedText(fromAsFamiliar));
         if (fromUser != null)
           sb.add(TextRenderer.getRenderedText(fromUser));
       }
@@ -358,7 +356,8 @@ public class TextRenderer {
       // If folder is not yours show whose it is.
       if (!ownerUserId.equals(myUserId)) {
         StringBuffer sb = new StringBuffer(32);
-        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, true);
+        // use my contact list only, not the reciprocal contacts
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false);
         if (rec != null) {
           sb.append('[');
           sb.append(getRenderedText(rec));
@@ -394,7 +393,8 @@ public class TextRenderer {
               Record recipient = null;
               if (share.isOwnedByUser()) {
                 if (userL == null) userL = new ArrayList();
-                recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, true);
+                // use my contact list only, not the reciprocal contacts
+                recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, false);
                 if (recipient != null)
                   userL.add(recipient);
                 else {

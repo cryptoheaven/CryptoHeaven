@@ -74,7 +74,8 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
           UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(traceRecord.ownerUserId);
 
           if (uRec != null) {
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, true);
+            // use my contact list only, not the reciprocal contacts
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           }

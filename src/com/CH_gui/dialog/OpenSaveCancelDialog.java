@@ -130,10 +130,12 @@ public class OpenSaveCancelDialog extends GeneralDialog {
           // internal Mail message or File from folder
           if (parentMsgData != null) {
             Long senderUserId = parentMsgData.senderUserId;
-            msgOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
+            // use my contact list only, not the reciprocal contacts
+            msgOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(senderUserId, true, false, true);
             if (msgOriginator == null) {
               SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(senderUserId)), 30000);
-              msgOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(senderUserId, true, true, true);
+              // use my contact list only, not the reciprocal contacts
+              msgOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(senderUserId, true, false, true);
             }
             jFromText.setText(ListRenderer.getRenderedText(msgOriginator));
             jFromText.setIcon(ListRenderer.getRenderedIcon(msgOriginator));
@@ -176,10 +178,12 @@ public class OpenSaveCancelDialog extends GeneralDialog {
               keyRec = cache.getKeyRecord(keyId);
             }
             if (keyRec != null) {
-              fileOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
+              // use my contact list only, not the reciprocal contacts
+              fileOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, false, true);
               if (fileOriginator == null) {
                 SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(keyRec.ownerUserId)), 30000);
-                fileOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, true, true);
+                // use my contact list only, not the reciprocal contacts
+                fileOriginator = CacheUsrUtils.convertUserIdToFamiliarUser(keyRec.ownerUserId, true, false, true);
               }
               jOriginalSignerText.setText(ListRenderer.getRenderedText(fileOriginator));
               jOriginalSignerText.setIcon(ListRenderer.getRenderedIcon(fileOriginator));

@@ -61,7 +61,8 @@ public class URLLauncherMAILTO extends Object implements URLLauncher {
       Long userid = null;
       try {
         userid = Long.valueOf(path);
-        initialRecipient = CacheUsrUtils.convertUserIdToFamiliarUser(userid, true, true);
+        // use my contact list only, not the reciprocal contacts
+        initialRecipient = CacheUsrUtils.convertUserIdToFamiliarUser(userid, true, false);
       } catch (Throwable t) {
       }
       if (initialRecipient == null)

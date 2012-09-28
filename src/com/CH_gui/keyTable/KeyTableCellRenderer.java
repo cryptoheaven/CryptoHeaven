@@ -63,7 +63,8 @@ public class KeyTableCellRenderer extends RecordTableCellRenderer {
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         JSortedTable jSortedTable = (JSortedTable) table;
         KeyRecord kRec = (KeyRecord) (((KeyTableModel) jSortedTable.getRawModel()).getRowObject(jSortedTable.convertMyRowIndexToModel(row)));
-        Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(kRec.ownerUserId, true, true);
+        // use my contact list only, not the reciprocal contacts
+        Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(kRec.ownerUserId, true, false);
         if (owner == null) {
           UserRecord uRec = new UserRecord();
           uRec.userId = kRec.keyId;

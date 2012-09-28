@@ -501,7 +501,8 @@ public class MsgTableModel extends RecordTableModel {
               value = fromEmailAddress;
             } else {
               if (forSortOnly) {
-                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+                // use my contact list only, not the reciprocal contacts
+                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
               } else {
                 value = msgData.senderUserId;
               }
@@ -869,7 +870,8 @@ public class MsgTableModel extends RecordTableModel {
       if (msgData.isEmail() || fromEmailAddress != null) {
         fromName = fromEmailAddress;
       } else {
-        fromName = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, true));
+        // use my contact list only, not the reciprocal contacts
+        fromName = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
       }
     }
     return fromName;

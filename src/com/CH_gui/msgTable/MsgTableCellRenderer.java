@@ -306,7 +306,8 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         setHorizontalAlignment(LEFT);
         // The From field is the contact name or user's short info, whichever is available
         Long userId = (Long) value;
-        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(userId, false, true);
+        // use my contact list only, not the reciprocal contacts
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(userId, true, false);
         if (rec != null) {
           setIcon(ListRenderer.getRenderedIcon(rec));
           setText(ListRenderer.getRenderedText(rec));

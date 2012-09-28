@@ -674,7 +674,8 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
         ContactRecord cRec = cRecs[i];
         // If notification capable contact.
         if (cRec.previousStatus != null && cRec.ownerUserId.equals(userId)) {
-          String userName = ListRenderer.getRenderedText( CacheUsrUtils.convertUserIdToFamiliarUser(cRec.contactWithId, true, true) );
+          // use my contact list only, not the reciprocal contacts
+          String userName = ListRenderer.getRenderedText( CacheUsrUtils.convertUserIdToFamiliarUser(cRec.contactWithId, true, false) );
           // If STATUS pop-up notifications enabled
           if (userRecord != null && (userRecord.flags.longValue() & UserRecord.FLAG_USER_ONLINE_STATUS_POPUP) != 0) {
             // Popup slider for user "OFFLINE" notification

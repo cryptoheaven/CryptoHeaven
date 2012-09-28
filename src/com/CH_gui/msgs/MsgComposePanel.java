@@ -2653,7 +2653,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TypingGUIUpdater.class, "TypingGUIUpdater.run()");
 
-      Record r = CacheUsrUtils.convertUserIdToFamiliarUser(userId, false, true);
+      // use my contact list only, not the reciprocal contacts
+      Record r = CacheUsrUtils.convertUserIdToFamiliarUser(userId, true, false);
       final String name = ListRenderer.getRenderedText(r);
 
       Timer timer = new Timer(0, new ActionListener() {

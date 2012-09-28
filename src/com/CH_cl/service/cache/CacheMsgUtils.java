@@ -140,7 +140,8 @@ public class CacheMsgUtils {
     if (msgData.isEmail() || fromEmailAddress != null) {
       fromRec = CacheEmlUtils.convertToFamiliarEmailRecord(fromEmailAddress);
     } else {
-      fromRec = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, false, true);
+      // use my contact list only, not the reciprocal contacts
+      fromRec = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
     }
     return fromRec;
   }
