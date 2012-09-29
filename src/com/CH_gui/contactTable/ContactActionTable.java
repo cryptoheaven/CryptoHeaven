@@ -937,7 +937,14 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
                 Window w = SwingUtilities.windowForComponent(parent);
                 if (w == null || !(w instanceof Frame))
                   w = MainFrame.getSingleInstance();
-                new ChatSessionChooserDialog((Frame) w, selectedRecords, perfectMatch, suitableChatsL);
+                try {
+                  new ChatSessionChooserDialog((Frame) w, selectedRecords, perfectMatch, suitableChatsL);
+                } catch (NoClassDefFoundError e) {
+                  if (trace != null) trace.exception(getClass(), 100, e);
+                  if (trace != null) trace.data(101, "Defaulting to the standard call doChat() with explicit contact selection.");
+                  // required JRE 1.6 to run modern GroupLayout gui -- default to direct choice
+                  doChat(selectedRecords);
+                }
               } else {
                 doChat(selectedRecords);
               }
