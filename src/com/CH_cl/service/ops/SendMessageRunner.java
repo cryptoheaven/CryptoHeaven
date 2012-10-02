@@ -489,7 +489,7 @@ public class SendMessageRunner extends ThreadTraced {
       if (pass == FETCHING_KEYS_PASS && userIDsWeNeedKeysL.size() > 0) {
         Long[] uIDs = new Long[userIDsWeNeedKeysL.size()];
         userIDsWeNeedKeysL.toArray(uIDs);
-        SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(uIDs)), 60000);
+        SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(uIDs)), 60000, 1);
         ArrayList missingKeysUIDsL = new ArrayList();
         for (int i=0; i<userIDsWeNeedKeysL.size(); i++) {
           Long uId = (Long) userIDsWeNeedKeysL.get(i);

@@ -277,8 +277,9 @@ public class GlobalProperties extends Object {
   // build 714 Fix message threading border indents in the msg/post tables
   // build 716 Fix conversions to familiar user to use our own cantact list and avoid reciprocal contacts, fix NullPointerException in creating chats when share is not cached.
   // build 718 Convert 'reciprocal' contact use as recipient for mail or shares, to our 'own' contact, smaller font for multiple chat attachments
+  // build 720 Show calculated storage stamp for all accounts
 
-  public static final short PROGRAM_BUILD_NUMBER = 718;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 720;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

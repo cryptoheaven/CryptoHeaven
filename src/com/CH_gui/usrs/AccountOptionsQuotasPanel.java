@@ -1,49 +1,54 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.usrs;
 
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.gui.*;
+import com.CH_co.util.Misc;
+import com.CH_co.util.URLs;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.HTML_ClickablePane;
-import com.CH_guiLib.gui.*;
-
-import java.awt.*;
-import java.sql.*;
-import java.text.*;
-import java.util.*;
+import com.CH_guiLib.gui.JMyTextField;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.sql.Timestamp;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.StringTokenizer;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeListener;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.14 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.14 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class AccountOptionsQuotasPanel extends JPanel {
 
   public JCheckBox jIncludeChangesToQuotas;
@@ -138,14 +143,12 @@ public class AccountOptionsQuotasPanel extends JPanel {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    if (!userRecord.isCapableToManageUserAccounts()) {
-      panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Calculated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
-          GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-      jStorageCalcDate = new JMyLabel(FETCHING_DATA);
-      panel.add(jStorageCalcDate, new GridBagConstraints(1, posY, 1, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-      posY ++;
-    }
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Calculated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+    jStorageCalcDate = new JMyLabel(FETCHING_DATA);
+    panel.add(jStorageCalcDate, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    posY ++;
 
 
     // separator
