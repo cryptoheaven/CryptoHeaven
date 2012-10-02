@@ -562,7 +562,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           if (msgActionCode != CommandCodes.USR_A_RECYCLE_SESSION_SEQUENCE) {
             try {
               if (trace != null) trace.data(50, "Wait till stream is secured or threads released.");
-              dataIn.wait(15000);
+              dataIn.wait(20000);
             } catch (InterruptedException e) {
             }
             if (trace != null) trace.data(55, "Woke up from waiting for secured streams or unlock upon login failure.");
@@ -930,7 +930,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
               // Login request may unexpectadly fail with general IO error, or succeed, lets keep a timeout.
               if (trace != null) trace.data(22, "Wait till key is received or threads released.");
               dataOut.flush(); // flush the synchronized requests to make sure they go out ASAP
-              dataOut.wait(15000); // wait for 15 sec MAXIMUM
+              dataOut.wait(25000); // wait for 25 sec MAXIMUM
             } catch (InterruptedException e) {
               if (trace != null) trace.data(23, "We got an Interrupt Exception -- this is OK, quit waiting now.");
             }
