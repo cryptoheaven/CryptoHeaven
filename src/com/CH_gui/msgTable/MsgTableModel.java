@@ -428,7 +428,7 @@ public class MsgTableModel extends RecordTableModel {
       }
       return TextRenderer.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
     } else {
-      return null;
+      return super.getSearchableCharSequencesFor(searchableObj, includeMsgBody);
     }
   }
 

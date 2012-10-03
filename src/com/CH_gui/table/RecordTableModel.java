@@ -12,6 +12,7 @@
 
 package com.CH_gui.table;
 
+import com.CH_cl.service.cache.TextRenderer;
 import com.CH_co.service.records.FileLinkRecord;
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.service.records.Record;
@@ -244,7 +245,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     return getSearchableCharSequencesFor(searchableObj, true);
   }
   public Collection getSearchableCharSequencesFor(Object searchableObj, boolean providerSetting) {
-    return null;
+    if (searchableObj instanceof Record)
+      return TextRenderer.getSearchTextFor((Record) searchableObj, providerSetting);
+    else
+      return null;
   }
 
   public String getColumnName(int column) {

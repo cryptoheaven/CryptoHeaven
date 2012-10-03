@@ -14,7 +14,6 @@ package com.CH_gui.fileTable;
 
 import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FileFilter;
@@ -33,7 +32,6 @@ import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -213,13 +211,6 @@ public class FileTableModel extends RecordTableModel {
         fetchFiles(shareId, folderId, forceFetch);
       }
     }
-  }
-
-  public Collection getSearchableCharSequencesFor(Object searchableObj) {
-    if (searchableObj instanceof Record)
-      return TextRenderer.getSearchTextFor((Record) searchableObj, true);
-    else
-      return null;
   }
 
   public Object getValueAtRawColumn(Record record, int column, boolean forSortOnly) {
