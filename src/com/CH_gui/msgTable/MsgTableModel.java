@@ -729,11 +729,11 @@ public class MsgTableModel extends RecordTableModel {
             }
           }
           if (toAddStar && flagIcon != ImageNums.IMAGE_NONE) {
-            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.STAR_BRIGHTER) + "\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\"/>");
+            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.STAR_BRIGHTER) + "\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\">");
           } else if (toAddStar) {
-            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.STAR_BRIGHT) + "\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\"/>");
+            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.STAR_BRIGHT) + "\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\">");
           } else if (flagIcon != ImageNums.IMAGE_NONE) {
-            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(flagIcon) + "\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\"/>");
+            sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(flagIcon) + "\" align=\"ABSBOTTOM\" width=\"14\" height=\"14\">");
           }
 
           if (toAddFrom || toAddSent) {
@@ -750,11 +750,11 @@ public class MsgTableModel extends RecordTableModel {
 
           if (toAddPriority) {
             if (msgData.isImpHigh())
-              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_HIGH12) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_HIGH12) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\">");
             else if (msgData.isImpFYI())
-              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_LOW12) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_LOW12) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\">");
             else if (msgData.isImpSystem())
-              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_FIRE12) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\"/>");
+              sb.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.PRIORITY_FIRE12) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\">");
           }
 
           if (toAddAttachment) {
@@ -790,7 +790,7 @@ public class MsgTableModel extends RecordTableModel {
               }
               String strLinked = numOfAttachments == 1 ? linkNames : "("+numOfAttachments+" items)";
               String strNotLinked = numOfAttachments == 1 ? "" : " <font size=\"-1\" color=\"#777777\">"+linkNames+"</font><br>";
-              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.ATTACH_SMALL) + "\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"16\"/>"+strLinked+"</a><br>"+strNotLinked);
+              sb.append("<a href=\"http://localhost/actions/706\"><img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.ATTACH_SMALL) + "\" border=\"0\" align=\"ABSBOTTOM\" width=\"14\" height=\"16\">"+strLinked+"</a><br>"+strNotLinked);
               if (linkNames.length() > 0)
                 sb.append(" ");
             }

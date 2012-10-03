@@ -714,7 +714,12 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
       else if (code == KeyEvent.VK_V && e.isControlDown() && !e.isShiftDown() && !e.isAltDown() && !e.isAltGraphDown()) {
         if (isHTML) {
           // check if we are forced to paste plain text, if so use the special call to create new lines
-          DataFlavor[] flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
+          DataFlavor[] flavors = null;
+          try {
+            flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
+          } catch (NoSuchMethodError x) {
+            // jre 1.4 -- ignore special handling, editor will use default PASTE
+          }
           if (flavors != null) {
             boolean isFormattedAvailable = false;
             boolean isPlainAvailable = false;
