@@ -67,6 +67,8 @@ import javax.swing.table.TableModel;
 */
 public class RecordTableScrollPane extends JScrollPane implements VisualsSavable, DisposableObj {
 
+  private static Integer versionedVisualsSavable = new Integer(2);
+
   private RecordTableModel recordTableModel;
   private JSortedTable jSTable;
 
@@ -671,7 +673,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
     return null;
   }
   public Integer getVisualsVersion() {
-    return null;
+    return versionedVisualsSavable;
   }
   public boolean isVisible(Record rec) {
     boolean visible = false;

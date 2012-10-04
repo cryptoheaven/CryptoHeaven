@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.contactTable;
 
@@ -41,22 +41,24 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.25 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.25 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ContactTableComponent extends RecordTableComponent {
+
+  private static Integer versionedVisualsSavable = new Integer(2);
 
   private JMyListCombo combo;
   private UserListener userListener;
@@ -73,7 +75,7 @@ public class ContactTableComponent extends RecordTableComponent {
     setTitle("Contacts");
     if (trace != null) trace.exit(ContactTableComponent.class);
   }
-   */
+  */
   /** Creates new ContactTableComponent */
   public ContactTableComponent(RecordFilter contactFilter, String emptyTemplateName, String backTemplateName, boolean withDoubleClickAction, boolean suppressToolbar, boolean suppressUtilityBar) {
     super(new ContactActionTable(contactFilter, withDoubleClickAction), emptyTemplateName, backTemplateName, null, suppressToolbar, suppressUtilityBar, false);
@@ -131,8 +133,8 @@ public class ContactTableComponent extends RecordTableComponent {
   }
 
   /**
-   * This call is currently ignored as contacts are only displayed for all folders at once.
-   */
+  * This call is currently ignored as contacts are only displayed for all folders at once.
+  */
   public void initDataModel(Long folderId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactTableComponent.class, "initDataModel(Long folderId)");
     if (trace != null) trace.args(folderId);
@@ -369,12 +371,12 @@ public class ContactTableComponent extends RecordTableComponent {
   }
 
   public Integer getVisualsVersion() {
-    return new Integer(1);
+    return versionedVisualsSavable;
   }
 
   /**
-   * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
-   * Dispose the object and release resources to help in garbage collection.
+  * I N T E R F A C E   M E T H O D  ---   D i s p o s a b l e O b j  *****
+  * Dispose the object and release resources to help in garbage collection.
   */
   public void disposeObj() {
     if (userListener != null) {

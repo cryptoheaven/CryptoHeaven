@@ -321,7 +321,7 @@ public class GlobalProperties extends Object {
     }
   }
 
-  private static void initialLoad() {
+  private static synchronized void initialLoad() {
     // now load the saved properties possibly overwriting the default ones.
     String it = getPropertiesFullFileName();
     InputStream is = null;
@@ -511,10 +511,10 @@ public class GlobalProperties extends Object {
   * Enforces use of strings for property keys and values.
   * @return the previous value of the specified key, or null if it did not have one.
   */
-  public static String setProperty(String key, String value) {
+  public static synchronized String setProperty(String key, String value) {
     return (String) properties.setProperty(key, value);
   }
-  public static String setProperty(String key, String value, Long userId) {
+  public static synchronized String setProperty(String key, String value, Long userId) {
     String property = null;
     if (userId != null) {
       property = (String) properties.setProperty(getUserPropertyPrefix(userId) + key, value);
@@ -527,18 +527,18 @@ public class GlobalProperties extends Object {
   /**
   * Remove a property value.
   */
-  public static String remove(String key) {
+  public static synchronized String remove(String key) {
     return (String) properties.remove(key);
   }
 
   /** List all properties to the PrintStream <i>out</i>. */
-  public static void list (PrintStream out) {
+  public static synchronized void list(PrintStream out) {
     hashAdd();
     properties.list(out);
   }
 
   /** List all properties to the PrintWriter <i>out</i>. */
-  public static void list (PrintWriter out) {
+  public static synchronized void list(PrintWriter out) {
     hashAdd();
     properties.list(out);
   }
@@ -607,12 +607,12 @@ public class GlobalProperties extends Object {
   /**
   * Storing is private because it needs to update the current hash of all property values.
   */
-  private static synchronized void store (OutputStream out, String header) throws IOException {
+  private static synchronized void store(OutputStream out, String header) throws IOException {
     hashAdd();
     properties.store(out, header);
   }
 
-  public static synchronized boolean store () {
+  public static synchronized boolean store() {
     boolean success = true;
     OutputStream out = null;
     try {
