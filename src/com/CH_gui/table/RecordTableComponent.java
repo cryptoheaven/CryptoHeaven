@@ -366,7 +366,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         if (uRec.isPersonalAccount() || uRec.isBusinessMasterAccount()) {
           showExpired = isDateInThePast(uRec.dateExpired, 3);
         } else if (uRec.isBusinessSubAccount()) {
-          showExpiredSub = isDateInThePast(uRec.dateExpired, 3);
+          // give more days before subs see warning comparing to shorter period for business admins
+          showExpiredSub = isDateInThePast(uRec.dateExpired, 5);
         } else if (uRec.isFreePromoAccount()) {
           showPurchase = isDateInThePast(uRec.dateCreated, 3);
         }
@@ -1290,7 +1291,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       javax.swing.SwingUtilities.invokeLater(new GUIUpdater(event));
     }
   }
-  
+
   /**
   * User listener to update overlimit panel.
   */
