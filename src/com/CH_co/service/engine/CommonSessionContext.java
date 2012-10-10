@@ -1,47 +1,52 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.engine;
 
-import java.net.*;
-import java.io.*;
-
+import com.CH_co.cryptx.*;
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.io.SpeedLimitedInputStream;
+import com.CH_co.io.SpeedLimitedOutputStream;
+import com.CH_co.monitor.Interruptible;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.Misc;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-import com.CH_co.cryptx.*;
-import com.CH_co.trace.Trace;
-import com.CH_co.monitor.Interruptible;
-import com.CH_co.io.*;
-import com.CH_co.util.Misc;
-
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Holds session related variables like I/O streams, client and server version numbers, etc.
- *
- * Structure of stream chains:
- *  i/o stream ->
- *     speed limited and interruptible i/o stream ->
- *  a)  data i/o stream2
- *  b)  block cipher i/o stream ->
- *        data i/o stream2
- * 
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Holds session related variables like I/O streams, client and server version numbers, etc.
+*
+* Structure of stream chains:
+*  i/o stream ->
+*     speed limited and interruptible i/o stream ->
+*  a)  data i/o stream2
+*  b)  block cipher i/o stream ->
+*        data i/o stream2
+* 
+* @author  Marcin Kurzawa
+* @version
+*/
 public abstract class CommonSessionContext extends Object implements Interruptible {
 
   protected Socket connectedSocket;
@@ -199,9 +204,9 @@ public abstract class CommonSessionContext extends Object implements Interruptib
 
 
   /** Secures the input/output Data streams with current key material.
-   *  Notifies waiters on the DataInputStream2 that is has changed through dataIn.notifyAll();
-   *  Releases all threads that are waiting on DataInputStream2 and DataOutputStream2 for completion of login sequence.
-   */
+  *  Notifies waiters on the DataInputStream2 that is has changed through dataIn.notifyAll();
+  *  Releases all threads that are waiting on DataInputStream2 and DataOutputStream2 for completion of login sequence.
+  */
   public synchronized void secureStreams() throws InvalidKeyException, NoSuchAlgorithmException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CommonSessionContext.class, "secureStreams()");
     if (streamsSecured)
@@ -309,8 +314,8 @@ public abstract class CommonSessionContext extends Object implements Interruptib
 
 
   /**
-   * Interruptible interface method.
-   */
+  * Interruptible interface method.
+  */
   public synchronized void interrupt() {
     try { speedIn.interrupt();  } catch (Throwable t) { }
     try { speedOut.interrupt(); } catch (Throwable t) { }
