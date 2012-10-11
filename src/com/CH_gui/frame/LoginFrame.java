@@ -2142,11 +2142,18 @@ public class LoginFrame extends JFrame {
       if (replyChkAction2 != null && replyChkAction2.getActionCode() >= 0) {
         chkEmailOk = true;
       } else if (replyChkAction2 != null && replyChkAction2.getActionCode() < 0) {
-        MessageDialog.showWarningDialog(null, "Email address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.", com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"));
-        // Suppress the generic error because we have a more user-friendly version below,
+        // Suppress the generic error to avoid the "Operation did not complete successfully" part and replace if with more pleasant Warning style message,
         // and we still want to run the reply action to comply with SIL rules and progress monitors, etc.
-        if (replyChkAction2.getMsgDataSet() instanceof Str_Rp)
-          ((Str_Rp) replyChkAction2.getMsgDataSet()).message = null;
+        String customMessage = null;
+        if (replyChkAction2.getMsgDataSet() instanceof Str_Rp) {
+          Str_Rp reply = (Str_Rp) replyChkAction2.getMsgDataSet();
+          customMessage = "<html>"+reply.message;
+          reply.message = null;
+        }
+        if (customMessage == null) {
+          customMessage = "<html>Email address '" + request.requestedEmailAddress + "' is already taken, please choose a different username.";
+        }
+        MessageDialog.showWarningDialog(null, customMessage, com.CH_cl.lang.Lang.rb.getString("title_New_Account_Error"));
       }
       DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyChkAction2);
 
