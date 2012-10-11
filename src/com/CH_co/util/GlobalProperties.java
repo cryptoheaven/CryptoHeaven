@@ -280,8 +280,9 @@ public class GlobalProperties extends Object {
   // build 720 Show calculated storage stamp for all accounts
   // build 722 Make the recycle table searchable
   // build 724 Fix message editor 'paste' ctrl-v for jre 1.4
+  // build 726 Remove default 'Download' toolbar button from email tables, 'download'='email export' which is rare and confusable with 'save attachments'
 
-  public static final short PROGRAM_BUILD_NUMBER = 724;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 726;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
@@ -476,7 +477,7 @@ public class GlobalProperties extends Object {
 //...........................................................................
 
   /** Get the value of a property for this key. */
-  public static String getProperty (String key) {
+  public static String getProperty(String key) {
     return getProperty(key, null, null);
   }
 
@@ -484,10 +485,10 @@ public class GlobalProperties extends Object {
   * Get the value of a property for this key, or return
   * <i>value</i> if the property was not set.
   */
-  public static String getProperty (String key, String value) {
+  public static String getProperty(String key, String value) {
     return getProperty(key, value, null);
   }
-  public static String getProperty (String key, String value, Long userId) {
+  public static String getProperty(String key, String value, Long userId) {
     String property = value;
     if (key != null) {
       if (userId != null) {
