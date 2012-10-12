@@ -33,14 +33,14 @@ import java.util.*;
 public class FolderRecUtil extends Object {
 
   // When folder contents is fetched, lets keep these folderIDs here.
-  private static final HashSet fldFetchRequestsIssuedHT = new HashSet();
+  private static final HashSet fldFetchRequestsIssuedHS = new HashSet();
 
   // When folder view is invalidated, lets keep these marks here.
   private static final Hashtable fldViewInvalidatedHT = new Hashtable();
 
   public static synchronized List getFoldersFetched() {
     ArrayList list = new ArrayList();
-    Iterator iter = fldFetchRequestsIssuedHT.iterator();
+    Iterator iter = fldFetchRequestsIssuedHS.iterator();
     while (iter.hasNext()) {
       Long folderId = (Long) iter.next();
       list.add(folderId);
@@ -50,7 +50,7 @@ public class FolderRecUtil extends Object {
 
   public static synchronized List getFoldersFetchedAndInvalidated() {
     ArrayList list = new ArrayList();
-    Iterator iter = fldFetchRequestsIssuedHT.iterator();
+    Iterator iter = fldFetchRequestsIssuedHS.iterator();
     while (iter.hasNext()) {
       Long folderId = (Long) iter.next();
       if (wasFolderViewInvalidated(folderId))
@@ -60,10 +60,10 @@ public class FolderRecUtil extends Object {
   }
 
   public static synchronized void markFolderFetchRequestIssued(Long folderId) {
-    fldFetchRequestsIssuedHT.add(folderId);
+    fldFetchRequestsIssuedHS.add(folderId);
   }
   public static synchronized boolean wasFolderFetchRequestIssued(Long folderId) {
-    return folderId != null && fldFetchRequestsIssuedHT.contains(folderId);
+    return folderId != null && fldFetchRequestsIssuedHS.contains(folderId);
   }
 
   public static synchronized void markFolderViewInvalidated(Long folderId, boolean isInvalidated) {
@@ -77,12 +77,12 @@ public class FolderRecUtil extends Object {
   }
 
   public static synchronized void clear() {
-    fldFetchRequestsIssuedHT.clear();
+    fldFetchRequestsIssuedHS.clear();
     fldViewInvalidatedHT.clear();
   }
 
   public static synchronized void clearFetchedIDs() {
-    fldFetchRequestsIssuedHT.clear();
+    fldFetchRequestsIssuedHS.clear();
   }
 
 }
