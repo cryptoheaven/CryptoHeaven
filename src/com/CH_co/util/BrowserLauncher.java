@@ -6,6 +6,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -204,44 +206,48 @@ public class BrowserLauncher {
    */
   static {
     loadedWithoutErrors = true;
-    String osName = System.getProperty("os.name");
-    if (osName.startsWith("Mac OS")) {
-      String mrjVersion = System.getProperty("mrj.version");
-      String majorMRJVersion = mrjVersion.substring(0, 3);
-      try {
-        double version = Double.valueOf(majorMRJVersion).doubleValue();
-        if (version == 2) {
-          jvm = MRJ_2_0;
-        } else if (version >= 2.1 && version < 3) {
-          // Assume that all 2.x versions of MRJ work the same.  MRJ 2.1 actually
-          // works via Runtime.exec() and 2.2 supports that but has an openURL() method
-          // as well that we currently ignore.
-          jvm = MRJ_2_1;
-        } else if (version == 3.0) {
-          jvm = MRJ_3_0;
-        } else if (version >= 3.1) {
-          // Assume that all 3.1 and later versions of MRJ work the same.
-          jvm = MRJ_3_1;
-        } else {
+    try {
+      String osName = System.getProperty("os.name");
+      if (osName.startsWith("Mac OS")) {
+        String mrjVersion = System.getProperty("mrj.version");
+        String majorMRJVersion = mrjVersion.substring(0, 3);
+        try {
+          double version = Double.valueOf(majorMRJVersion).doubleValue();
+          if (version == 2) {
+            jvm = MRJ_2_0;
+          } else if (version >= 2.1 && version < 3) {
+            // Assume that all 2.x versions of MRJ work the same.  MRJ 2.1 actually
+            // works via Runtime.exec() and 2.2 supports that but has an openURL() method
+            // as well that we currently ignore.
+            jvm = MRJ_2_1;
+          } else if (version == 3.0) {
+            jvm = MRJ_3_0;
+          } else if (version >= 3.1) {
+            // Assume that all 3.1 and later versions of MRJ work the same.
+            jvm = MRJ_3_1;
+          } else {
+            loadedWithoutErrors = false;
+            errorMessage = "Unsupported MRJ version: " + version;
+          }
+        } catch (NumberFormatException nfe) {
           loadedWithoutErrors = false;
-          errorMessage = "Unsupported MRJ version: " + version;
+          errorMessage = "Invalid MRJ version: " + mrjVersion;
         }
-      } catch (NumberFormatException nfe) {
-        loadedWithoutErrors = false;
-        errorMessage = "Invalid MRJ version: " + mrjVersion;
-      }
-    } else if (osName.startsWith("Windows")) {
-      if (osName.indexOf("9") != -1) {
-        jvm = WINDOWS_9x;
+      } else if (osName.startsWith("Windows")) {
+        if (osName.indexOf("9") != -1) {
+          jvm = WINDOWS_9x;
+        } else {
+          jvm = WINDOWS_NT;
+        }
       } else {
-        jvm = WINDOWS_NT;
+        jvm = OTHER;
       }
-    } else {
-      jvm = OTHER;
-    }
 
-    if (loadedWithoutErrors) {	// if we haven't hit any errors yet
-      loadedWithoutErrors = loadClasses();
+      if (loadedWithoutErrors) {	// if we haven't hit any errors yet
+        loadedWithoutErrors = loadClasses();
+      }
+    } catch (Throwable t) {
+      loadedWithoutErrors = false;
     }
   }
 
@@ -483,151 +489,174 @@ public class BrowserLauncher {
     if (appletContext != null) {
       appletContext.showDocument(new URL(url), "_blank");
     } else {
-      if (!loadedWithoutErrors) {
-        throw new IOException("Exception in finding browser: " + errorMessage);
+      boolean invokedWithCore = false;
+      // quick fix is to use Java 1.6 Desktop class and fallback on the old code.
+      try {
+        // Convert a URL to a URI
+        URI uri = null;
+        try {
+          uri = new URI(url.toString());
+        } catch (URISyntaxException e) {
+        }
+        Class desktopClass = Class.forName("java.awt.Desktop");
+        Method getDesktop = desktopClass.getMethod("getDesktop", null);
+        Object desktopObj = getDesktop.invoke(null, null);
+        Method browse = desktopClass.getMethod("browse", new Class[] {URI.class});
+        browse.invoke(desktopObj, new Object[] {uri});
+        invokedWithCore = true;
+      } catch (ClassNotFoundException e1) {
+      } catch (NoSuchMethodException e2) {
+      } catch (IllegalAccessException e3) {
+      } catch (InvocationTargetException e4) {
+      } catch (Throwable t) {
       }
-      Object browser = locateBrowser();
-      if (browser == null) {
-        throw new IOException("Unable to locate browser: " + errorMessage);
-      }
+      if (!invokedWithCore) {
+        if (!loadedWithoutErrors) {
+          throw new IOException("Exception in finding browser: " + errorMessage);
+        }
+        Object browser = locateBrowser();
+        if (browser == null) {
+          throw new IOException("Unable to locate browser: " + errorMessage);
+        }
 
-      Process process = null;
+        Process process = null;
 
-      switch (jvm) {
-        case MRJ_2_0:
-          Object aeDesc = null;
-          try {
-            aeDesc = aeDescConstructor.newInstance(new Object[] { url });
-            putParameter.invoke(browser, new Object[] { keyDirectObject, aeDesc });
-            sendNoReply.invoke(browser, new Object[] { });
-          } catch (InvocationTargetException ite) {
-            throw new IOException("InvocationTargetException while creating AEDesc: " + ite.getMessage());
-          } catch (IllegalAccessException iae) {
-            throw new IOException("IllegalAccessException while building AppleEvent: " + iae.getMessage());
-          } catch (InstantiationException ie) {
-            throw new IOException("InstantiationException while creating AEDesc: " + ie.getMessage());
-          } finally {
-            aeDesc = null;	// Encourage it to get disposed if it was created
-            browser = null;	// Ditto
-          }
-          break;
-        case MRJ_2_1:
-          Runtime.getRuntime().exec(new String[] { (String) browser, url } );
-          break;
-        case MRJ_3_0:
-          int[] instance = new int[1];
-          int result = ICStart(instance, 0);
-          if (result == 0) {
-            int[] selectionStart = new int[] { 0 };
-            byte[] urlBytes = url.getBytes();
-            int[] selectionEnd = new int[] { urlBytes.length };
-            result = ICLaunchURL(instance[0], new byte[] { 0 }, urlBytes,
-                        urlBytes.length, selectionStart,
-                        selectionEnd);
+        switch (jvm) {
+          case MRJ_2_0:
+            Object aeDesc = null;
+            try {
+              aeDesc = aeDescConstructor.newInstance(new Object[] { url });
+              putParameter.invoke(browser, new Object[] { keyDirectObject, aeDesc });
+              sendNoReply.invoke(browser, new Object[] { });
+            } catch (InvocationTargetException ite) {
+              throw new IOException("InvocationTargetException while creating AEDesc: " + ite.getMessage());
+            } catch (IllegalAccessException iae) {
+              throw new IOException("IllegalAccessException while building AppleEvent: " + iae.getMessage());
+            } catch (InstantiationException ie) {
+              throw new IOException("InstantiationException while creating AEDesc: " + ie.getMessage());
+            } finally {
+              aeDesc = null;	// Encourage it to get disposed if it was created
+              browser = null;	// Ditto
+            }
+            break;
+          case MRJ_2_1:
+            Runtime.getRuntime().exec(new String[] { (String) browser, url } );
+            break;
+          case MRJ_3_0:
+            int[] instance = new int[1];
+            int result = ICStart(instance, 0);
             if (result == 0) {
-              // Ignore the return value; the URL was launched successfully
-              // regardless of what happens here.
-              ICStop(instance);
-            } else {
-              throw new IOException("Unable to launch URL: " + result);
-            }
-          } else {
-            throw new IOException("Unable to create an Internet Config instance: " + result);
-          }
-          break;
-        case MRJ_3_1:
-          try {
-            openURL.invoke(null, new Object[] { url });
-          } catch (InvocationTargetException ite) {
-            throw new IOException("InvocationTargetException while calling openURL: " + ite.getMessage());
-          } catch (IllegalAccessException iae) {
-            throw new IOException("IllegalAccessException while calling openURL: " + iae.getMessage());
-          }
-          break;
-        case WINDOWS_NT:
-            // <<<< Marcin - my alternate way to start browser that reuses an open browser window
-  //          Process process = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
-  //          // This avoids a memory leak on some versions of Java on Windows.
-  //          // That's hinted at in <http://developer.java.sun.com/developer/qow/archive/68/>.
-  //          try {
-  //            process.waitFor();
-  //            process.exitValue();
-  //          } catch (InterruptedException ie) {
-  //            throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
-  //          }
-  //          break;
-            // >>>>
-        case WINDOWS_9x:
-          // Add quotes around the URL to allow ampersands and other special
-          // characters to work.
-          // <<<<  Marcin -- fix Win9x launch by specifing the default parameter '/r'
-          String startOptions = THIRD_WINDOWS_PARAMETER; 
-          if (jvm == WINDOWS_9x)
-            startOptions = "\"/r\"";
-          // >>>>
-          process = Runtime.getRuntime().exec(new String[] { (String) browser,
-                                FIRST_WINDOWS_PARAMETER,
-                                SECOND_WINDOWS_PARAMETER,
-                                startOptions,
-                                '"' + url + '"' });
-          // This avoids a memory leak on some versions of Java on Windows.
-          // That's hinted at in <http://developer.java.sun.com/developer/qow/archive/68/>.
-          try {
-            process.waitFor();
-            process.exitValue();
-          } catch (InterruptedException ie) {
-            throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
-          }
-          break;
-        case OTHER:
-          // assume Unix or Linux
-//          // Assume that we're on Unix and that Netscape is installed
-//          // First, attempt to open the URL in a currently running session of Netscape
-//          process = Runtime.getRuntime().exec(new String[] { (String) browser,
-//                            NETSCAPE_REMOTE_PARAMETER,
-//                            NETSCAPE_OPEN_PARAMETER_START +
-//                            url +
-//                            NETSCAPE_OPEN_PARAMETER_END });
-//          try {
-//            int exitCode = process.waitFor();
-//            if (exitCode != 0) {	// if Netscape was not open
-              // <<<< Marcin - my alternate way to look for different browsers on linux
-          String[] browsers = { "firefox", "opera", "mozilla","netscape", "konqueror", "epiphany" };
-          String unixBrowser = null;
-          try {
-            for (int count = 0; count < browsers.length && unixBrowser == null; count++) {
-              if (Runtime.getRuntime().exec(new String[] {"which", browsers[count]}).waitFor() == 0) {
-                unixBrowser = browsers[count];
-                break;
+              int[] selectionStart = new int[] { 0 };
+              byte[] urlBytes = url.getBytes();
+              int[] selectionEnd = new int[] { urlBytes.length };
+              result = ICLaunchURL(instance[0], new byte[] { 0 }, urlBytes,
+                          urlBytes.length, selectionStart,
+                          selectionEnd);
+              if (result == 0) {
+                // Ignore the return value; the URL was launched successfully
+                // regardless of what happens here.
+                ICStop(instance);
+              } else {
+                throw new IOException("Unable to launch URL: " + result);
               }
+            } else {
+              throw new IOException("Unable to create an Internet Config instance: " + result);
             }
-          } catch (Throwable t) { }
-          if (unixBrowser == null) {
-            process = Runtime.getRuntime().exec(new String[] {(String)browser, url});
-          } else {
-            process = Runtime.getRuntime().exec(new String[] {unixBrowser, url});
-          }
-          try {
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-              // browser was not open
+            break;
+          case MRJ_3_1:
+            try {
+              openURL.invoke(null, new Object[] { url });
+            } catch (InvocationTargetException ite) {
+              throw new IOException("InvocationTargetException while calling openURL: " + ite.getMessage());
+            } catch (IllegalAccessException iae) {
+              throw new IOException("IllegalAccessException while calling openURL: " + iae.getMessage());
             }
-          } catch (InterruptedException ie) {
-            throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
-          }
-          break;
-        default:
-          // This should never occur, but if it does, we'll try the simplest thing possible
-          process = Runtime.getRuntime().exec(new String[] { (String) browser, url });
-          try {
-            int exitCode = process.waitFor();
-            if (exitCode != 0) { // if browser was not open
-              Runtime.getRuntime().exec(new String[] { (String) browser, url });
+            break;
+          case WINDOWS_NT:
+              // <<<< Marcin - my alternate way to start browser that reuses an open browser window
+    //          Process process = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+    //          // This avoids a memory leak on some versions of Java on Windows.
+    //          // That's hinted at in <http://developer.java.sun.com/developer/qow/archive/68/>.
+    //          try {
+    //            process.waitFor();
+    //            process.exitValue();
+    //          } catch (InterruptedException ie) {
+    //            throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
+    //          }
+    //          break;
+              // >>>>
+          case WINDOWS_9x:
+            // Add quotes around the URL to allow ampersands and other special
+            // characters to work.
+            // <<<<  Marcin -- fix Win9x launch by specifing the default parameter '/r'
+            String startOptions = THIRD_WINDOWS_PARAMETER; 
+            if (jvm == WINDOWS_9x)
+              startOptions = "\"/r\"";
+            // >>>>
+            process = Runtime.getRuntime().exec(new String[] { (String) browser,
+                                  FIRST_WINDOWS_PARAMETER,
+                                  SECOND_WINDOWS_PARAMETER,
+                                  startOptions,
+                                  '"' + url + '"' });
+            // This avoids a memory leak on some versions of Java on Windows.
+            // That's hinted at in <http://developer.java.sun.com/developer/qow/archive/68/>.
+            try {
+              process.waitFor();
+              process.exitValue();
+            } catch (InterruptedException ie) {
+              throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
             }
-          } catch (InterruptedException ie) {
-            throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
-          }
-          break;
+            break;
+          case OTHER:
+            // assume Unix or Linux
+  //          // Assume that we're on Unix and that Netscape is installed
+  //          // First, attempt to open the URL in a currently running session of Netscape
+  //          process = Runtime.getRuntime().exec(new String[] { (String) browser,
+  //                            NETSCAPE_REMOTE_PARAMETER,
+  //                            NETSCAPE_OPEN_PARAMETER_START +
+  //                            url +
+  //                            NETSCAPE_OPEN_PARAMETER_END });
+  //          try {
+  //            int exitCode = process.waitFor();
+  //            if (exitCode != 0) {	// if Netscape was not open
+                // <<<< Marcin - my alternate way to look for different browsers on linux
+            String[] browsers = { "firefox", "opera", "mozilla","netscape", "konqueror", "epiphany" };
+            String unixBrowser = null;
+            try {
+              for (int count = 0; count < browsers.length && unixBrowser == null; count++) {
+                if (Runtime.getRuntime().exec(new String[] {"which", browsers[count]}).waitFor() == 0) {
+                  unixBrowser = browsers[count];
+                  break;
+                }
+              }
+            } catch (Throwable t) { }
+            if (unixBrowser == null) {
+              process = Runtime.getRuntime().exec(new String[] {(String)browser, url});
+            } else {
+              process = Runtime.getRuntime().exec(new String[] {unixBrowser, url});
+            }
+            try {
+              int exitCode = process.waitFor();
+              if (exitCode != 0) {
+                // browser was not open
+              }
+            } catch (InterruptedException ie) {
+              throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
+            }
+            break;
+          default:
+            // This should never occur, but if it does, we'll try the simplest thing possible
+            process = Runtime.getRuntime().exec(new String[] { (String) browser, url });
+            try {
+              int exitCode = process.waitFor();
+              if (exitCode != 0) { // if browser was not open
+                Runtime.getRuntime().exec(new String[] { (String) browser, url });
+              }
+            } catch (InterruptedException ie) {
+              throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
+            }
+            break;
+        }
       }
     } // end appletContext == null
   }
@@ -638,40 +667,57 @@ public class BrowserLauncher {
    * @throws IOException If the web browser could not be located or does not run
    */
   public static void openFile(File file) throws IOException {
-    Process process = null;
-    switch (jvm) {
-      case MRJ_2_0:
-      case MRJ_2_1:
-      case MRJ_3_0:
-      case MRJ_3_1:
-        process = Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
-        break;
-      case WINDOWS_NT:
-      case WINDOWS_9x:
-        if (file.isDirectory())
-          process = Runtime.getRuntime().exec(new String[] { "rundll32", "url.dll,FileProtocolHandler", file.getAbsolutePath() });
-        else
-          process = Runtime.getRuntime().exec(new String[] { "rundll32", "SHELL32.DLL,ShellExec_RunDLL", file.getAbsolutePath() });
-        try {
-          int exitValue = -1;
-          if (process != null)
-            exitValue = process.waitFor();
-          if (exitValue < 0) {
-            if (jvm == WINDOWS_9x) {
-              process = Runtime.getRuntime().exec(new String[] { "start", file.getAbsolutePath() });
-            } else {
-              Runtime.getRuntime().exec(new String[] { "cmd", "/c", "start", file.getAbsolutePath() });
+    boolean invokedWithCore = false;
+    // quick fix is to use Java 1.6 Desktop class and fallback on the old code.
+    try {
+      Class desktopClass = Class.forName("java.awt.Desktop");
+      Method getDesktop = desktopClass.getMethod("getDesktop", null);
+      Object desktopObj = getDesktop.invoke(null, null);
+      Method open = desktopClass.getMethod("open", new Class[] {File.class});
+      open.invoke(desktopObj, new Object[] {file});
+      invokedWithCore = true;
+    } catch (ClassNotFoundException e1) {
+    } catch (NoSuchMethodException e2) {
+    } catch (IllegalAccessException e3) {
+    } catch (InvocationTargetException e4) {
+    } catch (Throwable t) {
+    }
+    if (!invokedWithCore) {
+      Process process = null;
+      switch (jvm) {
+        case MRJ_2_0:
+        case MRJ_2_1:
+        case MRJ_3_0:
+        case MRJ_3_1:
+          process = Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
+          break;
+        case WINDOWS_NT:
+        case WINDOWS_9x:
+          if (file.isDirectory())
+            process = Runtime.getRuntime().exec(new String[] { "rundll32", "url.dll,FileProtocolHandler", file.getAbsolutePath() });
+          else
+            process = Runtime.getRuntime().exec(new String[] { "rundll32", "SHELL32.DLL,ShellExec_RunDLL", file.getAbsolutePath() });
+          try {
+            int exitValue = -1;
+            if (process != null)
+              exitValue = process.waitFor();
+            if (exitValue < 0) {
+              if (jvm == WINDOWS_9x) {
+                process = Runtime.getRuntime().exec(new String[] { "start", file.getAbsolutePath() });
+              } else {
+                Runtime.getRuntime().exec(new String[] { "cmd", "/c", "start", file.getAbsolutePath() });
+              }
             }
+          } catch (InterruptedException e) {
           }
-        } catch (InterruptedException e) {
-        }
-        break;
-      case OTHER:
-        process = Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
-        break;
-      default:
-        process = Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
-        break;
+          break;
+        case OTHER:
+          process = Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
+          break;
+        default:
+          process = Runtime.getRuntime().exec(new String[] { "open", file.getAbsolutePath() });
+          break;
+      }
     }
   }
 
