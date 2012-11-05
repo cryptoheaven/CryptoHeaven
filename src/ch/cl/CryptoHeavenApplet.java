@@ -83,7 +83,11 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj, Applet
   private void setApplet(CryptoHeavenApplet app) {
     applet = app;
     Misc.setSystemExitObj(app);
-    BrowserLauncher.setAppletContext(app != null ? app : null);
+    try {
+      BrowserLauncher.setAppletContext(app != null ? app : null);
+    } catch (Throwable t) {
+      // catch all throwables incase this legacy class cannot be loaded and initialized
+    }
   }
 
   /**
