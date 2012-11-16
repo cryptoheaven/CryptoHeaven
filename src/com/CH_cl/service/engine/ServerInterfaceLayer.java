@@ -1767,6 +1767,15 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     return rc;
   }
 
+  public short getPersistentMainWorkerServerBuild() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getPersistentMainWorkerServerBuild()");
+    ServerInterfaceWorker mWorker = mainWorker;
+    boolean isPersistent = mWorker != null ? mWorker.isPersistent() : false;
+    short serverBuild = isPersistent ? mWorker.getSessionContextServerBuild() : 0;
+    if (trace != null) trace.exit(ServerInterfaceLayer.class, serverBuild);
+    return serverBuild;
+  }
+
   /**
   * @return maximum number of workers this manager can have
   */
@@ -2015,7 +2024,10 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // If client with no prior login encounters a connection exception, it has to exit.
           if (isClient && lastLoginMessageAction == null && t instanceof SILConnectionException) {
             destroyServer();
-            NotificationCenter.show(NotificationCenter.ERROR_CONNECTION, "No Connection", t.getMessage());
+            int msgType = NotificationCenter.ERROR_MESSAGE;
+            String title = "No Connection";
+            String key = msgType+title;
+            NotificationCenter.show(key, msgType, title, t.getMessage());
           }
           // Delay before we do anything with re-connectivity.
           try { Thread.sleep(DELAY_NEW_CONNECTION_AFTER_NET_ERROR); } catch (InterruptedException e) { }

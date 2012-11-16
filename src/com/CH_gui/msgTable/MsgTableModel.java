@@ -481,7 +481,7 @@ public class MsgTableModel extends RecordTableModel {
         case 2:
           boolean isStarred = msgLink.isStarred();
           boolean isFlagged = false;
-          StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+          StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
           if (stat != null)
             isFlagged = StatRecord.getIconForFlag(stat.getFlag(isModeMsgBody())) != ImageNums.IMAGE_NONE;
           if (isStarred && isFlagged)
@@ -722,7 +722,7 @@ public class MsgTableModel extends RecordTableModel {
 
           int flagIcon = ImageNums.IMAGE_NONE;
           if (toAddFlag) {
-            StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+            StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
             if (stat != null) {
               Short flagS = stat.getFlag(model.isModeMsgBody());
               flagIcon = StatRecord.getIconForFlag(flagS);

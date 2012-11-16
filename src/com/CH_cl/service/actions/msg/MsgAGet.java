@@ -74,9 +74,24 @@ public class MsgAGet extends ClientMessageAction {
   * and optionally returns a request Message.  If there is no request, null is returned.
   */
   public MessageAction runAction() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgAGet.class, "runAction(Connection)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgAGet.class, "runAction()");
 
     Msg_GetLinkAndData_Rp reply = (Msg_GetLinkAndData_Rp) getMsgDataSet();
+    MessageAction request = runAction(getServerInterfaceLayer(), reply, this);
+
+    if (trace != null) trace.exit(MsgAGet.class, request);
+    return request;
+  }
+
+  /**
+   * Run the action, also used by the folder re-synch code
+   * @param SIL
+   * @param reply
+   * @param context
+   * @return null
+   */
+  public static MessageAction runAction(ServerInterfaceLayer SIL, Msg_GetLinkAndData_Rp reply, MessageAction context) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgAGet.class, "runAction(ServerInterfaceLayer SIL, Msg_GetLinkAndData_Rp reply, MessageAction context)");
 
     Short fetchingOwnerObjType = reply.ownerObjType;
     Long fetchingOwnerObjId = reply.ownerObjId;
@@ -88,7 +103,7 @@ public class MsgAGet extends ClientMessageAction {
     MsgDataRecord[] dataRecords = reply.dataRecords;
     StatRecord[] statRecords = reply.stats_rp != null ? reply.stats_rp.stats : null;
 
-    FetchedDataCache cache = getFetchedDataCache();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     Set groupIDsSet = null;
 
 
@@ -144,7 +159,7 @@ public class MsgAGet extends ClientMessageAction {
     if (userIDsL != null && userIDsL.size() > 0) {
       Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
       userIDs = (Long[]) ArrayUtils.removeDuplicates(userIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000);
+      SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userIDs)), 30000);
     }
 
 
@@ -163,7 +178,7 @@ public class MsgAGet extends ClientMessageAction {
 //      Long[] keyIDs = new Long[keyIDsV.size()];
 //      keyIDsV.toArray(keyIDs);
 //      keyIDs = (Long[]) ArrayUtils.removeDuplicates(keyIDs);
-//      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyIDs)), 30000, 3);
+//      SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyIDs)), 30000, 3);
 //    }
 
 
@@ -182,15 +197,12 @@ public class MsgAGet extends ClientMessageAction {
     if (folderIDsL != null && folderIDsL.size() > 0) {
       Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
+      SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
 
     // Gather messages for removal by looking for non-existing messages, this works in fetches done in stages because they return data in sorted sequencial batches.
     MsgLinkRecord[] toRemoveMsgLinks = null;
     if (!anySkippedOver && fetchNumMax != null && fetchNumNew != null) {
-      // TODO remove temp check below
-      // temporary check before we upgrade engines to build 638 or newer
-      if ((getClientContext().serverBuild < 638 && timestamp != null) || getClientContext().serverBuild >= 638)
       if (linkRecords != null && linkRecords.length > 0) {
         MsgLinkRecord[] priorMsgs = cache.getMsgLinkRecords(linkRecords[0].dateCreated, linkRecords[linkRecords.length-1].dateCreated, fetchingOwnerObjId, fetchingOwnerObjType);
         toRemoveMsgLinks = (MsgLinkRecord[]) ArrayUtils.getDifference(priorMsgs, linkRecords);
@@ -251,7 +263,7 @@ public class MsgAGet extends ClientMessageAction {
       if (needMsgBody_dataIDsV != null) {
         for (int i=0; i<needMsgBody_dataIDsV.size(); i++) {
           Obj_IDList_Co request = new Obj_IDList_Co(new Long[] {(Long)(needMsgBody_shareIDsV.get(i)), (Long)(needMsgBody_linkIDsV.get(i)), null, new Long(1)});
-          getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000);
+          SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000);
         }
       }
     }
@@ -301,7 +313,7 @@ public class MsgAGet extends ClientMessageAction {
       HashSet objLinkIDsHS = null;
       for (int i=0; i<linkRecords.length; i++) {
         MsgLinkRecord link = linkRecords[i];
-        if (cache.getStatRecord(link.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE) == null) {
+        if (cache.getStatRecord(link.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
             FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
@@ -325,7 +337,7 @@ public class MsgAGet extends ClientMessageAction {
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request), 30000);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request), 30000);
       }
     }
 
@@ -365,7 +377,7 @@ public class MsgAGet extends ClientMessageAction {
         Long[] shareIDs = (Long[]) ArrayUtils.toArray(shareL, Long.class);
         shareIDs = (Long[]) ArrayUtils.removeDuplicates(shareIDs);
         Msg_ToSymEnc_Rq request = new Msg_ToSymEnc_Rq(shareIDs, msgLinks);
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TO_SYM_ENC, request));
+        SIL.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_TO_SYM_ENC, request));
       }
     }
 
@@ -413,7 +425,7 @@ public class MsgAGet extends ClientMessageAction {
       }
       if (hashesL != null) {
         Obj_List_Co requestSet = new Obj_List_Co(hashesL);
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet), 30000);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.ADDR_Q_FIND_HASH, requestSet), 30000);
         cache.addRequestedAddrHashes(hashesL);
       }
     }
@@ -434,8 +446,8 @@ public class MsgAGet extends ClientMessageAction {
         if (nextFetchActionsHM != null)
           nextFetchActionsHM.remove(fetchingFolderId);
       } else {
-        if (isInterrupted()) {
-          interrupt();
+        if (context.isInterrupted()) {
+          context.interrupt();
           // When connecting to pre build 388 engine this may be null when number of messages in the folder modulus fetchNumMax = 0, so check it just in case...
           if (fetchingFolderRec != null) {
             cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
@@ -451,7 +463,7 @@ public class MsgAGet extends ClientMessageAction {
           short numNew = fetchNumNew.shortValue();
           short numMax = fetchNumMax.shortValue();
 
-          long startTime = getStampTime();
+          long startTime = context.getStampTime();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
           double multiplier = ((double) MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time
@@ -494,8 +506,8 @@ public class MsgAGet extends ClientMessageAction {
           int actionCode = full ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
           MessageAction msgAction = new MessageAction(actionCode, request);
           if (!suppressAutoFetchContinuation) {
-            msgAction.setInterruptsFrom(this);
-            getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
+            msgAction.setInterruptsFrom(context);
+            SIL.submitAndReturn(msgAction, 30000);
           } else {
             if (nextFetchActionsHM == null)
               nextFetchActionsHM = new HashMap();

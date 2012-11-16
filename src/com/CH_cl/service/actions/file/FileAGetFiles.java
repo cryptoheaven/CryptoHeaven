@@ -12,21 +12,23 @@
 
 package com.CH_cl.service.actions.file;
 
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.actions.msg.MsgAGet;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.RecordEvent;
-
-import com.CH_co.service.msg.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
+import com.CH_co.service.msg.dataSets.file.File_GetLinks_Rp;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.stat.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ArrayUtils;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Set;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -57,9 +59,24 @@ public class FileAGetFiles extends ClientMessageAction {
   * and optionally returns a request Message.  If there is no request, null is returned.
   */
   public MessageAction runAction() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAGetFiles.class, "runAction(Connection)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAGetFiles.class, "runAction()");
 
     File_GetLinks_Rp reply = (File_GetLinks_Rp) getMsgDataSet();
+    MessageAction request = runAction(getServerInterfaceLayer(), reply, this);
+
+    if (trace != null) trace.exit(FileAGetFiles.class, request);
+    return request;
+  }
+
+  /**
+  * Run the action, also used by the folder re-synch code
+  * @param SIL
+  * @param reply
+  * @param context
+  * @return null
+  */
+  public static MessageAction runAction(ServerInterfaceLayer SIL, File_GetLinks_Rp reply, MessageAction context) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAGetFiles.class, "runAction(ServerInterfaceLayer SIL, File_GetLinks_Rp reply, MessageAction context)");
 
     Short fetchingOwnerObjType = reply.ownerObjType;
     Long fetchingOwnerObjId = reply.ownerObjId;
@@ -68,7 +85,7 @@ public class FileAGetFiles extends ClientMessageAction {
     FileLinkRecord[] fileLinks = reply.fileLinks;
     StatRecord[] statRecords = reply.stats_rp != null ? reply.stats_rp.stats : null;
 
-    FetchedDataCache cache = getFetchedDataCache();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     Set groupIDsSet = null;
 
     // Since getting file links may be a result of another user creating it,
@@ -98,9 +115,8 @@ public class FileAGetFiles extends ClientMessageAction {
     if (folderIDsL != null && folderIDsL.size() > 0) {
       Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
+      SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
-
 
     // update the fetched stats if any
     if (statRecords != null)
@@ -115,7 +131,7 @@ public class FileAGetFiles extends ClientMessageAction {
       ArrayList objLinkIDsL = null;
       for (int i=0; i<fileLinks.length; i++) {
         FileLinkRecord link = fileLinks[i];
-        if (cache.getStatRecord(link.fileLinkId, FetchedDataCache.STAT_TYPE_FILE) == null) {
+        if (cache.getStatRecord(link.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
             FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);
@@ -140,7 +156,7 @@ public class FileAGetFiles extends ClientMessageAction {
         request.ownerObjIDs = shareIDs;
         request.objLinkIDs = objLinkIDs;
 
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request), 30000);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.STAT_Q_GET, request), 30000);
       }
     }
 
@@ -158,8 +174,8 @@ public class FileAGetFiles extends ClientMessageAction {
         if (fetchingFolderRec != null)
           cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_COMPLETED);
       } else {
-        if (isInterrupted()) {
-          interrupt();
+        if (context.isInterrupted()) {
+          context.interrupt();
           // When connecting to pre build 388 engine this may be null when number of messages in the folder modulus fetchNumMax = 0, so check it just in case...
           if (fetchingFolderRec != null)
             cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_INTERRUPTED);
@@ -170,7 +186,7 @@ public class FileAGetFiles extends ClientMessageAction {
 
           short numMax = fetchNumMax.shortValue();
 
-          long startTime = getStampTime();
+          long startTime = context.getStampTime();
           long endTime = System.currentTimeMillis();
           double ellapsed = (double) Math.max(1, endTime-startTime); // avoid division by zero
           double multiplier = ((double) MsgAGet.MAX_BATCH_MILLIS) / ellapsed; // adjust the new fetch size so that it doesn't take too much time
@@ -195,8 +211,8 @@ public class FileAGetFiles extends ClientMessageAction {
 
           File_GetFiles_Rq request = new File_GetFiles_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, timeStamp);
           MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
-          msgAction.setInterruptsFrom(this);
-          getServerInterfaceLayer().submitAndReturn(msgAction, 30000);
+          msgAction.setInterruptsFrom(context);
+          SIL.submitAndReturn(msgAction, 30000);
         }
       }
     }

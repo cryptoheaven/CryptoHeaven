@@ -1,40 +1,39 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
-import java.util.*;
-import java.lang.reflect.Array;
-
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: Static utility methods that work on Records
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.20 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: Static utility methods that work on Records
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.20 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class RecordUtils extends Object {
 
   /** Creates new RecordUtils */
@@ -147,25 +146,25 @@ public class RecordUtils extends Object {
 
 
   /**
-   * @return an array with elements that exist in both arrays comparing using the getId() method.
-   * Elements from the sourceMap are returned.
-   */
+  * @return an array with elements that exist in both arrays comparing using the getId() method.
+  * Elements from the sourceMap are returned.
+  */
   public static Record[] AND(Map sourceMap, Record[] compareTo) {
     return pick(sourceMap, compareTo, true);
   }
   /**
-   * @return an array with elements that exist only in compareTo array as compared using the getId().equals() method
-   * Elements from the compareTo array are returned.
-   */
+  * @return an array with elements that exist only in compareTo array as compared using the getId().equals() method
+  * Elements from the compareTo array are returned.
+  */
   public static Record[] NOT(Map sourceMap, Record[] compareTo) {
     return pick(sourceMap, compareTo, false);
   }
 
 
   /**
-   * @return an array with elements that EXIST in the sourceMap when probed from compareTo array.
-   * Elements from the sourceMap if it exists there, or from compareTo is it doesn't exist in the sorceMap.
-   */
+  * @return an array with elements that EXIST in the sourceMap when probed from compareTo array.
+  * Elements from the sourceMap if it exists there, or from compareTo is it doesn't exist in the sorceMap.
+  */
   private static Record[] pick(Map sourceMap, Record[] recs, boolean exist) {
     ArrayList resultsL = new ArrayList(recs.length);
 
@@ -186,10 +185,10 @@ public class RecordUtils extends Object {
 
 
   /**
-   * Merge all existing map entries with new ones, and insert those not in the map yet.
-   * @return an array of records that were touched in the map either by merging or insertion.
-   * The returned array has the same runtime type as the sourceRecords array.
-   */
+  * Merge all existing map entries with new ones, and insert those not in the map yet.
+  * @return an array of records that were touched in the map either by merging or insertion.
+  * The returned array has the same runtime type as the sourceRecords array.
+  */
   public static Record[] merge(Map destinationMap, Record[] recs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "merge(Map destinationMap, Record[] recs)");
     if (trace != null) trace.args(destinationMap);
@@ -222,11 +221,11 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * Removes the elements specified in the array from the map.
-   * @return an array of records that were removed from the map if found there, or from toRemoveItems for ones that were not in the map.
-   * No records either in the map or from the array are merged during this operation.
-   * The returned array has the same runtime type as the toRemoveItems array.
-   */
+  * Removes the elements specified in the array from the map.
+  * @return an array of records that were removed from the map if found there, or from toRemoveItems for ones that were not in the map.
+  * No records either in the map or from the array are merged during this operation.
+  * The returned array has the same runtime type as the toRemoveItems array.
+  */
   public static Record[] remove(Map removeFromMap, Record[] recs) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "remove(Map removeFromMap, Record[] recs)");
     if (trace != null) trace.args(removeFromMap);
@@ -258,8 +257,8 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * @return the Record from the array with specified ID
-   */
+  * @return the Record from the array with specified ID
+  */
   public static Record find(Record[] records, Long id) {
     if (records != null && id != null) {
       for (int i=0; i<records.length; i++) {
@@ -276,8 +275,8 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * @return the Record from the List with specified ID
-   */
+  * @return the Record from the List with specified ID
+  */
   public static Record find(List records, Long id) {
     if (records != null && id != null) {
       for (int i=0; i<records.size(); i++) {
@@ -294,21 +293,21 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * @return true if record with specified ID is found.
-   */
+  * @return true if record with specified ID is found.
+  */
   public static boolean contains(Record[] records, Long id) {
     return find(records, id) != null ? true : false;
   }
   /**
-   * @return true if record with specified ID is found.
-   */
+  * @return true if record with specified ID is found.
+  */
   public static boolean contains(List records, Long id) {
     return find(records, id) != null ? true : false;
   }
 
   /**
-   * returns an array of cloned records.
-   */
+  * returns an array of cloned records.
+  */
   public static Record[] cloneRecords(Record[] src) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "cloneRecords(Record[] src)");
     if (trace != null) trace.args(src);
@@ -323,9 +322,9 @@ public class RecordUtils extends Object {
 
 
   /**
-   * @return the difference between specified arrays.
-   * The runtime instance of the array is Record[] !!!
-   */
+  * @return the difference between specified arrays.
+  * The runtime instance of the array is Record[] !!!
+  */
   public static Record[] getDifference(Record[] source, Record[] subtract) {
     return getDifference(source, subtract, null);
   }
@@ -348,9 +347,9 @@ public class RecordUtils extends Object {
     return recs;
   }
   /**
-   * @return the difference between specified arrays.
-   * The runtime instance of the array is Record[] !!!
-   */
+  * @return the difference between specified arrays.
+  * The runtime instance of the array is Record[] !!!
+  */
   public static Record[] getDifference(Record[] source, Set subtract, Comparator comparator) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "getDifference(Record[] source, Collection subtract, Comparator comparator)");
     if (trace != null) trace.args(source, subtract, comparator);
@@ -402,9 +401,9 @@ public class RecordUtils extends Object {
     return recs;
   }
   /**
-   * @return the difference between specified arrays.
-   * The runtime instance of the returned array has the runtime instance type of the first element
-   */
+  * @return the difference between specified arrays.
+  * The runtime instance of the returned array has the runtime instance type of the first element
+  */
   public static Record[] difference(Record[] source, Record[] subtract) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "difference(Record[] source, Record[] subtract)");
     if (trace != null) trace.args(source);
@@ -422,9 +421,9 @@ public class RecordUtils extends Object {
     return recs;
   }
   /**
-   * @return the difference between specified arrays.
-   * The runtime instance of the returned array has the runtime instance type of the first array
-   */
+  * @return the difference between specified arrays.
+  * The runtime instance of the returned array has the runtime instance type of the first array
+  */
   public static Record[] difference(Record[] source, Set subtract) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "difference(Record[] source, Set subtract)");
     if (trace != null) trace.args(source);
@@ -440,9 +439,9 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * Filter specified array.
-   * @return new instance of array of which has the runtime instance type of the source array.
-   */
+  * Filter specified array.
+  * @return new instance of array of which has the runtime instance type of the source array.
+  */
   public static Record[] filter(Record[] recs, RecordFilter filter) {
     Record[] keptRecords = null;
     if (recs != null) {
@@ -458,8 +457,8 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * Concatinates arrays and returns an Record[]
-   */
+  * Concatinates arrays and returns an Record[]
+  */
   public static Record[] concatinate(Record[] a1, Record[] a2) {
     Record[] array = null;
     if (a1 != null && a2 != null) {
@@ -479,8 +478,8 @@ public class RecordUtils extends Object {
   }
 
   /**
-   * Divides an array of IDs into series of smaller arrays.
-   */
+  * Divides an array of IDs into series of smaller arrays.
+  */
   public static Long[][] divideIntoChunks(Long[] ids, int chunkSize) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordUtils.class, "divideIntoChunks(Long[] ids, int chunkSize)");
     if (trace != null) trace.args(ids);

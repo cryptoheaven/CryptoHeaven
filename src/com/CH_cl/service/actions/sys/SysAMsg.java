@@ -38,8 +38,6 @@ import com.CH_co.util.*;
  */
 public class SysAMsg extends ClientMessageAction {
 
-  private static SingleTokenArbiter msgDialogArbiter = null;
-
   /** Creates new SysAMsg */
   public SysAMsg() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SysAMsg.class, "SysAMsg()");
@@ -61,7 +59,6 @@ public class SysAMsg extends ClientMessageAction {
 
     // Suppress the dialog if title and body are empty
     if (title != null && body != null) {
-      if (msgDialogArbiter == null) msgDialogArbiter = new SingleTokenArbiter();
       String key = msgType+title+body;
       int dialogType = NotificationCenter.ERROR_MESSAGE;
       if (msgType.equalsIgnoreCase("i")) {
@@ -71,7 +68,7 @@ public class SysAMsg extends ClientMessageAction {
       } else if (msgType.equalsIgnoreCase("e")) {
         dialogType = NotificationCenter.ERROR_MESSAGE;
       }
-      NotificationCenter.show(msgDialogArbiter, key, dialogType, title, body);
+      NotificationCenter.show(key, dialogType, title, body);
     }
 
     if (trace != null) trace.exit(SysAMsg.class, null);

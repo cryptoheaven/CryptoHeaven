@@ -741,7 +741,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       ArrayList statsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
-        StatRecord statRecord = cache.getStatRecord(records[i].fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+        StatRecord statRecord = cache.getStatRecord(records[i].fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
         if (statRecord != null && !statRecord.mark.equals(newMark))
           statsL.add(statRecord);
       }
@@ -953,7 +953,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           totalSize = new Long(fLink.origSize.longValue() + (totalSize != null ? totalSize.longValue() : 0));
 
           if (!(anySeen && anyUnseen)) {
-            StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+            StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
             if (statRecord != null) {
               if (statRecord.mark.equals(StatRecord.FLAG_OLD))
                 anySeen = true;
@@ -978,7 +978,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         FileRecord fRec = (FileRecord) tableModel.getRowObjectNoTrace(i);
         if (fRec instanceof FileLinkRecord) {
           FileLinkRecord fLink = (FileLinkRecord) fRec;
-          StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+          StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
           if (statRecord != null && (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))) {
             anyUnseenGlobal = true;
             break;

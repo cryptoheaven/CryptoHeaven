@@ -20,7 +20,6 @@ import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.MessageActionNameSwitch;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.NotificationCenter;
-import com.CH_co.util.SingleTokenArbiter;
 import com.CH_co.util.URLs;
 
 /** 
@@ -40,11 +39,6 @@ import com.CH_co.util.URLs;
 * @version 
 */
 public class InterruptMessageAction extends ClientMessageAction {
-
-  // Only one message dialog per interrupted action, issue tokens for the dialogs to 
-  // suppress multiple dialogs for a single actionCode, before the shown dialog is dismissed.
-  private static SingleTokenArbiter singleInterruptedDialogArbiter = new SingleTokenArbiter();
-
 
   /** Creates new InterruptMessageAction */
   public InterruptMessageAction(MessageAction interruptedAction) {
@@ -108,7 +102,7 @@ public class InterruptMessageAction extends ClientMessageAction {
           }
 
           if (!isSuppressed)
-            NotificationCenter.show(singleInterruptedDialogArbiter, key, msgType, title, msg);
+            NotificationCenter.show(key, msgType, title, msg);
         } else {
           if (trace != null) trace.data(100, "suppress interrupt msg");
         }

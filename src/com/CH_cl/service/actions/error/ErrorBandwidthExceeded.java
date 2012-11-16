@@ -58,9 +58,11 @@ public class ErrorBandwidthExceeded extends ClientMessageAction {
     // Check individual action GUI suppression, global flag will be checked by NotificationCenter
     if (!isGUIsuppressed) {
       Str_Rp reply = (Str_Rp) getMsgDataSet();
+      int msgType = NotificationCenter.ERROR_MESSAGE;
       String title = "Bandwidth Limit Exceeded";
       String msg = reply.message;
-      NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+      String key = msgType+title;
+      NotificationCenter.show(key, msgType, title, msg);
     }
 
     if (trace != null) trace.exit(ErrorBandwidthExceeded.class, null);

@@ -1,39 +1,39 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.17 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.17 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class StatRecord extends Record { // implicit no-argument constructor
 
   public static final Short FLAG_NEW = new Short((short) 1);
@@ -51,6 +51,10 @@ public class StatRecord extends Record { // implicit no-argument constructor
   public static final byte STAT_TYPE_MESSAGE = 'M';
   public static final byte STAT_TYPE_UNKNOWN = 'U';
   public static final byte[] STAT_TYPES = new byte[] { STAT_TYPE_FILE, STAT_TYPE_FOLDER, STAT_TYPE_MESSAGE, STAT_TYPE_UNKNOWN };
+
+  public static final int STAT_TYPE_INDEX_FILE = 0;
+  public static final int STAT_TYPE_INDEX_FOLDER = 1;
+  public static final int STAT_TYPE_INDEX_MESSAGE = 2;
 
   public Long statId;
   public Long ownerUserId;
@@ -202,7 +206,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
       // Exception to the rule, stats are always fetched in whole so lets merge the delivery
       // date no matter what.  It should fix the lack of red flag for the first chat message.
       firstDelivered = record.firstDelivered;
-       */
+      */
     }
     else
       super.mergeError(updated);

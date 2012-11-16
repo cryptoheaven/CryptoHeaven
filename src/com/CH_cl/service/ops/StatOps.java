@@ -51,7 +51,7 @@ public class StatOps {
     if (msgLinks != null && msgLinks.length > 0) {
       ArrayList statUpdatesL = new ArrayList();
       for (int i=0; i<msgLinks.length; i++) {
-        StatRecord stat = cache.getStatRecord(msgLinks[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+        StatRecord stat = cache.getStatRecord(msgLinks[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
         if (stat != null && stat.mark.equals(StatRecord.FLAG_NEW)) {
           // clone the stats to send the request
           StatRecord statClone = (StatRecord) stat.clone();

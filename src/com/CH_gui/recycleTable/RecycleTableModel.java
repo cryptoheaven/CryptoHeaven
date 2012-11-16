@@ -246,7 +246,7 @@ public class RecycleTableModel extends RecordTableModel {
         case 0:
           boolean isStarred = fileLink.isStarred();
           boolean isFlagged = false;
-          StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+          StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(fileLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
           if (stat != null)
             isFlagged = StatRecord.getIconForFlag(stat.getFlag()) != ImageNums.IMAGE_NONE;
           if (isStarred && isFlagged)
@@ -311,7 +311,7 @@ public class RecycleTableModel extends RecordTableModel {
         case 0:
         boolean isStarred = msgLink.isStarred();
           boolean isFlagged = false;
-          StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+          StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
           if (stat != null)
             isFlagged = StatRecord.getIconForFlag(stat.getFlag()) != ImageNums.IMAGE_NONE;
           if (isStarred && isFlagged)

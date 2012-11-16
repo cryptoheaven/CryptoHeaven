@@ -106,7 +106,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
               outStream.flush();
               outStream.close();
               exportProgress.addProgress(" done.");
-              StatOps.markOldIfNeeded(SIL, msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+              StatOps.markOldIfNeeded(SIL, msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
             } else {
               exportProgress.addProgress(" already exists, skipped.");
             }

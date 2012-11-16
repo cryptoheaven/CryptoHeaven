@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.util;
 
@@ -23,14 +23,14 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ArrayUtils extends Object {
 
   /** @return true if an Array contain duplicate entries based of their equals comparison. */
@@ -52,8 +52,8 @@ public class ArrayUtils extends Object {
 
 
   /**
-   * Break off the string into multiple chunks inserting 'insertion' in between break points.
-   */
+  * Break off the string into multiple chunks inserting 'insertion' in between break points.
+  */
   public static String spreadString(String str, int charsPerInsertion, char insertion) {
     if (str.length() > charsPerInsertion) {
       int index = 0;
@@ -95,9 +95,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Returns a string of hexadecimal digits from an integer array. Each
-   * int is converted to 8 hex symbols.
-   */
+  * Returns a string of hexadecimal digits from an integer array. Each
+  * int is converted to 8 hex symbols.
+  */
   public static String toString(int[] ia) {
     int length = ia.length;
     char[] buf = new char[length * 8];
@@ -116,9 +116,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Returns a string of hexadecimal digits from a character. Each
-   * char is converted to 4 hex symbols.
-   */
+  * Returns a string of hexadecimal digits from a character. Each
+  * char is converted to 4 hex symbols.
+  */
   public static String toString(char c) {
     char[] buf = new char[4];
     buf[0] = HEX_DIGITS[(c >>> 12) & 0x0F];
@@ -129,8 +129,8 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Returns a byte array from a String containing hex encoding bytes.
-   */
+  * Returns a byte array from a String containing hex encoding bytes.
+  */
   public static byte[] toByteArray(String hex) {
     byte[] bytes = null;
     if (hex != null) {
@@ -164,10 +164,10 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Serialization of objects into String.
-   * @param o
-   * @return
-   */
+  * Serialization of objects into String.
+  * @param o
+  * @return
+  */
   public static String objToStr(Object o) {
     byte[] bytes = null;
     try {
@@ -183,10 +183,10 @@ public class ArrayUtils extends Object {
     return toString(bytes);
   }
   /**
-   * Un-Serialization of String into Object.
-   * @param s
-   * @return
-   */
+  * Un-Serialization of String into Object.
+  * @param s
+  * @return
+  */
   public static Object strToObj(String s) {
     Object obj = null;
     try {
@@ -201,10 +201,10 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Compares two byte arrays for equality.
-   *
-   * @return true if the arrays have identical contents
-   */
+  * Compares two byte arrays for equality.
+  *
+  * @return true if the arrays have identical contents
+  */
   private static boolean areEqual(byte[] a, byte[] b) {
     int aLength = a.length;
     if (aLength != b.length)
@@ -216,9 +216,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Returns an array of 2 hexadecimal digits (most significant
-   * digit first) corresponding to the lowest 8 bits of <i>n</i>.
-   */
+  * Returns an array of 2 hexadecimal digits (most significant
+  * digit first) corresponding to the lowest 8 bits of <i>n</i>.
+  */
   public static char[] byteToHexChars(int n) {
     char[] buf = {
       HEX_DIGITS[(n >>> 4) & 0x0F],
@@ -228,10 +228,10 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Returns a string of 8 hexadecimal digits (most significant
-   * digit first) corresponding to the integer <i>n</i>, which is
-   * treated as unsigned.
-   */
+  * Returns a string of 8 hexadecimal digits (most significant
+  * digit first) corresponding to the integer <i>n</i>, which is
+  * treated as unsigned.
+  */
   private static char[] intToHexChars(int n) {
     char[] buf = new char[8];
     for (int i = 7; i >= 0; i--) {
@@ -251,8 +251,8 @@ public class ArrayUtils extends Object {
 
 
   /** @return a new array of bytes of length=wantedLength or source if the
-   *  wantedLength is the length of the source array.
-   */
+  *  wantedLength is the length of the source array.
+  */
   public static byte[] fixLength(byte[] source, int wantedLength) {
     if (source.length == wantedLength)
       return source;
@@ -270,11 +270,11 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return a new array of Objects with two merged arrays and duplicates eliminated.
-   * The resulting array is of the same runtime instance as elements in the source arrays.
-   * The resulting array does not contain any duplicates when compared using the <code> equals </code> method.
-   * Order is always preserved.
-   */
+  * @return a new array of Objects with two merged arrays and duplicates eliminated.
+  * The resulting array is of the same runtime instance as elements in the source arrays.
+  * The resulting array does not contain any duplicates when compared using the <code> equals </code> method.
+  * Order is always preserved.
+  */
   public static Object[] mergeWithoutDuplicates (Object[] a1, Object[] a2) {
     if (a1 != null && a2 != null && !a1.getClass().equals(a2.getClass()))
       throw new IllegalArgumentException("Runtime instances of arrays do not match!");
@@ -315,9 +315,9 @@ public class ArrayUtils extends Object {
 
 
   /**
-   * Concatinates arrays and returns an Object[] of the same runtime instance
-   * as the source objects.
-   */
+  * Concatinates arrays and returns an Object[] of the same runtime instance
+  * as the source objects.
+  */
   public static Object[] concatinate(Object[] a1, Object[] a2) {
     if (a1 == null)
       return a2;
@@ -326,8 +326,8 @@ public class ArrayUtils extends Object {
     return concatinate(a1, a2, a1.getClass().getComponentType());
   }
   /**
-   * Concatinates arrays and returns an Object[] and returns a new array for component type specified.
-   */
+  * Concatinates arrays and returns an Object[] and returns a new array for component type specified.
+  */
   public static Object[] concatinate(Object[] a1, Object[] a2, Class type) {
     int size1 = a1 != null ? a1.length : 0;
     int size2 = a2 != null ? a2.length : 0;
@@ -341,8 +341,8 @@ public class ArrayUtils extends Object {
 
 
   /**
-   * Divides an array of Objects into series of smaller arrays.
-   */
+  * Divides an array of Objects into series of smaller arrays.
+  */
   public static Object[][] divideIntoChunks(Object[] objs, int chunkSize) {
     Object[][] chunkObjs = null;
     if (objs == null || objs.length == 0) {
@@ -368,10 +368,10 @@ public class ArrayUtils extends Object {
 
 
   /**
-   * Finds an object 'obj' in an array of objects.  n^2 performance, but quick for small arrays.
-   * Compares objects using the equals() method.
-   * @return an index to the found object or -1 if object is not found.
-   */
+  * Finds an object 'obj' in an array of objects.  n^2 performance, but quick for small arrays.
+  * Compares objects using the equals() method.
+  * @return an index to the found object or -1 if object is not found.
+  */
   public static int find(Object[] array, Object obj) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "find(Object[], Object)");
     if (trace != null) trace.args(array);
@@ -414,12 +414,12 @@ public class ArrayUtils extends Object {
 
 
   /**
-   * @return the difference between specified arrays.
-   * All runtime instances of the source and subtract arrays MUST be the same,
-   * or the returned array may have a wrong instance type.
-   * The runtime instance of the array is to hold object types specified by the
-   * source array type.
-   */
+  * @return the difference between specified arrays.
+  * All runtime instances of the source and subtract arrays MUST be the same,
+  * or the returned array may have a wrong instance type.
+  * The runtime instance of the array is to hold object types specified by the
+  * source array type.
+  */
   public static Object[] getDifference(Object[] source, Object[] subtract) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "getDifference(Object[] source, Object[] subtract)");
     if (trace != null) trace.args(source, subtract);
@@ -434,9 +434,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return the difference between specified arrays.
-   * The return instance is of runtime type Object[]
-   */
+  * @return the difference between specified arrays.
+  * The return instance is of runtime type Object[]
+  */
   public static Object[] getDifference2(Object[] source, Object[] subtract) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "getDifference2(Object[] source, Object[] subtract)");
     if (trace != null) trace.args(source, subtract);
@@ -474,18 +474,18 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return a new array of the same runtime instance without duplicate objects
-   * or the same array if no duplicates can be found.
-   */
+  * @return a new array of the same runtime instance without duplicate objects
+  * or the same array if no duplicates can be found.
+  */
   public static Object[] removeDuplicates(Object[] source) {
     if (source == null)
       return source;
     return removeDuplicates(source, source.getClass().getComponentType());
   }
   /**
-   * @return a new array of the specified runtime instance without duplicate objects
-   * or the same array if no duplicates can be found.  Order is always preserved.
-   */
+  * @return a new array of the specified runtime instance without duplicate objects
+  * or the same array if no duplicates can be found.  Order is always preserved.
+  */
   public static Object[] removeDuplicates(Object[] source, Class type) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "removeDuplicates(Object[] source, Class type)");
     if (trace != null) trace.args(source, type);
@@ -511,11 +511,11 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Removes all instances that 'equals()' the 'toRemove' object.
-   * @param source
-   * @param toRemove
-   * @return New instance of source array if anything was removed, the same instance otherwise.
-   */
+  * Removes all instances that 'equals()' the 'toRemove' object.
+  * @param source
+  * @param toRemove
+  * @return New instance of source array if anything was removed, the same instance otherwise.
+  */
   public static Object[] removeElements(Object[] source, Object toRemove) {
     Object[] result = null;
     boolean anyEquals = false;
@@ -538,11 +538,11 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Removes only the leading elements of the source array that 'equals()' the 'toRemove' object.
-   * @param source
-   * @param toRemove
-   * @return New instance of source array if anything was removed, the same instance otherwise.
-   */
+  * Removes only the leading elements of the source array that 'equals()' the 'toRemove' object.
+  * @param source
+  * @param toRemove
+  * @return New instance of source array if anything was removed, the same instance otherwise.
+  */
   public static Object[] removeLeadingElements(Object[] source, Object toRemove) {
     Object[] result = null;
     if (source.length == 0 || !source[0].equals(toRemove)) {
@@ -566,9 +566,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return an array of objects from the source array that match the type specified.
-   * Object classes are compared, instances subclassing specified type are considered different.
-   */
+  * @return an array of objects from the source array that match the type specified.
+  * Object classes are compared, instances subclassing specified type are considered different.
+  */
   public static Object[] gatherAllOfType(Object[] source, Class type) {
     ArrayList selectedL = null;
     if (source != null) {
@@ -582,9 +582,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return an array of objects from the source array that match the runtime instance specified.
-   * Object class trees are compared, instances subclassing specified type are considered equal.
-   */
+  * @return an array of objects from the source array that match the runtime instance specified.
+  * Object class trees are compared, instances subclassing specified type are considered equal.
+  */
   public static Object[] gatherAllOfInstance(Object[] source, Class type) {
     ArrayList selectedL = null;
     if (source != null) {
@@ -598,9 +598,9 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Replaces strings with substitute strings. The set is processed in sequence for result of set[0] may affect set[1].
-   * This method is performance optimized.
-   */
+  * Replaces strings with substitute strings. The set is processed in sequence for result of set[0] may affect set[1].
+  * This method is performance optimized.
+  */
   public static String replaceKeyWords(String str, String[][] sets) {
     return replaceKeyWords(str, sets, null, null, false);
   }
@@ -649,13 +649,13 @@ public class ArrayUtils extends Object {
     return str;
   }
   /**
-   * @param str The main text
-   * @param start The starting index of the tag of which we will check around
-   * @param end The ending index of the tag of which we will check around
-   * @param startTags Starting tags meant to be before the "start" index
-   * @param endTags Ending tags meant to be after the "end" index
-   * @return
-   */
+  * @param str The main text
+  * @param start The starting index of the tag of which we will check around
+  * @param end The ending index of the tag of which we will check around
+  * @param startTags Starting tags meant to be before the "start" index
+  * @param endTags Ending tags meant to be after the "end" index
+  * @return
+  */
   private static boolean isInsideSegment(String str, int start, int end, String[] startTags, String[] endTags) {
     boolean isAfterStartTag = false;
     boolean isBeforeEndTag = isBeforeEndTag(str, end, startTags, endTags);
@@ -700,10 +700,10 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * Replaces tags, using startTags and endTags specified, replace them with replacementTags.
-   * To match startTags only, leave endTag "" empty string
-   * startTags and endTags allow for multiple sets to accommodate upper and lower case variations
-   * For example: the following arguments will remove <HEAD> html tag and change "Hello" to "Hi"
+  * Replaces tags, using startTags and endTags specified, replace them with replacementTags.
+  * To match startTags only, leave endTag "" empty string
+  * startTags and endTags allow for multiple sets to accommodate upper and lower case variations
+  * For example: the following arguments will remove <HEAD> html tag and change "Hello" to "Hi"
     String str = "<html><head>Header</HEAD><body>Hello there</body></html>";
     String[][] startTags = new String[][] {
         { "<head", "<HEAD" },
@@ -717,7 +717,7 @@ public class ArrayUtils extends Object {
         "",
         "Hi",
       };
-   */
+  */
   public static String removeTags(String str, String[][] startTags, String[][] endTags, Object[] replacementTags) {
     return removeTags(str, startTags, endTags, replacementTags, true, null, null);
   }
@@ -804,8 +804,8 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return new instance of array of objects with runtime instance type of 'componentType'
-   */
+  * @return new instance of array of objects with runtime instance type of 'componentType'
+  */
   public static Object[] toArray(Collection objsCollection, Class componentType) {
     Object[] objs = null;
     if (objsCollection != null) {
@@ -818,15 +818,20 @@ public class ArrayUtils extends Object {
   }
 
   /**
-   * @return new instance of array of objects with runtime instance type of 'componentType'
-   */
+  * @return new instance of array of objects with runtime instance type of 'componentType', of same if componentType matches
+  */
   public static Object[] toArrayType(Object[] objsArrayToConvert, Class componentType) {
     Object[] objs = null;
     if (objsArrayToConvert != null) {
-      int length = objsArrayToConvert.length;
-      objs = (Object[]) Array.newInstance(componentType, length);
-      if (length > 0)
-        System.arraycopy(objsArrayToConvert, 0, objs, 0, length);
+      Class ofArray = objsArrayToConvert.getClass().getComponentType();
+      if (componentType.equals(ofArray)) {
+        objs = objsArrayToConvert;
+      } else {
+        int length = objsArrayToConvert.length;
+        objs = (Object[]) Array.newInstance(componentType, length);
+        if (length > 0)
+          System.arraycopy(objsArrayToConvert, 0, objs, 0, length);
+      }
     }
     return objs;
   }

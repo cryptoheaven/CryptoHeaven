@@ -158,7 +158,7 @@ public class JSortedTable extends JTable implements DisposableObj {
             int rawRow = sTable.convertMyRowIndexToModel(viewRow);
             MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
             if (msgLink != null)
-              StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+              StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
           }
         }
 

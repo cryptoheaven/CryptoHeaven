@@ -12,17 +12,17 @@
 
 package com.CH_cl.service.actions.fld;
 
-import java.util.*;
-
-import com.CH_co.trace.Trace;
-
-import com.CH_cl.service.actions.*;
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
+import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -59,7 +59,8 @@ public class FldARedFlagCount extends ClientMessageAction {
     Long[][] ids = reply.IDs;
 
     FetchedDataCache cache = getFetchedDataCache();
-    Vector updatedFoldersV = new Vector();
+    ArrayList updatedFoldersL = new ArrayList();
+    List fldIDsWithRedFlagL = new ArrayList();
 
     for (int i=0; i<ids[0].length; i++) {
       Long folderId = ids[0][i];
@@ -69,14 +70,32 @@ public class FldARedFlagCount extends ClientMessageAction {
       if (folderRecord != null) {
         boolean suppressSound = folderRecord.folderId.equals(cache.getUserRecord().junkFolderId) || folderRecord.folderId.equals(cache.getUserRecord().recycleFolderId);
         folderRecord.setUpdated(redFlagCount.intValue(), suppressSound);
-        updatedFoldersV.addElement(folderRecord);
+        updatedFoldersL.add(folderRecord);
+      }
+      if (redFlagCount != null && redFlagCount.longValue() > 0) {
+        fldIDsWithRedFlagL.add(folderId);
       }
     }
 
-    if (updatedFoldersV.size() > 0) {
-      FolderRecord[] updatedFolders = (FolderRecord[]) ArrayUtils.toArray(updatedFoldersV, FolderRecord.class);
+    if (updatedFoldersL.size() > 0) {
+      FolderRecord[] updatedFolders = (FolderRecord[]) ArrayUtils.toArray(updatedFoldersL, FolderRecord.class);
       // Cause folder listeners to do visual update.
       cache.addFolderRecords(updatedFolders);
+    }
+
+    // re-synch only those that were invalidated or never fetched and have a red flag
+    if (getCommonContext().serverBuild >= 730) {
+      ArrayList fldIDsToSynch = new ArrayList();
+      for (int i=0; i<fldIDsWithRedFlagL.size(); i++) {
+        Long fldId = (Long) fldIDsWithRedFlagL.get(i);
+        boolean wasFetched = FolderRecUtil.wasFolderFetchRequestIssued(fldId);
+        boolean wasInvalidated = FolderRecUtil.wasFolderViewInvalidated(fldId);
+        if (!wasFetched || wasInvalidated) {
+          fldIDsToSynch.add(fldId);
+        }
+      }
+      if (fldIDsToSynch.size() > 0)
+        FolderOps.runResynchFolders_Delayed(getServerInterfaceLayer(), fldIDsWithRedFlagL, 5000);
     }
 
     if (trace != null) trace.exit(FldARedFlagCount.class, null);

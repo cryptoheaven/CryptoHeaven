@@ -35,6 +35,7 @@ public class NotificationCenter {
   public static final int EMPTY_SPAM_FOLDER = 9009;
 
   private static Class implNotificationCenterI;
+  private static SingleTokenArbiter msgDialogArbiter = null;
 
   public static void setImpl(Class notificationCenterImpl) {
     implNotificationCenterI = notificationCenterImpl;
@@ -49,11 +50,12 @@ public class NotificationCenter {
       }
     }
   }
-  public static void show(final SingleTokenArbiter arbiter, final Object key, int type, String title, String msg) {
+  public static void show(final Object key, int type, String title, String msg) {
     if (implNotificationCenterI != null) {
       try {
         NotificationShowerI impl = (NotificationShowerI) implNotificationCenterI.newInstance();
-        impl.show(arbiter, key, type, title, msg);
+        if (msgDialogArbiter == null) msgDialogArbiter = new SingleTokenArbiter();
+        impl.show(msgDialogArbiter, key, type, title, msg);
       } catch (Throwable t) {
       }
     }

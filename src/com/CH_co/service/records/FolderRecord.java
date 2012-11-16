@@ -376,6 +376,9 @@ public class FolderRecord extends Record {
   public boolean isFileType() {
     return folderType.shortValue() == FolderRecord.FILE_FOLDER;
   }
+  public static boolean isFileType(short type) {
+    return type == FolderRecord.FILE_FOLDER;
+  }
   public boolean isGroupType() {
     return folderType.shortValue() == FolderRecord.GROUP_FOLDER;
   }

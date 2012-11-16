@@ -281,13 +281,15 @@ public class GlobalProperties extends Object {
   // build 722 Make the recycle table searchable
   // build 724 Fix message editor 'paste' ctrl-v for jre 1.4
   // build 726 Remove default 'Download' toolbar button from email tables, 'download'='email export' which is rare and confusable with 'save attachments'
+  // build 728 Work in progress towards Folder Synch, also fix for legacy BrowserLauncher to use Java 1.6 Desktop class if possible
+  // build 730 Folder Synch - working alpha
 
-  public static final short PROGRAM_BUILD_NUMBER = 726;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 730;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.7f;
-  public static final short PROGRAM_VERSION_MINOR = 2;
+  public static final short PROGRAM_VERSION_MINOR = 3;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

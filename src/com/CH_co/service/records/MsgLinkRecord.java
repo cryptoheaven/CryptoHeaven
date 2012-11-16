@@ -1,40 +1,47 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
-import com.CH_co.cryptx.*;
+import com.CH_co.cryptx.AsymmetricBlockCipher;
+import com.CH_co.cryptx.BA;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.cryptx.SymmetricBulkCipher;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.27 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.27 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class MsgLinkRecord extends Record implements LinkRecordI {
 
   public static final short STATUS_FLAG__DEFAULT = 0;
@@ -149,9 +156,9 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   }
 
   /**
-   * Seals the <code> symmetricKey </code> to <code> encSymmetricKey </code> 
-   * using the sealant object which is the owning object's symmetric key (case of postings and attachments).
-   */
+  * Seals the <code> symmetricKey </code> to <code> encSymmetricKey </code> 
+  * using the sealant object which is the owning object's symmetric key (case of postings and attachments).
+  */
   public void seal(BASymmetricKey ownerSymKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgLinkRecord.class, "seal(BASymmetricKey ownerSymKey)");
 
@@ -174,9 +181,9 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Seals the <code> symmetricKey </code> to <code> encSymmetricKey </code> 
-   * using the sealant object which is the recipients public key (case of personal message).
-   */
+  * Seals the <code> symmetricKey </code> to <code> encSymmetricKey </code> 
+  * using the sealant object which is the recipients public key (case of personal message).
+  */
   public void seal(KeyRecord recipientPubKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgLinkRecord.class, "seal(KeyRecord recipientPubKey)");
     if (ownerObjType != null || ownerObjId != null)
@@ -197,9 +204,9 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Unseals the <code> encSymmetricKey </code> into <code> symmetricKey </code> 
-   * using the unSealant object which is the owning object's symmetric key (case of postings and attachments).
-   */
+  * Unseals the <code> encSymmetricKey </code> into <code> symmetricKey </code> 
+  * using the unSealant object which is the owning object's symmetric key (case of postings and attachments).
+  */
   public void unSeal(BASymmetricKey ownerSymKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgLinkRecord.class, "unSeal(BASymmetricKey ownerSymKey)");
     if (trace != null) trace.args(ownerSymKey);
@@ -219,9 +226,9 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   }
 
   /**
-   * Unseals the <code> encSymmetricKey </code> into <code> symmetricKey </code> 
-   * using the unSealant object which is the recipient's private key (case of personal message).
-   */
+  * Unseals the <code> encSymmetricKey </code> into <code> symmetricKey </code> 
+  * using the unSealant object which is the recipient's private key (case of personal message).
+  */
   public void unSeal(KeyRecord privateKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgLinkRecord.class, "unSeal(KeyRecord privateKey)");
     if (!privateKey.keyId.equals(recPubKeyId))
@@ -283,8 +290,8 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   }
 
   /**
-   * @return index of fould message link (using collection's iterator) with given message id, or -1 if not found.
-   */
+  * @return index of fould message link (using collection's iterator) with given message id, or -1 if not found.
+  */
   public static int findLinkByMsgId(AbstractCollection collection, Long msgId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgLinkRecord.class, "findLinkByMsgId(AbstractCollection collection, Long msgId)");
     if (trace != null) trace.args(collection, msgId);
@@ -306,8 +313,8 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   }
 
   /**
-   * @return index (in the selectedIndexes) of fould message link with given message id, or -1 if not found.
-   */
+  * @return index (in the selectedIndexes) of fould message link with given message id, or -1 if not found.
+  */
   public static int findLinkByMsgId(AbstractCollection selectedIndexes, Vector collection, Long msgId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgLinkRecord.class, "findLinkByMsgId(AbstractCollection selectedIndexes, Vector collection, Long msgId)");
     if (trace != null) trace.args(selectedIndexes, collection, msgId);
@@ -387,14 +394,18 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   }
 
   /**********************
-   * LinkRecordI methods
-   *********************/
-  public Long getObjId() {
-    return msgId;
+  * LinkRecordI methods
+  *********************/
+  public int getCompatibleStatTypeIndex() {
+    return StatRecord.STAT_TYPE_INDEX_MESSAGE;
   }
 
-  public Long[] getObjIDs(LinkRecordI[] links) {
-    return getMsgIDs((MsgLinkRecord[]) links);
+  public Timestamp getCreatedStamp() {
+    return dateCreated;
+  }
+
+  public Long getObjId() {
+    return msgId;
   }
 
   public Short getOwnerObjType() {
@@ -403,10 +414,6 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
 
   public Long getOwnerObjId() {
     return ownerObjId;
-  }
-
-  public Long[] getOwnerObjIDs(LinkRecordI[] links, short ownerType) {
-    return getOwnerObjIDs((MsgLinkRecord[]) links, ownerType);
   }
 
   public void setId(Long id) {

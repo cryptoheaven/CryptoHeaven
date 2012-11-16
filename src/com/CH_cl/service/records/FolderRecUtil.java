@@ -33,14 +33,14 @@ import java.util.*;
 public class FolderRecUtil extends Object {
 
   // When folder contents is fetched, lets keep these folderIDs here.
-  private static final HashSet fldFetchRequestsIssuedHS = new HashSet();
+  private static final HashSet fldIDsFetchRequestsIssuedHS = new HashSet();
 
   // When folder view is invalidated, lets keep these marks here.
-  private static final Hashtable fldViewInvalidatedHT = new Hashtable();
+  private static final Hashtable fldIDsViewInvalidatedHT = new Hashtable();
 
-  public static synchronized List getFoldersFetched() {
+  public static synchronized List getFolderIDsFetched() {
     ArrayList list = new ArrayList();
-    Iterator iter = fldFetchRequestsIssuedHS.iterator();
+    Iterator iter = fldIDsFetchRequestsIssuedHS.iterator();
     while (iter.hasNext()) {
       Long folderId = (Long) iter.next();
       list.add(folderId);
@@ -48,9 +48,9 @@ public class FolderRecUtil extends Object {
     return list;
   }
 
-  public static synchronized List getFoldersFetchedAndInvalidated() {
+  public static synchronized List getFolderIDsFetchedAndInvalidated() {
     ArrayList list = new ArrayList();
-    Iterator iter = fldFetchRequestsIssuedHS.iterator();
+    Iterator iter = fldIDsFetchRequestsIssuedHS.iterator();
     while (iter.hasNext()) {
       Long folderId = (Long) iter.next();
       if (wasFolderViewInvalidated(folderId))
@@ -60,29 +60,39 @@ public class FolderRecUtil extends Object {
   }
 
   public static synchronized void markFolderFetchRequestIssued(Long folderId) {
-    fldFetchRequestsIssuedHS.add(folderId);
+    fldIDsFetchRequestsIssuedHS.add(folderId);
   }
+
   public static synchronized boolean wasFolderFetchRequestIssued(Long folderId) {
-    return folderId != null && fldFetchRequestsIssuedHS.contains(folderId);
+    return folderId != null && fldIDsFetchRequestsIssuedHS.contains(folderId);
   }
 
   public static synchronized void markFolderViewInvalidated(Long folderId, boolean isInvalidated) {
-    fldViewInvalidatedHT.put(folderId, Boolean.valueOf(isInvalidated));
+    fldIDsViewInvalidatedHT.put(folderId, Boolean.valueOf(isInvalidated));
   }
+
+  public static synchronized void markFolderViewInvalidated(Collection folderIDsL, boolean isInvalidated) {
+    Boolean flag = Boolean.valueOf(isInvalidated);
+    Iterator iter = folderIDsL.iterator();
+    while (iter.hasNext()) {
+      fldIDsViewInvalidatedHT.put(iter.next(), flag);
+    }
+  }
+
   public static synchronized boolean wasFolderViewInvalidated(Long folderId) {
     Boolean b = Boolean.FALSE;
     if (folderId != null)
-      b = (Boolean) fldViewInvalidatedHT.get(folderId);
+      b = (Boolean) fldIDsViewInvalidatedHT.get(folderId);
     return b != null ? b.booleanValue() : false;
   }
 
   public static synchronized void clear() {
-    fldFetchRequestsIssuedHS.clear();
-    fldViewInvalidatedHT.clear();
+    fldIDsFetchRequestsIssuedHS.clear();
+    fldIDsViewInvalidatedHT.clear();
   }
 
   public static synchronized void clearFetchedIDs() {
-    fldFetchRequestsIssuedHS.clear();
+    fldIDsFetchRequestsIssuedHS.clear();
   }
 
 }

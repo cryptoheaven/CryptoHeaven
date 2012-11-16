@@ -190,6 +190,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     return rc;
   }
 
+  protected short getSessionContextServerBuild() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "getSessionContextServerBuild()");
+    short serverBuild = sessionContext.serverBuild;
+    if (trace != null) trace.exit(ServerInterfaceWorker.class, serverBuild);
+    return serverBuild;
+  }
+
   protected long getSocketCreationStamp() {
     return creationTimestamp;
   }

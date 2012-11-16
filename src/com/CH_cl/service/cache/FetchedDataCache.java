@@ -96,9 +96,9 @@ public class FetchedDataCache extends Object {
 
   private ArrayList viewIterators;
 
-  public static final int STAT_TYPE_FILE = 0;
-  public static final int STAT_TYPE_FOLDER = 1;
-  public static final int STAT_TYPE_MESSAGE = 2;
+  public static final int STAT_TYPE_INDEX_FILE = StatRecord.STAT_TYPE_INDEX_FILE;
+  public static final int STAT_TYPE_INDEX_FOLDER = StatRecord.STAT_TYPE_INDEX_FOLDER;
+  public static final int STAT_TYPE_INDEX_MESSAGE = StatRecord.STAT_TYPE_INDEX_MESSAGE;
 
   EventListenerList myListenerList = new EventListenerList();
 
@@ -1555,7 +1555,7 @@ public class FetchedDataCache extends Object {
       fireFileLinkRecordUpdated(records, RecordEvent.REMOVE);
 
       // remove corresponding Stat Records
-      removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_FILE), false);
+      removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_INDEX_FILE), false);
 
       // recalculate flags in the involved folders
       statUpdatesInFoldersForVisualNotification(records, true);
@@ -2338,18 +2338,19 @@ public class FetchedDataCache extends Object {
       if (updatedFolders != null) {
         for (int i=0; i<updatedFolders.length; i++) {
           FolderRecord fRec = updatedFolders[i];
+          Long fRecId = fRec.folderId;
           int statType = -1;
           if (fRec != null) {
             Long[] statIDs = null;
             Record[] links = null;
             if (fRec.isFileType()) {
-              links = getFileLinkRecordsOwnerAndType(fRec.folderId, new Short(Record.RECORD_TYPE_FOLDER));
-              statType = STAT_TYPE_FILE;
+              links = getFileLinkRecordsOwnerAndType(fRecId, new Short(Record.RECORD_TYPE_FOLDER));
+              statType = STAT_TYPE_INDEX_FILE;
               if (trace != null) trace.data(30, links);
             }
             else if (fRec.isMsgType()) {
-              links = getMsgLinkRecordsOwnerAndType(fRec.folderId, new Short(Record.RECORD_TYPE_FOLDER));
-              statType = STAT_TYPE_MESSAGE;
+              links = getMsgLinkRecordsOwnerAndType(fRecId, new Short(Record.RECORD_TYPE_FOLDER));
+              statType = STAT_TYPE_INDEX_MESSAGE;
               if (trace != null) trace.data(31, links);
             }
             if (links != null && links.length > 0)
@@ -2373,7 +2374,13 @@ public class FetchedDataCache extends Object {
                     || newFlagCount == 0
                     || fRec.folderId.equals(getUserRecord().junkFolderId)
                     || fRec.folderId.equals(getUserRecord().recycleFolderId);
-            fRec.setUpdated(redFlagCount, suppressSound);
+            // Skip reporting ZERO count (or lower counts) if folder was never fetched as cached updates maybe incomplete... 
+            // Fallback on previous (maybe now incorrect) last server reported count.
+            if (fRec.getUpdateCount() > redFlagCount && FolderRecUtil.wasFolderFetchRequestIssued(fRecId) == false) {
+              // skip ZEROING unfetched folders, or reporting lower counts
+            } else {
+              fRec.setUpdated(redFlagCount, suppressSound);
+            }
           }
         } // end for
 
@@ -2468,7 +2475,7 @@ public class FetchedDataCache extends Object {
       fireMsgLinkRecordUpdated(records, RecordEvent.REMOVE);
 
       // remove corresponding Stat Records
-      removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_MESSAGE), false);
+      removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_INDEX_MESSAGE), false);
 
       // recalculate flags in the involved folders
       statUpdatesInFoldersForVisualNotification(records, true);

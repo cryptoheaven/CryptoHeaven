@@ -193,6 +193,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FLD_Q_RED_FLAG_COUNT), "Count New Objects for Folder(s)" },
       // Ring Ring
       { new Integer(CommandCodes.FLD_Q_RING_RING), "Ringing..." },
+      // Synch File/Message Folders
+      { new Integer(CommandCodes.FLD_Q_SYNC), "Synch Folders" },
 
 
       // =====================

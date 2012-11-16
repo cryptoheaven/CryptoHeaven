@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.actions;
 
@@ -31,14 +31,14 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ClientActionSwitch extends CommonActionSwitch {
 
   private static Switch_StrInt_Comparator codeComparator = new Switch_StrInt_Comparator(false, false);
@@ -133,6 +133,8 @@ public class ClientActionSwitch extends CommonActionSwitch {
       { new Integer(CommandCodes.FLD_A_RED_FLAG_COUNT), FldARedFlagCount.class.getName() },
       // Ring Ring
       { new Integer(CommandCodes.FLD_A_RING_RING), FldARingRing.class.getName() },
+      // Synch File/Message Folders
+      { new Integer(CommandCodes.FLD_A_SYNC), FldASync.class.getName() },
 
 
       // =====================
@@ -272,9 +274,9 @@ public class ClientActionSwitch extends CommonActionSwitch {
 
 
   /**
-   * Translates an Command Code into corresponding Client Action Class Name (classes located in this package only)
-   * @return name of the action class, (not fully qualified) String
-   */
+  * Translates an Command Code into corresponding Client Action Class Name (classes located in this package only)
+  * @return name of the action class, (not fully qualified) String
+  */
   public static String switchCodeToActionName(int msgCode) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ClientActionSwitch.class, "switchCodeToActionName(int msgCode)");
     if (trace != null) trace.args(msgCode);

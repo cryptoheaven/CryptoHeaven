@@ -113,7 +113,7 @@ public class FileAGetFilesData extends ClientMessageAction {
                                     destinationDirectory, isDefaultTempDir, fileLinkRecord.getFileName(),
                                     progressMonitor, fileLinkRecord.origSize);
           Stats.setStatus("File downloaded: "+fileLinkRecord.getFileName());
-          StatOps.markOldIfNeeded(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_FILE);
+          StatOps.markOldIfNeeded(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
         } catch (Throwable t) {
           // Failure of one of the files, should not affect the other when processing a few of them here.
           if (trace != null) trace.exception(FileAGetFilesData.class, 100, t);

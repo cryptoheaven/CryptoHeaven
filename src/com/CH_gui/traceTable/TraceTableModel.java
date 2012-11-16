@@ -270,11 +270,11 @@ public class TraceTableModel extends RecordTableModel {
         request.objLinkIDs = RecordUtils.getIDs(linksL);
         if (first.getOwnerObjType().shortValue() == Record.RECORD_TYPE_MESSAGE) {
           request.ownerObjType = new Short(Record.RECORD_TYPE_MESSAGE);
-          Long[] msgIDs = first.getOwnerObjIDs(links, Record.RECORD_TYPE_MESSAGE);
+          Long[] msgIDs = LinkRecordUtils.getOwnerObjIDs(links, Record.RECORD_TYPE_MESSAGE);
           request.ownerObjIDs = msgIDs;
         } else {
           request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
-          Long[] folderIDs = first.getOwnerObjIDs(links, Record.RECORD_TYPE_FOLDER);
+          Long[] folderIDs = LinkRecordUtils.getOwnerObjIDs(links, Record.RECORD_TYPE_FOLDER);
           Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderSharesMyForFolders(folderIDs, true));
           request.ownerObjIDs = shareIDs;
         }

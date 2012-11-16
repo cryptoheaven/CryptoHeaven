@@ -1,43 +1,46 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
+import com.CH_co.cryptx.BASymCipherBulk;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.cryptx.SymmetricBulkCipher;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_co.cryptx.*;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_co.util.NotificationCenter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.26 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.26 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
   public static final short STATUS_FLAG__DEFAULT = 0;
@@ -131,11 +134,11 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
 
 
   /**
-   * Seals the <code> fileType, fileName, symmetricKey </code>
-   * into <code> encFileType, encFileName, encSymmetricKey </code>
-   * using the sealant object which is the owner object's symmetric key.
-   * @param owner's symmetric key
-   */
+  * Seals the <code> fileType, fileName, symmetricKey </code>
+  * into <code> encFileType, encFileName, encSymmetricKey </code>
+  * using the sealant object which is the owner object's symmetric key.
+  * @param owner's symmetric key
+  */
   public void seal(BASymmetricKey sealingKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLinkRecord.class, "seal(BASymmetricKey sealingKey)");
     if (trace != null) trace.args(sealingKey);
@@ -157,8 +160,8 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
   }
 
   /**
-   * Seals the fileName and fileType with this object's symmetricKey.
-   */
+  * Seals the fileName and fileType with this object's symmetricKey.
+  */
   public void seal() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLinkRecord.class, "seal()");
 
@@ -190,11 +193,11 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
   }
 
   /**
-   * Unseals the <code> encFileType, encFileName, encSymmetricKey </code>
-   * into <code> fileType, fileName, symmetricKey </code> .
-   * using the unSealant object which is the owner object's symmetric key.
-   * @param owner's symmetric key
-   */
+  * Unseals the <code> encFileType, encFileName, encSymmetricKey </code>
+  * into <code> fileType, fileName, symmetricKey </code> .
+  * using the unSealant object which is the owner object's symmetric key.
+  * @param owner's symmetric key
+  */
   public void unSeal(BASymmetricKey unsealingKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLinkRecord.class, "unSeal(BASymmetricKey unsealingKey)");
     if (trace != null) trace.args(unsealingKey);
@@ -372,14 +375,18 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
   }
 
   /**********************
-   * LinkRecordI methods
-   *********************/
-  public Long getObjId() {
-    return fileId;
+  * LinkRecordI methods
+  *********************/
+  public int getCompatibleStatTypeIndex() {
+    return StatRecord.STAT_TYPE_INDEX_FILE;
   }
 
-  public Long[] getObjIDs(LinkRecordI[] links) {
-    return getFileIDs((FileLinkRecord[]) links);
+  public Timestamp getCreatedStamp() {
+    return recordCreated;
+  }
+
+  public Long getObjId() {
+    return fileId;
   }
 
   public Short getOwnerObjType() {
@@ -390,11 +397,8 @@ public class FileLinkRecord extends FileRecord implements LinkRecordI {
     return ownerObjId;
   }
 
-  public Long[] getOwnerObjIDs(LinkRecordI[] links, short ownerType) {
-    return getOwnerObjIDs((FileLinkRecord[]) links, ownerType);
-  }
-
   public void setId(Long id) {
     fileLinkId = id;
   }
+
 }

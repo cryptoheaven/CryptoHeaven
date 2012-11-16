@@ -1,33 +1,35 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
-import java.sql.Timestamp;
-import java.util.*;
-
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderShareRecord extends Record implements LinkRecordI {
 
   public static final short NO = 1;
@@ -119,11 +121,11 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Seals the <code> folderName, folderDesc, symmetricKey </code>
-   * into <code> encFolderName, encFolderDesc, encSymmetricKey </code>
-   * using the sealant object which is the Key Record and BASymmetricKey.
-   * Also sets pubKeyId.
-   */
+  * Seals the <code> folderName, folderDesc, symmetricKey </code>
+  * into <code> encFolderName, encFolderDesc, encSymmetricKey </code>
+  * using the sealant object which is the Key Record and BASymmetricKey.
+  * Also sets pubKeyId.
+  */
   public void seal(KeyRecord keyRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "seal(KeyRecord)");
 
@@ -143,10 +145,10 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   }
 
   /**
-   * Seals the <code> folderName, folderDesc </code>
-   * into <code> encFolderName, encFolderDesc </code>
-   * using the sealant object which is the BASymmetricKey of this record.
-   */
+  * Seals the <code> folderName, folderDesc </code>
+  * into <code> encFolderName, encFolderDesc </code>
+  * using the sealant object which is the BASymmetricKey of this record.
+  */
   public void seal() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "seal()");
 
@@ -169,10 +171,10 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Seals the <code> folderName, folderDesc, symmetricKey </code>
-   * to <code> encFolderName, endFolderDesc, encSymmetricKey </code>
-   * using the sealant object which is the owner's symKeyFldShares.
-   */
+  * Seals the <code> folderName, folderDesc, symmetricKey </code>
+  * to <code> encFolderName, endFolderDesc, encSymmetricKey </code>
+  * using the sealant object which is the owner's symKeyFldShares.
+  */
   public void seal(BASymmetricKey symKeyFldShares) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "seal(BASymmetricKey symKeyFldShares)");
 
@@ -198,10 +200,10 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code>
-   * into <code> folderName, folderDesc, symmetricKey </code>
-   * using the unSealant object which is the RSAPrivateKey and BASymmetricKey.
-   */
+  * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code>
+  * into <code> folderName, folderDesc, symmetricKey </code>
+  * using the unSealant object which is the RSAPrivateKey and BASymmetricKey.
+  */
   public void unSeal(RSAPrivateKey privateKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "unSeal(RSAPrivateKey)");
     if (trace != null) trace.args(privateKey);
@@ -234,10 +236,10 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**
-   * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code>
-   * into <code> folderName, folderDesc, symmetricKey </code>
-   * using the unSealant object which is the user's symKeyFldShares.
-   */
+  * Unseals the <code> encFolderName, encFolderDesc, encSymmetricKey </code>
+  * into <code> folderName, folderDesc, symmetricKey </code>
+  * using the unSealant object which is the user's symKeyFldShares.
+  */
   public void unSeal(BASymmetricKey symKeyFldShares) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderShareRecord.class, "unSeal(BASymmetricKey symKeyFldShares)");
     if (trace != null) trace.args(symKeyFldShares);
@@ -255,7 +257,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
         }
 
         super.unSeal();
-        
+
         symmetricKey = tempSymmetricKey;
         folderName = tempFolderName;
         folderDesc = tempFolderDesc;
@@ -461,8 +463,16 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
 
   /**********************
-   * LinkRecordI methods
-   *********************/
+  * LinkRecordI methods
+  *********************/
+  public int getCompatibleStatTypeIndex() {
+    return StatRecord.STAT_TYPE_INDEX_FOLDER;
+  }
+
+  public Timestamp getCreatedStamp() {
+    return dateCreated;
+  }
+
   public Long getObjId() {
     return folderId;
   }
@@ -473,14 +483,6 @@ public class FolderShareRecord extends Record implements LinkRecordI {
 
   public Short getOwnerObjType() {
     return ownerType;
-  }
-
-  public Long[] getOwnerObjIDs(LinkRecordI[] links, short ownerType) {
-    return getOwnerUserIDs((FolderShareRecord[]) links);
-  }
-
-  public Long[] getObjIDs(LinkRecordI[] links) {
-    return getFolderIDs((FolderShareRecord[]) links);
   }
 
   public void setId(Long id) {

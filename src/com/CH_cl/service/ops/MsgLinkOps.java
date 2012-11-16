@@ -12,7 +12,9 @@
 
 package com.CH_cl.service.ops;
 
+import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.queue.ProcessingFunctionI;
 import com.CH_co.queue.QueueMM1;
@@ -21,6 +23,7 @@ import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
 import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
 import com.CH_co.service.records.*;
+import com.CH_co.util.Misc;
 import java.util.ArrayList;
 
 /**
@@ -68,13 +71,19 @@ public class MsgLinkOps {
           request.IDs[0] = new Long[] { mLink.msgLinkId };
           request.IDs[1] = fromShareIDs;
 
-          SIL.submitAndWait(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request));
-
-          // re-query the cache after the request has completed
-          mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
-
-          // when we are all done fetching, resubmit owner Msg to cache for listeners to update rendering of attachments
-          cache.addMsgLinkRecords(new MsgLinkRecord[] { mLink });
+          ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request), 60000);
+          if (msgAction != null) {
+            Misc.suppressMsgDialogsGUI(true);
+            DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
+            Misc.suppressMsgDialogsGUI(false);
+            if (msgAction.getActionCode() > 0) {
+              // no error
+              // re-query the cache after the request has completed
+              mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
+              // when we are all done fetching, resubmit owner Msg to cache for listeners to update rendering of attachments
+              cache.addMsgLinkRecords(new MsgLinkRecord[] { mLink });
+            }
+          }
         }
       }
     } else {
@@ -89,7 +98,7 @@ public class MsgLinkOps {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       ArrayList statsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
-        StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_MESSAGE);
+        StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
         if (statRecord != null && !statRecord.mark.equals(newMark))
           statsL.add(statRecord);
       }
