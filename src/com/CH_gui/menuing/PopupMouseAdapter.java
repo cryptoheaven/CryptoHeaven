@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.menuing;
 
@@ -29,21 +29,21 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.CaretListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.12 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.12 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class PopupMouseAdapter extends MouseAdapter {
 
   private WeakReference registerForRef;
@@ -55,16 +55,15 @@ public class PopupMouseAdapter extends MouseAdapter {
     this.actionProducerRef = new WeakReference(actionProducer);
   }
 
-  public void mouseClicked(MouseEvent mouseEvent) {
+  public void mouseClicked(MouseEvent e) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PopupMouseAdapter.class, "mouseClicked(MouseEvent)");
-    if (trace != null) trace.args(mouseEvent);
+    if (trace != null) trace.args(e);
 
-    if (!mouseEvent.isConsumed() && SwingUtilities.isRightMouseButton(mouseEvent)) {
-
+    if (!e.isConsumed() && SwingUtilities.isRightMouseButton(e)) {
       JPopupMenu jPopupSpell = null;
       JPopupMenu jPopupActions = null;
 
-      Object source = mouseEvent.getSource();
+      Object source = e.getSource();
       if (source instanceof JComponent) {
         JComponent jComp = (JComponent) source;
         EventListener[] listeners = jComp.getListeners(CaretListener.class);
@@ -74,9 +73,9 @@ public class PopupMouseAdapter extends MouseAdapter {
           try {
             if (listener instanceof TigerBkgChecker) {
               TigerBkgChecker bgc = (TigerBkgChecker) listener;
-              Point pt = new Point(mouseEvent.getX(), mouseEvent.getY());
+              Point pt = new Point(e.getX(), e.getY());
               if (bgc.isInMisspelledWord(pt))
-                jPopupSpell = bgc.createPopupMenu(mouseEvent.getX(), mouseEvent.getY(), 8, "Ignore All", "Add to Dictionary", "(no spelling suggestions)");
+                jPopupSpell = bgc.createPopupMenu(e.getX(), e.getY(), 8, "Ignore All", "Add to Dictionary", "(no spelling suggestions)");
             }
           } catch (Throwable t) {
             t.printStackTrace();
@@ -109,8 +108,8 @@ public class PopupMouseAdapter extends MouseAdapter {
       }
 
       if (jPopup != null) {
-        mouseEvent.consume();
-        jPopup.show((Component) mouseEvent.getSource(), mouseEvent.getX(), mouseEvent.getY());
+        e.consume();
+        jPopup.show((Component) e.getSource(), e.getX(), e.getY());
       }
 
     }

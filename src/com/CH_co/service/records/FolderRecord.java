@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
@@ -20,14 +20,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderRecord extends Record {
 
   public static final short INTERNAL_ANY_SHARED_FOLDER = 0; // For internal use only, not a DB type
@@ -286,7 +286,7 @@ public class FolderRecord extends Record {
                 //numOfShares.shortValue() > 1 && // make chat archives also a chatting folder type
                 (numToKeep.shortValue() > 0 || keepAsOldAs.intValue() > 0)
               )
-           );
+          );
   }
 
   public boolean isChattingLive() {
@@ -297,7 +297,7 @@ public class FolderRecord extends Record {
     return (folderType.shortValue() == POSTING_FOLDER &&
             numOfShares.shortValue() > 1 &&
             (numToKeep.shortValue() > 0 || keepAsOldAs.intValue() > 0)
-           );
+          );
   }
 
   public boolean isDynamicName() {
@@ -316,9 +316,9 @@ public class FolderRecord extends Record {
   }
 
   /**
-   * @return string representation of folder type (ignore chatting folders, return posting instead)
-   * To include chatting folders in description, use the non-static version of GetFolderType.
-   */
+  * @return string representation of folder type (ignore chatting folders, return posting instead)
+  * To include chatting folders in description, use the non-static version of GetFolderType.
+  */
   public static String getFolderType(short type) {
     String typeName = null;
 
@@ -373,6 +373,12 @@ public class FolderRecord extends Record {
             type == CATEGORY_CHAT_FOLDER ||
             type == CATEGORY_GROUP_FOLDER;
   }
+  public boolean isContactType() {
+    return folderType.shortValue() == FolderRecord.CONTACT_FOLDER;
+  }
+  public static boolean isContactType(short type) {
+    return type == FolderRecord.CONTACT_FOLDER;
+  }
   public boolean isFileType() {
     return folderType.shortValue() == FolderRecord.FILE_FOLDER;
   }
@@ -416,9 +422,9 @@ public class FolderRecord extends Record {
   }
 
   /**
-   * Local update marking so that renderer may display updated folders differently
-   * and reset when user accesses the folder to check the updates.
-   */
+  * Local update marking so that renderer may display updated folders differently
+  * and reset when user accesses the folder to check the updates.
+  */
   public void setUpdated(int num, boolean suppressSound) {
     int oldNum = numOfUpdates;
     numOfUpdates = num;

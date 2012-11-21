@@ -141,17 +141,17 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       * and the popup window shown
       */
     addMouseListener(new MouseAdapter() {
-      public void mouseClicked(MouseEvent mouseEvent) {
+      public void mouseClicked(MouseEvent e) {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MouseAdapter.class, "mouseClicked(MouseEvent)");
-        if (trace != null) trace.args(mouseEvent);
+        if (trace != null) trace.args(e);
         if (trace != null) trace.data(10, "in FolderActionTree.class");
-        boolean rightButton = SwingUtilities.isRightMouseButton(mouseEvent);
-        boolean doubleClick = mouseEvent.getClickCount() == 2;
-        if (rightButton || doubleClick) {
-          Object source = mouseEvent.getSource();
+        boolean isPopupTrigger = SwingUtilities.isRightMouseButton(e);
+        boolean doubleClick = e.getClickCount() == 2;
+        if (isPopupTrigger || doubleClick) {
+          Object source = e.getSource();
           if (source instanceof FolderTree) {
             FolderTree treeSource = (FolderTree) source;
-            int row = treeSource.getRowForLocation(mouseEvent.getX(), mouseEvent.getY());
+            int row = treeSource.getRowForLocation(e.getX(), e.getY());
             if (row >= 0) {
               if (!treeSource.isRowSelected(row))
                 treeSource.setSelectionRow(row);
@@ -159,16 +159,16 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
             if (doubleClick) {
               Action doubleClickAction = getDoubleClickAction();
               if (doubleClickAction != null)
-                doubleClickAction.actionPerformed(new ActionEvent(mouseEvent.getSource(), mouseEvent.getID(), "doubleClick"));
+                doubleClickAction.actionPerformed(new ActionEvent(e.getSource(), e.getID(), "doubleClick"));
             }
           }
         }
         // expand selected Category Folder
         {
-          Object source = mouseEvent.getSource();
+          Object source = e.getSource();
           if (source instanceof FolderTree) {
             FolderTree treeSource = (FolderTree) source;
-            int row = treeSource.getRowForLocation(mouseEvent.getX(), mouseEvent.getY());
+            int row = treeSource.getRowForLocation(e.getX(), e.getY());
             if (row >= 0) {
               TreePath path = treeSource.getPathForRow(row);
               FolderPair folderPair = getLastPathComponentFolderPair(path);

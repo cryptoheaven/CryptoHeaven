@@ -238,7 +238,6 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       cache.removeContactRecords(cache.getContactRecords());
       // clear cached fetched folder IDs
       tableComp.clearCachedFetchedFolderIDs();
-      // TO-DO: Clean-up duplicate code...
       com.CH_cl.service.records.FolderRecUtil.clearFetchedIDs();
 
       // Mark Active Status right away since the GUI timer is scheduled in intervals...
@@ -472,7 +471,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
   public void readyForMainData(ServerInterfaceLayer SIL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrame.class, "readyForMainData(ServerInterfaceLayer SIL)");
-    SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE));
+    SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_INIT_DATA));
     if (trace != null) trace.exit(MainFrame.class);
   }
 

@@ -491,7 +491,7 @@ public class MainFrameStarter extends Object {
     public void readyForMainData(ServerInterfaceLayer SIL) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MainFrameStarter.class, "readyForMainData(ServerInterfaceLayer SIL)");
       // fetch contacts, root folders (including Sent folder for replying to message), etc...
-      SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_RECONNECT_UPDATE));
+      SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_INIT_DATA));
       if (trace != null) trace.exit(MainFrameStarter.class);
     }
   } // end class StarterLoginCoordinator

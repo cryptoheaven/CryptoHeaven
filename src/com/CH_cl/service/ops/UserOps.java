@@ -391,7 +391,7 @@ public class UserOps extends Object {
   }
 
   /**
-  * TO-DO: Legacy function because default email addresses are always fetched with User Handles... so remove this stuff...
+  * Find user's default email address in the cache or fetch from the server.
   * @return personal (nullable), short, full parts of default email address for specified user
   */
   public static String[] getOrFetchDefaultEmail(ServerInterfaceLayer SIL, UserRecord userRecord, boolean isGeneratePersonalPart) {

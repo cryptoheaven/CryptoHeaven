@@ -55,8 +55,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.USR_Q_LOGIN_SECURE_SESSION), "Open Secure Channel" },
       // Get Login Info
       { new Integer(CommandCodes.USR_Q_GET_LOGIN_INFO), "Get Login Data" },
-      // Get Re-Connection Update
-      { new Integer(CommandCodes.USR_Q_GET_RECONNECT_UPDATE), "Get Re-Connection Update" },
+      // Get Initial Data -- for loading client application views
+      { new Integer(CommandCodes.USR_Q_GET_INIT_DATA), "Get Initial Data" },
       // Get My Info
       { new Integer(CommandCodes.USR_Q_GET_INFO), "Retrieve Account" },
       // Get Sub-Account Info

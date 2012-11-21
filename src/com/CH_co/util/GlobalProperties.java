@@ -283,8 +283,9 @@ public class GlobalProperties extends Object {
   // build 726 Remove default 'Download' toolbar button from email tables, 'download'='email export' which is rare and confusable with 'save attachments'
   // build 728 Work in progress towards Folder Synch, also fix for legacy BrowserLauncher to use Java 1.6 Desktop class if possible
   // build 730 Folder Synch - working alpha
+  // build 732 Folder Synch - working beta adds synch of Contacts and Folder-tree
 
-  public static final short PROGRAM_BUILD_NUMBER = 730;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 732;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

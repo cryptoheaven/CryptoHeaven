@@ -132,10 +132,9 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         public void mouseClicked(MouseEvent e) {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MouseAdapter.class, "mouseClicked(MouseEvent e)");
           if (trace != null) trace.args(e);
-          // TO-DO: ????? popup triggering mouse clicks don't work!!!!
-          // if (e.isPopupTrigger()) {
-          if (!e.isConsumed() && SwingUtilities.isRightMouseButton(e)) {
-            if (trace != null) trace.data(10, "popupTrigger");
+          boolean isPopupTrigger = SwingUtilities.isRightMouseButton(e);
+          if (trace != null) trace.data(10, "popupTrigger");
+          if (!e.isConsumed() && isPopupTrigger) {
             Component c = e.getComponent();
             Component deepestComponent = SwingUtilities.getDeepestComponentAt(c, e.getX(), e.getY());
             if (trace != null) trace.info(11, "deepestComponent", deepestComponent);

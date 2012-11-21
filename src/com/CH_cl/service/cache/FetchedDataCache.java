@@ -13,19 +13,18 @@
 package com.CH_cl.service.cache;
 
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
+import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_cl.util.GlobalSubProperties;
-
 import com.CH_co.cryptx.*;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import java.security.*;
+import java.security.MessageDigest;
 import java.util.*;
 
 /**
@@ -925,7 +924,7 @@ public class FetchedDataCache extends Object {
 
       // use the changed shares instead of just the ones added
       records = (FolderShareRecord[]) ArrayUtils.toArray(sharesChanged, FolderShareRecord.class);
-      
+
       for (int i=0; i<records.length; i++) {
         // Clear folder cached data if applicable.
         FolderShareRecord sRec = records[i];
@@ -1019,6 +1018,18 @@ public class FetchedDataCache extends Object {
         FolderRecord[] fRecsToRemove = (FolderRecord[]) ArrayUtils.toArray(fRecsToRemoveL, FolderRecord.class);
         removeFolderRecords(fRecsToRemove);
       }
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  public synchronized void removeFolderShareRecords(Long[] shareIDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeFolderShareRecords(Long[] shareIDs)");
+    if (trace != null) trace.args(shareIDs);
+
+    FolderShareRecord[] shares = getFolderShareRecords(shareIDs);
+    if (shares != null && shares.length > 0) {
+      removeFolderShareRecords(shares);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -1996,6 +2007,18 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
+  public synchronized void removeContactRecords(Long[] contactIDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeContactRecords(Long[] contactIDs)");
+    if (trace != null) trace.args(contactIDs);
+
+    ContactRecord[] contacts = getContactRecords(contactIDs);
+    if (contacts != null && contacts.length > 0) {
+      removeContactRecords(contacts);
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
   private void unWrapContactRecords(ContactRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapContactRecords(ContactRecord[] records)");
     if (trace != null) trace.args(records);
@@ -2101,6 +2124,24 @@ public class FetchedDataCache extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecords()");
 
     ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactRecordMap.values(), ContactRecord.class);
+
+    if (trace != null) trace.exit(FetchedDataCache.class, contacts);
+    return contacts;
+  }
+
+  public synchronized ContactRecord[] getContactRecords(Long[] contactIDs) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getContactRecords(Long[] contactIDs)");
+    if (trace != null) trace.args(contactIDs);
+
+    ArrayList contactsL = new ArrayList();
+    if (contactIDs != null) {
+      for (int i=0; i<contactIDs.length; i++) {
+        ContactRecord contact = (ContactRecord) contactRecordMap.get(contactIDs[i]);
+        if (contact != null)
+          contactsL.add(contact);
+      }
+    }
+    ContactRecord[] contacts = (ContactRecord[]) ArrayUtils.toArray(contactsL, ContactRecord.class);
 
     if (trace != null) trace.exit(FetchedDataCache.class, contacts);
     return contacts;

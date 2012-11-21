@@ -31,7 +31,6 @@ import com.CH_gui.action.AbstractActionTraced;
 import com.CH_gui.action.Actions;
 import com.CH_gui.actionGui.JActionButton;
 import com.CH_gui.actionGui.JActionFrame;
-import com.CH_gui.contactTable.ChatSessionCreator;
 import com.CH_gui.contactTable.ContactActionTable;
 import com.CH_gui.dialog.CustomizeColumnsDialog;
 import com.CH_gui.frame.MsgTableStarterFrame;
@@ -41,7 +40,6 @@ import com.CH_gui.msgTable.MsgTableModel;
 import com.CH_gui.service.records.ContactRecUtil;
 import com.CH_gui.sortedTable.JSortedTable;
 import com.CH_gui.sortedTable.TableSorter;
-import com.CH_gui.tree.FolderActionTree;
 import com.CH_gui.util.*;
 import java.awt.*;
 import java.awt.dnd.*;
@@ -118,15 +116,15 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
     /** If right mouse button is clicked then the node is being selected. */
     if (trace != null) trace.data(10, "adding mouse listener to record action table", this);
     jSTable.addMouseListener(new MouseAdapter() {
-      public void mouseClicked(MouseEvent mouseEvent) {
+      public void mouseClicked(MouseEvent e) {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "mouseClicked(MouseEvent mouseEvent)");
-        if (trace != null) trace.args(mouseEvent);
-        boolean rightButton = SwingUtilities.isRightMouseButton(mouseEvent);
-        if (trace != null) trace.data(10, "rightButton", rightButton);
-        boolean doubleClick = mouseEvent.getClickCount() == 2;
+        if (trace != null) trace.args(e);
+        boolean isPopupTrigger = SwingUtilities.isRightMouseButton(e);
+        if (trace != null) trace.data(10, "rightButton", isPopupTrigger);
+        boolean doubleClick = e.getClickCount() == 2;
         if (trace != null) trace.data(11, "doubleClick", doubleClick);
-        if (rightButton || doubleClick) {
-          int row = jSTable.rowAtPoint(mouseEvent.getPoint());
+        if (isPopupTrigger || doubleClick) {
+          int row = jSTable.rowAtPoint(e.getPoint());
           if (trace != null) trace.data(12, "row", row);
           if (row >= 0 && !jSTable.isRowSelected(row)) {
             if (trace != null) trace.data(13, "setRowSelectionInterval");
@@ -136,7 +134,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
             Action action = getDoubleClickAction();
             if (trace != null) trace.data(14, "action", action);
             if (action != null) {
-              action.actionPerformed(new ActionEvent(mouseEvent.getSource(), mouseEvent.getID(), "doubleClick"));
+              action.actionPerformed(new ActionEvent(e.getSource(), e.getID(), "doubleClick"));
             }
           }
         }

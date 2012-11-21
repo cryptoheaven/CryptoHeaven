@@ -13,7 +13,9 @@
 package com.CH_cl.service.actions.cnt;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.file.FileAGetFiles;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.cnt.Cnt_AcceptDecline_Rq;
@@ -51,10 +53,26 @@ public class CntAGetContacts extends ClientMessageAction {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CntAGetContacts.class, "runAction(Connection)");
 
     Cnt_GetCnts_Rp dataSet = (Cnt_GetCnts_Rp) getMsgDataSet();
+    MessageAction request = runAction(getServerInterfaceLayer(), dataSet, this);
+
+    if (trace != null) trace.exit(FileAGetFiles.class, request);
+    return request;
+  }
+
+  /**
+  * Run the action, also used by the folder re-synch code
+  * @param SIL
+  * @param dataSet
+  * @param context
+  * @return null
+  */
+  public static MessageAction runAction(ServerInterfaceLayer SIL, Cnt_GetCnts_Rp dataSet, MessageAction context) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CntAGetContacts.class, "runAction(ServerInterfaceLayer SIL, Cnt_GetCnts_Rp dataSet, MessageAction context)");
+
     ContactRecord[] contactRecords = dataSet.contactRecords;
     InvEmlRecord[] invEmlRecords = dataSet.invEmlRecords;
 
-    FetchedDataCache cache = getFetchedDataCache();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord myUser = cache.getUserRecord();
     Long userId = cache.getMyUserId();
     Set groupIDsSet = null;
@@ -83,7 +101,7 @@ public class CntAGetContacts extends ClientMessageAction {
     if (folderIDsL != null && folderIDsL.size() > 0) {
       Long[] folderIDs = (Long[]) ArrayUtils.toArray(folderIDsL, Long.class);
       folderIDs = (Long[]) ArrayUtils.removeDuplicates(folderIDs);
-      getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
+      SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_GET_FOLDERS_SOME, new Obj_IDList_Co(folderIDs)), 60000);
     }
 
     // See if we got any contacts for which we don't have user handles fetched
@@ -109,7 +127,7 @@ public class CntAGetContacts extends ClientMessageAction {
       }
       if (unknownUserIDsL != null && unknownUserIDsL.size() > 0) {
         Long[] unknownUserIDs = (Long[]) ArrayUtils.toArray(unknownUserIDsL, Long.class);
-        getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDs)), 30000);
+        SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDs)), 30000);
       }
     }
 
@@ -205,12 +223,12 @@ public class CntAGetContacts extends ClientMessageAction {
       }
       if (recryptedContactsWithMeL != null && recryptedContactsWithMeL.size() > 0) {
         ContactRecord[] recryptedContacts = (ContactRecord[]) ArrayUtils.toArray(recryptedContactsWithMeL, ContactRecord.class);
-        getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME, new Cnt_AcceptDecline_Rq(recryptedContacts)));
+        SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_RENAME_CONTACTS_WITH_ME, new Cnt_AcceptDecline_Rq(recryptedContacts)));
       }
       if (recryptedContactsMineL != null && recryptedContactsMineL.size() > 0) {
         for (int i=0; i<recryptedContactsMineL.size(); i++) {
           ContactRecord cRec = (ContactRecord) recryptedContactsMineL.get(i);
-          getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_RENAME_MY_CONTACT, new Cnt_Rename_Rq(cRec)));
+          SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_RENAME_MY_CONTACT, new Cnt_Rename_Rq(cRec)));
         }
       }
     }
@@ -221,7 +239,7 @@ public class CntAGetContacts extends ClientMessageAction {
       final ContactRecord cRec = contactRecords[i];
       if (cRec.status != null) {
         short status = cRec.status.shortValue();
-        if (cRec.ownerUserId != null && cRec.ownerUserId.equals(getFetchedDataCache().getMyUserId()) &&
+        if (cRec.ownerUserId != null && cRec.ownerUserId.equals(cache.getMyUserId()) &&
           (status == ContactRecord.STATUS_ACCEPTED || status == ContactRecord.STATUS_DECLINED)) {
           if (toAcknowledgeL == null) toAcknowledgeL = new ArrayList();
           toAcknowledgeL.add(cRec.contactId);
@@ -233,7 +251,7 @@ public class CntAGetContacts extends ClientMessageAction {
       Obj_IDList_Co reply = new Obj_IDList_Co();
       reply.IDs = (Long[]) ArrayUtils.toArray(toAcknowledgeL, Long.class);
       MessageAction replyMsg = new MessageAction(CommandCodes.CNT_Q_ACKNOWLEDGE_CONTACTS, reply);
-      getServerInterfaceLayer().submitAndReturn(replyMsg);
+      SIL.submitAndReturn(replyMsg);
     }
 
     if (trace != null) trace.exit(CntAGetContacts.class, null);

@@ -359,22 +359,18 @@ public class MsgPanelUtils extends Object {
         Container cnt = jMessage;
         Component[] comps = cnt.getComponents();
         if (comps != null) {
-          //System.out.println("comps length = " + comps.length);
           for (int i=0; i<comps.length; i++) {
             Component comp = comps[i];
             if (comp instanceof Container) {
               Container cnt2 = (Container) comp;
               Component[] comps2 = cnt2.getComponents();
               if (comps2 != null) {
-                //System.out.println("cmps2 length = " + comps2.length);
                 for (int j=0; j<comps2.length; j++) {
                   Component comp2 = comps2[j];
-                  //System.out.println("j " + comp2.getName() + ", " + comp2.getClass() + ", " + comp2.getClass().getName() + ", " + comp2.getClass().getSimpleName());
                   cnt2.remove(comp2);
                 }
               }
             }
-            //System.out.println("i " + comp.getName() + ", " + comp.getClass() + ", " + comp.getClass().getName() + ", " + comp.getClass().getSimpleName());
             cnt.remove(comp);
           }
         }
@@ -472,8 +468,6 @@ public class MsgPanelUtils extends Object {
       try {
         if (jMessage instanceof JTextComponent) {
           ((JTextComponent) jMessage).setCaretPosition(0);
-        } else {
-          // TO-DO: cobra
         }
       } catch (Throwable t) {
         if (trace != null) trace.exception(MsgPanelUtils.class, 100, t);

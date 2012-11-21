@@ -13,6 +13,7 @@
 package com.CH_cl.service.actions.fld;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.cnt.CntAGetContacts;
 import com.CH_cl.service.actions.file.FileAGetFiles;
 import com.CH_cl.service.actions.msg.MsgAGet;
 import com.CH_cl.service.cache.CacheFldUtils;
@@ -22,7 +23,9 @@ import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.msg.dataSets.cnt.Cnt_GetCnts_Rp;
 import com.CH_co.service.msg.dataSets.file.File_GetLinks_Rp;
+import com.CH_co.service.msg.dataSets.fld.Fld_Folders_Rp;
 import com.CH_co.service.msg.dataSets.msg.Msg_GetLinkAndData_Rp;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
@@ -112,18 +115,54 @@ public class FldASync extends ClientMessageAction {
         }
         requestStartStamp = (Timestamp) objSet.objs[objSet.objs.length-1];
 
-
+//System.out.println("FldASync: ========================");
         if (trace != null) trace.data(10, "folderId="+folderId);
+//        System.out.println("folderId="+folderId);
         if (trace != null) trace.data(11, "requestStampFirst="+Misc.objToStr(requestStartStamp));
+//        System.out.println("requestStampFirst="+Misc.objToStr(requestStartStamp));
 
         if (!isMemoryOverflow) {
           if (trace != null) trace.data(12, "num flags changed="+(linkIDsWithDiffStats != null ? linkIDsWithDiffStats.length : 0));
-          if (FolderRecord.isFileType(folderType.shortValue()))
-            if (trace != null) trace.data(13, "num new file="+(((File_GetLinks_Rp) linksNew).fileLinks != null ? ((File_GetLinks_Rp) linksNew).fileLinks.length : 0));
-          else if (FolderRecord.isMsgType(folderType.shortValue()))
+//          System.out.println("num flags changed="+(linkIDsWithDiffStats != null ? linkIDsWithDiffStats.length : 0));
+          if (folderId == null) {
+            if (trace != null) trace.data(13, "num new folders="+(((Fld_Folders_Rp) linksNew).folderRecords != null ? ((Fld_Folders_Rp) linksNew).folderRecords.length : 0));
+            if (trace != null) trace.data(13, "num new shares="+(((Fld_Folders_Rp) linksNew).shareRecords != null ? ((Fld_Folders_Rp) linksNew).shareRecords.length : 0));
+
+//            System.out.println("num new folders="+(((Fld_Folders_Rp) linksNew).folderRecords != null ? ((Fld_Folders_Rp) linksNew).folderRecords.length : 0));
+//            System.out.println("num new shares="+(((Fld_Folders_Rp) linksNew).shareRecords != null ? ((Fld_Folders_Rp) linksNew).shareRecords.length : 0));
+//            Fld_Folders_Rp r = (Fld_Folders_Rp) linksNew;
+//            System.out.println("New FOLDERS:");
+//            for (int k=0; k<r.folderRecords.length; k++) {
+//              System.out.println(r.folderRecords[k]);
+//            }
+//            System.out.println("New SHARES:");
+//            for (int k=0; k<r.shareRecords.length; k++) {
+//              System.out.println(r.shareRecords[k]);
+//            }
+//            
+//            System.out.println("New FOLDERS:");
+//            for (int k=0; k<r.folderRecords.length; k++) {
+//              System.out.println(ListRenderer.getRenderedText(r.folderRecords[k]));
+//            }
+//            System.out.println("New SHARES:");
+//            for (int k=0; k<r.shareRecords.length; k++) {
+//              System.out.println(ListRenderer.getRenderedText(r.shareRecords[k]));
+//            }
+
+          } else if (FolderRecord.isContactType(folderType.shortValue())) {
+            if (trace != null) trace.data(13, "num new contacts="+(((Cnt_GetCnts_Rp) linksNew).contactRecords != null ? ((Cnt_GetCnts_Rp) linksNew).contactRecords.length : 0));
+//            System.out.println("num new contacts="+(((Cnt_GetCnts_Rp) linksNew).contactRecords != null ? ((Cnt_GetCnts_Rp) linksNew).contactRecords.length : 0));
+          } else if (FolderRecord.isFileType(folderType.shortValue())) {
+            if (trace != null) trace.data(13, "num new files="+(((File_GetLinks_Rp) linksNew).fileLinks != null ? ((File_GetLinks_Rp) linksNew).fileLinks.length : 0));
+//            System.out.println("num new files="+(((File_GetLinks_Rp) linksNew).fileLinks != null ? ((File_GetLinks_Rp) linksNew).fileLinks.length : 0));
+          } else if (FolderRecord.isMsgType(folderType.shortValue())) {
             if (trace != null) trace.data(13, "num new msgs="+(((Msg_GetLinkAndData_Rp) linksNew).linkRecords != null ? ((Msg_GetLinkAndData_Rp) linksNew).linkRecords.length : 0));
+//            System.out.println("num new msgs="+(((Msg_GetLinkAndData_Rp) linksNew).linkRecords != null ? ((Msg_GetLinkAndData_Rp) linksNew).linkRecords.length : 0));
+          }
           if (trace != null) trace.data(14, "num deleted="+(linkIDsRemoved != null ? linkIDsRemoved.length : 0));
+//          System.out.println("num deleted="+(linkIDsRemoved != null ? linkIDsRemoved.length : 0));
           if (trace != null) trace.data(15, "overflow="+(resultOverflowStamp != null));
+//          System.out.println("overflow="+(resultOverflowStamp != null));
 
           if (trace != null) trace.data(20, "folderType="+folderType);
           if (trace != null) trace.data(21, "linkIDsWithDiffStats="+Misc.objToStr(linkIDsWithDiffStats));
@@ -135,41 +174,74 @@ public class FldASync extends ClientMessageAction {
           if (trace != null) trace.data(27, "requestTruncated="+Misc.objToStr(requestTruncated));
           if (trace != null) trace.data(28, "requestStampLast="+Misc.objToStr(requestStampLast));
           if (trace != null) trace.data(29, "reply regular");
+//          System.out.println("reply regular");
         } else {
           if (trace != null) trace.data(30, "reply MEMORY OVERFLOW");
+//          System.out.println("reply MEMORY OVERFLOW");
         }
 
         // process each result set
         if (!isMemoryOverflow) {
-          boolean isFileFolder = FolderRecord.isFileType(folderType.shortValue());
-          boolean isMsgFolder = FolderRecord.isMsgType(folderType.shortValue());
+          boolean isFoldersMode = folderId == null;
+          boolean isContactsMode = folderType != null ? FolderRecord.isContactType(folderType.shortValue()) : false;
+          boolean isFilesMode = folderType != null ? FolderRecord.isFileType(folderType.shortValue()) : false;
+          boolean isMsgsMode = folderType != null ? FolderRecord.isMsgType(folderType.shortValue()) : false;
           // update our stats
           if (linkIDsWithDiffStats != null && linkIDsWithDiffStats.length > 0) {
             anyDiffLinks = true;
             ArrayList statsL = new ArrayList();
             for (int k=0; k<linkIDsWithDiffStats.length; k++) {
               Long linkId = linkIDsWithDiffStats[k];
-              LinkRecordI link = null;
-              if (isFileFolder) {
+              Record link = null;
+              if (isFoldersMode) {
+                link = cache.getFolderShareRecord(linkId);
+              } else if (isContactsMode) {
+                link = cache.getContactRecord(linkId);
+              } else if (isFilesMode) {
                 link = cache.getFileLinkRecord(linkId);
-              } else if (isMsgFolder) {
+              } else if (isMsgsMode) {
                 link = cache.getMsgLinkRecord(linkId);
               }
               if (link != null) {
-                Integer serverMark = diffBits[k];
-                short serverStatMark = (short) (serverMark.intValue() >> 16);
-                short serverLinkStatus = (short) (serverMark.intValue() & 0xFFFF);
-                if (link instanceof MsgLinkRecord) {
-                  MsgLinkRecord mLink = (MsgLinkRecord) link;
-                  mLink.status = new Short(serverLinkStatus);
-                } else if (link instanceof FileLinkRecord) {
-                  FileLinkRecord fLink = (FileLinkRecord) link;
-                  fLink.status = new Short(serverLinkStatus);
-                }
-                StatRecord stat = cache.getStatRecord(link.getId(), link.getCompatibleStatTypeIndex());
-                if (stat != null) {
-                  stat.mark = new Short(serverStatMark);
-                  statsL.add(stat);
+                int serverMark = diffBits[k].intValue();
+                if (isContactsMode) {
+                  int permits = serverMark & 0xFFFF;
+                  short status = (short) (serverMark >> 16);
+                  ContactRecord cRec = (ContactRecord) link;
+                  cRec.permits = new Integer(permits);
+                  cRec.status = new Short(status);
+                  // trigger listener update by re-adding to cache
+                  cache.addContactRecords(new ContactRecord[] {cRec});
+                } else {
+                  short serverStatMark = (short) (serverMark >> 16);
+                  short serverLinkStatus = (short) (serverMark & 0xFFFF);
+                  if (link instanceof FolderShareRecord) {
+                    FolderShareRecord sLink = (FolderShareRecord) link;
+                    short canWrite = (short) (serverLinkStatus & 0x0007);
+                    short canDelete = (short) ((serverLinkStatus >> 3) & 0x0007);
+                    sLink.canWrite = new Short(canWrite);
+                    sLink.canDelete = new Short(canDelete);
+                    // trigger listener update by re-adding to cache
+                    cache.addFolderShareRecords(new FolderShareRecord[] {sLink});
+                  } else if (link instanceof MsgLinkRecord) {
+                    MsgLinkRecord mLink = (MsgLinkRecord) link;
+                    mLink.status = new Short(serverLinkStatus);
+                    // trigger listener update by re-adding to cache
+                    cache.addMsgLinkRecords(new MsgLinkRecord[] {mLink});
+                  } else if (link instanceof FileLinkRecord) {
+                    FileLinkRecord fLink = (FileLinkRecord) link;
+                    fLink.status = new Short(serverLinkStatus);
+                    // trigger listener update by re-adding to cache
+                    cache.addFileLinkRecords(new FileLinkRecord[] {fLink});
+                  }
+                  // server skips StatRecord marks for folder-re-synch, so check for BLANK value
+                  if (serverStatMark != 0) {
+                    StatRecord stat = cache.getStatRecord(link.getId(), ((LinkRecordI) link).getCompatibleStatTypeIndex());
+                    if (stat != null) {
+                      stat.mark = new Short(serverStatMark);
+                      statsL.add(stat);
+                    }
+                  }
                 }
               }
             }
@@ -179,13 +251,26 @@ public class FldASync extends ClientMessageAction {
           }
           // add new links and stats
           if (linksNew != null) {
-            if (isFileFolder) {
+            if (isFoldersMode) {
+              Fld_Folders_Rp foldersReply = (Fld_Folders_Rp) linksNew;
+              if ((foldersReply.folderRecords != null && foldersReply.folderRecords.length > 0) ||
+                      (foldersReply.shareRecords != null && foldersReply.shareRecords.length > 0)) {
+                anyNewLinks = true;
+                FldAGetFolders.runAction(SIL, foldersReply, this);
+              }
+            } else if (isContactsMode) {
+              Cnt_GetCnts_Rp contactsReply = (Cnt_GetCnts_Rp) linksNew;
+              if (contactsReply.contactRecords != null && contactsReply.contactRecords.length > 0) {
+                anyNewLinks = true;
+                CntAGetContacts.runAction(SIL, contactsReply, this);
+              }
+            } else if (isFilesMode) {
               File_GetLinks_Rp linksReply = (File_GetLinks_Rp) linksNew;
               if (linksReply.fileLinks != null && linksReply.fileLinks.length > 0) {
                 anyNewLinks = true;
                 FileAGetFiles.runAction(SIL, linksReply, this);
               }
-            } else if (isMsgFolder) {
+            } else if (isMsgsMode) {
               Msg_GetLinkAndData_Rp linksReply = (Msg_GetLinkAndData_Rp) linksNew;
               if (linksReply.linkRecords != null && linksReply.linkRecords.length > 0) {
                 anyNewLinks = true;
@@ -196,9 +281,13 @@ public class FldASync extends ClientMessageAction {
           // remove deleted links
           if (linkIDsRemoved != null && linkIDsRemoved.length > 0) {
             anyRemoved = true;
-            if (isFileFolder) {
+            if (isFoldersMode) {
+              cache.removeFolderShareRecords(linkIDsRemoved);
+            } else if (isContactsMode) {
+              cache.removeContactRecords(linkIDsRemoved);
+            } else if (isFilesMode) {
               cache.removeFileLinkRecords(linkIDsRemoved);
-            } else if (isMsgFolder) {
+            } else if (isMsgsMode) {
               cache.removeMsgLinkRecords(linkIDsRemoved);
             }
           }
@@ -212,18 +301,21 @@ public class FldASync extends ClientMessageAction {
               // when probing, we must additionally detect any changes to continue synchronizing entire folder
               if (anyDiffLinks || anyNewLinks || anyRemoved) {
                 if (trace != null) trace.data(50, "creating Probe CONTINUATION request");
+//                System.out.println("FldASync: creating Probe CONTINUATION request");
                 followUpFolderIDsL.add(folderId);
                 followUpStartStampsL.add(resultOverflowStamp);
               }
             } else {
               // when not probing, overflow-stamp and previously-fetched are sufficient to continue
               if (trace != null) trace.data(51, "creating Overflow CONTINUATION request");
+//              System.out.println("FldASync: creating Overflow CONTINUATION request");
               followUpFolderIDsL.add(folderId);
               followUpStartStampsL.add(resultOverflowStamp);
             }
           }
         } else if (isMemoryOverflow) {
           if (trace != null) trace.data(52, "creating MEMORY OVERFLOW request");
+//          System.out.println("FldASync: creating MEMORY OVERFLOW request");
           followUpFolderIDsL.add(folderId);
           followUpStartStampsL.add(resultOverflowStamp);
         }
@@ -236,13 +328,15 @@ public class FldASync extends ClientMessageAction {
       // re-send overflow requests, and continuation requests
       if (resultRequestSetsL != null && resultRequestSetsL.size() > 0) {
         if (trace != null) trace.data(60, "Re-synch additional folders SENDING REQUEST ");
+//        System.out.println("FldASync: Re-synch additional folders SENDING REQUEST ");
         if (trace != null) trace.data(61, "set="+resultRequestSetsL);
+//        System.out.println("FldASync: set="+resultRequestSetsL);
         SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_SYNC, new Obj_List_Co(resultRequestSetsL)), 90000);
         if (trace != null) trace.data(62, "Re-synch additional folders SUBMITED");
+//        System.out.println("FldASync: Re-synch additional folders SUBMITED");
       }
 
     } catch (Throwable t) {
-      t.printStackTrace();
     }
 
     if (trace != null) trace.exit(FldASync.class, null);

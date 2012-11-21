@@ -615,7 +615,8 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
             int serverBuild = SIL.getPersistentMainWorkerServerBuild();
             if (serverBuild >= 730) {
               FetchedDataCache cache = SIL.getFetchedDataCache();
-              List requestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderId, null, 20, 20, 20, null);
+              // silent validator starts with modest 20 items, then continuation requests use defaults
+              List requestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderId, null, 20, 20, 20, 20, null);
               FolderRecUtil.markFolderViewInvalidated(folderId, false);
               if (requestSetsL != null && requestSetsL.size() > 0) {
                 SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_SYNC, new Obj_List_Co(requestSetsL)), 90000);

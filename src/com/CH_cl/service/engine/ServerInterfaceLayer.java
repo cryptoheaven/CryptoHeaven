@@ -743,9 +743,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           replyReceivedJob.run();
           replyReceivedJobExecuted = true;
         }
-        // TO-DO: running action here, will mess up the Default Progress Monitor 6 basic setps
-        // unless DefaultProgMonitor is not used for those special actions that may have reply-requests!
-
         // Don't start a new DefaultReplyRunner thread here (because it recursively used ServerInterfaceLayer)
         // Just execute the action synchronously (in a MIN PRIORIY THREAD) while the user waits.
         final MessageAction[] returnBufferMsgAction = new MessageAction[1];
@@ -1103,10 +1100,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
                 throw new SILConnectionException(errMsg + "Specified host is unknown or cannot be resolved.  The error message is: <br>" + t.getMessage());
               }
               else if (t instanceof IOException) {
-                // TO-DO: decide if this is ok, analyze the case of 1 worker active (main worker)
-                // should this mean System.exit if we have ZERO workers???
-                // Maybe we should retry if we have at least the main worker!
-                // throw new error if we have less than 2 workers (1 main, 1 heavy)
                 if (workers.size() == 0) {
                   if (trace != null) trace.data(90, "Not enough workers to ignore connection problem!");
                   throw new SILConnectionException(errMsg + "Input/Output error occurred.  The error message is: <br>" + t.getMessage());

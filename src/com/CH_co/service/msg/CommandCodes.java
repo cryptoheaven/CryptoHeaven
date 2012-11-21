@@ -48,7 +48,7 @@ public class CommandCodes extends Object {
   // Get Login Info
   public static final int USR_Q_GET_LOGIN_INFO = 1005;
   // Get Re-Connection Update
-  public static final int USR_Q_GET_RECONNECT_UPDATE = 1006;
+  public static final int USR_Q_GET_INIT_DATA = 1006;
 
   // Get My Info
   public static final int USR_Q_GET_INFO = 1010;
