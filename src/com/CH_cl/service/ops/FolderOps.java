@@ -18,7 +18,6 @@ import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -483,10 +482,23 @@ public class FolderOps extends Object {
   * Add folder IDs to the re-synch queue and dispatch a thread to run the query in background.
   */
   private static HashSet fldIDsForResynchQueueHS = new HashSet();
-  public static void runResynchFolders_Delayed(final ServerInterfaceLayer SIL, List additionalFldIDsL, final long delayMillis) {
+  public static void runResynchFolders_Delayed(ServerInterfaceLayer SIL, Long folderId, long delayMillis) {
+    boolean added;
     synchronized (fldIDsForResynchQueueHS) {
-      fldIDsForResynchQueueHS.addAll(additionalFldIDsL);
+      added = fldIDsForResynchQueueHS.add(folderId);
     }
+    if (added)
+      runResynchFolders_Delayed(SIL, delayMillis);
+  }
+  public static void runResynchFolders_Delayed(ServerInterfaceLayer SIL, List additionalFldIDsL, long delayMillis) {
+    boolean added;
+    synchronized (fldIDsForResynchQueueHS) {
+      added = fldIDsForResynchQueueHS.addAll(additionalFldIDsL);
+    }
+    if (added)
+      runResynchFolders_Delayed(SIL, delayMillis);
+  }
+  private static void runResynchFolders_Delayed(final ServerInterfaceLayer SIL, final long delayMillis) {
     Thread th = new ThreadTraced("Delayed folder re-synch.") {
       public void runTraced() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "runTraced()");
@@ -497,8 +509,12 @@ public class FolderOps extends Object {
         synchronized (fldIDsForResynchQueueHS) {
           if (fldIDsForResynchQueueHS.size() > 0) {
             if (trace != null) trace.data(10, "Re-synch folders - delayed");
-            List requestSetsL = CacheFldUtils.prepareSynchRequest(SIL.getFetchedDataCache(), fldIDsForResynchQueueHS, null, null);
-            FolderRecUtil.markFolderViewInvalidated(fldIDsForResynchQueueHS, false);
+            FetchedDataCache cache = SIL.getFetchedDataCache();
+            ArrayList folderIDsL = new ArrayList(fldIDsForResynchQueueHS);
+            // sort the folders so that memory-overflow cases will be handled better when requiring continuation requests
+            Collections.sort(folderIDsL);
+            List requestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderIDsL, null, null, null, null);
+            cache.markFolderViewInvalidated(folderIDsL, false);
             if (requestSetsL != null && requestSetsL.size() > 0) {
               if (trace != null) trace.data(20, "Re-synch folders via FldARedFlagCount SENDING REQUEST");
               if (trace != null) trace.data(21, "set="+requestSetsL);

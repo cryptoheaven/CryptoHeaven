@@ -126,9 +126,10 @@ public class MsgLinkOps {
   }
 
   private static class QueueFetchProcessor implements ProcessingFunctionI {
-    public void processQueuedObject(Object obj) {
+    public Object processQueuedObject(Object obj) {
       Object[] objSet = (Object[]) obj;
       getOrFetchMsgLinksByOwner((ServerInterfaceLayer) objSet[0], (Long) objSet[1], (Long) objSet[2], ((Short) objSet[3]).shortValue());
+      return null;
     }
   }
 }

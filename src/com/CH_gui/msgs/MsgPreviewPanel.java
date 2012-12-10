@@ -1764,7 +1764,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
   private class MsgPreviewUpdaterProcessor implements ProcessingFunctionI {
 
-    public void processQueuedObject(Object obj) {
+    public Object processQueuedObject(Object obj) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "processQueuedObject(Object obj)");
       if (trace != null) trace.args(obj);
 
@@ -1829,7 +1829,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         if (previewMsgLink == nextToUpdate || (previewMsgLink != null && previewMsgLink.equals(nextToUpdate)) || (nextToUpdate != null && nextToUpdate.equals(previewMsgLink)))
           msgPreviewUpdateFifo.remove();
       }
-      if (trace != null) trace.exit(getClass());
+      if (trace != null) trace.exit(getClass(), null);
+      return null;
     } // end run()
   } // end private class MsgPreviewUpdaterProcessor
 

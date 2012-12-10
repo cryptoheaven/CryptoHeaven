@@ -135,6 +135,7 @@ public class CommandCodes extends Object {
 
   // Apply Code
   public static final int USR_Q_APPLY_CODE = 1096;
+  public static final int USR_Q_RECALCULATE_STORAGE = 1097;
 
 
   // ======================
@@ -261,7 +262,11 @@ public class CommandCodes extends Object {
 
   // Synch File/Message Folders
   public static final int FLD_Q_SYNC = 1197;
+  public static final int FLD_Q_SYNC_NEXT = 1198;
+  public static final int FLD_Q_SYNC_CONTACTS = 1199;
+  public static final int FLD_Q_SYNC_FOLDER_TREE = 1201;
   public static final int FLD_A_SYNC = 10197;
+  public static final int FLD_A_SYNC_NEXT = 10198;
 
 
   // =====================
@@ -558,6 +563,8 @@ public class CommandCodes extends Object {
   //public static final int SYSNET_A_TOKEN = 6081; // response to a token pass is not used
   public static final int SYSENG_Q_LICENSE_UPDATED = 6090;
   public static final int SYSNET_A_LICENSE_UPDATED = 6091;
+  public static final int SYSENG_Q_GET_TEMP_USER_PACKETS = 6100;
+  public static final int SYSNET_A_GET_TEMP_USER_PACKETS = 6101;
 
   // =====================
   // *** System Errors ***

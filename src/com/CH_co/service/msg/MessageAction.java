@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.msg;
 
@@ -17,23 +17,25 @@ import com.CH_co.io.DataOutputStream2;
 import com.CH_co.monitor.*;
 import com.CH_co.service.engine.CommonSessionContext;
 import com.CH_co.service.msg.dataSets.Str_Rp;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Basic action of the client or the server in response to the msessage data received.
- * Cancel relates to individual requests as cancelled by for example a progress monitor.
- * Interrupt relates to chains of requests where some reply may cause subsequent requests.
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Basic action of the client or the server in response to the message data received.
+* Cancel relates to individual requests as canceled by for example a progress monitor.
+* Interrupt relates to chains of requests where some reply may cause subsequent requests.
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MessageAction extends Message implements Cancellable {
 
   // The IO source of this message.  Each message which was recreated from the stream should have this set.
@@ -92,8 +94,8 @@ public class MessageAction extends Message implements Cancellable {
 
 
   /**
-   * Protected constructors used in ReplyMessageAction where stamp is copied from request message.
-   */
+  * Protected constructors used in ReplyMessageAction where stamp is copied from request message.
+  */
   protected MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, MessageAction originalRequest) {
     this(actionCode, protocolMsgDataSet, originalRequest.uniqueStamp, originalRequest.cancelled, null, null);
   }
@@ -106,15 +108,15 @@ public class MessageAction extends Message implements Cancellable {
 
 
   /**
-   * Create a Message Action without message data set.
-   * @param timeStamp true if message should be time stamped, false otherwise (stamp=0)
-   */
+  * Create a Message Action without message data set.
+  * @param timeStamp true if message should be time stamped, false otherwise (stamp=0)
+  */
   public MessageAction(int actionCode, boolean timeStamp) {
     this(actionCode, (ProtocolMsgDataSet) null, timeStamp);
   }
   /**
-   * Create a Message Action without message data set and time-stamped.
-   */
+  * Create a Message Action without message data set and time-stamped.
+  */
   public MessageAction(int actionCode) {
     this(actionCode, (ProtocolMsgDataSet) null, true);
   }
@@ -168,8 +170,8 @@ public class MessageAction extends Message implements Cancellable {
     return stampTime;
   }
   /**
-   * Change the stamp to a current and next value.
-   */
+  * Change the stamp to a current and next value.
+  */
   public void restamp() {
     uniqueStamp = nextStamp();
   }
@@ -215,8 +217,8 @@ public class MessageAction extends Message implements Cancellable {
 
 
   /**
-   * @return the action code of the incoming message
-   */
+  * @return the action code of the incoming message
+  */
   public static int readActionCodeFromStream(DataInputStream2 dataIn) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "readActionCodeFromStream(DataInputStream2 dataIn)");
     // Thread is held here until integer becomes available
@@ -232,8 +234,8 @@ public class MessageAction extends Message implements Cancellable {
   }
 
   /**
-   * @return Action stamp of the incoming message.  Stamp follows after Action Code.
-   */
+  * @return Action stamp of the incoming message.  Stamp follows after Action Code.
+  */
   public static long readActionStampFromStream(DataInputStream2 in) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageAction.class, "readStampFromStream(DataInputStream2 in)");
     long stamp = 0;
@@ -296,8 +298,8 @@ public class MessageAction extends Message implements Cancellable {
   }
 
   /**
-   * Initialize the Message Action with the context of the communications through which it came.
-   */
+  * Initialize the Message Action with the context of the communications through which it came.
+  */
   protected void setCommonContext(CommonSessionContext sessionContext) {
     this.sessionContext = sessionContext;
   }
@@ -356,4 +358,23 @@ public class MessageAction extends Message implements Cancellable {
       + "\n session context = " + sessionContext;
     return text;
   }
+
+  public ProtocolMsgDataSet wrapIntoTransferable() {
+    ArrayList objsL = new ArrayList();
+    objsL.add(new Integer(actionCode));
+    objsL.add(new Long(uniqueStamp));
+    objsL.add(getMsgDataSet());
+    Obj_List_Co set = new Obj_List_Co(objsL);
+    return set;
+  }
+
+  public static MessageAction unwrapFromTransferable(ProtocolMsgDataSet dataSet) {
+    Obj_List_Co set = (Obj_List_Co) dataSet;
+    int actionCode = ((Integer) set.objs[0]).intValue();
+    MessageAction action = new MessageAction(actionCode);
+    action.uniqueStamp = ((Long) set.objs[1]).longValue();
+    action.setMsgDataSet((ProtocolMsgDataSet) set.objs[2]);
+    return action;
+  }
+
 }

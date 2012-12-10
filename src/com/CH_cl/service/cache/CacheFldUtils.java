@@ -11,8 +11,6 @@
 */
 package com.CH_cl.service.cache;
 
-import com.CH_cl.service.actions.msg.MsgAGet;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
@@ -166,9 +164,9 @@ public class CacheFldUtils {
   }
 
 
-  public static List prepareSynchRequest(FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, List resultRequestSetsL) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "prepareSynchRequest(FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, List resultRequestSetsL)");
-    if (trace != null) trace.args(folderIDsL, startStampsL);
+  public static List prepareSynchRequest(FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, Collection wasFetchedL, Collection wasInvalidatedL, List resultRequestSetsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "prepareSynchRequest(FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, Collection wasFetchedL, Collection wasInvalidatedL, List resultRequestSetsL)");
+    if (trace != null) trace.args(folderIDsL, startStampsL, wasFetchedL, wasInvalidatedL);
     // smaller-and-faster batch for initial re-synch, larger for continuation requests
     int initialLow = startStampsL == null ? 20 : 200;
     int initialHigh = startStampsL == null ? 100 : 1000;
@@ -179,36 +177,40 @@ public class CacheFldUtils {
     int maxItemsForNonFetchedFoldersNext = 3;
     int maxItemsForProbingNewItems = 1;
     Object[] folderIDs = folderIDsL.toArray();
-    Object[] startStamps = startStampsL != null ? startStampsL.toArray() : null;
+    Object[] startStamps = startStampsL != null && startStampsL.size() > 0 ? startStampsL.toArray() : null;
+    Object[] wasFetcheds = wasFetchedL != null && wasFetchedL.size() > 0 ? wasFetchedL.toArray() : null;
+    Object[] wasInvalidateds = wasInvalidatedL != null && wasInvalidatedL.size() > 0 ? wasInvalidatedL.toArray() : null;
     for (int i=0; i<folderIDs.length; i++) {
       Long folderId = (Long) folderIDs[i];
-      Timestamp startStamp = (Timestamp) (startStamps != null ? startStamps[i] : null);
-      resultRequestSetsL = prepareSynchRequest(cache, folderId, startStamp, maxItemsForFetchedFolders, maxItemsForNonFetchedFoldersInitial, maxItemsForNonFetchedFoldersNext, maxItemsForProbingNewItems, resultRequestSetsL);
+      Timestamp startStamp = (Timestamp) (startStamps != null && startStamps.length > i ? startStamps[i] : null);
+      Boolean wasFetched = (Boolean) (wasFetcheds != null && wasFetcheds.length > i ? wasFetcheds[i] : null);
+      Boolean wasInvalidated = (Boolean) (wasInvalidateds != null && wasInvalidateds.length > i ? wasInvalidateds[i] : null);
+      resultRequestSetsL = prepareSynchRequest(cache, folderId, startStamp, maxItemsForFetchedFolders, maxItemsForNonFetchedFoldersInitial, maxItemsForNonFetchedFoldersNext, maxItemsForProbingNewItems, wasFetched, wasInvalidated, resultRequestSetsL);
     }
     if (trace != null) trace.exit(CacheFldUtils.class, resultRequestSetsL);
     return resultRequestSetsL;
   }
 
-  public static List prepareSynchRequest(FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, List resultRequestSetsL) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "prepareSynchRequest(FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, List resultRequestSetsL)");
+  public static List prepareSynchRequest(FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, Boolean wasFetched, Boolean wasInvalidated, List resultRequestSetsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "prepareSynchRequest(FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, Boolean wasFetched, Boolean wasInvalidated, List resultRequestSetsL)");
     if (trace != null) trace.args(folderId, startStamp);
     if (trace != null) trace.args(maxItemsForFetchedFolders);
     if (trace != null) trace.args(maxItemsForNonFetchedFoldersInitial);
     if (trace != null) trace.args(maxItemsForNonFetchedFoldersNext);
     if (trace != null) trace.args(maxItemsForProbingNewItems);
-    boolean wasFetched = folderId != null ? FolderRecUtil.wasFolderFetchRequestIssued(folderId) : false;
-    boolean wasInvalidated = folderId != null ? FolderRecUtil.wasFolderViewInvalidated(folderId) : false;
+    if (trace != null) trace.args(wasFetched);
+    if (trace != null) trace.args(wasInvalidated);
+    if (wasFetched == null)
+      wasFetched = folderId != null ? Boolean.valueOf(cache.wasFolderFetchRequestIssued(folderId)) : null;
+    if (wasInvalidated == null)
+      wasInvalidated = folderId != null ? Boolean.valueOf(cache.wasFolderViewInvalidated(folderId)) : null;
     if (trace != null) trace.data(10, "preparing for folderId="+folderId+", startStamp="+startStamp+", wasFetched="+wasFetched+", wasInvalidated="+wasInvalidated);
     FolderRecord folder = folderId != null ? cache.getFolderRecord(folderId) : null;
     FolderShareRecord share = folderId != null ? cache.getFolderShareRecordMy(folderId, true) : null;
-//    if (share != null)
-//      System.out.println("REQUEST preparing for "+ListRenderer.getRenderedText(share) +" folderId="+folderId+", startStamp="+startStamp+", wasFetched="+wasFetched+", wasInvalidated="+wasInvalidated);
-//    else
-//      System.out.println("REQUEST preparing for FOLDER-RE-SYNCH, startStamp="+startStamp);
     if (folderId == null || (folder != null && share != null)) {
       UserRecord uRec = cache.getUserRecord();
       if (folderId == null || folder.isFileType() || folder.isMsgType() || (folder.isContactType() && uRec.contactFolderId.equals(folderId))) {
-        boolean isProbingForNewItems = startStamp == null && !wasInvalidated && folder != null && !folder.isContactType();
+        boolean isProbingForNewItems = startStamp == null && folder != null && (folder.isFileType() || folder.isMsgType()) && wasInvalidated != null && !wasInvalidated.booleanValue();
         boolean isTruncated = false;
         Boolean includeBodies = null;
         Record[] links = null;
@@ -222,7 +224,7 @@ public class CacheFldUtils {
             for (int i=0; i<allShares.length; i++) {
               FolderShareRecord sRec = allShares[i];
               FolderRecord fRec = cache.getFolderRecord(sRec.folderId);
-              if (!fRec.isCategoryType() && !fRec.isLocalFileType()) {
+              if (fRec != null && !fRec.isCategoryType() && !fRec.isLocalFileType()) {
                 if (sRec.isOwnedBy(userId, groupIDsSet))
                   allMyRemoteSharesL.add(sRec);
               }
@@ -235,75 +237,63 @@ public class CacheFldUtils {
           links = cache.getFileLinkRecordsOwnerAndType(folderId, new Short(Record.RECORD_TYPE_FOLDER));
         } else if (folder.isMsgType()) {
           includeBodies = Boolean.valueOf(folder != null && 
-                  ( (folder.folderType.shortValue() == FolderRecord.POSTING_FOLDER && wasFetched) ||
+                  ( (folder.folderType.shortValue() == FolderRecord.POSTING_FOLDER && wasFetched.booleanValue()) ||
                     folder.isChatting() // always fetch chatting messages
                 ));
           links = cache.getMsgLinkRecordsForFolder(folderId);
           // check for partially fetched msg folder - set isTruncated
-          if (MsgAGet.hasNextOrFetching(folderId))
+          if (cache.hasNextFetchRequestOrFetching(folderId))
             isTruncated = true;
         }
         Integer[] diffBits = null;
-        Timestamp past3days = new Timestamp(System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000L));
         if (links != null) {
           if (trace != null) trace.data(20, "sorting links for folder "+folderId);
           // Sorting/Filtering is skipped for ContactRecords and FoldersShareRecords
-          if (folder != null && !folder.isContactType()) {
+          if (folder != null && (folder.isMsgType() || folder.isFileType())) {
             // sort links most-recent-first -- skip Contact and FolderShares sorting, we'll always fetch all Contacts and FolderShares
-            Arrays.sort(links, new Comparator() {
-              public int compare(Object o1, Object o2) {
-                // newest on top
-                if (o1 != null && o2 != null && o1 instanceof LinkRecordI && o2 instanceof LinkRecordI)
-                  return ((LinkRecordI) o2).getCreatedStamp().compareTo(((LinkRecordI) o1).getCreatedStamp());
-                else if (o1 == null && o2 == null)
-                  return 0;
-                else if (o1 == null)
-                  return -1;
-                else if (o2 == null)
-                  return 1;
-                else
-                  return 0;
-              }
-            });
-            // For recent items or continuation requests use the supplied "max" item count,
-            // For old items and top-of-list non-continuation requests, use lower value 1/5 of max + 20.
-            int maxOldItemsForFetchedFolders = startStamp != null ? maxItemsForFetchedFolders : Math.min(maxItemsForFetchedFolders, maxItemsForFetchedFolders/5+20);
-            List linksL = Arrays.asList(links);
-            List linksFilteredL = null;
-            // truncate list at "maxItemsForFetchedFolders" items or 25 items and 3 days old
-            int eligibleCount = 0;
-            int firstEligibleIndex = -1;
-            for (int k=0; k<linksL.size(); k++) {
-              LinkRecordI link = (LinkRecordI) linksL.get(k);
-              if (trace != null) trace.data(30, "considering link id", link.getId());
-              if (startStamp == null || startStamp.getTime() >= link.getCreatedStamp().getTime()) {
-                if (trace != null) trace.data(31, "stamp check passed");
-                if (firstEligibleIndex == -1) {
-                  firstEligibleIndex = k;
-                  if (trace != null) trace.data(32, "firstEligibleIndex=", firstEligibleIndex);
+            if (links.length > 1) {
+              Arrays.sort(links, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                  // newest on top
+                  if (o1 != null && o2 != null && o1 instanceof LinkRecordI && o2 instanceof LinkRecordI)
+                    return ((LinkRecordI) o2).getCreatedStamp().compareTo(((LinkRecordI) o1).getCreatedStamp());
+                  else if (o1 == null && o2 == null)
+                    return 0;
+                  else if (o1 == null)
+                    return -1;
+                  else if (o2 == null)
+                    return 1;
+                  else
+                    return 0;
                 }
-                if ((eligibleCount >= maxItemsForFetchedFolders && wasFetched) || 
-                        (eligibleCount >= maxItemsForNonFetchedFoldersNext && !wasFetched) ||
-                        (eligibleCount >= maxOldItemsForFetchedFolders && link.getCreatedStamp().getTime() < past3days.getTime()) ||
-                        (eligibleCount >= maxItemsForProbingNewItems && isProbingForNewItems && wasFetched)) {
+              });
+            }
+            // For recent items or continuation requests use the supplied "max" item count,
+            // Start with empty list, if nothing qualifies through our Time Stamp filter then we'll submit empty list.
+            List linksFilteredL = new ArrayList();
+            // truncate list at "maxItemsForFetchedFolders" items or 25 items and 3 days old
+            int count = 0;
+            for (int k=0; k<links.length; k++) {
+              LinkRecordI link = (LinkRecordI) links[k];
+              if (trace != null) trace.data(30, "considering link id", link.getId());
+              // If not filtering based on Stamp, or if already entered stamp-eligible zone in sorted array, or StartStamp is newer than compared link's stamp.
+              if (startStamp == null || linksFilteredL.size() > 0 || startStamp.compareTo(link.getCreatedStamp()) >= 0) {
+                if (trace != null) trace.data(31, "stamp check passed");
+                if ((count >= maxItemsForFetchedFolders && wasFetched.booleanValue()) || 
+                        (count >= maxItemsForNonFetchedFoldersNext && !wasFetched.booleanValue()) ||
+                        (count >= maxItemsForProbingNewItems && isProbingForNewItems && wasFetched.booleanValue())) {
                   if (trace != null) trace.data(33, "link not eligible, truncating at k=", k);
-                  linksFilteredL = linksL.subList(firstEligibleIndex, k);
                   isTruncated = true;
                   break;
                 }
                 // Loop not braked-out so it must be eligible.
-                eligibleCount ++;
+                linksFilteredL.add(link);
+                count ++;
               }
             }
-            // if didn't break-out of the loop with in-eligible link, make filtered list now
-            if (linksFilteredL == null && firstEligibleIndex >= 0 && eligibleCount < linksL.size()) {
-              linksFilteredL = linksL.subList(firstEligibleIndex, firstEligibleIndex+eligibleCount);
-            }
-            // if we have a new filtered list, use only those elements
-            if (linksFilteredL != null) {
-              links = (Record[]) ArrayUtils.toArray(linksFilteredL, Record.class);
-            }
-            if (trace != null) trace.data(40, "filter done, items "+links.length+" last element is "+(links != null && links.length > 0 ? links[links.length-1].toString() : "LIST EMPTY"));
+            // Copy back the filtered results, if none of the links qualified, then we'll have EMPTY array links which is ok.
+            links = (Record[]) ArrayUtils.toArray(linksFilteredL, Record.class);
+            if (trace != null) trace.data(40, "filter done, items "+links.length+" first element is "+(links != null && links.length > 0 ? links[0].toString() : " EMPTY ")+", last element is "+(links != null && links.length > 0 ? links[links.length-1].toString() : "LIST EMPTY"));
           }
           // gather corresponding stat marks
           diffBits = new Integer[links.length];
@@ -343,35 +333,35 @@ public class CacheFldUtils {
           if (trace != null) trace.data(60, "REQUEST skipped due to truncated empty continuation");
         } else {
 
-          boolean isContactMode = folderId != null && folder.isContactType();
-          boolean isFoldersMode = folderId == null;
+          boolean isFileMode = folder != null && folder.isMsgType();
+          boolean isMsgMode = folder != null && folder.isFileType();
 
-          // request structure: <shareId> <includeBodies> <startStamp> <list-of-link-ids>+ <stats-marks>+ <lastStamp> <isTruncated> <fetchNumItems>
+          // request structure: <shareId> <includeBodies> <startStamp> <list-of-link-ids>+ <stats-marks>+ <lastStamp> <isTruncated> <isProbingForNewItems> <wasFetched> <wasInvalidated> <fetchNumItems>
           Obj_List_Co objs = new Obj_List_Co();
-          objs.objs = new Object[9];
+          objs.objs = new Object[11];
           objs.objs[0] = share != null ? share.shareId : null;
-          if (!isFoldersMode && !isContactMode) {
+          if (isFileMode || isMsgMode) {
             objs.objs[1] = includeBodies;
             objs.objs[2] = startStamp != null ? startStamp : null; // this is start stamp of our intent, NOT the of our first link! The top of list must be NULL so server will include most recent links.
           }
           objs.objs[3] = RecordUtils.getIDs(links);
           objs.objs[4] = diffBits;
-          if (!isFoldersMode && !isContactMode) {
+          if (isFileMode || isMsgMode) {
             LinkRecordI lastLink = (LinkRecordI) (links != null && links.length > 0 && links[links.length-1] instanceof LinkRecordI ? links[links.length-1] : null);
             objs.objs[5] = lastLink != null ? lastLink.getCreatedStamp() : null; // in case server has links deleted, this will tell him what stamp we have cached
             objs.objs[6] = Boolean.valueOf(isTruncated); // We are sending entire list, or truncating at some point
             objs.objs[7] = Boolean.valueOf(isProbingForNewItems);
-            objs.objs[8] = new Integer(wasFetched ? maxItemsForFetchedFolders : (lastLink == null ? maxItemsForNonFetchedFoldersInitial : maxItemsForNonFetchedFoldersNext));
+            objs.objs[8] = wasFetched;
+            objs.objs[9] = wasInvalidated;
+            objs.objs[10] = new Integer(wasFetched.booleanValue() ? maxItemsForFetchedFolders : (lastLink == null ? maxItemsForNonFetchedFoldersInitial : maxItemsForNonFetchedFoldersNext));
           }
 
           if (trace != null) trace.data(70, "REQUEST = "+Misc.objToStr(objs.objs));
-//          System.out.println("REQUEST = "+Misc.objToStr(objs.objs));
           if (resultRequestSetsL == null) resultRequestSetsL = new ArrayList();
           resultRequestSetsL.add(objs);
         }
       } else {
         if (trace != null) trace.data(100, "not a file or message folder, not a contact folder, not a folder-re-synch, >> prep for synch skipped");
-//        System.out.println("not a file or message folder, not a contact folder, not a folder-re-synch, >> prep for synch skipped");
       }
     }
     if (trace != null) trace.exit(CacheFldUtils.class, "request set list");

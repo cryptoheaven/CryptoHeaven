@@ -238,7 +238,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
       cache.removeContactRecords(cache.getContactRecords());
       // clear cached fetched folder IDs
       tableComp.clearCachedFetchedFolderIDs();
-      com.CH_cl.service.records.FolderRecUtil.clearFetchedIDs();
+      cache.clearFolderFetchedIDs();
 
       // Mark Active Status right away since the GUI timer is scheduled in intervals...
       // if user was disconnected in INACTIVE state, he should be marked active now...

@@ -27,10 +27,10 @@ public interface WorkerManagerI extends RequestSubmitterI {
 
 
   /**
-  * Logs out all workers and disconnects them.
-  * This call causes loss of all knowledge about connections for workers and data cache
+  * Forces destroy of all workers and shuts down their I/O.
+  * This call causes loss of all knowledge about connections for workers.
   */
-  public void logoutWorkers();
+  public void destroyWorkers();
 
   /**
   * Sets the last successful login action, called by workers after successful login.

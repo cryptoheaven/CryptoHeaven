@@ -103,6 +103,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.USR_Q_CUMULATIVE_USAGE), "Calculate Usage" },
       // Apply Code
       { new Integer(CommandCodes.USR_Q_APPLY_CODE), "Apply Code" },
+      // Recalculate Storage
+      { new Integer(CommandCodes.USR_Q_RECALCULATE_STORAGE), "Recalculate Storage" },
       // Error: Handle already taken
       { new Integer(CommandCodes.USR_E_HANDLE_ALREADY_TAKEN), "Error: Username already taken" },
 
@@ -193,8 +195,11 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FLD_Q_RED_FLAG_COUNT), "Count New Objects for Folder(s)" },
       // Ring Ring
       { new Integer(CommandCodes.FLD_Q_RING_RING), "Ringing..." },
-      // Synch File/Message Folders
+      // Synch File/Message Folders, Folder tree, Contacts
       { new Integer(CommandCodes.FLD_Q_SYNC), "Synch Folders" },
+      { new Integer(CommandCodes.FLD_Q_SYNC_NEXT), "Synch Folders Next" },
+      { new Integer(CommandCodes.FLD_Q_SYNC_CONTACTS), "Synch Contacts" },
+      { new Integer(CommandCodes.FLD_Q_SYNC_FOLDER_TREE), "Synch Folder Shares" },
 
 
       // =====================
@@ -460,6 +465,9 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.FLD_A_RED_FLAG_COUNT), "Count New Objects for Folder(s)" },
       // Ring Ring
       { new Integer(CommandCodes.FLD_A_RING_RING), "Ring, ring..." },
+      // Synch File/Message Folders, Folder tree, Contacts
+      { new Integer(CommandCodes.FLD_A_SYNC), "Synch Folders" },
+      { new Integer(CommandCodes.FLD_A_SYNC_NEXT), "Synch Folders Next" },
       // Folder Errors
       { new Integer(CommandCodes.FLD_E_CANNOT_REMOVE_SUPER_ROOT_FOLDER), "Cannot remove super root folder" },
       { new Integer(CommandCodes.FLD_E_FOLDER_DNE_OR_NOT_YOURS), "Folder does not exist or is not yours" },
@@ -588,6 +596,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.SYSENG_Q_CONSOLE_COMMAND), "SYSENG_Q_CONSOLE_COMMAND" },
       { new Integer(CommandCodes.SYSNET_A_CONSOLE_COMMAND), "SYSNET_A_CONSOLE_COMMAND" },
       { new Integer(CommandCodes.SYSENG_Q_TOKEN), "SYSENG_Q_TOKEN" },
+      { new Integer(CommandCodes.SYSENG_Q_GET_TEMP_USER_PACKETS), "SYSENG_Q_GET_TEMP_USER_PACKETS" },
+      { new Integer(CommandCodes.SYSNET_A_GET_TEMP_USER_PACKETS), "SYSNET_A_GET_TEMP_USER_PACKETS" },
 
       // =====================
       // *** System Errors ***
@@ -609,7 +619,7 @@ public class MessageActionNameSwitch extends Object {
     if (index >= 0)
       actionInfoName = (String) actionInfoNames[index][1];
     else
-      actionInfoName = "Internet connection quality is poor. Please retry in a little while, code="+code+".";
+      actionInfoName = "code="+code;
 
     if (actionInfoName.startsWith("com.CH_")) {
       if (trace != null) trace.data(90, actionInfoName);

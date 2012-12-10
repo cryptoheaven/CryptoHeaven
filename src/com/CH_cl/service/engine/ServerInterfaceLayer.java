@@ -15,7 +15,6 @@ package com.CH_cl.service.engine;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FileLobUp;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.monitor.DefaultProgMonitor;
 import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.monitor.ProgMonitorPool;
@@ -81,6 +80,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private static final String PROPERTY_LAST_ENGINE_HOST = "lastEngineHost";
   private static final String PROPERTY_LAST_ENGINE_PORT = "lastEnginePort";
 
+  // Global flag to tweak connectivity and use staged fetching for mobile devices.
+  public static boolean IS_MOBILE_MODE = false;
+
   // For every 3 additional non-heavy jobs waiting, create additional connection.
   private static final int FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION = 2; // used to have 5 here
 
@@ -115,6 +117,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       This queue ensures that jobs are executed in order that they arrive, and frees up the
       ExecutionQueue so that its not blocked while independent jobs are being run. */
   private Fifo independentExecutionQueue;
+  private ProcessingFunctionI independentExecutor;
 
   /** List to put the waiting stamps. */
   private final ArrayList stampList = new ArrayList();
@@ -248,9 +251,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     this.jobFifo = new JobFifo();
 
     // Create the independent execution queue
-    independentExecutor = independentExecutor != null ? independentExecutor : new IndependentClientQueueExecutionFunction(this);
+    this.independentExecutor = independentExecutor != null ? independentExecutor : new IndependentClientQueueExecutionFunction(this);
     this.independentExecutionQueue = new Fifo();
-    this.independentExecutionQueue.installSink("Independent Exec Queue", independentExecutor);
+    this.independentExecutionQueue.installSink("Independent Exec Queue", this.independentExecutor);
 
     // set MAX connection count
     if (fixedMaxConnectionCount == null) {
@@ -748,7 +751,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         final MessageAction[] returnBufferMsgAction = new MessageAction[1];
         Thread th = new ThreadTraced("Reply Runner") {
           public void runTraced() {
-            returnBufferMsgAction[0] = DefaultReplyRunner.runAction(replyMsg);
+            Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "runTraced()");
+            try {
+              returnBufferMsgAction[0] = (MessageAction) independentExecutor.processQueuedObject(replyMsg);
+            } catch (Throwable t) {
+              if (trace != null) trace.exception(getClass(), 100, t);
+            }
+            if (trace != null) trace.exit(getClass());
           }
         };
         th.setDaemon(true);
@@ -775,13 +784,17 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
   public int getMaxHeavyWorkerCount() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getMaxHeavyWorkerCount()");
-    int maxCount = getMaxConnectionCount() - 1;
+    int maxCount = getMaxAdjustedConnectionCount() - 1;
+    if (maxCount < 1 && maxConnectionCount > 0)
+      maxCount = 1;
     if (trace != null) trace.exit(ServerInterfaceLayer.class, maxCount);
     return maxCount;
   }
-  public int getMaxConnectionCount() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getMaxConnectionCount()");
+  private int getMaxAdjustedConnectionCount() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getMaxAdjustedConnectionCount()");
     int maxCount = maxConnectionCount;
+    if (IS_MOBILE_MODE && maxCount > 2)
+      maxCount = 2;
     if (!hasEverLoggedInSuccessfully || !hasMainWorker()) {
       if (trace != null) trace.data(10, "temporary ceiling of 1 until logged in with main worker");
       maxCount = Math.min(1, maxConnectionCount);
@@ -800,13 +813,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ensureEnoughFreeWorkers(boolean forceAdditionalConnection)");
     if (trace != null) trace.args(forceAdditionalConnection);
 
-    if (workers.size() < getMaxConnectionCount() && !destroyed && !destroying) {
+    if (workers.size() < getMaxAdjustedConnectionCount() && !destroyed && !destroying) {
       // count free workers
       int countFreeAllWorkers = 0;
       int countFreeHeavyWorkers = 0;
-      
+
       int countAllWorkers;
-      
+
       synchronized (workers) {
         countAllWorkers = workers.size();
         if (trace != null) trace.data(10, "for all workers, size=", countAllWorkers);
@@ -819,7 +832,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           }
         }
       }
-      
+
       if (trace != null) trace.data(11, "countFreeAllWorkers", countFreeAllWorkers);
       if (trace != null) trace.data(12, "countFreeHeavyWorkers", countFreeHeavyWorkers);
 
@@ -847,9 +860,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (hasMainWorker()) {
         // for every some non-heavy jobs create additional worker
         if (countAllWorkers > 0) { // Avoid divizion-by-zero.
-          // Jobs waiting | Workers
+          // For non-mobile: Jobs waiting | Workers
           // 0|1, 1-2|2, 3-4|3, 5-10|4
-          countWorkersToCreate += (1 + countAllJobs - countLargeFileJobs) / (FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION * countAllWorkers);
+          // For mobileFactor = 1 : 0-1|1, 2-4|2, 5-7|3, 8|4
+          // For mobileFactor = 2 : 0-2|1, 3-6|2, 7-10|3
+          // For mobileFactor = 3 : 0-3|1, 4-8|2, 9-13|3
+          int mobileFactor = IS_MOBILE_MODE ? 3 : 0;
+          countWorkersToCreate += (1 + countAllJobs - countLargeFileJobs) / ((FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION+mobileFactor) * countAllWorkers);
         }
         // If we should create at least 1 connection because there are jobs long awaiting to be sent...
         if (forceAdditionalConnection && countWorkersToCreate < 1) {
@@ -868,8 +885,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       }
 
       // limit number of all workers to the preset maximum
-      if (countWorkersToCreate + countAllWorkers > getMaxConnectionCount()) {
-        countWorkersToCreate = getMaxConnectionCount() - countAllWorkers;
+      if (countWorkersToCreate + countAllWorkers > getMaxAdjustedConnectionCount()) {
+        countWorkersToCreate = getMaxAdjustedConnectionCount() - countAllWorkers;
         if (trace != null) trace.data(28, "upper limit of workers reached, set back workers to create to", countWorkersToCreate);
       }
 
@@ -914,7 +931,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
         int countAllWorkers = workers.size();
         if (trace != null) trace.data(10, "countAllWorkers", countAllWorkers);
-        if (countAllWorkers < 2 && countAllWorkers < getMaxConnectionCount())
+        if (countAllWorkers < 2 && countAllWorkers < getMaxAdjustedConnectionCount())
           createWorkers(1);
 
         if (trace != null) trace.exit(getClass());
@@ -1460,7 +1477,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             submitAndReturn(new MessageAction(CommandCodes.USR_Q_LOGOUT));
           }
           if (countWorkers > 0) {
-            // wait max 3 seconds for LOGOUT request to have a change to be sent
+            // wait max 3 seconds for LOGOUT request to have a chance to be sent
             for (int i=0; i<300; i++) {
               if (workers.size() > 0)
                 Thread.sleep(10);
@@ -1472,7 +1489,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
     hostsAndPorts = null;
     try {
-      logoutWorkers();
+      destroyWorkers();
     } catch (Throwable t) {
     }
 
@@ -1487,7 +1504,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * Logs out all workers and disconnects them.
   * This call causes loss of all knowledge about connections for workers and data cache
   */
-  public void logoutWorkers() {
+  public void destroyWorkers() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "logoutWorkers()");
     // kill all workers
     if (trace != null) trace.data(10, "killing all workers");
@@ -1496,9 +1513,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     ArrayList workersToDestroyL = new ArrayList();
     synchronized (workers) {
       workersToDestroyL.addAll(workers);
-      workers.clear();
-      // destroyed worker could be replaced by new one which should now be updating connection counts
-      if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
     }
 
     // do the destroying without-blocking
@@ -1580,7 +1594,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       // destroyed worker could be replaced by new one which should now be updating connection counts
       if (!destroyed && !destroying) Stats.setConnections(workers.size(), getWorkerCounts());
     }
-    
+
     if (workerRemoved) {
       // penalize connection type if it broke and lasted for short time
       if (!suppressConnectionTypePenalization) {
@@ -1672,7 +1686,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (submitNow) {
         if (trace != null) trace.data(10, "main worker needed - submitting request");
         // Whichever worker picks it up, it should claim Main Worker and send it to the server to register for notifications.
-        // Quietly add a NOTIFY message without having aditional workers created to serve it -- do not user submitAndReturn.
+        // Quietly add a NOTIFY message without having aditional workers created to serve it -- do not use submitAndReturn.
         // This message is only meant for already existing workers, otherwise we would have an infinite loop.
         MessageAction msgActionNotify = new MessageAction(CommandCodes.SYS_Q_NOTIFY);
         enqueueProgMonitor(msgActionNotify);
@@ -1773,7 +1787,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * @return maximum number of workers this manager can have
   */
   public int getMaxWorkerCount() {
-    return getMaxConnectionCount();
+    return getMaxAdjustedConnectionCount();
   }
 
   /**
@@ -1824,7 +1838,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     ========================================================= */
 
     /** start processing cached objects */
-    public void processQueuedObject(Object obj) {
+    public Object processQueuedObject(Object obj) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(QueueExecutionFunction.class, "processQueuedObject(Object)");
       if (trace != null) trace.args(obj);
 
@@ -1929,7 +1943,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         if (trace != null) trace.exception(QueueExecutionFunction.class, 100, t);
       }
 
-      if (trace != null) trace.exit(QueueExecutionFunction.class);
+      if (trace != null) trace.exit(QueueExecutionFunction.class, null);
+      return null;
     } // end processQueuedObject
   } // end inner class QueueExecutionFunction
 
@@ -2041,8 +2056,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   } // end class BusyConnectionScanner
 
   private class SleepMonitor extends ThreadTraced {
-    private long stampLast = 0;
-    private long sleepSomeLast = 0;
+    private long stampBeforeSleep = 0;
     private SleepMonitor() {
       super("SleepMonitor");
       setDaemon(true);
@@ -2052,17 +2066,15 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       while (!destroyed) {
         try {
           long stampNow = System.currentTimeMillis();
-          boolean invalidStamp = stampLast > stampNow;
-          if (sleepSomeLast > 0) {
-            if (stampLast > 0) {
-              if (stampNow - stampLast > sleepSomeLast + 1000 || invalidStamp) { // lost 1000 ms or more from our clock
-                sleepDetected();
-              }
+          boolean invalidStamp = stampBeforeSleep > stampNow;
+          if (stampBeforeSleep > 0) {
+            // Check if we lost time sleeping that exceeds "RECONNECTION UPDATE" interval + 1 second.
+            if (stampNow - stampBeforeSleep > ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE + 1000 || invalidStamp) {
+              sleepDetected();
             }
           }
-          stampLast = stampNow;
-          long sleepSome = Math.max(100, ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE/5)+100; // always positive
-          sleepSomeLast = sleepSome;
+          stampBeforeSleep = stampNow;
+          long sleepSome = ServerInterfaceWorker.TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE/10 + 1000;
           Thread.sleep(sleepSome);
         } catch (Throwable t) {
         }
@@ -2071,10 +2083,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
     private void sleepDetected() {
       // invalidate views of fetched folders so that client reloads them on demand
-      FolderRecord[] folders = FetchedDataCache.getSingleInstance().getFolderRecords();
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FolderRecord[] folders = cache.getFolderRecords();
       for (int i=0; i<folders.length; i++) {
         Long folderId = folders[i].folderId;
-        FolderRecUtil.markFolderViewInvalidated(folderId, true);
+        cache.markFolderViewInvalidated(folderId, true);
       }
     }
   }

@@ -430,7 +430,7 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       SIL.ensureAtLeastOneAdditionalWorker_SpawnThread();
 
       // limit number of entries
-      UploadDownloadSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
+      UploadDownloadSynch.entry(SIL.getMaxHeavyWorkerCount());
 
       try {
         FileLinkRecord[] linkRecords = request.fileLinks;

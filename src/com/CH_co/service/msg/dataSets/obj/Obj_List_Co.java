@@ -1,45 +1,48 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.msg.dataSets.obj;
 
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.DataSetException;
+import com.CH_co.service.msg.Message;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.Misc;
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.sql.*;
-import java.util.*;
-
-import com.CH_co.trace.Trace;
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.io.DataInputStream2; 
-import com.CH_co.io.DataOutputStream2;
-import com.CH_co.service.msg.*;
-import com.CH_co.util.*;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: General purpose data set to transfer an array of primitive objects and itself.
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.14 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: General purpose data set to transfer an array of primitive objects and itself.
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.14 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class Obj_List_Co extends ProtocolMsgDataSet {
 
   // Each element can be any type/instance of the class ProtocolMsgDataSet or some other simple type.
@@ -80,8 +83,8 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
     if (trace != null) trace.exit(Obj_List_Co.class);
   }
   /** Creates new Obj_List_Co */
-  public Obj_List_Co(List objsL) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "Obj_List_Co(List objsL)");
+  public Obj_List_Co(Collection objsL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Obj_List_Co.class, "Obj_List_Co(Collection objsL)");
     if (trace != null) trace.args(objsL);
     this.objs = ArrayUtils.toArray(objsL, Object.class);
     if (trace != null) trace.exit(Obj_List_Co.class);
@@ -269,9 +272,9 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
   }
 
   /**
-   * Passes call to the wrapped data sets asking them if any is sensitive.
-   * @return true if at least one of them is sensitive.
-   */
+  * Passes call to the wrapped data sets asking them if any is sensitive.
+  * @return true if at least one of them is sensitive.
+  */
   public boolean isTimeSensitive() {
     boolean isSensitive = false;
     for (int i=0; i<objs.length; i++) {
@@ -292,9 +295,9 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
   }
 
   /**
-   * Passes call to the wrapped data sets asking them if any is sensitive.
-   * @return true if at least one of them is sensitive.
-   */
+  * Passes call to the wrapped data sets asking them if any is sensitive.
+  * @return true if at least one of them is sensitive.
+  */
   public boolean isUserSensitive() {
     boolean isSensitive = false;
     for (int i=0; i<objs.length; i++) {
@@ -315,8 +318,8 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
   }
 
   /**
-   * Pass setting to the wrapped data sets.
-   */
+  * Pass setting to the wrapped data sets.
+  */
   public void setServerSessionCurrentStamp(Timestamp ts) {
     for (int i=0; i<objs.length; i++) {
       if (objs[i] instanceof ProtocolMsgDataSet) {
@@ -333,8 +336,8 @@ public class Obj_List_Co extends ProtocolMsgDataSet {
     super.setServerSessionCurrentStamp(ts);
   }
   /**
-   * Pass setting to the wrapped data sets.
-   */
+  * Pass setting to the wrapped data sets.
+  */
   public void setServerSessionUserId(Long userId) {
     for (int i=0; i<objs.length; i++) {
       if (objs[i] instanceof ProtocolMsgDataSet) {

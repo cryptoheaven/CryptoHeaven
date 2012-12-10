@@ -368,11 +368,12 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
         // create runnable to run after reply is received that will update new object count
         final FolderRecord _sourceFolder = sourceFolder;
+        final boolean _allowLoweringOfUpdateCounts = actionCode == CommandCodes.FILE_Q_MOVE_FILES;
         Runnable newCountUpdate = null;
         if (sourceFolder != null) {
           newCountUpdate = new Runnable() {
             public void run() {
-              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, true);
+              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, _allowLoweringOfUpdateCounts, true);
             }
           };
         }
@@ -409,7 +410,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
             if (sourceFolder != null) {
               newCountUpdate = new Runnable() {
                 public void run() {
-                  cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, true);
+                  cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, false, true);
                 }
               };
             }

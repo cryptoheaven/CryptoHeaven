@@ -135,6 +135,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
       { new Integer(CommandCodes.FLD_A_RING_RING), FldARingRing.class.getName() },
       // Synch File/Message Folders
       { new Integer(CommandCodes.FLD_A_SYNC), FldASync.class.getName() },
+      { new Integer(CommandCodes.FLD_A_SYNC_NEXT), FldASync.class.getName() },
 
 
       // =====================
@@ -254,6 +255,7 @@ public class ClientActionSwitch extends CommonActionSwitch {
       { new Integer(CommandCodes.SYSNET_A_REMOVE_USER), SysQServerAction.class.getName() },
       { new Integer(CommandCodes.SYSNET_A_SERVER_AVAILABLE), SysQServerAction.class.getName() },
       { new Integer(CommandCodes.SYSNET_A_CONSOLE_COMMAND), SysQServerAction.class.getName() },
+      { new Integer(CommandCodes.SYSNET_A_GET_TEMP_USER_PACKETS), SysQServerAction.class.getName() },
     };
 
     Arrays.sort(actionClassNames, codeComparator);

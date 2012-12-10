@@ -12,10 +12,18 @@
 
 package com.CH_gui.usrs;
 
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.UserRecordEvent;
+import com.CH_cl.service.cache.event.UserRecordListener;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.DisposableObj;
 import com.CH_co.util.Misc;
 import com.CH_co.util.URLs;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyButtonNoFocus;
 import com.CH_gui.gui.JMyCheckBox;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
@@ -25,12 +33,16 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.StringTokenizer;
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeListener;
 
 /**
@@ -49,7 +61,7 @@ import javax.swing.event.ChangeListener;
 * @author  Marcin Kurzawa
 * @version
 */
-public class AccountOptionsQuotasPanel extends JPanel {
+public class AccountOptionsQuotasPanel extends JPanel implements DisposableObj {
 
   public JCheckBox jIncludeChangesToQuotas;
 
@@ -63,6 +75,9 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
   public boolean isChangingMyUserRecord;
 
+  private UserRecord userRecord;
+  private UserListener userListener;
+
   private static String FETCHING_DATA = com.CH_cl.lang.Lang.rb.getString("Fetching_Data...");
 
   /** Creates new AccountOptionsQuotasPanel */
@@ -71,10 +86,14 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
     this.isChangingMyUserRecord = isMyUserRec;
 
-    if (userRecords.length == 1)
+    if (userRecords.length == 1) {
+      this.userRecord = userRecords[0];
       makeQuotasPanel(userRecords[0], includePricingInfo);
-    else
+      this.userListener = new UserListener();
+      FetchedDataCache.getSingleInstance().addUserRecordListener(userListener);
+    } else {
       makeQuotasPanel(checkBoxListener, userRecords);
+    }
 
     if (trace != null) trace.exit(AccountOptionsQuotasPanel.class);
   }
@@ -90,7 +109,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
 
     panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Creation_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JMyLabel(Misc.getFormattedTimestamp(userRecord.dateCreated)), new GridBagConstraints(1, posY, 1, 1, 10, 0,
+    panel.add(new JMyLabel(Misc.getFormattedTimestamp(userRecord.dateCreated)), new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -109,13 +128,13 @@ public class AccountOptionsQuotasPanel extends JPanel {
         moreDays = Math.max(moreDays, 0);
         expDate += "   " + java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("(###_days)"), new Object[] {new Long(moreDays)});
       }
-      panel.add(new JMyLabel(expDate), new GridBagConstraints(1, posY, 1, 1, 10, 0,
+      panel.add(new JMyLabel(expDate), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -132,27 +151,37 @@ public class AccountOptionsQuotasPanel extends JPanel {
       jStorageLimit = new JMyTextField(storageLimit);
       storageComp = jStorageLimit;
     }
-    panel.add(storageComp, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+    panel.add(storageComp, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Storage_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jStorageUsed = new JMyLabel(FETCHING_DATA);
-    panel.add(jStorageUsed, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+    panel.add(jStorageUsed, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
+    JButton jRecalculate = new JMyButtonNoFocus(com.CH_cl.lang.Lang.rb.getString("button_Recalculate"));
+    jRecalculate.setBorder((new CompoundBorder(new EtchedBorder(), new EmptyBorder(0, 2, 0, 2))));
+    ActionListener recalcAction = new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.USR_Q_RECALCULATE_STORAGE), 60000);
+      }
+    };
+    jRecalculate.addActionListener(recalcAction);
     panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Calculated")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jStorageCalcDate = new JMyLabel(FETCHING_DATA);
     panel.add(jStorageCalcDate, new GridBagConstraints(1, posY, 1, 1, 10, 0,
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 2), 0, 0));
+    panel.add(jRecalculate, new GridBagConstraints(2, posY, 1, 1, 0, 0,
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 2, 5, 5), 0, 0));
     posY ++;
 
 
     // separator
-    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+    panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 0, 0,
         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -170,7 +199,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
       jBandwidthLimit = new JMyTextField(bandwidthLimit);
       bandwidthComp = jBandwidthLimit;
     }
-    panel.add(bandwidthComp, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+    panel.add(bandwidthComp, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -178,7 +207,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
     panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Bandwidth_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
     jBandwidthUsed = new JMyLabel(FETCHING_DATA);
-    panel.add(jBandwidthUsed, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+    panel.add(jBandwidthUsed, new GridBagConstraints(1, posY, 2, 1, 10, 0,
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -186,7 +215,7 @@ public class AccountOptionsQuotasPanel extends JPanel {
     // display user max sub user accounts
     if (userRecord.isCapableToManageUserAccounts()) {
       // separator
-      panel.add(new JSeparator(), new GridBagConstraints(0, posY, 2, 1, 0, 0,
+      panel.add(new JSeparator(), new GridBagConstraints(0, posY, 3, 1, 0, 0,
           GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
@@ -199,21 +228,21 @@ public class AccountOptionsQuotasPanel extends JPanel {
         jAccountsLimit.setText("single account");
       else
         jAccountsLimit.setText((userRecord.maxSubAccounts.shortValue() + 1) + " in total (1 administrative and "+userRecord.maxSubAccounts+" managed)");
-      panel.add(jAccountsLimit, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+      panel.add(jAccountsLimit, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
       panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_User_Accounts_Used")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       jAccountsUsed = new JMyLabel(FETCHING_DATA);
-      panel.add(jAccountsUsed, new GridBagConstraints(1, posY, 1, 1, 10, 0,
+      panel.add(jAccountsUsed, new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     }
 
     if (includePricingInfo) {
       // seperator
-      panel.add(AccountOptionsSignaturesPanel.makeDivider(com.CH_cl.lang.Lang.rb.getString("tab_Pricing")), new GridBagConstraints(0, posY, 2, 1, 10, 0,
+      panel.add(AccountOptionsSignaturesPanel.makeDivider(com.CH_cl.lang.Lang.rb.getString("tab_Pricing")), new GridBagConstraints(0, posY, 3, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
 
@@ -225,12 +254,12 @@ public class AccountOptionsQuotasPanel extends JPanel {
       jPane.setCaretPosition(0);
       jPane.setEditable(false);
       jPane.setPreferredSize(new Dimension(100, 50));
-      add(new JScrollPane(jPane), new GridBagConstraints(0, posY, 2, 1, 10, 10,
+      add(new JScrollPane(jPane), new GridBagConstraints(0, posY, 3, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(5, 5, 5, 5), 0, 0));
       posY ++;
     } else {
       // filler
-      panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 2, 1, 0, 10,
+      panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 3, 1, 0, 10,
           GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
       posY ++;
     }
@@ -378,4 +407,63 @@ public class AccountOptionsQuotasPanel extends JPanel {
     return num;
   }
 
+  public void updateQuotas(Long storageUsedF, Long transferUsedF, Short accountsUsedF) {
+    if (jStorageUsed != null) {
+      if (storageUsedF != null) {
+        jStorageUsed.setText(Misc.getFormattedSize(storageUsedF, 4, 3));
+      } else {
+        jStorageUsed.setText("");
+      }
+    }
+
+    if (jStorageCalcDate != null) {
+      if (userRecord != null && userRecord.checkStorageDate != null) {
+        jStorageCalcDate.setText(Misc.getFormattedTimestamp(userRecord.checkStorageDate));
+      } else {
+        jStorageCalcDate.setText("");
+      }
+    }
+
+    if (jBandwidthUsed != null) {
+      if (transferUsedF != null) {
+        jBandwidthUsed.setText(Misc.getFormattedSize(transferUsedF, 4, 3));
+      } else {
+        jBandwidthUsed.setText("");
+      }
+    }
+
+    if (jAccountsUsed != null && accountsUsedF != null) {
+      jAccountsUsed.setText((accountsUsedF.shortValue() + 1) + " in total (1 administrative and "+accountsUsedF.shortValue()+" managed)"); // +1 for admin
+    }
+  }
+
+  /**
+  * Dispose and remove cache listeners
+  */
+  public void disposeObj() {
+    if (userListener != null) {
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      cache.removeUserRecordListener(userListener);
+      userListener = null;
+    }
+  }
+
+  private class UserListener implements UserRecordListener {
+    public void userRecordUpdated(UserRecordEvent e) {
+      if (userRecord != null) {
+        UserRecord[] uRecs = e.getUserRecords();
+        if (uRecs != null) {
+          for (int i=0; i<uRecs.length; i++) {
+            UserRecord uRec = uRecs[0];
+            if (uRec.userId.equals(userRecord.userId)) {
+              // skip business master accounts as they should show "cumulation of sub-accounts"
+              if (!uRec.isBusinessMasterAccount()) {
+                updateQuotas(uRec.storageUsed, uRec.transferUsed, null);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

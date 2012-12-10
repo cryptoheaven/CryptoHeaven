@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.groupTable;
 
@@ -32,21 +32,21 @@ import com.CH_gui.table.RecordTableModel;
 import java.util.ArrayList;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.3 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.3 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class GroupTableModel extends RecordTableModel {
 
   // FolderShareIds for which records have been fetched already.
@@ -76,9 +76,9 @@ public class GroupTableModel extends RecordTableModel {
         });
 
   /** 
-   * Creates new GroupTableModel.
-   * Sets auto update.
-   */
+  * Creates new GroupTableModel.
+  * Sets auto update.
+  */
   public GroupTableModel() {
     super(columnHeaderData);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableModel.class, "GroupTableModel()");
@@ -86,9 +86,9 @@ public class GroupTableModel extends RecordTableModel {
   }
 
   /** 
-   * Creates new GroupTableModel.
-   * Sets auto update.
-   */
+  * Creates new GroupTableModel.
+  * Sets auto update.
+  */
   public GroupTableModel(Long folderId) {
     super(columnHeaderData, new ShareFilter(folderId));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableModel.class, "GroupTableModel()");
@@ -97,17 +97,17 @@ public class GroupTableModel extends RecordTableModel {
   }
 
   /**
-   * When folders are fetched, their IDs are cached so that we know if table fetch is required when
-   * user switches focus to another folder...
-   * This vector should also be cleared when users are switched...
-   */
+  * When folders are fetched, their IDs are cached so that we know if table fetch is required when
+  * user switches focus to another folder...
+  * This vector should also be cleared when users are switched...
+  */
   public void clearCachedFetchedFolderIDs() {
     fetchedIds.clear();
   }
 
   /**
-   * Sets auto update mode by listening on the cache share updates.
-   */
+  * Sets auto update mode by listening on the cache share updates.
+  */
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableModel.class, "setAutoUpdate(boolean flag)");
     if (trace != null) trace.args(flag);
@@ -126,8 +126,8 @@ public class GroupTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model setting the specified folderId as its main variable
-   */
+  * Initializes the model setting the specified folderId as its main variable
+  */
   public synchronized void initData(Long folderId) {
     FolderPair folderPair = getParentFolderPair();
     if (folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
@@ -139,8 +139,8 @@ public class GroupTableModel extends RecordTableModel {
   }
 
   /**
-   * @param fetch true if data should be refetched from the database.
-   */
+  * @param fetch true if data should be refetched from the database.
+  */
   public synchronized void refreshData(boolean forceFetch) {
     FolderPair folderPair = getParentFolderPair();
     if (folderPair != null) {
@@ -149,8 +149,8 @@ public class GroupTableModel extends RecordTableModel {
   }
 
   /**
-   * Initializes the model setting the specified folderId as its main variable
-   */
+  * Initializes the model setting the specified folderId as its main variable
+  */
   private synchronized void switchData(Long folderId) {
     FolderPair folderPair = getParentFolderPair();
     if (folderPair == null || folderPair.getFolderRecord() == null || !folderPair.getId().equals(folderId)) {
@@ -180,8 +180,8 @@ public class GroupTableModel extends RecordTableModel {
 
 
   /**
-   * Forces a refresh of data displayed even if its already displaying the specified folder data.
-   */
+  * Forces a refresh of data displayed even if its already displaying the specified folder data.
+  */
   private synchronized void refreshData(Long folderId, boolean forceFetch) {
     if (folderId != null) {
       FolderShareRecord shareRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(folderId, true);
@@ -257,8 +257,8 @@ public class GroupTableModel extends RecordTableModel {
 */
 
   /**
-   * Invoked by the cell editor when value in the column changes.
-   */
+  * Invoked by the cell editor when value in the column changes.
+  */
   public void setValueAt(Object aValue, int row, int column) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableModel.class, "setValueAt(Object aValue, int row, int column)");
     if (trace != null) trace.args(aValue);
@@ -290,17 +290,18 @@ public class GroupTableModel extends RecordTableModel {
 
 
   /** 
-   * Send a request to fetch shares for the <code> folderPair </code> from the server.
-   */
+  * Send a request to fetch shares for the <code> folderPair </code> from the server.
+  */
   private synchronized void fetchShares(final Long shareId, Long folderId, boolean force) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GroupTableModel.class, "fetchShares(FolderPair folderPair, Long folderId, boolean force)");
     if (trace != null) trace.args(shareId, folderId);
     if (trace != null) trace.args(force);
 
     synchronized (fetchedIds) {
-      if (force || !fetchedIds.contains(shareId)) {
-
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      if (force || 
+              !cache.wasFolderFetchRequestIssued(folderId) || 
+              !fetchedIds.contains(shareId)) {
 
 //        // if folder previously fetched, remove file links from the cache, leave the folders
 //        if (fetchedIds.contains(shareId)) {
@@ -324,20 +325,24 @@ public class GroupTableModel extends RecordTableModel {
         if (cache.getFolderShareRecord(shareId) != null &&
             cache.getFolderRecord(folderId) != null &&
             !cache.getFolderRecord(folderId).isCategoryType()) {
+
+          FolderRecord folder = cache.getFolderRecord(folderId);
+          if (folder != null) cache.markFolderFetchRequestIssued(folder.folderId);
+
           Obj_IDAndIDList_Rq request = new Obj_IDAndIDList_Rq();
           request.IDs = new Obj_IDList_Co();
           request.IDs.IDs = new Long[] {shareId}; 
           request.id = new Long(Record.RECORD_TYPE_SHARE);
 
           MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_GET_FOLDER_SHARES, new Obj_IDList_Co(shareId));
-          Runnable afterJob = new Runnable() {
+          Runnable replyReceivedJob = new Runnable() {
             public void run() {
               if (!fetchedIds.contains(shareId)) {
                 fetchedIds.add(shareId);
               }
             }
           };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 5000, afterJob, afterJob);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, replyReceivedJob, null, null);
         }
       }
     } // end synchronized
@@ -346,8 +351,8 @@ public class GroupTableModel extends RecordTableModel {
   } 
 
   /**
-   * Checks if folder share's content of a given ID was already retrieved.
-   */
+  * Checks if folder share's content of a given ID was already retrieved.
+  */
   public boolean isContentFetched(Long shareId) {
     synchronized (fetchedIds) {
       return fetchedIds.contains(shareId);
@@ -359,7 +364,7 @@ public class GroupTableModel extends RecordTableModel {
   /************* LISTENERS ON CHANGES IN THE CACHE *****************************************/
   /****************************************************************************************/
 
-   /** Listen on updates to the FolderShareRecords in the cache.
+  /** Listen on updates to the FolderShareRecords in the cache.
     * If the event happens, add, move or remove shares
     */
   private class FolderShareListener implements FolderShareRecordListener {

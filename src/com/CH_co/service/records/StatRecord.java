@@ -217,7 +217,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
     return "[StatRecord"
       + ": statId="         + statId
       + ", ownerUserId="    + ownerUserId
-      + ", objType="        + "'" + (objType != null ? (char)objType.byteValue() : '-') + "'"
+      + ", objType="        + objType != null ? "'"+(char)objType.byteValue()+"'" : "null"
       + ", objId="          + objId
       + ", objLinkId="      + objLinkId
       + ", mark="           + mark

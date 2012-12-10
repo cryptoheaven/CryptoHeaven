@@ -414,7 +414,11 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
             msgActionCode == CommandCodes.FLD_Q_RED_FLAG_COUNT ||
             msgActionCode == CommandCodes.FLD_A_RED_FLAG_COUNT ||
             msgActionCode == CommandCodes.FLD_Q_SYNC ||
+            msgActionCode == CommandCodes.FLD_Q_SYNC_NEXT ||
+            msgActionCode == CommandCodes.FLD_Q_SYNC_CONTACTS ||
+            msgActionCode == CommandCodes.FLD_Q_SYNC_FOLDER_TREE ||
             msgActionCode == CommandCodes.FLD_A_SYNC ||
+            msgActionCode == CommandCodes.FLD_A_SYNC_NEXT ||
             msgActionCode == CommandCodes.FILE_Q_GET_PROGRESS ||
             msgActionCode == CommandCodes.FILE_Q_NEW_FILE_STUDS_BACKGROUND ||
             msgActionCode == CommandCodes.FILE_Q_UPLOAD_CONTENT ||

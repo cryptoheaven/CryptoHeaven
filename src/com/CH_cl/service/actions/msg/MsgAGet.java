@@ -20,7 +20,6 @@ import com.CH_cl.service.cache.event.MsgLinkRecordEvent;
 import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.records.EmailAddressRecord;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.msg.Msg_GetLinkAndData_Rp;
@@ -34,7 +33,6 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,11 +55,6 @@ import java.util.Set;
 public class MsgAGet extends ClientMessageAction {
 
   public static int MAX_BATCH_MILLIS = 5000;
-  public static boolean suppressAutoFetchContinuation = false;
-
-  private static final Object monitor = new Object();
-  private static HashMap nextFetchActionsHM;
-  private static ArrayList nextFetchProgressingIDsL;
 
   /** Creates new MsgAGet */
   public MsgAGet() {
@@ -84,12 +77,12 @@ public class MsgAGet extends ClientMessageAction {
   }
 
   /**
-   * Run the action, also used by the folder re-synch code
-   * @param SIL
-   * @param reply
-   * @param context
-   * @return null
-   */
+  * Run the action, also used by the folder re-synch code
+  * @param SIL
+  * @param reply
+  * @param context
+  * @return null
+  */
   public static MessageAction runAction(ServerInterfaceLayer SIL, Msg_GetLinkAndData_Rp reply, MessageAction context) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgAGet.class, "runAction(ServerInterfaceLayer SIL, Msg_GetLinkAndData_Rp reply, MessageAction context)");
 
@@ -230,7 +223,7 @@ public class MsgAGet extends ClientMessageAction {
           FolderRecord fRec = cache.getFolderRecord(msgLink.ownerObjId);
           // If the folder was ever fetched, then get body, otherwise, we never displayed its data, and do not need the body.
           if (fRec != null && (
-                (fRec.folderType.shortValue() == FolderRecord.POSTING_FOLDER && FolderRecUtil.wasFolderFetchRequestIssued(fRec.folderId)) ||
+                (fRec.folderType.shortValue() == FolderRecord.POSTING_FOLDER && cache.wasFolderFetchRequestIssued(fRec.folderId)) ||
                 fRec.isChatting() // always fetch chatting messages
                 ))
           {
@@ -443,8 +436,7 @@ public class MsgAGet extends ClientMessageAction {
         if (fetchingFolderRec != null) {
           cache.fireFolderRecordUpdated(new FolderRecord[] { fetchingFolderRec }, RecordEvent.FOLDER_FETCH_COMPLETED);
         }
-        if (nextFetchActionsHM != null)
-          nextFetchActionsHM.remove(fetchingFolderId);
+        cache.removeNextFetchAction(fetchingFolderId);
       } else {
         if (context.isInterrupted()) {
           context.interrupt();
@@ -505,13 +497,11 @@ public class MsgAGet extends ClientMessageAction {
           Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(fetchingShareId, Record.RECORD_TYPE_FOLDER, fetchingFolderId, numMax, numNew, lastMsgFetchedStamp);
           int actionCode = full ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
           MessageAction msgAction = new MessageAction(actionCode, request);
-          if (!suppressAutoFetchContinuation) {
+          if (!ServerInterfaceLayer.IS_MOBILE_MODE) {
             msgAction.setInterruptsFrom(context);
             SIL.submitAndReturn(msgAction, 30000);
           } else {
-            if (nextFetchActionsHM == null)
-              nextFetchActionsHM = new HashMap();
-            nextFetchActionsHM.put(fetchingFolderId, msgAction);
+            cache.setNextFetchAction(fetchingFolderId, msgAction);
           }
         }
       }
@@ -519,52 +509,6 @@ public class MsgAGet extends ClientMessageAction {
 
     if (trace != null) trace.exit(MsgAGet.class, null);
     return null;
-  }
-
-  public static boolean hasNextFetchRequest(Long folderId) {
-    synchronized (monitor) {
-      return nextFetchActionsHM != null && nextFetchActionsHM.containsKey(folderId);
-    }
-  }
-
-  public static boolean hasNextOrFetching(Long folderId) {
-    synchronized (monitor) {
-      return hasNextFetchRequest(folderId) || isFetchingNext(folderId);
-    }
-  }
-
-  public static boolean isFetchingNext(Long folderId) {
-    synchronized (monitor) {
-      return nextFetchProgressingIDsL != null && nextFetchProgressingIDsL.contains(folderId);
-    }
-  }
-
-  public static boolean sendNextFetchRequest(ServerInterfaceLayer SIL, final Long folderId, final Runnable afterJob) {
-    boolean anySent = false;
-    synchronized (monitor) {
-      // take off the request from pending to avoid client to repedetly sending the same request
-      final MessageAction msgAction = (MessageAction) nextFetchActionsHM.remove(folderId);
-      if (msgAction != null) {
-        if (nextFetchProgressingIDsL == null) nextFetchProgressingIDsL = new ArrayList();
-        nextFetchProgressingIDsL.add(folderId);
-        msgAction.restamp();
-        // take off the request from pending to avoid client to repedetly sending the same request
-        Runnable reinsert = new Runnable() {
-          public void run() {
-            synchronized (monitor) {
-              // We'll reinsert the request right after reciving a reply or interrupt.
-              // Proper execution of reply will remove this action from pending.
-              // After-Job handles next request so it should not reinsert.
-              nextFetchActionsHM.put(folderId, msgAction);
-              nextFetchProgressingIDsL.remove(folderId);
-            }
-          }
-        };
-        SIL.submitAndReturn(msgAction, 120000, reinsert, afterJob, reinsert);
-        anySent = true;
-      }
-    }
-    return anySent;
   }
 
 }

@@ -656,7 +656,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       ClientMessageAction replyAction = null;
 
       // limit number of entries
-      UploadDownloadSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()));
+      UploadDownloadSynch.entry(SIL.getMaxHeavyWorkerCount());
       try {
         // number of visible progress monitors are limited to the number of active transfer connections too
         ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferDown(fileNames, destDir, files, !openAfterDownload, suppressDownloadSoundsAndAutoClose);

@@ -255,7 +255,6 @@ public class UserTableModel extends RecordTableModel {
           FetchedDataCache.getSingleInstance().removeUserRecords(recs);
         }
 
-
         Obj_List_Co request = new Obj_List_Co();
         request.objs = new Object[] { Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null, Boolean.FALSE };
 

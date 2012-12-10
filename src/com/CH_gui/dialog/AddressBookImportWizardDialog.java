@@ -17,7 +17,6 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.ops.SendMessageRunner;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.nanoxml.XMLElement;
@@ -176,9 +175,9 @@ public class AddressBookImportWizardDialog extends WizardDialog {
 
           // if no duplicates, fetch all addresses first so we can do comparisons
           if (!allowDuplicates) {
-            if (!FolderRecUtil.wasFolderFetchRequestIssued(destPair.getFolderRecord().folderId)) {
+            if (!cache.wasFolderFetchRequestIssued(destPair.getFolderRecord().folderId)) {
               // Mark the folder as "fetch issued"
-              FolderRecUtil.markFolderFetchRequestIssued(destPair.getFolderRecord().folderId);
+              cache.markFolderFetchRequestIssued(destPair.getFolderRecord().folderId);
               // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
               // use initial fetch size of MAX size because we are not waiting for multiple stages of fetching before continuing... probably should wait for completion or interruption of all stages
               Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(destPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, destPair.getFolderRecord().folderId, null, (short) Msg_GetMsgs_Rq.FETCH_NUM_LIST__MAX_SIZE__HARD_LIMIT, (Timestamp) null);

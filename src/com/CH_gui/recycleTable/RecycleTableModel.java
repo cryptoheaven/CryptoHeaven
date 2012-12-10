@@ -16,7 +16,6 @@ import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FileFilter;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_co.service.msg.CommandCodes;
@@ -438,9 +437,11 @@ public class RecycleTableModel extends RecordTableModel {
     if (trace != null) trace.args(force);
 
     synchronized (fetchedIds) {
-      if (force || !fetchedIds.contains(shareId) || (getFilterNarrowing() != null && !fetchedIdsFull.contains(shareId))) {
-
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      if (force || 
+              !cache.wasFolderFetchRequestIssued(folderId) || 
+              !fetchedIds.contains(shareId) || 
+              (getFilterNarrowing() != null && !fetchedIdsFull.contains(shareId))) {
 
         // if folder previously fetched, remove file and msg links from the cache, leave the folders
         if (fetchedIds.contains(shareId)) {
@@ -477,8 +478,7 @@ public class RecycleTableModel extends RecordTableModel {
             !cache.getFolderRecord(folderId).isCategoryType()) {
 
           FolderRecord folder = cache.getFolderRecord(folderId);
-          if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-          if (folder != null) FolderRecUtil.markFolderFetchRequestIssued(folder.folderId);
+          if (folder != null) cache.markFolderFetchRequestIssued(folder.folderId);
 
           {
             // Request Files
@@ -486,14 +486,14 @@ public class RecycleTableModel extends RecordTableModel {
             File_GetFiles_Rq request = new File_GetFiles_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
 
             MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
-            Runnable afterJob = new Runnable() {
+            Runnable replyReceivedJob = new Runnable() {
               public void run() {
-                FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
-                if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-                if (!fetchedIds.contains(shareId)) fetchedIds.add(shareId);
+                if (!fetchedIds.contains(shareId)) {
+                  fetchedIds.add(shareId);
+                }
               }
             };
-            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, null, afterJob, afterJob);
+            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, replyReceivedJob, null, null);
           }
           {
             // Request Msgs
@@ -502,10 +502,9 @@ public class RecycleTableModel extends RecordTableModel {
 
             final int _action = getFilterNarrowing() != null ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
             MessageAction msgAction = new MessageAction(_action, request);
-            Runnable afterJob = new Runnable() {
+            Runnable replyReceivedJob = new Runnable() {
               public void run() {
-                FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
-                if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
+                FetchedDataCache cache = FetchedDataCache.getSingleInstance();
                 if (!fetchedIds.contains(shareId)) fetchedIds.add(shareId);
                 if (_action == CommandCodes.MSG_Q_GET_BRIEFS)
                   if (!fetchedIdsBriefs.contains(shareId)) fetchedIdsBriefs.add(shareId);
@@ -513,7 +512,7 @@ public class RecycleTableModel extends RecordTableModel {
                   if (!fetchedIdsFull.contains(shareId)) fetchedIdsFull.add(shareId);
               }
             };
-            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, null, afterJob, afterJob);
+            MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 25000, replyReceivedJob, null, null);
           }
         }
       }

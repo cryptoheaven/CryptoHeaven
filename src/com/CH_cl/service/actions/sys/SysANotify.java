@@ -17,7 +17,6 @@ import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.engine.ServerInterfaceWorker;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
@@ -61,7 +60,7 @@ public class SysANotify extends ClientMessageAction {
   */
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SysANotify.class, "runAction(Connection)");
-//System.out.println("SysANotify:  running in the SysANotify");
+
     final FetchedDataCache cache = getServerInterfaceLayer().getFetchedDataCache();
 
     if (cache.getUserRecord() != null && cache.getKeyRecordMyCurrent() != null && cache.getKeyRecordMyCurrent().getPrivateKey() != null) {
@@ -84,51 +83,55 @@ public class SysANotify extends ClientMessageAction {
       // Now do the re-synch if needed.
       if (shouldReSynch) {
         // Skip too rapid repeted requests (less than 15 seconds apart)
-        boolean isTooRapid = stampNow - reSynchStamp < 15000 || stampNow < reSynchStamp; // include invalid stamps
-        if (!isTooRapid) {
+        boolean isTooRapid = stampNow - reSynchStamp < 15000;
+        // If not too often, or when invalid stamp
+        if (!isTooRapid || stampNow < reSynchStamp) {
           reSynchStamp = System.currentTimeMillis();
-//          System.out.println("SysANotify: should re-synch");
           Thread th = new ThreadTraced("ReSynch Runner") {
             public void runTraced() {
               // invalidate views of fetched folders so that client reloads them on demand
               FolderRecord[] folders = cache.getFolderRecords();
-              for (int i=0; i<folders.length; i++) {
-                Long folderId = folders[i].folderId;
-                FolderRecUtil.markFolderViewInvalidated(folderId, true);
+              if (folders != null) {
+                for (int i=0; i<folders.length; i++) {
+                  Long folderId = folders[i].folderId;
+                  if (cache.wasFolderFetchRequestIssued(folderId))
+                    cache.markFolderViewInvalidated(folderId, true);
+                }
               }
 
-//              System.out.println("SysANotify: about to request re-synchs");
-
-              // if connection is still active then request update
-              if (SIL.hasPersistentMainWorker()) {
+              boolean replyOk = true;
+              // if any connection is still active then request updates
+              if (replyOk && SIL.hasMainWorker()) {
                 // send re-synch request for folders - wait for reply as subsequent synchronization may need to run for all folders
                 Long folderId = null; // null signifies Folders-Mode
-//                System.out.println("SysANotify: prepping for re-synch folders");
-                List fldRequestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderId, null, 0, 0, 0, 0, null);
+                List fldRequestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderId, null, 0, 0, 0, 0, null, null, null);
                 if (fldRequestSetsL != null && fldRequestSetsL.size() > 0) {
-//                  System.out.println("SysANotify: requesting to synch folders");
-                  SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_SYNC, new Obj_List_Co(fldRequestSetsL)), 90000);
+                  replyOk = SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_SYNC_FOLDER_TREE, new Obj_List_Co(fldRequestSetsL)), 90000);
                 }
+              }
+
+              // if any connection is still active then request updates
+              if (replyOk && SIL.hasMainWorker()) {
                 // send re-synch request for contacts
                 Long contactFolderId = cache.getUserRecord().contactFolderId;
-                List cntRequestSetsL = CacheFldUtils.prepareSynchRequest(cache, contactFolderId, null, 0, 0, 0, 0, null);
-                FolderRecUtil.markFolderViewInvalidated(contactFolderId, false);
+                List cntRequestSetsL = CacheFldUtils.prepareSynchRequest(cache, contactFolderId, null, 0, 0, 0, 0, null, null, null);
+                cache.markFolderViewInvalidated(contactFolderId, false);
                 if (cntRequestSetsL != null && cntRequestSetsL.size() > 0) {
-//                  System.out.println("SysANotify: requesting to synch contacts");
-                  SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_SYNC, new Obj_List_Co(cntRequestSetsL)), 90000);
+                  replyOk = SIL.submitAndWait(new MessageAction(CommandCodes.FLD_Q_SYNC_CONTACTS, new Obj_List_Co(cntRequestSetsL)), 90000);
                 }
+              }
 
+              // if any connection is still active then request updates
+              if (replyOk && SIL.hasMainWorker()) {
                 // get updated new object counts
                 FolderShareRecord[] allShares = cache.getFolderSharesMy(true);
                 if (allShares != null && allShares.length > 0) {
                   // if connection is still active then request update
                   if (SIL.hasPersistentMainWorker()) {
-//                    System.out.println("SysANotify: ******* requesting to get red flag count");
                     SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_RED_FLAG_COUNT, new Obj_IDList_Co(RecordUtils.getIDs(allShares))));
                   }
                 }
               }
-
             }
           };
           th.setDaemon(true);

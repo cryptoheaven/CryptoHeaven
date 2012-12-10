@@ -12,15 +12,13 @@
 
 package com.CH_gui.table;
 
-import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_cl.service.ops.FolderOps;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
 import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
-import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
@@ -608,36 +606,26 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
         FolderPair folderPair = recordTableModel.getParentFolderPair();
         FolderRecord folder = folderPair != null ? folderPair.getFolderRecord() : null;
         Long folderId = folder != null ? folder.folderId : null;
-        boolean viewInvalidated = FolderRecUtil.wasFolderViewInvalidated(folderId);
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        FetchedDataCache cache = SIL.getFetchedDataCache();
+        boolean viewInvalidated = cache.wasFolderViewInvalidated(folderId);
         if (folder != null && viewInvalidated) {
-          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
           if (SIL.hasPersistentMainWorker() && SIL.isLoggedIn()) {
-            int serverBuild = SIL.getPersistentMainWorkerServerBuild();
-            if (serverBuild >= 730) {
-              FetchedDataCache cache = SIL.getFetchedDataCache();
-              // silent validator starts with modest 20 items, then continuation requests use defaults
-              List requestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderId, null, 20, 20, 20, 20, null);
-              FolderRecUtil.markFolderViewInvalidated(folderId, false);
-              if (requestSetsL != null && requestSetsL.size() > 0) {
-                SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_SYNC, new Obj_List_Co(requestSetsL)), 90000);
-              }
+            if (!folder.isRecycleType()) {
+              FolderOps.runResynchFolders_Delayed(SIL, folderId, 100);
             } else {
-              if (folder.isFileType() || folder.isRecycleType()) {
-                FolderRecUtil.markFolderViewInvalidated(folderId, false);
-                File_GetFiles_Rq request = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
-                int action = CommandCodes.FILE_Q_GET_FILES_STAGED;
-                SIL.submitAndReturn(new MessageAction(action, request), 30000);
-              }
-              if (folder.isMsgType() || folder.isRecycleType()) {
-                FolderRecUtil.markFolderViewInvalidated(folderId, false);
-                Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
-                int messageMode = MsgTableModel.MODE_MSG; // default value in case this is a Recycle table
-                if (recordTableModel instanceof MsgTableModel) {
-                  messageMode = ((MsgTableModel) recordTableModel).getMode();
-                }
-                int action = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
-                SIL.submitAndReturn(new MessageAction(action, request), 30000);
-              }
+              // re-fetch Recycled Files
+              cache.markFolderViewInvalidated(folderId, false);
+              File_GetFiles_Rq requestF = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
+              SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, requestF), 30000);
+              // re-fetch Recycled Messages
+              cache.markFolderViewInvalidated(folderId, false);
+              Msg_GetMsgs_Rq requestM = new Msg_GetMsgs_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
+              int messageMode = MsgTableModel.MODE_MSG; // default value in case this is a Recycle table
+              if (recordTableModel instanceof MsgTableModel)
+                messageMode = ((MsgTableModel) recordTableModel).getMode();
+              int actionM = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
+              SIL.submitAndReturn(new MessageAction(actionM, requestM), 30000);
             }
           }
         }

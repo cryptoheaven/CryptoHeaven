@@ -268,29 +268,7 @@ public class AccountOptionsDialog extends GeneralDialog {
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
             // userRecord was updated with the fetched record and merged together
-            if (jPanelQuotas.jStorageUsed != null) {
-              if (storageUsedF != null) {
-                jPanelQuotas.jStorageUsed.setText(Misc.getFormattedSize(storageUsedF, 4, 3));
-              } else {
-                jPanelQuotas.jStorageUsed.setText("");
-              }
-            }
-
-            if (jPanelQuotas.jStorageCalcDate != null) {
-              if (userRecords.length == 1 && userRecords[0].checkStorageDate != null) {
-                jPanelQuotas.jStorageCalcDate.setText(Misc.getFormattedTimestamp(userRecords[0].checkStorageDate));
-              } else {
-                jPanelQuotas.jStorageCalcDate.setText("");
-              }
-            }
-
-            if (jPanelQuotas.jBandwidthUsed != null) {
-              if (transferUsedF != null) {
-                jPanelQuotas.jBandwidthUsed.setText(Misc.getFormattedSize(transferUsedF, 4, 3));
-              } else {
-                jPanelQuotas.jBandwidthUsed.setText("");
-              }
-            }
+            jPanelQuotas.updateQuotas(storageUsedF, transferUsedF, accountsUsedF);
 
             if (userRecords.length == 1 && userRecords[0].defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
               EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
@@ -298,10 +276,6 @@ public class AccountOptionsDialog extends GeneralDialog {
               jDefaultEmail.setText(emlRec.getEmailAddressFull());
               jDefaultEmail.setCaretPosition(0);
               setEditableDefaultEmail(myUserRecord, emlRec);
-            }
-
-            if (jPanelQuotas.jAccountsUsed != null) {
-              jPanelQuotas.jAccountsUsed.setText((accountsUsedF.shortValue() + 1) + " in total (1 administrative and "+accountsUsedF.shortValue()+" managed)"); // +1 for admin
             }
 
             // update checkboxes

@@ -12,22 +12,23 @@
 
 package com.CH_gui.list;
 
-import java.sql.*;
-import java.util.*;
-
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.msg.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.MsgDataRecordEvent;
+import com.CH_cl.service.cache.event.MsgDataRecordListener;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_cl.service.records.filters.RecordIdFilter;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import com.CH_gui.frame.*;
+import com.CH_co.util.ArrayUtils;
+import com.CH_gui.frame.MainFrame;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Comparator;
 
 
 /**
@@ -141,12 +142,13 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
 
   private void makeSureAddressBooksAreFetched(FolderPair[] allAddressBookChoices) {
     // make sure address books are fetched
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     for (int i=0; allAddressBookChoices!=null && i<allAddressBookChoices.length; i++) {
       FolderRecord fRec = ((FolderPair) allAddressBookChoices[i]).getFolderRecord();
       FolderShareRecord sRec = ((FolderPair) allAddressBookChoices[i]).getFolderShareRecord();
-      if (!FolderRecUtil.wasFolderFetchRequestIssued(fRec.folderId)) {
+      if (!cache.wasFolderFetchRequestIssued(fRec.folderId)) {
         // Mark the folder as "fetch issued"
-        FolderRecUtil.markFolderFetchRequestIssued(fRec.folderId);
+        cache.markFolderFetchRequestIssued(fRec.folderId);
         // <shareId> <ownerObjType> <ownerObjId> <fetchNum> <timestamp>
         Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(sRec.shareId, Record.RECORD_TYPE_FOLDER, fRec.folderId, null, (short) Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
         MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BRIEFS, request), 30000);

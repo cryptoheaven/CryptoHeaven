@@ -601,7 +601,7 @@ public class FileLobUp {
         }
         DigestInputStream dEncStream = null;
         try {
-          FileLobUpSynch.entry(Math.max(1, SIL.getMaxHeavyWorkerCount()), plainDataFile.length());
+          FileLobUpSynch.entry(SIL.getMaxHeavyWorkerCount(), plainDataFile.length());
           // check for interrupt, maybe it got interrupted while we were waiting for entry to this throttled code
           if (isInterrupted)
             throw new IllegalStateException("Upload already interrupted.");

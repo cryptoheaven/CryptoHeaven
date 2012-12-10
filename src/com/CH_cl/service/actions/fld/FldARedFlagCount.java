@@ -15,7 +15,6 @@ package com.CH_cl.service.actions.fld;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FolderOps;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDs_Co;
 import com.CH_co.service.records.FolderRecord;
@@ -84,19 +83,17 @@ public class FldARedFlagCount extends ClientMessageAction {
     }
 
     // re-synch only those that were invalidated or never fetched and have a red flag
-    if (getCommonContext().serverBuild >= 730) {
-      ArrayList fldIDsToSynch = new ArrayList();
-      for (int i=0; i<fldIDsWithRedFlagL.size(); i++) {
-        Long fldId = (Long) fldIDsWithRedFlagL.get(i);
-        boolean wasFetched = FolderRecUtil.wasFolderFetchRequestIssued(fldId);
-        boolean wasInvalidated = FolderRecUtil.wasFolderViewInvalidated(fldId);
-        if (!wasFetched || wasInvalidated) {
-          fldIDsToSynch.add(fldId);
-        }
+    ArrayList fldIDsToSynch = new ArrayList();
+    for (int i=0; i<fldIDsWithRedFlagL.size(); i++) {
+      Long fldId = (Long) fldIDsWithRedFlagL.get(i);
+      boolean wasFetched = cache.wasFolderFetchRequestIssued(fldId);
+      boolean wasInvalidated = cache.wasFolderViewInvalidated(fldId);
+      if (!wasFetched || wasInvalidated) {
+        fldIDsToSynch.add(fldId);
       }
-      if (fldIDsToSynch.size() > 0)
-        FolderOps.runResynchFolders_Delayed(getServerInterfaceLayer(), fldIDsWithRedFlagL, 5000);
     }
+    if (fldIDsToSynch.size() > 0)
+      FolderOps.runResynchFolders_Delayed(getServerInterfaceLayer(), fldIDsWithRedFlagL, 5000);
 
     if (trace != null) trace.exit(FldARedFlagCount.class, null);
     return null;

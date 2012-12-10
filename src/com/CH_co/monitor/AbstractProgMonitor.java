@@ -73,7 +73,7 @@ abstract public class AbstractProgMonitor extends Object {
     if (trace != null) trace.args(stamp);
     if (trace != null) trace.data(10, name);
     Stats.moveGlobe(this);
-    Stats.setStatusAll("Request [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
+//    Stats.setStatusAll("Request [" + MessageActionNameSwitch.getActionInfoName(actionCode) + "]");
     if (trace != null) trace.exit(AbstractProgMonitor.class);
   }
 

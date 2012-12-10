@@ -1483,11 +1483,12 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
 
         // create runnable to run after reply is received that will update new object count
         final FolderRecord _sourceFolder = sourceFolder;
+        final boolean _allowLoweringOfUpdateCounts = actionCode == CommandCodes.MSG_Q_MOVE;
         Runnable newCountUpdate = null;
         if (sourceFolder != null) {
           newCountUpdate = new Runnable() {
             public void run() {
-              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, true);
+              cache.statUpdatesInFoldersForVisualNotification(new FolderRecord[] { _sourceFolder }, _allowLoweringOfUpdateCounts, true);
             }
           };
         }

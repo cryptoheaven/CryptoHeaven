@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.trace;
 
@@ -23,15 +23,15 @@ import com.CH_co.io.*;
 import com.CH_co.util.Misc;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Thread safe Tracing Facility
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Thread safe Tracing Facility
+* @author  Marcin Kurzawa
+* @version
+*/
 public class Trace extends Object {
 
   // debug help to show threads that are non-deamon useful in debugin program non-exits after logout...
@@ -85,8 +85,8 @@ public class Trace extends Object {
   }
 
   /** Initializes the Tracing Facility if Tracing is enabled in TraceProperties.
-   *  To Enable Tracing set property Trace.* = true
-   */
+  *  To Enable Tracing set property Trace.* = true
+  */
   static {
     // touch TraceProperties class as this will initialize Trace properly.
     TraceProperties.isTraceEnabled();
@@ -174,10 +174,11 @@ public class Trace extends Object {
     }
     else {
       synchronized (staticMonitor) {
-        Trace threadTrace = (Trace) hashMap.get( new Integer(Thread.currentThread().hashCode()) );
+        Object key = makeKey();
+        Trace threadTrace = (Trace) hashMap.get(key);
         if (threadTrace == null) {
           threadTrace = new Trace();
-          hashMap.put( new Integer(Thread.currentThread().hashCode()), threadTrace );
+          hashMap.put(key, threadTrace);
         }
         String str = className + " " + methodPrototype;
         threadTrace.addLine("|>" + str);
@@ -188,9 +189,16 @@ public class Trace extends Object {
     } // end else
   }
 
+  private static Object makeKey() {
+    return makeKey(Thread.currentThread());
+  }
+  private static Object makeKey(Thread th) {
+    return th.getName() + th.hashCode();
+  }
+
   /**
-   * Exit from a pair entry
-   */
+  * Exit from a pair entry
+  */
   private void exit(Class c, Object obj, boolean isObj) {
     // this debug is done on "exit" because threads may set its Deamon status in the constructor
     if (DEBUG__PRINT_OUT_NON_DEAMON_THREADS) {
@@ -549,8 +557,8 @@ public class Trace extends Object {
   }
 
   /** Clears all resources associated with the calling Thread's trace object
-   *  Every thread that used tracing facility should call this before dying.
-   */
+  *  Every thread that used tracing facility should call this before dying.
+  */
   public void clear() {
     if (this == dumpingTrace) return;
     try {
@@ -566,11 +574,11 @@ public class Trace extends Object {
             t.printStackTrace();
           }
         }
-         */
+        */
         addLine("<-- Trace Cleared for thread " + threadName);
         if (lastThread == thisThread)
           lastThread = null;
-        Trace trace = (Trace) hashMap.remove( new Integer(thisThread.hashCode()) );
+        Trace trace = (Trace) hashMap.remove(makeKey(thisThread));
         trace.stack.clear(); trace.stack = null;
         trace.stack2.clear(); trace.stack2 = null;
       }
@@ -583,8 +591,8 @@ public class Trace extends Object {
   }
 
   /** Adds a line of text to output at current stack level.
-   * Prints String or Throwable.
-   */
+  * Prints String or Throwable.
+  */
   private void addLine(Object obj) {
     if (!isPaused()) {
       String str = null;

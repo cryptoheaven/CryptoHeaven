@@ -19,7 +19,6 @@ import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.ops.FileLinkOps;
 import com.CH_cl.service.ops.MsgLinkOps;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_cl.service.records.filters.TextSearchFilter;
 import com.CH_co.monitor.Interrupter;
@@ -918,9 +917,12 @@ public class MsgTableModel extends RecordTableModel {
     if (trace != null) trace.args(force);
 
     synchronized (fetchedIds) {
-      if (force || !fetchedIds.contains(shareId) || (isFilteringBodies() && !fetchedIdsFull.contains(shareId))) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      if (force || 
+              !cache.wasFolderFetchRequestIssued(folderId) || 
+              !fetchedIds.contains(shareId) || 
+              (isFilteringBodies() && !fetchedIdsFull.contains(shareId))) 
+      {
         // if refreshing and folder previously fetched, remove message links from the cache, leave the message data records
         if (force && fetchedIds.contains(shareId)) {
           int rowCount = getRowCount();
@@ -950,8 +952,7 @@ public class MsgTableModel extends RecordTableModel {
             !cache.getFolderRecord(folderId).isCategoryType()) {
 
           FolderRecord folder = cache.getFolderRecord(folderId);
-          if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-          if (folder != null) FolderRecUtil.markFolderFetchRequestIssued(folder.folderId);
+          if (folder != null) cache.markFolderFetchRequestIssued(folder.folderId);
 
           final boolean _isFilteringBodies = isFilteringBodies();
           final int _action = (messageMode == MODE_POST || messageMode == MODE_CHAT || _isFilteringBodies) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
@@ -1010,13 +1011,7 @@ public class MsgTableModel extends RecordTableModel {
               }
             }
           };
-          Runnable afterJob = new Runnable() {
-            public void run() {
-              FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
-              if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-            }
-          };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 30000, replyReceivedJob, afterJob, afterJob);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 30000, replyReceivedJob, null, null);
         }
       }
     } // end synchronized

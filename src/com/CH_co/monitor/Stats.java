@@ -13,9 +13,11 @@
 package com.CH_co.monitor;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
-import java.util.*;
+import com.CH_co.util.Misc;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -185,6 +187,7 @@ public class Stats extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Stats.class, "setStatusAll(String newStatus)");
     if (trace != null) trace.args(newStatus);
     synchronized (monitor) {
+      //System.out.println(""+new Date()+" : "+newStatus);
       statusHistoryAllL.addFirst(newStatus);
       statusHistoryDatesAllL.addFirst(new Date());
       while (statusHistoryAllL.size() > MAX_HISTORY_SIZE) {

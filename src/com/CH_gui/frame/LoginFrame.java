@@ -1978,7 +1978,7 @@ public class LoginFrame extends JFrame {
       if (replyAction == null || replyAction.getActionCode() != msgAction.getActionCode()) break;
     }
 
-    if (replyAction.getActionCode() == CommandCodes.SYS_A_REPLY_DATA_SETS) {
+    if (replyAction != null && replyAction.getActionCode() == CommandCodes.SYS_A_REPLY_DATA_SETS) {
       success = true;
     } else {
       if (trace != null) trace.data(100, "closing prog monitor, failed to fetch login info");

@@ -15,7 +15,6 @@ package com.CH_gui.fileTable;
 import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.FolderRecUtil;
 import com.CH_cl.service.records.filters.FileFilter;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_co.service.msg.CommandCodes;
@@ -348,9 +347,10 @@ public class FileTableModel extends RecordTableModel {
     if (trace != null) trace.args(force);
 
     synchronized (fetchedIds) {
-      if (force || !fetchedIds.contains(shareId)) {
-
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      if (force || 
+              !cache.wasFolderFetchRequestIssued(folderId) || 
+              !fetchedIds.contains(shareId)) {
 
         // if refreshing and folder previously fetched, remove file links from the cache, leave the folders
         if (force && fetchedIds.contains(shareId)) {
@@ -376,10 +376,7 @@ public class FileTableModel extends RecordTableModel {
             !cache.getFolderRecord(folderId).isCategoryType()) {
 
           FolderRecord folder = cache.getFolderRecord(folderId);
-          if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-          if (folder != null) FolderRecUtil.markFolderFetchRequestIssued(folder.folderId);
-
-          final int _action = CommandCodes.FILE_Q_GET_FILES_STAGED;
+          if (folder != null) cache.markFolderFetchRequestIssued(folder.folderId);
 
           // order of fetching is from newest to oldest
           short fetchNumMax = -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE;
@@ -391,7 +388,7 @@ public class FileTableModel extends RecordTableModel {
           FileLinkRecord[] existingLinks = cache.getFileLinkRecords(shareId);
           request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
 
-          MessageAction msgAction = new MessageAction(_action, request);
+          MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, request);
           Runnable replyReceivedJob = new Runnable() {
             public void run() {
               if (!fetchedIds.contains(shareId)) {
@@ -399,13 +396,7 @@ public class FileTableModel extends RecordTableModel {
               }
             }
           };
-          Runnable afterJob = new Runnable() {
-            public void run() {
-              FolderRecord folder = FetchedDataCache.getSingleInstance().getFolderRecord(folderId);
-              if (folder != null) FolderRecUtil.markFolderViewInvalidated(folder.folderId, false);
-            }
-          };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, replyReceivedJob, afterJob, afterJob);
+          MainFrame.getServerInterfaceLayer().submitAndReturn(msgAction, 10000, replyReceivedJob, null, null);
         }
       }
     } // end synchronized

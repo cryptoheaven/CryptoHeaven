@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.queue;
 
@@ -18,21 +18,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.13 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.13 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class PriorityFifo extends Object implements PriorityFifoWriterI, PriorityFifoReaderI {
 
 //  public static final int PRIORITY_HIGHEST = 0;
@@ -57,8 +57,8 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
   }
 
   /**
-   * Lower priority number, closer in the queue.
-   */
+  * Lower priority number, closer in the queue.
+  */
   public synchronized void add(Object obj, long priority) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "add(Object obj, long priority)");
     if (trace != null) trace.args(obj);
@@ -99,6 +99,25 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
     if (trace != null) trace.exit(PriorityFifo.class);
   }
 
+  public synchronized void pushBack(Object obj) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PriorityFifo.class, "pushBack(Object obj)");
+
+    if (closed)
+      throw new IllegalStateException("Fifo is closed, no items can be pushed back.");
+
+    // Pushing back always uses highest priority so that retrieval of this item is next
+    list.addFirst(new ObjectPair(obj, PRIORITY_HIGHEST));
+
+    notify();
+
+    // If sink installed, run it to consume the item.
+    if (processingFunction != null) {
+      consume();
+    }
+
+    if (trace != null) trace.exit(PriorityFifo.class);
+  }
+
   private synchronized void consume() {
     if (!isProcessingFunctionRunning) {
       isProcessingFunctionRunning = true;
@@ -109,11 +128,18 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
               Object obj = null;
               synchronized (PriorityFifo.this) {
                 if (PriorityFifo.this.size() == 0) {
-                  isProcessingFunctionRunning = false;
-                  break;
-                } else {
-                  obj = PriorityFifo.this.remove();
+                  // Linger a second to see if anything else shows up before quitting...
+                  try {
+                    PriorityFifo.this.wait(1000);
+                  } catch (InterruptedException e) {
+                  }
+                  if (PriorityFifo.this.size() == 0) {
+                    isProcessingFunctionRunning = false;
+                    break;
+                  }
                 }
+                if (obj == null)
+                  obj = PriorityFifo.this.remove();
               }
               try { processingFunction.processQueuedObject(obj); } catch (Throwable t) { }
             }
@@ -210,6 +236,12 @@ public class PriorityFifo extends Object implements PriorityFifoWriterI, Priorit
       throw new IllegalStateException("Sink already installed!");
     processingFunction = function;
     processingFunctionRunnerName = runnerName;
+    return this;
+  }
+
+  public synchronized PriorityFifo redirectSink(String redirectName, ProcessingFunctionI function) {
+    processingFunction = function;
+    processingFunctionRunnerName = redirectName;
     return this;
   }
 

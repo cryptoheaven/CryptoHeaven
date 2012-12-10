@@ -13,10 +13,11 @@
 package com.CH_cl.service.cache;
 
 import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.records.FolderRecUtil;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_cl.util.GlobalSubProperties;
 import com.CH_co.cryptx.*;
+import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
@@ -91,7 +92,15 @@ public class FetchedDataCache extends Object {
   private MultiHashMap addrHashRecordMap_byHash; // key is the hash
   private Map[] statRecordMaps;
   private ArrayList msgBodyKeys;
-  private HashSet requestedAddrHashHS;
+  private Set requestedAddrSet;
+
+  // When folder contents is fetched, lets keep these folderIDs here.
+  private Set fldIDsFetchRequestsIssuedSet;
+  // When folder view is invalidated, lets keep these marks here.
+  private Set fldIDsViewInvalidatedSet;
+  // When staged fetching is enabled like in Android, store next fetch requests here
+  private Map nextFolderFetchActionsMap;
+  private Set nextFolderFetchProgressingIDsSet;
 
   private ArrayList viewIterators;
 
@@ -148,7 +157,11 @@ public class FetchedDataCache extends Object {
     for (int i=0; i<3; i++)
       statRecordMaps[i] = new HashMap();
     msgBodyKeys = new ArrayList();
-    requestedAddrHashHS = new HashSet();
+    requestedAddrSet = new HashSet();
+    fldIDsFetchRequestsIssuedSet = new HashSet();
+    fldIDsViewInvalidatedSet = new HashSet();
+    nextFolderFetchActionsMap = new HashMap();
+    nextFolderFetchProgressingIDsSet = new HashSet();
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
@@ -193,11 +206,15 @@ public class FetchedDataCache extends Object {
       keyRecordMap.clear();
       userRecordMap.clear();
       msgBodyKeys.clear();
-      requestedAddrHashHS.clear();
+      requestedAddrSet.clear();
       addrHashRecordMap_byMsgId.clear();
       addrHashRecordMap_byHash.clear();
+
+      fldIDsFetchRequestsIssuedSet.clear();
+      fldIDsViewInvalidatedSet.clear();
+      nextFolderFetchActionsMap.clear();
+      nextFolderFetchProgressingIDsSet.clear();
     }
-    FolderRecUtil.clear();
   }
 
   /**
@@ -272,7 +289,7 @@ public class FetchedDataCache extends Object {
   */
   public synchronized void addRequestedAddrHash(byte[] hash) {
     // Store the hash as string so when comparing different instances of the same data will match.
-    requestedAddrHashHS.add(ArrayUtils.toString(hash));
+    requestedAddrSet.add(ArrayUtils.toString(hash));
   }
 
   /**
@@ -287,7 +304,7 @@ public class FetchedDataCache extends Object {
   * @return true if hash exists in the requested cashe.
   */
   public synchronized boolean wasRequestedAddrHash(byte[] hash) {
-    return requestedAddrHashHS.contains(ArrayUtils.toString(hash));
+    return requestedAddrSet.contains(ArrayUtils.toString(hash));
   }
 
   /*********************************
@@ -830,6 +847,11 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
+  public synchronized void clearFolderFetchedIDs() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "clearFolderFetchedIDs()");
+    fldIDsFetchRequestsIssuedSet.clear();
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
 
 
   /****************************************
@@ -1542,7 +1564,7 @@ public class FetchedDataCache extends Object {
       fireFileLinkRecordUpdated(records, RecordEvent.SET);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records, false);
+      statUpdatesInFoldersForVisualNotification(records, false, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -1569,7 +1591,7 @@ public class FetchedDataCache extends Object {
       removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_INDEX_FILE), false);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records, true);
+      statUpdatesInFoldersForVisualNotification(records, true, true);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2254,7 +2276,7 @@ public class FetchedDataCache extends Object {
       fireMsgLinkRecordUpdated(records, RecordEvent.SET);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records, false);
+      statUpdatesInFoldersForVisualNotification(records, false, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2319,9 +2341,10 @@ public class FetchedDataCache extends Object {
   * Visually notify users that certain folders have modified content, update the
   * updates' count.
   * @param records can be instances of StatRecord, FileLinkRecords, MsgLinkRecords
+  * @param allowLoweringOfUpdateCounts Operations like REMOVE can lower update count, but ADD should not
   */
-  public void statUpdatesInFoldersForVisualNotification(Record[] records, boolean suppressAudibleNotification) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "statUpdatesInFoldersForVisualNotification(Record[] records, boolean suppressAudibleNotification)");
+  public void statUpdatesInFoldersForVisualNotification(Record[] records, boolean allowLoweringOfUpdateCounts, boolean suppressAudibleNotification) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "statUpdatesInFoldersForVisualNotification(Record[] records, boolean allowLoweringOfUpdateCounts, boolean suppressAudibleNotification)");
     if (trace != null) trace.args(records);
     if (trace != null) trace.args(suppressAudibleNotification);
 
@@ -2375,6 +2398,8 @@ public class FetchedDataCache extends Object {
       FolderRecord[] updatedFolders = getFolderRecords(folderIDs);
       if (trace != null) trace.data(19, updatedFolders);
 
+      ArrayList modifiedFoldersL = new ArrayList();
+
       // Go through all folders and count their red flags from the cache.
       if (updatedFolders != null) {
         for (int i=0; i<updatedFolders.length; i++) {
@@ -2417,17 +2442,17 @@ public class FetchedDataCache extends Object {
                     || fRec.folderId.equals(getUserRecord().recycleFolderId);
             // Skip reporting ZERO count (or lower counts) if folder was never fetched as cached updates maybe incomplete... 
             // Fallback on previous (maybe now incorrect) last server reported count.
-            if (fRec.getUpdateCount() > redFlagCount && FolderRecUtil.wasFolderFetchRequestIssued(fRecId) == false) {
-              // skip ZEROING unfetched folders, or reporting lower counts
-            } else {
+            int oldCount = fRec.getUpdateCount();
+            if (redFlagCount > oldCount || (redFlagCount < oldCount && wasFolderFetchRequestIssued(fRecId) && allowLoweringOfUpdateCounts)) {
               fRec.setUpdated(redFlagCount, suppressSound);
+              modifiedFoldersL.add(fRec);
             }
           }
         } // end for
 
         // cause the folder listeners to be notified
-        if (updatedFolders.length > 0)
-          addFolderRecords(updatedFolders);
+        if (modifiedFoldersL.size() > 0)
+          addFolderRecords((FolderRecord[]) ArrayUtils.toArray(modifiedFoldersL, FolderRecord.class));
       }
     } catch (Throwable t) {
     }
@@ -2491,7 +2516,7 @@ public class FetchedDataCache extends Object {
 
     // recalculate flags in the involved folders
     if (linkRecords != null && linkRecords.length > 0) {
-      statUpdatesInFoldersForVisualNotification(linkRecords, false);
+      statUpdatesInFoldersForVisualNotification(linkRecords, false, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2519,7 +2544,7 @@ public class FetchedDataCache extends Object {
       removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_INDEX_MESSAGE), false);
 
       // recalculate flags in the involved folders
-      statUpdatesInFoldersForVisualNotification(records, true);
+      statUpdatesInFoldersForVisualNotification(records, true, true);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2965,7 +2990,8 @@ public class FetchedDataCache extends Object {
         }
       }
       fireStatRecordUpdated(records, RecordEvent.SET);
-      statUpdatesInFoldersForVisualNotification(records, false);
+      // special case of allowing to lower flag counts for clearing of Chat flags to work when typing new msg.
+      statUpdatesInFoldersForVisualNotification(records, true, false);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -3000,7 +3026,7 @@ public class FetchedDataCache extends Object {
       fireStatRecordUpdated(records, RecordEvent.REMOVE);
 
       if (visualNotification)
-        statUpdatesInFoldersForVisualNotification(records, true);
+        statUpdatesInFoldersForVisualNotification(records, true, true);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -4214,4 +4240,103 @@ public class FetchedDataCache extends Object {
     }
     return count;
   }
+
+  /************************************************
+  * Folder Fetched/Invalidated handling
+  ************************************************/
+
+  public synchronized List getFolderIDsFetched() {
+    ArrayList list = new ArrayList();
+    Iterator iter = fldIDsFetchRequestsIssuedSet.iterator();
+    while (iter.hasNext()) {
+      Long folderId = (Long) iter.next();
+      list.add(folderId);
+    }
+    return list;
+  }
+
+//  public synchronized List getFolderIDsFetchedAndInvalidated() {
+//    ArrayList list = new ArrayList();
+//    Iterator iter = fldIDsFetchRequestsIssuedSet.iterator();
+//    while (iter.hasNext()) {
+//      Long folderId = (Long) iter.next();
+//      if (wasFolderViewInvalidated(folderId))
+//        list.add(folderId);
+//    }
+//    return list;
+//  }
+
+  public synchronized void markFolderFetchRequestIssued(Long folderId) {
+    fldIDsFetchRequestsIssuedSet.add(folderId);
+  }
+
+  public synchronized boolean wasFolderFetchRequestIssued(Long folderId) {
+    return folderId != null && fldIDsFetchRequestsIssuedSet.contains(folderId);
+  }
+
+  public synchronized void markFolderViewInvalidated(Long folderId, boolean isInvalidated) {
+    if (isInvalidated)
+      fldIDsViewInvalidatedSet.add(folderId);
+    else
+      fldIDsViewInvalidatedSet.remove(folderId);
+  }
+
+  public synchronized void markFolderViewInvalidated(Collection folderIDsL, boolean isInvalidated) {
+    Iterator iter = folderIDsL.iterator();
+    while (iter.hasNext()) {
+      markFolderViewInvalidated((Long) iter.next(), isInvalidated);
+    }
+  }
+
+  public synchronized boolean wasFolderViewInvalidated(Long folderId) {
+    return fldIDsViewInvalidatedSet.contains(folderId);
+  }
+
+  /**************************************************
+  * Staged fetching handling
+  *************************************************/
+
+  private synchronized boolean hasNextFetchRequest(Long folderId) {
+    return nextFolderFetchActionsMap != null && nextFolderFetchActionsMap.containsKey(folderId);
+  }
+
+  public synchronized boolean hasNextFetchRequestOrFetching(Long folderId) {
+    return hasNextFetchRequest(folderId) || isFetchingNext(folderId);
+  }
+
+  public synchronized boolean isFetchingNext(Long folderId) {
+    return nextFolderFetchProgressingIDsSet != null && nextFolderFetchProgressingIDsSet.contains(folderId);
+  }
+
+  public synchronized void removeNextFetchAction(Long folderId) {
+    nextFolderFetchActionsMap.remove(folderId);
+  }
+  public synchronized void setNextFetchAction(Long folderId, MessageAction msgAction) {
+    nextFolderFetchActionsMap.put(folderId, msgAction);
+  }
+  public synchronized boolean sendNextFetchRequest(ServerInterfaceLayer SIL, final Long folderId, final Runnable afterJob) {
+    boolean anySent = false;
+    // take off the request from pending to avoid client to repedetly sending the same request
+    final MessageAction msgAction = (MessageAction) nextFolderFetchActionsMap.remove(folderId);
+    if (msgAction != null) {
+      nextFolderFetchProgressingIDsSet.add(folderId);
+      msgAction.restamp();
+      // take off the request from pending to avoid client to repedetly sending the same request
+      Runnable reinsert = new Runnable() {
+        public void run() {
+          synchronized (FetchedDataCache.this) {
+            // We'll reinsert the request right after reciving a reply or interrupt.
+            // Proper execution of reply will remove this action from pending.
+            // After-Job handles next request so it should not reinsert.
+            nextFolderFetchActionsMap.put(folderId, msgAction);
+            nextFolderFetchProgressingIDsSet.remove(folderId);
+          }
+        }
+      };
+      SIL.submitAndReturn(msgAction, 120000, reinsert, afterJob, reinsert);
+      anySent = true;
+    }
+    return anySent;
+  }
+
 }

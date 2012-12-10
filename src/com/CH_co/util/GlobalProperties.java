@@ -284,13 +284,18 @@ public class GlobalProperties extends Object {
   // build 728 Work in progress towards Folder Synch, also fix for legacy BrowserLauncher to use Java 1.6 Desktop class if possible
   // build 730 Folder Synch - working alpha
   // build 732 Folder Synch - working beta adds synch of Contacts and Folder-tree
+  // build 734 Disconnected users get updates with transient-temporary packets upon their prompt reconnection.
+  // build 736 Servers request temp user packets from relevant peer-servers only, and do not broadcast requests to all engines.
+  // build 738 Adjustments for mobile to connection counts and ping-pong/timeouts.
+  // build 740 Add manual storage recalculate
+  // build 742 Folder synch should first remove then insert new items, important for synching folder trees.
 
-  public static final short PROGRAM_BUILD_NUMBER = 732;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 742;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.7f;
-  public static final short PROGRAM_VERSION_MINOR = 3;
+  public static final short PROGRAM_VERSION_MINOR = 4;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

@@ -24,5 +24,5 @@ package com.CH_co.queue;
 public interface ProcessingFunctionI {
 
   /** Start processing an object from a queue. */
-  public void processQueuedObject(Object obj);
+  public Object processQueuedObject(Object obj);
 }
