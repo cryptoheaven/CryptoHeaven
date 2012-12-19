@@ -1068,7 +1068,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "setAttachmentsPanel_updateGUI(MsgLinkRecord parentMsgLink, Object[] attachments, String skipFileNameForSubject, JPanel jAttachments, JPanel jLineAttachments)");
     if (trace != null) trace.args(parentMsgLink, attachments, skipFileNameForSubject);
     boolean visible = false;
-    String skipFileName = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject) : null;
+    String skipFileName1 = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject) : null;
+    String skipFileName2 = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject, true) : null;
     jAttachments.removeAll();
     attachmentsMap.clear();
     if (attachments != null && attachments.length > 0) {
@@ -1079,9 +1080,11 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       for (int i=0; i<attachments.length; i++) {
         boolean skip = false;
         String name = ListRenderer.getRenderedText(attachments[i]);
-        if (skipFileName != null && attachments[i] instanceof FileLinkRecord && name.endsWith(".eml")) {
+        if (skipFileName1 != null && attachments[i] instanceof FileLinkRecord && name.endsWith(".eml")) {
           String fileName = name.substring(0, name.length()-".eml".length());
-          if (skipFileName.startsWith(fileName) && (skipFileName.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
+          if (skipFileName1.startsWith(fileName) && (skipFileName1.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
+            skip = true;
+          else if (skipFileName2.startsWith(fileName) && (skipFileName2.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
             skip = true;
         }
         if (!skip) {

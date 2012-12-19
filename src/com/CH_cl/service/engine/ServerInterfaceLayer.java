@@ -865,7 +865,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // For mobileFactor = 1 : 0-1|1, 2-4|2, 5-7|3, 8|4
           // For mobileFactor = 2 : 0-2|1, 3-6|2, 7-10|3
           // For mobileFactor = 3 : 0-3|1, 4-8|2, 9-13|3
-          int mobileFactor = IS_MOBILE_MODE ? 3 : 0;
+          // For mobileFactor = 4 : 0-4|1, 5-10|2, 11-16|3
+          // For mobileFactor = 5 : 0-5|1, 6-12|2, 13-19|3
+          int mobileFactor = IS_MOBILE_MODE ? 5 : 0;
           countWorkersToCreate += (1 + countAllJobs - countLargeFileJobs) / ((FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION+mobileFactor) * countAllWorkers);
         }
         // If we should create at least 1 connection because there are jobs long awaiting to be sent...

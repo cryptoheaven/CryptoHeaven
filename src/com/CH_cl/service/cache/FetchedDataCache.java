@@ -4296,7 +4296,7 @@ public class FetchedDataCache extends Object {
   * Staged fetching handling
   *************************************************/
 
-  private synchronized boolean hasNextFetchRequest(Long folderId) {
+  public synchronized boolean hasNextFetchRequest(Long folderId) {
     return nextFolderFetchActionsMap != null && nextFolderFetchActionsMap.containsKey(folderId);
   }
 
