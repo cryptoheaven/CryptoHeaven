@@ -745,6 +745,7 @@ public class MsgTableModel extends RecordTableModel {
             sb.append(fromName);
             sb.append("</strong>");
             sb.append("</font>");
+            sb.append(" ");
           }
 
           if (toAddPriority) {
@@ -812,6 +813,13 @@ public class MsgTableModel extends RecordTableModel {
 
           sb.append(HTML_utils.HTML_FONT_START);
 
+          // Make sure we append something for Subject && Body for the table to size properly
+          if ((subject == null || subject.length() == 0) && (messageText == null || messageText.length() == 0)) {
+            if (subject == null && messageText == null && msgData.getEncSubject() != null)
+              subject = "Message is currently not available.";
+            else
+              subject = " ";
+          }
           boolean subjectAppended = false;
           // append subject
           if (subject != null && subject.length() > 0) {

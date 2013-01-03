@@ -1978,20 +1978,38 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
+      boolean anyNew = false;
       synchronized (this) {
         unWrapContactRecords(records);
+        // see if we got new records, or updates only
+        for (int i=0; i<records.length; i++) {
+          if (!contactRecordMap.containsKey(records[i].contactId)) {
+            anyNew = true;
+            break;
+          }
+        }
         records = (ContactRecord[]) RecordUtils.merge(contactRecordMap, records);
       }
-      fireContactRecordUpdated(records, RecordEvent.SET);
+      if (anyNew) {
+        fireContactRecordUpdated(records, RecordEvent.SET);
+      } else {
+        fireContactRecordUpdated_Delayed(records, RecordEvent.SET);
+      }
 
       // Gather any folders that may use the contact name and dispatch event because rendering may need to change ... skip my own shares ...
       Long[] contactUserIDs = ContactRecord.getInvolvedUserIDs(records);
       contactUserIDs = (Long[]) ArrayUtils.getDifference(contactUserIDs, new Long[] { myUserId });
       FolderShareRecord[] involvedShares = getFolderShareRecordsForUsers(contactUserIDs);
       FolderRecord[] involvedFolders = getFolderRecords(FolderShareRecord.getFolderIDs(involvedShares));
-      for (int i=0; i<involvedFolders.length; i++)
+      for (int i=0; i<involvedFolders.length; i++) {
         involvedFolders[i].invalidateCachedValues();
-      fireFolderRecordUpdated(involvedFolders, RecordEvent.SET);
+      }
+
+      if (anyNew) {
+        fireFolderRecordUpdated(involvedFolders, RecordEvent.SET);
+      } else {
+        fireFolderRecordUpdated_Delayed(involvedFolders, RecordEvent.SET);
+      }
 
       // After notification is done, make previous status equal current status,
       // so that late unnecessary notification are not triggered when managing contacts.
@@ -3567,6 +3585,9 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
+  private void fireFolderRecordUpdated_Delayed(FolderRecord[] records, int eventType) {
+    fireRecordsUpdated_Delayed(records, eventType, delayedFoldersSet, delayedFoldersRemoved);
+  }
 
 
   /***********************************************
@@ -3822,7 +3843,9 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
-
+  private void fireContactRecordUpdated_Delayed(ContactRecord[] records, int eventType) {
+    fireRecordsUpdated_Delayed(records, eventType, delayedContactsSet, delayedContactsRemoved);
+  }
 
 
   /*******************************************
@@ -4171,18 +4194,20 @@ public class FetchedDataCache extends Object {
   ***   RecordIteratorI handling       ***
   ****************************************/
 
-  public synchronized void addViewIterator(RecordIteratorI viewIterator) {
+  public synchronized boolean addViewIterator(RecordIteratorI viewIterator) {
+    boolean added = false;
     if (viewIterators == null)
       viewIterators = new ArrayList();
-    viewIterators.add(viewIterator);
+    if (!viewIterators.contains(viewIterator))
+      added = viewIterators.add(viewIterator);
+    return added;
   }
 
-  public synchronized void removeViewIterator(RecordIteratorI viewIterator) {
-    if (viewIterators != null) {
-      int lastIndex = viewIterators.lastIndexOf(viewIterator);
-      if (lastIndex >= 0)
-        viewIterators.remove(lastIndex);
-    }
+  public synchronized boolean removeViewIterator(RecordIteratorI viewIterator) {
+    boolean removed = false;
+    if (viewIterators != null)
+      removed = viewIterators.remove(viewIterator);
+    return removed;
   }
 
   public synchronized Record getNextItem(Record item, int direction) {
@@ -4255,17 +4280,6 @@ public class FetchedDataCache extends Object {
     return list;
   }
 
-//  public synchronized List getFolderIDsFetchedAndInvalidated() {
-//    ArrayList list = new ArrayList();
-//    Iterator iter = fldIDsFetchRequestsIssuedSet.iterator();
-//    while (iter.hasNext()) {
-//      Long folderId = (Long) iter.next();
-//      if (wasFolderViewInvalidated(folderId))
-//        list.add(folderId);
-//    }
-//    return list;
-//  }
-
   public synchronized void markFolderFetchRequestIssued(Long folderId) {
     fldIDsFetchRequestsIssuedSet.add(folderId);
   }
@@ -4337,6 +4351,119 @@ public class FetchedDataCache extends Object {
       anySent = true;
     }
     return anySent;
+  }
+
+
+  /********************************************************
+  * Handling of delayed events
+  *******************************************************/
+  private final Object delayedMonitor = new Object();
+  private HashSet delayedContactsSet = new HashSet();
+  private HashSet delayedContactsRemoved = new HashSet();
+  private HashSet delayedFoldersSet = new HashSet();
+  private HashSet delayedFoldersRemoved = new HashSet();
+  private boolean delayedTaskScheduled = false;
+  private Timer delayTimer = new Timer();
+
+  private void fireRecordsUpdated_Delayed(Record[] records, int eventType, HashSet set, HashSet removed) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "fireRecordsUpdated_Delayed(ContactRecord[] records, int eventType, HashSet set, HashSet removed)");
+    if (trace != null) trace.args(records);
+    if (trace != null) trace.args(eventType);
+    if (trace != null) trace.args(set, removed);
+    if (!DEBUG__SUPPRESS_EVENTS_CONTACTS) {
+      if (records != null && records.length > 0) {
+        synchronized (delayedMonitor) {
+          if (eventType == RecordEvent.SET) {
+            for (int i=0; i<records.length; i++) {
+              Record rec = records[i];
+              set.add(rec);
+              removed.remove(rec);
+            }
+          } else if (eventType == RecordEvent.REMOVE) {
+            for (int i=0; i<records.length; i++) {
+              Record rec = records[i];
+              removed.add(rec);
+              set.remove(rec);
+            }
+          }
+          if (!delayedTaskScheduled) {
+            try {
+              // create new task, because they can't be reused...
+              delayTimer.schedule(new DelayedTask(), 1000);
+              delayedTaskScheduled = true;
+            } catch (Throwable t) {
+              t.printStackTrace();
+            }
+          }
+        }
+      }
+    }
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  private class DelayedTask extends TimerTask {
+    public void run() {
+      synchronized (delayedMonitor) {
+        delayedTaskScheduled = false;
+        try {
+          // CONTACTS
+          // SET
+          if (delayedContactsSet.size() > 0) {
+            ContactRecord[] recs = (ContactRecord[]) ArrayUtils.toArray(delayedContactsSet, ContactRecord.class);
+            Long[] ids = RecordUtils.getIDs(recs);
+            // use only records still existing in the cache
+            recs = getContactRecords(ids);
+            fireContactRecordUpdated(recs, RecordEvent.SET);
+            delayedContactsSet.clear();
+          }
+          // REMOVE
+          if (delayedContactsRemoved.size() > 0) {
+            ArrayList records = new ArrayList();
+            Iterator iter = delayedContactsRemoved.iterator();
+            while (iter.hasNext()) {
+              ContactRecord rec = (ContactRecord) iter.next();
+              // use only records REMOVED from the cache
+              if (getContactRecord(rec.contactId) == null) {
+                records.add(rec);
+              }
+            }
+            if (records.size() > 0) {
+              ContactRecord[] recs = (ContactRecord[]) ArrayUtils.toArray(records, ContactRecord.class);
+              fireContactRecordUpdated(recs, RecordEvent.REMOVE);
+            }
+            delayedContactsRemoved.clear();
+          }
+          // FOLDERS
+          // SET
+          if (delayedFoldersSet.size() > 0) {
+            FolderRecord[] recs = (FolderRecord[]) ArrayUtils.toArray(delayedFoldersSet, FolderRecord.class);
+            Long[] ids = RecordUtils.getIDs(recs);
+            // use only records still existing in the cache
+            recs = getFolderRecords(ids);
+            fireFolderRecordUpdated(recs, RecordEvent.SET);
+            delayedFoldersSet.clear();
+          }
+          // REMOVE
+          if (delayedFoldersRemoved.size() > 0) {
+            ArrayList records = new ArrayList();
+            Iterator iter = delayedFoldersRemoved.iterator();
+            while (iter.hasNext()) {
+              FolderRecord rec = (FolderRecord) iter.next();
+              // use only records REMOVED from the cache
+              if (getFolderRecord(rec.folderId) == null) {
+                records.add(rec);
+              }
+            }
+            if (records.size() > 0) {
+              FolderRecord[] recs = (FolderRecord[]) ArrayUtils.toArray(records, FolderRecord.class);
+              fireFolderRecordUpdated(recs, RecordEvent.REMOVE);
+            }
+            delayedFoldersRemoved.clear();
+          }
+        } catch (Throwable t) {
+        }
+      } // end synchronized
+    }
   }
 
 }

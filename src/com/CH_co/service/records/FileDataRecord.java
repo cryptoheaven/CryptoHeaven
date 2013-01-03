@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
@@ -25,21 +25,21 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.29 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.29 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FileDataRecord extends Record {
 
   public Long fileId;
@@ -118,14 +118,14 @@ public class FileDataRecord extends Record {
 
 
   /**
-   * Seals the <code> plainDataFile </code> into
-   * <code> origDataDigest, signedOrigDigest, encDataDigest, signedEncDigest, encDataFile, encSize </code> .
-   * using the sealant object which are <code> signingKeyRecord, symmetricKey </code> .
-   * Hash of the data is distributed privately in encrypted form between trusted individuals,
-   * its not published publicly, it need not be long.
-   * @param signingKeyRecord the asymmetric key used to produce signed digests.
-   * @param symmetricKey key material used for symmetric encryption of the file.
-   */
+  * Seals the <code> plainDataFile </code> into
+  * <code> origDataDigest, signedOrigDigest, encDataDigest, signedEncDigest, encDataFile, encSize </code> .
+  * using the sealant object which are <code> signingKeyRecord, symmetricKey </code> .
+  * Hash of the data is distributed privately in encrypted form between trusted individuals,
+  * its not published publicly, it need not be long.
+  * @param signingKeyRecord the asymmetric key used to produce signed digests.
+  * @param symmetricKey key material used for symmetric encryption of the file.
+  */
   public void seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor, int maxTries) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "seal(KeyRecord signingKeyRecord, BASymmetricKey symmetricKey, ProgMonitorI progressMonitor, int maxTries)");
     if (trace != null) trace.args(maxTries);
@@ -272,17 +272,17 @@ public class FileDataRecord extends Record {
 
 
   /**
-   * Unseals the <code> encDataFile </code> into <code> plainDataFile </code>
-   * using the unSealant object which are <code> verifyingKeyRecord, symmetricKey </code> .
-   * Hash of the data is distributed privately in encrypted form between trusted individuals,
-   * its not published publically, it need not be long.
-   * @param verifyingKeyRecord Key Record used to verify the signed digests, if null record will not be verified, only uncrypted!
-   * @param symmetricKey key used to symmetricaly decrypt the encrypted file data
-   * @param destinationDirectory Directory of the plain file, if null then temporary file will be assigned (destinationFileName is irrelevant in that case).
-   */
+  * Unseals the <code> encDataFile </code> into <code> plainDataFile </code>
+  * using the unSealant object which are <code> verifyingKeyRecord, symmetricKey </code> .
+  * Hash of the data is distributed privately in encrypted form between trusted individuals,
+  * its not published publically, it need not be long.
+  * @param verifyingKeyRecord Key Record used to verify the signed digests, if null record will not be verified, only uncrypted!
+  * @param symmetricKey key used to symmetricaly decrypt the encrypted file data
+  * @param destinationDirectory Directory of the plain file, if null then temporary file will be assigned (destinationFileName is irrelevant in that case).
+  */
   public void unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey,
-                     File destinationDirectory, Boolean isDefaultTempDir, String destinationFileName,
-                     ProgMonitorI progressMonitor, Long originalSize)
+                    File destinationDirectory, Boolean isDefaultTempDir, String destinationFileName,
+                    ProgMonitorI progressMonitor, Long originalSize)
   {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey, File destinationDirectory, Boolean isDefaultTempDir, String destinationFileName, ProgMonitor progressMonitor, Long originalSize)");
     if (trace != null) trace.args(verifyingKeyRecord, symmetricKey, destinationDirectory, isDefaultTempDir, destinationFileName, progressMonitor, originalSize);
@@ -309,45 +309,61 @@ public class FileDataRecord extends Record {
 
       // create a temporary file for plain data
       if (destinationDirectory != null) {
-        destinationFile = new File(destinationDirectory, destinationFileName);
-        // If file goes to temp dir, make sure its unique name and added to cleanup
-        if (isDefaultTempDir != null && isDefaultTempDir.booleanValue()) {
-          int maxRnd = 99999;
-          int tryNum = 0;
-          String tmpName = destinationFileName;
-          String tmpExt = "";
-          int index = destinationFileName != null ? destinationFileName.lastIndexOf('.') : -1;
-          if (index > 0) {
-            tmpName = destinationFileName.substring(0, index);
-            tmpExt = destinationFileName.substring(index); // includes the dot '.' in front
-          }
-          while (destinationFile.exists()) {
-            tryNum ++;
-            if (tryNum % 100 == 0)
-              maxRnd = maxRnd * 10;
-            else if (tryNum > 1000) {
-              destinationFile = null;
-              throw new IllegalStateException("Could not create a temporary file.");
+        // 1st try use original name, 2nd try use 'safe' string for filename
+        for (int i=0; i<2; i++) {
+          boolean isRetry = i == 1;
+          if (isRetry)
+            destinationFileName = FileTypes.getFileSafeShortString(destinationFileName);
+          destinationFile = new File(destinationDirectory, destinationFileName);
+          // If file goes to temp dir, make sure its unique name and added to cleanup
+          if (isDefaultTempDir != null && isDefaultTempDir.booleanValue()) {
+            int maxRnd = 99999;
+            int tryNum = 0;
+            String tmpName = destinationFileName;
+            String tmpExt = "";
+            int index = destinationFileName != null ? destinationFileName.lastIndexOf('.') : -1;
+            if (index > 0) {
+              tmpName = destinationFileName.substring(0, index);
+              tmpExt = destinationFileName.substring(index); // includes the dot '.' in front
             }
-            Random rnd = new Random();
-            int r = rnd.nextInt(maxRnd-1-maxRnd/10)+1+maxRnd/10;
-            destinationFile = new File(destinationDirectory, tmpName+"-"+r+tmpExt);
+            while (destinationFile.exists()) {
+              tryNum ++;
+              if (tryNum % 100 == 0)
+                maxRnd = maxRnd * 10;
+              else if (tryNum > 1000) {
+                destinationFile = null;
+                throw new IllegalStateException("Could not create a temporary file.");
+              }
+              Random rnd = new Random();
+              int r = rnd.nextInt(maxRnd-1-maxRnd/10)+1+maxRnd/10;
+              destinationFile = new File(destinationDirectory, tmpName+"-"+r+tmpExt);
+            }
+            GlobalProperties.addTempFileToCleanup(destinationFile);
           }
-          GlobalProperties.addTempFileToCleanup(destinationFile);
-        }
-        if (destinationFile.exists()) {
-          ConfirmFileReplaceI confirmReplace = ConfirmFileReplaceFactory.newInstance(destinationFile, originalSize, this);
-          // if GUI is suppressed, or otherwise the component is not available then default is to REPLACE the file.
-          if (confirmReplace != null) {
-            if (confirmReplace.isRename())
-              destinationFile = confirmReplace.getRenamdFile();
-            else if (!confirmReplace.isReplace()) {
-              // File already exists so mark the link to it and
-              plainDataFile = destinationFile;
-              destinationFile = null;
+          if (destinationFile.exists()) {
+            ConfirmFileReplaceI confirmReplace = ConfirmFileReplaceFactory.newInstance(destinationFile, originalSize, this);
+            // if GUI is suppressed, or otherwise the component is not available then default is to REPLACE the file.
+            if (confirmReplace != null) {
+              if (confirmReplace.isRename())
+                destinationFile = confirmReplace.getRenamdFile();
+              else if (!confirmReplace.isReplace()) {
+                // File already exists so mark the link to it and
+                plainDataFile = destinationFile;
+                destinationFile = null;
+              }
             }
           }
-        }
+          if (destinationFile != null) {
+            // Open the destination file to write to it.
+            // This will fail if it cannot be oppened - possibly 
+            try {
+              fileOut = new FileOutputStream(destinationFile);
+              destinationFileCreated = true;
+              break;
+            } catch (Throwable t) {
+            }
+          }
+        } // end for
       } else {
         // get extension
         String ext = null;
@@ -357,6 +373,9 @@ public class FileDataRecord extends Record {
         destinationFile = File.createTempFile(TEMP_PLAIN_FILE_PREFIX, ext);
         // temp plain files should be cleaned up
         GlobalProperties.addTempFileToCleanup(destinationFile);
+        // Open the destination file to write to it.
+        fileOut = new FileOutputStream(destinationFile);
+        destinationFileCreated = true;
       }
 
       if (progressMonitor != null) {
@@ -383,9 +402,7 @@ public class FileDataRecord extends Record {
         BlockCipherInputStream cipherIn = new BlockCipherInputStream(interEncIn, symmetricKey);
         GZIPInputStream gzipIn = new GZIPInputStream(cipherIn);
 
-        // Open the destination file to write to it.
-        fileOut = new FileOutputStream(destinationFile);
-        destinationFileCreated = true;
+        // Create Destination file streams
         BufferedOutputStream bufFileOut = new BufferedOutputStream(fileOut, 1024*32);
         DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, new SHA256());
 
@@ -449,20 +466,20 @@ public class FileDataRecord extends Record {
           String keyErrorMsg = null;
           boolean skipErrorMsg = false;
           keyErrorMsg += "\n" +
-                         "\nSpecified Signing Key cannot verify the Signed Digest of Plain Data." +
-                         "\n";
+                        "\nSpecified Signing Key cannot verify the Signed Digest of Plain Data." +
+                        "\n";
           if (verifyingKeyRecord != null && verifiedPlainDigest != null) {
             keyErrorMsg += "Specifically, signing key " + verifyingKeyRecord.verboseInfo() + " verifies the " +
-                           "signed digest of plain data " + ArrayUtils.toString(signedOrigDigest.toByteArray()) + " " +
-                           "to the value " + ArrayUtils.toString(verifiedPlainDigest.toByteArray()) + " which differs " +
-                           "from the expected value " + ArrayUtils.toString(origDataDigest.toByteArray());
+                          "signed digest of plain data " + ArrayUtils.toString(signedOrigDigest.toByteArray()) + " " +
+                          "to the value " + ArrayUtils.toString(verifiedPlainDigest.toByteArray()) + " which differs " +
+                          "from the expected value " + ArrayUtils.toString(origDataDigest.toByteArray());
           }
           else {
             // we will skip error messages due to missing user key, user might have been deleted and his key as well...
             skipErrorMsg = true;
             keyErrorMsg += "Specifically, signing key is not available in the system.  " +
-                           "This could be caused by removal of the account from which the file was signed, " +
-                           "or an unexpected system error.";
+                          "This could be caused by removal of the account from which the file was signed, " +
+                          "or an unexpected system error.";
           }
           if (!skipErrorMsg) {
             keyMsg += keyErrorMsg;
@@ -534,8 +551,8 @@ public class FileDataRecord extends Record {
   }
 
   /**
-   * Unseals the attributes only, no data files.
-   */
+  * Unseals the attributes only, no data files.
+  */
   public void unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileDataRecord.class, "unSeal(KeyRecord verifyingKeyRecord, BASymmetricKey symmetricKey)");
     if (trace != null) trace.args(verifyingKeyRecord);
@@ -668,9 +685,9 @@ public class FileDataRecord extends Record {
   }
 
   /**
-   * When record is being finalized, and auto remove flag is set,
-   * then plain file will be deleted.
-   */
+  * When record is being finalized, and auto remove flag is set,
+  * then plain file will be deleted.
+  */
   public void setAutoRemovePlainFile(boolean remove) {
     autoRemovePlainFile = remove;
   }

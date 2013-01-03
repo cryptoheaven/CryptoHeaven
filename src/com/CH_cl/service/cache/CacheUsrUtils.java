@@ -66,6 +66,10 @@ public class CacheUsrUtils {
       if (uRec != null) {
         if (includeWebUsers || uRec.status == null || !uRec.isWebAccount())
           familiarUser = uRec;
+      } else {
+        uRec = new UserRecord();
+        uRec.userId = userId;
+        familiarUser = uRec;
       }
     }
 

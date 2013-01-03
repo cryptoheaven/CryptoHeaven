@@ -289,8 +289,9 @@ public class GlobalProperties extends Object {
   // build 738 Adjustments for mobile to connection counts and ping-pong/timeouts.
   // build 740 Add manual storage recalculate
   // build 742 Folder synch should first remove then insert new items, important for synching folder trees.
+  // build 744 Fix opening/downloading files with invalid filenames (possible when created on Mac OSX and downloaded to Windows)
 
-  public static final short PROGRAM_BUILD_NUMBER = 742;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 744;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
