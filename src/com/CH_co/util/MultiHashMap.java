@@ -1,29 +1,30 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.util;
 
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* HashMap that allows many values for each key. Same as MultiHashtable but not synchronized.
+* 
+* @author  Marcin Kurzawa
+* @version
+*/
 public class MultiHashMap extends Object {
 
   private HashMap hm;
@@ -35,9 +36,9 @@ public class MultiHashMap extends Object {
     hm = new HashMap();
   }
   /**
-   * Enforces unique values without requirement for keys to be unique.
-   * By default values just like keys don't have to be unique.
-   */
+  * Enforces unique values without requirement for keys to be unique.
+  * By default values just like keys don't have to be unique.
+  */
   public MultiHashMap(boolean uniqueValues) {
     hm = new HashMap();
     enforceUniqueValues = uniqueValues;
@@ -55,9 +56,9 @@ public class MultiHashMap extends Object {
     hm = new HashMap(m);
   }
 
- /**
-   * Store a value for a specified key.  When value is null store it too.
-   */
+/**
+  * Store a value for a specified key.  When value is null store it too.
+  */
   public void put(Object key, Object value) {
     Object o = hm.get(key);
     if (!enforceUniqueValues || !value.equals(o)) {
@@ -85,8 +86,8 @@ public class MultiHashMap extends Object {
   }
 
   /**
-   * @return the first value stored for a given key.
-   */
+  * @return the first value stored for a given key.
+  */
   public Object get(Object key) {
     Object o = hm.get(key);
     if (o instanceof MyCollection) {
@@ -100,8 +101,8 @@ public class MultiHashMap extends Object {
   }
 
   /**
-   * @return all values stored for a given key.
-   */
+  * @return all values stored for a given key.
+  */
   public Collection getAll(Object key) {
     Object o = hm.get(key);
     Collection c = null;
@@ -123,9 +124,9 @@ public class MultiHashMap extends Object {
   }
 
   /**
-   * Remove the first value from the set stored for a given key.
-   * Do not remove MyVector structure if it has at least 1 element...
-   */
+  * Remove the first value from the set stored for a given key.
+  * Do not remove MyVector structure if it has at least 1 element...
+  */
   public Object remove(Object key) {
     Object o = hm.remove(key);
     if (o instanceof MyCollection) {
@@ -144,8 +145,8 @@ public class MultiHashMap extends Object {
   }
 
   /**
-   * Remove the 'value' object from the set stored for a given key.
-   */
+  * Remove the 'value' object from the set stored for a given key.
+  */
   public Object remove(Object key, Object value) {
     Object o = hm.remove(key);
     if (o instanceof MyCollection) {
@@ -172,8 +173,8 @@ public class MultiHashMap extends Object {
   }
 
   /**
-   * Remove all values stored for a given key.
-   */
+  * Remove all values stored for a given key.
+  */
   public void removeAll(Object key) {
     Object o = hm.remove(key);
     if (o instanceof MyCollection) {
@@ -185,8 +186,8 @@ public class MultiHashMap extends Object {
   }
 
   /**
-   * Pool function is a composite of get and remove functions.
-   */
+  * Pool function is a composite of get and remove functions.
+  */
   public Collection poolAll(Object key) {
     Collection c = getAll(key);
     removeAll(key);
