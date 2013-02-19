@@ -212,7 +212,7 @@ public class CSVLexer {
         File f = new File(args[0]);
         if (f.exists()){
           if (f.canRead()){
-            in = new FileInputStream(f);
+            in = new BufferedInputStream(new FileInputStream(f), 32*1024);
           } else {
             throw new IOException("Could not open " + args[0]);
           }
@@ -229,6 +229,7 @@ public class CSVLexer {
       while ((t = shredder.getNextToken()) != null) {
         System.out.println("" + shredder.getLineNumber() + " " + t);
       }
+      in.close();
     } catch (IOException e){
       System.out.println(e.getMessage());
     }

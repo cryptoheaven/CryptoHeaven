@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -29,7 +29,7 @@ import java.security.MessageDigest;
 import java.util.*;
 
 /**
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -4218,7 +4218,9 @@ public class FetchedDataCache extends Object {
         int position = iter.getPosition(item);
         if (position != -1) {
           next = iter.getItemNext(item, direction);
-          break;
+          // If resolved, escape, else maybe another iterator will resolve this position...
+          if (next != null) 
+            break;
         }
       }
     }
@@ -4389,7 +4391,7 @@ public class FetchedDataCache extends Object {
           if (!delayedTaskScheduled) {
             try {
               // create new task, because they can't be reused...
-              delayTimer.schedule(new DelayedTask(), 1000);
+              delayTimer.schedule(new DelayedTask(), 250);
               delayedTaskScheduled = true;
             } catch (Throwable t) {
               t.printStackTrace();

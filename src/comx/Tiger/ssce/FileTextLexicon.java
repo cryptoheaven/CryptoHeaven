@@ -225,9 +225,9 @@ public class FileTextLexicon extends StreamTextLexicon {
 //        }
 //        throw new UnsupportedException();
 //      }
-      FileOutputStream fileoutputstream = null;
+      OutputStream fileoutputstream = null;
       try {
-        fileoutputstream = new FileOutputStream(fileName);
+        fileoutputstream = new BufferedOutputStream(new FileOutputStream(fileName), 32*1024);
         super.save(fileoutputstream);
       } finally {
         if (fileoutputstream != null)
@@ -241,9 +241,9 @@ public class FileTextLexicon extends StreamTextLexicon {
 
   protected void open(String s) throws IOException, FileFormatException, LexiconUpdateException {
     fileName = s;
-    FileInputStream fileinputstream = null;
+    InputStream fileinputstream = null;
     try {
-      fileinputstream = new FileInputStream(s);
+      fileinputstream = new BufferedInputStream(new FileInputStream(s), 8*1024);
       load(fileinputstream);
     } finally {
       if (fileinputstream != null)

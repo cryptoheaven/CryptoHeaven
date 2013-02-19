@@ -24,9 +24,11 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 
 import com.CH_co_eml.service.ops.EmailSendingAttOps;
+import java.io.BufferedOutputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import javax.mail.internet.MimeMessage;
@@ -101,7 +103,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
               MimeMessage emailMessage = (MimeMessage) ((Object[]) msgRoot.getUserObject())[0];
               File outFile = new File(destDir, filename);
               outFile.createNewFile();
-              FileOutputStream outStream = new FileOutputStream(outFile, false);
+              OutputStream outStream = new BufferedOutputStream(new FileOutputStream(outFile, false), 32*1024);
               emailMessage.writeTo(outStream);
               outStream.flush();
               outStream.close();

@@ -12,6 +12,7 @@
 
 package ch.cl;
 
+import com.CH_cl.service.engine.MyUncaughtExceptionHandler;
 import com.CH_cl.service.ops.AutoUpdaterArgs;
 import com.CH_cl.util.GlobalSubProperties;
 import com.CH_co.cryptx.*;
@@ -199,6 +200,13 @@ public class CryptoHeaven extends Object {
 
   public static void main(String[] args) {
     Misc.setIsRunningFromJNLP();
+
+    try {
+      Thread.setDefaultUncaughtExceptionHandler(new MyUncaughtExceptionHandler("Desktop " + GlobalProperties.PROGRAM_BUILD_NUMBER));
+    } catch (Throwable t) {
+      // This is JRE 1.5 code, so catch all errors!
+      System.out.println(t.getMessage());
+    }
 
     // Controls of private label load
     boolean privateLabelLoaded = false;

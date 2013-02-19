@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -71,6 +71,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
   public Short canDelete;
   public Timestamp dateCreated;
   public Timestamp dateUpdated;
+  public Timestamp dateUsed;
 
   /** unwrapped data */
   private String folderName;
@@ -411,6 +412,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
       if (record.canDelete      != null) canDelete      = record.canDelete;
       if (record.dateCreated    != null) dateCreated    = record.dateCreated;
       if (record.dateUpdated    != null) dateUpdated    = record.dateUpdated;
+      if (record.dateUsed       != null) dateUsed       = record.dateUsed;
 
       if (record.encFolderName != null) {
         encFolderName  = record.encFolderName;
@@ -454,6 +456,7 @@ public class FolderShareRecord extends Record implements LinkRecordI {
       + ", canDelete="        + canDelete
       + ", dateCreated="      + dateCreated
       + ", dateUpdated="      + dateUpdated
+      + ", dateUsed="         + dateUsed
       + ", un-sealed data >> "
       + ", folderName="       + folderName
       + ", folderDesc="       + folderDesc

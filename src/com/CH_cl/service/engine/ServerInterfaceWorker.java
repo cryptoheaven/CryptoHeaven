@@ -109,6 +109,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
   /** Login message action that should be used for login. */
   private MessageAction loginMsgAction;
+  /** Stamp of last login-success response */
+  private long lastSuccessfulLoginResponseStamp;
 
   /** Temporary holder for login message attempts. */
   private MessageAction attemptLoginMessageAction;
@@ -180,6 +182,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private void markPersistent() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceWorker.class, "markPersistent()");
     isPersistentWorker = true;
+    workerManager.claimPersistent(this);
     if (trace != null) trace.exit(ServerInterfaceWorker.class);
   }
 
@@ -535,6 +538,9 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         if (loginSuccessful) {
           if (trace != null) trace.data(40, "Login Successful, got ", msgActionCode);
           if (trace != null) trace.data(41, "Remembering the last login action for re-login purposes.");
+
+          // Mark successful login reply stamp.
+          lastSuccessfulLoginResponseStamp = System.currentTimeMillis();
 
           // Clear the need to send private key for subsequent logins;
           // this minimizes overhead for other loging as the key is already in the cache.
@@ -892,8 +898,11 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WriterThread.class, "processOutgoingMsgAction(MessageAction msgAction)");
       if (trace != null) trace.args(msgAction);
 
-      DataOutputStream2 dataOut = sessionContext.getDataOutputStream2();
+      // We'll need to check for Login success, so keep track of the start time.
+      boolean isLoginRequest = false;
+      long startStamp = System.currentTimeMillis();
 
+      DataOutputStream2 dataOut = sessionContext.getDataOutputStream2();
       int msgActionCode = msgAction.getActionCode();
 
       // All synchronized request-reply actions must go here.
@@ -959,6 +968,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           if (msgActionCode == CommandCodes.USR_Q_LOGIN_SECURE_SESSION ||
               msgActionCode == CommandCodes.SYS_Q_LOGIN)
           {
+            isLoginRequest = true;
             ProtocolMsgDataSet tempDataSet = msgAction.getMsgDataSet();
             ProtocolMsgDataSet loginDataSet = null;
             Obj_EncSet_Co encDataSet = null;
@@ -1010,6 +1020,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
 
         // If not a LOGIN action, just write out the message, no streams will change due to this action.
         msgAction.writeToStream(dataOut, sessionContext.clientBuild, sessionContext.serverBuild);
+      }
+
+      // Check for Login success
+      if (isLoginRequest) {
+        if (startStamp >= lastSuccessfulLoginResponseStamp) {
+          throw new IllegalStateException("Login did not complete successfully.");
+        }
       }
 
       if (trace != null) trace.exit(WriterThread.class);

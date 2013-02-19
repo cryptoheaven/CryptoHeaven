@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -68,6 +68,7 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
   public Timestamp dateCreated;
   public Timestamp dateUpdated;
   public Timestamp dateDelivered;
+  public Timestamp dateUsed;
 
   private String postRenderingCache;
 
@@ -364,6 +365,7 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
       if (record.dateCreated       != null) dateCreated      = record.dateCreated;
       if (record.dateUpdated       != null) dateUpdated      = record.dateUpdated;
       if (record.dateDelivered     != null) dateDelivered    = record.dateDelivered;
+      if (record.dateUsed          != null) dateUsed         = record.dateUsed;
 
       // un-sealed data
       if (record.symmetricKey      != null) symmetricKey     = record.symmetricKey;
@@ -388,6 +390,7 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
       + ", dateCreated="    + dateCreated
       + ", dateUpdated="    + dateUpdated
       + ", dateDelivered="  + dateDelivered
+      + ", dateUsed="       + dateUsed
       + ", un-sealed data >> "
       + ", symmetricKey="   + symmetricKey
       + "]";

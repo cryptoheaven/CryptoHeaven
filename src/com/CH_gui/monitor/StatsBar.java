@@ -216,7 +216,7 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
   }
 
   public void installListeners() {
-    Stats.addStatsListener(this);
+    Stats.registerStatsListener(this);
     if (mouseListener == null) {
       mouseListener = new StatusMouseListener();
       jLastStatus.addMouseListener(mouseListener);
@@ -224,7 +224,7 @@ public class StatsBar extends JPanel implements StatsListenerI, DisposableObj {
   }
 
   public void uninstallListeners() {
-    Stats.removeStatsListener(this);
+    Stats.unregisterStatsListener(this);
     if (mouseListener != null) {
       jLastStatus.removeMouseListener(mouseListener);
       mouseListener = null;

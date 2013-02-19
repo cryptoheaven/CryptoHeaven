@@ -56,7 +56,7 @@ public class FolderRecord extends Record {
   public static final String KEY_FOLDER_STR = "Key Folder";
   public static final String LOCAL_FILES_FOLDER_STR = "My Local Files";
   public static final String ADDRESS_FOLDER_STR = "Address Book";
-  public static final String GROUP_FOLDER_STR = "Group Folder";
+  public static final String GROUP_FOLDER_STR = "Group";
   public static final String WHITELIST_FOLDER_STR = "WhiteList Folder";
   public static final String RECYCLE_FOLDER_STR = "Recycle Bin";
 
@@ -68,6 +68,9 @@ public class FolderRecord extends Record {
   public static final long CATEGORY_FILE_ID = -300;
   public static final long CATEGORY_CHAT_ID = -200;
   public static final long CATEGORY_GROUP_ID = -100;
+
+  public static final short DEFAULT_CHAT_PURGING_RECORD_NUM = 200; // For Chatting folders, by default purge records if more than 200;
+  public static final int DEFAULT_CHAT_PURGING_RECORD_SECONDS = 0; // unlimited
 
   public Long folderId;
   public Long parentFolderId;

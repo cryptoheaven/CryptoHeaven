@@ -377,7 +377,7 @@ public class CSVPrinter implements CSVPrint {
         if (!f.exists()){
           f.createNewFile();
           if (f.canWrite()){
-            out = new FileOutputStream(f);
+            out = new BufferedOutputStream(new FileOutputStream(f), 32*1024);
           } else {
             throw new IOException("Could not open " + args[0]);
           }
@@ -408,6 +408,7 @@ public class CSVPrinter implements CSVPrint {
       p.printlnComment("Comment after explicit new line.");
       p.print("\nthree\nline\n");
       p.println("\ttab");
+      out.close();
     } catch (IOException e){
       System.out.println(e.getMessage());
     }

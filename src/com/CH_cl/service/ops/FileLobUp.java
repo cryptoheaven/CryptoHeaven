@@ -724,7 +724,7 @@ public class FileLobUp {
       plainDataFileLength = new Long(plainDataFile.length());
       if (trace != null) trace.data(10, "plainDataFileLength queried", plainDataFile, plainDataFileLength);
       if (DEBUG_CONSOLE) System.out.println("seal: sealing "+plainDataFile+" total length is "+plainDataFileLength);
-      FileInputStream fileIn = new FileInputStream(plainDataFile);
+      InputStream fileIn = new BufferedInputStream(new FileInputStream(plainDataFile), 32*1024);
 
       if (progressMonitor == null) {
         dFileIn = new DigestInputStream(fileIn, new SHA256());
@@ -739,7 +739,7 @@ public class FileLobUp {
       tempFile = File.createTempFile(FileDataRecord.TEMP_ENCRYPTED_FILE_PREFIX, null);
       if (trace != null) trace.data(20, "temp file crated", tempFile);
       tempFileOut = new FileOutputStream(tempFile);
-      dFileOut = new DigestOutputStream(tempFileOut, new SHA256());
+      dFileOut = new DigestOutputStream(new BufferedOutputStream(tempFileOut, 32*1024), new SHA256());
       BlockCipherOutputStream cipherOut = new BlockCipherOutputStream(dFileOut, symmetricKey);
       gzipOut = new GZIPOutputStream(cipherOut);
 

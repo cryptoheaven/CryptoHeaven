@@ -217,7 +217,7 @@ public class MultiPartFormOutputStream {
     String path = file.getCanonicalPath();
     InputStream is = null;
     try {
-      is = new FileInputStream(file);
+      is = new BufferedInputStream(new FileInputStream(file), 32*1024);
       writeFile(name, mimeType, path, is);
     } finally {
       try { if (is != null) is.close(); } catch (IOException e) { }

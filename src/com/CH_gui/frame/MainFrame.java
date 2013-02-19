@@ -12,6 +12,7 @@
 
 package com.CH_gui.frame;
 
+import com.CH_cl.service.engine.MyUncaughtExceptionHandler;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.ContactRecordEvent;
@@ -482,6 +483,14 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
   protected static void setServerInterfaceLayer(ServerInterfaceLayer newSIL) {
     SIL = newSIL;
+    // setup default crash reporting
+    try {
+      if (SIL != null)
+        MyUncaughtExceptionHandler.setSIL(SIL);
+    } catch (Throwable t) {
+      System.out.println(t.getMessage());
+      // This is JRE 1.5 code, so catch all errors!
+    }
   }
   public static ServerInterfaceLayer getServerInterfaceLayer() {
     return SIL;

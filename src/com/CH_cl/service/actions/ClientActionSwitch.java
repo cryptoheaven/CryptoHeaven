@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -31,7 +31,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -165,6 +165,8 @@ public class ClientActionSwitch extends CommonActionSwitch {
       { new Integer(CommandCodes.CNT_A_GET_CONTACTS), CntAGetContacts.class.getName() },
       // Remove Contacts
       { new Integer(CommandCodes.CNT_A_REMOVE_CONTACTS), CntARemoveContacts.class.getName() },
+      // Alter contact usage stamp
+      { new Integer(CommandCodes.CNT_A_UPDATE_USED), CntAUpdateUsed.class.getName() },
 
 
       //====================================

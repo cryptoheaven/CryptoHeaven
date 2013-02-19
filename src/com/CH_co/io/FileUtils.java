@@ -64,14 +64,14 @@ public class FileUtils extends Object {
     if (trace != null) trace.args(newFilePrefix);
 
     File tempFile = null;
-    FileOutputStream fileOut = null;
+    OutputStream fileOut = null;
 
     try {
       tempFile = File.createTempFile(newFilePrefix, null);
 
       GlobalProperties.addTempFileToCleanup(tempFile);
 
-      fileOut = new FileOutputStream(tempFile);
+      fileOut = new BufferedOutputStream(new FileOutputStream(tempFile), 32*1024);
 
       // read length of the incoming file
       long dataLength = readFileLength(in);
@@ -138,7 +138,7 @@ public class FileUtils extends Object {
     if (file == null) throw new IllegalArgumentException("File argument cannot be null.");
 
     try {
-      FileInputStream fileIn = new FileInputStream(file);
+      InputStream fileIn = new BufferedInputStream(new FileInputStream(file), 32*1024);
       DataInputStream dataIn = new DataInputStream(fileIn);
 
       // write length

@@ -343,7 +343,7 @@ public class EmailSendingAttOps extends Object {
               File tempFile = File.createTempFile(FileDataRecord.TEMP_PLAIN_FILE_PREFIX, null);
               // once temporary file is created, add it to collection for removal after we are done with this message tree
               returnTempFilesBufferL.add(tempFile);
-              FileOutputStream tempFileOut = new FileOutputStream(tempFile);
+              OutputStream tempFileOut = new BufferedOutputStream(new FileOutputStream(tempFile), 32*1024);
               mm.writeTo(tempFileOut);
               tempFileOut.flush();
               tempFileOut.close();

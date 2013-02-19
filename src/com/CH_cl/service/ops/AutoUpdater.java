@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -12,24 +12,26 @@
 
 package com.CH_cl.service.ops;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.actions.sys.*;
-import com.CH_cl.service.engine.*;
-
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.sys.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.actions.sys.SysAGetAutoUpdate;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.sys.Sys_AutoUpdate_Co;
+import com.CH_co.service.records.AutoUpdateRecord;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
 import java.io.*;
-import java.net.*;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.*;
 
 /**
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -81,7 +83,7 @@ public class AutoUpdater extends ThreadTraced {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "AutoUpdater.runTraced()");
     if (!isRunning && !Misc.isRunningFromApplet() && !Misc.isAllGUIsuppressed()) {
       isRunning = true;
-      lastRunStamp = System.currentTimeMillis();
+      markActivityStamp();
       try {
         // Filter out updates that we should not apply based on non-build sensitive and same file size
         if (updateRecs != null && updateRecs.length > 0) {
@@ -238,10 +240,10 @@ public class AutoUpdater extends ThreadTraced {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "readUpdateStruct(File updateFile)");
     if (trace != null) trace.args(updateFile);
     LinkedList updateStruct = null;
-    FileInputStream fIn = null;
+    InputStream fIn = null;
     DataInputStream dIn = null;
     try {
-      fIn = new FileInputStream(updateFile);
+      fIn = new BufferedInputStream(new FileInputStream(updateFile), 32*1024);
       dIn = new DataInputStream(fIn);
       int fileSize = dIn.readInt();
       if (updateFile.length() == fileSize) {
@@ -750,7 +752,7 @@ public class AutoUpdater extends ThreadTraced {
     BufferedOutputStream bout = null;
     try {
       fout = new FileOutputStream(toFill);
-      bout = new BufferedOutputStream(fout, 4*1024);
+      bout = new BufferedOutputStream(fout, 8*1024);
       for (int i=0; i<size; i++) {
         bout.write(0);
       }
@@ -970,6 +972,12 @@ public class AutoUpdater extends ThreadTraced {
     }
     if (trace != null) trace.exit(AutoUpdater.class, longInactive);
     return longInactive;
+  }
+
+  public static void markActivityStamp() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AutoUpdater.class, "markActivityStamp()");
+    lastRunStamp = System.currentTimeMillis();   
+    if (trace != null) trace.exit(AutoUpdater.class);
   }
 
   public static void resetInactiveStamp() {

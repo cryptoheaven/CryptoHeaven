@@ -1,39 +1,39 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.msg.dataSets.cnt;
 
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.records.ContactRecord;
+import com.CH_co.service.records.InvEmlRecord;
+import com.CH_co.util.Misc;
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.io.DataInputStream2; 
-import com.CH_co.io.DataOutputStream2;
-import com.CH_co.service.msg.ProtocolMsgDataSet;
-import com.CH_co.service.records.*;
-import com.CH_co.util.Misc;
-
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Get My Contacts
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Get My Contacts
+* @author  Marcin Kurzawa
+* @version
+*/
 public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
 
-  // <numOfContacts> { <contactId> <folderId> <ownerUserId> <contactWithId> <creatorId> <status> <permits> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote> <dateCreated> <dateUpdated> }*
+  // <numOfContacts> { <contactId> <folderId> <ownerUserId> <contactWithId> <creatorId> <status> <permits> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote> <dateCreated> <dateUpdated> <dateUsed> }*
   // <numOfInvEmls> { <id> <emailAddr> <sentByUID> <fromName> <fromEmail> <msg> <dateSent> }*
   public ContactRecord[] contactRecords;
   public InvEmlRecord[] invEmlRecords;
@@ -81,6 +81,8 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         dataOut.writeBytes(contactRecords[i].getEncOtherNote());
         dataOut.writeTimestamp(contactRecords[i].dateCreated);
         dataOut.writeTimestamp(contactRecords[i].dateUpdated);
+        if (clientBuild >= 748 && serverBuild >= 748)
+          dataOut.writeTimestamp(contactRecords[i].dateUsed);
       }
     }
 
@@ -132,6 +134,8 @@ public class Cnt_GetCnts_Rp extends ProtocolMsgDataSet {
         contactRecords[i].setEncOtherNote(dataIn.readSymCipherBulk());
         contactRecords[i].dateCreated = dataIn.readTimestamp();
         contactRecords[i].dateUpdated = dataIn.readTimestamp();
+        if (clientBuild >= 748 && serverBuild >= 748)
+          contactRecords[i].dateUsed = dataIn.readTimestamp();
       }
     }
 

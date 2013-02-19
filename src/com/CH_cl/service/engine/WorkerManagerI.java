@@ -97,6 +97,11 @@ public interface WorkerManagerI extends RequestSubmitterI {
   * The worker that picks up the SYS_Q_NOTIFY message action should claim Main Worker status.
   */
   public void claimMainWorker(ServerInterfaceWorker worker);
+  
+  /**
+  * The worker that picks up reply SYS_A_NOTIFY to the SYS_Q_NOTIFY request should claim persistent status.
+  */
+  public void claimPersistent(ServerInterfaceWorker worker);
 
   /**
   * Push-back a request to be placed on the job queue again.

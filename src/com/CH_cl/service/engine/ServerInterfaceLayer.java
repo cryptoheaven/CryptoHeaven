@@ -146,7 +146,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private static Class penalizedSocketType;
   private static final int DELAY_PENALIZED_CONNECTION_TYPE = 2000;
   // always delay protocoled sockets just a tiny bit to allow plain Socket some advantage of being first to connect...
-  private static final int DELAY_PROTOCOLED_CONNECTION  = 1000;
+  private static final int DELAY_PROTOCOLED_CONNECTION  = 1500;
   private static final int CONNECTION_TIMEOUT = 7000;
   private static final int MAX_CONNECTION_DELAY = Math.max(DELAY_PENALIZED_CONNECTION_TYPE, DELAY_PROTOCOLED_CONNECTION);
 
@@ -170,6 +170,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
   /** Last created SIL, maybe invalid */
   public static ServerInterfaceLayer lastSIL;
+
+  private HashSet statusListenersL;
 
   /**
   * Creates new ServerInterfaceLayer
@@ -972,7 +974,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
           if (trace != null) trace.data(11, "createWorker workerTrial="+workerTrial);
 
-          int[] hostIndexesToTry = null;
+          int[] hostIndexesToTry;
           int hostIndexCompletedFirst = -1;
           try {
             // First trial gives perference to previously working host,
@@ -1084,16 +1086,18 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             cleanupOtherSockets.start();
 
             if (socket != null) {
-              if (lastLoginMessageAction != null) {
+              MessageAction loginAction = lastLoginMessageAction;
+              if (loginAction != null) {
                 if (trace != null) trace.data(70, "restamp the auto-login message");
-                lastLoginMessageAction = new MessageAction(lastLoginMessageAction.getActionCode(), lastLoginMessageAction.getMsgDataSet());
+                loginAction = new MessageAction(loginAction.getActionCode(), loginAction.getMsgDataSet());
+                setLoginMsgAction(loginAction);
               } else {
                 if (trace != null) trace.data(71, "no auto-login message to restamp");
               }
               worker = new ServerInterfaceWorker(socket, this, this,
                                                 getReplyFifoWriterI(),
                                                 getRequestPriorityFifoReaderI(),
-                                                lastLoginMessageAction);
+                                                loginAction);
               if (trace != null) trace.data(80, "ServerInterfaceWorker instantiated");
             }
 
@@ -1471,7 +1475,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     // clear last login action so no worker can automatically login
     if (lastLoginMessageAction != null) {
-      lastLoginMessageAction = null;
+      setLoginMsgAction(null);
       try {
         if (workers.size() > 0) {
           int countWorkers = workers.size();
@@ -1534,13 +1538,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   /**
   * Sets the last successful login action, called by workers after successful login.
   */
-  public synchronized void setLoginMsgAction(MessageAction loginMsgAction) {
+  public void setLoginMsgAction(MessageAction loginMsgAction) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "setLoginMsgAction(MessageAction loginMsgAction)");
     if (trace != null) trace.args(loginMsgAction);
     lastLoginMessageAction = loginMsgAction;
+    notifyStatusChanged();
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
-  public synchronized boolean isLastLoginMsgActionSet() {
+  public boolean isLastLoginMsgActionSet() {
     return lastLoginMessageAction != null;
   }
   public boolean isLoggedIn() {
@@ -1550,18 +1555,18 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         rc = true;
     return rc;
   }
-  public synchronized ProtocolMsgDataSet getLoginMsgDataSet() {
-    if (lastLoginMessageAction != null) {
-      ProtocolMsgDataSet tempDataSet = lastLoginMessageAction.getMsgDataSet();
-      ProtocolMsgDataSet loginDataSet = null;
+  public ProtocolMsgDataSet getLoginMsgDataSet() {
+    MessageAction lastLogin = lastLoginMessageAction;
+    ProtocolMsgDataSet loginDataSet = null;
+    if (lastLogin != null) {
+      ProtocolMsgDataSet tempDataSet = lastLogin.getMsgDataSet();
       if (tempDataSet instanceof Obj_EncSet_Co) {
         loginDataSet = ((Obj_EncSet_Co) tempDataSet).dataSet;
       } else {
         loginDataSet = tempDataSet;
       }
-      return loginDataSet;
     }
-    return null;
+    return loginDataSet;
   }
 
   public synchronized void setRemoteSessionID(Long remoteSessionID) {
@@ -1626,16 +1631,18 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           }
         }
       }
-      boolean isTrigger = false;
+      boolean isMainQuit = false;
       // If a MAIN WORKER quits, we need to designate another main worker.
       synchronized (mainWorkerMonitor) {
         if (worker == mainWorker) {
           mainWorker = null;
-          isTrigger = true;
+          isMainQuit = true;
         }
       }
-      if (isTrigger)
+      if (isMainQuit) {
+        notifyStatusChanged();
         triggerCheckForMainWorker();
+      }
       // Since a woker died, trigger the check for waiting jobs.
       jobScanner.triggerCheckToServeNow();
     }
@@ -1650,6 +1657,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "claimMainWorker(ServerInterfaceWorker worker)");
     if (trace != null) trace.args(worker);
 
+    boolean isChanged = false;
     synchronized (mainWorkerMonitor) {
       if (trace != null) trace.data(10, worker != null ? "Claiming new main worker." : "Main worker won't be claimed.");
       if (mainWorker == null) {
@@ -1657,15 +1665,25 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         mainWorkerSubmition = false;
         // since workers submitting NOTIFY requests claim Main Persistent status, this cycle cannot break when there is a comm failure
         mainWorker = worker;
+        isChanged = true;
       }
       // Allow multiple main workers because this can happen briefly when main worker connection is being recycled
 //      else
 //        throw new IllegalStateException("Main Worker already claimed!");
     }
+    if (isChanged)
+      notifyStatusChanged();
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
+  /**
+  * The worker that picks up reply SYS_A_NOTIFY to the SYS_Q_NOTIFY request should claim persistent status.
+  */
+  public void claimPersistent(ServerInterfaceWorker worker) {
+    // Let them claim persistency, we won't deny any.
+    notifyStatusChanged();
+  }
 
   /**
   * Causes that a Main Worker is designated or a submission is in progress.
@@ -2090,6 +2108,40 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       for (int i=0; i<folders.length; i++) {
         Long folderId = folders[i].folderId;
         cache.markFolderViewInvalidated(folderId, true);
+      }
+    }
+  }
+
+  /**
+  * Notifies about changes to:
+  * lastLoginMessageAction,
+  * mainWorker,
+  */
+  public interface OnStatusChangeListener {
+    public void onStatusChanged();
+  }
+  private void notifyStatusChanged() {
+    if (statusListenersL != null) {
+      synchronized (statusListenersL) {
+        Iterator iter = statusListenersL.iterator();
+        while (iter.hasNext()) {
+          OnStatusChangeListener l = (OnStatusChangeListener) iter.next();
+          l.onStatusChanged();
+        }
+      }
+    }
+  }
+  public void registerForStatusChanged(OnStatusChangeListener listener) {
+    if (statusListenersL == null)
+      statusListenersL = new HashSet();
+    synchronized (statusListenersL) {
+      statusListenersL.add(listener);
+    }
+  }
+  public void unregisterForStatusChanged(OnStatusChangeListener listener) {
+    if (statusListenersL != null) {
+      synchronized (statusListenersL) {
+        statusListenersL.remove(listener);
       }
     }
   }

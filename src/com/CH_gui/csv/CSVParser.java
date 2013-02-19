@@ -358,7 +358,7 @@ public class CSVParser implements CSVParse {
         File f = new File(args[0]);
         if (f.exists()){
           if (f.canRead()){
-            in = new FileInputStream(f);
+            in = new BufferedInputStream(new FileInputStream(f), 32*1024);
           } else {
             throw new IOException("Could not open " + args[0]);
           }

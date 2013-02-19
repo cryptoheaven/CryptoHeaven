@@ -335,7 +335,7 @@ public class TraceProperties extends Object {
           if (withConsoleDebugInfo) System.out.println("Creating trace file " + fileName);
           String traceFileName = getOutputFullFileName(fileName);
           File traceFile = new File(traceFileName);
-          returnCountingOutput[0] = new CountingOutputStream(new FileOutputStream(traceFile));
+          returnCountingOutput[0] = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(traceFile), 32*1024));
           if (traceFile.exists()) {
             lastTraceFile = traceFile;
             if (withTraceFileCleanup) {

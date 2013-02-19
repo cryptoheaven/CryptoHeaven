@@ -27,6 +27,7 @@ import com.CH_co.util.*;
 
 import java.io.*;
 import java.security.*;
+import java.util.ArrayList;
 
 /** 
  * <b>Copyright</b> &copy; 2001-2012
@@ -70,6 +71,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
     BAEncodedPassword encodedPassword = cache.getEncodedPassword();
     String keyPropertyName = null;
     String keyPropertyFileName = null;
+    boolean isMultiplePaths = false;
 
     try {
       RSAPrivateKey privateKey = null;
@@ -101,23 +103,32 @@ public class UsrALoginSecureSession extends ClientMessageAction {
           }
           // also try the alternate paths to key file
           else {
+            ArrayList pathsTriedL = new ArrayList();
+            pathsTriedL.add(keyPropertyFileName);
             String[] paths = GlobalProperties.getProperty("PrivKeyFilePaths", "").split("[\\|]+");
             int pathsIndex = paths[0].equals("") ? 1 : 0; // ignore leading delimited blanks
             StringBuffer keyPropBuffer = new StringBuffer();
             while (paths.length > pathsIndex) {
               String path = paths[pathsIndex++];
               if (path != null && path.length() > 0) {
-                keyProperties = new GlobalSubProperties(new File(path), GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
-                property = keyProperties.getProperty(keyPropertyName);
-                keyPropBuffer.append(", ");
-                keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
-                if (property != null && property.length() > 0) {
-                  encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-                  break;
+                // Avoid trying the same one as originally that failed
+                if (!pathsTriedL.contains(path)) {
+                  pathsTriedL.add(path);
+                  keyProperties = new GlobalSubProperties(new File(path), GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+                  property = keyProperties.getProperty(keyPropertyName);
+                  keyPropBuffer.append(", \n");
+                  keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
+                  if (property != null && property.length() > 0) {
+                    encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+                    break;
+                  }
                 }
               }
             }
-            keyPropertyFileName += keyPropBuffer.toString();
+            if (keyPropBuffer.length() > 0) {
+              keyPropertyFileName += keyPropBuffer.toString();
+              isMultiplePaths = true;
+            }
           }
         }
       }
@@ -135,6 +146,7 @@ public class UsrALoginSecureSession extends ClientMessageAction {
               File file = fc.getSelectedFile();
               if (file != null) {
                 keyPropertyFileName = file.getAbsolutePath();
+                isMultiplePaths = false;
                 keyPropertyName = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+keyId;
                 GlobalSubProperties keyProperties = new GlobalSubProperties(file, GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
                 String property = keyProperties.getProperty(keyPropertyName);
@@ -179,13 +191,16 @@ public class UsrALoginSecureSession extends ClientMessageAction {
         }
         else {
           String message =
-              "<html>Private Key to decrypt session keys is not available! " +
+              "<html>Private Key is not available! " +
               "<p>" +
               "Login cannot complete! " +
               "<p>" +
-              "Your key property file appears to be missing or corrupted.  " +
-              "Could not find property field " + keyPropertyName + " to load your encrypted private key. " +
-              "The key property file scanned is: <br>" + keyPropertyFileName;
+              "Your keys file appears to be missing or corrupted.  " +
+              "Could not find " + keyPropertyName + " to load your encryption key. ";
+          if (isMultiplePaths)
+            message += "The files scanned are: \n<br>" + keyPropertyFileName;
+          else
+            message += "The file scanned is: \n<br>" + keyPropertyFileName;
           throw new SecurityException(message);
         }
       }

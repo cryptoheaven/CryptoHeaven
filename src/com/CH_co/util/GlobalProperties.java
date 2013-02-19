@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -22,7 +22,7 @@ import java.util.*;
 * properties. It reads an (program).properties file containing program-
 * specific properties. <p>
 *
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -290,13 +290,16 @@ public class GlobalProperties extends Object {
   // build 740 Add manual storage recalculate
   // build 742 Folder synch should first remove then insert new items, important for synching folder trees.
   // build 744 Fix opening/downloading files with invalid filenames (possible when created on Mac OSX and downloaded to Windows)
+  // build 746 Fix to skip sending too many redundant Online/Offline notifications.
+  // build 748 Added 'dateUsed' to Contacts and FolderShares
+  // build 750 Transfer 'dateUsed' for MsgLinkRecord
 
-  public static final short PROGRAM_BUILD_NUMBER = 744;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 750;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.7f;
-  public static final short PROGRAM_VERSION_MINOR = 4;
+  public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
@@ -320,7 +323,7 @@ public class GlobalProperties extends Object {
   static {
     try {
       String date = GlobalProperties.class.getPackage().getImplementationVersion();
-      if (date != null && date.indexOf('$') < 0 && date.indexOf('{') < 0 && date.indexOf('}') < 0) {
+      if (date != null && date.indexOf('$') < 0 && date.indexOf('{') < 0 && date.indexOf('}') < 0 && !date.equals("0.0")) {
         PROGRAM_BUILD_DATE = date.trim();
         PROGRAM_FULL_NAME += " compiled on " + PROGRAM_BUILD_DATE;
       }

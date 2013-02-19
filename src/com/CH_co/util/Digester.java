@@ -52,7 +52,7 @@ public class Digester extends Object {
 
   public static byte[] digestFile(File file, MessageDigest digest) throws FileNotFoundException, IOException {
     digest.reset();
-    FileInputStream fIn = new FileInputStream(file);
+    InputStream fIn = new BufferedInputStream(new FileInputStream(file), 32*1024);
 
     byte[] block = new byte[16*1024];
     int read = fIn.read(block);

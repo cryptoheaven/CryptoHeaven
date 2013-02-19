@@ -1,62 +1,74 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.actions.ClientMessageAction;
-import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.ops.*;
-
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FolderShareOps;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.fld.Fld_AddShares_Rq;
+import com.CH_co.service.msg.dataSets.fld.Fld_AltPerm_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.fld.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_co.util.NotificationCenter;
 import com.CH_gui.file.FileUtilities;
+import com.CH_gui.folder.FolderPurgingPanel;
+import com.CH_gui.folder.FolderSharingPanel;
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.folder.*;
 import com.CH_gui.gui.*;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.util.*;
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_gui.util.VisualsSavable;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import javax.swing.border.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.34 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.34 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderPropertiesDialog extends GeneralDialog implements VisualsSavable {
 
   private static final int DEFAULT_OK_INDEX = 0;
@@ -220,7 +232,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
     posY ++;
 
 
-    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Folder_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
+    panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString(folderPair.getFolderRecord().isGroupType() ? "label_Group_ID" : "label_Folder_ID")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     panel.add(new JMyLabel(folderPair.getId().toString()), new GridBagConstraints(1, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
@@ -430,7 +442,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
               (!folderPairChanged.getFolderRecord().isGroupType() && folderPairChanged.getFolderRecord().ownerUserId.equals(cache.getMyUserId())) ||
               // or a group folder the one being changed in the dialog
               (folderPairChanged.getFolderRecord().isGroupType() && folderPairChanged.getId().equals(folderPair.getId()))
-             ) {
+            ) {
 
             // commit removal of old shares
             FolderShareRecord[] existingShares = cache.getFolderShareRecordsForFolder(folderPairChanged.getId());
@@ -764,7 +776,7 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
           }
 
           jContains.setText(java.text.MessageFormat.format(com.CH_gui.lang.Lang.rb.getString("NUM_ITEM(S)"), new Object[] {data.objId_1.toString(), suffix}));
-           */
+          */
 
           jContains.setText(sb.toString());
           String oSize = "";

@@ -102,7 +102,7 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
 
     // include address contacts
     // only those ones which have the links (prevent from displaying deleted in current session addresses)
-    MsgDataRecord[] addresses = cache.getMsgDataRecords(new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR));
+    MsgDataRecord[] addresses = cache.getMsgDataRecords(new MsgFilter(true)); // Address Cards with email address only
     MsgLinkRecord[] addrLinks = cache.getMsgLinkRecordsForMsgs(RecordUtils.getIDs(addresses));
     Record[] allInitialAddressContactChoices = cache.getMsgDataRecords(MsgLinkRecord.getMsgIDs(addrLinks));
     Arrays.sort(allInitialAddressContactChoices, comparator);
@@ -173,7 +173,7 @@ public class RecipientListProvider extends Object implements ObjectsProviderUpda
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(GUIUpdater.class, "GUIUpdater.run()");
       if (updatable != null && event.getEventType() == RecordEvent.SET) {
-        final MsgDataRecord[] addresses = (MsgDataRecord[]) RecordUtils.filter(event.getMsgDataRecords(), new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR));
+        final MsgDataRecord[] addresses = (MsgDataRecord[]) RecordUtils.filter(event.getMsgDataRecords(), new MsgFilter(true)); // Address Cards with email address only
         if (addresses != null && addresses.length > 0) {
           Arrays.sort(addresses, new ListComparator());
           updatable.update(addresses);

@@ -167,7 +167,7 @@ public class FileDataRecord extends Record {
       // create a temporary file for the encrypted data
       tempFile = File.createTempFile(TEMP_ENCRYPTED_FILE_PREFIX, null);
       tempFileOut = new FileOutputStream(tempFile);
-      BufferedOutputStream bufFileOut = new BufferedOutputStream(tempFileOut, 1024*8);
+      BufferedOutputStream bufFileOut = new BufferedOutputStream(tempFileOut, 32*1024);
       DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, new SHA256());
       //DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, MessageDigest.getInstance("SHA-1"));
       BlockCipherOutputStream cipherOut = new BlockCipherOutputStream(dFileOut, symmetricKey);
@@ -394,7 +394,7 @@ public class FileDataRecord extends Record {
         //DigestInputStream dEncFileIn = new DigestInputStream(encFileIn, MessageDigest.getInstance("SHA-1"));
         // buffer should suck all through digest input stream even if original file is 0 length and is treated differently by GZIP sucker
         //SpeedLimitedInputStream encSpeedIn = new SpeedLimitedInputStream(dEncFileIn, SpeedLimiter.DEFAULT_THROUGHPUT*2, false);
-        BufferedInputStream encBufFileIn = new BufferedInputStream(dEncFileIn, 1024*32);
+        BufferedInputStream encBufFileIn = new BufferedInputStream(dEncFileIn, 32*1024);
         // progress interruptible stream
         InterruptibleInputStream interEncIn = new InterruptibleInputStream(encBufFileIn);
         if (progressMonitor != null) progressMonitor.setInterrupt(interEncIn);
@@ -403,7 +403,7 @@ public class FileDataRecord extends Record {
         GZIPInputStream gzipIn = new GZIPInputStream(cipherIn);
 
         // Create Destination file streams
-        BufferedOutputStream bufFileOut = new BufferedOutputStream(fileOut, 1024*32);
+        BufferedOutputStream bufFileOut = new BufferedOutputStream(fileOut, 32*1024);
         DigestOutputStream dFileOut = new DigestOutputStream(bufFileOut, new SHA256());
 
         // move data from the GZIP input to file output

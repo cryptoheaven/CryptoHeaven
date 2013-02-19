@@ -36,6 +36,7 @@ abstract public class Record extends Object implements Cloneable, Comparable {
   public static final short RECORD_TYPE_USER = 7;
   public static final short RECORD_TYPE_MSG_LINK = 8;
   public static final short RECORD_TYPE_GROUP = 9;
+  public static final short RECORD_TYPE_INVEML = 10;
 
   private boolean sealed;
   private boolean unSealed;

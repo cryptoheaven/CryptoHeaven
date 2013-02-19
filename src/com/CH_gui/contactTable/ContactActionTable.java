@@ -16,6 +16,7 @@ import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.ChatOps;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.records.filters.ContactFilterCl;
 import com.CH_cl.service.records.filters.FixedFilter;
@@ -970,8 +971,25 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
     }
   }
 
-  private static void doChat(MemberContactRecordI[] contacts) {
-    new ChatSessionCreator(contacts).start();
+  public static void doChat(MemberContactRecordI[] contacts) {
+    CallbackI callbackChatOpener = new CallbackI() {
+      public void callback(Object value) {
+        FolderPair chatFolderPair = (FolderPair) value;
+        if (chatFolderPair != null) {
+          RecordTableFrame openFrame = RecordTableFrame.getOpenRecordTableFrame(chatFolderPair);
+          if (openFrame != null) {
+            RecordTableFrame.toFrontAnimation(openFrame);
+          } else {
+            new ChatTableFrame(chatFolderPair);
+          }
+        }
+      }
+    };
+    FolderPair chat = ChatOps.doGetChatFolder(contacts);
+    if (chat != null)
+      callbackChatOpener.callback(chat);
+    else
+      ChatOps.doCreateOrFetchChatFolder(MainFrame.getServerInterfaceLayer(), contacts, callbackChatOpener);
   }
   private static void doSharedSpace(Component parent, MemberContactRecordI[] contacts, short folderType) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();

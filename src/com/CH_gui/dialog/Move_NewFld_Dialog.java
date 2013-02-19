@@ -83,8 +83,6 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
   private static final int TAB_PURGING = 2;
 
   private static final boolean MONO_FOLDERS = false; // Mode where a folder tree may consist of a single folder type, only the roots may be different.
-  public static final short DEFAULT_CHAT_PURGING_RECORD_NUM = 100; // For Chatting folders, by default purge records if more than 100;
-  public static final int DEFAULT_CHAT_PURGING_RECORD_SECONDS = 0; // unlimited, old value was 60*60*24*7*8;  // For Chatting folders, by default purge records if older than 8 weeks;
 
   FolderTreeModelGui treeModel = null;
   FolderPair        selectedFolderPair = null;
@@ -563,11 +561,11 @@ public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable 
       if (folderPurgingPanel != null) {
         Short numToKeep = folderPurgingPanel.folderAttributesPanel.getNumToKeep();
         if (numToKeep == null || numToKeep.shortValue() == 0) {
-          folderPurgingPanel.folderAttributesPanel.setNumToKeep(new Short(DEFAULT_CHAT_PURGING_RECORD_NUM));
+          folderPurgingPanel.folderAttributesPanel.setNumToKeep(new Short(FolderRecord.DEFAULT_CHAT_PURGING_RECORD_NUM));
         }
         Integer keepAsOldAs = folderPurgingPanel.folderAttributesPanel.getKeepAsOldAs();
         if (keepAsOldAs == null || keepAsOldAs.intValue() == 0) {
-          folderPurgingPanel.folderAttributesPanel.setKeepAsOldAs(new Integer(DEFAULT_CHAT_PURGING_RECORD_SECONDS));
+          folderPurgingPanel.folderAttributesPanel.setKeepAsOldAs(new Integer(FolderRecord.DEFAULT_CHAT_PURGING_RECORD_SECONDS));
         }
       }
     } else {

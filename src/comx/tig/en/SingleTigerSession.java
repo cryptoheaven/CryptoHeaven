@@ -365,7 +365,7 @@ public class SingleTigerSession extends Object {
               if (pathSeperator > 0)
                 new File(userLexFilename.substring(0, pathSeperator)).mkdirs();
               userLexFile.createNewFile();
-              FileOutputStream fOut = new FileOutputStream(userLexFile);
+              OutputStream fOut = new BufferedOutputStream(new FileOutputStream(userLexFile), 1*1024);
               fOut.write("#LID 24941".getBytes());
               fOut.flush();
               fOut.close();

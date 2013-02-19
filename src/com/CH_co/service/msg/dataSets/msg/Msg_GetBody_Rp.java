@@ -86,6 +86,8 @@ public class Msg_GetBody_Rp extends ProtocolMsgDataSet {
     dataOut.writeSmallint(linkRecord.status);
     dataOut.writeTimestamp(linkRecord.dateDelivered);
     dataOut.writeTimestamp(linkRecord.dateUpdated);
+    if (clientBuild >= 750 && serverBuild >= 750)
+      dataOut.writeTimestamp(linkRecord.dateUsed);
 
     dataOut.writeLongObj(dataRecord.msgId);
     if (clientBuild >= 86)
@@ -147,6 +149,8 @@ public class Msg_GetBody_Rp extends ProtocolMsgDataSet {
     linkRecord.status = dataIn.readSmallint();
     linkRecord.dateDelivered = dataIn.readTimestamp();
     linkRecord.dateUpdated = dataIn.readTimestamp();
+    if (clientBuild >= 750 && serverBuild >= 750)
+      linkRecord.dateUsed = dataIn.readTimestamp();
 
     dataRecord = new MsgDataRecord();
 

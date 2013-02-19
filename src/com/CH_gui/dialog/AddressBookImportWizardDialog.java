@@ -46,8 +46,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.EventObject;
 import java.util.StringTokenizer;
@@ -193,7 +195,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
           // import addresses
           Long shareId = destPair.getFolderShareRecord().shareId;
           Record[] recipient = new Record[] { destPair };
-          FileInputStream in = new FileInputStream(file);
+          InputStream in = new BufferedInputStream(new FileInputStream(file), 32*1024);
           CSVParser parser = new CSVParser(in);
           // load headers of import file
           String[] headers = parser.getLine();
@@ -299,7 +301,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
             if (isFile) {
               // load headers of import file
               try {
-                FileInputStream in = new FileInputStream(file);
+                InputStream in = new BufferedInputStream(new FileInputStream(file), 32*1024);
                 CSVParser parser = new CSVParser(in);
                 String[] headers = parser.getLine();
                 int count = 0;

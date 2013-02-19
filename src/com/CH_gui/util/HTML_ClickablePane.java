@@ -21,9 +21,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.Hashtable;
 import javax.swing.JFrame;
@@ -473,7 +471,7 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
           url = new URL(args[0]);
         f.getContentPane().add(new JScrollPane(new HTML_ClickablePane(url, null)), "Center");
       } else {
-        FileInputStream fin = new FileInputStream(args[0]);
+        InputStream fin = new BufferedInputStream(new FileInputStream(args[0]), 32*1024);
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         int b = 0;
         while ((b = fin.read()) >= 0) {

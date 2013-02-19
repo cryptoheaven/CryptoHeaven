@@ -349,7 +349,7 @@ public class PropSpellingSession extends SpellingSession
             s3 = s3 + File.separator;
           s = s3 + s;
         }
-        FileInputStream fileinputstream = new FileInputStream(s);
+        InputStream fileinputstream = new BufferedInputStream(new FileInputStream(s), 32*1024);
         if (fileinputstream == null)
           throw new Exception();
         if (s2.equalsIgnoreCase("c"))

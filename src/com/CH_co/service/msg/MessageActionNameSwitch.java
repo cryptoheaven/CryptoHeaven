@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -17,7 +17,7 @@ import com.CH_co.util.Misc;
 import java.util.Arrays;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -136,7 +136,7 @@ public class MessageActionNameSwitch extends Object {
       // =============================
 
       // Find if email address exists in Address Book
-      { new Integer(CommandCodes.ADDR_Q_FIND_HASH), "Find Email Address in Address Book" },
+      { new Integer(CommandCodes.ADDR_Q_FIND_HASH), "Find Address in Book" },
 
 
       // =======================
@@ -192,7 +192,7 @@ public class MessageActionNameSwitch extends Object {
       // Get Last Content Update (Msg or File)
       { new Integer(CommandCodes.FLD_Q_GET_LAST_UPDATE), "Fetch Last Update" },
       // Get Folder Red Flag Count
-      { new Integer(CommandCodes.FLD_Q_RED_FLAG_COUNT), "Count New Objects for Folder(s)" },
+      { new Integer(CommandCodes.FLD_Q_RED_FLAG_COUNT), "Count New Items" },
       // Ring Ring
       { new Integer(CommandCodes.FLD_Q_RING_RING), "Ringing..." },
       // Synch File/Message Folders, Folder tree, Contacts
@@ -279,6 +279,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.CNT_Q_ALTER_PERMITS), "Alter Contact Permissions" },
       // Alter Settings
       { new Integer(CommandCodes.CNT_Q_ALTER_SETTINGS), "Alter Contact Settings" },
+      // Alter contact usage stamp
+      { new Integer(CommandCodes.CNT_Q_UPDATE_USED), "Update Contact Used" },
       // Accept Contacts Failure
       { new Integer(CommandCodes.CNT_E_CONTACT_IS_NOT_ACCESSIBLE), "Contact is not accessible" },
 
@@ -300,7 +302,7 @@ public class MessageActionNameSwitch extends Object {
       // New Message
       { new Integer(CommandCodes.MSG_Q_NEW), "Create New Message" },
       // Convert message link to symmetric encryption
-      { new Integer(CommandCodes.MSG_Q_TO_SYM_ENC), "Change Message Encryption to Symmetric" },
+      { new Integer(CommandCodes.MSG_Q_TO_SYM_ENC), "Message Encryption to Symmetric" },
       // Remove Messages
       { new Integer(CommandCodes.MSG_Q_REMOVE), "Remove Message(s)" },
       // Remove Old Messages
@@ -444,7 +446,7 @@ public class MessageActionNameSwitch extends Object {
       // =============================
 
       // Find if email address exists in Address Book
-      { new Integer(CommandCodes.ADDR_A_FOUND_HASH), "Find Email Address in Address Book" },
+      { new Integer(CommandCodes.ADDR_A_FOUND_HASH), "Find Address in Book" },
 
 
       // =======================
@@ -462,7 +464,7 @@ public class MessageActionNameSwitch extends Object {
       // Get Folder Size
       { new Integer(CommandCodes.FLD_A_GET_FOLDER_SIZE), "Get Folder Size" },
       // Get Folder Red Flag Count
-      { new Integer(CommandCodes.FLD_A_RED_FLAG_COUNT), "Count New Objects for Folder(s)" },
+      { new Integer(CommandCodes.FLD_A_RED_FLAG_COUNT), "Count New Items" },
       // Ring Ring
       { new Integer(CommandCodes.FLD_A_RING_RING), "Ring, ring..." },
       // Synch File/Message Folders, Folder tree, Contacts
@@ -502,6 +504,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.CNT_A_GET_CONTACTS), "Get Contact List" },
       // Remove Contacts
       { new Integer(CommandCodes.CNT_A_REMOVE_CONTACTS), "Remove Contact(s)" },
+      // Alter contact usage stamp
+      { new Integer(CommandCodes.CNT_A_UPDATE_USED), "Update Contact Used" },
 
 
       //====================================
@@ -560,7 +564,7 @@ public class MessageActionNameSwitch extends Object {
       // Server replies with Version information
       { new Integer(CommandCodes.SYS_A_VERSION), "Version Info" },
 
-      { new Integer(CommandCodes.SYS_A_NOTIFY), "Register Persistent Connection Reply" },
+      { new Integer(CommandCodes.SYS_A_NOTIFY), "Register Persistent Connection" },
 
       // Connection timeout
       { new Integer(CommandCodes.SYS_A_CONNECTION_TIMEOUT), "Connection Timeout" },

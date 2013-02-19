@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -19,6 +19,7 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_cl.util.GlobalSubProperties;
 import com.CH_co.cryptx.*;
 import com.CH_co.service.msg.CommandCodes;
@@ -27,6 +28,7 @@ import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.msg.dataSets.usr.*;
 import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.URLs;
@@ -34,10 +36,11 @@ import java.io.File;
 import java.security.DigestException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -440,6 +443,187 @@ public class UserOps extends Object {
     return new Object[] { sender, senderEmailShort, senderEmailFull };
   }
 
+  /**
+  * @return expanded list of recipients
+  */
+  public static Record[] getExpandedListOfRecipients(ServerInterfaceLayer SIL, Record[] recipients, boolean expandAddressBooks, boolean expandGroups) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "getExpandedListOfRecipients(ServerInterfaceLayer SIL, Record[] recipients, boolean expandAddressBooks, boolean expandGroups)");
+    if (trace != null) trace.args(recipients);
+    if (trace != null) trace.args(expandAddressBooks);
+    if (trace != null) trace.args(expandGroups);
+    if (expandAddressBooks) {
+      FolderFilter addressBookFilter = new FolderFilter(FolderRecord.ADDRESS_FOLDER);
+      Record[] addressBooks = (Record[]) addressBookFilter.filterInclude(recipients);
+      recipients = addressBookFilter.filterExclude(recipients);
+      // gather address contacts for the address books selected
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), new Short(Record.RECORD_TYPE_FOLDER));
+      Record[] addressContactDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(addressContactLinks));
+      // filter out messages leaving address contacts objects
+      addressContactDatas = new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR).filterInclude(addressContactDatas);
+      // add address contacts from selected books to the list of recipients
+      recipients = RecordUtils.concatinate(recipients, addressContactDatas);
+    }
+    if (expandGroups) {
+      FolderFilter groupFilter = new FolderFilter(FolderRecord.GROUP_FOLDER);
+      Record[] groups = (Record[]) groupFilter.filterInclude(recipients);
+      recipients = groupFilter.filterExclude(recipients);
+      // gather group members for the group folders selected
+      Record[] members = UserOps.getOrFetchFamiliarUsers(SIL, groups);
+      // add members from selected groups to the list of recipients
+      recipients = RecordUtils.concatinate(recipients, members);
+    }
+    if (trace != null) trace.exit(UserOps.class, recipients);
+    return recipients;
+  }
+
+
+  /**
+  * Convert any EmailAddressRecords in the array to familiar users or contact objects.
+  * Convert any 'reciprocal' contact to our own contact if possible, otherwise to user record.
+  * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
+  * @return true if anything was converted.
+  */
+  public static boolean convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts)");
+    if (trace != null) trace.args(recipients);
+    if (trace != null) trace.args(convertNotHostedEmailsToWebAccounts);
+
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
+    boolean anyConverted = false;
+    ArrayList unknownEmailsV = new ArrayList();
+    ArrayList unknownUserIDsV = new ArrayList();
+
+    if (trace != null) trace.data(10, "gather unknown email addresses");
+
+    // gather unknown email addresses
+    for (int i=0; recipients!=null && i<recipients.length; i++) {
+      Record rec = recipients[i];
+
+      if (rec instanceof MsgDataRecord) {
+        MsgDataRecord mData = (MsgDataRecord) rec;
+        if (mData.isTypeAddress()) {
+          rec = new EmailAddressRecord(mData.getEmailAddress());
+          recipients[i] = rec;
+          anyConverted = true;
+        }
+      } else if (rec instanceof InvEmlRecord) {
+        InvEmlRecord invRec = (InvEmlRecord) rec;
+        rec = new EmailAddressRecord(invRec.emailAddr);
+        recipients[i] = rec;
+        anyConverted = true;
+      }
+
+      if (rec instanceof EmailAddressRecord) {
+        EmailAddressRecord eaRec = (EmailAddressRecord) rec;
+        String[] addresses = EmailRecord.gatherAddresses(eaRec.address);
+        for (int k=0; addresses!=null && k<addresses.length; k++) {
+          String addr = addresses[k];
+          // see if we have the email address cached
+          // If unknown and numeric address, request for email lookup will return nothing, so we still need the handle lookup request too!
+          if (cache.getEmailRecord(addr) == null) {
+            if (!unknownEmailsV.contains(addr)) {
+              if (trace != null) trace.data(20, addr);
+              unknownEmailsV.add(addr);
+            }
+          }
+          // see if numeric, then prepare to fetch user's handle
+          try {
+            Long uID = Long.valueOf(EmailRecord.getNick(addr));
+            if (EmailRecord.isDomainEqual(URLs.getElements(URLs.DOMAIN_MAIL)[0], EmailRecord.getDomain(addr)) && cache.getUserRecord(uID) == null) {
+              if (!unknownUserIDsV.contains(uID)) {
+                if (trace != null) trace.data(30, uID);
+                unknownUserIDsV.add(uID);
+              }
+            }
+          } catch (Exception e) {
+          }
+        }
+      }
+
+      if (rec instanceof ContactRecord) {
+        ContactRecord cRec = (ContactRecord) rec;
+        if (!cRec.ownerUserId.equals(cache.getMyUserId())) {
+          Long otherUserId = cRec.ownerUserId;
+          rec = CacheUsrUtils.convertUserIdToFamiliarUser(otherUserId, true, false);
+          recipients[i] = rec;
+          anyConverted = true;
+        }
+      }
+
+      if (rec instanceof UserRecord) {
+        Long uID = ((UserRecord) rec).userId;
+        if (cache.getUserRecord(uID) == null)
+          unknownUserIDsV.add(uID);
+      }
+    }
+
+    if (trace != null) trace.data(20, "unknown email addresses gathered", unknownEmailsV);
+
+    // fetch all unknown email addresses -- this will inturn fetch unknown user handles
+    if (unknownEmailsV.size() > 0) {
+      if (trace != null) trace.data(40, unknownEmailsV);
+      Object[] emls = new Object[unknownEmailsV.size()];
+      unknownEmailsV.toArray(emls);
+      Object[] set = new Object[] { emls, Boolean.valueOf(convertNotHostedEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
+      SIL.submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
+    }
+    // fetch unknown users
+    if (unknownUserIDsV.size() > 0) {
+      if (trace != null) trace.data(50, unknownUserIDsV);
+      SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000);
+    }
+
+    if (trace != null) trace.data(60, "convert all EmailAddressRecords to UserRecords or ContactRecords");
+
+    // convert all EmailAddressRecords to UserRecords or ContactRecords
+    for (int i=0; recipients!=null && i<recipients.length; i++) {
+      Record rec = recipients[i];
+      if (rec instanceof EmailAddressRecord) {
+        EmailAddressRecord eaRec = (EmailAddressRecord) rec;
+        String[] addresses = EmailRecord.gatherAddresses(eaRec.address);
+        for (int k=0; addresses!=null && k<addresses.length; k++) {
+          String addr = addresses[k];
+          EmailRecord eRec = cache.getEmailRecord(addr);
+
+          Long userID = null;
+          boolean isEmailHosted = false;
+          if (eRec != null) {
+            userID = eRec.userId;
+            isEmailHosted = eRec.isHosted();
+            if (trace != null) trace.data(70, addr);
+          } else {
+            // see if numeric
+            if (trace != null) trace.data(80, addr);
+            try {
+              Long uID = Long.valueOf(EmailRecord.getNick(addr));
+              if (EmailRecord.isDomainEqual(URLs.getElements(URLs.DOMAIN_MAIL)[0], EmailRecord.getDomain(addr))) {
+                userID = uID;
+                if (trace != null) trace.data(90, addr);
+              }
+            } catch (Exception e) {
+            }
+          }
+
+          if (userID != null) {
+            boolean includeWebUsers = convertNotHostedEmailsToWebAccounts || isEmailHosted;
+            Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(userID, true, false, includeWebUsers);
+            if (trace != null) trace.data(100, familiar);
+            if (familiar != null) {
+              recipients[i] = familiar;
+              anyConverted = true;
+              if (trace != null) trace.data(110, "converted to", familiar);
+            }
+          }
+        }
+      }
+    }
+
+    if (trace != null) trace.exit(UserOps.class, anyConverted);
+    return anyConverted;
+  }
+
   public static boolean sendPassRecoverySettings(ServerInterfaceLayer SIL, PassRecoveryRecord passRecoveryRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordRecoverySettings(ServerInterfaceLayer SIL, PassRecoveryRecord passRecoveryRecord)");
     if (trace != null) trace.args(SIL, passRecoveryRecord);
@@ -480,6 +664,92 @@ public class UserOps extends Object {
 
     if (trace != null) trace.exit(UserOps.class, success);
     return success;
+  }
+
+  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI recipient) {
+    if (recipient instanceof Record) {
+      updateUsedStamp(SIL, new Record[][] { { (Record) recipient } });
+    }
+  }
+  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI[] memberRecipients) {
+    Record[][] recipients = new Record[1][memberRecipients.length];
+    for (int i=0; i<recipients.length; i++) {
+      recipients[0][i] = (Record) memberRecipients[i];
+    }
+    updateUsedStamp(SIL, recipients);
+  }
+  public static void updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients)");
+    if (trace != null) trace.args(SIL, msgRecipients);
+
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    if (msgRecipients != null) {
+      HashSet contactIDsHS = new HashSet();
+      HashSet addressLinkIDsHS = new HashSet();
+      HashSet groupShareIDsHS = new HashSet();
+      for (int i=0; i<msgRecipients.length; i++) {
+        Record[] recipients = msgRecipients[i];
+        if (recipients != null) {
+          for (int j=0; j<recipients.length; j++) {
+            Record recipient = recipients[j];
+            if (trace != null) trace.data(10, "processing recipient", recipient.getClass().getSimpleName(), recipient);
+            if (recipient instanceof ContactRecord) {
+              // contact
+              contactIDsHS.add(recipient.getId());
+            } else if (recipient instanceof MsgLinkRecord) {
+              // address book entry
+              System.out.println("updateUsedStamp for Addres via Link");
+              addressLinkIDsHS.add(recipient.getId());
+            } else if (recipient instanceof MsgDataRecord) {
+              // address book entry
+              System.out.println("updateUsedStamp for Addres via Data");
+              MsgLinkRecord[] addrLinks = cache.getMsgLinkRecordsForMsg(recipient.getId());
+              if (addrLinks != null && addrLinks.length > 0) {
+                for (int k=0; k<addrLinks.length; k++)
+                  addressLinkIDsHS.add(addrLinks[k].msgLinkId);
+              }
+            } else if (recipient instanceof EmailAddressRecord) {
+              // email address - match with address books
+              if (trace != null) trace.data(20, "email address needs to be converted to Address Book entry");
+              EmailAddressRecord emlAddr = (EmailAddressRecord) recipient;
+              MsgDataRecord[] addrs = cache.getAddrRecords(emlAddr.address);
+              if (addrs != null && addrs.length > 0) {
+                if (trace != null) trace.data(21, "matching Address Book entry", addrs);
+                Long[] addrIDs = RecordUtils.getIDs(addrs);
+                MsgLinkRecord[] addrLinks = cache.getMsgLinkRecordsForMsgs(addrIDs);
+                if (addrLinks != null && addrLinks.length > 0) {
+                  for (int u=0; u<addrLinks.length; u++) {
+                    addressLinkIDsHS.add(addrLinks[u].msgLinkId);
+                    if (trace != null) trace.data(22, "Address Book entry link", addrLinks[u].msgLinkId);
+                  }
+                }
+              }
+            } else if (recipient instanceof FolderPair) {
+              // mail/posting folder, or group
+              FolderPair pair = (FolderPair) recipient;
+              FolderRecord folder = pair.getFolderRecord();
+              FolderShareRecord share = pair.getFolderShareRecord();
+              groupShareIDsHS.add(share.shareId);
+              if (folder.isGroupType()) {
+                if (trace != null) trace.data(30, "Group Id", recipient.getId());
+                if (trace != null) trace.data(31, "Group Share", share);
+              } else {
+                if (trace != null) trace.data(40, "Folder Id", recipient.getId());
+                if (trace != null) trace.data(41, "Folder Share", share);
+              }
+            }
+          }
+        }
+      }
+      if (contactIDsHS.size() > 0 || addressLinkIDsHS.size() > 0 || groupShareIDsHS.size() > 0) {
+        Long[] contactIDs = (Long[]) ArrayUtils.toArray(contactIDsHS, Long.class);
+        Long[] addressLinkIDs = (Long[]) ArrayUtils.toArray(addressLinkIDsHS, Long.class);
+        Long[] groupShareIDs = (Long[]) ArrayUtils.toArray(groupShareIDsHS, Long.class);
+        SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_UPDATE_USED, new Obj_List_Co(new Object[] { contactIDs, addressLinkIDs, groupShareIDs })));
+      }
+    }
+
+    if (trace != null) trace.exit(UserOps.class);
   }
 
   public static void updateUserSettingsSpellingProperties(ServerInterfaceLayer SIL, Properties properties) {

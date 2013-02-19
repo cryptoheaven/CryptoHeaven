@@ -405,6 +405,10 @@ public class CommandCodes extends Object {
 
   // Alter personal Settings
   public static final int CNT_Q_ALTER_SETTINGS = 1391;
+  
+  // Alter contact usage stamp
+  public static final int CNT_Q_UPDATE_USED = 1392;
+  public static final int CNT_A_UPDATE_USED = 10392;
 
   //====================================
   // *** Message / Posting  Commands ***

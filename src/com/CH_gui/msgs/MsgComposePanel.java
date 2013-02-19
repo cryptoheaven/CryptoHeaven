@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -92,7 +92,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.undo.UndoManager;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -260,7 +260,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
               boolean anyConverted = false;
               // This will also trigger fetch of any EmailRecord that we might be sending to
               // and panel renderer will be able to substitute it to show that encryption is possible.
-              anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], false);
+              anyConverted = UserOps.convertRecipientEmailAndUnknownUsersToFamiliars(MainFrame.getServerInterfaceLayer(), selectedRecipients[i], false);
               if (anyConverted)
                 redrawRecipients(i);
               if (markAsOriginalContent)
@@ -965,15 +965,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           preConversionSelectedRecipients = (Record[][]) selectedRecipients.clone();
           // convert all email addresses and address contacts to users or contacts if possible
           if (!isSavingAsDraft) {
+            ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
             for (int i=TO; i<RECIPIENT_TYPES.length; i++) {
               boolean expandAddressBooks = objType == MsgDataRecord.OBJ_TYPE_MSG;
               boolean expandGroups = true;
               int numRecipients = selectedRecipients[i].length;
-              selectedRecipients[i] = MsgPanelUtils.getExpandedListOfRecipients(selectedRecipients[i], expandAddressBooks, expandGroups);
+              selectedRecipients[i] = UserOps.getExpandedListOfRecipients(SIL, selectedRecipients[i], expandAddressBooks, expandGroups);
               boolean anyExpanded = numRecipients != selectedRecipients[i].length;
               boolean anyConverted = false;
               if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
-                anyConverted = convertRecipientEmailAndUnknownUsersToFamiliars(selectedRecipients[i], isStagedSecure());
+                anyConverted = UserOps.convertRecipientEmailAndUnknownUsersToFamiliars(SIL, selectedRecipients[i], isStagedSecure());
               }
               if (anyExpanded || anyConverted) {
                 redrawRecipients(i);
@@ -1746,151 +1747,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       errSB.append(sb.toString());
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
-  }
-
-
-  /**
-  * Convert any EmailAddressRecords in the array to familiar users or contact objects.
-  * Convert any 'reciprocal' contact to our own contact if possible, otherwise to user record.
-  * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
-  * @return true if anything was converted.
-  */
-  private boolean convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertNotHostedEmailsToWebAccounts) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "convertRecipientEmailAndUnknownUsersToFamiliars(Record[] recipients, boolean convertNotHostedEmailsToWebAccounts)");
-    if (trace != null) trace.args(recipients);
-    if (trace != null) trace.args(convertNotHostedEmailsToWebAccounts);
-
-    boolean anyConverted = false;
-    ArrayList unknownEmailsV = new ArrayList();
-    ArrayList unknownUserIDsV = new ArrayList();
-
-    if (trace != null) trace.data(10, "gather unknown email addresses");
-
-    // gather unknown email addresses
-    for (int i=0; recipients!=null && i<recipients.length; i++) {
-      Record rec = recipients[i];
-
-      if (rec instanceof MsgDataRecord) {
-        MsgDataRecord mData = (MsgDataRecord) rec;
-        if (mData.isTypeAddress()) {
-          rec = new EmailAddressRecord(mData.getEmailAddress());
-          recipients[i] = rec;
-          anyConverted = true;
-        }
-      } else if (rec instanceof InvEmlRecord) {
-        InvEmlRecord invRec = (InvEmlRecord) rec;
-        rec = new EmailAddressRecord(invRec.emailAddr);
-        recipients[i] = rec;
-        anyConverted = true;
-      }
-
-      if (rec instanceof EmailAddressRecord) {
-        EmailAddressRecord eaRec = (EmailAddressRecord) rec;
-        String[] addresses = EmailRecord.gatherAddresses(eaRec.address);
-        for (int k=0; addresses!=null && k<addresses.length; k++) {
-          String addr = addresses[k];
-          // see if we have the email address cached
-          // If unknown and numeric address, request for email lookup will return nothing, so we still need the handle lookup request too!
-          if (cache.getEmailRecord(addr) == null) {
-            if (!unknownEmailsV.contains(addr)) {
-              if (trace != null) trace.data(20, addr);
-              unknownEmailsV.add(addr);
-            }
-          }
-          // see if numeric, then prepare to fetch user's handle
-          try {
-            Long uID = Long.valueOf(EmailRecord.getNick(addr));
-            if (EmailRecord.isDomainEqual(URLs.getElements(URLs.DOMAIN_MAIL)[0], EmailRecord.getDomain(addr)) && cache.getUserRecord(uID) == null) {
-              if (!unknownUserIDsV.contains(uID)) {
-                if (trace != null) trace.data(30, uID);
-                unknownUserIDsV.add(uID);
-              }
-            }
-          } catch (Exception e) {
-          }
-        }
-      }
-
-      if (rec instanceof ContactRecord) {
-        ContactRecord cRec = (ContactRecord) rec;
-        if (!cRec.ownerUserId.equals(cache.getMyUserId())) {
-          Long otherUserId = cRec.ownerUserId;
-          rec = CacheUsrUtils.convertUserIdToFamiliarUser(otherUserId, true, false);
-          recipients[i] = rec;
-          anyConverted = true;
-        }
-      }
-
-      if (rec instanceof UserRecord) {
-        Long uID = ((UserRecord) rec).userId;
-        if (cache.getUserRecord(uID) == null)
-          unknownUserIDsV.add(uID);
-      }
-    }
-
-    if (trace != null) trace.data(20, "unknown email addresses gathered", unknownEmailsV);
-
-    // fetch all unknown email addresses -- this will inturn fetch unknown user handles
-    if (unknownEmailsV.size() > 0) {
-      if (trace != null) trace.data(40, unknownEmailsV);
-      Object[] emls = new Object[unknownEmailsV.size()];
-      unknownEmailsV.toArray(emls);
-      Object[] set = new Object[] { emls, Boolean.valueOf(convertNotHostedEmailsToWebAccounts) }; // adds new web-account addresses if they don't already exist
-      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 30000);
-    }
-    // fetch unknown users
-    if (unknownUserIDsV.size() > 0) {
-      if (trace != null) trace.data(50, unknownUserIDsV);
-      MainFrame.getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsV)), 30000);
-    }
-
-    if (trace != null) trace.data(60, "convert all EmailAddressRecords to UserRecords or ContactRecords");
-
-    // convert all EmailAddressRecords to UserRecords or ContactRecords
-    for (int i=0; recipients!=null && i<recipients.length; i++) {
-      Record rec = recipients[i];
-      if (rec instanceof EmailAddressRecord) {
-        EmailAddressRecord eaRec = (EmailAddressRecord) rec;
-        String[] addresses = EmailRecord.gatherAddresses(eaRec.address);
-        for (int k=0; addresses!=null && k<addresses.length; k++) {
-          String addr = addresses[k];
-          EmailRecord eRec = cache.getEmailRecord(addr);
-
-          Long userID = null;
-          boolean isEmailHosted = false;
-          if (eRec != null) {
-            userID = eRec.userId;
-            isEmailHosted = eRec.isHosted();
-            if (trace != null) trace.data(70, addr);
-          } else {
-            // see if numeric
-            if (trace != null) trace.data(80, addr);
-            try {
-              Long uID = Long.valueOf(EmailRecord.getNick(addr));
-              if (EmailRecord.isDomainEqual(URLs.getElements(URLs.DOMAIN_MAIL)[0], EmailRecord.getDomain(addr))) {
-                userID = uID;
-                if (trace != null) trace.data(90, addr);
-              }
-            } catch (Exception e) {
-            }
-          }
-
-          if (userID != null) {
-            boolean includeWebUsers = convertNotHostedEmailsToWebAccounts || isEmailHosted;
-            Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(userID, true, false, includeWebUsers);
-            if (trace != null) trace.data(100, familiar);
-            if (familiar != null) {
-              recipients[i] = familiar;
-              anyConverted = true;
-              if (trace != null) trace.data(110, "converted to", familiar);
-            }
-          }
-        }
-      }
-    }
-
-    if (trace != null) trace.exit(MsgComposePanel.class, anyConverted);
-    return anyConverted;
   }
 
   public void selectRecipientsPressed(int recipientType) {
@@ -2922,6 +2778,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
         // check for unknown recipients for addition to Address Book
         checkForUnknownRecipientsForAddressBookAdition_Threaded(preConversionSelectedRecipients, postConversionSelectedRecipients);
+
+        // update 'Used' stamps for the recipient contacts - pre-conversion recipients include un-expanded groups
+        UserOps.updateUsedStamp(MainFrame.getServerInterfaceLayer(), preConversionSelectedRecipients);
 
         // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
         if (trace != null) trace.exit(getClass());

@@ -322,7 +322,7 @@ public class CleanupAgent extends Thread {
       FileUtils.moveData(new DataInputStream(randomIn), raf, len, progMonitor);
       raf.close();
     } catch (Throwable t) {
-      FileOutputStream fos = new FileOutputStream(file);
+      OutputStream fos = new BufferedOutputStream(new FileOutputStream(file), 32*1024);
       FileUtils.moveData(new DataInputStream(randomIn), fos, len, progMonitor);
       fos.flush();
       fos.close();

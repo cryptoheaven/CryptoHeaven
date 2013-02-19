@@ -233,7 +233,7 @@ public class MessageDialog extends Object {
     // For connection errors, hide them when back online
     if (messageType == NotificationCenter.ERROR_CONNECTION) {
       final GeneralDialog _connectionDialog = dialog;
-      Stats.addStatsListener(new StatsListenerI() {
+      Stats.registerStatsListener(new StatsListenerI() {
         public void setStatsConnections(Integer connectionsPlain, Integer connectionsHTML) {
           int connections = 0;
           if (connectionsPlain != null)
@@ -242,7 +242,7 @@ public class MessageDialog extends Object {
             connections += connectionsHTML.intValue();
           if (connections > 0) {
             try { _connectionDialog.dispose(); } catch (Throwable t) { }
-            try { Stats.removeStatsListener(this); } catch (Throwable t) { }
+            try { Stats.unregisterStatsListener(this); } catch (Throwable t) { }
           }
         }
         public void setStatsGlobeMove(Boolean isMoving) {

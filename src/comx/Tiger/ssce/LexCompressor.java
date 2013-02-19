@@ -78,9 +78,9 @@ public class LexCompressor
     datainputstream.close();
     BufferedReader bufferedreader;
     if (c == '\uFEFF' || c == '\uFFFE')
-      bufferedreader = new BufferedReader(new InputStreamReader(new FileInputStream(s), "Unicode"));
+      bufferedreader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(s), 32*1024), "Unicode"));
     else
-      bufferedreader = new BufferedReader(new InputStreamReader(new FileInputStream(s)));
+      bufferedreader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(s), 32*1024)));
     Vector vector = new Vector();
     boolean flag = false;
     do
@@ -372,9 +372,9 @@ public class LexCompressor
     datainputstream.close();
     BufferedReader bufferedreader;
     if (c == '\uFEFF' || c == '\uFFFE')
-      bufferedreader = new BufferedReader(new InputStreamReader(new FileInputStream(s), "Unicode"));
+      bufferedreader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(s), 32*1024), "Unicode"));
     else
-      bufferedreader = new BufferedReader(new InputStreamReader(new FileInputStream(s)));
+      bufferedreader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(s), 32*1024)));
     simpleSuffixes = new Vector();
     String s1;
     for (int i = 0; i < 30 && (s1 = bufferedreader.readLine()) != null; i++)

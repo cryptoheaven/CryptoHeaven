@@ -1,39 +1,39 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.msg.dataSets.fld;
 
+import com.CH_co.io.DataInputStream2;
+import com.CH_co.io.DataOutputStream2;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.ProtocolMsgDataSet;
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.service.records.FolderShareRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.util.Misc;
 import java.io.IOException;
 
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.util.Misc;
-import com.CH_co.io.DataInputStream2; 
-import com.CH_co.io.DataOutputStream2;
-
-import com.CH_co.service.records.*;
-import com.CH_co.service.msg.ProtocolMsgDataSet;
-
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>  
- *
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>  
+*
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class Fld_Folders_Rp extends ProtocolMsgDataSet {
   // <numOfFolders> { <folderId> <parentFolderId> <ownerUserId> <folderType> <numToKeep> <keepAsOldAs> <numOfShares> <dateCreated> <dateUpdated> }*
-  // <numOfShares> { <shareId> <folderId> <ownerType> <ownerUserId> <encFolderName> <encFolderDesc> <encSymmetricKey> <pubKeyId> <canWrite> <canDelete> <dateCreated> <dateUpdated> }*
+  // <numOfShares> { <shareId> <folderId> <ownerType> <ownerUserId> <encFolderName> <encFolderDesc> <encSymmetricKey> <pubKeyId> <canWrite> <canDelete> <dateCreated> <dateUpdated> <dateUsed> }*
 
   public FolderRecord[] folderRecords;
   public FolderShareRecord[] shareRecords;
@@ -110,6 +110,8 @@ public class Fld_Folders_Rp extends ProtocolMsgDataSet {
         dataOut.writeSmallint(shareRecords[i].canDelete);
         dataOut.writeTimestamp(shareRecords[i].dateCreated);
         dataOut.writeTimestamp(shareRecords[i].dateUpdated);
+        if (clientBuild >= 748 && serverBuild >= 748)
+          dataOut.writeTimestamp(shareRecords[i].dateUsed);
       }
     }
 
@@ -167,6 +169,8 @@ public class Fld_Folders_Rp extends ProtocolMsgDataSet {
         shareRecords[i].canDelete = dataIn.readSmallint();
         shareRecords[i].dateCreated = dataIn.readTimestamp();
         shareRecords[i].dateUpdated = dataIn.readTimestamp();
+        if (clientBuild >= 748 && serverBuild >= 748)
+          shareRecords[i].dateUsed = dataIn.readTimestamp();
       }
     }
 

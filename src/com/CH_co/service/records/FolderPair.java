@@ -1,35 +1,35 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
 import com.CH_co.trace.Trace;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.15 $</b>
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description: 
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.15 $</b>
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class FolderPair extends FileRecord implements MemberContactRecordI {
 
   private FolderRecord folderRecord = null;
@@ -123,6 +123,19 @@ public class FolderPair extends FileRecord implements MemberContactRecordI {
       + "]";
   }
 
+  /**
+  * Create a deep copy cloning the Folder and Share
+  * @return 
+  */
+  public Object clone() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderPair.class, "clone()");
+    if (trace != null) trace.info(10, this);
+    FolderShareRecord newShare = (FolderShareRecord) folderShare.clone();
+    FolderRecord newFolder = (FolderRecord) folderRecord.clone();
+    FolderPair record = new FolderPair(newShare, newFolder);
+    if (trace != null) trace.exit(FolderPair.class, "record");
+    return record;
+  }
   public void setId(Long id) {
     if (folderRecord != null)
       folderRecord.folderId = id;

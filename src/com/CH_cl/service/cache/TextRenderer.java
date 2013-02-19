@@ -128,6 +128,10 @@ public class TextRenderer {
       EmailRecord eRec = (EmailRecord) value;
       label = eRec.getEmailAddressFull();
     }
+    else if (value instanceof InvEmlRecord) {
+      InvEmlRecord rec = (InvEmlRecord) value;
+      label = rec.emailAddr;
+    }
 
     return label;
   }

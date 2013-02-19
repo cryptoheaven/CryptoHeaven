@@ -55,8 +55,10 @@ import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.ArrayList;
@@ -178,8 +180,8 @@ public class LoginFrame extends JFrame {
   public static final String RETYPE_PASSWORD_ERROR = com.CH_cl.lang.Lang.rb.getString("msg_Re-typed_Password_does_not_match...");
   private static final String EMAIL_NULL = com.CH_cl.lang.Lang.rb.getString("msg_Proceed_without_Email_address...");
 
-  private static String OK_BUTTON_LOGIN_MODE = com.CH_cl.lang.Lang.rb.getString("button_Login");
-  private static String OK_BUTTON_NEW_ACCOUNT_MODE = com.CH_cl.lang.Lang.rb.getString("button_Create");
+  private static String OK_BUTTON_LOGIN_MODE = com.CH_cl.lang.Lang.rb.getString("button_Sign_In");
+  private static String OK_BUTTON_NEW_ACCOUNT_MODE = com.CH_cl.lang.Lang.rb.getString("button_Register");
   private TypeAheadPopupList typeAheadPopupList;
 
   private JWindow keyGenSplash = null;
@@ -198,7 +200,7 @@ public class LoginFrame extends JFrame {
 
   /** Creates new LoginFrame */
   public LoginFrame(LoginCoordinatorI loginCoordinator, Window splashWindow) {
-    super(com.CH_cl.lang.Lang.rb.getString("title_Login_Window"));
+    super(com.CH_cl.lang.Lang.rb.getString("title_Sign_In"));
 
     if (KeyRecord.DEBUG__ALLOW_SHORT_KEYS) {
       keyLength = KeyRecord.DEBUG__SHORTEST_KEY;
@@ -349,7 +351,7 @@ public class LoginFrame extends JFrame {
   private void changeModeToLogin() {
 
     isNewAccountDialog = false;
-    setTitle(com.CH_cl.lang.Lang.rb.getString("title_Login_Dialog"));
+    setTitle(com.CH_cl.lang.Lang.rb.getString("title_Sign_In"));
 //    switchModeLink.setText("Sign up for a new account");
     userName.selectAll();
     userName.requestFocusInWindow();
@@ -357,7 +359,7 @@ public class LoginFrame extends JFrame {
     recoveryLabel.setText("Forgot your password?");
     recoveryLabel.setVisible(true);
     if (switchModeButton != null) {
-      switchModeButton.setText(com.CH_cl.lang.Lang.rb.getString("button_New_Account"));
+      switchModeButton.setText(com.CH_cl.lang.Lang.rb.getString("button_Register"));
       switchModeButton.setEnabled(isNewAccountOptionEnabled);
     }
     okButton.setText(OK_BUTTON_LOGIN_MODE);
@@ -473,7 +475,7 @@ public class LoginFrame extends JFrame {
     }
 
     isNewAccountDialog = true;
-    setTitle(com.CH_cl.lang.Lang.rb.getString("title_Create_New_Account"));
+    setTitle(com.CH_cl.lang.Lang.rb.getString("title_Register"));
 //    switchModeLink.setText("Sign in to an existing account");
     userName.selectAll();
     userName.requestFocusInWindow();
@@ -483,7 +485,7 @@ public class LoginFrame extends JFrame {
     retypePassword.setText("");
     licenseCheck.setSelected(false);
     if (switchModeButton != null) {
-      switchModeButton.setText(com.CH_cl.lang.Lang.rb.getString("button_Switch_to_Login"));
+      switchModeButton.setText(com.CH_cl.lang.Lang.rb.getString("button_Switch_to_Sign_In"));
       switchModeButton.setEnabled(true);
     }
 
@@ -1271,7 +1273,7 @@ public class LoginFrame extends JFrame {
     buttonsL.add(okButton);
 
     if (includeSwitchModeButton) {
-      switchModeButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_New_Account"));
+      switchModeButton = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Register"));
       switchModeButton.setEnabled(isNewAccountOptionEnabled);
       switchModeButton.addActionListener(new NewAccountSignInActionListener());
       buttonsL.add(switchModeButton);
@@ -1412,12 +1414,12 @@ public class LoginFrame extends JFrame {
   private static boolean isPrivKeyFileChoiceValid(File file) {
     boolean rc = true;
     if (file.exists()) {
-      FileInputStream fileIn = null;
+      InputStream fileIn = null;
       boolean fileFormatValid = false;
       String errorMsg = null;
       try {
         Properties testLoad = new Properties();
-        fileIn = new FileInputStream(file);
+        fileIn = new BufferedInputStream(new FileInputStream(file), 32*1024);
         testLoad.load(fileIn);
         fileIn.close();
         fileFormatValid = true;
@@ -1581,7 +1583,7 @@ public class LoginFrame extends JFrame {
           if (eName == null) {
             SwingUtilities.invokeLater(new Runnable() {
               public void run() {
-                MessageDialog.showErrorDialog(LoginFrame.this, "You have entered an invalid Username.  Please choose another Username.", com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
+                MessageDialog.showErrorDialog(LoginFrame.this, "You entered an invalid Username.  Please choose another Username.", com.CH_cl.lang.Lang.rb.getString("title_Invalid_Input"));
               }
             });
             error = true;
@@ -1784,7 +1786,7 @@ public class LoginFrame extends JFrame {
         // HTTP fetch server list and create ServerInterfaceLayer
         performConnect(getServer());
         // try to login...
-        loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_cl.lang.Lang.rb.getString("title_Secure_Login"),
+        loginProgMonitor = ProgMonitorFactory.newInstanceLogin(com.CH_cl.lang.Lang.rb.getString("title_Secure_Sign_In"),
                 new String[] {  com.CH_cl.lang.Lang.rb.getString("label_Open_Secure_Channel"),
                                 com.CH_cl.lang.Lang.rb.getString("label_Retrieve_Account_Information"),
                                 //com.CH_gui.lang.Lang.rb.getString("label_Load_Key_Pairs"),
@@ -1948,7 +1950,7 @@ public class LoginFrame extends JFrame {
       success = false;
       if (trace != null) trace.data(200, "closing prog monitor, exception during login");
       loginProgMonitor.allDone();
-      MessageDialog.showErrorDialog(null, e.getMessage(), com.CH_cl.lang.Lang.rb.getString("msgTitle_Login_Error"));
+      MessageDialog.showErrorDialog(null, e.getMessage(), com.CH_cl.lang.Lang.rb.getString("msgTitle_Sign_In_Error"));
     }
 
     if (trace != null) trace.exit(LoginFrame.class, success);

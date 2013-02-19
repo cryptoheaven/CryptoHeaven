@@ -17,7 +17,7 @@ import com.CH_co.service.records.MemberContactRecordI;
 import com.CH_co.service.records.RecordUtils;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ImageNums;
-import com.CH_gui.contactTable.ChatSessionCreator;
+import com.CH_gui.contactTable.ContactActionTable;
 import com.CH_gui.frame.ChatTableFrame;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.frame.RecordTableFrame;
@@ -315,7 +315,7 @@ public class ChatSessionChooserDialog extends GeneralDialog {
   private class OKActionListener implements ActionListener {
     public synchronized void actionPerformed (ActionEvent event) {
       if (panel.jRadioButton1.isSelected()) {
-        new ChatSessionCreator(selectedRecords).start();
+        ContactActionTable.doChat(selectedRecords);
       } else {
         for (int i=0; i<100; i++) {
           JRadioButton jRadio = getRadioButton(i);

@@ -164,7 +164,11 @@ public class ContactTableModel extends RecordTableModel {
             status = ContactRecord.STATUS_ACCEPTED;
           else if (status == ContactRecord.STATUS_DECLINED_ACKNOWLEDGED)
             status = ContactRecord.STATUS_DECLINED;
-          else if (status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE)
+          else if (status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE ||
+                  status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AWAY ||
+                  status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE ||
+                  status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_DND ||
+                  status == ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_NA)
             status = ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE;
           int alphaStatus = -status + ((int) 'x');
           value = "" + ((char) alphaStatus) + value;

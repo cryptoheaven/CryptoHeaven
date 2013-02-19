@@ -64,43 +64,6 @@ import javax.swing.text.JTextComponent;
 */
 public class MsgPanelUtils extends Object {
 
-
-  /**
-  * @return expanded list of recipients
-  */
-  public static Record[] getExpandedListOfRecipients(Record[] recipients, boolean expandAddressBooks, boolean expandGroups) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPanelUtils.class, "getExpandedListOfRecipients(Record[] recipients, boolean expandAddressBooks, boolean expandGroups)");
-    if (trace != null) trace.args(recipients);
-    if (trace != null) trace.args(expandAddressBooks);
-    if (trace != null) trace.args(expandGroups);
-    if (expandAddressBooks) {
-      FolderFilter addressBookFilter = new FolderFilter(FolderRecord.ADDRESS_FOLDER);
-      Record[] addressBooks = (Record[]) addressBookFilter.filterInclude(recipients);
-      recipients = addressBookFilter.filterExclude(recipients);
-      // gather address contacts for the address books selected
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), new Short(Record.RECORD_TYPE_FOLDER));
-      Record[] addressContactDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(addressContactLinks));
-      // filter out messages leaving address contacts objects
-      addressContactDatas = new MsgFilter(MsgDataRecord.OBJ_TYPE_ADDR).filterInclude(addressContactDatas);
-      // add address contacts from selected books to the list of recipients
-      recipients = RecordUtils.concatinate(recipients, addressContactDatas);
-    }
-    if (expandGroups) {
-      FolderFilter groupFilter = new FolderFilter(FolderRecord.GROUP_FOLDER);
-      Record[] groups = (Record[]) groupFilter.filterInclude(recipients);
-      recipients = groupFilter.filterExclude(recipients);
-      // gather group members for the group folders selected
-      Record[] members = UserOps.getOrFetchFamiliarUsers(MainFrame.getServerInterfaceLayer(), groups);
-      // add members from selected groups to the list of recipients
-      recipients = RecordUtils.concatinate(recipients, members);
-    }
-    if (trace != null) trace.exit(MsgPanelUtils.class, recipients);
-    return recipients;
-  }
-
-
-
   /**
   * Finds a matching EmailRecord that is our Recipient for the specified Message
   * @param originalMsg

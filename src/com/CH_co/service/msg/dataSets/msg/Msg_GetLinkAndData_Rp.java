@@ -160,6 +160,8 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
         if (clientBuild >= 220 && serverBuild >= 220)
           dataOut.writeTimestamp(linkRecords[i].dateDelivered);
         dataOut.writeTimestamp(linkRecords[i].dateUpdated);
+        if (clientBuild >= 750 && serverBuild >= 750)
+          dataOut.writeTimestamp(linkRecords[i].dateUsed);
       }
     }
     // write MsgDataRecords second
@@ -263,6 +265,8 @@ public class Msg_GetLinkAndData_Rp extends ProtocolMsgDataSet {
         if (clientBuild >= 220 && serverBuild >= 220)
           linkRecords[i].dateDelivered = dataIn.readTimestamp();
         linkRecords[i].dateUpdated = dataIn.readTimestamp();
+        if (clientBuild >= 750 && serverBuild >= 750)
+          linkRecords[i].dateUsed = dataIn.readTimestamp();
       }
     }
 

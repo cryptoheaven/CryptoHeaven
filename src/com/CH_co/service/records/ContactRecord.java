@@ -1,33 +1,34 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.records;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.ImageNums;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>  
- *
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>  
+*
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class ContactRecord extends Record implements MemberContactRecordI {
 
   public static final short STATUS_INITIATED = 1;
@@ -69,6 +70,7 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   private BASymCipherBulk encOtherNote;
   public Timestamp dateCreated;
   public Timestamp dateUpdated;
+  public Timestamp dateUsed;
 
 
   /** unwrapped data */
@@ -81,9 +83,9 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * Default comparison is made by object ID but this is rather user unfriendly comparison.
-   * We overwrite with name comparison.
-   */
+  * Default comparison is made by object ID but this is rather user unfriendly comparison.
+  * We overwrite with name comparison.
+  */
   public int compareTo(Object record) {
     if (record instanceof ContactRecord) {
       ContactRecord rec = (ContactRecord) record;
@@ -172,14 +174,14 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * Seals the <code> ownerNote and otherSymKey </code> into 
-   * <code> encOwnerNote and encOtherSymKey </code> 
-   * using the sealant object which is the symmetric key of the folder and 
-   * symmetric key of the contact for the other party.
-   * Also sets otherKeyId when sealing.
-   * @param folderSymKey symmetric key for the owner's folder where this contact is to be located
-   * @param otherKey private key of the other party to seal reason for contact for that person's eyes
-   */
+  * Seals the <code> ownerNote and otherSymKey </code> into 
+  * <code> encOwnerNote and encOtherSymKey </code> 
+  * using the sealant object which is the symmetric key of the folder and 
+  * symmetric key of the contact for the other party.
+  * Also sets otherKeyId when sealing.
+  * @param folderSymKey symmetric key for the owner's folder where this contact is to be located
+  * @param otherKey private key of the other party to seal reason for contact for that person's eyes
+  */
   public void seal(BASymmetricKey folderSymKey, KeyRecord otherKeyRec) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "seal(BASymmetricKey folderSymKey, KeyRecord otherKeyRec)");
 
@@ -192,8 +194,8 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * Owner part of the seal.
-   */
+  * Owner part of the seal.
+  */
   public void seal(BASymmetricKey folderSymKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "seal(BASymmetricKey folderSymKey)");
 
@@ -211,8 +213,8 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * Other part of the seal.
-   */
+  * Other part of the seal.
+  */
   public void seal(KeyRecord otherKeyRec) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "seal(KeyRecord otherKeyRec)");
 
@@ -234,9 +236,9 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * Other part of the seal used when recrypting.  Junk the symmetric key received from our contact
-   * and instead recrypt everything with our own symKeyCntNotes symmetric key.
-   */
+  * Other part of the seal used when recrypting.  Junk the symmetric key received from our contact
+  * and instead recrypt everything with our own symKeyCntNotes symmetric key.
+  */
   public void sealRecrypt(BASymmetricKey symKeyCntNotes) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "sealRecrypt(BASymmetricKey symKeyCntNotes)");
 
@@ -266,13 +268,13 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * UnSeals the <code> encContactName and encContactDesc and encOtherSymKey </code> into 
-   * <code> contactName and contactDesc and otherSymKey </code> 
-   * using the sealant object which is the symmetric key of the folder and
-   * the private key of the receipient.
-   * @param folderSymKey symmetric key for the owner's folder where this contact is located
-   * @param otherKey private key of the other party to unSeal reason for contact 
-   */
+  * UnSeals the <code> encContactName and encContactDesc and encOtherSymKey </code> into 
+  * <code> contactName and contactDesc and otherSymKey </code> 
+  * using the sealant object which is the symmetric key of the folder and
+  * the private key of the receipient.
+  * @param folderSymKey symmetric key for the owner's folder where this contact is located
+  * @param otherKey private key of the other party to unSeal reason for contact 
+  */
   public void unSeal(BASymmetricKey folderSymKey, KeyRecord otherKeyRec) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "unSeal(BASymmetricKey folderSymKey, KeyRecord otherKeyRec)");
 
@@ -285,8 +287,8 @@ public class ContactRecord extends Record implements MemberContactRecordI {
 
 
   /**
-   * Owner part of the unSeal.
-   */
+  * Owner part of the unSeal.
+  */
   public void unSeal(BASymmetricKey folderSymKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "unSeal(BASymmetricKey folderSymKey)");
 
@@ -307,11 +309,11 @@ public class ContactRecord extends Record implements MemberContactRecordI {
   }
 
   /**
-   * Other part of the unSeal.
-   */
+  * Other part of the unSeal.
+  */
   public void unSeal(KeyRecord otherKeyRec) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "unSeal(KeyRecord otherKeyRec)");
-    
+
     if (trace != null) trace.data(10, this);
     if (!otherKeyId.equals(otherKeyRec.keyId)) {
       throw new IllegalArgumentException("Wrong key record specified!");
@@ -336,8 +338,8 @@ public class ContactRecord extends Record implements MemberContactRecordI {
 
 
   /**
-   * Other part of the unSeal.  UnSeal the recrypted contact record with symmetric key from UserRecord (symKeyCntNotes)
-   */
+  * Other part of the unSeal.  UnSeal the recrypted contact record with symmetric key from UserRecord (symKeyCntNotes)
+  */
   public void unSealRecrypted(BASymmetricKey symKeyCntNotes) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactRecord.class, "unSealRecrypted(BASymmetricKey symKeyCntNotes)");
 
@@ -490,7 +492,7 @@ public class ContactRecord extends Record implements MemberContactRecordI {
         if (cRec.ownerUserId != null && 
             !cRec.ownerUserId.equals(myUserId) && 
             status == ContactRecord.STATUS_INITIATED
-           )
+          )
         {
           if (toAcceptDeclineL == null) toAcceptDeclineL = new ArrayList();
           toAcceptDeclineL.add(cRec);
@@ -658,6 +660,7 @@ public class ContactRecord extends Record implements MemberContactRecordI {
       if (record.permits         != null) permits        = record.permits;
       if (record.dateCreated     != null) dateCreated    = record.dateCreated;
       if (record.dateUpdated     != null) dateUpdated    = record.dateUpdated;
+      if (record.dateUsed        != null) dateUsed       = record.dateUsed;
 
       if (record.encOtherNote != null) {
         otherKeyId      = record.otherKeyId;
@@ -695,6 +698,7 @@ public class ContactRecord extends Record implements MemberContactRecordI {
       + ", encOtherNote="   + encOtherNote
       + ", dateCreated="    + dateCreated
       + ", dateUpdated="    + dateUpdated
+      + ", dateUsed="       + dateUsed
       + ", un-sealed data >> "
       + ", ownerNote="      + ownerNote
       + ", otherSymKey="    + otherSymKey
