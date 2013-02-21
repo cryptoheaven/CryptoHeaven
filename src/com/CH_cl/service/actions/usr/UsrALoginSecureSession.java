@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.actions.usr;
 
@@ -30,17 +30,18 @@ import java.security.*;
 import java.util.ArrayList;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class UsrALoginSecureSession extends ClientMessageAction {
 
   private static Class fileChooserImpl;
+  private static AlternateKeyFileProviderI keyFileProvider;
 
   /** Creates new UsrALoginSecureSession */
   public UsrALoginSecureSession() {
@@ -48,6 +49,10 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
   public static void setImplFileChooser(Class impl) {
     fileChooserImpl = impl;
+  }
+
+  public static void setAltKeyFileProvider(AlternateKeyFileProviderI provider) {
+    keyFileProvider = provider;
   }
 
   /** The action handler performs all actions related to the received message (reply),
@@ -110,18 +115,31 @@ public class UsrALoginSecureSession extends ClientMessageAction {
             StringBuffer keyPropBuffer = new StringBuffer();
             while (paths.length > pathsIndex) {
               String path = paths[pathsIndex++];
-              if (path != null && path.length() > 0) {
-                // Avoid trying the same one as originally that failed
-                if (!pathsTriedL.contains(path)) {
-                  pathsTriedL.add(path);
-                  keyProperties = new GlobalSubProperties(new File(path), GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
-                  property = keyProperties.getProperty(keyPropertyName);
-                  keyPropBuffer.append(", \n");
-                  keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
-                  if (property != null && property.length() > 0) {
-                    encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-                    break;
-                  }
+              // Avoid trying the same one as originally that failed
+              if (path != null && path.length() > 0 && !pathsTriedL.contains(path)) {
+                pathsTriedL.add(path);
+                keyProperties = new GlobalSubProperties(new File(path), GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+                property = keyProperties.getProperty(keyPropertyName);
+                keyPropBuffer.append(", \n");
+                keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
+                if (property != null && property.length() > 0) {
+                  encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+                  break;
+                }
+              }
+            }
+            // Still no key? Use alternative provider.
+            if (encPrivateKey == null && keyFileProvider != null) {
+              String path = keyFileProvider.getAlternateKeyFile();
+              // Avoid trying the same one as originally that failed
+              if (path != null && path.length() > 0 && !pathsTriedL.contains(path)) {
+                pathsTriedL.add(path);
+                keyProperties = new GlobalSubProperties(new File(path), GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+                property = keyProperties.getProperty(keyPropertyName);
+                keyPropBuffer.append(", \n");
+                keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
+                if (property != null && property.length() > 0) {
+                  encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
                 }
               }
             }
@@ -258,5 +276,9 @@ public class UsrALoginSecureSession extends ClientMessageAction {
       GlobalProperties.setProperty("PrivKeyFilePaths", pathListSB.toString());
       GlobalProperties.store();
     }
+  }
+
+  public static interface AlternateKeyFileProviderI {
+    public String getAlternateKeyFile();
   }
 }

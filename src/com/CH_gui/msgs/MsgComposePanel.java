@@ -1090,7 +1090,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       emlListPanel.setLayout(new GridBagLayout());
       for (int i=0; i<emailAddresses.length; i++) {
         Icon icon = ListRenderer.getRenderedIcon(emailAddresses[i]);
-        String label = ListRenderer.getRenderedText(emailAddresses[i], false, false, true);
+        String label = ListRenderer.getRenderedText(emailAddresses[i], false, false, false, false, true);
         emlListPanel.add(new JMyLabel(label, icon, JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 15, 2, 10), 0, 0));
       }
@@ -1209,7 +1209,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           if (!e.isConsumed()) {
             StringBuffer initialEmails = new StringBuffer();
             for (int i=0; i<emlAddrs.length; i++) {
-              String label = ListRenderer.getRenderedText(emlAddrs[i], false, false, true);
+              String label = ListRenderer.getRenderedText(emlAddrs[i], false, false, false, false, true);
               initialEmails.append(label);
               if (i+1<emlAddrs.length)
                 initialEmails.append(", ");

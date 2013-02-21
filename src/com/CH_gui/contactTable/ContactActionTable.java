@@ -757,7 +757,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       emlListPanel.setLayout(new GridBagLayout());
       for (int i=0; i<selectedInvEmls.length; i++) {
         Icon icon = ListRenderer.getRenderedIcon(selectedInvEmls[i]);
-        String label = ListRenderer.getRenderedText(selectedInvEmls[i], false, false, true);
+        String label = ListRenderer.getRenderedText(selectedInvEmls[i], false, false, false, false, true);
         emlListPanel.add(new JMyLabel(label, icon, JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
       }

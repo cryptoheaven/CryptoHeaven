@@ -67,7 +67,7 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
         if (rawColumn == 0) {
           Record rec = tm.getTracedObjRecord(traceRecord.objId);
           setIcon(ListRenderer.getRenderedIcon(rec));
-          setText(ListRenderer.getRenderedText(rec, true, true, true));
+          setText(ListRenderer.getRenderedText(rec, true, false, false, false, true));
         }
         // User info
         else if (rawColumn == 3) {

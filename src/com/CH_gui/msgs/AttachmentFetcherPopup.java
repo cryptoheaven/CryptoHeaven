@@ -183,13 +183,13 @@ public class AttachmentFetcherPopup extends ThreadTraced {
     popup.add(new JSeparator());
 
     for (int i=0; i<msgLinks.length; i++) {
-      String subject = ListRenderer.getRenderedText(msgLinks[i], true, false, true, true);
+      String subject = ListRenderer.getRenderedText(msgLinks[i], true, false, false, false, true, true);
       JMenuItem msgItem = new JMyMenuItem(subject, ListRenderer.getRenderedIcon(msgLinks[i]));
       msgItem.addActionListener(new MsgPreviewShower(msgLinks[i]));
       popup.add(msgItem);
     }
     for (int i=0; i<fileLinks.length; i++) {
-      JMenuItem fileItem = new JMyMenuItem(ListRenderer.getRenderedText(fileLinks[i], true, false, true, true), ListRenderer.getRenderedIcon(fileLinks[i]));
+      JMenuItem fileItem = new JMyMenuItem(ListRenderer.getRenderedText(fileLinks[i], true, false, false, false, true, true), ListRenderer.getRenderedIcon(fileLinks[i]));
       fileItem.addActionListener(new FileDownloader(parent, paramParentMsgLinkRecords, fileLinks[i]));
       popup.add(fileItem);
     }

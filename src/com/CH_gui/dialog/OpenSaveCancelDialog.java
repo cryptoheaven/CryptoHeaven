@@ -121,7 +121,7 @@ public class OpenSaveCancelDialog extends GeneralDialog {
         if (parentMsgData != null && (parentMsgData.isEmail() || fromEmailAddress != null)) {
           // email delivered from outside
           emailSender = CacheEmlUtils.convertToFamiliarEmailRecord(fromEmailAddress);
-          jFromText.setText(ListRenderer.getRenderedText(emailSender, false, false, true));
+          jFromText.setText(ListRenderer.getRenderedText(emailSender, false, false, false, false, true));
           jFromText.setIcon(ListRenderer.getRenderedIcon(emailSender));
           jOriginalSignerText.setText("Mail Server");
           isFromSet = true;

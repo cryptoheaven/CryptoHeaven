@@ -15,6 +15,7 @@ package com.CH_gui.msgs;
 import com.CH_cl.service.cache.CacheEmlUtils;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
@@ -192,7 +193,7 @@ public class MsgPanelUtils extends Object {
                   obj = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) obj).address);
                 }
                 label.setIcon(ListRenderer.getRenderedIcon(obj, true));
-                label.setText(ListRenderer.getRenderedText(obj, false, true, true));
+                label.setText(ListRenderer.getRenderedText(obj, false, false, true, true, true));
                 label.setIconTextGap(2);
                 jFlowPanel.add(label);
               }
