@@ -773,7 +773,7 @@ public class MsgTableModel extends RecordTableModel {
                 for (int i=0; i<fLinks.length; i++) {
                   if (linkNames.length() > 0)
                     linkNames += "<br>";
-                  linkNames += ListRenderer.getRenderedText(fLinks[i], true, false, false, false, false, true);
+                  linkNames += ListRenderer.getRenderedText(fLinks[i], true, false, false, false, false, false, true, null);
                 }
               } else {
                 FileLinkOps.addToLinkFetchQueue(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
@@ -783,7 +783,7 @@ public class MsgTableModel extends RecordTableModel {
                 for (int i=0; i<mLinks.length; i++) {
                   if (linkNames.length() > 0)
                     linkNames += "<br>";
-                  linkNames += ListRenderer.getRenderedText(mLinks[i], true, false, false, false, false, true);
+                  linkNames += ListRenderer.getRenderedText(mLinks[i], true, false, false, false, false, false, true, null);
                 }
               } else {
                 MsgLinkOps.addToLinkFetchQueue(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);

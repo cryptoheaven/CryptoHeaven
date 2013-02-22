@@ -80,7 +80,7 @@ public class MsgTableFrame extends RecordTableFrame implements DisposableObj {
     this(parent, initialData, initialData == null, initialState, msgPreviewMode, parentViewTable);
   }
   private MsgTableFrame(Record parent, MsgLinkRecord[] initialData, boolean isInitDataModel, int initialState, boolean msgPreviewMode, RecordTableScrollPane parentViewTable) {
-    super(ListRenderer.getRenderedText(parent, false, false, true, false, false), true, true);
+    super(ListRenderer.getRenderedText(parent, false, false, true, false, true, false), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableFrame.class, "MsgTableFrame(Record parent, MsgLinkRecord[] initialData, boolean isInitDataModel, int initialState, boolean msgPreviewMode, RecordTableScrollPane parentViewTable)");
     if (trace != null) trace.args(parent, initialData);
     if (trace != null) trace.args(isInitDataModel);

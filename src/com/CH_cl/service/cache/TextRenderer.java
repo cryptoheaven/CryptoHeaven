@@ -24,10 +24,10 @@ import java.util.*;
 public class TextRenderer {
 
   public static String getRenderedText(Object value) {
-    return getRenderedText(value, false, false, false, false, false, false);
+    return getRenderedText(value, false, false, false, false, false, false, false);
   }
 
-  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
+  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeGroupOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
 
     String label = null;
 
@@ -48,14 +48,19 @@ public class TextRenderer {
     }
     else if (value instanceof FolderPair) {
       FolderPair fPair = (FolderPair) value;
-      boolean isChat = fPair.getFolderRecord().isChatting();
-      if (isChat && includeChatParticipants) {
-        label = getFolderAndShareNames(fPair, includeChatParticipants);
-      } else if (!isChat && includeFolderParticipants) {
-        label = getFolderAndShareNames(fPair, true);
-      } else if (!isChat && includeFolderOwner) {
-        label = getFolderAndShareNames(fPair, false);
+      if (fPair.getFolderRecord().isChatting()) {
+        if (includeChatParticipants)
+          label = getFolderAndShareNames(fPair, true); // true for all participants
+      } else if (fPair.getFolderRecord().isGroupType()) {
+        if (includeGroupOwner)
+          label = getFolderAndShareNames(fPair, false); // false for all members, owner only please
       } else {
+        if (includeFolderParticipants)
+          label = getFolderAndShareNames(fPair, true);
+        else if (includeFolderOwner)
+          label = getFolderAndShareNames(fPair, false);
+      }
+      if (label == null) {
         label = fPair.getMyName();
       }
     }

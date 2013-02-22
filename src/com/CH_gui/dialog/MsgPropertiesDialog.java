@@ -809,7 +809,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       } else {
         jFrom.setIcon(ListRenderer.getRenderedIcon(sender));
       }
-      String text = ListRenderer.getRenderedText(sender, false, false, false, false, true);
+      String text = ListRenderer.getRenderedText(sender, false, false, false, false, false, true);
       if (!(sender instanceof UserRecord) && !dataRecord.isRegularEmail())
         jFrom.setText(text + " (user ID: " + dataRecord.senderUserId + ")");
       else

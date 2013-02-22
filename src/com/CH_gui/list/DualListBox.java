@@ -769,8 +769,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
     setBorder(BorderFactory.createEtchedBorder());
     setLayout(new GridBagLayout());
 
-    initSource(new ListRenderer(false, false, true, true, true, false, true, this));
-    initDest(new ListRenderer(false, false, true, true, true, false, true, null));
+    initSource(new ListRenderer(false, false, true, false, true, true, false, true, this));
+    initDest(new ListRenderer(false, false, true, false, true, true, false, true, null));
 
     addButton = new JMyButton(ADD_BUTTON_LABEL);
     removeButton = new JMyButton(REMOVE_BUTTON_LABEL);

@@ -948,7 +948,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 if (recipient instanceof EmailAddressRecord) {
                   recipient = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) recipient).address);
                 }
-                label.setText(ListRenderer.getRenderedText(recipient, false, false, true, true, true));
+                label.setText(ListRenderer.getRenderedText(recipient, false, false, true, false, true, true));
                 label.setIcon(ListRenderer.getRenderedIcon(recipient));
                 label.setIconTextGap(2);
                 labelsL.add(label);
@@ -1946,7 +1946,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             } else {
               jFromName.setIcon(ListRenderer.getRenderedIcon(sender));
             }
-            jFromName.setText(ListRenderer.getRenderedText(sender, false, false, false, false, true));
+            jFromName.setText(ListRenderer.getRenderedText(sender, false, false, false, false, false, true));
           } else {
             jFromName.setIcon(Images.get(ImageNums.PERSON16));
             jFromName.setText(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {msgData.senderUserId}));

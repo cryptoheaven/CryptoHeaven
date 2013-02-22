@@ -1223,7 +1223,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           if (i>0)
             sb.append(", \n");
           sb.append("   ");
-          sb.append(ListRenderer.getRenderedText(protectedMasterFoldersV.elementAt(i), false, false, true, true, false));
+          sb.append(ListRenderer.getRenderedText(protectedMasterFoldersV.elementAt(i), false, false, true, false, true, false));
         }
         MessageDialog.showWarningDialog(parent, sb.toString(), "Could not delete protected folders...", false);
       }

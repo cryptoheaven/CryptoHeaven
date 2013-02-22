@@ -327,7 +327,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
   public void setTitle(Object title) {
     this.title = title;
     if (title != null) {
-      jTitleLabel.setText(ListRenderer.getRenderedText(title, false, false, false, false, false));
+      jTitleLabel.setText(ListRenderer.getRenderedText(title));
       jTitleLabel.setIcon(ListRenderer.getRenderedIcon(title));
       validate();
     }
@@ -1003,7 +1003,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       FolderShareRecord sRec = cache.getFolderShareRecordMy(folderId, true);
       if (fRec != null && sRec != null) {
         FolderPair fPair = new FolderPair(sRec, fRec);
-        titleName = ListRenderer.getRenderedText(fPair, false, false, false, false, false);
+        titleName = ListRenderer.getRenderedText(fPair);
         titleIcon = ListRenderer.getRenderedIcon(fPair);
       }
 

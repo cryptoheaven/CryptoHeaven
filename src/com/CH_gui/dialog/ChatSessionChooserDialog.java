@@ -111,7 +111,7 @@ public class ChatSessionChooserDialog extends GeneralDialog {
         int rc = 0;
         // sort in descending order
         if (f1.dateUpdated == null && f2.dateUpdated == null)
-          rc = ListRenderer.getRenderedText(o2, false, false, false, true, false).compareTo(ListRenderer.getRenderedText(o1, false, false, false, true, false));
+          rc = ListRenderer.getRenderedText(o2, false, false, false, false, true, false).compareTo(ListRenderer.getRenderedText(o1, false, false, false, false, true, false));
         else if (f1.dateUpdated == null)
           rc = +1;
         else if (f2.dateUpdated == null)
@@ -164,7 +164,7 @@ public class ChatSessionChooserDialog extends GeneralDialog {
       JRadioButton radio = getRadioButton(i);
       if (radio != null) {
         if (isFinalOrder)
-          radio.setText(ListRenderer.getRenderedText(suitableChatsL.get(i), false, false, false, true, false));
+          radio.setText(ListRenderer.getRenderedText(suitableChatsL.get(i), false, false, false, false, true, false));
         else if (i == 0)
           radio.setText("Fetching data ...");
         else

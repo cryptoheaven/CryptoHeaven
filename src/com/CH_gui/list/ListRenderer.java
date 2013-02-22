@@ -50,6 +50,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   private boolean withFileSizes;
   private boolean withFolderParticipants;
   private boolean withFolderOwner;
+  private boolean withGroupOwner;
   private boolean withChatParticipants;
   private boolean withFullEmailAddresses;
   private boolean withUploadPendingNote;
@@ -60,16 +61,11 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
 
   public ListRenderer() {
   }
-  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFolderOwner, boolean withChatParticipants, boolean withFullEmailAddresses) {
-    this(withFileSizes, withFolderParticipants, withFolderOwner, withChatParticipants, withFullEmailAddresses, false, false, null);
-  }
-  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFolderOwner, boolean withChatParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, boolean forSendReceive) {
-    this(withFileSizes, withFolderParticipants, withFolderOwner, withChatParticipants, withFullEmailAddresses, withUploadPendingNote, forSendReceive, null);
-  }
-  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFolderOwner, boolean withChatParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, boolean forSendReceive, StringHighlighterI stringHighlighter) {
+  public ListRenderer(boolean withFileSizes, boolean withFolderParticipants, boolean withFolderOwner, boolean withGroupOwner, boolean withChatParticipants, boolean withFullEmailAddresses, boolean withUploadPendingNote, boolean forSendReceive, StringHighlighterI stringHighlighter) {
     this.withFileSizes = withFileSizes;
     this.withFolderParticipants = withFolderParticipants;
     this.withFolderOwner = withFolderOwner;
+    this.withGroupOwner = withGroupOwner;
     this.withChatParticipants = withChatParticipants;
     this.withFullEmailAddresses = withFullEmailAddresses;
     this.withUploadPendingNote = withUploadPendingNote;
@@ -85,6 +81,12 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   }
   public boolean isWithFolderParticipants() {
     return withFolderParticipants;
+  }
+  public boolean isWithFolderOwner() {
+    return withFolderOwner;
+  }
+  public boolean isWithGroupOwner() {
+    return withGroupOwner;
   }
   public boolean isWithChatParticipants() {
     return withChatParticipants;
@@ -107,6 +109,12 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
   public void setWithFolderParticipants(boolean withFolderParticipants) {
     this.withFolderParticipants = withFolderParticipants;
   }
+  public void setWithFolderOwner(boolean withFolderOwner) {
+    this.withFolderOwner = withFolderOwner;
+  }
+  public void setWithGroupOwner(boolean withGroupOwner) {
+    this.withGroupOwner = withGroupOwner;
+  }
   public void setWithChatParticipants(boolean withChatParticipants) {
     this.withChatParticipants = withChatParticipants;
   }
@@ -117,21 +125,15 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     this.withUploadPendingNote = withUploadPendingNote;
   }
   public String getRenderedTextApplySettings(Object value) {
-    return getRenderedText(value, withFileSizes, withFolderParticipants, withFolderOwner, withChatParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
+    return getRenderedText(value, withFileSizes, withFolderParticipants, withFolderOwner, withGroupOwner, withChatParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
   }
   public static String getRenderedText(Object value) {
-    return getRenderedText(value, false, false, false, false, false, false, null);
+    return getRenderedText(value, false, false, false, false, false, false, false, null);
   }
-  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeChatParticipants, boolean includeFullEmailAddress) {
-    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeChatParticipants, includeFullEmailAddress, false, null);
+  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeGroupOwner, boolean includeChatParticipants, boolean includeFullEmailAddress) {
+    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeGroupOwner, includeChatParticipants, includeFullEmailAddress, false, null);
   }
-  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, StringHighlighterI stringHighlighter) {
-    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeChatParticipants, includeFullEmailAddress, false, stringHighlighter);
-  }
-  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
-    return getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeChatParticipants, includeFullEmailAddress, includeUploadPendingNote, null);
-  }
-  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote, StringHighlighterI stringHighlighter) {
+  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeGroupOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote, StringHighlighterI stringHighlighter) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ListRenderer.class, "getRenderedText()");
     String label = null;
 
@@ -194,7 +196,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
 
     if (label == null) {
-      label = TextRenderer.getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeChatParticipants, includeFullEmailAddress, includeUploadPendingNote);
+      label = TextRenderer.getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeGroupOwner, includeChatParticipants, includeFullEmailAddress, includeUploadPendingNote);
     }
 
     if (label == null) {
@@ -297,7 +299,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
         value = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) value).address);
       }
     }
-    label = getRenderedText(value, withFileSizes, withFolderParticipants, withFolderOwner, withChatParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
+    label = getRenderedText(value, withFileSizes, withFolderParticipants, withFolderOwner, withGroupOwner, withChatParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);
     icon = getRenderedIcon(value, forSendReceive);
 
     // get tool tip

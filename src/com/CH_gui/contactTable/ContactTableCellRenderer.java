@@ -84,7 +84,7 @@ public class ContactTableCellRenderer extends RecordTableCellRenderer {
       if (tableModel instanceof ContactTableModel) {
         ContactTableModel ctm = (ContactTableModel) tableModel;
         Record record = ctm.getRowObject(sTable.convertMyRowIndexToModel(row));
-        setText(ListRenderer.getRenderedText(record, false, false, false, false, false));
+        setText(ListRenderer.getRenderedText(record));
         // If table has no Status column, use Name's column icon for status
         if (ctm.getColumnHeaderData().convertRawColumnToModel(2) == -1 && record instanceof ContactRecord) {
           ContactRecord contactRecord = (ContactRecord) record;

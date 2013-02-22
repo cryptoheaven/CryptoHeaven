@@ -324,7 +324,7 @@ public class RecycleTableModel extends RecordTableModel {
           break;
         // Subject or Posting or Address Name
         case 1:
-          value = ListRenderer.getRenderedText(msgData, false, false, false, false, true);
+          value = ListRenderer.getRenderedText(msgData, false, false, false, false, false, true);
           break;
         // From
         case 2:

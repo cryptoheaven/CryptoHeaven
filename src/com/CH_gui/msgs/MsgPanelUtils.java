@@ -193,7 +193,7 @@ public class MsgPanelUtils extends Object {
                   obj = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) obj).address);
                 }
                 label.setIcon(ListRenderer.getRenderedIcon(obj, true));
-                label.setText(ListRenderer.getRenderedText(obj, false, false, true, true, true));
+                label.setText(ListRenderer.getRenderedText(obj, false, false, true, false, true, true));
                 label.setIconTextGap(2);
                 jFlowPanel.add(label);
               }
