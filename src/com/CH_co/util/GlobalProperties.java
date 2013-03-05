@@ -293,13 +293,14 @@ public class GlobalProperties extends Object {
   // build 746 Fix to skip sending too many redundant Online/Offline notifications.
   // build 748 Added 'dateUsed' to Contacts and FolderShares
   // build 750 Transfer 'dateUsed' for MsgLinkRecord
+  // build 752 Consistent colors for chat user and background
 
-  public static final short PROGRAM_BUILD_NUMBER = 750;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 752;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.7f;
-  public static final short PROGRAM_VERSION_MINOR = 5;
+  public static final short PROGRAM_VERSION_MINOR = 6;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

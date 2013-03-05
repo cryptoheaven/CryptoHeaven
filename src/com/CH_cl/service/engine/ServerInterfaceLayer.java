@@ -101,6 +101,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public static final int DEFAULT_MIN_CONNECTION_COUNT = 1;
 
   private int maxConnectionCount = DEFAULT_MAX_CONNECTION_COUNT;
+  private static final int MAX_CONNECTION_COUNT_MOBILE = 3;
+
   public static final String PROPERTY_NAME_MAX_CONNECTION_COUNT = "ServerInterfaceLayer" + "_maxConnCount";
 
   /** ArrayList of connection workers. */
@@ -795,8 +797,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private int getMaxAdjustedConnectionCount() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getMaxAdjustedConnectionCount()");
     int maxCount = maxConnectionCount;
-    if (IS_MOBILE_MODE && maxCount > 2)
-      maxCount = 2;
+    if (IS_MOBILE_MODE && maxCount > MAX_CONNECTION_COUNT_MOBILE)
+      maxCount = MAX_CONNECTION_COUNT_MOBILE;
     if (!hasEverLoggedInSuccessfully || !hasMainWorker()) {
       if (trace != null) trace.data(10, "temporary ceiling of 1 until logged in with main worker");
       maxCount = Math.min(1, maxConnectionCount);
@@ -869,8 +871,13 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           // For mobileFactor = 3 : 0-3|1, 4-8|2, 9-13|3
           // For mobileFactor = 4 : 0-4|1, 5-10|2, 11-16|3
           // For mobileFactor = 5 : 0-5|1, 6-12|2, 13-19|3
-          int mobileFactor = IS_MOBILE_MODE ? 5 : 0;
-          countWorkersToCreate += (1 + countAllJobs - countLargeFileJobs) / ((FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION+mobileFactor) * countAllWorkers);
+          int adjustmentFactor = 0;
+          if (IS_MOBILE_MODE) {
+            // Used to have adjustmentFactor 5 for mobile, but it creates some connectivity problems
+            // as bad connections take a LONG time to recycle... so do not adjust mobiles!
+            //adjustmentFactor = 5;
+          }
+          countWorkersToCreate += (1 + countAllJobs - countLargeFileJobs) / ((FOR_EVERY_N_NON_HEAVY_JOBS_CREATE_CONNECTION+adjustmentFactor) * countAllWorkers);
         }
         // If we should create at least 1 connection because there are jobs long awaiting to be sent...
         if (forceAdditionalConnection && countWorkersToCreate < 1) {

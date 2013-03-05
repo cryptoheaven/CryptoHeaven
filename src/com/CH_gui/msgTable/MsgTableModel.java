@@ -21,6 +21,7 @@ import com.CH_cl.service.ops.FileLinkOps;
 import com.CH_cl.service.ops.MsgLinkOps;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_cl.service.records.filters.TextSearchFilter;
+import com.CH_cl.util.UserColor;
 import com.CH_co.monitor.Interrupter;
 import com.CH_co.monitor.Interruptible;
 import com.CH_co.service.msg.CommandCodes;
@@ -676,10 +677,6 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           boolean isHTML = msgData.isHtml();
-          StringBuffer sb = new StringBuffer();
-
-          sb.append(HTML_utils.HTML_START);
-          sb.append(HTML_utils.HTML_BODY_START);
 
           boolean toAddFrom = false;
           boolean toAddSent = false;
@@ -687,7 +684,7 @@ public class MsgTableModel extends RecordTableModel {
           boolean toAddAttachment = false;
           boolean toAddFlag = false;
           boolean toAddStar = false;
-
+          
           String fromName = null;
           String prevFromName = null;
           // if table has no 'From' column prepend it to the body
@@ -719,6 +716,12 @@ public class MsgTableModel extends RecordTableModel {
             toAddStar = true;
           }
 
+          StringBuffer sb = new StringBuffer();
+          // HTML TAG
+          sb.append(HTML_utils.HTML_START);
+          // BODY TAG
+          sb.append(HTML_utils.HTML_BODY_START);
+
           int flagIcon = ImageNums.IMAGE_NONE;
           if (toAddFlag) {
             StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
@@ -740,7 +743,9 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddFrom) {
-            sb.append("<font color=\"#9c2950\">");
+            int color = UserColor.getUserColor(msgData.senderUserId);
+            String webColor = UserColor.toWeb(color);
+            sb.append("<font color=\""+webColor+"\">");
             sb.append("<strong>");
             sb.append(fromName);
             sb.append("</strong>");
@@ -800,10 +805,11 @@ public class MsgTableModel extends RecordTableModel {
             sb.append("<font size=\"-2\" color=\"#777777\">");
             if (toAddFrom)
               sb.append(' ');
-            String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, true, true, false) : "";
+            //String prevDateStr = prevMsgLink != null ? Misc.getFormattedDate(prevMsgLink.dateCreated, true, true, false) : "";
             String dateStr = Misc.getFormattedDate(msgLink.dateCreated, true, true, false);
-            if (!dateStr.equals(prevDateStr))
-              sb.append(dateStr);
+            //if (!dateStr.equals(prevDateStr))
+            // always add date/time for consistent alignment of the body...
+            sb.append(dateStr);
             sb.append("</font> ");
           }
 

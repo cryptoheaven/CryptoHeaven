@@ -13,7 +13,7 @@
 package com.CH_gui.postTable;
 
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_co.cryptx.SHA256;
+import com.CH_cl.util.UserColor;
 import com.CH_co.service.records.MsgDataRecord;
 import com.CH_co.service.records.MsgLinkRecord;
 import com.CH_co.service.records.Record;
@@ -30,8 +30,7 @@ import com.CH_gui.util.HTML_EditorKit;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.security.MessageDigest;
-import java.util.ArrayList;
+import java.awt.Font;
 import java.util.HashMap;
 import javax.swing.JTable;
 import javax.swing.border.Border;
@@ -53,10 +52,6 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
 
   private HTML_ClickablePane jTextAreaRenderer = null;
 
-  //private static Color postingAltColor = new Color(230, 242, 255);
-  //private static Color postingAltColorSelected = new Color(184, 194, 204);
-  //private static Color[] altBkColors = new Color[] { postingAltColor, postingAltColorSelected };
-
   // POST and CHAT have a little taller borders
   private static final int BORDER_TOP = 5;
   private static final int BORDER_BOTTOM = 5;
@@ -65,22 +60,19 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   private static final Border BORDER_ICONIZED_FIRST = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
   private static final Border BORDER_TEXT = new EmptyBorder(BORDER_TOP,5,BORDER_BOTTOM,5);
 
-  // User is the key, value is the Color object
-  private static final HashMap altBkUserAssignedColors;
-  private static final ArrayList altBkUserColors;
+  // Background color for 'me' user
   private static Color altMyBkColor;
-  private static MessageDigest sha256;
+
+  // Cache for user color objects
+  private static HashMap colorCacheBk = new HashMap();
+  private static HashMap colorCacheFg = new HashMap();
+
+  private static Color colorFgDefault = null;
+  private static Font fontBold = null;
+  private static Font fontPlain = null;
+
   static {
-    altBkUserColors = new ArrayList();
-    altBkUserColors.add(new Color(230, 242, 255)); // old chat color
-    altBkUserColors.add(new Color(236, 251, 232));
-    altBkUserColors.add(new Color(253, 242, 230));
-    altBkUserColors.add(new Color(245, 243, 233));
-
-    altBkUserAssignedColors = new HashMap();
     altMyBkColor = new Color(247, 247, 247);
-    sha256 = new SHA256();
-
     // for clickable links and actions, register the handler...
     HTML_ClickablePane.setRegisteredGlobalLauncher(HTML_ClickablePane.PROTOCOL_MAIL, new URLLauncherMAILTO());
   };
@@ -105,44 +97,64 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
     return htmlPane;
   }
 
-  private static Color makeBkColor(Object sourceContents) {
-    byte[] digest = sha256.digest(("" + sourceContents).getBytes());
-    int[] colors = new int[3];
-    colors[0] = (32 + 16 + 8 + 4 + 2 + 1) & digest[0];
-    colors[1] = (32 + 16 + 8 + 4 + 2 + 1) & digest[1];
-    colors[2] = (32 + 16 + 8 + 4 + 2 + 1) & digest[2];
-    while (true) {
-      int diffToGoal = 720 - (colors[0] + colors[1] + colors[2]);
-      int add = diffToGoal/3;
-      int newSum = 0;
-      for (int i=0; i<3; i++) {
-        if (colors[i] + add > 255)
-          colors[i] = 255;
-        else
-          colors[i] += add;
-        newSum += colors[i];
+  private static Color getUserBkColor(Object colorKey) {
+    Color color = (Color) colorCacheBk.get(colorKey);
+    if (color == null) {
+      int userColor = 0;
+      if (colorKey instanceof Long) {
+        userColor = UserColor.getUserColor((Long) colorKey);
+      } else {
+        userColor = UserColor.getUserColor(colorKey.toString());
       }
-      if (newSum > 710)
-        break;
-    }
-    return new Color(colors[0], colors[1], colors[2]);
-  }
-
-  private static Color getUserColor(Object colorKey) {
-    Color color = null;
-    synchronized (altBkUserAssignedColors) {
-      color = (Color) altBkUserAssignedColors.get(colorKey);
-      if (color == null) {
-        if (altBkUserAssignedColors.size() == altBkUserColors.size()) {
-          color = makeBkColor(colorKey);
-          altBkUserColors.add(color);
-        } else {
-          color = (Color) altBkUserColors.get(altBkUserAssignedColors.size());
-        }
-        altBkUserAssignedColors.put(colorKey, color);
-      }
+      int r = UserColor.getRed(userColor);
+      int g = UserColor.getGreen(userColor);
+      int b = UserColor.getBlue(userColor);
+      int t = r+g+b;
+      // 90% to white
+      double adjust = ((255.0 * 3.0 - t) * 0.90) / 3.0;
+      double[] rgb = new double[] { r+adjust, g+adjust, b+adjust };
+      redistribute_rgb(rgb);
+      color = new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]);
+      colorCacheBk.put(colorKey, color);
     }
     return color;
+  }
+
+  private static Color getUserFgColor(Object colorKey) {
+    Color color = (Color) colorCacheFg.get(colorKey);
+    if (color == null) {
+      int userColor = 0;
+      if (colorKey instanceof Long) {
+        userColor = UserColor.getUserColor((Long) colorKey);
+      } else {
+        userColor = UserColor.getUserColor(colorKey.toString());
+      }
+      // 10% darker because we'll put it on colored background, using simple scaling without redistribution...
+      color = new Color((int) (UserColor.getRed(userColor)*0.9), (int) (UserColor.getGreen(userColor)*0.9), (int) (UserColor.getBlue(userColor)*0.9));
+      colorCacheFg.put(colorKey, color);
+    }
+    return color;
+  }
+
+  private static void redistribute_rgb(double[] rgb) {
+    double r = rgb[0];
+    double g = rgb[1];
+    double b = rgb[2];
+    double threshold = 255.999;
+    double m = Math.max(Math.max(r, g), b);
+    if (m <= threshold) {
+      return;
+    }
+    double total = r + g + b;
+    if (total >= 3 * threshold) {
+      rgb[0] = threshold; rgb[1] = threshold; rgb[2] = threshold;
+      return;
+    }
+    double x = (3.0 * threshold - total) / (3.0 * m - total);
+    double gray = threshold - x * m;
+    rgb[0] = gray + x * r;
+    rgb[1] = gray + x * g;
+    rgb[2] = gray + x * b;
   }
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -151,6 +163,13 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column, boolean forPrint) {
     Object v = value instanceof StringBuffer ? "" : value;
     Component renderer = super.getTableCellRendererComponent(table, v, isSelected, hasFocus, row, column);
+
+    // init static values
+    if (colorFgDefault == null) {
+      colorFgDefault = renderer.getForeground();
+      fontPlain = renderer.getFont();
+      fontBold = fontPlain.deriveFont(Font.BOLD);
+    }
 
     Border border = getBorder();
     if (border == RecordTableCellRenderer.BORDER_TEXT) {
@@ -163,9 +182,13 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       setBorder(PostTableCellRenderer.BORDER_ICONIZED_FIRST);
     }
 
+    int rawColumn = getRawColumn(table, column);
+
     // Determine color of the message, white or none-white?
+    // Determine color of FROM name
     {
       Color bkColor = null;
+      Color fgColor = null;
       if (isSelected && false) {
         bkColor = getDefaultBackground(row, isSelected);
       } else {
@@ -180,13 +203,19 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
               FetchedDataCache cache = FetchedDataCache.getSingleInstance();
               MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
               if (msgData != null) {
-                if (cache.getMyUserId().equals(msgData.senderUserId)) {
+                if (msgData.senderUserId.equals(cache.getMyUserId())) {
                   bkColor = altMyBkColor;
                 } else {
+                  Object colorKey;
                   if (msgData.isEmail()) {
-                    bkColor = getUserColor((""+msgData.getFromEmailAddress()).toLowerCase());
+                    colorKey = (""+msgData.getFromEmailAddress()).toLowerCase();
                   } else {
-                    bkColor = getUserColor(""+msgData.senderUserId);
+                    colorKey = msgData.senderUserId;
+                  }
+                  bkColor = getUserBkColor(colorKey);
+                  // From column
+                  if (rawColumn == 3 && !forPrint) {
+                    fgColor = getUserFgColor(colorKey);
                   }
                 }
               }
@@ -201,10 +230,17 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
         bkColor = bkColor.darker();
       }
       renderer.setBackground(bkColor);
+
+      // Adjust the FROM color and BOLDNESS
+      if (fgColor != null) {
+        renderer.setForeground(fgColor);
+        renderer.setFont(fontBold);
+      } else {
+        renderer.setForeground(colorFgDefault);
+        renderer.setFont(fontPlain);
+      }
     }
     // end of background color management
-
-    int rawColumn = getRawColumn(table, column);
 
     // subject + body
     if (rawColumn == 5) {
@@ -215,17 +251,13 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       JSortedTable sTable = (JSortedTable) table;
       TableModel tableModel = sTable.getRawModel();
 
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      MsgLinkRecord mLink = null;
-      MsgDataRecord mData = null;
-      MsgLinkRecord pLink = null;
-
       // Since multiple views may display the same message links, we must choose how to view them in the renderer.
       if (tableModel instanceof MsgTableModel) {
         MsgTableModel mtm = (MsgTableModel) tableModel;
-        mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
-        mData = cache.getMsgDataRecord(mLink.msgId);
-        pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
+        MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
+        MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
         Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
         if (subjectValue != null) {
           if (subjectValue instanceof StringBuffer)
@@ -280,21 +312,25 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
     } // end if String Buffer
     // From
     else if (rawColumn == 3 && !forPrint) {
-      if (row > 0) {
-        JSortedTable sTable = (JSortedTable) table;
-        TableModel tableModel = sTable.getRawModel();
-        if (tableModel instanceof MsgTableModel) {
-          MsgTableModel mtm = (MsgTableModel) tableModel;
-          MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
-          MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
-          if (pLink != null) {
-            Object obj = mtm.getValueAtRawColumn(mLink, rawColumn, false);
-            if (obj != null) {
-              Object pObj = mtm.getValueAtRawColumn(pLink, rawColumn, false);
-              if (obj.equals(pObj)) {
-                ((MsgTableCellRenderer) renderer).setText(null);
-                ((MsgTableCellRenderer) renderer).setIcon(null);
-              }
+      JSortedTable sTable = (JSortedTable) table;
+      TableModel tableModel = sTable.getRawModel();
+      if (tableModel instanceof MsgTableModel) {
+        MsgTableModel mtm = (MsgTableModel) tableModel;
+        MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        MsgDataRecord mData = mLink != null ? cache.getMsgDataRecord(mLink.msgId) : null;
+        boolean isFromMe = mData != null && mData.senderUserId.equals(cache.getMyUserId());
+        if (isFromMe)
+          ((MsgTableCellRenderer) renderer).setText("me");
+        // check previous row to see if the same 'from'
+        MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
+        if (pLink != null) {
+          Object obj = mtm.getValueAtRawColumn(mLink, rawColumn, false);
+          if (obj != null) {
+            Object pObj = mtm.getValueAtRawColumn(pLink, rawColumn, false);
+            if (obj.equals(pObj)) {
+              ((MsgTableCellRenderer) renderer).setText(null);
+              ((MsgTableCellRenderer) renderer).setIcon(null);
             }
           }
         }

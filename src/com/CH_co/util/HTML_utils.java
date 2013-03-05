@@ -28,7 +28,7 @@ public class HTML_utils {
 
 //  public static final String HTML_FONT_START = "<font face="+DEFAULT_FONTS_QUOTED+">";
 //  public static final String HTML_FONT_END = "</font>";
-  
+
   public static final String HTML_FONT_START = "";
   public static final String HTML_FONT_END = "";
 
