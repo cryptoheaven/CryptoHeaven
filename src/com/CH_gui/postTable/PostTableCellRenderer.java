@@ -106,14 +106,8 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       } else {
         userColor = UserColor.getUserColor(colorKey.toString());
       }
-      int r = UserColor.getRed(userColor);
-      int g = UserColor.getGreen(userColor);
-      int b = UserColor.getBlue(userColor);
-      int t = r+g+b;
-      // 90% to white
-      double adjust = ((255.0 * 3.0 - t) * 0.90) / 3.0;
-      double[] rgb = new double[] { r+adjust, g+adjust, b+adjust };
-      redistribute_rgb(rgb);
+      double[] rgb = new double[] { UserColor.getRed(userColor), UserColor.getGreen(userColor), UserColor.getBlue(userColor) };
+      lighter_rgb(rgb, 0.90);
       color = new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]);
       colorCacheBk.put(colorKey, color);
     }
@@ -129,18 +123,33 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       } else {
         userColor = UserColor.getUserColor(colorKey.toString());
       }
-      // 10% darker because we'll put it on colored background, using simple scaling without redistribution...
-      color = new Color((int) (UserColor.getRed(userColor)*0.9), (int) (UserColor.getGreen(userColor)*0.9), (int) (UserColor.getBlue(userColor)*0.9));
+      // Make it 10% darker because we'll put it against color backgrount... 
+      // We want 90% of the current color amount
+      double scale = 0.90;
+      color = new Color((int) (UserColor.getRed(userColor)*scale), (int) (UserColor.getGreen(userColor)*scale), (int) (UserColor.getBlue(userColor)*scale));
       colorCacheFg.put(colorKey, color);
     }
     return color;
   }
 
+  /**
+   * Make lighter shade of color;
+   * @param rgb values 0..255 for Red, Green, Blue
+   * @param factor Amount of adjustment; 0.5 half way from current to white
+   */
+  private static void lighter_rgb(double[] rgb, double factor) {
+    double total = rgb[0]+rgb[1]+rgb[2];
+    double adjust = ((255.0 * 3 - total) * factor) / 3;
+    rgb[0] = rgb[0]+adjust;
+    rgb[1] = rgb[1]+adjust;
+    rgb[2] = rgb[2]+adjust;
+    redistribute_rgb(rgb);
+  }
   private static void redistribute_rgb(double[] rgb) {
     double r = rgb[0];
     double g = rgb[1];
     double b = rgb[2];
-    double threshold = 255.999;
+    double threshold = 255.0;
     double m = Math.max(Math.max(r, g), b);
     if (m <= threshold) {
       return;
@@ -150,7 +159,7 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       rgb[0] = threshold; rgb[1] = threshold; rgb[2] = threshold;
       return;
     }
-    double x = (3.0 * threshold - total) / (3.0 * m - total);
+    double x = (3 * threshold - total) / (3 * m - total);
     double gray = threshold - x * m;
     rgb[0] = gray + x * r;
     rgb[1] = gray + x * g;
