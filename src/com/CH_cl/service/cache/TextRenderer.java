@@ -433,6 +433,12 @@ public class TextRenderer {
             public int compare(Object o1, Object o2) {
               String s1 = getRenderedText(o1);
               String s2 = getRenderedText(o2);
+              if (s1 == null && s2 == null)
+                return 0;
+              else if (s1 == null)
+                return -1;
+              else if (s2 == null)
+                return +1;
               return s1.compareTo(s2);
             }
           };
