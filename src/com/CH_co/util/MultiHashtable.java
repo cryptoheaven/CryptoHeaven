@@ -117,7 +117,8 @@ public class MultiHashtable extends Object {
         hm.put(key, c);
       }
     }
-    return c;
+    // Copy over the values to prevent the caller from changing our collection.
+    return c != null ? new ArrayList(c) : null;
   }
 
   /**

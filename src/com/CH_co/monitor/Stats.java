@@ -12,7 +12,6 @@
 
 package com.CH_co.monitor;
 
-import com.CH_cl.service.engine.MyUncaughtExceptionHandler;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 import java.util.*;
@@ -231,9 +230,6 @@ public class Stats extends Object {
           ((StatsListenerI) iter.next()).setStatsConnections(connectionsPlain, connectionsHTML);
       }
     }
-
-    // Check if there are pending crash reports that need to be sent.
-    MyUncaughtExceptionHandler.crashReport_sendAnyPendingIfPossible();
   }
 
   public static void setTransferRate(long bytesPerSecond) {

@@ -199,7 +199,7 @@ public class URLs extends Object {
 
     DOMAIN_MAIL = i;
     customizationKeys[i] = "DOMAIN_MAIL";
-    customizationStrings[i] = get(DOMAIN)+",aprava.com,highvip.com,emailhosting.tv,MDemail.net,SecureMedical.net"; i++;
+    customizationStrings[i] = get(DOMAIN)+",salusafe.com,aprava.com,highvip.com,emailhosting.tv,MDemail.net,SecureMedical.net"; i++;
 
     HOME_PAGE = i;
     customizationKeys[i] = "HOME_PAGE";
