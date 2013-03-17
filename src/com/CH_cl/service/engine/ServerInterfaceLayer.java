@@ -1039,10 +1039,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             final Socket[][] socketBuffers = new Socket[hostIndexesToTry.length][1];
             Throwable[][] errBuffers = new Throwable[hostIndexesToTry.length][1];
 
+            Stats.setStatusAll("Attempting connection.");
+            
             StringBuffer sbSocketInfo = new StringBuffer();
             for (int k=0; k<hostIndexesToTry.length; k++) {
               sbSocketInfo.append("Socket host ").append(hostsAndPorts[hostIndexesToTry[k]][0]);
-              sbSocketInfo.append(" port ").append(hostsAndPorts[hostIndexesToTry[k]][1]).append(", ");
+              sbSocketInfo.append(" port ").append(hostsAndPorts[hostIndexesToTry[k]][1]);
+              if (k<hostIndexesToTry.length-1)
+                sbSocketInfo.append(", ");
               ths[k] = createSocket_Threaded((String) hostsAndPorts[hostIndexesToTry[k]][0],
                                               ((Integer) hostsAndPorts[hostIndexesToTry[k]][1]).intValue(),
                                               socketBuffers[k], errBuffers[k]);
@@ -1070,10 +1074,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
             Socket socket = socketBuffers[joinedIndexFirst][0];
             if (trace != null) trace.data(60, "createWorker() attempted hosts and ports are", sbSocketInfo.toString());
+            Stats.setStatusAll("Attempted "+sbSocketInfo.toString());
             if (trace != null) trace.data(61, "createWorker() created socket is", socket);
-            if (socket != null) {
-              if (trace != null) trace.data(62, "socketType", socket.getClass());
-            }
+            String type = socket != null ? socket.getClass().toString() : null;
+            type = type != null ? type.substring(type.lastIndexOf(".")+1) : null;
+            if (trace != null) trace.data(62, "socketType", type);
+            Stats.setStatusAll("Using "+socket+" type "+type);
 
             // Clear other sockets that might have been created too
             // remove socket that we are using so it doesn't get cleaned up here
@@ -1238,6 +1244,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       final Socket[] socketBuffer = new Socket[1];
       final Exception[] exceptionBuffer = new Exception[1];
 
+      Stats.setStatusAll("createSocket() > "+hostName+":"+portNumber);
+
       // try establishing a new connection in a seperate thread... so it doesn't block too long...
       Thread socketConnector = new ThreadTraced("Socket Connector") {
         public void runTraced() {
@@ -1328,6 +1336,21 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (trace != null) trace.data(19, "socket.getSoLinger()", socket.getSoLinger());
       if (trace != null) trace.data(20, "socket.getSoTimeout()", socket.getSoTimeout());
       if (trace != null) trace.data(21, "socket.getTcpNoDelay()", socket.getTcpNoDelay());
+      
+      StringBuffer sb = new StringBuffer();
+      sb.append("createSocket() < "+ socket+"\n");
+      sb.append("getInetAddress()="+ socket.getInetAddress()+"\n");
+      sb.append("getLocalAddress()="+ socket.getLocalAddress()+"\n");
+      sb.append("getLocalPort()="+ socket.getLocalPort()+"\n");
+      sb.append("getPort()="+ socket.getPort()+"\n");
+      sb.append("getClass()="+ socket.getClass()+"\n");
+      sb.append("getKeepAlive()="+ socket.getKeepAlive()+"\n");
+      sb.append("getReceiveBufferSize()="+ socket.getReceiveBufferSize()+"\n");
+      sb.append("getSendBufferSize()="+ socket.getSendBufferSize()+"\n");
+      sb.append("getSoLinger()="+ socket.getSoLinger()+"\n");
+      sb.append("getSoTimeout()="+ socket.getSoTimeout()+"\n");
+      sb.append("getTcpNoDelay()="+ socket.getTcpNoDelay());
+      Stats.setStatusAll(sb.toString());
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);

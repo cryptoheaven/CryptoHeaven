@@ -20,6 +20,7 @@ import com.CH_co.service.records.FolderPair;
 import com.CH_co.service.records.FolderRecord;
 import com.CH_co.service.records.MsgLinkRecord;
 import com.CH_co.trace.Trace;
+import com.CH_co.tree.FolderTreeNode;
 import com.CH_co.util.ArrayUtils;
 import com.CH_gui.addressBook.AddrDND_Transferable;
 import com.CH_gui.addressBook.AddrDND_TransferableData;
@@ -160,19 +161,36 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
           }
           // Accept folder destination to be my AND other's people folders since we now manage a VIEW tree too.
           //else if (toMoveFolder && fRec.ownerUserId.equals(FetchedDataCache.getSingleInstance().getMyUserId()))
-          else if (toMoveFolder)
-            acceptMove = true;
-          else if (toMoveFile && type == FolderRecord.FILE_FOLDER) {
-            if ((sourceActions & DnDConstants.ACTION_MOVE) != 0)
+          else if (toMoveFolder) {
+            // check if not dropping into its own child
+            Transferable tr = event.getTransferable();
+            FolderDND_TransferableData data = (FolderDND_TransferableData) tr.getTransferData(FolderDND_Transferable.FOLDER_RECORD_FLAVOR);
+            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(FetchedDataCache.getSingleInstance().getFolderRecords(data.folderIDs));
+            if (!isAnyInPath(path, fldPairs, true)) // don't want ugly icon when user hovers over self -- we'll reject it during drop
               acceptMove = true;
-            else if ((sourceActions & DnDConstants.ACTION_COPY) != 0)
-              acceptCopy = true;
           }
-          else if (toMoveFile && fRec.isMsgType())
-            acceptCopy = true;
-          else if (toMoveFile && fRec.isRecycleType()) {
-            if ((sourceActions & DnDConstants.ACTION_MOVE) != 0)
-              acceptMove = true;
+          else if (toMoveFile) {
+            // check if not dropping folder into its own child
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+            Transferable tr = event.getTransferable();
+            FileDND_TransferableData data = (FileDND_TransferableData) tr.getTransferData(FileDND_Transferable.FILE_RECORD_FLAVOR);
+            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]));
+            // reject if there are any folders droped onto its child
+            boolean isOntoChild = fldPairs != null && fldPairs.length > 0 && isAnyInPath(path, fldPairs, true);
+            if (!isOntoChild) {
+              if (toMoveFile && type == FolderRecord.FILE_FOLDER) {
+                if ((sourceActions & DnDConstants.ACTION_MOVE) != 0)
+                  acceptMove = true;
+                else if ((sourceActions & DnDConstants.ACTION_COPY) != 0)
+                  acceptCopy = true;
+              }
+              else if (toMoveFile && fRec.isMsgType())
+                acceptCopy = true;
+              else if (toMoveFile && fRec.isRecycleType()) {
+                if ((sourceActions & DnDConstants.ACTION_MOVE) != 0)
+                  acceptMove = true;
+              }
+            }
           }
           else if (toUpload && (type == FolderRecord.FILE_FOLDER || fRec.isMsgType()))
             acceptCopy = true;
@@ -327,10 +345,14 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
             else 
               fLinks = cache.getFileLinkRecords(data.fileRecordIDs[1]);
             FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]));
-            if (isFileFolderType || isRecycleFolderType)
-              FileActionTable.doMoveOrSaveAttachmentsAction(fPairs[0], fLinks, fldPairs);
-            else if (isMsgFolderType)
+            if (isFileFolderType || isRecycleFolderType) {
+              // reject if there are any folders droped onto its child
+              boolean isOntoSelfOrChild = fldPairs != null && fldPairs.length > 0 && isAnyInPath(path, fldPairs, false);
+              if (!isOntoSelfOrChild)
+                FileActionTable.doMoveOrSaveAttachmentsAction(fPairs[0], fLinks, fldPairs);
+            } else if (isMsgFolderType) {
               new MessageFrame(fPairs, fLinks);
+            }
           } // end Moving files and Attaching files
 
           // Moving or Copying addresses
@@ -438,12 +460,15 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
         // Don't allow dropping onto itself
         boolean dropOntoItself = pair != null && pair.equals(fldPairs[0]);
         if (!dropOntoItself) {
-          event.acceptDrop(DnDConstants.ACTION_MOVE);
-          isDropAccepted = true;
-          FolderPair toPair = pair != null ? pair : fldPairs[0];
-          if (toPair.getId().longValue() < 0)
-            toPair = fldPairs[0];
-          FileActionTable.doMoveOrSaveAttachmentsAction(toPair, null, fldPairs);
+          // check if not dropping into our child folder
+          if (!isAnyInPath(path, fldPairs, false)) {
+            event.acceptDrop(DnDConstants.ACTION_MOVE);
+            isDropAccepted = true;
+            FolderPair toPair = pair != null ? pair : fldPairs[0];
+            if (toPair.getId().longValue() < 0)
+              toPair = fldPairs[0];
+            FileActionTable.doMoveOrSaveAttachmentsAction(toPair, null, fldPairs);
+          }
         }
       }
 
@@ -458,6 +483,26 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
     restoreOriginalSelection();
     event.getDropTargetContext().dropComplete(true);
     if (trace != null) trace.exit(FolderDND_DropTargetListener.class);
+  }
+  private boolean isAnyInPath(TreePath path, FolderPair[] fldPairs, boolean isSkipLastPath) {
+    boolean inPath = false;
+    // check if not dropping into our child folder
+    Object[] dropPath = path.getPath();
+    int size = dropPath.length;
+    if (isSkipLastPath)
+      size--; // skip the last path element check
+    for (int i=0; i<size; i++) {
+      FolderTreeNode node = (FolderTreeNode) dropPath[i];
+      FolderPair nodePair = node.getFolderObject();
+      if (nodePair != null) {
+        if (ArrayUtils.find(fldPairs, nodePair) >= 0) {
+          // drop into its own child!
+          inPath = true;
+          break;
+        }
+      }
+    }
+    return inPath;
   }
   public void dropActionChanged(DropTargetDragEvent event) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderDND_DropTargetListener.class, "dropActionChanged(DropTargetDragEvent event)");

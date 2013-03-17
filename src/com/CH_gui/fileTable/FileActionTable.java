@@ -338,7 +338,25 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       FileLinkRecord[] fLinks = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
       FolderPair[] fPairs = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
       FolderPair chosenFolderPair = getMoveCopyDestination(true, fPairs != null && fPairs.length > 0, fLinks != null && fLinks.length > 0);
-      doMoveOrSaveAttachmentsAction(chosenFolderPair, fLinks, fPairs);
+      boolean isOntoSelfOrChild = fPairs != null && fPairs.length > 0 && isAnyInPath(chosenFolderPair, fPairs);
+      if (!isOntoSelfOrChild)
+        doMoveOrSaveAttachmentsAction(chosenFolderPair, fLinks, fPairs);
+      else
+        NotificationCenter.show(NotificationCenter.INFORMATION_MESSAGE, "Cannot move", "Cannot move a folder into its own child.");
+    }
+    private boolean isAnyInPath(FolderPair destPair, FolderPair[] movePairs) {
+      boolean isInPath = false;
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FolderPair[] moveChildrenTree = cache.getFolderPairsViewAllDescending(movePairs, true);
+      if (moveChildrenTree != null) {
+        for (int i=0; i<moveChildrenTree.length; i++) {
+          if (moveChildrenTree[i].equals(destPair)) {
+            isInPath = true;
+            break;
+          }
+        }
+      }
+      return isInPath;
     }
     private void updateText(int countSelectedFiles) {
       if (countSelectedFiles > 1) {
