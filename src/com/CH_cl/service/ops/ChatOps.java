@@ -109,12 +109,19 @@ public class ChatOps {
         BASymmetricKey baSymmetricKey = new BASymmetricKey(32);
 
         // Create a folder share with the chatting partner.
+        boolean isError = false;
         FolderShareRecord[] additionalShares = new FolderShareRecord[_chatWithContacts.length];
         for (int i=0; i<_chatWithContacts.length; i++) {
           additionalShares[i] = new FolderShareRecord();
           FolderShareRecord newShare = additionalShares[i];
           if (_chatWithContacts[i].getMemberType() == Record.RECORD_TYPE_USER) {
-            newShare.ownerUserId = ((ContactRecord) _chatWithContacts[i]).contactWithId;
+            ContactRecord cRec = (ContactRecord) _chatWithContacts[i];
+            if (cRec.ownerUserId.equals(cache.getMyUserId()))
+              newShare.ownerUserId = cRec.contactWithId;
+            else {
+              isError = true;
+              break;
+            }
             newShare.ownerType = new Short(Record.RECORD_TYPE_USER);
           } else if (_chatWithContacts[i].getMemberType() == Record.RECORD_TYPE_GROUP) {
             newShare.ownerUserId = ((FolderPair) _chatWithContacts[i]).getId();
@@ -125,30 +132,32 @@ public class ChatOps {
           newShare.setSymmetricKey(baSymmetricKey);
         }
 
-        String myFolderName = folderName.toString();
-        String shareFolderName = folderName.toString();
+        if (!isError) {
+          String myFolderName = folderName.toString();
+          String shareFolderName = folderName.toString();
 
-        Fld_NewFld_Rq request = FolderOps.createNewFldRq(
-            null,
-            FolderRecord.CHATTING_FOLDER, // Chatting folder since July 2006
-            myFolderName, folderDesc, shareFolderName, folderDesc,
-            new Short(FolderRecord.DEFAULT_CHAT_PURGING_RECORD_NUM),
-            new Integer(FolderRecord.DEFAULT_CHAT_PURGING_RECORD_SECONDS),
-            baSymmetricKey,
-            false,
-            additionalShares,
-            _SIL
-            );
-        baSymmetricKey.clearContent();
+          Fld_NewFld_Rq request = FolderOps.createNewFldRq(
+              null,
+              FolderRecord.CHATTING_FOLDER, // Chatting folder since July 2006
+              myFolderName, folderDesc, shareFolderName, folderDesc,
+              new Short(FolderRecord.DEFAULT_CHAT_PURGING_RECORD_NUM),
+              new Integer(FolderRecord.DEFAULT_CHAT_PURGING_RECORD_SECONDS),
+              baSymmetricKey,
+              false,
+              additionalShares,
+              _SIL
+              );
+          baSymmetricKey.clearContent();
 
-        ClientMessageAction msgAction = _SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_OR_GET_OLD, request), 30000);
-        DefaultReplyRunner.nonThreadedRun(_SIL, msgAction);
-        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
-          Fld_Folders_Rp reply = (Fld_Folders_Rp) msgAction.getMsgDataSet();
-          FolderRecord folderRec = reply.folderRecords[0];
-          // Shares might have came in any order, so just ask cache to get the right one.
-          FolderShareRecord shareRec = cache.getFolderShareRecordMy(folderRec.folderId, true);
-          chatPair = new FolderPair(shareRec, folderRec);
+          ClientMessageAction msgAction = _SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_OR_GET_OLD, request), 30000);
+          DefaultReplyRunner.nonThreadedRun(_SIL, msgAction);
+          if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
+            Fld_Folders_Rp reply = (Fld_Folders_Rp) msgAction.getMsgDataSet();
+            FolderRecord folderRec = reply.folderRecords[0];
+            // Shares might have came in any order, so just ask cache to get the right one.
+            FolderShareRecord shareRec = cache.getFolderShareRecordMy(folderRec.folderId, true);
+            chatPair = new FolderPair(shareRec, folderRec);
+          }
         }
 
         _chatFolderPairCallback.callback(chatPair);

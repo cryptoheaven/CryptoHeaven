@@ -9,7 +9,7 @@
 * it only in accordance with the terms of the license agreement
 * you entered into with CryptoHeaven Corp.
 */
-package com.CH_cl.service.engine;
+package com.CH_cl.util;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.actions.error.ErrorMessageAction;
@@ -17,6 +17,8 @@ import com.CH_cl.service.actions.msg.MsgAGet;
 import com.CH_cl.service.actions.sys.SysANoop;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -32,7 +34,6 @@ import com.CH_co.trace.TraceDiagnostics;
 import com.CH_co.util.GlobalProperties;
 import com.CH_co.util.Misc;
 import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Date;
 
 /**
@@ -51,23 +52,20 @@ import java.util.Date;
 * @author Marcin Kurzawa
 * @version
 */
-public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
+public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
   private static final String CRASH_REPORT__PROPERTY = "crashReport";
   private static final long CRASH_REPORT_ACCOUNT = 2934084;
 
-  private static ServerInterfaceLayer SIL;
   private static String TAG = "";
 
   private static long lastReportSentStamp;
   private static final long minDelayBetweenReports = 10 * 60 * 1000; // 10 minutes
 
-  public MyUncaughtExceptionHandler(String platformTag) {
-    TAG = platformTag;
-  }
-
-  public static void setSIL(ServerInterfaceLayer theSIL) {
-    SIL = theSIL;
+  /**
+  * No-arg constructor for reflection API
+  */
+  public MyUncaughtExceptionHandler() {
   }
 
   public void uncaughtException(Thread thread, Throwable ex) {
@@ -84,7 +82,7 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
               + infoBuffer.toString();
       String reportCombined = crashReport_prepWithPending(report);
       boolean isSent = false;
-      ServerInterfaceLayer mySil = SIL;
+      ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerOps.getSIL();
       if (mySil != null && mySil.isLoggedIn() && mySil.hasPersistentMainWorker()) {
         isSent = crashReport_send(mySil, CRASH_REPORT_ACCOUNT, reportCombined);
       }
@@ -115,7 +113,7 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
   public static boolean crashReport_sendAnyPendingIfPossible() {
     boolean anySent = false;
-    ServerInterfaceLayer mySil = SIL;
+    ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerOps.getSIL();
     if (mySil != null) {
       String oldReport = GlobalProperties.getProperty(CRASH_REPORT__PROPERTY, "");
       if (oldReport != null && oldReport.length() > 0) {
@@ -151,7 +149,7 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
       Long RECIVER_USER_ID = new Long(toUserId);
       long TIMEOUT = 15000;
 
-      String MSG_SUBJECT = TAG + " Crash from " + TextRenderer.getRenderedText(fromUser) + " build " + GlobalProperties.PROGRAM_BUILD_NUMBER;
+      String MSG_SUBJECT = TAG + (TAG != null && TAG.length() > 0 ? " " : "") + "Crash from " + TextRenderer.getRenderedText(fromUser) + " build " + GlobalProperties.PROGRAM_BUILD_NUMBER;
       String MSG_BODY = report;
       Long[] MY_OUTGOING_CONTACT_ID_WITH_RECIVER = null; // assume no contact 
 
@@ -250,5 +248,9 @@ public class MyUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
     isSuccess = !errors;
     return isSuccess;
+  }
+
+  public static void setTag(String tag) {
+    TAG = tag;
   }
 }

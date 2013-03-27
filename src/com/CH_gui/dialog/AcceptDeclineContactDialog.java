@@ -16,6 +16,7 @@ import com.CH_cl.service.actions.*;
 import com.CH_cl.service.engine.*;
 import com.CH_cl.service.cache.*;
 import com.CH_cl.service.cache.event.*;
+import com.CH_cl.service.ops.UserOps;
 
 import com.CH_co.cryptx.*;
 import com.CH_co.service.msg.*;
@@ -415,6 +416,9 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
         int code = accept ? CommandCodes.CNT_Q_ACCEPT_CONTACTS : CommandCodes.CNT_Q_DECLINE_CONTACTS;
         ProtocolMsgDataSet dataSet = prepareDataSet(accept); // << this may take some time due to encryption
         serverInterfaceLayer.submitAndReturn(new MessageAction(code, dataSet));
+        // update 'Used' stamp for the Accepted contact
+        if (accept)
+          UserOps.updateUsedStamp(serverInterfaceLayer, contactRecord);
       }
     };
     th.setDaemon(true);

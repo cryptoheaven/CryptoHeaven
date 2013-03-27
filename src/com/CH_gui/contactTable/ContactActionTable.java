@@ -813,7 +813,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
               member = cRec;
             } else {
               hasErrors = true;
-              NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Please establish a contact first", "Please establish an active contact with " + ListRenderer.getRenderedText(member)+", then retry.");
+              UserRecord otherUser = cache.getUserRecord(otherUserId);
+              String otherPerson = otherUser != null ? otherUser.handle : ListRenderer.getRenderedText(member);
+              NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Please establish a contact first", "Please establish an active contact with " + otherPerson + ", then retry.");
               break;
             }
           }

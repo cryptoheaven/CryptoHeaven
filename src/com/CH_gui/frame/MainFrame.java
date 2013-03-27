@@ -12,7 +12,6 @@
 
 package com.CH_gui.frame;
 
-import com.CH_cl.service.engine.MyUncaughtExceptionHandler;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.ContactRecordEvent;
@@ -27,6 +26,7 @@ import com.CH_cl.service.records.filters.ContactFilterCl;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_cl.service.records.filters.InvEmlFilter;
+import com.CH_cl.util.MyUncaughtExceptionHandlerOps;
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.cryptx.Rnd;
 import com.CH_co.io.RandomInputStream;
@@ -486,7 +486,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     // setup default crash reporting
     try {
       if (SIL != null)
-        MyUncaughtExceptionHandler.setSIL(SIL);
+        MyUncaughtExceptionHandlerOps.setSIL(SIL);
     } catch (Throwable t) {
       System.out.println(t.getMessage());
       // This is JRE 1.5 code, so catch all errors!
