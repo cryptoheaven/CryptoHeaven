@@ -15,6 +15,7 @@ package com.CH_cl.service.engine;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FileLobUp;
+import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import com.CH_co.monitor.DefaultProgMonitor;
 import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.monitor.ProgMonitorPool;
@@ -458,6 +459,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         } catch (Throwable t) {
           if (trace != null) trace.data(100, "Exception while running action", msgAction);
           if (trace != null) trace.exception(getClass(), 101, t);
+          MyUncaughtExceptionHandlerOps.unhandledException(t);
         }
         if (trace != null) trace.exit(getClass());
       } // end run()
@@ -760,6 +762,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               returnBufferMsgAction[0] = (MessageAction) independentExecutor.processQueuedObject(replyMsg);
             } catch (Throwable t) {
               if (trace != null) trace.exception(getClass(), 100, t);
+              MyUncaughtExceptionHandlerOps.unhandledException(t);
             }
             if (trace != null) trace.exit(getClass());
           }
@@ -1991,6 +1994,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       } catch (Throwable t) {
         // execution of server reply went wrong -- critical error.
         if (trace != null) trace.exception(QueueExecutionFunction.class, 100, t);
+        MyUncaughtExceptionHandlerOps.unhandledException(t);
       }
 
       if (trace != null) trace.exit(QueueExecutionFunction.class, null);

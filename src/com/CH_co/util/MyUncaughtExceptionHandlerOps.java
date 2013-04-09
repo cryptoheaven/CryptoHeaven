@@ -9,12 +9,10 @@
 * it only in accordance with the terms of the license agreement
 * you entered into with CryptoHeaven Corp.
 */
-package com.CH_cl.util;
+package com.CH_co.util;
 
-import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.monitor.Stats;
 import com.CH_co.monitor.StatsListenerAdapter;
-import com.CH_co.util.GlobalProperties;
 import java.lang.reflect.Method;
 
 /**
@@ -35,13 +33,15 @@ import java.lang.reflect.Method;
 */
 public class MyUncaughtExceptionHandlerOps {
 
-  private static boolean isAttached;
-  private static ServerInterfaceLayer SIL;
+  private static boolean isAttachAttempted;
+  private static Object exceptionHandler;
+  private static String tag;
 
-  public static void attachHandler(String platformTag) {
-    if (!isAttached) {
-      isAttached = true;
+  public static void attachDefaultHandler(String theTag) {
+    if (!isAttachAttempted) {
+      isAttachAttempted = true;
       try {
+        tag = theTag;
         Class handlerClass = null;
         try {
           handlerClass = Class.forName("com.CH_cl.util.MyUncaughtExceptionHandler");
@@ -52,18 +52,19 @@ public class MyUncaughtExceptionHandlerOps {
         Object handlerImpl = handlerClass.newInstance();
         if (handlerImpl != null) {
           Thread.UncaughtExceptionHandler handler = (Thread.UncaughtExceptionHandler) handlerImpl;
-          Method setTag = handlerImpl.getClass().getMethod("setTag", new Class[] {String.class});
-          setTag.invoke(handlerImpl, new Object[] {platformTag});
           Thread.setDefaultUncaughtExceptionHandler(handler);
+          exceptionHandler = handler;
         }
         Stats.registerStatsListener(new StatsListenerAdapter() {
           public void setStatsConnections(Integer connectionsPlain, Integer connectionsHTML) {
             Thread th = new Thread() {
               public void run() {
                 try {
-                  // Don't use reflection in listener as we know that handler was already setup so it is present and working.
-                  MyUncaughtExceptionHandler.crashReport_sendAnyPendingIfPossible();
+                  Class handlerClass = Class.forName("com.CH_cl.util.MyUncaughtExceptionHandler");
+                  Method methodSend = handlerClass.getMethod("crashReport_sendAnyPendingIfPossible", null);
+                  methodSend.invoke(null, null);
                 } catch (Throwable t) {
+                  t.printStackTrace();
                   // This is JRE 1.5 code, so catch all errors!
                 }
               }
@@ -78,12 +79,21 @@ public class MyUncaughtExceptionHandlerOps {
     }
   }
 
-  protected static ServerInterfaceLayer getSIL() {
-    return SIL;
+  public static void unhandledException(Throwable ex) {
+    if (exceptionHandler != null) {
+      try {
+        ((Thread.UncaughtExceptionHandler) exceptionHandler).uncaughtException(Thread.currentThread(), ex);
+      } catch (Throwable t) {
+      }
+    }
   }
 
-  public static void setSIL(ServerInterfaceLayer theSIL) {
-    SIL = theSIL;
+  public static void setTag(String theTag) {
+    tag = theTag;
+  }
+
+  public static String getTag() {
+    return tag;
   }
 
 }

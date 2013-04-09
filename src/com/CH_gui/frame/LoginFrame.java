@@ -91,7 +91,6 @@ public class LoginFrame extends JFrame {
   private static final boolean ENABLE_PASSWORD_LENGTH_NOTE = false;
   private static final boolean ENABLE_PASSWORD_NON_RECOVERY_WARNING = true;
 
-  protected static final String PROPERTY_USER_NAME = "LastUserName";
   private static final String PROPERTY_USER_NAME_LIST = "LastUserNameList";
   private static final String PROPERTY_SERVER_LIST = "ServerList";
   private static final String PROPERTY_REMEMBER_USER_NAME = "RememberUserName";
@@ -219,7 +218,7 @@ public class LoginFrame extends JFrame {
       }
     }
 
-    this.defaultUserName = GlobalProperties.getProperty(PROPERTY_USER_NAME, DEFAULT_USER_NAME);
+    this.defaultUserName = GlobalProperties.getProperty(GlobalProperties.PROPERTY_USER_NAME, DEFAULT_USER_NAME);
     this.defaultUserNameList = getUserList();
     this.defaultRememberUserName = getRememberUserNameProperty();
 
@@ -668,7 +667,7 @@ public class LoginFrame extends JFrame {
       while (usersL.size() > 100)
         usersL.remove(usersL.size()-1);
       // set the default username property too
-      GlobalProperties.setProperty(PROPERTY_USER_NAME, toAdd);
+      GlobalProperties.setProperty(GlobalProperties.PROPERTY_USER_NAME, toAdd);
     }
     StringBuffer usersStr = new StringBuffer();
     for (int i=0; i<usersL.size(); i++) {
@@ -1816,9 +1815,9 @@ public class LoginFrame extends JFrame {
         if (isRememberUserName) {
           defaultUserNameList = putUserList(defaultUserNameList, getUserName());
         } else {
-          if (uName.equals(GlobalProperties.getProperty(PROPERTY_USER_NAME))) {
+          if (uName.equals(GlobalProperties.getProperty(GlobalProperties.PROPERTY_USER_NAME))) {
             // Remove the username only if the same one is specified, leave other's name if different.
-            GlobalProperties.setProperty(PROPERTY_USER_NAME, DEFAULT_USER_NAME);
+            GlobalProperties.setProperty(GlobalProperties.PROPERTY_USER_NAME, DEFAULT_USER_NAME);
           }
           // remove the user from the type-ahead-popup list
           putUserList((String) null, getUserName());

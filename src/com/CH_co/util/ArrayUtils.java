@@ -601,10 +601,10 @@ public class ArrayUtils extends Object {
   * Replaces strings with substitute strings. The set is processed in sequence for result of set[0] may affect set[1].
   * This method is performance optimized.
   */
-  public static String replaceKeyWords(String str, String[][] sets) {
+  public static StringBuffer replaceKeyWords(StringBuffer str, String[][] sets) {
     return replaceKeyWords(str, sets, null, null, false);
   }
-  public static String replaceKeyWords(String str, String[][] sets, String[] beginTags, String[] endTags, boolean isInsideTagsInclusion) {
+  public static StringBuffer replaceKeyWords(StringBuffer str, String[][] sets, String[] beginTags, String[] endTags, boolean isInsideTagsInclusion) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ArrayUtils.class, "replaceKeyWords(String str, String[][] sets, String[] beginTags, String[] endTags, boolean isInsideTagsInclusion)");
 
     int numOfSets = sets.length;
@@ -641,7 +641,7 @@ public class ArrayUtils extends Object {
           str.getChars(oldStart, end, chars, 0);
           resultB.append(chars, 0, len);
         }
-        str = resultB.toString();
+        str = resultB;
       } // end anyFound
     } // end for
 
@@ -656,12 +656,12 @@ public class ArrayUtils extends Object {
   * @param endTags Ending tags meant to be after the "end" index
   * @return
   */
-  private static boolean isInsideSegment(String str, int start, int end, String[] startTags, String[] endTags) {
+  private static boolean isInsideSegment(StringBuffer str, int start, int end, String[] startTags, String[] endTags) {
     boolean isAfterStartTag = false;
     boolean isBeforeEndTag = isBeforeEndTag(str, end, startTags, endTags);
     if (isBeforeEndTag) {
       // reverse the String and tags to search for beginning of the matching tag.
-      String strR = new StringBuffer(str).reverse().toString();
+      StringBuffer strR = new StringBuffer(str).reverse();
       String[] startTagsR = new String[endTags.length];
       String[] endTagsR = new String[startTags.length];
       for (int i=0; i<startTagsR.length; i++) {
@@ -675,7 +675,7 @@ public class ArrayUtils extends Object {
     }
     return isBeforeEndTag && isAfterStartTag;
   }
-  private static boolean isBeforeEndTag(String str, int start, String[] startTags, String[] endTags) {
+  private static boolean isBeforeEndTag(StringBuffer str, int start, String[] startTags, String[] endTags) {
     int behindFirstEndTag = Integer.MAX_VALUE;
     int behindFirstStartTag = Integer.MAX_VALUE;
     if (endTags != null) {
@@ -718,10 +718,10 @@ public class ArrayUtils extends Object {
         "Hi",
       };
   */
-  public static String removeTags(String str, String[][] startTags, String[][] endTags, Object[] replacementTags) {
+  public static StringBuffer removeTags(StringBuffer str, String[][] startTags, String[][] endTags, Object[] replacementTags) {
     return removeTags(str, startTags, endTags, replacementTags, true, null, null);
   }
-  public static String removeTags(String str, String[][] startTags, String[][] endTags, Object[] replacementTags, boolean isInsideTagsInclusion, String[] outerBeginTags, String[] outerEndTags) {
+  public static StringBuffer removeTags(StringBuffer str, String[][] startTags, String[][] endTags, Object[] replacementTags, boolean isInsideTagsInclusion, String[] outerBeginTags, String[] outerEndTags) {
     char[] chars = null;
     for (int x=0; x<startTags.length; x++) {
       String[] startTag = startTags[x];
@@ -797,7 +797,7 @@ public class ArrayUtils extends Object {
           str.getChars(oldStart, end, chars, 0);
           resultB.append(chars, 0, len);
         }
-        str = resultB.toString();
+        str = resultB;
       }
     }
     return str;

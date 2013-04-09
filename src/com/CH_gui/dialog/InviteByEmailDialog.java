@@ -1,56 +1,56 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import com.CH_gui.gui.*;
-import com.CH_gui.frame.MainFrame;
-import com.CH_gui.msgs.MsgComposePanel;
-import com.CH_gui.util.*;
-
-import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.ContactOps;
 import com.CH_cl.service.records.filters.FolderFilter;
-
-import com.CH_co.cryptx.BASymmetricKey;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.cnt.Cnt_NewCnt_Rq;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
+import com.CH_co.service.records.FolderRecord;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.CallbackI;
+import com.CH_co.util.ImageNums;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.msgs.MsgComposePanel;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.23 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.23 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class InviteByEmailDialog extends GeneralDialog {
 
   JLabel jInviteHeader = new JMyLabel("<html><body><font size='+1'>"+com.CH_cl.lang.Lang.rb.getString("label_Invite_Your_Friends_and_Associates.")+"</font></body></html>");
@@ -173,136 +173,31 @@ public class InviteByEmailDialog extends GeneralDialog {
   private void pressedSend() {
     boolean formatOk = RecipientsDialog.isEmailLineValid(jToText.getText());
     if (formatOk) {
-      doInvite(jToText.getText(), jBodyText.getText(), this, false);
+      ArrayList emlAddrsL = new ArrayList();
+      ArrayList emlNicksL = new ArrayList();
+      CallbackI callback = new CallbackI() {
+        public void callback(Object value) {
+          if (value instanceof Boolean) {
+            if (((Boolean) value).booleanValue()) {
+              // success
+              closeDialog();
+            } else {
+              // failed
+              setEnabledButtons(true);
+            }
+          }
+        }
+      };
+      setEnabledButtons(false);
+      ContactOps.doInviteToContacts_Threaded(SIL, jToText.getText(), jBodyText.getText(), callback, false, emlAddrsL, emlNicksL);
+      if (emlAddrsL.size() > 0) {
+        // Add-at-once the email addresses that we sent invites to.
+        MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(null, emlNicksL, emlAddrsL, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER), true, null, true);
+      }
     } else {
       String messageText = "Please enter a valid email address of the recipient(s).";
       String title = "Invalid email address";
       MessageDialog.showInfoDialog(InviteByEmailDialog.this, new JMyLabel(messageText), title, false);
-    }
-  }
-
-  public static void doInvite(String emlAddresses, String personalMessage, final InviteByEmailDialog dialog, final boolean autoCreateWebAccounts) {
-    if (dialog != null)
-      dialog.setEnabledButtons(false);
-
-    final String emailAddresses = emlAddresses != null ? emlAddresses.trim() : null;
-    final String personalMsg = personalMessage != null ? personalMessage.trim() : null;
-    //final String[] texts = Misc.getEmailInvitationText(personalMsg, null, FetchedDataCache.getSingleInstance().getUserRecord());
-
-    // gather email addresses and nicks for adding to AddressBook
-    final ArrayList emailAddressesL = new ArrayList();
-    ArrayList emailNicksL = new ArrayList();
-    if (emailAddresses != null) {
-      StringTokenizer st = new StringTokenizer(emailAddresses, ",;:");
-      while (st.hasMoreTokens()) {
-        String token = st.nextToken().trim();
-        String[] emls = EmailRecord.gatherAddresses(token);
-        if (emls != null && emls.length > 0) {
-          for (int i=0; i<emls.length; i++) {
-            String addrFull;
-            // If emails were separeted by other than ,;: then we will have multiple addresses here.  Otherwise use the original token with original personal info.
-            if (emls.length == 1)
-              addrFull = token;
-            else
-              addrFull = emls[i];
-            if (EmailRecord.findEmailAddress(emailAddressesL, addrFull) < 0) {
-              emailAddressesL.add(addrFull);
-              emailNicksL.add(EmailRecord.getPersonalOrNick(addrFull));
-            }
-          }
-        }
-      }
-    }
-
-    boolean shouldSend = emailAddressesL.size() > 0;
-    if (shouldSend) {
-      Thread th = new ThreadTraced("Invitation Sender") {
-        public void runTraced() {
-          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-
-          // Check if that email address already belongs to an existing user account, create a contact too
-          Object[] set = new Object[] { ArrayUtils.toArray(emailAddressesL, Object.class), new Boolean(autoCreateWebAccounts) };
-          SIL.submitAndWait(new MessageAction(CommandCodes.EML_Q_LOOKUP_ADDR, new Obj_List_Co(set)), 60000);
-          FetchedDataCache cache = SIL.getFetchedDataCache();
-          UserRecord myUser = cache.getUserRecord();
-          Long myUserId = myUser.userId;
-          Long shareId = cache.getFolderShareRecordMy(myUser.contactFolderId, false).shareId;
-          BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
-          String contactReason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
-
-          for (int i=0; i<emailAddressesL.size(); i++) {
-            String emlAddr = (String) emailAddressesL.get(i);
-            EmailRecord emlRec = cache.getEmailRecord(emlAddr);
-            if (emlRec != null) {
-              Long contactWithId = emlRec.userId;
-              if (!myUserId.equals(contactWithId)) {
-                ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, contactWithId);
-                if (cRec == null) {
-                  // Check if we have user's public key, if not fetch it
-                  KeyRecord pubKey = cache.getKeyRecordForUser(contactWithId);
-                  if (pubKey == null) {
-                    Obj_IDList_Co request = new Obj_IDList_Co();
-                    request.IDs = new Long[] { contactWithId };
-                    MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-                    SIL.submitAndWait(msgAction, 60000);
-                  }
-                  Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
-                  request.shareId = shareId;
-                  request.contactRecord = new ContactRecord();
-                  request.contactRecord.contactWithId = contactWithId;
-                  request.contactRecord.setOwnerNote(emlAddr);
-                  request.contactRecord.setOtherNote(contactReason);
-                  request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
-                  request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
-                  SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
-                }
-              }
-            }
-          }
-
-          // Send invites by Email
-          // skip if email already belongs to my active or declined contact
-          StringBuffer filteredEmlAddressesSB = new StringBuffer();
-          for (int i=0; i<emailAddressesL.size(); i++) {
-            String emlAddr = (String) emailAddressesL.get(i);
-            EmailRecord emlRec = cache.getEmailRecord(emlAddr);
-            if (emlRec != null) {
-              Long contactWithId = emlRec.userId;
-              if (!myUserId.equals(contactWithId)) {
-                ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, contactWithId);
-                if (cRec != null && (cRec.isOfActiveTypeAnyState() || cRec.isOfDeclinedTypeAnyState())) {
-                  emlAddr = null;
-                }
-              }
-            }
-            if (emlAddr != null) {
-              if (filteredEmlAddressesSB.length() > 0)
-                filteredEmlAddressesSB.append(",");
-              filteredEmlAddressesSB.append(emlAddr);
-            }
-          }
-          boolean inviteSuccess = true;
-          if (filteredEmlAddressesSB.length() > 0) {
-            Obj_List_Co request = new Obj_List_Co();
-            request.objs = new String[] { filteredEmlAddressesSB.toString(), personalMsg };
-            ClientMessageAction msgActionInv = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_SEND_EMAIL_INVITATION, request), 120000);
-            DefaultReplyRunner.nonThreadedRun(SIL, msgActionInv);
-            inviteSuccess = msgActionInv != null && msgActionInv.getActionCode() >= 0;
-          }
-          if (inviteSuccess && dialog != null)
-            dialog.closeDialog();
-          else if (!inviteSuccess && dialog != null)
-            dialog.setEnabledButtons(true);
-        }
-      };
-      th.setDaemon(true);
-      th.start();
-      // Add-at-once the email addresses that we sent invites to.
-      MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(null, emailNicksL, emailAddressesL, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER), true, null, true);
-    }
-    if (!shouldSend) {
-      if (dialog != null)
-        dialog.setEnabledButtons(true);
     }
   }
 

@@ -842,7 +842,7 @@ public class MsgTableModel extends RecordTableModel {
               messageText = msgData.getEncodedHTMLData();
             } else {
               // simplify HTML message for chat display - also converting <p> to <br> to keep it simpler
-              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true, true, true, true, true);
+              messageText = HTML_Ops.clearHTMLheaderAndConditionForDisplay(messageText, true, true, true, true, true, true, true, true);
               // move the BODY tag right after the HTML tag...
               int iBody1 = messageText.indexOf("<body");
               if (iBody1 < 0)

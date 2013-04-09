@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -12,33 +12,48 @@
 
 package com.CH_gui.contactTable;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.msg.dataSets.usr.*;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.cache.event.RecordEvent;
+import com.CH_cl.service.cache.event.UserRecordEvent;
+import com.CH_cl.service.cache.event.UserRecordListener;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.ContactOps;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
+import com.CH_co.service.msg.dataSets.usr.Usr_AltUsrData_Rq;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.ContactFilterCo;
+import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-
+import com.CH_co.util.CallbackI;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.NotificationCenter;
 import com.CH_gui.action.AbstractActionTraced;
 import com.CH_gui.action.ActionUtilities;
-import com.CH_gui.dialog.InviteByEmailDialog;
-import com.CH_gui.frame.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.table.*;
-import com.CH_gui.util.*;
-
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.frame.FindUserFrame;
+import com.CH_gui.frame.MainFrame;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyListCombo;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.msgs.MsgComposePanel;
+import com.CH_gui.table.RecordTableComponent;
+import com.CH_gui.util.Images;
+import com.CH_gui.util.MessageDialog;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -205,7 +220,14 @@ public class ContactTableComponent extends RecordTableComponent {
           text = "";
         String[] addresses = EmailRecord.gatherAddresses(text);
         if (addresses != null && addresses.length > 0) {
-          InviteByEmailDialog.doInvite(text, "", null, autoCreateWebAccounts);
+          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+          ArrayList emlAddrsL = new ArrayList();
+          ArrayList emlNicksL = new ArrayList();
+          ContactOps.doInviteToContacts_Threaded(SIL, text, "", null, autoCreateWebAccounts, emlAddrsL, emlNicksL);
+          if (emlAddrsL.size() > 0) {
+            // Add-at-once the email addresses that we sent invites to.
+            MsgComposePanel.checkEmailAddressesForAddressBookAdition_Threaded(ContactTableComponent.this, emlNicksL, emlAddrsL, false, new FolderFilter(FolderRecord.ADDRESS_FOLDER), true, null, true);
+          }
         } else {
           new FindUserFrame(com.CH_cl.lang.Lang.rb.getString("button_Select"), com.CH_cl.lang.Lang.rb.getString("button_Close"), text, true).setContactCreateHotButtonCallback(new CallbackI() {
             public void callback(Object value) {

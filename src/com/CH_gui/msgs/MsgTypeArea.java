@@ -301,7 +301,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
             return " [" + part.substring(part.lastIndexOf('/')+1, part.lastIndexOf('"')) + "] ";
           }
         };
-        body = ArrayUtils.removeTags(body, startTags, endTags, new Object[] { callback });
+        body = ArrayUtils.removeTags(new StringBuffer(body), startTags, endTags, new Object[] { callback }).toString();
       }
       if (objType == MsgDataRecord.OBJ_TYPE_ADDR) {
         XMLElement content = contactInfoPanel.getContent();

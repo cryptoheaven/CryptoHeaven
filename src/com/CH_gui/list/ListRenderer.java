@@ -169,13 +169,13 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
               subject = "Body: " + MsgPanelUtils.extractPlainFromHtml(mData.getText());
               if (subject.length() > 40)
                 subject = subject.substring(0, 40) + " ...";
-              subject = ArrayUtils.replaceKeyWords(subject,
+              subject = ArrayUtils.replaceKeyWords(new StringBuffer(subject),
                 new String[][] {
                   {"\n\r", " "},
                   {"\r\n", " "},
                   {"\r", " "},
                   {"\n", " "},
-              });
+              }).toString();
             } else {
               subject = "(No subject, Message ID " + mData.msgId + ")";
             }

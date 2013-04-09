@@ -1,59 +1,64 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.actions.*;
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.cache.*;
-
-import com.CH_co.cryptx.*;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.cnt.*;
-import com.CH_co.service.msg.dataSets.obj.*;
-import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
-import com.CH_co.util.*;
-
+import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.ContactOps;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
+import com.CH_co.service.records.KeyRecord;
+import com.CH_co.service.records.UserRecord;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ImageNums;
 import com.CH_gui.frame.MainFrame;
-import com.CH_gui.gui.*;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
 import com.CH_gui.service.records.RecordUtilsGui;
-import com.CH_gui.util.*;
-import com.CH_guiLib.gui.*;
-
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.Images;
+import com.CH_guiLib.gui.JMyTextField;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Keymap;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.6 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.6 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class InitiateContactDialog extends GeneralDialog {
 
   JLabel jContactWith;
@@ -231,62 +236,8 @@ public class InitiateContactDialog extends GeneralDialog {
   private void pressedOK() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InitiateContactDialog.class, "pressedOK()");
     closeDialog();
-    sendContactCreate_Threaded(jContactName != null ? jContactName.getText().trim() : null,  jContactReason.getText().trim(), contactWithIds, null);
+    ContactOps.doCreateContacts_Threaded(SIL, jContactName != null ? jContactName.getText().trim() : null,  jContactReason.getText().trim(), contactWithIds, null);
     if (trace != null) trace.exit(InitiateContactDialog.class);
-  }
-
-  public static void sendContactCreate_Threaded(final String name, final String reason, final Long[] contactWithIds, final CallbackI callback) {
-    Thread th = new ThreadTraced("Initiate Contact -- Pressed OK Submitter") {
-      public void runTraced() {
-        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-        FetchedDataCache cache = SIL.getFetchedDataCache();
-        Long shareId = cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId;
-        BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
-
-        // make sure we have all public keys of other users
-        ArrayList userIDsWithNoKeysL = new ArrayList();
-        for (int i=0; i<contactWithIds.length; i++) {
-          if (cache.getKeyRecordForUser(contactWithIds[i]) == null)
-            userIDsWithNoKeysL.add(contactWithIds[i]);
-        }
-        if (userIDsWithNoKeysL.size() > 0) {
-          Obj_IDList_Co request = new Obj_IDList_Co(userIDsWithNoKeysL);
-          MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-          ClientMessageAction replyMsg = SIL.submitAndFetchReply(msgAction, 60000);
-          DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-        }
-
-        // send the Contact creation requests
-        for (int i=0; i<contactWithIds.length; i++) {
-          //1310 <shareId>   <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
-
-          // process each contact separately one at a time
-          Long contactWithId = contactWithIds[i];
-
-          Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
-          request.shareId = shareId;
-          request.contactRecord = new ContactRecord();
-          request.contactRecord.contactWithId = contactWithId;
-          request.contactRecord.setOwnerNote(name != null && name.trim().length() > 0 ? name.trim() : cache.getUserRecord(contactWithId).handle);
-          request.contactRecord.setOtherNote(reason.trim());
-          request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
-          request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
-
-          // using the callback we must know when it is finished so use submit with fetch
-          if (callback != null) {
-            ClientMessageAction replyMsg = SIL.submitAndFetchReply(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request), 60000);
-            DefaultReplyRunner.nonThreadedRun(SIL, replyMsg);
-          } else {
-            SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
-          }
-        }
-        if (callback != null) {
-          callback.callback(contactWithIds);
-        }
-      }
-    };
-    th.setDaemon(true);
-    th.start();
   }
 
   private void pressedCancel() {

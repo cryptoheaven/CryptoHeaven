@@ -94,7 +94,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
     if (trace != null) trace.args(recordFilter);
     // Each instance of the table will get its own header data so that
     // changes by that table will not affect other tables of the same type.
-    this.columnHeaderData = (ColumnHeaderData) Misc.cloneSerializable(columnHeaderData);
+    this.columnHeaderData = (ColumnHeaderData) Misc.cloneBySerialization(columnHeaderData);
     this.recordFilter = recordFilter;
     if (trace != null) trace.exit(RecordTableModel.class);
   }

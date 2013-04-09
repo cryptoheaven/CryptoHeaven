@@ -548,7 +548,7 @@ public class MsgPanelUtils extends Object {
       }
     }
     if (isHtmlMode) {
-      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, false, false, false, false, true, false, false);
+      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, false, false, false, false, false, true, false, false);
     }
     boolean addSpaces = text.trim().length() > 0;
     if (inHtmlMode != isHtmlMode) {
@@ -601,7 +601,8 @@ public class MsgPanelUtils extends Object {
     String originalHtml = html;
     String text = "";
     synchronized (paneForPlainExtraction) {
-      html = ArrayUtils.replaceKeyWords(html,
+      StringBuffer htmlSB = new StringBuffer(html);
+      htmlSB = ArrayUtils.replaceKeyWords(htmlSB,
         new String[][] {
           {"<P>",    "</DIV><P><DIV>"},
           {"<p>",    "</DIV><P><DIV>"},
@@ -638,32 +639,33 @@ public class MsgPanelUtils extends Object {
         "<TABLE>",
         "<!--INPUT--!>",
       };
-      html = ArrayUtils.removeTags(html, startTags, endTags, replacementTags);
+      htmlSB = ArrayUtils.removeTags(htmlSB, startTags, endTags, replacementTags);
       { // HEAD cleanup
-        int indexBodyStart = html.indexOf("<body"); if (indexBodyStart < 0) indexBodyStart = html.indexOf("<BODY");
-        int indexHeadEnd = html.indexOf("</head"); if (indexHeadEnd < 0) indexHeadEnd = html.indexOf("</HEAD");
+        int indexBodyStart = htmlSB.indexOf("<body"); if (indexBodyStart < 0) indexBodyStart = htmlSB.indexOf("<BODY");
+        int indexHeadEnd = htmlSB.indexOf("</head"); if (indexHeadEnd < 0) indexHeadEnd = htmlSB.indexOf("</HEAD");
         if (indexBodyStart < indexHeadEnd) {
           // skip HEAD cleanup because it seems that body is inside the HEAD tag
         } else {
           startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
           endTags = new String[][] {{ "</head>", "</HEAD>" }};
           replacementTags = new String[] { null };
-          html = ArrayUtils.removeTags(html, startTags, endTags, replacementTags);
+          htmlSB = ArrayUtils.removeTags(htmlSB, startTags, endTags, replacementTags);
         }
       }
       // don't convert P to BR because plain text extraction would loose \n new-line characters
-      String content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(html, true, true, true, true, true, true, false);
-      boolean success = MsgPanelUtils.setMessageContent(content, true, paneForPlainExtraction, true);
+      StringBuffer content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(htmlSB, true, true, true, true, true, true, true, false, null);
+      boolean success = MsgPanelUtils.setMessageContent(content.toString(), true, paneForPlainExtraction, true);
       if (!success) {
         // don't convert P to BR because plain text extraction would loose \n new-line characters
-        content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(originalHtml, true, true, true, true, true, true, false);
-        MsgPanelUtils.setMessageContent(content, true, paneForPlainExtraction, true);
+        String originalCleared = HTML_Ops.clearHTMLheaderAndConditionForDisplay(originalHtml, true, true, true, true, true, true, true, false);
+        MsgPanelUtils.setMessageContent(originalCleared, true, paneForPlainExtraction, true);
       }
       Document d = paneForPlainExtraction.getDocument();
       try {
         text = d.getText(0, d.getLength());
         text = text.trim();
-        text = ArrayUtils.replaceKeyWords(text,
+        StringBuffer textSB = new StringBuffer(text);
+        textSB = ArrayUtils.replaceKeyWords(textSB,
           new String[][] {
             {"        \n",              "\n"},
             {"    \n",                  "\n"},
@@ -674,6 +676,7 @@ public class MsgPanelUtils extends Object {
             {"\n\n\n\n\n",              "\n\n\n"},
             {"\n\n\n\n",                "\n\n\n"},
         });
+        text = textSB.toString();
       } catch (Throwable t) {
       }
     }
@@ -746,10 +749,11 @@ public class MsgPanelUtils extends Object {
                           String text = content[0];
                           if (isHTMLview) {
                             boolean isRemoveStyles = false;
+                            boolean isRemoveInlineStyles = false;
                             boolean isRemoveHead = false;
                             boolean isRemoveRemoteLoading = !skipRemoteLoadingCleaning;
 
-                            text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, isRemoveStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
+                            text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, isRemoveStyles, isRemoveInlineStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
                           }
 
                           // Eliminate flickering and improve performance by skipping duplicate requests

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
+ * Copyright 2001-2013 by CryptoHeaven Corp.,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -12,14 +12,15 @@
 
 package com.CH_cl.service.engine;
 
-import com.CH_co.trace.*;
-import com.CH_co.monitor.*;
-
-import com.CH_co.service.msg.MessageAction;
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_co.util.MyUncaughtExceptionHandlerOps;
+import com.CH_co.monitor.ProgMonitorI;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
+ * <b>Copyright</b> &copy; 2001-2013
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
@@ -61,6 +62,7 @@ public class DefaultReplyRunner extends ThreadTraced {
     } catch (Throwable t) {
       if (trace != null) trace.data(100, "Exception while running action", msgAction);
       if (trace != null) trace.exception(DefaultReplyRunner.class, 101, t);
+      MyUncaughtExceptionHandlerOps.unhandledException(t);
     }
 
     // help garbage collection

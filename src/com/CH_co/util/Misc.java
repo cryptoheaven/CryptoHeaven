@@ -608,16 +608,17 @@ public class Misc extends Object {
     if (plain != null) {
       StringBuffer sb = new StringBuffer();
       // pre-process string to remove \n\r \r\n combos
-      plain = ArrayUtils.replaceKeyWords(plain, new String[][] {
+      StringBuffer plainSB = new StringBuffer(plain);
+      plainSB = ArrayUtils.replaceKeyWords(plainSB, new String[][] {
                   {"\n\r", "\n"},
                   {"\r\n", "\n"},
                   {"\r",   "\n"},
                 });
-      int len = plain.length();
+      int len = plainSB.length();
       char prevCH = ' ';
       char currCH = ' ';
       for (int i=0; i<len; i++) {
-        char ch = plain.charAt(i);
+        char ch = plainSB.charAt(i);
         currCH = ch;
         if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9'))
           sb.append(ch); // for performance, try most common case first
@@ -704,7 +705,7 @@ public class Misc extends Object {
   * Do cloning using serialization.
   * @return cloned instance of object
   */
-  public static Object cloneSerializable(Object object) {
+  public static Object cloneBySerialization(Serializable object) {
     Object rcObj = null;
 
     try {

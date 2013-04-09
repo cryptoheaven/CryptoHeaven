@@ -1156,7 +1156,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     if (content[0].equalsIgnoreCase("text/html")) {
       String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, true) : "";
       if (signatureText.trim().length() > 0) {
-        signatureText = ArrayUtils.replaceKeyWords(signatureText,
+        signatureText = ArrayUtils.replaceKeyWords(new StringBuffer(signatureText),
             new String[][] {
               {"<BODY>", " "},
               {"<body>", " "},
@@ -1166,7 +1166,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
               {"<html>", " "},
               {"</HTML>", " "},
               {"</html>", " "},
-          });
+          }).toString();
       }
       text =
           "<html><body> " +
@@ -1279,7 +1279,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       // << comes in HTML
       if (dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         // clear excessive HTML to make feasible for usage as reply content
-        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, false, false, true, true, true, false, false);
+        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, false, false, false, true, true, true, false, false);
         if (convertHTMLBodyToPlain) {
           String html = quotedMsgBody;
           if (trace != null) trace.data(50, "extracting plain from html");

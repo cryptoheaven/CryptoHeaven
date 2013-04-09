@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -53,9 +53,8 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-
 /**
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -177,7 +176,7 @@ public class MainFrameStarter extends Object {
           } else if (args[i].equalsIgnoreCase("-username")) {
             i ++;
             String handle = URLDecoder.decode(args[i]);
-            GlobalProperties.setProperty(LoginFrame.PROPERTY_USER_NAME, handle);
+            GlobalProperties.setProperty(GlobalProperties.PROPERTY_USER_NAME, handle);
           } else if (args[i].equalsIgnoreCase("-password")) {
             i ++;
             LoginFrame.defaultPassword = args[i];

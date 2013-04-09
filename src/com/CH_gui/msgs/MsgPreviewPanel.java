@@ -1742,9 +1742,10 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         sb.append("</body></html>");
 
         boolean isRemoveStyles = false;
+        boolean isRemoveInlineStyles = false;
         boolean isRemoveHead = false;
         boolean isRemoveRemoteLoading = false;
-        String content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(sb.toString(), isRemoveStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
+        String content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(sb.toString(), isRemoveStyles, isRemoveInlineStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
 
         MyHTMLEditor pane = new MyHTMLEditor();
         MsgPanelUtils.setMessageContent(content, true, pane, true);

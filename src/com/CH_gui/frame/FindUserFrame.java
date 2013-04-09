@@ -1,49 +1,52 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.frame;
 
-import com.CH_gui.actionGui.*;
-import com.CH_gui.dialog.InitiateContactDialog;
-import com.CH_gui.gui.*;
-import com.CH_gui.usrs.*;
-import com.CH_gui.userTable.*;
-import com.CH_gui.util.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.ContactOps;
 import com.CH_co.service.records.RecordUtils;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.CallbackI;
-
-import java.awt.event.*;
-import java.awt.*;
-import javax.swing.*;
+import com.CH_gui.actionGui.JActionFrameClosable;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.userTable.UserActionTable;
+import com.CH_gui.usrs.EmailInvitationPanel;
+import com.CH_gui.usrs.UserSearchPanel;
+import com.CH_gui.util.MiscGui;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.16 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.16 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FindUserFrame extends JActionFrameClosable {
 
   private static final int DEFAULT_CANCEL_BUTTON_INDEX = 2;
@@ -90,8 +93,8 @@ public class FindUserFrame extends JActionFrameClosable {
   }
 
   /**
-   * @return the dialog 'Search' and 'Cancel' buttons
-   */
+  * @return the dialog 'Search' and 'Cancel' buttons
+  */
   private JButton[] createButtons() {
     JButton[] buttons = new JButton[3];
 
@@ -131,15 +134,16 @@ public class FindUserFrame extends JActionFrameClosable {
   }
 
   /**
-   * Silent contact creation action.
-   */
+  * Silent contact creation action.
+  */
   private class ContactCreateAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
       Long[] contactWithIds = RecordUtils.getIDs(userSearchPanel.userActionTable.getSelectedRecords());
       if (contactWithIds != null && contactWithIds.length > 0) {
-        FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        FetchedDataCache cache = SIL.getFetchedDataCache();
         String reason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle});
-        InitiateContactDialog.sendContactCreate_Threaded(null, reason, contactWithIds, contactCreateHotButtonCallback);
+        ContactOps.doCreateContacts_Threaded(SIL, null, reason, contactWithIds, contactCreateHotButtonCallback);
         closeFrame();
       }
     }

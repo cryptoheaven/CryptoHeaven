@@ -874,10 +874,11 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
 
                 if (isHTMLformatted) {
                   boolean isRemoveStyles = false;
+                  boolean isRemoveInlineStyles = false;
                   boolean isRemoveHead = true; // avoid many HEAD tags in the generated table
                   boolean isRemoveRemoteLoading = false;
-                  s = HTML_Ops.clearHTMLheaderAndConditionForDisplay(s, isRemoveStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
-                  s = ArrayUtils.replaceKeyWords(s,
+                  s = HTML_Ops.clearHTMLheaderAndConditionForDisplay(s, isRemoveStyles, isRemoveInlineStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
+                  StringBuffer buf = ArrayUtils.replaceKeyWords(new StringBuffer(s),
                       new String[][] {
                         {"<body>", ""},
                         {"<BODY>", ""},
@@ -888,7 +889,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
                         {"</html>", ""},
                         {"</HTML>", ""},
                   });
-                  sb.append(s);
+                  sb.append(buf);
                 } else {
                   sb.append(Misc.encodePlainIntoHtml(s));
                 }

@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -23,7 +23,7 @@ import com.CH_co.io.*;
 import com.CH_co.util.Misc;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -579,8 +579,8 @@ public class Trace extends Object {
         if (lastThread == thisThread)
           lastThread = null;
         Trace trace = (Trace) hashMap.remove(makeKey(thisThread));
-        trace.stack.clear(); trace.stack = null;
-        trace.stack2.clear(); trace.stack2 = null;
+        trace.stack.clear();
+        trace.stack2.clear();
       }
     } catch (Throwable t) {
     }
@@ -660,7 +660,7 @@ public class Trace extends Object {
   }
 
   private boolean debugLevelBelow(int debugLevel) {
-    if (TraceProperties.getLevel( (Class) stack.peek() ) < debugLevel)
+    if (stack.size() > 0 && TraceProperties.getLevel( (Class) stack.peek() ) < debugLevel)
       return true;
     return false;
   }

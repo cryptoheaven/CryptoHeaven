@@ -13,6 +13,9 @@
 package com.CH_co.util;
 
 import com.CH_co.trace.Trace;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 /** 
 * <b>Copyright</b> &copy; 2001-2012
@@ -32,12 +35,20 @@ import com.CH_co.trace.Trace;
 */
 public class HTML_Ops {
 
-  public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, 
+  public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveInlineStyles,
           boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, 
           boolean isRemoveComment, boolean isRemoveRemoteLoading, boolean isConvertPtoBR) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment, boolean isRemoveRemoteLoading, boolean isConvertPtoBR)");
-    if (trace != null) trace.args(htmlMessage != null && htmlMessage.length() < 255 ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null"));
+    return clearHTMLheaderAndConditionForDisplay(new StringBuffer(htmlMessage), isRemoveStyles, isRemoveInlineStyles, 
+            isRemoveHead, isRemoveLeadP, isRemoveMap, 
+            isRemoveComment, isRemoveRemoteLoading, isConvertPtoBR, null).toString();
+  }
+  public static StringBuffer clearHTMLheaderAndConditionForDisplay(StringBuffer htmlMessage, boolean isRemoveStyles, boolean isRemoveInlineStyles,
+          boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, 
+          boolean isRemoveComment, boolean isRemoveRemoteLoading, boolean isConvertPtoBR, StringBuffer reportSB) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(HTML_Ops.class, "clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveInlineStyles, boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, boolean isRemoveComment, boolean isRemoveRemoteLoading, boolean isConvertPtoBR)");
+    if (trace != null) trace.args(htmlMessage != null && htmlMessage.length() < 255 ? htmlMessage.toString() : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null"));
     if (trace != null) trace.args(isRemoveStyles);
+    if (trace != null) trace.args(isRemoveInlineStyles);
     if (trace != null) trace.args(isRemoveHead);
     if (trace != null) trace.args(isRemoveLeadP);
     if (trace != null) trace.args(isRemoveMap);
@@ -45,81 +56,116 @@ public class HTML_Ops {
     if (trace != null) trace.args(isRemoveRemoteLoading);
     if (trace != null) trace.args(isConvertPtoBR);
 
+    // timing
+    long start, end;
+    
     if (htmlMessage != null) {
 
       if (isRemoveStyles) {
+        start = System.currentTimeMillis();
         String[][] startTags = new String[][] {{ "<style", "<STYLE" }};
         String[][] endTags = new String[][] {{ "</style>", "</STYLE>" }};
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
-        startTags = new String[][] {{ "style=\"", "STYLE=\"", "class=\"", "CLASS=\"" }};
-        endTags = new String[][] {{ "\"" }};
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed styles in ").append(end-start).append(" ms.\n");
+      }
+      
+      if (isRemoveInlineStyles) {
+        start = System.currentTimeMillis();
+        String[][] startTags = new String[][] {{ "style=\"", "STYLE=\"", "class=\"", "CLASS=\"" }};
+        String[][] endTags = new String[][] {{ "\"" }};
         String[] replacementTags = new String[] { "" };
         String[] outerBeginTags = new String[] { "<" };
         String[] outerEndTags = new String[] { ">" };
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed inline styles in ").append(end-start).append(" ms.\n");
       }
 
       if (isRemoveHead) {
+        start = System.currentTimeMillis();
         boolean isBodyPresent = htmlMessage.indexOf("<body") >= 0 || htmlMessage.indexOf("<BODY") >= 0;
         String[][] startTags = new String[][] {{ "<head>", "<HEAD>", "<head ", "<HEAD " }};
         String[][] endTags = new String[][] {{ "</head>", "</HEAD>" }};
-        String trimmedHtmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+        StringBuffer trimmedHtmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
         if (isBodyPresent && trimmedHtmlMessage.indexOf("<body") < 0 && trimmedHtmlMessage.indexOf("<BODY") < 0) {
           // keep original html message because trimming the 'head' somehow removed the 'body' which is not right
         } else {
           htmlMessage = trimmedHtmlMessage;
         }
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed head in ").append(end-start).append(" ms.\n");
       }
 
       // noticed an email contained thousands of <v> and </v> tags which are invalid and crashed the client, so I removed them here
-      htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
-        new String[][] {
-          {"<v>", ""},
-          {"<V>", ""},
-          {"</v>", ""},
-          {"</V>", ""},
-      });
+      {
+        start = System.currentTimeMillis();
+        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+          new String[][] {
+            {"<v>", ""},
+            {"<V>", ""},
+            {"</v>", ""},
+            {"</V>", ""},
+        });
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed invalid v's in ").append(end-start).append(" ms.\n");
+      }
 
       boolean removedLeadP = !isRemoveLeadP;
       if (!removedLeadP) {
+        start = System.currentTimeMillis();
         int iStartP = htmlMessage.indexOf("<P>");
         int iStartP2 = htmlMessage.indexOf("</P>");
         int iStartB = htmlMessage.indexOf("<BODY");
         if (iStartB >= 0 && iStartP >= iStartB && iStartP2 > iStartP && iStartP2 + "</P>".length() < htmlMessage.length()) {
-          int iStartB2 = htmlMessage.indexOf('>', iStartB);
+          int iStartB2 = htmlMessage.indexOf(">", iStartB);
           if (iStartB2 > iStartB && iStartB2 < iStartP) {
-            htmlMessage = htmlMessage.substring(0, iStartP) + htmlMessage.substring(iStartP + "<P>".length(), iStartP2) + htmlMessage.substring(iStartP2 + "</P>".length());
+            htmlMessage = new StringBuffer(htmlMessage.substring(0, iStartP) + htmlMessage.substring(iStartP + "<P>".length(), iStartP2) + htmlMessage.substring(iStartP2 + "</P>".length()));
+//            htmlMessage = htmlMessage.substring(0, iStartP) + htmlMessage.substring(iStartP + "<P>".length(), iStartP2) + htmlMessage.substring(iStartP2 + "</P>".length());
             removedLeadP = true;
           }
         }
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed lead Ps1 in ").append(end-start).append(" ms.\n");
       }
       if (!removedLeadP) {
+        start = System.currentTimeMillis();
         int iStartP = htmlMessage.indexOf("<p>");
         int iStartP2 = htmlMessage.indexOf("</p>");
         int iStartB = htmlMessage.indexOf("<body");
         if (iStartB >= 0 && iStartP >= iStartB && iStartP2 > iStartP && iStartP2 + "</p>".length() < htmlMessage.length()) {
-          int iStartB2 = htmlMessage.indexOf('>', iStartB);
+          int iStartB2 = htmlMessage.indexOf(">", iStartB);
           if (iStartB2 > iStartB && iStartB2 < iStartP) {
-            htmlMessage = htmlMessage.substring(0, iStartP) + htmlMessage.substring(iStartP + "<p>".length(), iStartP2) + htmlMessage.substring(iStartP2 + "</p>".length());
+            htmlMessage = new StringBuffer(htmlMessage.substring(0, iStartP) + htmlMessage.substring(iStartP + "<p>".length(), iStartP2) + htmlMessage.substring(iStartP2 + "</p>".length()));
+//            htmlMessage = htmlMessage.substring(0, iStartP) + htmlMessage.substring(iStartP + "<p>".length(), iStartP2) + htmlMessage.substring(iStartP2 + "</p>".length());
             removedLeadP = true;
           }
         }
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed lead Ps2 in ").append(end-start).append(" ms.\n");
       }
 
       if (isRemoveMap) {
+        start = System.currentTimeMillis();
         String[][] startTags = new String[][] {{ "<map", "<MAP" }};
         String[][] endTags = new String[][] {{ "</map>", "</MAP>" }};
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed map in ").append(end-start).append(" ms.\n");
       }
 
       if (isRemoveComment) {
+        start = System.currentTimeMillis();
         String[][] startTags = new String[][] {{ "<!--" }};
         String[][] endTags = new String[][] {{ "-->" }};
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, null);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed comment in ").append(end-start).append(" ms.\n");
       }
 
       // removes loading of resources through styles
       if (isRemoveRemoteLoading) {
+        start = System.currentTimeMillis();
         // Removal example:
         // <img src="http://domain.com/image.jpg">    ---->    <img src="images/clear-pixel.gif">
         String[][] startTags = new String[][] {{ "src=\"http", "SRC=\"http", "src='http", "SRC='http"  }};
@@ -165,9 +211,12 @@ public class HTML_Ops {
                     { " URL(", " URLX(" },
                   }, new String[] { "<" }, new String[] { ">" }, true);
         }
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed remote loading in ").append(end-start).append(" ms.\n");
       }
 
       if (isConvertPtoBR) {
+        start = System.currentTimeMillis();
         // First eliminate double spaces inside formatting tags.
         // Don't touch double spaces else where as they maybe renderable when inside <PRE></PRE> tags
         htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
@@ -184,10 +233,13 @@ public class HTML_Ops {
             { "</p>", " " },
             { "</P>", " " },
           }, null, null, true);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("converted Ps to BRs in ").append(end-start).append(" ms.\n");
       }
 
       // Always remove unsupported CID sources
       {
+        start = System.currentTimeMillis();
         // Removal example:
         // <img src="cid:24234234234">    ---->    <img src="images/clear-pixel.gif">
         String[][] startTags = new String[][] {{ "src=\"cid", "SRC=\"cid", "src='cid", "SRC='cid" }};
@@ -202,10 +254,13 @@ public class HTML_Ops {
         outerBeginTags = new String[] { "<img", "<IMG" };
         outerEndTags = new String[] { ">" };
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed unsupported CIDs in ").append(end-start).append(" ms.\n");
       }
 
       // Always remove scripts
       {
+        start = System.currentTimeMillis();
         // remove SCRIPTs
         String[][] startTags = new String[][] {{ "<script", "<SCRIPT" }};
         String[][] endTags = new String[][] {{ "</script>", "</SCRIPT>" }};
@@ -217,71 +272,119 @@ public class HTML_Ops {
         String[] outerBeginTags = new String[] { "<" };
         String[] outerEndTags = new String[] { ">" };
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("removed scripts in ").append(end-start).append(" ms.\n");
       }
 
       // java renderer has trouble with empty 'background' style and with #fff colors turning blue
-      if (htmlMessage.indexOf("background:") >= 0)
-        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
-          new String[][] {
-                  { "background: #fff;", "background: #ffffff;" },
-                  { "background: #fff'", "background: #ffffff'" },
-                  { "background: #fff\"", "background: #ffffff\"" },
-                  { "background: #FFF;", "background: #ffffff;" },
-                  { "background: #FFF'", "background: #ffffff'" },
-                  { "background: #FFF\"", "background: #ffffff\"" },
-                  { "background:#fff;", "background: #ffffff;" },
-                  { "background:#fff'", "background: #ffffff'" },
-                  { "background:#fff\"", "background: #ffffff\"" },
-                  { "background:#FFF;", "background: #ffffff;" },
-                  { "background:#FFF'", "background: #ffffff'" },
-                  { "background:#FFF\"", "background: #ffffff\"" },
-                  { "background: ;", "background: #ffffff;" },
-                  { "background: '", "background: #ffffff'" },
-                  { "background: \"", "background: #ffffff\"" },
-                  { "background:;", "background: #ffffff;" },
-                  { "background:'", "background: #ffffff'" },
-                  { "background:\"", "background: #ffffff\"" },
-                }, new String[] { "<" }, new String[] { ">" }, true);
-      if (htmlMessage.indexOf("background-color:") >= 0)
-        htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
-          new String[][] {
-                  { "background-color: #fff;", "background-color: #ffffff;" },
-                  { "background-color: #fff'", "background-color: #ffffff'" },
-                  { "background-color: #fff\"", "background-color: #ffffff\"" },
-                  { "background-color: #FFF;", "background-color: #ffffff;" },
-                  { "background-color: #FFF'", "background-color: #ffffff'" },
-                  { "background-color: #FFF\"", "background-color: #ffffff\"" },
-                  { "background-color:#fff;", "background-color: #ffffff;" },
-                  { "background-color:#fff'", "background-color: #ffffff'" },
-                  { "background-color:#fff\"", "background-color: #ffffff\"" },
-                  { "background-color:#FFF;", "background-color: #ffffff;" },
-                  { "background-color:#FFF'", "background-color: #ffffff'" },
-                  { "background-color:#FFF\"", "background-color: #ffffff\"" },
-                  { "background-color: ;", "background-color: #ffffff;" },
-                  { "background-color: '", "background-color: #ffffff'" },
-                  { "background-color: \"", "background-color: #ffffff\"" },
-                  { "background-color:;", "background-color: #ffffff;" },
-                  { "background-color:'", "background-color: #ffffff'" },
-                  { "background-color:\"", "background-color: #ffffff\"" },
-                }, new String[] { "<" }, new String[] { ">" }, true);
+      {
+        start = System.currentTimeMillis();
+        if (htmlMessage.indexOf("background:") >= 0)
+          htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+            new String[][] {
+                    { "background: #fff;", "background: #ffffff;" },
+                    { "background: #fff'", "background: #ffffff'" },
+                    { "background: #fff\"", "background: #ffffff\"" },
+                    { "background: #FFF;", "background: #ffffff;" },
+                    { "background: #FFF'", "background: #ffffff'" },
+                    { "background: #FFF\"", "background: #ffffff\"" },
+                    { "background:#fff;", "background: #ffffff;" },
+                    { "background:#fff'", "background: #ffffff'" },
+                    { "background:#fff\"", "background: #ffffff\"" },
+                    { "background:#FFF;", "background: #ffffff;" },
+                    { "background:#FFF'", "background: #ffffff'" },
+                    { "background:#FFF\"", "background: #ffffff\"" },
+                    { "background: ;", "background: #ffffff;" },
+                    { "background: '", "background: #ffffff'" },
+                    { "background: \"", "background: #ffffff\"" },
+                    { "background:;", "background: #ffffff;" },
+                    { "background:'", "background: #ffffff'" },
+                    { "background:\"", "background: #ffffff\"" },
+                  }, new String[] { "<" }, new String[] { ">" }, true);
+        if (htmlMessage.indexOf("background-color:") >= 0)
+          htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
+            new String[][] {
+                    { "background-color: #fff;", "background-color: #ffffff;" },
+                    { "background-color: #fff'", "background-color: #ffffff'" },
+                    { "background-color: #fff\"", "background-color: #ffffff\"" },
+                    { "background-color: #FFF;", "background-color: #ffffff;" },
+                    { "background-color: #FFF'", "background-color: #ffffff'" },
+                    { "background-color: #FFF\"", "background-color: #ffffff\"" },
+                    { "background-color:#fff;", "background-color: #ffffff;" },
+                    { "background-color:#fff'", "background-color: #ffffff'" },
+                    { "background-color:#fff\"", "background-color: #ffffff\"" },
+                    { "background-color:#FFF;", "background-color: #ffffff;" },
+                    { "background-color:#FFF'", "background-color: #ffffff'" },
+                    { "background-color:#FFF\"", "background-color: #ffffff\"" },
+                    { "background-color: ;", "background-color: #ffffff;" },
+                    { "background-color: '", "background-color: #ffffff'" },
+                    { "background-color: \"", "background-color: #ffffff\"" },
+                    { "background-color:;", "background-color: #ffffff;" },
+                    { "background-color:'", "background-color: #ffffff'" },
+                    { "background-color:\"", "background-color: #ffffff\"" },
+                  }, new String[] { "<" }, new String[] { ">" }, true);
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("converted background colors in ").append(end-start).append(" ms.\n");
+      }
 
       // java renderer has trouble with rgb(256, 256, 256) values that have a space between numbers
-      if (htmlMessage.indexOf("rgb(") >= 0) {
-        String[][] startTags = new String[][] {{ "rgb(" }};
-        String[][] endTags = new String[][] {{ ")" }};
-        Object[] replacementTags = new Object[] { new CallbackReturnI() {
-          public Object callback(Object value) {
-            return ((String) value).replaceAll(" ", "");
-          }
-        }};
-        String[] outerBeginTags = new String[] { "<" };
-        String[] outerEndTags = new String[] { ">" };
-        htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
+      {
+        start = System.currentTimeMillis();
+        if (htmlMessage.indexOf("rgb(") >= 0) {
+          String[][] startTags = new String[][] {{ "rgb(" }};
+          String[][] endTags = new String[][] {{ ")" }};
+          Object[] replacementTags = new Object[] { new CallbackReturnI() {
+            public Object callback(Object value) {
+              return ((String) value).replaceAll(" ", "");
+            }
+          }};
+          String[] outerBeginTags = new String[] { "<" };
+          String[] outerEndTags = new String[] { ">" };
+          htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
+        }
+        end = System.currentTimeMillis();
+        if (reportSB != null) reportSB.append("converted RGBs in ").append(end-start).append(" ms.\n");
       }
     }
 
-    String traceHTMLmsg = (htmlMessage != null && htmlMessage.length() < 255) ? htmlMessage : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null");
+    String traceHTMLmsg = (htmlMessage != null && htmlMessage.length() < 255) ? htmlMessage.toString() : (htmlMessage != null ? "too long length="+htmlMessage.length() : "null");
     if (trace != null) trace.exit(HTML_Ops.class, traceHTMLmsg);
     return htmlMessage;
+  }
+  
+  public static void main(String[] args) {
+    if (args == null || args.length == 0) {
+      System.out.println("Specify input HTML file.");
+      return;
+    } else {
+      try {
+        File inFile = new File(args[0]);
+        BufferedReader bf = new BufferedReader(new FileReader(inFile));
+        StringBuffer sb = new StringBuffer();
+        String line = bf.readLine();
+        while (line != null) {
+          sb.append(line).append("\n");
+          line = bf.readLine();
+        }
+
+        StringBuffer reportSB = null;
+        
+        String html = sb.toString();
+        StringBuffer htmlSB = new StringBuffer(html);
+        System.out.println("Timing clear function...");
+        long start = System.currentTimeMillis();
+        int REPS = 10;
+        for (int i=0; i<REPS; i++) {
+          reportSB = new StringBuffer();
+          clearHTMLheaderAndConditionForDisplay(htmlSB, true, true, true, true, true, true, false, false, reportSB);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("completed " + REPS + " reps in " + (end-start) + " ms.");
+        System.out.println("report: "+reportSB.toString());
+
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+    }
   }
 }

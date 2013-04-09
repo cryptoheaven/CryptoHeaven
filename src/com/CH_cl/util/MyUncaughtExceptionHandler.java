@@ -33,7 +33,9 @@ import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.TraceDiagnostics;
 import com.CH_co.util.GlobalProperties;
 import com.CH_co.util.Misc;
+import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -52,12 +54,10 @@ import java.util.Date;
 * @author Marcin Kurzawa
 * @version
 */
-public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler, Serializable { // Serializable to prevent obfuscation of class and method names
 
   private static final String CRASH_REPORT__PROPERTY = "crashReport";
   private static final long CRASH_REPORT_ACCOUNT = 2934084;
-
-  private static String TAG = "";
 
   private static long lastReportSentStamp;
   private static final long minDelayBetweenReports = 10 * 60 * 1000; // 10 minutes
@@ -82,7 +82,7 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
               + infoBuffer.toString();
       String reportCombined = crashReport_prepWithPending(report);
       boolean isSent = false;
-      ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerOps.getSIL();
+      ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerSIL.getSIL();
       if (mySil != null && mySil.isLoggedIn() && mySil.hasPersistentMainWorker()) {
         isSent = crashReport_send(mySil, CRASH_REPORT_ACCOUNT, reportCombined);
       }
@@ -113,7 +113,7 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
 
   public static boolean crashReport_sendAnyPendingIfPossible() {
     boolean anySent = false;
-    ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerOps.getSIL();
+    ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerSIL.getSIL();
     if (mySil != null) {
       String oldReport = GlobalProperties.getProperty(CRASH_REPORT__PROPERTY, "");
       if (oldReport != null && oldReport.length() > 0) {
@@ -131,7 +131,6 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
 
   private static boolean crashReport_send(ServerInterfaceLayer SIL, long toUserId, String report) {
     boolean isSuccess = false;
-
     boolean errors = false;
 
     try {
@@ -149,7 +148,9 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
       Long RECIVER_USER_ID = new Long(toUserId);
       long TIMEOUT = 15000;
 
-      String MSG_SUBJECT = TAG + (TAG != null && TAG.length() > 0 ? " " : "") + "Crash from " + TextRenderer.getRenderedText(fromUser) + " build " + GlobalProperties.PROGRAM_BUILD_NUMBER;
+      String TAG = MyUncaughtExceptionHandlerOps.getTag();
+      TAG = TAG != null ? TAG + " " : "";
+      String MSG_SUBJECT = TAG + "Crash from " + TextRenderer.getRenderedText(fromUser) + " build " + GlobalProperties.PROGRAM_BUILD_NUMBER;
       String MSG_BODY = report;
       Long[] MY_OUTGOING_CONTACT_ID_WITH_RECIVER = null; // assume no contact 
 
@@ -250,7 +251,4 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
     return isSuccess;
   }
 
-  public static void setTag(String tag) {
-    TAG = tag;
-  }
 }

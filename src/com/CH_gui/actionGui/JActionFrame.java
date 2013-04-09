@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -40,7 +40,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -823,7 +823,12 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
       Point p = JActionFrameClosable.getSpreadWindowLocation(this);
       if (p != null) {
         setLocation(p);
-        GlobalProperties.setProperty(MiscGui.getVisualsKeyName(this), getVisuals());
+        String key = MiscGui.getVisualsKeyName(this);
+        String visuals = getVisuals();
+        if (visuals != null)
+          GlobalProperties.setProperty(key, visuals);
+        else
+          GlobalProperties.remove(key);
       }
     }
     super.setVisible(b);

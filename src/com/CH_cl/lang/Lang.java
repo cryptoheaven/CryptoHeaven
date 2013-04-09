@@ -12,6 +12,7 @@
 
 package com.CH_cl.lang;
 
+import java.io.Serializable;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -31,7 +32,7 @@ import java.util.ResourceBundle;
 * @author  Marcin Kurzawa
 * @version 
 */
-public class Lang extends Object {
+public class Lang extends Object implements Serializable { // use Serializable as a trick to skip obfuscation
 
   public static ResourceBundle rb;
 

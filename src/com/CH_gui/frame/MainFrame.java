@@ -26,7 +26,7 @@ import com.CH_cl.service.records.filters.ContactFilterCl;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_cl.service.records.filters.InvEmlFilter;
-import com.CH_cl.util.MyUncaughtExceptionHandlerOps;
+import com.CH_cl.util.MyUncaughtExceptionHandlerSIL;
 import com.CH_co.cryptx.BAEncodedPassword;
 import com.CH_co.cryptx.Rnd;
 import com.CH_co.io.RandomInputStream;
@@ -483,13 +483,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
 
   protected static void setServerInterfaceLayer(ServerInterfaceLayer newSIL) {
     SIL = newSIL;
-    // setup default crash reporting
-    try {
-      if (SIL != null)
-        MyUncaughtExceptionHandlerOps.setSIL(SIL);
-    } catch (Throwable t) {
-      System.out.println(t.getMessage());
-      // This is JRE 1.5 code, so catch all errors!
+    // setup default crash reporting SIL
+    if (SIL != null) {
+      MyUncaughtExceptionHandlerSIL.setSIL(SIL);
     }
   }
   public static ServerInterfaceLayer getServerInterfaceLayer() {

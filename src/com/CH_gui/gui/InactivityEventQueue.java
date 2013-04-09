@@ -17,6 +17,7 @@ import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.cache.event.UserSettingsRecordEvent;
 import com.CH_cl.service.cache.event.UserSettingsRecordListener;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
@@ -206,6 +207,7 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
         }
       }
     } catch (Throwable t) {
+      MyUncaughtExceptionHandlerOps.unhandledException(t);
       t.printStackTrace();
     }
   }

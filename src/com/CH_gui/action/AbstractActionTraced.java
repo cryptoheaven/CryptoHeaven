@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
+ * Copyright 2001-2013 by CryptoHeaven Corp.,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -12,13 +12,14 @@
 
 package com.CH_gui.action;
 
+import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import com.CH_co.trace.Trace;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
+ * <b>Copyright</b> &copy; 2001-2013
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
@@ -50,6 +51,7 @@ public abstract class AbstractActionTraced extends AbstractAction {
       actionPerformedTraced(event);
     } catch (Throwable t) {
       if (trace != null) trace.exception(getClass(), 100, t);
+      MyUncaughtExceptionHandlerOps.unhandledException(t);
     }
     if (trace != null) trace.exit(getClass());
   }
