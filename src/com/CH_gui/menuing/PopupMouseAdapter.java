@@ -23,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.ref.WeakReference;
 import java.util.EventListener;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -83,14 +84,19 @@ public class PopupMouseAdapter extends MouseAdapter {
         }
       }
 
-
       if (registerForRef != null && actionProducerRef != null) {
         Component registerFor = (Component) registerForRef.get();
         ActionProducerI actionProducer = (ActionProducerI) actionProducerRef.get();
         if (registerFor != null && actionProducer != null) {
           Window window = SwingUtilities.windowForComponent(registerFor);
-          if (window instanceof JActionFrame)
-            jPopupActions = ((JActionFrame) window).getMenuTreeModel().generatePopup(actionProducer.getActions());
+          if (window instanceof JActionFrame) {
+            MenuTreeModel model = ((JActionFrame) window).getMenuTreeModel();
+            if (model != null) {
+              Action[] actions = actionProducer.getActions();
+              if (actions != null && actions.length > 0)
+                jPopupActions = model.generatePopup(actions);
+            }
+          }
         }
       }
 

@@ -31,6 +31,7 @@ import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rq;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -378,6 +379,7 @@ public class MsgAGet extends ClientMessageAction {
     // see if any email message has unknown FROM or TO address, or any Address Record has unknown hash, if so, request it from the server
     {
       ArrayList hashesL = null;
+      HashSet hashesHS = null; // for keeping our list of unique values
       for (int i=0; i<dataRecords.length; i++) {
         MsgDataRecord dataRecord = dataRecords[i];
         String fromEmailAddress = dataRecord.getFromEmailAddress();
@@ -397,7 +399,10 @@ public class MsgAGet extends ClientMessageAction {
               (cache.getAddrHashRecords(hash) == null && !cache.wasRequestedAddrHash(hash)))
           {
             if (hashesL == null) hashesL = new ArrayList();
-            hashesL.add(hash);
+            if (hashesHS == null) hashesHS = new HashSet();
+            BigInteger hashValue = new BigInteger(hash);
+            if (hashesHS.add(hashValue))
+              hashesL.add(hash);
           }
         }
         // now gather all Recipient email addresses
@@ -410,7 +415,10 @@ public class MsgAGet extends ClientMessageAction {
               hash = cache.getAddrHashForEmail(emlAddr);
               if (hash != null && cache.getAddrHashRecords(hash) == null && !cache.wasRequestedAddrHash(hash)) {
                 if (hashesL == null) hashesL = new ArrayList();
-                hashesL.add(hash);
+                if (hashesHS == null) hashesHS = new HashSet();
+                BigInteger hashValue = new BigInteger(hash);
+                if (hashesHS.add(hashValue))
+                  hashesL.add(hash);
               }
             }
           }

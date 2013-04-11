@@ -208,7 +208,6 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
       }
     } catch (Throwable t) {
       MyUncaughtExceptionHandlerOps.unhandledException(t);
-      t.printStackTrace();
     }
   }
 
