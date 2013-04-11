@@ -72,6 +72,12 @@ public class CryptoHeavenApplet extends JApplet implements DisposableObj, Applet
       // make sure there is no leading delimited blanks
       args = (String[]) ArrayUtils.removeLeadingElements(args, "");
     }
+    // Attach Applet exception handler
+    try {
+      MyUncaughtExceptionHandlerOps.attachDefaultHandler("Applet " + GlobalProperties.PROGRAM_BUILD_NUMBER);
+    } catch (Throwable t) {
+      // Uncaught Exception Handler is jre 1.5+ code so catch all here
+    }
     CryptoHeaven.main(args);
   }
 

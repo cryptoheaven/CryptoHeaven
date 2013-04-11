@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -34,7 +34,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -96,18 +96,22 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
             new FileTableFrame(CacheFldUtils.convertRecordToPair(cache.getFolderRecord(uRec.fileFolderId)));
           } else if (args.equalsIgnoreCase("Address Book") || args.equalsIgnoreCase("Address-Book")) {
             FolderPair fPair = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
-            new AddressTableFrame(fPair);
+            if (fPair != null)
+              new AddressTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Allowed Senders") || args.equalsIgnoreCase("Allowed-Senders")) {
             FolderPair fPair = FolderOps.getOrCreateWhiteList(MainFrame.getServerInterfaceLayer());
-            new WhiteListTableFrame(fPair);
+            if (fPair != null)
+              new WhiteListTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Drafts")) {
             FolderPair fPair = FolderOps.getOrCreateDraftFolder(MainFrame.getServerInterfaceLayer());
-            new MsgTableFrame(fPair);
+            if (fPair != null)
+              new MsgTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Inbox")) {
             new MsgTableFrame(CacheFldUtils.convertRecordToPair(cache.getFolderRecord(uRec.msgFolderId)));
           } else if (args.equalsIgnoreCase("Spam")) {
             FolderPair fPair = FolderOps.getOrCreateJunkFolder(MainFrame.getServerInterfaceLayer());
-            new MsgTableFrame(fPair);
+            if (fPair != null)
+              new MsgTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Sent")) {
             new MsgTableFrame(CacheFldUtils.convertRecordToPair(cache.getFolderRecord(uRec.sentFolderId)));
           } else if (args.equalsIgnoreCase("Contacts")) {

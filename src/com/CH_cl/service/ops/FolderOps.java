@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -34,7 +34,7 @@ import com.CH_co.util.NotificationCenter;
 import java.util.*;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -329,116 +329,126 @@ public class FolderOps extends Object {
   }
 
   public static FolderPair getOrCreateAddressBook(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
+    FolderPair fPair = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord userRecord = cache.getUserRecord();
-    Long addrFolderId = userRecord.addrFolderId;
-    if (addrFolderId == null || cache.getFolderRecord(addrFolderId) == null) {
-      boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.ADDRESS_FOLDER, "Address Book", "Saved Email Addresses", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_ADDRESS_OR_GET_OLD, dataSet), 60000);
-      // assign folder id back to UserRecord in cache to avoid potential loops
-      if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
-        Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
-        addrFolderId = fldSet.folderRecords[0].folderId;
-        userRecord.addrFolderId = addrFolderId;
+    if (userRecord != null) {
+      Long addrFolderId = userRecord.addrFolderId;
+      if (addrFolderId == null || cache.getFolderRecord(addrFolderId) == null) {
+        boolean useInheritedSharing = false;
+        Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.ADDRESS_FOLDER, "Address Book", "Saved Email Addresses", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_ADDRESS_OR_GET_OLD, dataSet), 60000);
+        // assign folder id back to UserRecord in cache to avoid potential loops
+        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
+          Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
+          addrFolderId = fldSet.folderRecords[0].folderId;
+          userRecord.addrFolderId = addrFolderId;
+        }
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
-      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-    }
-    FolderPair fPair = null;
-    if (addrFolderId != null) {
-      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(addrFolderId));
+      if (addrFolderId != null) {
+        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(addrFolderId));
+      }
     }
     return fPair;
   }
 
   public static FolderPair getOrCreateWhiteList(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
+    FolderPair fPair = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord userRecord = cache.getUserRecord();
-    Long whiteFolderId = userRecord.whiteFolderId;
-    if (whiteFolderId == null || cache.getFolderRecord(whiteFolderId) == null) {
-      boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(getOrCreateAddressBook(SIL), FolderRecord.WHITELIST_FOLDER, "Allowed Senders", "List of originators who you have decided should be able to send you messages WITHOUT being checked for Spam. This will prevent their messages being blocked even if our Anti-Spam process calculates that the message is spam.", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_WHITE_OR_GET_OLD, dataSet), 60000);
-      // assign folder id back to UserRecord in cache to avoid potential loops
-      if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
-        Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
-        whiteFolderId = fldSet.folderRecords[0].folderId;
-        userRecord.whiteFolderId = whiteFolderId;
+    if (userRecord != null) {
+      Long whiteFolderId = userRecord.whiteFolderId;
+      if (whiteFolderId == null || cache.getFolderRecord(whiteFolderId) == null) {
+        boolean useInheritedSharing = false;
+        Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(getOrCreateAddressBook(SIL), FolderRecord.WHITELIST_FOLDER, "Allowed Senders", "List of originators who you have decided should be able to send you messages WITHOUT being checked for Spam. This will prevent their messages being blocked even if our Anti-Spam process calculates that the message is spam.", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_WHITE_OR_GET_OLD, dataSet), 60000);
+        // assign folder id back to UserRecord in cache to avoid potential loops
+        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
+          Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
+          whiteFolderId = fldSet.folderRecords[0].folderId;
+          userRecord.whiteFolderId = whiteFolderId;
+        }
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
-      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-    }
-    FolderPair fPair = null;
-    if (whiteFolderId != null) {
-      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(whiteFolderId));
+      if (whiteFolderId != null) {
+        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(whiteFolderId));
+      }
     }
     return fPair;
   }
 
   public static FolderPair getOrCreateDraftFolder(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
+    FolderPair fPair = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord userRecord = cache.getUserRecord();
-    Long draftFolderId = userRecord.draftFolderId;
-    if (draftFolderId == null || cache.getFolderRecord(draftFolderId) == null) {
-      boolean useInheritedSharing = false;
-      Fld_NewFld_Rq draftDataSet = FolderOps.createNewFldRq(null, FolderRecord.MESSAGE_FOLDER, "Drafts", "Saved Message Drafts", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_DRAFT_OR_GET_OLD, draftDataSet), 60000);
-      // assign folder id back to UserRecord in cache to avoid potential loops
-      if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
-        Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
-        draftFolderId = fldSet.folderRecords[0].folderId;
-        userRecord.draftFolderId = draftFolderId;
+    if (userRecord != null) {
+      Long draftFolderId = userRecord.draftFolderId;
+      if (draftFolderId == null || cache.getFolderRecord(draftFolderId) == null) {
+        boolean useInheritedSharing = false;
+        Fld_NewFld_Rq draftDataSet = FolderOps.createNewFldRq(null, FolderRecord.MESSAGE_FOLDER, "Drafts", "Saved Message Drafts", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL);
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_DRAFT_OR_GET_OLD, draftDataSet), 60000);
+        // assign folder id back to UserRecord in cache to avoid potential loops
+        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
+          Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
+          draftFolderId = fldSet.folderRecords[0].folderId;
+          userRecord.draftFolderId = draftFolderId;
+        }
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
-      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-    }
-    FolderPair fPair = null;
-    if (draftFolderId != null) {
-      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(draftFolderId));
+      if (draftFolderId != null) {
+        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(draftFolderId));
+      }
     }
     return fPair;
   }
 
   public static FolderPair getOrCreateJunkFolder(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
+    FolderPair fPair = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord userRecord = cache.getUserRecord();
-    Long junkFolderId = userRecord.junkFolderId;
-    if (junkFolderId == null || cache.getFolderRecord(junkFolderId) == null) {
-      boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD, dataSet), 60000);
-      // assign folder id back to UserRecord in cache to avoid potential loops
-      if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
-        Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
-        junkFolderId = fldSet.folderRecords[0].folderId;
-        userRecord.junkFolderId = junkFolderId;
+    if (userRecord != null) {
+      Long junkFolderId = userRecord.junkFolderId;
+      if (junkFolderId == null || cache.getFolderRecord(junkFolderId) == null) {
+        boolean useInheritedSharing = false;
+        Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.MESSAGE_FOLDER, "Spam", "Suspected spam email is deposited here", null, null, null, new Integer(1296000), new BASymmetricKey(32), useInheritedSharing, null, SIL); // 15 days default expiry // "Junk email"
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_JUNK_OR_GET_OLD, dataSet), 60000);
+        // assign folder id back to UserRecord in cache to avoid potential loops
+        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
+          Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
+          junkFolderId = fldSet.folderRecords[0].folderId;
+          userRecord.junkFolderId = junkFolderId;
+        }
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
-      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-    }
-    FolderPair fPair = null;
-    if (junkFolderId != null) {
-      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(junkFolderId));
+      if (junkFolderId != null) {
+        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(junkFolderId));
+      }
     }
     return fPair;
   }
 
   public static FolderPair getOrCreateRecycleFolder(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
+    FolderPair fPair = null;
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     UserRecord userRecord = cache.getUserRecord();
-    Long recycleFolderId = userRecord.recycleFolderId;
-    if (recycleFolderId == null || cache.getFolderRecord(recycleFolderId) == null) {
-      boolean useInheritedSharing = false;
-      Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.RECYCLE_FOLDER, "Recycle Bin", "Deleted items are deposited here", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL); // no default expiry
-      ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_RECYCLE_OR_GET_OLD, dataSet), 60000);
-      // assign folder id back to UserRecord in cache to avoid potential loops
-      if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
-        Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
-        recycleFolderId = fldSet.folderRecords[0].folderId;
-        userRecord.recycleFolderId = recycleFolderId;
+    if (userRecord != null) {
+      Long recycleFolderId = userRecord.recycleFolderId;
+      if (recycleFolderId == null || cache.getFolderRecord(recycleFolderId) == null) {
+        boolean useInheritedSharing = false;
+        Fld_NewFld_Rq dataSet = FolderOps.createNewFldRq(null, FolderRecord.RECYCLE_FOLDER, "Recycle Bin", "Deleted items are deposited here", null, null, null, null, new BASymmetricKey(32), useInheritedSharing, null, SIL); // no default expiry
+        ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_NEW_DFT_RECYCLE_OR_GET_OLD, dataSet), 60000);
+        // assign folder id back to UserRecord in cache to avoid potential loops
+        if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_GET_FOLDERS) {
+          Fld_Folders_Rp fldSet = (Fld_Folders_Rp) msgAction.getMsgDataSet();
+          recycleFolderId = fldSet.folderRecords[0].folderId;
+          userRecord.recycleFolderId = recycleFolderId;
+        }
+        DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
-      DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-    }
-    FolderPair fPair = null;
-    if (recycleFolderId != null) {
-      fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(recycleFolderId));
+      if (recycleFolderId != null) {
+        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(recycleFolderId));
+      }
     }
     return fPair;
   }
