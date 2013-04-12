@@ -298,8 +298,9 @@ public class GlobalProperties extends Object {
   // build 756 Default Uncaught Exception Handler
   // build 758 Case of 'ThreadDeath' in exception handler and minor fixes based on desktop crash reports.
   // build 760 Engine fixes for few minor reported exception
+  // build 762 Engine restricting additional nicknames.
 
-  public static final short PROGRAM_BUILD_NUMBER = 760;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 762;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
