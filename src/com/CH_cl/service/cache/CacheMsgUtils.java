@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -11,6 +11,8 @@
 */
 package com.CH_cl.service.cache;
 
+import com.CH_cl.service.ops.SendMessageInfoProviderI;
+import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.NewsAddressRecord;
 import com.CH_co.cryptx.BASymmetricKey;
@@ -18,17 +20,29 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.ArrayUtils;
-import com.CH_co.util.Hasher;
-import com.CH_co.util.Misc;
-import com.CH_co.util.URLs;
+import com.CH_co.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-/**
+/** 
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
 *
-* @author Marcin
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.1 $</b>
+* @author  Marcin Kurzawa
+* @version
 */
 public class CacheMsgUtils {
 
@@ -186,6 +200,93 @@ public class CacheMsgUtils {
     return sender;
   }
 
+  public static String[] getSigText(UserSettingsRecord userSettingsRecord) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "getSigText(UserSettingsRecord userSettingsRecord)");
+    if (trace != null) trace.args(userSettingsRecord);
+
+    boolean isHtmlMode = getSigType(userSettingsRecord).equals("text/html");
+    String text = "";
+    String mode = "";
+    String defaultSig = userSettingsRecord.getDefaultSig();
+    String defaultSigType = userSettingsRecord.getDefaultSigType();
+    if (defaultSig != null) {
+      if (defaultSigType.equalsIgnoreCase("text/file")) {
+        String error = null;
+        try {
+          BufferedReader br = new BufferedReader(new FileReader(defaultSig));
+          StringBuffer sb = new StringBuffer();
+          String line = null;
+          while ((line=br.readLine()) != null) {
+            if (sb.length() > 0)
+              sb.append("\n");
+            sb.append(line);
+          }
+          br.close();
+          text = sb.toString();
+          // check all characters of the signature for validity
+          for (int i=0; i<text.length(); i++) {
+            char ch = text.charAt(i);
+            if (!Character.isLetterOrDigit(ch) && !Character.isWhitespace(ch) && (ch < 32 || ch > 126)) {
+              error = "The signature file specified is not a valid text-file.";
+              break;
+            }
+          }
+          if (error != null)
+            text = "";
+        } catch (Throwable t) {
+          error = "The signature text-file could not be loaded. \n\nError code is: " + t.getMessage();
+        }
+        if (error != null) {
+          NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, "Invalid Signature", error);
+        }
+      } else {
+        text = defaultSig;
+      }
+    }
+    if (isHtmlMode) {
+      text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, true, false, true, true, true, true, false, false);
+    }
+    boolean addSpaces = text.trim().length() > 0;
+    if (isHtmlMode)
+      mode = "text/html";
+    else
+      mode = "text/plain";
+    if (addSpaces && isHtmlMode)
+      text = "<p></p>" + text;
+    else if (addSpaces && !isHtmlMode)
+      text = "\n\n" + text;
+
+    String[] sig = new String[] { mode, text };
+    if (trace != null) trace.exit(CacheMsgUtils.class, sig);
+    return sig;
+  }
+
+  private static String getSigType(UserSettingsRecord userSettingsRecord) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "getSigType(UserSettingsRecord userSettingsRecord)");
+    if (trace != null) trace.args(userSettingsRecord);
+
+    String sigType = userSettingsRecord.getDefaultSigType();
+    String type = null;
+    if (sigType == null) {
+      type = "";
+    } else if (sigType.equalsIgnoreCase("text/html")) {
+      type = "text/html";
+    } else if (sigType.equalsIgnoreCase("text/plain")) {
+      type = "text/plain";
+    } else if (sigType.equalsIgnoreCase("text/file")) {
+      String fileName = userSettingsRecord.getDefaultSig().toLowerCase();
+      if (fileName.endsWith(".htm") || fileName.endsWith(".html"))
+        type = "text/html";
+      else
+        type = "text/plain";
+    } else {
+      type = null;
+    }
+
+    if (trace != null) trace.exit(CacheMsgUtils.class, type);
+    return type;
+  }
+
   public static boolean hasAttachments(Record rec) {
     boolean hasAttachments = false;
     if (rec instanceof MsgLinkRecord) {
@@ -196,6 +297,180 @@ public class CacheMsgUtils {
       hasAttachments = ((MsgDataRecord) rec).hasAttachments();
     }
     return hasAttachments;
+  }
+
+  /**
+  * @return Elements consist of: header type ("text/plain" or "text/html"), header, body type, body
+  */
+  public static String[] makeReplyToContent(MsgLinkRecord linkRecord, MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "makeReplyToContent(MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody)");
+    if (trace != null) trace.args(dataRecord);
+    if (trace != null) trace.args(isForceConvertHTMLtoPLAIN);
+    if (trace != null) trace.args(isForceOutputInHTMLPrintHeader);
+    if (trace != null) trace.args(isForceOutputInHTMLBody);
+
+    String[] content = new String[4]; // header type, header, body type, body
+
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
+    Object[] senderSet = UserOps.getCachedOrMakeSenderDefaultEmailSet(dataRecord);
+    Record sender = (Record) senderSet[0];
+    String senderEmailShort = (String) senderSet[1];
+    String senderEmailFull = (String) senderSet[2];
+
+    if (sender != null) {
+      Record[][] recipients = gatherAllMsgRecipients(dataRecord);
+      StringBuffer[] sb = new StringBuffer[recipients.length];
+      for (int recipientType=0; recipientType<recipients.length; recipientType++) {
+        sb[recipientType] = new StringBuffer();
+        if (recipients[recipientType] != null) {
+          for (int i=0; i<recipients[recipientType].length; i++) {
+            Record recipient = recipients[recipientType][i];
+            String displayName = TextRenderer.getRenderedText(recipient);
+            String[] emailAddr = CacheUsrUtils.getEmailAddressSet(recipient);
+            if (dataRecord.isHtmlMail()) {
+              // skip embeding link if generating Print Header
+              if (isForceOutputInHTMLPrintHeader || emailAddr == null) {
+                if (emailAddr != null) {
+                  sb[recipientType].append(Misc.encodePlainIntoHtml(emailAddr[2]));
+                } else {
+                  sb[recipientType].append(Misc.encodePlainIntoHtml(displayName));
+                }
+              } else {
+                sb[recipientType].append("<A href='mailto:" + emailAddr[1] + "'>" + Misc.encodePlainIntoHtml(displayName) + "</A>");
+              }
+            } else {
+              if (emailAddr != null) {
+                if (isForceOutputInHTMLPrintHeader) {
+                  sb[recipientType].append(Misc.encodePlainIntoHtml(emailAddr[2]));
+                } else {
+                  sb[recipientType].append(emailAddr[2]);
+                }
+              } else {
+                if (isForceOutputInHTMLPrintHeader) {
+                  sb[recipientType].append(Misc.encodePlainIntoHtml(displayName));
+                } else {
+                  sb[recipientType].append(displayName);
+                }
+              }
+            }
+            if (i < recipients[recipientType].length - 1) {
+              sb[recipientType].append("; ");
+            }
+          }
+        }
+      }
+
+      boolean convertHTMLBodyToPlain = isForceConvertHTMLtoPLAIN;
+//      if (!isForceConvertHTMLtoPLAIN) {
+//        convertHTMLBodyToPlain = MsgPreviewPanel.isDefaultToPLAINpreferred(linkRecord, dataRecord);
+//      }
+
+      String quotedSubject = dataRecord.isTypeMessage() ? dataRecord.getSubject() : dataRecord.name;
+      String quotedMsgBody = dataRecord.isTypeMessage() ? dataRecord.getText() : dataRecord.addressBody;
+
+      // << comes in HTML
+      if (dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
+        // clear excessive HTML to make feasible for usage as reply content
+        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, true, false, true, true, true, true, false, false);
+//        if (convertHTMLBodyToPlain) {
+//          String html = quotedMsgBody;
+//          if (trace != null) trace.data(50, "extracting plain from html");
+//          String plain = MsgPanelUtils.extractPlainFromHtml(html);
+//          if (trace != null) trace.data(51, "encoding plain into html");
+//          quotedMsgBody = Misc.encodePlainIntoHtml(plain);
+//        }
+        content[2] = "text/html";
+        // >> comes out in reduced HTML, but still HTML
+      } else {
+        if (isForceOutputInHTMLBody) {
+          // << comes in PLAIN
+          if (trace != null) trace.data(60, "extracting plain from html");
+          quotedMsgBody = Misc.encodePlainIntoHtml(quotedMsgBody);
+          content[2] = "text/html";
+          // >> comes out converted to HTML
+        } else {
+          // << comes in PLAIN
+          content[2] = "text/plain";
+          // >> comes out PLAIN
+        }
+      }
+
+      // additional conditioning...
+      if (quotedMsgBody != null && quotedMsgBody.length() > 0 && dataRecord.isHtmlMail() && !convertHTMLBodyToPlain) {
+        // quotedMsgBody = "<table>" + quotedMsgBody + "</table>";
+      } else if (quotedMsgBody == null) {
+        quotedMsgBody = "";
+      }
+
+      if (isForceOutputInHTMLPrintHeader || isForceOutputInHTMLBody || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
+        if (trace != null) trace.data(70, "making HTML header lines");
+        content[0] = "text/html";
+        content[1] =
+            (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(TextRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
+            (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") +
+            (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") +
+
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_From"),
+                (isForceOutputInHTMLPrintHeader ? Misc.encodePlainIntoHtml(senderEmailFull) : "<A href='mailto:" + senderEmailShort + "'>" + Misc.encodePlainIntoHtml(senderEmailFull) + "</A>"),
+                isForceOutputInHTMLPrintHeader) +
+            //(sbReplyTo != null ? ("<b>" + com.CH_gui.lang.Lang.rb.getString("column_Reply_To") + ":</b>  " + Misc.encodePlainIntoHtml(sbReplyTo.toString()) + " <br>") : "") +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_To"), sb[SendMessageInfoProviderI.TO].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Cc"), sb[SendMessageInfoProviderI.CC].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
+            (isForceOutputInHTMLPrintHeader ? "</table>" : "");
+
+        if (content[2].equalsIgnoreCase("text/html")) {
+          // condition formatting is a performance hit for complex messages -- removed
+//          if (trace != null) trace.data(100, "condition formatting start");
+//          quotedMsgBody = ArrayUtils.replaceKeyWords(quotedMsgBody,
+//              new String[][] {
+//                {"<P>", "<p>"},
+//                {"</P>", "</p>"},
+//                {"\n", " "},
+//                {"\r", " "},
+//                {"     ", " "},
+//                {"   ", " "},
+//                {"  ", " "},
+//                {" <p>", "<p>"},
+//                {" </p>", "</p>"},
+//                {"<p> ", "<p>"},
+//                {"</p> ", "</p>"},
+//                {"<p></p><p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
+//                {"<p></p><p></p><p></p>", "<p></p><p></p>"},
+//                {"<p><p><p><p><p>", "<p><p>"},
+//                {"<p><p><p>", "<p><p>"},
+//            }, new String[] { "<PRE>", "<pre>" }, new String[] { "</PRE>", "</pre>"} );
+//          if (trace != null) trace.data(101, "condition formatting done");
+        }
+        content[3] = quotedMsgBody;
+      } else {
+        content[0] = "text/plain";
+        content[1] =
+            com.CH_cl.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
+            (sb[SendMessageInfoProviderI.TO].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_To") + ": " + sb[SendMessageInfoProviderI.TO].toString() + "\n") : "") +
+            (sb[SendMessageInfoProviderI.CC].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_Cc") + ": " + sb[SendMessageInfoProviderI.CC].toString() + "\n") : "") +
+            com.CH_cl.lang.Lang.rb.getString("column_Sent") + ": " + new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated) + "\n" +
+            com.CH_cl.lang.Lang.rb.getString("column_Subject") + ": " + quotedSubject + " \n\n";
+        content[3] = quotedMsgBody;
+      }
+    }
+
+    if (trace != null) trace.exit(CacheMsgUtils.class, content);
+    return content;
+  }
+
+  private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
+    if (htmlText != null && htmlText.length() > 0) {
+      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2'>" : "") +
+              "<b>" + name + ": </b>" +
+              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2'>" : "") +
+              htmlText +
+              (isPrintHeader ? "</font></td></tr>" : "<br>");
+    } else {
+      return "";
+    }
   }
 
   public static void unlockPassProtectedMsg(MsgDataRecord msgDataRecStartWith, Hasher.Set bodyKey) {

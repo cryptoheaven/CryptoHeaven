@@ -873,7 +873,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
                 sb.append("<font size=\"-2\">");
 
                 if (isHTMLformatted) {
-                  boolean isRemoveStyles = false;
+                  boolean isRemoveStyles = true;
                   boolean isRemoveInlineStyles = false;
                   boolean isRemoveHead = true; // avoid many HEAD tags in the generated table
                   boolean isRemoveRemoteLoading = false;

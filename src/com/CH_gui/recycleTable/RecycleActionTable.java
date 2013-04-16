@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -60,7 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2012
+* <b>Copyright</b> &copy; 2001-2013
 * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
 * CryptoHeaven Corp.
 * </a><br>All rights reserved.<p>
@@ -224,8 +224,8 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     if (recordsL != null && recordsL.size() > 0) {
       Vector selectedV = new Vector();
       for (int i=0; i<recordsL.size(); i++) {
-        if (classType.isInstance(recordsL.get(0))) { // check if classType specified is equivalent or superclass (or super interface) of record element
-        //if (recordsV.elementAt(i).getClass().equals(classType)) {
+        // check if classType specified is equivalent or superclass (or super interface) of record element
+        if (classType.isInstance(recordsL.get(i))) {
           selectedV.addElement(recordsL.get(i));
         }
       }

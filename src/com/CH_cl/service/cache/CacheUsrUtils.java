@@ -1,5 +1,5 @@
 /*
-* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Copyright 2001-2013 by CryptoHeaven Corp.,
 * Mississauga, Ontario, Canada.
 * All rights reserved.
 *
@@ -11,18 +11,110 @@
 */
 package com.CH_cl.service.cache;
 
+import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.URLs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
+/** 
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
 *
-* @author Marcin
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.1 $</b>
+* @author  Marcin Kurzawa
+* @version
 */
 public class CacheUsrUtils {
+
+  public static Record[][] checkValidityOfRecipients(Record[][] selectedRecipients, StringBuffer errorSB) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUsrUtils.class, "checkValidityOfRecipients(Record[][] selectedRecipients, StringBuffer errorSB)");
+    if (trace != null) trace.args(selectedRecipients);
+    // check for contacts to have messaging enabled
+    ArrayList badContactsL = null;
+    // check for address contacts to have a valid email address
+    ArrayList badAddressesL = null;
+    // check for invalid or inaccessible folders
+    ArrayList badFoldersL = null;
+    // put objects that pass in here
+    ArrayList[] filteredSelectedRecipientsL = new ArrayList[selectedRecipients.length];
+    for (int recipientType=MsgLinkRecord.RECIPIENT_TYPE_TO; selectedRecipients.length>recipientType && recipientType<=MsgLinkRecord.RECIPIENT_TYPE_BCC; recipientType++) {
+      filteredSelectedRecipientsL[recipientType] = new ArrayList();
+      for (int i=0; selectedRecipients[recipientType] != null && i<selectedRecipients[recipientType].length; i++) {
+        Record rec = selectedRecipients[recipientType][i];
+        boolean invalid = false;
+        if (rec instanceof ContactRecord) {
+          ContactRecord cRec = (ContactRecord) rec;
+          if ((cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_MESSAGING) != 0) {
+            if (badContactsL == null) badContactsL = new ArrayList();
+            if (!badContactsL.contains(rec))
+              badContactsL.add(rec);
+            invalid = true;
+          }
+        } else if (rec instanceof MsgDataRecord) {
+          MsgDataRecord mData = (MsgDataRecord) rec;
+          if (mData.isTypeAddress() && (mData.email == null || mData.email.length() == 0)) {
+            if (badAddressesL == null) badAddressesL = new ArrayList();
+            if (!badAddressesL.contains(rec))
+              badAddressesL.add(rec);
+            invalid = true;
+          }
+        } else if (rec instanceof FolderRecord) {
+          FolderRecord fldRec = (FolderRecord) rec;
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+          FolderRecord fRec = cache.getFolderRecord(fldRec.folderId);
+          if (fRec == null || cache.getFolderShareRecordMy(fRec.folderId, true) == null) {
+            if (badFoldersL == null) badFoldersL = new ArrayList();
+            if (!badFoldersL.contains(rec))
+              badFoldersL.add(rec);
+            invalid = true;
+          }
+        }
+        if (!invalid) {
+          filteredSelectedRecipientsL[recipientType].add(rec);
+        }
+      }
+    }
+    appendInvalidRecipientErrMsg(errorSB, badContactsL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
+    appendInvalidRecipientErrMsg(errorSB, badAddressesL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
+    appendInvalidRecipientErrMsg(errorSB, badFoldersL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
+    Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsL.length][];
+    for (int recipientType=0; recipientType<filteredSelectedRecipients.length; recipientType++) {
+      Record[] recipients = new Record[filteredSelectedRecipientsL[recipientType].size()];
+      filteredSelectedRecipientsL[recipientType].toArray(recipients);
+      filteredSelectedRecipients[recipientType] = recipients;
+    }
+    if (trace != null) trace.exit(CacheUsrUtils.class, filteredSelectedRecipients);
+    return filteredSelectedRecipients;
+  }
+  private static void appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUsrUtils.class, "appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix)");
+    if (trace != null) trace.args(errSB, recsL, msgPrefix);
+    if (recsL != null) {
+      StringBuffer sb = new StringBuffer();
+      for (int i=0; i<recsL.size(); i++) {
+        sb.append(TextRenderer.getRenderedText(recsL.get(i)));
+        if (i<recsL.size()-1)
+          sb.append(", ");
+      }
+      if (errSB.length() > 0) errSB.append("\n\n");
+      errSB.append(msgPrefix);
+      errSB.append("\n\n");
+      errSB.append(sb.toString());
+    }
+    if (trace != null) trace.exit(CacheUsrUtils.class);
+  }
 
   /**
   * @return an acknowledged contact record or user record.
@@ -154,4 +246,53 @@ public class CacheUsrUtils {
     return title;
   }
 
+
+  /**
+  * @return a set of personal(nullable)/short/full version of email address.
+  */
+  public static String[] getEmailAddressSet(Record rec) {
+    String[] emailSet = null;
+    if (rec instanceof UserRecord) {
+      emailSet = CacheUsrUtils.getCachedDefaultEmail((UserRecord) rec, false);
+    } else if (rec instanceof ContactRecord) {
+      ContactRecord cRec = (ContactRecord) rec;
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      Long myUserId = cache.getMyUserId();
+      Long otherUserId = null;
+      if (cRec.ownerUserId.equals(myUserId)) {
+        otherUserId = cRec.contactWithId;
+      } else if (cRec.contactWithId.equals(myUserId)) {
+        otherUserId = cRec.ownerUserId;
+      }
+      // first try using UserRecord, then if it fails, continue with ContactRecord
+      UserRecord uRec = cache.getUserRecord(otherUserId);
+      if (uRec != null) {
+        emailSet = CacheUsrUtils.getCachedDefaultEmail((UserRecord) rec, false);
+      }
+      if (emailSet == null) {
+        emailSet = new String[3];
+        emailSet[0] = TextRenderer.getRenderedText(cRec);
+        emailSet[1] = "" + otherUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0];
+        emailSet[2] = emailSet[0] + " <" + otherUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0] + ">";
+      }
+    } else if (rec instanceof EmailAddressRecord) {
+      emailSet = new String[3];
+      emailSet[0] = EmailRecord.getPersonal(((EmailAddressRecord) rec).address);
+      emailSet[1] = ((EmailAddressRecord) rec).address;
+      emailSet[2] = ((EmailAddressRecord) rec).address;
+      //Email.
+      // remove possible Full Name part
+      String nick = EmailRecord.getNick(emailSet[1]);
+      String domain = EmailRecord.getDomain(emailSet[1]);
+      if (nick != null && nick.length() > 0 && domain != null && domain.length() > 0) {
+        emailSet[1] = nick + "@" + domain;
+      }
+    } else if (rec instanceof EmailRecord) {
+      emailSet = new String[2];
+      emailSet[0] = ((EmailRecord) rec).personal;
+      emailSet[1] = ((EmailRecord) rec).emailAddr;
+      emailSet[2] = ((EmailRecord) rec).getEmailAddressFull();
+    }
+    return emailSet;
+  }
 }

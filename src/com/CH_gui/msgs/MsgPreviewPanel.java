@@ -1720,7 +1720,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       context.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       try {
         boolean simplifyHTML = msgDataRecord.isHtmlMail() && isForceSimpleHTML;
-        String[] contentParts = MsgComposeComponents.makeReplyToContent(msgLinkRecord, msgDataRecord, simplifyHTML, true, false);
+        String[] contentParts = CacheMsgUtils.makeReplyToContent(msgLinkRecord, msgDataRecord, simplifyHTML, true, false);
         StringBuffer sb = new StringBuffer();
         // start the html printed body
         sb.append("<html><body>");
@@ -1741,9 +1741,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         // close the entire body
         sb.append("</body></html>");
 
-        boolean isRemoveStyles = false;
+        boolean isRemoveStyles = true;
         boolean isRemoveInlineStyles = false;
-        boolean isRemoveHead = false;
+        boolean isRemoveHead = true;
         boolean isRemoveRemoteLoading = false;
         String content = HTML_Ops.clearHTMLheaderAndConditionForDisplay(sb.toString(), isRemoveStyles, isRemoveInlineStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
 

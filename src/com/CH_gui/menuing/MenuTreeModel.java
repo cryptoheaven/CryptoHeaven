@@ -660,17 +660,19 @@ public class MenuTreeModel extends Object {
       // Insert new actions into the tree -- and based on the position, to the menu too.
       for (int i=0; i<actionArray.length; i++) {
         Action action = actionArray[i];
-        // see if the action is to be included in the menu
-        Boolean include = (Boolean) action.getValue(Actions.IN_MENU);
-        if (include == null || include.equals(Boolean.TRUE)) {
-          addAction(action, treeModel, treeModelHM, true);
-          anyAdded = true;
-        }
-        // see if the action is to be included in the popups or regulated by IN_POPUP_SHOW_DEACTIVATED variable flag
-        include = (Boolean) action.getValue(Actions.IN_POPUP);
-        if (include == null || include.equals(Boolean.TRUE) || action.getValue(Actions.IN_POPUP_SHOW_DEACTIVATED) != null) {
-          addAction(action, treeModelPopup, treeModelPopupHM, false);
-          anyAdded = true;
+        if (action != null) {
+          // see if the action is to be included in the menu
+          Boolean include = (Boolean) action.getValue(Actions.IN_MENU);
+          if (include == null || include.equals(Boolean.TRUE)) {
+            addAction(action, treeModel, treeModelHM, true);
+            anyAdded = true;
+          }
+          // see if the action is to be included in the popups or regulated by IN_POPUP_SHOW_DEACTIVATED variable flag
+          include = (Boolean) action.getValue(Actions.IN_POPUP);
+          if (include == null || include.equals(Boolean.TRUE) || action.getValue(Actions.IN_POPUP_SHOW_DEACTIVATED) != null) {
+            addAction(action, treeModelPopup, treeModelPopupHM, false);
+            anyAdded = true;
+          }
         }
       }
       if (anyAdded) {
@@ -724,7 +726,8 @@ public class MenuTreeModel extends Object {
       }
     }
     if (ensureVisibility) {
-      ensureNodeIsVisible(node);
+      if (node != null)
+        ensureNodeIsVisible(node);
     }
   }
 
@@ -953,12 +956,14 @@ public class MenuTreeModel extends Object {
       // Remove existing action from the tree -- and based on their visible position(s), from the menu(s) too.
       for (int i=0; i<actionArray.length; i++) {
         Action action = actionArray[i];
-        Integer actionId = (Integer) action.getValue(Actions.ACTION_ID);
-        // Attempt to find the node starting from the root.
-        //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) modelSet.getRoot());
-        DefaultMutableTreeNode node = findNode(actionId, treeModelHM);
-        if (node != null) {
-          ensureNodeIsInvisible(node);
+        if (action != null) {
+          Integer actionId = (Integer) action.getValue(Actions.ACTION_ID);
+          // Attempt to find the node starting from the root.
+          //DefaultMutableTreeNode node = findNode(actionId, (DefaultMutableTreeNode) modelSet.getRoot());
+          DefaultMutableTreeNode node = findNode(actionId, treeModelHM);
+          if (node != null) {
+            ensureNodeIsInvisible(node);
+          }
         }
       }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
+ * Copyright 2001-2013 by CryptoHeaven Corp.,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -26,7 +26,7 @@ import java.util.*;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
+ * <b>Copyright</b> &copy; 2001-2013
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
@@ -430,12 +430,14 @@ public class ToolBarModel extends Object {
       boolean anyRemoved = false;
       for (int i=0; i<actionArray.length; i++) {
         Action action = actionArray[i];
-        MenuActionItem toolItem = findTool((Integer) action.getValue(Actions.ACTION_ID));
-        if (toolItem != null) {
-          Boolean removable = (Boolean) action.getValue(Actions.REMOVABLE_TOOLBAR);
-          if (!toolItem.isActionItem() || (removable != null && removable.equals(Boolean.TRUE))) {
-            anyRemoved = true;
-            toolItem.setAction(null);
+        if (action != null) {
+          MenuActionItem toolItem = findTool((Integer) action.getValue(Actions.ACTION_ID));
+          if (toolItem != null) {
+            Boolean removable = (Boolean) action.getValue(Actions.REMOVABLE_TOOLBAR);
+            if (!toolItem.isActionItem() || (removable != null && removable.equals(Boolean.TRUE))) {
+              anyRemoved = true;
+              toolItem.setAction(null);
+            }
           }
         }
       }

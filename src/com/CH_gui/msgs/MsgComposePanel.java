@@ -1660,91 +1660,14 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
   private void checkValidityOfRecipients(boolean withRedraw) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkValidityOfRecipients(boolean withRedraw)");
     if (trace != null) trace.args(withRedraw);
-    selectedRecipients = checkValidityOfRecipients(selectedRecipients);
-    if (withRedraw)
-      redrawRecipientsAll();
-    if (trace != null) trace.exit(MsgComposePanel.class);
-  }
-  private Record[][] checkValidityOfRecipients(Record[][] selectedRecipients) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkValidityOfRecipients(Record[][] selectedRecipients)");
-    if (trace != null) trace.args(selectedRecipients);
-    // check for contacts to have messaging enabled
-    ArrayList badContactsL = null;
-    // check for address contacts to have a valid email address
-    ArrayList badAddressesL = null;
-    // check for invalid or inaccessible folders
-    ArrayList badFoldersL = null;
-    // put objects that pass in here
-    ArrayList[] filteredSelectedRecipientsL = new ArrayList[selectedRecipients.length];
-    for (int recipientType=TO; selectedRecipients.length>recipientType && recipientType<=BCC; recipientType++) {
-      filteredSelectedRecipientsL[recipientType] = new ArrayList();
-      for (int i=0; selectedRecipients[recipientType] != null && i<selectedRecipients[recipientType].length; i++) {
-        Record rec = selectedRecipients[recipientType][i];
-        boolean invalid = false;
-        if (rec instanceof ContactRecord) {
-          ContactRecord cRec = (ContactRecord) rec;
-          if ((cRec.permits.intValue() & ContactRecord.PERMIT_DISABLE_MESSAGING) != 0) {
-            if (badContactsL == null) badContactsL = new ArrayList();
-            if (!badContactsL.contains(rec))
-              badContactsL.add(rec);
-            invalid = true;
-          }
-        } else if (rec instanceof MsgDataRecord) {
-          MsgDataRecord mData = (MsgDataRecord) rec;
-          if (mData.isTypeAddress() && (mData.email == null || mData.email.length() == 0)) {
-            if (badAddressesL == null) badAddressesL = new ArrayList();
-            if (!badAddressesL.contains(rec))
-              badAddressesL.add(rec);
-            invalid = true;
-          }
-        } else if (rec instanceof FolderRecord) {
-          FolderRecord fldRec = (FolderRecord) rec;
-          FolderRecord fRec = cache.getFolderRecord(fldRec.folderId);
-          if (fRec == null || cache.getFolderShareRecordMy(fRec.folderId, true) == null) {
-            if (badFoldersL == null) badFoldersL = new ArrayList();
-            if (!badFoldersL.contains(rec))
-              badFoldersL.add(rec);
-            invalid = true;
-          }
-        }
-        if (!invalid) {
-          filteredSelectedRecipientsL[recipientType].add(rec);
-        }
-      }
-    }
     StringBuffer errorSB = new StringBuffer();
-    appendInvalidRecipientErrMsg(errorSB, badContactsL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
-    appendInvalidRecipientErrMsg(errorSB, badAddressesL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
-    appendInvalidRecipientErrMsg(errorSB, badFoldersL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
+    selectedRecipients = CacheUsrUtils.checkValidityOfRecipients(selectedRecipients, errorSB);
     if (errorSB.length() > 0) {
       String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
       MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, NotificationCenter.WARNING_MESSAGE, false);
     }
-    Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsL.length][];
-    for (int recipientType=0; recipientType<filteredSelectedRecipients.length; recipientType++) {
-      Record[] recipients = new Record[filteredSelectedRecipientsL[recipientType].size()];
-      filteredSelectedRecipientsL[recipientType].toArray(recipients);
-      filteredSelectedRecipients[recipientType] = recipients;
-    }
-    if (trace != null) trace.exit(MsgComposePanel.class, filteredSelectedRecipients);
-    return filteredSelectedRecipients;
-  }
-
-
-  private static void appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix)");
-    if (trace != null) trace.args(errSB, recsL, msgPrefix);
-    if (recsL != null) {
-      StringBuffer sb = new StringBuffer();
-      for (int i=0; i<recsL.size(); i++) {
-        sb.append(ListRenderer.getRenderedText(recsL.get(i)));
-        if (i<recsL.size()-1)
-          sb.append(", ");
-      }
-      if (errSB.length() > 0) errSB.append("\n\n");
-      errSB.append(msgPrefix);
-      errSB.append("\n\n");
-      errSB.append(sb.toString());
+    if (withRedraw) {
+      redrawRecipientsAll();
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
   }

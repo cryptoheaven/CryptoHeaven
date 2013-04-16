@@ -407,63 +407,69 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
     public void runTraced() {
       runTraced(broaderSearchIfNoResults);
     }
-    private void runTraced(boolean broaderSearchIfNoResults) {
+    private void runTraced(final boolean broaderSearchIfNoResults) {
       MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_SEARCH, request);
-      ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction, 30000);
+      final ClientMessageAction replyAction = SIL.submitAndFetchReply(msgAction, 30000);
 
       DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
 
-      boolean querySatisfied = false;
-      if (replyAction instanceof UsrAGetHandles) {
-        UsrAGetHandles handlesAction = (UsrAGetHandles) replyAction;
-        Usr_UsrHandles_Rp handlesSet = (Usr_UsrHandles_Rp) handlesAction.getMsgDataSet();
-        UserRecord[] uRecords = handlesSet.userRecords;
-        boolean isResultTruncated = uRecords != null && uRecords.length >= 10;
-        // get merged records
-        uRecords = SIL.getFetchedDataCache().getUserRecords(RecordUtils.getIDs(uRecords));
-        userActionTable.getTableModel().setData(uRecords);
-        userActionTable.setEnabledActions();
-        if (uRecords != null && uRecords.length > 0) {
-          querySatisfied = true;
-          userActionTable.getJSortedTable().getSelectionModel().setSelectionInterval(0, 0);
-        }
-        jSearchField.selectAll();
-        if (isResultTruncated)
-          MessageDialog.showInfoDialog(UserSearchPanel.this, "Displaying first few hits only.  Please narrow down your search.", "Search too broad.", false);
-      }
-
-      if (!querySatisfied) {
-        if (broaderSearchIfNoResults && (request.idMode == 1 || request.handleMode ==  4)) {
-          if (request.idMode == 1) {
-            jRadioPartial.setSelected(true);
-            request.idMode = 2;
-          }
-          if (request.handleMode == 4) {
-            jRadioPartial.setSelected(true);
-            request.handleMode = 2;
-          }
-          runTraced(false);
-        } else {
-          if (emailInvitationPanel != null && request.handle != null && request.handle.length() > 0) {
-            String line1 = "No user accounts found to match your search.";
-            String line2 = "Would you like to send an email invitation now?";
-            JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-            msgPanel.add(new JMyLabel(line1));
-            msgPanel.add(new JMyLabel(line2));
-            String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_users_found");
-            ActionListener yesAction = new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
-                emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION].actionPerformed(null);
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          if (UserSearchPanel.this.isVisible()) {
+            boolean querySatisfied = false;
+            if (replyAction instanceof UsrAGetHandles) {
+              UsrAGetHandles handlesAction = (UsrAGetHandles) replyAction;
+              Usr_UsrHandles_Rp handlesSet = (Usr_UsrHandles_Rp) handlesAction.getMsgDataSet();
+              UserRecord[] uRecords = handlesSet.userRecords;
+              boolean isResultTruncated = uRecords != null && uRecords.length >= 10;
+              // get merged records
+              uRecords = SIL.getFetchedDataCache().getUserRecords(RecordUtils.getIDs(uRecords));
+              userActionTable.getTableModel().setData(uRecords);
+              userActionTable.setEnabledActions();
+              if (uRecords != null && uRecords.length > 0) {
+                querySatisfied = true;
+                userActionTable.getJSortedTable().getSelectionModel().setSelectionInterval(0, 0);
               }
-            };
-            MessageDialog.showDialogYesNo(UserSearchPanel.this, msgPanel, title, NotificationCenter.QUESTION_MESSAGE, false, yesAction, null);
-          } else {
-            String messageText = com.CH_cl.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
-            String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_users_found");
-            MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+              jSearchField.selectAll();
+              if (isResultTruncated)
+                MessageDialog.showInfoDialog(UserSearchPanel.this, "Displaying first few hits only.  Please narrow down your search.", "Search too broad.", false);
+            }
+
+            if (!querySatisfied) {
+              if (broaderSearchIfNoResults && (request.idMode == 1 || request.handleMode ==  4)) {
+                if (request.idMode == 1) {
+                  jRadioPartial.setSelected(true);
+                  request.idMode = 2;
+                }
+                if (request.handleMode == 4) {
+                  jRadioPartial.setSelected(true);
+                  request.handleMode = 2;
+                }
+                runTraced(false);
+              } else {
+                if (emailInvitationPanel != null && request.handle != null && request.handle.length() > 0) {
+                  String line1 = "No user accounts found to match your search.";
+                  String line2 = "Would you like to send an email invitation now?";
+                  JPanel msgPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+                  msgPanel.add(new JMyLabel(line1));
+                  msgPanel.add(new JMyLabel(line2));
+                  String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_users_found");
+                  ActionListener yesAction = new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                      emailInvitationPanel.getActions()[EmailInvitationPanel.SEND_EMAIL_INVITAION_ACTION].actionPerformed(null);
+                    }
+                  };
+                  MessageDialog.showDialogYesNo(UserSearchPanel.this, msgPanel, title, NotificationCenter.QUESTION_MESSAGE, false, yesAction, null);
+                } else {
+                  String messageText = com.CH_cl.lang.Lang.rb.getString("msg_No_users_found_to_satisfy_your_search_criteria.");
+                  String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_No_users_found");
+                  MessageDialog.showInfoDialog(UserSearchPanel.this, messageText, title, false);
+                }
+              }
+            }
           }
         }
-      }
+      });
     }
   }
 

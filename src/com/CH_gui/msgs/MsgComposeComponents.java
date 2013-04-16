@@ -16,8 +16,6 @@ import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.MsgDataOps;
-import com.CH_cl.service.ops.UserOps;
-import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -39,7 +37,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -800,10 +797,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
         if ((!isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToNew)) ||
             (isReplyOrForwardMsgType && Boolean.TRUE.equals(userSettingsRecord.sigAddToReFwd))
             ) {
-          boolean isHTML = isHTML();
-          String signatureText = MsgPanelUtils.getSigText(userSettingsRecord, isHTML);
-          if (signatureText.trim().length() > 0) {
-            msgTypeArea.setContentText(signatureText, isHTML, false, true);
+          String[] sigText = CacheMsgUtils.getSigText(userSettingsRecord);
+          if (sigText[1].trim().length() > 0) {
+            msgTypeArea.setContentText(sigText[1], sigText[0].equals("text/html"), false, true);
           }
         }
       }
@@ -1150,11 +1146,15 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     else if (isForward)
       setSubject(MsgDataOps.getSubjectForward(new Object[] { dataRecord }, 250));
 
-    String[] content = makeReplyToContent(quotedMsg, dataRecord, false, false, false);
+    String[] content = CacheMsgUtils.makeReplyToContent(quotedMsg, dataRecord, false, false, false);
 
     String text = null;
+    String[] sigText = addSignature ? CacheMsgUtils.getSigText(userSettingsRecord) : null;
+    String signatureText = sigText != null ? sigText[1] : "";
     if (content[0].equalsIgnoreCase("text/html")) {
-      String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, true) : "";
+      if (sigText != null && !sigText[0].equals("text/html")) {
+        signatureText = Misc.encodePlainIntoHtml(signatureText);
+      }
       if (signatureText.trim().length() > 0) {
         signatureText = ArrayUtils.replaceKeyWords(new StringBuffer(signatureText),
             new String[][] {
@@ -1188,7 +1188,9 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       msgTypeArea.setHTML(true);
       msgTypeArea.setContentText(text, true, false, true);
     } else {
-      String signatureText = addSignature ? MsgPanelUtils.getSigText(userSettingsRecord, false) : "";
+      if (sigText != null && !sigText[0].equals("text/plain")) {
+        signatureText = MsgPanelUtils.extractPlainFromHtml(signatureText);
+      }
       if (signatureText.trim().length() > 0) {
         signatureText += "\n\n";
       }
@@ -1204,231 +1206,6 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     }
 
     if (trace != null) trace.exit(MsgComposeComponents.class);
-  }
-
-  /**
-  * @return Elements consist of: header type ("text/plain" or "text/html"), header, body type, body
-  */
-  public static String[] makeReplyToContent(MsgLinkRecord linkRecord, MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "makeReplyToContent(MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody)");
-    if (trace != null) trace.args(dataRecord);
-    if (trace != null) trace.args(isForceConvertHTMLtoPLAIN);
-    if (trace != null) trace.args(isForceOutputInHTMLPrintHeader);
-    if (trace != null) trace.args(isForceOutputInHTMLBody);
-
-    String[] content = new String[4]; // header type, header, body type, body
-
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-
-    Object[] senderSet = UserOps.getCachedOrMakeSenderDefaultEmailSet(dataRecord);
-    Record sender = (Record) senderSet[0];
-    String senderEmailShort = (String) senderSet[1];
-    String senderEmailFull = (String) senderSet[2];
-
-    if (sender != null) {
-      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
-      StringBuffer[] sb = new StringBuffer[recipients.length];
-      for (int recipientType=0; recipientType<recipients.length; recipientType++) {
-        sb[recipientType] = new StringBuffer();
-        if (recipients[recipientType] != null) {
-          for (int i=0; i<recipients[recipientType].length; i++) {
-            Record recipient = recipients[recipientType][i];
-            String displayName = ListRenderer.getRenderedText(recipient);
-            String[] emailAddr = getEmailAddressSet(recipient);
-            if (dataRecord.isHtmlMail()) {
-              // skip embeding link if generating Print Header
-              if (isForceOutputInHTMLPrintHeader || emailAddr == null) {
-                if (emailAddr != null) {
-                  sb[recipientType].append(Misc.encodePlainIntoHtml(emailAddr[2]));
-                } else {
-                  sb[recipientType].append(Misc.encodePlainIntoHtml(displayName));
-                }
-              } else {
-                sb[recipientType].append("<A href='mailto:" + emailAddr[1] + "'>" + Misc.encodePlainIntoHtml(displayName) + "</A>");
-              }
-            } else {
-              if (emailAddr != null) {
-                if (isForceOutputInHTMLPrintHeader) {
-                  sb[recipientType].append(Misc.encodePlainIntoHtml(emailAddr[2]));
-                } else {
-                  sb[recipientType].append(emailAddr[2]);
-                }
-              } else {
-                if (isForceOutputInHTMLPrintHeader) {
-                  sb[recipientType].append(Misc.encodePlainIntoHtml(displayName));
-                } else {
-                  sb[recipientType].append(displayName);
-                }
-              }
-            }
-            if (i < recipients[recipientType].length - 1) {
-              sb[recipientType].append("; ");
-            }
-          }
-        }
-      }
-
-      boolean convertHTMLBodyToPlain = isForceConvertHTMLtoPLAIN;
-//      if (!isForceConvertHTMLtoPLAIN) {
-//        convertHTMLBodyToPlain = MsgPreviewPanel.isDefaultToPLAINpreferred(linkRecord, dataRecord);
-//      }
-
-      String quotedSubject = dataRecord.isTypeMessage() ? dataRecord.getSubject() : dataRecord.name;
-      String quotedMsgBody = dataRecord.isTypeMessage() ? dataRecord.getText() : dataRecord.addressBody;
-
-      // << comes in HTML
-      if (dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
-        // clear excessive HTML to make feasible for usage as reply content
-        quotedMsgBody = HTML_Ops.clearHTMLheaderAndConditionForDisplay(quotedMsgBody, false, false, false, true, true, true, false, false);
-        if (convertHTMLBodyToPlain) {
-          String html = quotedMsgBody;
-          if (trace != null) trace.data(50, "extracting plain from html");
-          String plain = MsgPanelUtils.extractPlainFromHtml(html);
-          if (trace != null) trace.data(51, "encoding plain into html");
-          quotedMsgBody = Misc.encodePlainIntoHtml(plain);
-        }
-        content[2] = "text/html";
-        // >> comes out in reduced HTML, but still HTML
-      } else {
-        if (isForceOutputInHTMLBody) {
-          // << comes in PLAIN
-          if (trace != null) trace.data(60, "extracting plain from html");
-          quotedMsgBody = Misc.encodePlainIntoHtml(quotedMsgBody);
-          content[2] = "text/html";
-          // >> comes out converted to HTML
-        } else {
-          // << comes in PLAIN
-          content[2] = "text/plain";
-          // >> comes out PLAIN
-        }
-      }
-
-      // additional conditioning...
-      if (quotedMsgBody != null && quotedMsgBody.length() > 0 && dataRecord.isHtmlMail() && !convertHTMLBodyToPlain) {
-        // quotedMsgBody = "<table>" + quotedMsgBody + "</table>";
-      } else if (quotedMsgBody == null) {
-        quotedMsgBody = "";
-      }
-
-      if (isForceOutputInHTMLPrintHeader || isForceOutputInHTMLBody || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
-        if (trace != null) trace.data(70, "making HTML header lines");
-        content[0] = "text/html";
-        content[1] =
-            (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(ListRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
-            (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") +
-            (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") +
-
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_From"),
-                (isForceOutputInHTMLPrintHeader ? Misc.encodePlainIntoHtml(senderEmailFull) : "<A href='mailto:" + senderEmailShort + "'>" + Misc.encodePlainIntoHtml(senderEmailFull) + "</A>"),
-                isForceOutputInHTMLPrintHeader) +
-            //(sbReplyTo != null ? ("<b>" + com.CH_gui.lang.Lang.rb.getString("column_Reply_To") + ":</b>  " + Misc.encodePlainIntoHtml(sbReplyTo.toString()) + " <br>") : "") +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_To"), sb[MsgComposePanel.TO].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Cc"), sb[MsgComposePanel.CC].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
-            (isForceOutputInHTMLPrintHeader ? "</table>" : "");
-
-        if (content[2].equalsIgnoreCase("text/html")) {
-          // condition formatting is a performance hit for complex messages -- removed
-//          if (trace != null) trace.data(100, "condition formatting start");
-//          quotedMsgBody = ArrayUtils.replaceKeyWords(quotedMsgBody,
-//              new String[][] {
-//                {"<P>", "<p>"},
-//                {"</P>", "</p>"},
-//                {"\n", " "},
-//                {"\r", " "},
-//                {"     ", " "},
-//                {"   ", " "},
-//                {"  ", " "},
-//                {" <p>", "<p>"},
-//                {" </p>", "</p>"},
-//                {"<p> ", "<p>"},
-//                {"</p> ", "</p>"},
-//                {"<p></p><p></p><p></p><p></p><p></p>", "<p></p><p></p>"},
-//                {"<p></p><p></p><p></p>", "<p></p><p></p>"},
-//                {"<p><p><p><p><p>", "<p><p>"},
-//                {"<p><p><p>", "<p><p>"},
-//            }, new String[] { "<PRE>", "<pre>" }, new String[] { "</PRE>", "</pre>"} );
-//          if (trace != null) trace.data(101, "condition formatting done");
-        }
-        content[3] = quotedMsgBody;
-      } else {
-        content[0] = "text/plain";
-        content[1] =
-            com.CH_cl.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
-            (sb[MsgComposePanel.TO].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_To") + ": " + sb[MsgComposePanel.TO].toString() + "\n") : "") +
-            (sb[MsgComposePanel.CC].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_Cc") + ": " + sb[MsgComposePanel.CC].toString() + "\n") : "") +
-            com.CH_cl.lang.Lang.rb.getString("column_Sent") + ": " + new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated) + "\n" +
-            com.CH_cl.lang.Lang.rb.getString("column_Subject") + ": " + quotedSubject + " \n\n";
-        content[3] = quotedMsgBody;
-      }
-    }
-
-    if (trace != null) trace.exit(MsgComposeComponents.class, content);
-    return content;
-  }
-
-
-
-  private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
-    if (htmlText != null && htmlText.length() > 0) {
-      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2'>" : "") +
-              "<b>" + name + ": </b>" +
-              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2'>" : "") +
-              htmlText +
-              (isPrintHeader ? "</font></td></tr>" : "<br>");
-    } else {
-      return "";
-    }
-  }
-
-  /**
-  * @return a set of personal(nullable)/short/full version of email address.
-  */
-  private static String[] getEmailAddressSet(Record rec) {
-    String[] emailSet = null;
-    if (rec instanceof UserRecord) {
-      emailSet = UserOps.getOrFetchDefaultEmail(MainFrame.getServerInterfaceLayer(), (UserRecord) rec, false);
-    } else if (rec instanceof ContactRecord) {
-      ContactRecord cRec = (ContactRecord) rec;
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      Long myUserId = cache.getMyUserId();
-      Long otherUserId = null;
-      if (cRec.ownerUserId.equals(myUserId)) {
-        otherUserId = cRec.contactWithId;
-      } else if (cRec.contactWithId.equals(myUserId)) {
-        otherUserId = cRec.ownerUserId;
-      }
-      // first try using UserRecord, then if it fails, continue with ContactRecord
-      UserRecord uRec = cache.getUserRecord(otherUserId);
-      if (uRec != null) {
-        emailSet = UserOps.getOrFetchDefaultEmail(MainFrame.getServerInterfaceLayer(), uRec, false);
-      }
-      if (emailSet == null) {
-        emailSet = new String[3];
-        emailSet[0] = ListRenderer.getRenderedText(cRec);
-        emailSet[1] = "" + otherUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0];
-        emailSet[2] = emailSet[0] + " <" + otherUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0] + ">";
-      }
-    } else if (rec instanceof EmailAddressRecord) {
-      emailSet = new String[3];
-      emailSet[0] = EmailRecord.getPersonal(((EmailAddressRecord) rec).address);
-      emailSet[1] = ((EmailAddressRecord) rec).address;
-      emailSet[2] = ((EmailAddressRecord) rec).address;
-      //Email.
-      // remove possible Full Name part
-      String nick = EmailRecord.getNick(emailSet[1]);
-      String domain = EmailRecord.getDomain(emailSet[1]);
-      if (nick != null && nick.length() > 0 && domain != null && domain.length() > 0) {
-        emailSet[1] = nick + "@" + domain;
-      }
-    } else if (rec instanceof EmailRecord) {
-      emailSet = new String[2];
-      emailSet[0] = ((EmailRecord) rec).personal;
-      emailSet[1] = ((EmailRecord) rec).emailAddr;
-      emailSet[2] = ((EmailRecord) rec).getEmailAddressFull();
-    }
-    return emailSet;
   }
 
   public void setForward(Object[] selectedAttachments) {
