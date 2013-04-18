@@ -272,9 +272,11 @@ public class AccountOptionsDialog extends GeneralDialog {
 
             if (userRecords.length == 1 && userRecords[0].defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
               EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
-              defaultEmail = emlRec.getEmailAddressFull().toLowerCase();
-              jDefaultEmail.setText(emlRec.getEmailAddressFull());
-              jDefaultEmail.setCaretPosition(0);
+              String emlFull = emlRec.getEmailAddressFull();
+              defaultEmail = emlFull.toLowerCase();
+              jDefaultEmail.setText(emlFull);
+              if (emlFull.length() > 0)
+                jDefaultEmail.setCaretPosition(0);
               setEditableDefaultEmail(myUserRecord, emlRec);
             }
 

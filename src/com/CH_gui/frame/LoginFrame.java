@@ -1683,7 +1683,9 @@ public class LoginFrame extends JFrame {
         if (isLoginSuccess) {
           LoginFrame.this.closeFrame();
           loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), true);
-          Stats.setStatus("Welcome "+FetchedDataCache.getSingleInstance().getUserRecord().handle);
+          UserRecord myUser = FetchedDataCache.getSingleInstance().getUserRecord();
+          if (myUser != null)
+            Stats.setStatus("Welcome "+myUser.handle);
         } else if (!isUsernameForRetry) {
           if (isUsernameInRetry) {
             setUsername(usernamePreRetry);
@@ -1987,7 +1989,8 @@ public class LoginFrame extends JFrame {
     }
 
     // We don't want to disturb the login progress monitor, so we don't use the DefaultReplyRunner
-    replyAction.runAction();
+    if (replyAction != null)
+      replyAction.runAction();
 
     // If this was creation of a new account, we must update the key record with encrypted private portion,
     // or store it locally.

@@ -670,7 +670,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       // account for every exit
       UploadDownloadSynch.exit();
 
-      if (replyAction.getActionCode() == CommandCodes.FILE_A_GET_FILES_DATA && replyAction instanceof FileAGetFilesData) {
+      if (replyAction instanceof FileAGetFilesData && replyAction.getActionCode() == CommandCodes.FILE_A_GET_FILES_DATA) {
         ((FileAGetFilesData)replyAction).setDestinationDirectory(destDir);
       }
 

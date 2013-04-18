@@ -501,28 +501,30 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
             MsgDataRecord msgData = msgDatas[i];
             MsgLinkRecord msgLink = cache.getMsgLinkRecordsForMsg(msgData.msgId)[0];
             FileLinkRecord[] links = FileLinkOps.getOrFetchFileLinksByOwner(SIL, msgLink.msgLinkId, msgData.msgId, Record.RECORD_TYPE_MESSAGE);
-            for (int k=0; k<links.length; k++) {
-              // Merge info from returned links and submited data records.
-              // Use enc version of key because if file has a Q&A, sym key may not be available now.
-              FileLinkRecord link = links[k];
-              // find matching link from local ones that we know we sent
-              int dataIndex = -1;
-              for (int z=0; z<linkRecords.length; z++) {
-                if (link.getEncSymmetricKey().equals(linkRecords[z].getEncSymmetricKey())) {
-                  dataIndex = z;
-                  // If file is protected with Q&A, use our local copy of sym key as fetched file link may not have it decrypted yet.
-                  link.setSymmetricKey(linkRecords[z].getSymmetricKey());
-                  break;
+            if (links != null) {
+              for (int k=0; k<links.length; k++) {
+                // Merge info from returned links and submited data records.
+                // Use enc version of key because if file has a Q&A, sym key may not be available now.
+                FileLinkRecord link = links[k];
+                // find matching link from local ones that we know we sent
+                int dataIndex = -1;
+                for (int z=0; z<linkRecords.length; z++) {
+                  if (link.getEncSymmetricKey().equals(linkRecords[z].getEncSymmetricKey())) {
+                    dataIndex = z;
+                    // If file is protected with Q&A, use our local copy of sym key as fetched file link may not have it decrypted yet.
+                    link.setSymmetricKey(linkRecords[z].getSymmetricKey());
+                    break;
+                  }
                 }
-              }
-              // Only incomplete files should cause an error, but only after we upload the ones that we can...
-              // Completed file links that are not found locally are probably remote file attachments.
-              if (dataIndex == -1 && link.isIncomplete())
-                err += link.getFileName() + "\n";
-              else if (dataIndex >= 0) {
-                FileDataRecord data = dataRecords[dataIndex];
-                Object[] job = new Object[] {link, data};
-                prioritizedList.add(job, data.getPlainDataFile().length());
+                // Only incomplete files should cause an error, but only after we upload the ones that we can...
+                // Completed file links that are not found locally are probably remote file attachments.
+                if (dataIndex == -1 && link.isIncomplete())
+                  err += link.getFileName() + "\n";
+                else if (dataIndex >= 0) {
+                  FileDataRecord data = dataRecords[dataIndex];
+                  Object[] job = new Object[] {link, data};
+                  prioritizedList.add(job, data.getPlainDataFile().length());
+                }
               }
             }
           }

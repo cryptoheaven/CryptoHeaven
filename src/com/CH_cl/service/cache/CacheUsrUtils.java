@@ -264,10 +264,10 @@ public class CacheUsrUtils {
       } else if (cRec.contactWithId.equals(myUserId)) {
         otherUserId = cRec.ownerUserId;
       }
-      // first try using UserRecord, then if it fails, continue with ContactRecord
+      // try using UserRecord, else return NULL
       UserRecord uRec = cache.getUserRecord(otherUserId);
       if (uRec != null) {
-        emailSet = CacheUsrUtils.getCachedDefaultEmail((UserRecord) rec, false);
+        emailSet = CacheUsrUtils.getCachedDefaultEmail((UserRecord) uRec, false);
       }
       if (emailSet == null) {
         emailSet = new String[3];

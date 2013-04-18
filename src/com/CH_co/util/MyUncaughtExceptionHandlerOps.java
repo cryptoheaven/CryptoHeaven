@@ -80,14 +80,10 @@ public class MyUncaughtExceptionHandlerOps {
   }
 
   public static void unhandledException(Throwable ex) {
-    if (ex instanceof ThreadDeath) {
-      // noop: Ignore normal occurance of 'deamon' thread being interrupted by quitting JVM
-    } else {
-      if (exceptionHandler != null) {
-        try {
-          ((Thread.UncaughtExceptionHandler) exceptionHandler).uncaughtException(Thread.currentThread(), ex);
-        } catch (Throwable t) {
-        }
+    if (exceptionHandler != null) {
+      try {
+        ((Thread.UncaughtExceptionHandler) exceptionHandler).uncaughtException(Thread.currentThread(), ex);
+      } catch (Throwable t) {
       }
     }
   }

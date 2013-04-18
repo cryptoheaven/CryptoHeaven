@@ -57,7 +57,7 @@ public class FileLinkOps {
     FileLinkRecord[] fLinks = null;
     if (ownerType == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord mData = cache.getMsgDataRecord(ownerObjId);
-      if (mData.attachedFiles.shortValue() > 0) {
+      if (mData != null && mData.attachedFiles.shortValue() > 0) {
         fLinks = cache.getFileLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
         if (fLinks != null && fLinks.length == mData.attachedFiles.shortValue()) {
           // we have all file link attachments

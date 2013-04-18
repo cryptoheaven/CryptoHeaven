@@ -51,7 +51,7 @@ public class MsgLinkOps {
     MsgLinkRecord[] mLinks = null;
     if (ownerType == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord mData = cache.getMsgDataRecord(ownerObjId);
-      if (mData.attachedMsgs.shortValue() > 0) {
+      if (mData != null && mData.attachedMsgs.shortValue() > 0) {
         mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
         if (mLinks != null && mLinks.length == mData.attachedMsgs.shortValue()) {
           // we have all msg link attachments

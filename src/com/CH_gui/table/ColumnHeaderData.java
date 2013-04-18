@@ -95,7 +95,10 @@ public class ColumnHeaderData extends Object implements Serializable {
     return data[I_VIEWABLE_SEQUENCE].length;
   }
   public int convertColumnToRawModel(int column) {
-    return ((Integer) data[I_VIEWABLE_SEQUENCE][column]).intValue();
+    if (data[I_VIEWABLE_SEQUENCE].length > column)
+      return ((Integer) data[I_VIEWABLE_SEQUENCE][column]).intValue();
+    else
+      return -1;
   }
   public int convertRawColumnToModel(int rawColumn) {
     return ArrayUtils.find(data[I_VIEWABLE_SEQUENCE], new Integer(rawColumn));

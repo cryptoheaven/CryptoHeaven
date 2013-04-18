@@ -87,27 +87,31 @@ public class EmailSendingAttOps extends Object {
 
     if (msgData.attachedMsgs.shortValue() > 0) {
       MsgLinkRecord[] links = dataAcquisitionHelper.fetchMsgLinksByOwner(msgLink.getId(), msgData.getId(), Record.RECORD_TYPE_MESSAGE);
-      for (int i=0; i<links.length; i++) {
-        MsgLinkRecord link = links[i];
-        MsgDataRecord data = dataAcquisitionHelper.fetchMsgDataByID(link.msgLinkId, link.msgId);
-        DefaultMutableTreeNode child = new DefaultMutableTreeNode(new Record[] { link, data });
-        node.add(child);
-        boolean isPrivileged = data.isPrivilegedBodyAccess(fromUserId, dataAcquisitionHelper.getCurrentTime(true));
-        if (!isPrivileged) {
-          data.setEncText(new BASymCipherBulk(new byte[0]));
-        } else {
-          if (child.getLevel() < MAX_ATTACHMENT_LEVELS)
-            getAttachmentsRecur(dataAcquisitionHelper, fromUserId, child);
+      if (links != null) {
+        for (int i=0; i<links.length; i++) {
+          MsgLinkRecord link = links[i];
+          MsgDataRecord data = dataAcquisitionHelper.fetchMsgDataByID(link.msgLinkId, link.msgId);
+          DefaultMutableTreeNode child = new DefaultMutableTreeNode(new Record[] { link, data });
+          node.add(child);
+          boolean isPrivileged = data.isPrivilegedBodyAccess(fromUserId, dataAcquisitionHelper.getCurrentTime(true));
+          if (!isPrivileged) {
+            data.setEncText(new BASymCipherBulk(new byte[0]));
+          } else {
+            if (child.getLevel() < MAX_ATTACHMENT_LEVELS)
+              getAttachmentsRecur(dataAcquisitionHelper, fromUserId, child);
+          }
         }
       }
     }
     if (msgData.attachedFiles.shortValue() > 0) {
       FileLinkRecord[] links = dataAcquisitionHelper.fetchFileLinksByOwner(msgLink.getId(), msgData.getId(), Record.RECORD_TYPE_MESSAGE);
-      for (int i=0; i<links.length; i++) {
-        FileLinkRecord link = links[i];
-        FileDataRecord data = dataAcquisitionHelper.fetchFileDataAttrByID(link.fileLinkId, link.fileId);
-        DefaultMutableTreeNode child = new DefaultMutableTreeNode(new Record[] { link, data });
-        node.add(child);
+      if (links != null) {
+        for (int i=0; i<links.length; i++) {
+          FileLinkRecord link = links[i];
+          FileDataRecord data = dataAcquisitionHelper.fetchFileDataAttrByID(link.fileLinkId, link.fileId);
+          DefaultMutableTreeNode child = new DefaultMutableTreeNode(new Record[] { link, data });
+          node.add(child);
+        }
       }
     }
 

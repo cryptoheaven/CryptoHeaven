@@ -300,8 +300,10 @@ public class GlobalProperties extends Object {
   // build 760 Engine fixes for few minor reported exception
   // build 762 Engine restricting additional nicknames.
   // build 764 Message reply quoting parts moved to common client package.
+  // build 766,768 Fixing more exceptions based on bug reports
 
-  public static final short PROGRAM_BUILD_NUMBER = 764;  // even
+
+  public static final short PROGRAM_BUILD_NUMBER = 768;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
