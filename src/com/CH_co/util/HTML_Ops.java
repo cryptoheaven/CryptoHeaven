@@ -38,7 +38,8 @@ public class HTML_Ops {
   public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveInlineStyles,
           boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, 
           boolean isRemoveComment, boolean isRemoveRemoteLoading, boolean isConvertPtoBR) {
-    return clearHTMLheaderAndConditionForDisplay(new StringBuffer(htmlMessage), isRemoveStyles, isRemoveInlineStyles, 
+    StringBuffer htmlMsgSB = htmlMessage != null ? new StringBuffer(htmlMessage) : null;
+    return clearHTMLheaderAndConditionForDisplay(htmlMsgSB, isRemoveStyles, isRemoveInlineStyles, 
             isRemoveHead, isRemoveLeadP, isRemoveMap, 
             isRemoveComment, isRemoveRemoteLoading, isConvertPtoBR, null).toString();
   }

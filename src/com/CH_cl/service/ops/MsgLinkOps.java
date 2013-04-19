@@ -61,27 +61,29 @@ public class MsgLinkOps {
 
           // if message belongs to folder, specify the shareId in the query
           MsgLinkRecord mLink = cache.getMsgLinkRecord(ownerLinkId);
-          if (mLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-            FolderShareRecord fShare = cache.getFolderShareRecordMy(mLink.ownerObjId, true);
-            fromShareIDs = new Long[] { fShare.shareId };
-          }
+          if (mLink != null) {
+            if (mLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
+              FolderShareRecord fShare = cache.getFolderShareRecordMy(mLink.ownerObjId, true);
+              fromShareIDs = new Long[] { fShare.shareId };
+            }
 
-          Obj_IDs_Co request = new Obj_IDs_Co();
-          request.IDs = new Long[2][];
-          request.IDs[0] = new Long[] { mLink.msgLinkId };
-          request.IDs[1] = fromShareIDs;
+            Obj_IDs_Co request = new Obj_IDs_Co();
+            request.IDs = new Long[2][];
+            request.IDs[0] = new Long[] { mLink.msgLinkId };
+            request.IDs[1] = fromShareIDs;
 
-          ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request), 60000);
-          if (msgAction != null) {
-            Misc.suppressMsgDialogsGUI(true);
-            DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
-            Misc.suppressMsgDialogsGUI(false);
-            if (msgAction.getActionCode() > 0) {
-              // no error
-              // re-query the cache after the request has completed
-              mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
-              // when we are all done fetching, resubmit owner Msg to cache for listeners to update rendering of attachments
-              cache.addMsgLinkRecords(new MsgLinkRecord[] { mLink });
+            ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.MSG_Q_GET_MSG_ATTACHMENT_BRIEFS, request), 60000);
+            if (msgAction != null) {
+              Misc.suppressMsgDialogsGUI(true);
+              DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
+              Misc.suppressMsgDialogsGUI(false);
+              if (msgAction.getActionCode() > 0) {
+                // no error
+                // re-query the cache after the request has completed
+                mLinks = cache.getMsgLinkRecordsOwnerAndType(ownerObjId, new Short(ownerType));
+                // when we are all done fetching, resubmit owner Msg to cache for listeners to update rendering of attachments
+                cache.addMsgLinkRecords(new MsgLinkRecord[] { mLink });
+              }
             }
           }
         }
