@@ -88,37 +88,39 @@ public class CacheFldUtils {
 
       for (int i=0; i<recs.length; i++) {
         Record rec = recs[i];
-        if (rec instanceof FolderShareRecord) {
-          FolderShareRecord shareRecord = (FolderShareRecord) rec;
-          if (shareRecord.isOwnedByGroup() && groupIDsSet == null)
-            groupIDsSet = cache.getFolderGroupIDsMySet();
-          if (shareRecord.isOwnedBy(userId, groupIDsSet)) {
-            FolderRecord folderRecord = cache.getFolderRecord(shareRecord.folderId);
-            if (folderRecord == null && makeupPairsIfDoNotExist) {
-              folderRecord = new FolderRecord();
-              folderRecord.folderId = shareRecord.folderId;
-              folderRecord.ownerUserId = userId;
+        if (rec != null) {
+          if (rec instanceof FolderShareRecord) {
+            FolderShareRecord shareRecord = (FolderShareRecord) rec;
+            if (shareRecord.isOwnedByGroup() && groupIDsSet == null)
+              groupIDsSet = cache.getFolderGroupIDsMySet();
+            if (shareRecord.isOwnedBy(userId, groupIDsSet)) {
+              FolderRecord folderRecord = cache.getFolderRecord(shareRecord.folderId);
+              if (folderRecord == null && makeupPairsIfDoNotExist) {
+                folderRecord = new FolderRecord();
+                folderRecord.folderId = shareRecord.folderId;
+                folderRecord.ownerUserId = userId;
+              }
+              if (folderRecord != null) {
+                folderPair = new FolderPair(shareRecord, folderRecord);
+                list.add(folderPair);
+              }
             }
-            if (folderRecord != null) {
+          } else if (rec instanceof FolderRecord) {
+            FolderRecord folderRecord = (FolderRecord) rec;
+            if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
+            FolderShareRecord shareRecord = cache.getFolderShareRecordMy(folderRecord.getId(), groupIDsSet);
+            if (shareRecord == null && makeupPairsIfDoNotExist) {
+              shareRecord = new FolderShareRecord();
+              shareRecord.folderId = folderRecord.folderId;
+              shareRecord.ownerUserId = userId;
+            }
+            if (shareRecord != null) {
               folderPair = new FolderPair(shareRecord, folderRecord);
               list.add(folderPair);
             }
+          } else {
+            throw new IllegalArgumentException("Instance " + rec.getClass().getName() + " is not supported in this call!");
           }
-        } else if (rec instanceof FolderRecord) {
-          FolderRecord folderRecord = (FolderRecord) rec;
-          if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
-          FolderShareRecord shareRecord = cache.getFolderShareRecordMy(folderRecord.getId(), groupIDsSet);
-          if (shareRecord == null && makeupPairsIfDoNotExist) {
-            shareRecord = new FolderShareRecord();
-            shareRecord.folderId = folderRecord.folderId;
-            shareRecord.ownerUserId = userId;
-          }
-          if (shareRecord != null) {
-            folderPair = new FolderPair(shareRecord, folderRecord);
-            list.add(folderPair);
-          }
-        } else {
-          throw new IllegalArgumentException("Instance " + rec.getClass().getName() + " is not supported in this call!");
         }
       }
 
