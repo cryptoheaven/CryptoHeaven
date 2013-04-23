@@ -56,18 +56,20 @@ public class FolderTreeSelectionExpansion extends Object {
     FolderTreeSelectionExpansion newVisuals = new FolderTreeSelectionExpansion();
 
     FolderTreeModelGui model = folderTree.getFolderTreeModel();
-    FolderTreeNodeGui root = model.getRootNode();
-    Enumeration enm = root.depthFirstEnumeration();
-    while (enm.hasMoreElements()) {
-      FolderTreeNodeGui node = (FolderTreeNodeGui) enm.nextElement();
-      if (node != root) {
-        TreePath path = new TreePath(model.getPathToRoot(node));
-        FolderPair fPair = node.getFolderObject();
-        Long folderId = fPair.getFolderRecord().getId();
-        if (folderTree.isVisible(path))
-          newVisuals.visibleFolderIDsV.addElement(folderId);
-        if (folderTree.isPathSelected(path))
-          newVisuals.selectedFolderIDsV.addElement(folderId);
+    synchronized (model) {
+      FolderTreeNodeGui root = model.getRootNode();
+      Enumeration enm = root.depthFirstEnumeration();
+      while (enm.hasMoreElements()) {
+        FolderTreeNodeGui node = (FolderTreeNodeGui) enm.nextElement();
+        if (node != root) {
+          TreePath path = new TreePath(model.getPathToRoot(node));
+          FolderPair fPair = node.getFolderObject();
+          Long folderId = fPair.getFolderRecord().getId();
+          if (folderTree.isVisible(path))
+            newVisuals.visibleFolderIDsV.addElement(folderId);
+          if (folderTree.isPathSelected(path))
+            newVisuals.selectedFolderIDsV.addElement(folderId);
+        }
       }
     }
 
@@ -83,30 +85,32 @@ public class FolderTreeSelectionExpansion extends Object {
     if (trace != null) trace.args(folderTree);
 
     FolderTreeModelGui model = folderTree.getFolderTreeModel();
-    for (int i=0; i<visibleFolderIDsV.size(); i++) {
-      FolderTreeNodeGui node = model.findNode((Long) visibleFolderIDsV.elementAt(i), true);
-      if (node != null) {
-        TreePath path = new TreePath(model.getPathToRoot(node));
-        if (path != null) {
-          folderTree.makeVisible(path);
+    synchronized (model) {
+      for (int i=0; i<visibleFolderIDsV.size(); i++) {
+        FolderTreeNodeGui node = model.findNode((Long) visibleFolderIDsV.elementAt(i), true);
+        if (node != null) {
+          TreePath path = new TreePath(model.getPathToRoot(node));
+          if (path != null) {
+            folderTree.makeVisible(path);
+          }
         }
       }
-    }
-    Vector selectionPathsV = new Vector();
-    for (int i=0; i<selectedFolderIDsV.size(); i++) {
-      Long folderId = (Long) selectedFolderIDsV.elementAt(i);
-      FolderTreeNodeGui node = model.findNode(folderId, true);
-      if (node != null) {
-        TreePath path = new TreePath(model.getPathToRoot(node));
-        if (path != null) {
-          selectionPathsV.addElement(path);
+      Vector selectionPathsV = new Vector();
+      for (int i=0; i<selectedFolderIDsV.size(); i++) {
+        Long folderId = (Long) selectedFolderIDsV.elementAt(i);
+        FolderTreeNodeGui node = model.findNode(folderId, true);
+        if (node != null) {
+          TreePath path = new TreePath(model.getPathToRoot(node));
+          if (path != null) {
+            selectionPathsV.addElement(path);
+          }
         }
       }
-    }
-    if (selectionPathsV.size() > 0) {
-      TreePath[] selectionPaths = new TreePath[selectionPathsV.size()];
-      selectionPathsV.toArray(selectionPaths);
-      folderTree.setSelectionPaths(selectionPaths);
+      if (selectionPathsV.size() > 0) {
+        TreePath[] selectionPaths = new TreePath[selectionPathsV.size()];
+        selectionPathsV.toArray(selectionPaths);
+        folderTree.setSelectionPaths(selectionPaths);
+      }
     }
 
     if (trace != null) trace.exit(FolderTreeSelectionExpansion.class);

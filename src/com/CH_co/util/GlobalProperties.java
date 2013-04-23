@@ -301,9 +301,9 @@ public class GlobalProperties extends Object {
   // build 762 Engine restricting additional nicknames.
   // build 764 Message reply quoting parts moved to common client package.
   // build 766,768,770 Fixing more exceptions based on bug reports
+  // build 772,774,776 Unsealing objects in the cache outside of synchronized
 
-
-  public static final short PROGRAM_BUILD_NUMBER = 770;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 776;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

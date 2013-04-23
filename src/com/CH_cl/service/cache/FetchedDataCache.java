@@ -414,9 +414,9 @@ public class FetchedDataCache extends Object {
         myUserSettingsRecord.merge(userSettingsRecord);
       else
         myUserSettingsRecord = userSettingsRecord;
-
-      fireUserSettingsRecordUpdated(new UserSettingsRecord[] { myUserSettingsRecord }, RecordEvent.SET);
     }
+
+    fireUserSettingsRecordUpdated(new UserSettingsRecord[] { myUserSettingsRecord }, RecordEvent.SET);
 
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
@@ -866,90 +866,22 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
-      // Merge so that cached valued become updated, this is required for the
-      // unsealing process to have complete and upto-date shares in the cache.
-      Long myUId = null;
-      Set groupIDsSet = null;
-      HashSet sharesChanged = null;
+      Long myUId = getMyUserId();
+      Set groupIDsSet = getFolderGroupIDsSet(myUId);
+      HashSet sharesChangedHS = unWrapFolderShareRecords(records, myUId, groupIDsSet);
+
       synchronized (this) {
-        // gather all stored shares for potential unsealing;
-        FolderShareRecord[] prevShares = getFolderShareRecords();
-        // Merge so that cached valued become updated, this is required for the
-        // unsealing process to have complete and upto-date shares in the cache.
         records = (FolderShareRecord[]) RecordUtils.merge(folderShareRecordMap, records);
         for (int i=0; i<records.length; i++) folderShareRecordMap_byFldId.put(records[i].folderId, records[i]);
         for (int i=0; i<records.length; i++) folderShareRecordMap_byOwnerId.put(records[i].ownerUserId, records[i]);
-        // carry on with unsealing preparations
-        myUId = getMyUserId();
-        groupIDsSet = getFolderGroupIDsSet(myUId);
-        ArrayList toUnsealL = new ArrayList(Arrays.asList(records));
-        sharesChanged = new HashSet();
-        for (int i=0; i<records.length; i++) {
-          sharesChanged.add(records[i]);
-        }
-        // also add any previous shares that may need unsealing (nested encryption dependent on the new additions)
-        if (prevShares != null) {
-          for (int i=0; i<prevShares.length; i++) {
-            FolderShareRecord prevShare = prevShares[i];
-            if (!prevShare.isUnSealed() || prevShare.getSymmetricKey() == null)
-              toUnsealL.add(prevShare);
-          }
-        }
-        ArrayList exceptionL = new ArrayList();
-        while (toUnsealL.size() > 0) {
-          boolean anyUnsealed = false;
-          for (int i=0; i<toUnsealL.size(); i++) {
-            FolderShareRecord sRec = (FolderShareRecord) toUnsealL.get(i);
-            if (sRec.getSymmetricKey() == null) {
-              if (sRec.isOwnedBy(myUId, groupIDsSet)) { // group changes
-                // local folder
-                if (sRec.shareId.longValue() == FolderShareRecord.SHARE_LOCAL_ID) {
-                  sRec.setFolderName(FolderShareRecord.SHARE_LOCAL_NAME);
-                  sRec.setFolderDesc(FolderShareRecord.SHARE_LOCAL_DESC);
-                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_FILE_ID) {
-                  sRec.setFolderName(FolderShareRecord.CATEGORY_FILE_NAME);
-                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_FILE_DESC);
-                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_MAIL_ID) {
-                  sRec.setFolderName(FolderShareRecord.CATEGORY_MAIL_NAME);
-                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_MAIL_DESC);
-                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_CHAT_ID) {
-                  sRec.setFolderName(FolderShareRecord.CATEGORY_CHAT_NAME);
-                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_CHAT_DESC);
-                } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_GROUP_ID) {
-                  sRec.setFolderName(FolderShareRecord.CATEGORY_GROUP_NAME);
-                  sRec.setFolderDesc(FolderShareRecord.CATEGORY_GROUP_DESC);
-                }
-                try {
-                  if (attemptUnsealShare(sRec, exceptionL, groupIDsSet)) {
-                    anyUnsealed = true;
-                    if (!sharesChanged.contains(sRec))
-                      sharesChanged.add(sRec);
-                  }
-                } catch (Throwable t) {
-                  if (trace != null) trace.data(100, "Exception occured while attempting to unseal FolderShare", sRec);
-                  if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
-                }
-              } else {
-                // maybe this wasn't owned by me or so-far-known my groups... but maybe in next iteration a parent dependency will solve this one
-                exceptionL.add(sRec);
-              }
-            }
-          } // end for
-          toUnsealL.clear();
-          if (exceptionL.size() > 0 && anyUnsealed) {
-            // another iteration
-            toUnsealL.addAll(exceptionL);
-          }
-          exceptionL.clear();
-        } // end while
-      } // end synchronized - don't want other threads to take records if we are not done unsealing them...
+      }
 
       // use the changed shares instead of just the ones added
-      records = (FolderShareRecord[]) ArrayUtils.toArray(sharesChanged, FolderShareRecord.class);
+      FolderShareRecord[] sharesChanged = (FolderShareRecord[]) ArrayUtils.toArray(sharesChangedHS, FolderShareRecord.class);
 
-      for (int i=0; i<records.length; i++) {
+      for (int i=0; i<sharesChanged.length; i++) {
         // Clear folder cached data if applicable.
-        FolderShareRecord sRec = records[i];
+        FolderShareRecord sRec = sharesChanged[i];
         if (sRec.isOwnedBy(myUId, groupIDsSet)) { // group changes
           FolderRecord fRec = getFolderRecord(sRec.folderId);
           if (fRec != null) {
@@ -958,16 +890,111 @@ public class FetchedDataCache extends Object {
         }
       }
 
-      fireFolderShareRecordUpdated(records, RecordEvent.SET);
+      fireFolderShareRecordUpdated(sharesChanged, RecordEvent.SET);
 
     } // end if records != null
 
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
-  private boolean attemptUnsealShare(FolderShareRecord sRec, Collection exceptionList, Set groupIDsSet) {
+  private HashSet unWrapFolderShareRecords(final FolderShareRecord[] records, Long myUid, Set groupIDsSet) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapFolderShareRecords(FolderShareRecord[] records, Long myUid, Set groupIDsSet)");
+    if (trace != null) trace.args(records, myUid, groupIDsSet);
+
+    // New shares will be useful in finding unwrapping keys where we check cache and fall back on this additional sets.
+    CallbackReturnI additionalSharesProvider = new CallbackReturnI() {
+      private Object[] additionalSharesSet = null;
+      public Object callback(Object value) {
+        if (additionalSharesSet == null) {
+          Map additionalShares = new HashMap();
+          MultiHashMap additionalShares_byFldId = new MultiHashMap(true);
+          for (int i=0; i<records.length; i++) {
+            FolderShareRecord additionalShare = records[i];
+            additionalShares.put(additionalShare.shareId, additionalShare);
+            additionalShares_byFldId.put(additionalShare.folderId, additionalShare);
+          }
+          additionalSharesSet = new Object[] { additionalShares, additionalShares_byFldId };
+        }
+        return additionalSharesSet;
+      }
+    };
+
+    // Tracking all changed shares for return
+    HashSet sharesChanged = new HashSet();
+    for (int i=0; i<records.length; i++) {
+      sharesChanged.add(records[i]);
+    }
+
+    // gather all stored shares for potential unsealing;
+    FolderShareRecord[] prevShares = getFolderShareRecords();
+
+    // To unseal all the new shares, plus all previous that were not unsealed before
+    ArrayList toUnsealL = new ArrayList(Arrays.asList(records));
+    // Also add any previous shares that may need unsealing (nested encryption dependent on the new additions)
+    if (prevShares != null) {
+      for (int i=0; i<prevShares.length; i++) {
+        FolderShareRecord prevShare = prevShares[i];
+        if (!prevShare.isUnSealed() || prevShare.getSymmetricKey() == null || prevShare.getFolderName() == null)
+          toUnsealL.add(prevShare);
+      }
+    }
+
+    // Process all shares that need unsealing, new and previous...
+    ArrayList exceptionL = new ArrayList();
+    while (toUnsealL.size() > 0) {
+      boolean anyUnsealed = false;
+      for (int i=0; i<toUnsealL.size(); i++) {
+        FolderShareRecord sRec = (FolderShareRecord) toUnsealL.get(i);
+        if (sRec.getSymmetricKey() == null) {
+          if (sRec.isOwnedBy(myUid, groupIDsSet)) { // group changes
+            // local folder
+            if (sRec.shareId.longValue() == FolderShareRecord.SHARE_LOCAL_ID) {
+              sRec.setFolderName(FolderShareRecord.SHARE_LOCAL_NAME);
+              sRec.setFolderDesc(FolderShareRecord.SHARE_LOCAL_DESC);
+            } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_FILE_ID) {
+              sRec.setFolderName(FolderShareRecord.CATEGORY_FILE_NAME);
+              sRec.setFolderDesc(FolderShareRecord.CATEGORY_FILE_DESC);
+            } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_MAIL_ID) {
+              sRec.setFolderName(FolderShareRecord.CATEGORY_MAIL_NAME);
+              sRec.setFolderDesc(FolderShareRecord.CATEGORY_MAIL_DESC);
+            } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_CHAT_ID) {
+              sRec.setFolderName(FolderShareRecord.CATEGORY_CHAT_NAME);
+              sRec.setFolderDesc(FolderShareRecord.CATEGORY_CHAT_DESC);
+            } else if (sRec.shareId.longValue() == FolderShareRecord.CATEGORY_GROUP_ID) {
+              sRec.setFolderName(FolderShareRecord.CATEGORY_GROUP_NAME);
+              sRec.setFolderDesc(FolderShareRecord.CATEGORY_GROUP_DESC);
+            }
+            try {
+              if (attemptUnsealShare(sRec, exceptionL, groupIDsSet, additionalSharesProvider)) {
+                anyUnsealed = true;
+                if (!sharesChanged.contains(sRec))
+                  sharesChanged.add(sRec);
+              }
+            } catch (Throwable t) {
+              if (trace != null) trace.data(100, "Exception occured while attempting to unseal FolderShare", sRec);
+              if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
+            }
+          } else {
+            // maybe this wasn't owned by me or so-far-known my groups... but maybe in next iteration a parent dependency will solve this one
+            exceptionL.add(sRec);
+          }
+        }
+      } // end for
+      toUnsealL.clear();
+      if (exceptionL.size() > 0 && anyUnsealed) {
+        // another iteration
+        toUnsealL.addAll(exceptionL);
+      }
+      exceptionL.clear();
+    } // end while
+
+    if (trace != null) trace.exit(FetchedDataCache.class, sharesChanged);
+    return sharesChanged;
+  }
+
+  private boolean attemptUnsealShare(FolderShareRecord sRec, Collection exceptionList, Set groupIDsSet, CallbackReturnI additionalSharesProvider) {
     boolean wasUnsealed = false;
-    // if anything to unseal
+    // if there is anything to unseal
     if (sRec.getEncFolderName() != null) {
       // un-seal with user's global-folder symmetric key
       if (sRec.isOwnedByUser() && sRec.getPubKeyId() == null) {
@@ -978,6 +1005,13 @@ public class FetchedDataCache extends Object {
       else if (sRec.isOwnedByGroup()) {
         FolderShareRecord myGroupShare = getFolderShareRecordMy(sRec.ownerUserId, groupIDsSet);
         BASymmetricKey symmetricKey = myGroupShare != null ? myGroupShare.getSymmetricKey() : null;
+        if (symmetricKey == null && additionalSharesProvider != null) { //additionalShares != null && additionalShares_byFldId != null) {
+          Object[] additionalSharesSet = (Object[]) additionalSharesProvider.callback(null);
+          Map additionalShares = (Map) additionalSharesSet[0];
+          MultiHashMap additionalShares_byFldId = (MultiHashMap) additionalSharesSet[1];
+          myGroupShare = getFolderShareRecordMy(sRec.ownerUserId, groupIDsSet, myUserId, additionalShares, additionalShares_byFldId);
+          symmetricKey = myGroupShare != null ? myGroupShare.getSymmetricKey() : null;
+        }
         if (symmetricKey != null) {
           sRec.unSeal(symmetricKey);
           wasUnsealed = true;
@@ -1102,12 +1136,15 @@ public class FetchedDataCache extends Object {
   /**
   * @return a FolderShareRecord from cache for a given folderId and current user.
   */
-  private synchronized FolderShareRecord getFolderShareRecordMy(Long folderId) {
+  private FolderShareRecord getFolderShareRecordMy(Long folderId) {
+    return getFolderShareRecordMy(folderId, myUserId, folderShareRecordMap_byFldId);
+  }
+  private static FolderShareRecord getFolderShareRecordMy(Long folderId, Long myUserId, MultiHashMap shares_byFldId) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId)");
     if (trace != null) trace.args(folderId);
 
     FolderShareRecord shareRec = null;
-    Collection sharesV = folderShareRecordMap_byFldId.getAll(folderId);
+    Collection sharesV = shares_byFldId.getAll(folderId);
     if (sharesV != null) {
       Iterator iter = sharesV.iterator();
       while (iter.hasNext()) {
@@ -1118,10 +1155,10 @@ public class FetchedDataCache extends Object {
         }
       }
     }
-
     if (trace != null) trace.exit(FetchedDataCache.class, shareRec);
     return shareRec;
   }
+
   public synchronized FolderShareRecord getFolderShareRecordMy(Long folderId, boolean includeGroupOwned) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId, boolean includeGroupOwned)");
     if (trace != null) trace.args(folderId);
@@ -1150,14 +1187,30 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.exit(FetchedDataCache.class, shareRec);
     return shareRec;
   }
-  private synchronized FolderShareRecord getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet)");
+  private static FolderShareRecord getFolderShareRecordMy(Long folderId, Set groupIDsSet, Long myUserId, Map shares, MultiHashMap shares_byFldId) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordMy(Long folderId, Set groupIDsSet, Long myUserId, Map shares, MultiHashMap shares_byFldId)");
+    if (trace != null) trace.args(folderId, groupIDsSet, myUserId, shares, shares_byFldId);
+
+    FolderShareRecord shareRec = getFolderShareRecordMy(folderId, myUserId, shares_byFldId);
+    if (shareRec == null && groupIDsSet != null) {
+      shareRec = getFolderShareRecordGroupOwnded(folderId, groupIDsSet, shares);
+    }
+
+    if (trace != null) trace.exit(FetchedDataCache.class, shareRec);
+    return shareRec;
+  }
+  private FolderShareRecord getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet) {
+    return getFolderShareRecordGroupOwnded(folderId, groupIDsSet, folderShareRecordMap);
+  }
+  private static FolderShareRecord getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet, Map shares) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "getFolderShareRecordGroupOwnded(Long folderId, Set groupIDsSet, Map shares)");
     if (trace != null) trace.args(folderId);
     if (trace != null) trace.args(groupIDsSet); // if present - include folder shares through group memberships
+    if (trace != null) trace.args(shares);
 
     FolderShareRecord shareRec = null;
     if (groupIDsSet != null && groupIDsSet.size() > 0) {
-      Collection col = folderShareRecordMap.values();
+      Collection col = shares.values();
       Iterator iter = col.iterator();
       while (iter.hasNext()) {
         FolderShareRecord shareRecord = (FolderShareRecord) iter.next();
@@ -1512,61 +1565,78 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
+      // expensive unsealing outside of synchronized
+      unWrapFileLinkRecords(records);
       synchronized (this) {
-        Set groupIDsSet = null;
-        // un-seal the records
-        for (int i=0; i<records.length; i++) {
-          FileLinkRecord fLink = records[i];
-          BASymmetricKey unsealingKey = null;
-          short ownerObjType = fLink.ownerObjType.shortValue();
-
-          // find the symmetric key from the owner object's record.
-          switch (ownerObjType) {
-            case Record.RECORD_TYPE_FOLDER:
-              if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
-              FolderShareRecord shareRecord = getFolderShareRecordMy(fLink.ownerObjId, groupIDsSet);
-              // Share Record may be null if this file was moved from a shared folder to a private on
-              // not accessible to us, but some other user.
-              if (shareRecord != null) {
-                unsealingKey = shareRecord.getSymmetricKey();
-              }
-              break;
-            case Record.RECORD_TYPE_MESSAGE:
-              // any password protected message has the key
-              MsgDataRecord msgDataRecord = getMsgDataRecord(fLink.ownerObjId);
-              MsgLinkRecord[] msgLinkRecords = null;
-              if (msgDataRecord.bodyPassHash != null) {
-                unsealingKey = msgDataRecord.getSymmetricBodyKey();
-              } else {
-                // any message link has a symmetric key for the message data and attached files
-                msgLinkRecords = getMsgLinkRecordsForMsg(fLink.ownerObjId);
-                if (msgLinkRecords != null && msgLinkRecords.length > 0)
-                  unsealingKey = msgLinkRecords[0].getSymmetricKey();
-              }
-              // clear parent message rendering cache as it might need to be updated with new attachments
-              if (msgLinkRecords == null)
-                msgLinkRecords = getMsgLinkRecordsForMsg(fLink.ownerObjId);
-              MsgLinkRecord.clearPostRenderingCache(msgLinkRecords);
-              // re-inject the parent message into cache to trigger listener updates
-              addMsgLinkRecords(msgLinkRecords);
-              break;
-            default:
-              throw new IllegalArgumentException("Not supported: ownerObjType=" + ownerObjType);
-          }
-          if (unsealingKey != null) {
-            fLink.unSeal(unsealingKey);
-          }
-        } // end for
-
         records = (FileLinkRecord[]) RecordUtils.merge(fileLinkRecordMap, records);
         for (int i=0; i<records.length; i++) fileLinkRecordMap_byFileId.put(records[i].fileId, records[i]);
       } // end synchronized
+      // for any attachments, clear parent message rendering cache
+      for (int i=0; i<records.length; i++) {
+        FileLinkRecord link = records[i];
+        if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
+          MsgLinkRecord[] msgParentLinks = getMsgLinkRecordsForMsg(link.ownerObjId);
+          if (msgParentLinks != null && msgParentLinks.length > 0) {
+            // clear parent message rendering cache as it might need to be updated with new attachments
+            MsgLinkRecord.clearPostRenderingCache(msgParentLinks);
+            // re-inject the parent message into cache to trigger listener updates
+            addMsgLinkRecords(msgParentLinks);
+          }
+        }
+      }
       fireFileLinkRecordUpdated(records, RecordEvent.SET);
 
       // recalculate flags in the involved folders
       statUpdatesInFoldersForVisualNotification(records, false, false);
     }
 
+    if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  private void unWrapFileLinkRecords(FileLinkRecord[] linkRecords) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapFileLinkRecords(FileLinkRecord[] linkRecords)");
+    if (trace != null) trace.args(linkRecords);
+    Set groupIDsSet = null;
+    // un-seal the records
+    for (int i=0; i<linkRecords.length; i++) {
+      FileLinkRecord fLink = linkRecords[i];
+      try {
+        BASymmetricKey unsealingKey = null;
+        short ownerObjType = fLink.ownerObjType.shortValue();
+
+        // find the symmetric key from the owner object's record.
+        switch (ownerObjType) {
+          case Record.RECORD_TYPE_FOLDER:
+            if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
+            FolderShareRecord shareRecord = getFolderShareRecordMy(fLink.ownerObjId, groupIDsSet);
+            // Share Record may be null if this file was moved from a shared folder to a private on
+            // not accessible to us, but some other user.
+            if (shareRecord != null) {
+              unsealingKey = shareRecord.getSymmetricKey();
+            }
+            break;
+          case Record.RECORD_TYPE_MESSAGE:
+            // any password protected message has the key
+            MsgDataRecord msgDataRecord = getMsgDataRecord(fLink.ownerObjId);
+            MsgLinkRecord[] msgLinkRecords = null;
+            if (msgDataRecord.bodyPassHash != null) {
+              unsealingKey = msgDataRecord.getSymmetricBodyKey();
+            } else {
+              // any message link has a symmetric key for the message data and attached files
+              msgLinkRecords = getMsgLinkRecordsForMsg(fLink.ownerObjId);
+              if (msgLinkRecords != null && msgLinkRecords.length > 0)
+                unsealingKey = msgLinkRecords[0].getSymmetricKey();
+            }
+            break;
+        }
+        if (unsealingKey != null) {
+          fLink.unSeal(unsealingKey);
+        }
+      } catch (Throwable t) {
+        if (trace != null) trace.data(100, "Exception occured while processing file link", fLink);
+        if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
+      }
+    } // end for
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
 
@@ -1833,57 +1903,67 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
+
+      // expensive unsealing outside of synchronized
+      boolean isUserSettingsChange = false;
       StringBuffer errBuffer = new StringBuffer();
+      isUserSettingsChange = unWrapKeyRecords(records, errBuffer);
+
       synchronized (this) {
-        // Unwrap key records.
-        for (int i=0; i<records.length; i++) {
-          if (records[i].ownerUserId.equals(myUserId)) {
-
-            // in case this is my key and doesn't have the encrypted private key, try to fetch it from properties
-            BASymCipherBlock ba = records[i].getEncPrivateKey();
-            if (ba == null) {
-
-              String propertyKey = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+records[i].keyId;
-              GlobalSubProperties keyProperties = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
-              String property = keyProperties.getProperty(propertyKey);
-
-              if (property != null && property.length() > 0) {
-                ba = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-                records[i].setEncPrivateKey(ba);
-              }
-            }
-
-            records[i].unSeal(getEncodedPassword());
-
-            // Now that we have the key, if my userRecord is not yet decrypted, decrypt it now.
-            UserRecord myUserRecord = getUserRecord();
-            if (myUserRecord != null &&
-                records[i].keyId.equals(myUserRecord.pubKeyId) &&
-                records[i].getPrivateKey() != null &&
-                myUserRecord.getSymKeyFldShares() == null)
-            {
-              myUserRecord.unSeal(records[i]);
-            }
-
-            // Also decrypt the user settings if not yet decrypted
-            if (myUserSettingsRecord != null &&
-                myUserSettingsRecord.getXmlText() == null &&
-                myUserSettingsRecord.pubKeyId.equals(records[i].keyId))
-            {
-              myUserSettingsRecord.unSeal(records[i], errBuffer);
-              fireUserSettingsRecordUpdated(new UserSettingsRecord[] { myUserSettingsRecord }, RecordEvent.SET);
-            }
-          }
-        }
-
         records = (KeyRecord[]) RecordUtils.merge(keyRecordMap, records);
       }
+
+      // notify if user settings was just unsealed
+      if (isUserSettingsChange) {
+        fireUserSettingsRecordUpdated(new UserSettingsRecord[] { myUserSettingsRecord }, RecordEvent.SET);
+      }
+
       if (errBuffer.length() > 0)
         NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid Settings", errBuffer.toString());
+
       fireKeyRecordUpdated(records, RecordEvent.SET);
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
+  }
+
+  private boolean unWrapKeyRecords(KeyRecord[] records, StringBuffer errBuffer) {
+    boolean isUserSettingsChange = false;
+    for (int i=0; i<records.length; i++) {
+      if (records[i].ownerUserId.equals(myUserId)) {
+        // in case this is my key and doesn't have the encrypted private key, try to fetch it from properties
+        BASymCipherBlock ba = records[i].getEncPrivateKey();
+        if (ba == null) {
+          String propertyKey = "Enc"+RSAPrivateKey.OBJECT_NAME+"_"+records[i].keyId;
+          GlobalSubProperties keyProperties = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
+          String property = keyProperties.getProperty(propertyKey);
+
+          if (property != null && property.length() > 0) {
+            ba = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+            records[i].setEncPrivateKey(ba);
+          }
+        }
+        records[i].unSeal(getEncodedPassword());
+        // Now that we have the key, if my userRecord is not yet decrypted, decrypt it now.
+        UserRecord myUserRecord = getUserRecord();
+        if (myUserRecord != null &&
+            records[i].keyId.equals(myUserRecord.pubKeyId) &&
+            records[i].getPrivateKey() != null &&
+            myUserRecord.getSymKeyFldShares() == null)
+        {
+          myUserRecord.unSeal(records[i]);
+        }
+        // Also decrypt the user settings if not yet decrypted
+        if (myUserSettingsRecord != null &&
+            myUserSettingsRecord.getXmlText() == null &&
+            myUserSettingsRecord.pubKeyId.equals(records[i].keyId))
+        {
+          myUserSettingsRecord.unSeal(records[i], errBuffer);
+          isUserSettingsChange = true;
+        }
+      }
+    }
+    return isUserSettingsChange;
   }
 
   /**
@@ -1978,9 +2058,10 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
+      // expensive unsealing outside of synchronized
+      unWrapContactRecords(records);
       boolean anyNew = false;
       synchronized (this) {
-        unWrapContactRecords(records);
         // see if we got new records, or updates only
         for (int i=0; i<records.length; i++) {
           if (!contactRecordMap.containsKey(records[i].contactId)) {
@@ -2068,66 +2149,70 @@ public class FetchedDataCache extends Object {
     // Unwrap contact records.
     for (int i=0; i<records.length; i++) {
       ContactRecord cRec = records[i];
-
-      // If status change to ONLINE, play sound.
-      if (cRec.status != null && ContactRecord.isOnlineStatus(cRec.status)) {
-        ContactRecord oldRec = getContactRecord(cRec.contactId);
-        if (oldRec != null &&
-                !ContactRecord.isOnlineStatus(oldRec.status) &&
-                myUserId.equals(oldRec.ownerUserId) &&
-                (oldRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0
-                )
-        {
-          Sounds.playAsynchronous(Sounds.ONLINE);
-        }
-      }
-
-      if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
-      FolderShareRecord shareRecord = getFolderShareRecordMy(cRec.folderId, groupIDsSet);
-      // unSeal only OWNER part
-      if (cRec.ownerUserId != null && cRec.ownerUserId.equals(myUserId)) {
-        // OWNER part
-        if (cRec.getEncOwnerNote() != null) {
-          if (cRec.getEncOwnerNote().size() > 0) {
-            if (shareRecord != null)
-              cRec.unSeal(shareRecord.getSymmetricKey());
-          } else {
-            // If owner's note is blank, use default handle or make from user id.
-            UserRecord uRec = getUserRecord(cRec.contactWithId);
-            if (uRec != null)
-              cRec.setOwnerNote(uRec.handle);
-            else
-              cRec.setOwnerNote("User (" + cRec.contactWithId + ")");
+      try {
+        // If status change to ONLINE, play sound.
+        if (cRec.status != null && ContactRecord.isOnlineStatus(cRec.status)) {
+          ContactRecord oldRec = getContactRecord(cRec.contactId);
+          if (oldRec != null &&
+                  !ContactRecord.isOnlineStatus(oldRec.status) &&
+                  myUserId.equals(oldRec.ownerUserId) &&
+                  (oldRec.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0
+                  )
+          {
+            Sounds.playAsynchronous(Sounds.ONLINE);
           }
         }
-      }
-      // unSeal only OTHER part
-      else if (cRec.contactWithId != null && cRec.contactWithId.equals(myUserId)) {
-        // OTHER part
-        if (cRec.getEncOtherNote() != null) {
-          if (cRec.getEncOtherNote().size() > 0) {
-            Long keyId = cRec.getOtherKeyId();
-            if (keyId != null) {
-              KeyRecord otherKeyRec = getKeyRecord(keyId);
-              if (otherKeyRec != null) {
-                cRec.unSeal(otherKeyRec);
+
+        if (groupIDsSet == null) groupIDsSet = getFolderGroupIDsSet(myUserId);
+        FolderShareRecord shareRecord = getFolderShareRecordMy(cRec.folderId, groupIDsSet);
+        // unSeal only OWNER part
+        if (cRec.ownerUserId != null && cRec.ownerUserId.equals(myUserId)) {
+          // OWNER part
+          if (cRec.getEncOwnerNote() != null) {
+            if (cRec.getEncOwnerNote().size() > 0) {
+              if (shareRecord != null)
+                cRec.unSeal(shareRecord.getSymmetricKey());
+            } else {
+              // If owner's note is blank, use default handle or make from user id.
+              UserRecord uRec = getUserRecord(cRec.contactWithId);
+              if (uRec != null)
+                cRec.setOwnerNote(uRec.handle);
+              else
+                cRec.setOwnerNote("User (" + cRec.contactWithId + ")");
+            }
+          }
+        }
+        // unSeal only OTHER part
+        else if (cRec.contactWithId != null && cRec.contactWithId.equals(myUserId)) {
+          // OTHER part
+          if (cRec.getEncOtherNote() != null) {
+            if (cRec.getEncOtherNote().size() > 0) {
+              Long keyId = cRec.getOtherKeyId();
+              if (keyId != null) {
+                KeyRecord otherKeyRec = getKeyRecord(keyId);
+                if (otherKeyRec != null) {
+                  cRec.unSeal(otherKeyRec);
+                }
+              } else {
+                // if no keyId then this record must have already been recrypted
+                if (myUserRecord == null) myUserRecord = getUserRecord();
+                BASymmetricKey ba = myUserRecord.getSymKeyCntNotes();
+                if (ba != null) cRec.unSealRecrypted(ba);
               }
             } else {
-              // if no keyId then this record must have already been recrypted
-              if (myUserRecord == null) myUserRecord = getUserRecord();
-              BASymmetricKey ba = myUserRecord.getSymKeyCntNotes();
-              if (ba != null) cRec.unSealRecrypted(ba);
+              // If other note is blank, use default handle or make from user id.
+              UserRecord uRec = getUserRecord(cRec.ownerUserId);
+              if (uRec != null)
+                cRec.setOtherNote(uRec.handle);
+              else
+                cRec.setOtherNote("User (" + cRec.contactWithId + ")");
             }
-          } else {
-            // If other note is blank, use default handle or make from user id.
-            UserRecord uRec = getUserRecord(cRec.ownerUserId);
-            if (uRec != null)
-              cRec.setOtherNote(uRec.handle);
-            else
-              cRec.setOtherNote("User (" + cRec.contactWithId + ")");
           }
-        }
-      } // end unSeal OTHER part
+        } // end unSeal OTHER part
+      } catch (Throwable t) {
+        if (trace != null) trace.data(100, "Exception occured while processing contact", cRec);
+        if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
+      }
     }
 
     if (trace != null) trace.exit(FetchedDataCache.class);
@@ -2285,11 +2370,27 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
+      // expensive unsealing outside of synchronized
+      unWrapMsgLinkRecords(records);
       synchronized (this) {
-        // unseal the Msg Links
-        unWrapMsgLinkRecords(records);
         records = (MsgLinkRecord[]) RecordUtils.merge(msgLinkRecordMap, records);
         for (int i=0; i<records.length; i++) msgLinkRecordMap_byMsgId.put(records[i].msgId, records[i]);
+      }
+      // for any attachments, clear parent message rendering cache
+      for (int i=0; i<records.length; i++) {
+        MsgLinkRecord link = records[i];
+        if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
+          // avoid infinite loop if by mistake owner would be the same message
+          if (!link.ownerObjId.equals(link.msgId)) {
+            MsgLinkRecord[] msgParentLinks = getMsgLinkRecordsForMsg(link.ownerObjId);
+            if (msgParentLinks != null && msgParentLinks.length > 0) {
+              // clear parent message rendering cache as it might need to be updated with new attachments
+              MsgLinkRecord.clearPostRenderingCache(msgParentLinks);
+              // re-inject the parent message into cache to trigger listener updates
+              addMsgLinkRecords(msgParentLinks);
+            }
+          }
+        }
       }
       fireMsgLinkRecordUpdated(records, RecordEvent.SET);
 
@@ -2323,7 +2424,7 @@ public class FetchedDataCache extends Object {
                 // Last desperate attempt to unwrap the parent folder, maybe we got it last minute
                 // as a request due to the incomming link which had no prior known parent folder.
                 ArrayList exceptionL = new ArrayList();
-                attemptUnsealShare(sRec, exceptionL, groupIDsSet);
+                attemptUnsealShare(sRec, exceptionL, groupIDsSet, null);
               }
               link.unSeal(sRec.getSymmetricKey());
             }
@@ -2339,21 +2440,16 @@ public class FetchedDataCache extends Object {
               if (msgLinkRecords != null && msgLinkRecords.length > 0)
                 link.unSeal(msgLinkRecords[0].getSymmetricKey());
             }
-            // clear parent message rendering cache as it might need to be updated with new attachments
-            if (msgLinkRecords == null)
-              msgLinkRecords = getMsgLinkRecordsForMsg(link.ownerObjId);
-            MsgLinkRecord.clearPostRenderingCache(msgLinkRecords);
           }
         }
       } catch (Throwable t) {
-        if (trace != null) trace.data(100, "Exception occured while processing link", link);
+        if (trace != null) trace.data(100, "Exception occured while processing message link", link);
         if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
       }
     } // end for
 
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
-
 
   /**
   * Visually notify users that certain folders have modified content, update the
@@ -2497,27 +2593,34 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(linkRecords, dataRecords);
     if (trace != null) trace.args(suppressEventFireing);
 
+    MsgDataRecord[] affectedMsgDatas = null;
+    // unseal the Msg Links and Msg Datas
+    if (linkRecords != null && linkRecords.length > 0) {
+      unWrapMsgLinkRecords(linkRecords);
+    }
+    if (dataRecords != null && dataRecords.length > 0) {
+      unWrapMsgDataRecords(dataRecords, linkRecords);
+    } else if (linkRecords != null && linkRecords.length > 0) {
+      // since there are no Msg Datas specified, maybe we should try unWrapping any datas pointed by the link from the cache...
+      // this would cover symmetric recrypt case of shared inboxes
+      Long[] msgIDs = MsgLinkRecord.getMsgIDs(linkRecords);
+      affectedMsgDatas = getMsgDataRecords(msgIDs);
+      if (affectedMsgDatas != null && affectedMsgDatas.length > 0)
+        unWrapMsgDataRecords(affectedMsgDatas, linkRecords);
+    }
+
     synchronized (this) {
-      // unseal the Msg Links and Msg Datas
+      // merge Msg Links and Msg Datas
       if (linkRecords != null && linkRecords.length > 0) {
-        unWrapMsgLinkRecords(linkRecords);
         linkRecords = (MsgLinkRecord[]) RecordUtils.merge(msgLinkRecordMap, linkRecords);
         for (int i=0; i<linkRecords.length; i++) msgLinkRecordMap_byMsgId.put(linkRecords[i].msgId, linkRecords[i]);
       }
       if (dataRecords != null && dataRecords.length > 0) {
-        unWrapMsgDataRecords(dataRecords);
         dataRecords = (MsgDataRecord[]) RecordUtils.merge(msgDataRecordMap, dataRecords);
         for (int i=0; i<dataRecords.length; i++) msgDataRecordMap_byReplyToMsgId.put(dataRecords[i].replyToMsgId, dataRecords[i]);
-      } else if (linkRecords != null && linkRecords.length > 0) {
-        // since there are no Msg Datas specified, maybe we should try unWrapping any datas pointed by the link from the cache...
-        // this would cover symmetric recrypt case of shared inboxes
-        Long[] msgIDs = MsgLinkRecord.getMsgIDs(linkRecords);
-        // re-assign the variable, we'll use it in fireing the events
-        dataRecords = getMsgDataRecords(msgIDs);
-        if (dataRecords != null && dataRecords.length > 0)
-          unWrapMsgDataRecords(dataRecords);
       }
     }
+
     if (!suppressEventFireing) {
       if (linkRecords == null || linkRecords.length == 0) {
         if (dataRecords != null && dataRecords.length > 0) {
@@ -2529,6 +2632,9 @@ public class FetchedDataCache extends Object {
       }
       if (dataRecords != null && dataRecords.length > 0) {
         fireMsgDataRecordUpdated(dataRecords, RecordEvent.SET);
+      }
+      if (affectedMsgDatas != null && affectedMsgDatas.length > 0) {
+        fireMsgDataRecordUpdated(affectedMsgDatas, RecordEvent.SET);
       }
     }
 
@@ -2819,9 +2925,9 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
+      // expensive unsealing outside of synchronized
+      unWrapMsgDataRecords(records, null);
       synchronized (this) {
-        // unSeal Msg Data records
-        unWrapMsgDataRecords(records);
         records = (MsgDataRecord[]) RecordUtils.merge(msgDataRecordMap, records);
         for (int i=0; i<records.length; i++) msgDataRecordMap_byReplyToMsgId.put(records[i].replyToMsgId, records[i]);
       }
@@ -2830,37 +2936,65 @@ public class FetchedDataCache extends Object {
 
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
-  private void unWrapMsgDataRecords(MsgDataRecord[] dataRecords) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapMsgDataRecords(MsgDataRecord[] dataRecords)");
+  /**
+  * Unseals MsgDataRecords
+  * @param dataRecords MsgDataRecords we want to unseal
+  * @param additionalMsgLinks 'nullable' Additional links that may hold keys to datas, which are not yet inserted in the cache
+  */
+  private void unWrapMsgDataRecords(MsgDataRecord[] dataRecords, MsgLinkRecord[] additionalMsgLinks) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "unWrapMsgDataRecords(MsgDataRecord[] dataRecords, MsgLinkRecord[] additionalMsgLinks)");
     if (trace != null) trace.args(dataRecords);
+    // performance search enhancement for additional links
+    MultiHashMap additionalHM_byMsgId = null;
+    // for each Message
     for (int i=0; i<dataRecords.length; i++) {
       MsgDataRecord data = dataRecords[i];
       try {
         MsgLinkRecord[] linkRecords = getMsgLinkRecordsForMsg(data.msgId);
-        if (linkRecords != null && linkRecords.length > 0) {
-          // Find a symmetric key from links that might have been password protected and not unsealed yet...
-          BASymmetricKey symmetricKey = null;
-          for (int k=0; k<linkRecords.length; k++)
-            if (linkRecords[k].getSymmetricKey() != null)
+        // Find a symmetric key from links that might have been password protected and not unsealed yet...
+        BASymmetricKey symmetricKey = null;
+        if (linkRecords != null) {
+          for (int k=0; k<linkRecords.length; k++) {
+            if (linkRecords[k].getSymmetricKey() != null) {
               symmetricKey = linkRecords[k].getSymmetricKey();
-          if (symmetricKey != null) {
-            // if this data record contains sendPrivKeyId, then signature needs to be verified
-            if (data.getSendPrivKeyId() != null) {
-              // for performance don't verify everything, do it when person asks to see it
-              //            KeyRecord msgSigningKeyRec = getKeyRecord(data.getSendPrivKeyId());
-              //            if (msgSigningKeyRec != null)
-              //              data.unSeal(linkRecords[0].getSymmetricKey(), msgSigningKeyRec);
-              //            else
-              // signing key no longer exists, maybe the user account was deleted..., just unseal the message.
-              data.unSealWithoutVerify(symmetricKey, msgBodyKeys);
-            } else {
-              // unSeal the subject only, don't verify signatures as the text is not available yet
-              data.unSealSubject(symmetricKey);
+              break;
             }
           }
         }
+        // If needed, try the additional links
+        if (symmetricKey == null && additionalMsgLinks != null) {
+          // prep performance enhancement table
+          if (additionalHM_byMsgId == null) {
+            additionalHM_byMsgId = new MultiHashMap(true);
+            for (int k=0; k<additionalMsgLinks.length; k++) additionalHM_byMsgId.put(additionalMsgLinks[k].msgId, additionalMsgLinks[k]);
+          }
+          Collection msgLinks = additionalHM_byMsgId.getAll(data.msgId);
+          Iterator iter = msgLinks.iterator();
+          while (iter.hasNext()) {
+            MsgLinkRecord msgLink = (MsgLinkRecord) iter.next();
+            if (msgLink.getSymmetricKey() != null) {
+              symmetricKey = msgLink.getSymmetricKey();
+              break;
+            }
+          }
+        }
+        if (symmetricKey != null) {
+          // if this data record contains sendPrivKeyId, then signature needs to be verified
+          if (data.getSendPrivKeyId() != null) {
+            // for performance don't verify everything, do it when person asks to see it
+            //            KeyRecord msgSigningKeyRec = getKeyRecord(data.getSendPrivKeyId());
+            //            if (msgSigningKeyRec != null)
+            //              data.unSeal(linkRecords[0].getSymmetricKey(), msgSigningKeyRec);
+            //            else
+            // signing key no longer exists, maybe the user account was deleted..., just unseal the message.
+            data.unSealWithoutVerify(symmetricKey, msgBodyKeys);
+          } else {
+            // unSeal the subject only, don't verify signatures as the text is not available yet
+            data.unSealSubject(symmetricKey);
+          }
+        }
       } catch (Throwable t) {
-        if (trace != null) trace.data(100, "Exception occured while processing data", data);
+        if (trace != null) trace.data(100, "Exception occured while processing message data", data);
         if (trace != null) trace.exception(FetchedDataCache.class, 101, t);
       }
     }

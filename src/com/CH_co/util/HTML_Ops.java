@@ -38,10 +38,14 @@ public class HTML_Ops {
   public static String clearHTMLheaderAndConditionForDisplay(String htmlMessage, boolean isRemoveStyles, boolean isRemoveInlineStyles,
           boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, 
           boolean isRemoveComment, boolean isRemoveRemoteLoading, boolean isConvertPtoBR) {
-    StringBuffer htmlMsgSB = htmlMessage != null ? new StringBuffer(htmlMessage) : null;
-    return clearHTMLheaderAndConditionForDisplay(htmlMsgSB, isRemoveStyles, isRemoveInlineStyles, 
-            isRemoveHead, isRemoveLeadP, isRemoveMap, 
-            isRemoveComment, isRemoveRemoteLoading, isConvertPtoBR, null).toString();
+    StringBuffer htmlMsgReturn = null;
+    if (htmlMessage != null) {
+      StringBuffer htmlMsgSB = new StringBuffer(htmlMessage);
+      htmlMsgReturn = clearHTMLheaderAndConditionForDisplay(htmlMsgSB, isRemoveStyles, isRemoveInlineStyles, 
+              isRemoveHead, isRemoveLeadP, isRemoveMap, 
+              isRemoveComment, isRemoveRemoteLoading, isConvertPtoBR, null);
+    }
+    return htmlMsgReturn != null ? htmlMsgReturn.toString() : null;
   }
   public static StringBuffer clearHTMLheaderAndConditionForDisplay(StringBuffer htmlMessage, boolean isRemoveStyles, boolean isRemoveInlineStyles,
           boolean isRemoveHead, boolean isRemoveLeadP, boolean isRemoveMap, 

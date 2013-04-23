@@ -430,7 +430,8 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
                 querySatisfied = true;
                 userActionTable.getJSortedTable().getSelectionModel().setSelectionInterval(0, 0);
               }
-              jSearchField.selectAll();
+              if (jSearchField.getText().length() > 0)
+                jSearchField.selectAll();
               if (isResultTruncated)
                 MessageDialog.showInfoDialog(UserSearchPanel.this, "Displaying first few hits only.  Please narrow down your search.", "Search too broad.", false);
             }

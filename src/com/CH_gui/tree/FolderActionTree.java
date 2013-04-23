@@ -1436,25 +1436,26 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
       FolderRecord[] folderRecords = null;
       folderRecords = event.getFolderRecords();
       if (folderRecords != null) {
-        FolderTreeModelGui model = null;
-        for (int i=0; i<folderRecords.length; i++) {
-          FolderRecord fRec = folderRecords[i];
-          int updates = fRec.getUpdateCount();
-          if (updates > 0) {
-            int lastMark = getFolderUpdateMark(fRec.folderId);
-            if (updates > lastMark) { // if updates is less then who cares for deletions, nothing new after all
-              if (model == null) model = FolderActionTree.this.getFolderTreeModel();
-              FolderTreeNode node = model.findNode(folderRecords[i].folderId, true);
-              TreePath path = model.getPathToRoot(fRec);
-              if (path != null && !FolderActionTree.this.isVisible(path)) {
-                //FolderActionTree.this.scrollPathToVisible(path);
-                FolderActionTree.this.scrollPathToVisible2(path);
+        FolderTreeModelGui model = FolderActionTree.this.getFolderTreeModel();
+        synchronized (model) {
+          for (int i=0; i<folderRecords.length; i++) {
+            FolderRecord fRec = folderRecords[i];
+            int updates = fRec.getUpdateCount();
+            if (updates > 0) {
+              int lastMark = getFolderUpdateMark(fRec.folderId);
+              if (updates > lastMark) { // if updates is less then who cares for deletions, nothing new after all
+                FolderTreeNode node = model.findNode(folderRecords[i].folderId, true);
+                TreePath path = model.getPathToRoot(fRec);
+                if (path != null && !FolderActionTree.this.isVisible(path)) {
+                  //FolderActionTree.this.scrollPathToVisible(path);
+                  FolderActionTree.this.scrollPathToVisible2(path);
+                }
               }
             }
-          }
-          // set the last processed undate count even if zero
-          setFolderUpdateMark(fRec.folderId, updates);
-        } // end for
+            // set the last processed undate count even if zero
+            setFolderUpdateMark(fRec.folderId, updates);
+          } // end for
+        }
       }
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
       if (trace != null) trace.exit(FolderGUIUpdater.class);

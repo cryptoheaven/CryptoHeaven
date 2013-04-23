@@ -31,9 +31,7 @@ import javax.swing.tree.TreePath;
  *
  * Class Description:
  *
- *
- * Class Details:
- *
+ * Class Details: All "public" access to the tree structure is "synchronized"
  *
  * <b>$Revision: 1.6 $</b>
  * @author  Marcin Kurzawa
@@ -89,27 +87,27 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 //    return (FolderTreeNode) getChild(parent, childIndex);
 //  }
 
-  public FolderTreeNodeGui getRootNode() {
+  public synchronized FolderTreeNodeGui getRootNode() {
     return (FolderTreeNodeGui) getRoot();
   }
-  public FolderTreeNodeGui getRootNodeById(long folderId) {
+  private FolderTreeNodeGui getRootNodeById(long folderId) {
     return (FolderTreeNodeGui) getRootNode().getRootNodeById(folderId);
   }
 
-  public FolderTreeNodeGui getRootChatNode() {
+  private FolderTreeNodeGui getRootChatNode() {
     return getRootNodeById(FolderRecord.CATEGORY_CHAT_ID);
   }
-  public FolderTreeNodeGui getRootFileNode() {
+  private FolderTreeNodeGui getRootFileNode() {
     return getRootNodeById(FolderRecord.CATEGORY_FILE_ID);
   }
-  public FolderTreeNodeGui getRootGroupNode() {
+  private FolderTreeNodeGui getRootGroupNode() {
     return getRootNodeById(FolderRecord.CATEGORY_GROUP_ID);
   }
-  public FolderTreeNodeGui getRootMsgNode() {
+  private FolderTreeNodeGui getRootMsgNode() {
     return getRootNodeById(FolderRecord.CATEGORY_MAIL_ID);
   }
 
-  public RecordFilter getFilter() {
+  public synchronized RecordFilter getFilter() {
     return filter;
   }
 
@@ -152,7 +150,7 @@ public class FolderTreeModelGui extends DefaultTreeModel {
   /**
    * @param folders is a non-empty array of FolderPairs that will be added to this tree model
    */
-  public void addNodes(FolderPair[] folders) {
+  public synchronized void addNodes(FolderPair[] folders) {
     addNodes(folders, true);
     // Java 1.4.1 screwes up in tree display if we don't reload() so do it here...
     reload();
@@ -161,7 +159,7 @@ public class FolderTreeModelGui extends DefaultTreeModel {
    * Adding nodes keeping each child level sorted or not
    * @param inOrder node sorting
    */
-  public void addNodes(FolderPair[] folders, boolean inOrder) {
+  private void addNodes(FolderPair[] folders, boolean inOrder) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "addNodes(FolderPair[], boolean inOrder)");
     if (trace != null) trace.args(folders);
     if (trace != null) trace.args(inOrder);
@@ -244,13 +242,13 @@ public class FolderTreeModelGui extends DefaultTreeModel {
    * If folder already exists in the tree than it is merged, if the parentNode changes, it is moved
    * otherwise, it is added to new parent node or to the root
    */
-  private synchronized void addNode(FolderPair folderPair) {
+  private void addNode(FolderPair folderPair) {
     addNode(folderPair, true);
   }
-  private synchronized void addNode(FolderPair folderPair, boolean inOrder) {
+  private void addNode(FolderPair folderPair, boolean inOrder) {
     addNode(folderPair, inOrder, false);
   }
-  private synchronized void addNode(FolderPair folderPair, boolean inOrder, boolean suppressReccur) {
+  private void addNode(FolderPair folderPair, boolean inOrder, boolean suppressReccur) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "addNode(FolderPair, inOrder, suppressReccur)");
     if (trace != null) trace.args(folderPair);
     if (trace != null) trace.args(inOrder);
@@ -472,11 +470,11 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 
 
   /** @Return a tree path of <code> folderPair </code> in the tree **/
-  public TreePath getPathToRoot(FolderPair folderPair) {
+  public synchronized TreePath getPathToRoot(FolderPair folderPair) {
     return getPathToRoot(folderPair.getFolderRecord());
   }
   /** @Return a tree path of <code> folderRecord </code> in the tree **/
-  public TreePath getPathToRoot(FolderRecord folderRecord) {
+  public synchronized TreePath getPathToRoot(FolderRecord folderRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "getPathToRoot(FolderRecord folderRecord)");
 
     FolderTreeNodeGui node = findNode(folderRecord.folderId, true);
@@ -567,13 +565,6 @@ public class FolderTreeModelGui extends DefaultTreeModel {
       }
     }
     super.removeNodeFromParent(node);
-  }
-
-  /**
-   * @return synchronization object for compound tree manipulations.
-   */
-  public Object getMonitor() {
-    return this;
   }
 
 }

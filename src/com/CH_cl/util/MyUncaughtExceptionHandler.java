@@ -20,6 +20,8 @@ import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.queue.ProcessingFunctionI;
+import com.CH_co.queue.QueueMM1;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
@@ -62,6 +64,8 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
   private static long lastReportSentStamp;
   private static final long minDelayBetweenReports = 10 * 60 * 1000; // 10 minutes
 
+  private static QueueMM1 reportsMM1;
+
   /**
   * No-arg constructor for reflection API
   */
@@ -73,6 +77,7 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
       // noop: Ignore normal occurance of 'deamon' thread being interrupted by quitting JVM
     } else {
       try {
+        ensureExistanceOfQueue();
         String stack = Misc.getStack(ex);
         UserRecord fromUser = FetchedDataCache.getSingleInstance().getUserRecord();
         StringBuffer infoBuffer = new StringBuffer();
@@ -83,176 +88,206 @@ public class MyUncaughtExceptionHandler implements Thread.UncaughtExceptionHandl
                 + "Thread: " + thread.getName() + "\n"
                 + stack + "\n"
                 + infoBuffer.toString();
-        String reportCombined = crashReport_prepWithPending(report);
-        boolean isSent = false;
-        ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerSIL.getSIL();
-        if (mySil != null && mySil.isLoggedIn() && mySil.hasPersistentMainWorker()) {
-          isSent = crashReport_send(mySil, CRASH_REPORT_ACCOUNT, reportCombined);
-        }
-        if (isSent) {
-          // Remove any previous reports that we combined
-          GlobalProperties.remove(CRASH_REPORT__PROPERTY);
-        } else {
-          GlobalProperties.setProperty(CRASH_REPORT__PROPERTY, reportCombined);
-        }
-        // commit state to file
-        GlobalProperties.store();
+        ensureExistanceOfQueue();
+        reportsMM1.getFifoWriterI().add(report);
       } catch (Throwable t) {
         // Must catch all exception to avoid infinite loop in handling uncaught exception!!!
       }
     }
   }
 
-  private static String crashReport_prepWithPending(String report) throws IOException {
-    String oldReport = GlobalProperties.getProperty(CRASH_REPORT__PROPERTY, "");
-    if (oldReport != null && oldReport.length() > 0) {
-      report = report + "\n======================\nOlder Report:\n======================\n" + oldReport;
-      // Truncate if too long.
-      if (report.length() > 10000) {
-        report = report.substring(0, 10000) + "\n\nTRUNCATED (TOO LONG)!";
-      }
-    }
-    return report;
+  public static void crashReport_triggerAnyPendingIfPossible() {
+    ensureExistanceOfQueue();
+    reportsMM1.getFifoWriterI().add("");
   }
 
-  public static boolean crashReport_sendAnyPendingIfPossible() {
-    boolean anySent = false;
-    ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerSIL.getSIL();
-    if (mySil != null) {
+  private synchronized static void ensureExistanceOfQueue() {
+    if (reportsMM1 == null) {
+      reportsMM1 = new QueueMM1("Reports Queue", new ReportProcessingFunction());
+    }
+  }
+
+  private static class ReportProcessingFunction implements ProcessingFunctionI {
+
+    public Object processQueuedObject(Object obj) {
+      try {
+        String report = (String) obj;
+        if (report != null && report.length() > 0) {
+          String reportCombined = crashReport_prepWithPending(report);
+          boolean isSent = false;
+          ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerSIL.getSIL();
+          if (mySil != null && mySil.isLoggedIn() && mySil.hasPersistentMainWorker()) {
+            isSent = crashReport_send(mySil, CRASH_REPORT_ACCOUNT, reportCombined);
+          }
+          if (isSent) {
+            // Remove any previous reports that we combined
+            GlobalProperties.remove(CRASH_REPORT__PROPERTY);
+          } else {
+            GlobalProperties.setProperty(CRASH_REPORT__PROPERTY, reportCombined);
+          }
+          // commit state to file
+          GlobalProperties.store();
+        } else {
+          crashReport_sendAnyPendingIfPossible();
+        }
+      } catch (Throwable t) {
+        // Must catch all exception to avoid infinite loop in handling uncaught exception!!!
+      }
+      return null;
+    }
+
+    private static String crashReport_prepWithPending(String report) throws IOException {
       String oldReport = GlobalProperties.getProperty(CRASH_REPORT__PROPERTY, "");
       if (oldReport != null && oldReport.length() > 0) {
-        if (mySil.isLoggedIn() && mySil.hasPersistentMainWorker()) {
-          if (crashReport_send(mySil, CRASH_REPORT_ACCOUNT, oldReport)) {
-            anySent = true;
-            GlobalProperties.remove(CRASH_REPORT__PROPERTY);
-            GlobalProperties.store();
-          }
+        report = report + "\n======================\nOlder Report:\n======================\n" + oldReport;
+        // Truncate if too long.
+        if (report.length() > 10000) {
+          report = report.substring(0, 10000) + "\n\nTRUNCATED (TOO LONG)!";
         }
       }
+      return report;
     }
-    return anySent;
-  }
 
-  private static boolean crashReport_send(ServerInterfaceLayer SIL, long toUserId, String report) {
-    boolean isSuccess = false;
-    boolean errors = false;
-
-    try {
-      if (lastReportSentStamp + minDelayBetweenReports > System.currentTimeMillis()) {
-        throw new IllegalStateException("Too often! - skip.");
-      }
-      lastReportSentStamp = System.currentTimeMillis();
-
-      MessageAction msgAction = null;
-      ClientMessageAction replyAction = null;
-      KeyRecord recPubKey = null;
-      FetchedDataCache cache = SIL.getFetchedDataCache();
-      UserRecord fromUser = cache.getUserRecord();
-
-      Long RECIVER_USER_ID = new Long(toUserId);
-      long TIMEOUT = 15000;
-
-      String TAG = MyUncaughtExceptionHandlerOps.getTag();
-      TAG = TAG != null ? TAG + " " : "";
-      String MSG_SUBJECT = TAG + "Crash from " + TextRenderer.getRenderedText(fromUser) + " build " + GlobalProperties.PROGRAM_BUILD_NUMBER;
-      String MSG_BODY = report;
-      Long[] MY_OUTGOING_CONTACT_ID_WITH_RECIVER = null; // assume no contact 
-
-      StringBuffer errorBuffer = new StringBuffer();
-
-      //=======
-      // FETCH RECIVER PUBLIC KEY
-      // We need this to encrypt the message so only the recipient can read its content.
-      //=======
-      if (!errors) {
-//        System.out.print("FETCH RECIVER PUBLIC KEY... ");
-        recPubKey = cache.getKeyRecordForUser(RECIVER_USER_ID);
-        if (recPubKey == null) {
-          msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(RECIVER_USER_ID));
-          // Submit a request to the server to fetch recipients public key.
-          // Our thread will wait until processing of the reply is done.
-          replyAction = SIL.submitAndFetchReply(msgAction, TIMEOUT);
-          if (replyAction != null) {
-            DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
-          }
-        }
-        recPubKey = cache.getKeyRecordForUser(RECIVER_USER_ID);
-        if (recPubKey == null) {
-//          System.out.println("FAILED");
-          errorBuffer.append("Failed fetch reciver PUBLIC KEY");
-          errors = true;
-          if (replyAction == null) {
-            errorBuffer.append(" due to TIMEOUT");
-          }
-        } else {
-//          System.out.println("DONE");
-        }
-      }
-
-
-      //=======
-      // SEND ENCRYPTED AND SECURED MESSAGE
-      //=======
-      if (!errors) {
-//        System.out.print("SEND ENCRYPTED AND SECURED MESSAGE... ");
-        // One-time message encryption key is formulated using a secure random generator.
-        BASymmetricKey symmetricKey = new BASymmetricKey(32);
-
-        // Create the message content.
-        MsgLinkRecord linkRecord = new MsgLinkRecord();
-        // This is the symmetric key which is used to encrypt this message.
-        linkRecord.setSymmetricKey(symmetricKey);
-        // Encrypt the symmetric key and set the rest of message link attributes.
-        linkRecord.seal(recPubKey);
-
-        MsgDataRecord dataRecord = new MsgDataRecord();
-        // Just a simple mail in HTML format...
-        dataRecord.importance = Short.valueOf(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN);
-        dataRecord.objType = Short.valueOf(MsgDataRecord.OBJ_TYPE_MSG);
-        dataRecord.setSubject(MSG_SUBJECT);
-        dataRecord.setTextBody(MSG_BODY);
-        // Encrypt the symmetric key and message content and set the rest of message data attributes.
-        dataRecord.seal(symmetricKey, cache.getKeyRecordMyCurrent());
-
-
-        // Create a new message request data set.
-        Msg_New_Rq msgRq = new Msg_New_Rq((Long[]) null, MY_OUTGOING_CONTACT_ID_WITH_RECIVER, new MsgLinkRecord[]{linkRecord}, dataRecord);
-        msgAction = new MessageAction(CommandCodes.MSG_Q_NEW, msgRq);
-
-        Class replyClass = null;
-        // Submit the new message request to the server for processing.
-        // Our thread will wait until reply is available.
-        replyAction = SIL.submitAndFetchReply(msgAction, TIMEOUT);
-        // All action replies should be run eventually, even if its a noop it is a good practice to run it anyway.
-        if (replyAction != null) {
-          DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
-          replyClass = replyAction.getClass();
-        }
-        if (replyClass != null && (replyClass.equals(MsgAGet.class) || replyClass.equals(SysANoop.class))) {
-          // when reply is a message or a noop action, all completed ok.
-//          System.out.println("DONE");
-        } else {
-//          System.out.println("FAILED");
-          if (replyClass != null && replyClass.equals(ErrorMessageAction.class)) {
-            ProtocolMsgDataSet set = replyAction.getMsgDataSet();
-            if (set instanceof Str_Rp) {
-//              System.out.println("Error Message: " + ((Str_Rp) set).message);
+    private static boolean crashReport_sendAnyPendingIfPossible() {
+      boolean anySent = false;
+      ServerInterfaceLayer mySil = MyUncaughtExceptionHandlerSIL.getSIL();
+      if (mySil != null) {
+        String oldReport = GlobalProperties.getProperty(CRASH_REPORT__PROPERTY, "");
+        if (oldReport != null && oldReport.length() > 0) {
+          if (mySil.isLoggedIn() && mySil.hasPersistentMainWorker()) {
+            if (crashReport_send(mySil, CRASH_REPORT_ACCOUNT, oldReport)) {
+              anySent = true;
+              GlobalProperties.remove(CRASH_REPORT__PROPERTY);
+              GlobalProperties.store();
             }
           }
-          errorBuffer.append("Failed SEND MESSAGE");
-          errors = true;
-          if (replyClass == null) {
-            errorBuffer.append(" due to TIMEOUT");
-          }
         }
       }
-    } catch (Throwable t) {
-      // sending failed... 
-      errors = true;
+      return anySent;
     }
 
-    isSuccess = !errors;
-    return isSuccess;
+    private static boolean crashReport_send(ServerInterfaceLayer SIL, long toUserId, String report) {
+      boolean isSuccess = false;
+      boolean errors = false;
+
+      try {
+        if (lastReportSentStamp + minDelayBetweenReports > System.currentTimeMillis()) {
+          throw new IllegalStateException("Too often! - skip.");
+        }
+        lastReportSentStamp = System.currentTimeMillis();
+
+        MessageAction msgAction = null;
+        ClientMessageAction replyAction = null;
+        KeyRecord recPubKey = null;
+        FetchedDataCache cache = SIL.getFetchedDataCache();
+        UserRecord fromUser = cache.getUserRecord();
+
+        Long RECIVER_USER_ID = new Long(toUserId);
+        long TIMEOUT = 15000;
+
+        String TAG = MyUncaughtExceptionHandlerOps.getTag();
+        TAG = TAG != null ? TAG + " " : "";
+        String MSG_SUBJECT = TAG + "Crash from " + TextRenderer.getRenderedText(fromUser) + " build " + GlobalProperties.PROGRAM_BUILD_NUMBER;
+        String MSG_BODY = report;
+        Long[] MY_OUTGOING_CONTACT_ID_WITH_RECIVER = null; // assume no contact 
+
+        StringBuffer errorBuffer = new StringBuffer();
+
+        //=======
+        // FETCH RECIVER PUBLIC KEY
+        // We need this to encrypt the message so only the recipient can read its content.
+        //=======
+        if (!errors) {
+  //        System.out.print("FETCH RECIVER PUBLIC KEY... ");
+          recPubKey = cache.getKeyRecordForUser(RECIVER_USER_ID);
+          if (recPubKey == null) {
+            msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(RECIVER_USER_ID));
+            // Submit a request to the server to fetch recipients public key.
+            // Our thread will wait until processing of the reply is done.
+            replyAction = SIL.submitAndFetchReply(msgAction, TIMEOUT);
+            if (replyAction != null) {
+              DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
+            }
+          }
+          recPubKey = cache.getKeyRecordForUser(RECIVER_USER_ID);
+          if (recPubKey == null) {
+  //          System.out.println("FAILED");
+            errorBuffer.append("Failed fetch reciver PUBLIC KEY");
+            errors = true;
+            if (replyAction == null) {
+              errorBuffer.append(" due to TIMEOUT");
+            }
+          } else {
+  //          System.out.println("DONE");
+          }
+        }
+
+
+        //=======
+        // SEND ENCRYPTED AND SECURED MESSAGE
+        //=======
+        if (!errors) {
+  //        System.out.print("SEND ENCRYPTED AND SECURED MESSAGE... ");
+          // One-time message encryption key is formulated using a secure random generator.
+          BASymmetricKey symmetricKey = new BASymmetricKey(32);
+
+          // Create the message content.
+          MsgLinkRecord linkRecord = new MsgLinkRecord();
+          // This is the symmetric key which is used to encrypt this message.
+          linkRecord.setSymmetricKey(symmetricKey);
+          // Encrypt the symmetric key and set the rest of message link attributes.
+          linkRecord.seal(recPubKey);
+
+          MsgDataRecord dataRecord = new MsgDataRecord();
+          // Just a simple mail in HTML format...
+          dataRecord.importance = Short.valueOf(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN);
+          dataRecord.objType = Short.valueOf(MsgDataRecord.OBJ_TYPE_MSG);
+          dataRecord.setSubject(MSG_SUBJECT);
+          dataRecord.setTextBody(MSG_BODY);
+          // Encrypt the symmetric key and message content and set the rest of message data attributes.
+          dataRecord.seal(symmetricKey, cache.getKeyRecordMyCurrent());
+
+
+          // Create a new message request data set.
+          Msg_New_Rq msgRq = new Msg_New_Rq((Long[]) null, MY_OUTGOING_CONTACT_ID_WITH_RECIVER, new MsgLinkRecord[]{linkRecord}, dataRecord);
+          msgAction = new MessageAction(CommandCodes.MSG_Q_NEW, msgRq);
+
+          Class replyClass = null;
+          // Submit the new message request to the server for processing.
+          // Our thread will wait until reply is available.
+          replyAction = SIL.submitAndFetchReply(msgAction, TIMEOUT);
+          // All action replies should be run eventually, even if its a noop it is a good practice to run it anyway.
+          if (replyAction != null) {
+            DefaultReplyRunner.nonThreadedRun(SIL, replyAction);
+            replyClass = replyAction.getClass();
+          }
+          if (replyClass != null && (replyClass.equals(MsgAGet.class) || replyClass.equals(SysANoop.class))) {
+            // when reply is a message or a noop action, all completed ok.
+  //          System.out.println("DONE");
+          } else {
+  //          System.out.println("FAILED");
+            if (replyClass != null && replyClass.equals(ErrorMessageAction.class)) {
+              ProtocolMsgDataSet set = replyAction.getMsgDataSet();
+              if (set instanceof Str_Rp) {
+  //              System.out.println("Error Message: " + ((Str_Rp) set).message);
+              }
+            }
+            errorBuffer.append("Failed SEND MESSAGE");
+            errors = true;
+            if (replyClass == null) {
+              errorBuffer.append(" due to TIMEOUT");
+            }
+          }
+        }
+      } catch (Throwable t) {
+        // sending failed... 
+        errors = true;
+      }
+
+      isSuccess = !errors;
+      return isSuccess;
+    }
+
   }
 
 }

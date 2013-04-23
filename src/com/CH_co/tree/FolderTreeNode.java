@@ -27,7 +27,7 @@ import java.util.*;
  * Class Description:
  *
  *
- * Class Details:
+ * Class Details: NOT-SYNCHRONIZED node and node-management
  *
  *
  * <b>$Revision: 1.5 $</b>
@@ -251,7 +251,7 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     if (trace != null) trace.exit(FolderTreeNode.class);
   }
 
-  private static synchronized void addNode(FolderPair folderPair, FolderTreeNode root, boolean inOrder) {
+  private static void addNode(FolderPair folderPair, FolderTreeNode root, boolean inOrder) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "addNode(FolderPair, FolderTreeNode root, boolean inOrder)");
     if (trace != null) trace.args(folderPair, root);
     if (trace != null) trace.args(inOrder);
@@ -459,7 +459,7 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     return getRootNodeById(FolderRecord.CATEGORY_MAIL_ID);
   }
 
-  public static void printTree(FolderTreeNode root, PrintWriter out) {
+  private static void printTree(FolderTreeNode root, PrintWriter out) {
     Enumeration enm = root.preorderEnumeration();
     while (enm.hasMoreElements()) {
       FolderTreeNode node = (FolderTreeNode) enm.nextElement();

@@ -25,6 +25,7 @@ import java.util.*;
  * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
  *
+ * Class Details: All "public" access to the tree structure is "synchronized"
  *
  * @author  Marcin Kurzawa
  * @version
@@ -79,20 +80,19 @@ public class FolderTreeModel {
   public FolderTreeNode getRootNode() {
     return root;
   }
-  public FolderTreeNode getRootNodeById(long folderId) {
+  private FolderTreeNode getRootNodeById(long folderId) {
     return (FolderTreeNode) getRootNode().getRootNodeById(folderId);
   }
-
-  public FolderTreeNode getRootChatNode() {
+  private FolderTreeNode getRootChatNode() {
     return getRootNodeById(FolderRecord.CATEGORY_CHAT_ID);
   }
-  public FolderTreeNode getRootFileNode() {
+  private FolderTreeNode getRootFileNode() {
     return getRootNodeById(FolderRecord.CATEGORY_FILE_ID);
   }
-  public FolderTreeNode getRootGroupNode() {
+  private FolderTreeNode getRootGroupNode() {
     return getRootNodeById(FolderRecord.CATEGORY_GROUP_ID);
   }
-  public FolderTreeNode getRootMsgNode() {
+  private FolderTreeNode getRootMsgNode() {
     return getRootNodeById(FolderRecord.CATEGORY_MAIL_ID);
   }
 
@@ -103,14 +103,14 @@ public class FolderTreeModel {
   /**
    * @param folders is a non-empty array of FolderPairs that will be added to this tree model
    */
-  public void addNodes(FolderPair[] folders) {
+  public synchronized void addNodes(FolderPair[] folders) {
     addNodes(folders, true);
   }
   /**
    * Adding nodes keeping each child level sorted or not
    * @param inOrder node sorting
    */
-  public void addNodes(FolderPair[] folders, boolean inOrder) {
+  public synchronized void addNodes(FolderPair[] folders, boolean inOrder) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModel.class, "addNodes(FolderPair[], boolean inOrder)");
     if (trace != null) trace.args(folders);
     if (trace != null) trace.args(inOrder);
@@ -193,13 +193,13 @@ public class FolderTreeModel {
    * If folder already exists in the tree than it is merged, if the parentNode changes, it is moved
    * otherwise, it is added to new parent node or to the root
    */
-  private synchronized void addNode(FolderPair folderPair) {
+  private void addNode(FolderPair folderPair) {
     addNode(folderPair, true);
   }
-  private synchronized void addNode(FolderPair folderPair, boolean inOrder) {
+  private void addNode(FolderPair folderPair, boolean inOrder) {
     addNode(folderPair, inOrder, false);
   }
-  private synchronized void addNode(FolderPair folderPair, boolean inOrder, boolean suppressReccur) {
+  private void addNode(FolderPair folderPair, boolean inOrder, boolean suppressReccur) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModel.class, "addNode(FolderPair, inOrder, suppressReccur)");
     if (trace != null) trace.args(folderPair);
     if (trace != null) trace.args(inOrder);

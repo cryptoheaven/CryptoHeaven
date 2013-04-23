@@ -181,10 +181,12 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
     if (trace != null) trace.args(records);
     if (records != null) {
       tree.suppressSelection(true);
-      FolderTreeSelectionExpansion selectionExpansion = FolderTreeSelectionExpansion.getData(tree);
       FolderTreeModelGui treeModel = tree.getFolderTreeModel();
-      treeModel.addNodes(records);
-      selectionExpansion.restoreData(tree);
+      synchronized (treeModel) {
+        FolderTreeSelectionExpansion selectionExpansion = FolderTreeSelectionExpansion.getData(tree);
+        treeModel.addNodes(records);
+        selectionExpansion.restoreData(tree);
+      }
       tree.suppressSelection(false);
     }
     if (trace != null) trace.exit(FolderTreeScrollPane.class);
@@ -195,11 +197,14 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeScrollPane.class, "removeFoldersFromTree(FolderRecord[])");
     if (trace != null) trace.args(records);
     if (records != null && records.length > 0) {
-      FolderTreeSelectionExpansion selectionExpansion = FolderTreeSelectionExpansion.getData(tree);
-      // Remove specified records but keep their children if they still exist in the cache.
-      boolean keepCacheResidantChildren = true;
-      tree.getFolderTreeModel().removeRecords(records, keepCacheResidantChildren);
-      selectionExpansion.restoreData(tree);
+      FolderTreeModelGui treeModel = tree.getFolderTreeModel();
+      synchronized (treeModel) {
+        FolderTreeSelectionExpansion selectionExpansion = FolderTreeSelectionExpansion.getData(tree);
+        // Remove specified records but keep their children if they still exist in the cache.
+        boolean keepCacheResidantChildren = true;
+        treeModel.removeRecords(records, keepCacheResidantChildren);
+        selectionExpansion.restoreData(tree);
+      }
     }
     if (trace != null) trace.exit(FolderTreeScrollPane.class);
   }

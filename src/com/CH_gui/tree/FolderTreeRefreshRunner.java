@@ -73,7 +73,7 @@ public class FolderTreeRefreshRunner extends ThreadTraced {
 
     if (refreshNow) {
       try {
-        Object treeLock = fTree.getFolderTreeModel().getMonitor();
+        Object treeLock = fTree.getFolderTreeModel();
 
         FolderTreeSelectionExpansion selectionExpansion = null;
         FolderTreeModelGui model = null;

@@ -61,7 +61,7 @@ public class MyUncaughtExceptionHandlerOps {
               public void run() {
                 try {
                   Class handlerClass = Class.forName("com.CH_cl.util.MyUncaughtExceptionHandler");
-                  Method methodSend = handlerClass.getMethod("crashReport_sendAnyPendingIfPossible", null);
+                  Method methodSend = handlerClass.getMethod("crashReport_triggerAnyPendingIfPossible", null);
                   methodSend.invoke(null, null);
                 } catch (Throwable t) {
                   t.printStackTrace();
