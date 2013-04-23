@@ -1,39 +1,38 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.tree;
 
-import com.CH_co.service.records.*;
+import com.CH_co.service.records.FolderPair;
+import com.CH_co.service.records.FolderRecord;
 import com.CH_co.trace.Trace;
-
-import java.io.PrintWriter;
-import java.util.*;
+import java.util.Enumeration;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details: NOT-SYNCHRONIZED node and node-management
- *
- *
- * <b>$Revision: 1.5 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details: NOT-SYNCHRONIZED node and node-management
+*
+*
+* <b>$Revision: 1.5 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderTreeNode extends MyDefaultMutableTreeNode {
 
   public static FolderTreeNodeSortNameProviderI folderTreeNodeSortNameProviderI;
@@ -55,9 +54,9 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
   }
 
   /**
-   * @return a node with <code> folderId/shareId </code> if found in this sub-tree
-   * @return null if not found
-   */
+  * @return a node with <code> folderId/shareId </code> if found in this sub-tree
+  * @return null if not found
+  */
   public static FolderTreeNode findNode(Long id, boolean isFolderId, FolderTreeNode root) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "findNode(Long id, boolean isFolderId, FolderTreeNode root)");
     if (trace != null) trace.args(id);
@@ -89,7 +88,6 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     if (trace != null) trace.exit(FolderTreeNode.class, foundNode);
     return foundNode;
   }
-
 
   /** @return an index of where the folder should be inserted among the children
     * of <code> this parent </code>. If parent is a root, grouping of folderTypes
@@ -145,6 +143,44 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     return index;
   }
 
+  public FolderTreeNode getRootNode() {
+    return (FolderTreeNode) getRoot();
+  }
+
+  public FolderTreeNode getRootNodeById(long folderId) {
+    FolderTreeNode rootNode = null;
+    FolderTreeNode theRoot = (FolderTreeNode) getRoot();
+    rootNode = theRoot;
+    Enumeration enm = theRoot.children();
+    while (enm.hasMoreElements()) {
+      FolderTreeNode child = (FolderTreeNode) enm.nextElement();
+      if (child.getFolderObject().getFolderRecord().folderId.longValue() == folderId) {
+        rootNode = child;
+        break;
+      }
+    }
+    return rootNode;
+  }
+
+  public FolderTreeNode getRootChatNode() {
+    return getRootNodeById(FolderRecord.CATEGORY_CHAT_ID);
+  }
+  public FolderTreeNode getRootFileNode() {
+    return getRootNodeById(FolderRecord.CATEGORY_FILE_ID);
+  }
+  public FolderTreeNode getRootGroupNode() {
+    return getRootNodeById(FolderRecord.CATEGORY_GROUP_ID);
+  }
+  public FolderTreeNode getRootMsgNode() {
+    return getRootNodeById(FolderRecord.CATEGORY_MAIL_ID);
+  }
+
+  public String toString() {
+    return "[FolderTreeNode"
+      + ": this=" + super.toString()
+      + ", folderPair=" + getFolderObject()
+      + "]";
+  }
 
 // /**
 //  * @return FolderPair of parent of <code> this node </code>
@@ -217,267 +253,225 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
 //
 //    return folderPairs;
 //  }
-
-
-  public String toString() {
-    return "[FolderTreeNode"
-      + ": this=" + super.toString()
-      + ", folderPair=" + getFolderObject()
-      + "]";
-  }
-
-
-  /**
-   * This private function should only be called recursively when doing ordered processing
-   * @param inOrder should be false when processing temporary trees to avoid infinite recurseve calls.
-   */
-  public void addNodes(FolderPair[] folders, boolean inOrder) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "addNodes(FolderPair[], boolean inOrder)");
-    if (trace != null) trace.args(folders);
-    if (trace != null) trace.args(inOrder);
-
-    // First remove the folders that are not wanted anymore from the ones for addition...
-    // and gather the nodes that will be added.
-    if (folders != null && folders.length > 0) {
-      FolderTreeNode root = getRootNode();
-      for (int i = 0; i<folders.length; i++) {
-        FolderPair fPair = folders[i];
-        if (fPair != null) {
-          addNode(fPair, root, inOrder);
-        }
-      }
-    }
-
-    if (trace != null) trace.exit(FolderTreeNode.class);
-  }
-
-  private static void addNode(FolderPair folderPair, FolderTreeNode root, boolean inOrder) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "addNode(FolderPair, FolderTreeNode root, boolean inOrder)");
-    if (trace != null) trace.args(folderPair, root);
-    if (trace != null) trace.args(inOrder);
-
-    FolderRecord fRec = folderPair.getFolderRecord();
-
-    // Folders are added according to therir parent child relationship (using parent id then viewParentId).
-    // To try keeping shared folders tree the same between users, depending if we have access to parent folder, determine who is the real view parent...
-    Long folderId = fRec.folderId;
-    Long parentId = folderPair.getFileViewParentId();
-
-    // find relavent nodes in the tree
-    FolderTreeNode prevNode = findNode(folderId, true, root);
-    FolderTreeNode parentNode = findNode(parentId, true, root);
-
-    if (parentNode == null || parentNode == prevNode) {
-      parentNode = root;
-      if (trace != null) trace.data(5, "Adding folder to ROOT!");
-      if (fRec.getId().longValue() >= 0 || fRec.isLocalFileType()) {
-        if (fRec.isFileType() || fRec.isLocalFileType()) {
-          parentNode = root.getRootFileNode();
-        } else if (fRec.isChatting()) {
-          parentNode = root.getRootChatNode();
-        } else if (fRec.isMailType()) {
-          parentNode = root.getRootMsgNode();
-        } else if (fRec.isGroupType()) {
-          parentNode = root.getRootGroupNode();
-        }
-      }
-    }
-    FolderTreeNode oldParent = null;
-    Long oldParentId = null;
-
-    /* if node exists in the tree already, then merge it */
-    if (prevNode != null) {
-      oldParent = (FolderTreeNode) prevNode.getParentNode();
-      // if old parent is root, old parent Id is folder's id
-      if (oldParent == root) {
-        oldParentId = folderId;
-      }
-      else {
-        oldParentId = oldParent.getFolderObject().getFolderRecord().getId();
-      }
-
-      // if parent ID has changed -- move the tree branch to new parent
-      if (!oldParentId.equals(parentId)) {
-        // live chatting folders have dynamic names so always remove/insert them to keep proper sort ordering
-        if (!fRec.isDynamicName() &&
-                ((oldParentId.longValue() < 0 && folderPair.isViewRoot()) ||
-                (oldParentId.equals(folderPair.getFileViewParentId())))
-                ) {
-          // skip change because old parent was a Category folder and new parent is ROOT too, so nothing changed
-        } else {
-          // if oldParent is ancestor to prevNode AND parentNode is not descendant of prevNode
-          if (prevNode.isNodeAncestor(oldParent) && !prevNode.isNodeDescendant(parentNode)) {
-            prevNode.removeFromParent();
-            insertNodeInto(prevNode, parentNode, inOrder ? parentNode.getInsertionIndex(folderPair) : 0);
-          } else {
-            if (trace != null) trace.data(10, "WARNING: illegal node position -- structure change ignored!");
-            if (trace != null) trace.data(11, "oldParent", oldParent);
-            if (trace != null) trace.data(12, "prevNode", prevNode);
-            if (trace != null) trace.data(13, "parentNode", parentNode);
-          }
-        }
-      }
-    }
-    // Add it to the new parent -- automatically remove from the old spot if required.
-    else {
-      // node to add is newly created -- copy the runtime instance from tree root
-      FolderTreeNode newNode = null;
-      try {
-        newNode = (FolderTreeNode) root.getClass().newInstance();
-      } catch (InstantiationException ex) {
-        ex.printStackTrace();
-      } catch (IllegalAccessException ex) {
-        ex.printStackTrace();
-      }
-      newNode.setUserObject(folderPair);
-      insertNodeInto(newNode, parentNode, inOrder ? parentNode.getInsertionIndex(folderPair) : 0);
-      // attach all root's children that have parentID = folderID to the new node
-      selectAndMoveRootChildrenToNewParent(newNode, root);
-    }
-
-    if (trace != null) trace.exit(FolderTreeNode.class);
-  }
-
-  private static void insertNodeInto(FolderTreeNode newChild, FolderTreeNode parent, int index) {
-    // Cache the new parent Id in child's view hierarchy so cache queries can find
-    // children by view (case of parent not being availble when only child folder
-    // is available through granted share)
-    if (parent.getFolderObject() != null)
-      newChild.getFolderObject().getFolderShareRecord().guiViewParentId = parent.getFolderObject().getId();
-    parent.insert((MyMutableTreeNode) newChild, index);
-  }
-
-  private static boolean selectAndMoveRootChildrenToNewParent(FolderTreeNode newParent, FolderTreeNode root) {
-    boolean anyMoved = false;
-    anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
-    if (!newParent.getFolderObject().getFolderRecord().isCategoryType()) {
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootFileNode(), root);
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootChatNode(), root);
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootMsgNode(), root);
-      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootGroupNode(), root);
-    }
-    return anyMoved;
-  }
-
-  /** Takes all children of <code> moveFromParent </code> that parentIds match id of
-    * <code> newParent </code> and move them to the new parent
-    * Also adds all root none-category folders to a new parent category folder.
-    * This method creates the appropriate events for you.
-    * @return true if any nodes have been moved
-    */
-  private static boolean selectAndMoveChildrenToNewParent(FolderTreeNode newParent, FolderTreeNode moveFromParent, FolderTreeNode root) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "moveChildrenToNewParent(FolderTreeNode newParent, FolderTreeNode moveFromParent, FolderTreeNode root)");
-    if (trace != null) trace.args(newParent);
-    if (trace != null) trace.args(moveFromParent);
-
-    FolderRecord newParentFolder = newParent.getFolderObject().getFolderRecord();
-    Long newParentId = newParentFolder.getId();
-
-    ArrayList nodesToMove = new ArrayList();
-
-    // gather nodes to be moved... (so we don't invalidate the Enumerateion
-    int childCount = moveFromParent.getChildCount();
-    for (int i=0; i<childCount; i++) {
-      FolderTreeNode nextChild = (FolderTreeNode) moveFromParent.getChildNodeAt(i);
-      FolderPair fPair = nextChild.getFolderObject();
-      FolderRecord folder = fPair.getFolderRecord();
-
-      // include all folders those parent should be the newParent, exclude folders of the same id as newParentId
-      if (folder != null) {
-        if (!folder.isCategoryType()) {
-          boolean move = false;
-          Long viewParentId = fPair.getFileViewParentId();
-          if (newParentId.equals(viewParentId) && !(newParentId.equals(folder.folderId)))
-            move = true;
-          else if (newParentFolder.isCategoryType() && moveFromParent == root) {
-            if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_FILE_FOLDER && (folder.isFileType() || folder.isLocalFileType()))
-              move = true;
-            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_CHAT_FOLDER && folder.isChatting())
-              move = true;
-            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_MAIL_FOLDER && folder.isMailType())
-              move = true;
-            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_GROUP_FOLDER && folder.isGroupType())
-              move = true;
-          }
-          if (move) {
-            nodesToMove.add(nextChild);
-          }
-        }
-      }
-    }
-
-    // move the nodes
-    int moveSize = nodesToMove.size();
-    for (int i=0; i<moveSize; i++) {
-      FolderTreeNode node = (FolderTreeNode) nodesToMove.get(i);
-      if (!node.isNodeDescendant(newParent)) {
-        node.removeFromParent();
-        insertNodeInto(node, newParent, newParent.getInsertionIndex(node.getFolderObject()));
-      } else {
-        if (trace != null) trace.data(10, "WARNING: illegal node position -- structure change ignored!");
-        if (trace != null) trace.data(11, "node (being moved)", node);
-        if (trace != null) trace.data(12, "newParent", newParent);
-        if (trace != null) trace.data(13, "node parent", node.getParentNode());
-      }
-    }
-
-    boolean anyMoved = moveSize > 0;
-    if (trace != null) trace.exit(FolderTreeNode.class, anyMoved);
-    return anyMoved;
-  }
-
-
-  public FolderTreeNode getRootNode() {
-    return (FolderTreeNode) getRoot();
-  }
-
-  public FolderTreeNode getRootNodeById(long folderId) {
-    FolderTreeNode rootNode = null;
-    FolderTreeNode theRoot = (FolderTreeNode) getRoot();
-    rootNode = theRoot;
-    Enumeration enm = theRoot.children();
-    while (enm.hasMoreElements()) {
-      FolderTreeNode child = (FolderTreeNode) enm.nextElement();
-      if (child.getFolderObject().getFolderRecord().folderId.longValue() == folderId) {
-        rootNode = child;
-        break;
-      }
-    }
-    return rootNode;
-  }
-
-  public FolderTreeNode getRootChatNode() {
-    return getRootNodeById(FolderRecord.CATEGORY_CHAT_ID);
-  }
-  public FolderTreeNode getRootFileNode() {
-    return getRootNodeById(FolderRecord.CATEGORY_FILE_ID);
-  }
-  public FolderTreeNode getRootGroupNode() {
-    return getRootNodeById(FolderRecord.CATEGORY_GROUP_ID);
-  }
-  public FolderTreeNode getRootMsgNode() {
-    return getRootNodeById(FolderRecord.CATEGORY_MAIL_ID);
-  }
-
-  private static void printTree(FolderTreeNode root, PrintWriter out) {
-    Enumeration enm = root.preorderEnumeration();
-    while (enm.hasMoreElements()) {
-      FolderTreeNode node = (FolderTreeNode) enm.nextElement();
-      if (node != null) {
-        FolderPair pair = node.getFolderObject();
-        if (pair != null) {
-          StringBuffer sb = new StringBuffer();
-          int level = node.getLevel()-1;
-          for (int i=0; i<level; i++)
-            sb.append('-');
-          if (sb.length() > 0)
-            sb.append(' ');
-          sb.append(pair.getMyName());
-          out.println(sb.toString());
-        } else {
-          out.println("null pair");
-        }
-      }
-    }
-  }
+//
+//  /**
+//   * This private function should only be called recursively when doing ordered processing
+//   * @param inOrder should be false when processing temporary trees to avoid infinite recurseve calls.
+//   */
+//  public void addNodes(FolderPair[] folders, boolean inOrder) {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "addNodes(FolderPair[], boolean inOrder)");
+//    if (trace != null) trace.args(folders);
+//    if (trace != null) trace.args(inOrder);
+//
+//    // First remove the folders that are not wanted anymore from the ones for addition...
+//    // and gather the nodes that will be added.
+//    if (folders != null && folders.length > 0) {
+//      FolderTreeNode root = getRootNode();
+//      for (int i = 0; i<folders.length; i++) {
+//        FolderPair fPair = folders[i];
+//        if (fPair != null) {
+//          addNode(fPair, root, inOrder);
+//        }
+//      }
+//    }
+//
+//    if (trace != null) trace.exit(FolderTreeNode.class);
+//  }
+//
+//  private static void addNode(FolderPair folderPair, FolderTreeNode root, boolean inOrder) {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "addNode(FolderPair, FolderTreeNode root, boolean inOrder)");
+//    if (trace != null) trace.args(folderPair, root);
+//    if (trace != null) trace.args(inOrder);
+//
+//    FolderRecord fRec = folderPair.getFolderRecord();
+//
+//    // Folders are added according to therir parent child relationship (using parent id then viewParentId).
+//    // To try keeping shared folders tree the same between users, depending if we have access to parent folder, determine who is the real view parent...
+//    Long folderId = fRec.folderId;
+//    Long parentId = folderPair.getFileViewParentId();
+//
+//    // find relavent nodes in the tree
+//    FolderTreeNode prevNode = findNode(folderId, true, root);
+//    FolderTreeNode parentNode = findNode(parentId, true, root);
+//
+//    if (parentNode == null || parentNode == prevNode) {
+//      parentNode = root;
+//      if (trace != null) trace.data(5, "Adding folder to ROOT!");
+//      if (fRec.getId().longValue() >= 0 || fRec.isLocalFileType()) {
+//        if (fRec.isFileType() || fRec.isLocalFileType()) {
+//          parentNode = root.getRootFileNode();
+//        } else if (fRec.isChatting()) {
+//          parentNode = root.getRootChatNode();
+//        } else if (fRec.isMailType()) {
+//          parentNode = root.getRootMsgNode();
+//        } else if (fRec.isGroupType()) {
+//          parentNode = root.getRootGroupNode();
+//        }
+//      }
+//    }
+//    FolderTreeNode oldParent = null;
+//    Long oldParentId = null;
+//
+//    /* if node exists in the tree already, then merge it */
+//    if (prevNode != null) {
+//      oldParent = (FolderTreeNode) prevNode.getParentNode();
+//      // if old parent is root, old parent Id is folder's id
+//      if (oldParent == root) {
+//        oldParentId = folderId;
+//      }
+//      else {
+//        oldParentId = oldParent.getFolderObject().getFolderRecord().getId();
+//      }
+//
+//      // if parent ID has changed -- move the tree branch to new parent
+//      if (!oldParentId.equals(parentId)) {
+//        // live chatting folders have dynamic names so always remove/insert them to keep proper sort ordering
+//        if (!fRec.isDynamicName() &&
+//                ((oldParentId.longValue() < 0 && folderPair.isViewRoot()) ||
+//                (oldParentId.equals(folderPair.getFileViewParentId())))
+//                ) {
+//          // skip change because old parent was a Category folder and new parent is ROOT too, so nothing changed
+//        } else {
+//          // if oldParent is ancestor to prevNode AND parentNode is not descendant of prevNode
+//          if (prevNode.isNodeAncestor(oldParent) && !prevNode.isNodeDescendant(parentNode)) {
+//            prevNode.removeFromParent();
+//            insertNodeInto(prevNode, parentNode, inOrder ? parentNode.getInsertionIndex(folderPair) : 0);
+//          } else {
+//            if (trace != null) trace.data(10, "WARNING: illegal node position -- structure change ignored!");
+//            if (trace != null) trace.data(11, "oldParent", oldParent);
+//            if (trace != null) trace.data(12, "prevNode", prevNode);
+//            if (trace != null) trace.data(13, "parentNode", parentNode);
+//          }
+//        }
+//      }
+//    }
+//    // Add it to the new parent -- automatically remove from the old spot if required.
+//    else {
+//      // node to add is newly created -- copy the runtime instance from tree root
+//      FolderTreeNode newNode = null;
+//      try {
+//        newNode = (FolderTreeNode) root.getClass().newInstance();
+//      } catch (InstantiationException ex) {
+//        ex.printStackTrace();
+//      } catch (IllegalAccessException ex) {
+//        ex.printStackTrace();
+//      }
+//      newNode.setUserObject(folderPair);
+//      insertNodeInto(newNode, parentNode, inOrder ? parentNode.getInsertionIndex(folderPair) : 0);
+//      // attach all root's children that have parentID = folderID to the new node
+//      selectAndMoveRootChildrenToNewParent(newNode, root);
+//    }
+//
+//    if (trace != null) trace.exit(FolderTreeNode.class);
+//  }
+//
+//  private static void insertNodeInto(FolderTreeNode newChild, FolderTreeNode parent, int index) {
+//    // Cache the new parent Id in child's view hierarchy so cache queries can find
+//    // children by view (case of parent not being availble when only child folder
+//    // is available through granted share)
+//    if (parent.getFolderObject() != null)
+//      newChild.getFolderObject().getFolderShareRecord().guiViewParentId = parent.getFolderObject().getId();
+//    parent.insert((MyMutableTreeNode) newChild, index);
+//  }
+//
+//  private static boolean selectAndMoveRootChildrenToNewParent(FolderTreeNode newParent, FolderTreeNode root) {
+//    boolean anyMoved = false;
+//    anyMoved |= selectAndMoveChildrenToNewParent(newParent, root, root);
+//    if (!newParent.getFolderObject().getFolderRecord().isCategoryType()) {
+//      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootFileNode(), root);
+//      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootChatNode(), root);
+//      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootMsgNode(), root);
+//      anyMoved |= selectAndMoveChildrenToNewParent(newParent, root.getRootGroupNode(), root);
+//    }
+//    return anyMoved;
+//  }
+//
+//  /** Takes all children of <code> moveFromParent </code> that parentIds match id of
+//    * <code> newParent </code> and move them to the new parent
+//    * Also adds all root none-category folders to a new parent category folder.
+//    * This method creates the appropriate events for you.
+//    * @return true if any nodes have been moved
+//    */
+//  private static boolean selectAndMoveChildrenToNewParent(FolderTreeNode newParent, FolderTreeNode moveFromParent, FolderTreeNode root) {
+//    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeNode.class, "moveChildrenToNewParent(FolderTreeNode newParent, FolderTreeNode moveFromParent, FolderTreeNode root)");
+//    if (trace != null) trace.args(newParent);
+//    if (trace != null) trace.args(moveFromParent);
+//
+//    FolderRecord newParentFolder = newParent.getFolderObject().getFolderRecord();
+//    Long newParentId = newParentFolder.getId();
+//
+//    ArrayList nodesToMove = new ArrayList();
+//
+//    // gather nodes to be moved... (so we don't invalidate the Enumerateion
+//    int childCount = moveFromParent.getChildCount();
+//    for (int i=0; i<childCount; i++) {
+//      FolderTreeNode nextChild = (FolderTreeNode) moveFromParent.getChildNodeAt(i);
+//      FolderPair fPair = nextChild.getFolderObject();
+//      FolderRecord folder = fPair.getFolderRecord();
+//
+//      // include all folders those parent should be the newParent, exclude folders of the same id as newParentId
+//      if (folder != null) {
+//        if (!folder.isCategoryType()) {
+//          boolean move = false;
+//          Long viewParentId = fPair.getFileViewParentId();
+//          if (newParentId.equals(viewParentId) && !(newParentId.equals(folder.folderId)))
+//            move = true;
+//          else if (newParentFolder.isCategoryType() && moveFromParent == root) {
+//            if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_FILE_FOLDER && (folder.isFileType() || folder.isLocalFileType()))
+//              move = true;
+//            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_CHAT_FOLDER && folder.isChatting())
+//              move = true;
+//            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_MAIL_FOLDER && folder.isMailType())
+//              move = true;
+//            else if (newParentFolder.folderType.shortValue() == FolderRecord.CATEGORY_GROUP_FOLDER && folder.isGroupType())
+//              move = true;
+//          }
+//          if (move) {
+//            nodesToMove.add(nextChild);
+//          }
+//        }
+//      }
+//    }
+//
+//    // move the nodes
+//    int moveSize = nodesToMove.size();
+//    for (int i=0; i<moveSize; i++) {
+//      FolderTreeNode node = (FolderTreeNode) nodesToMove.get(i);
+//      if (!node.isNodeDescendant(newParent)) {
+//        node.removeFromParent();
+//        insertNodeInto(node, newParent, newParent.getInsertionIndex(node.getFolderObject()));
+//      } else {
+//        if (trace != null) trace.data(10, "WARNING: illegal node position -- structure change ignored!");
+//        if (trace != null) trace.data(11, "node (being moved)", node);
+//        if (trace != null) trace.data(12, "newParent", newParent);
+//        if (trace != null) trace.data(13, "node parent", node.getParentNode());
+//      }
+//    }
+//
+//    boolean anyMoved = moveSize > 0;
+//    if (trace != null) trace.exit(FolderTreeNode.class, anyMoved);
+//    return anyMoved;
+//  }
+//
+//  private static void printTree(FolderTreeNode root, PrintWriter out) {
+//    Enumeration enm = root.preorderEnumeration();
+//    while (enm.hasMoreElements()) {
+//      FolderTreeNode node = (FolderTreeNode) enm.nextElement();
+//      if (node != null) {
+//        FolderPair pair = node.getFolderObject();
+//        if (pair != null) {
+//          StringBuffer sb = new StringBuffer();
+//          int level = node.getLevel()-1;
+//          for (int i=0; i<level; i++)
+//            sb.append('-');
+//          if (sb.length() > 0)
+//            sb.append(' ');
+//          sb.append(pair.getMyName());
+//          out.println(sb.toString());
+//        } else {
+//          out.println("null pair");
+//        }
+//      }
+//    }
+//  }
 }

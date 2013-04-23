@@ -15,7 +15,7 @@ package com.CH_cl.service.engine;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FileLobUp;
-import com.CH_co.util.MyUncaughtExceptionHandlerOps;
+import com.CH_cl.util.ThreadCheck;
 import com.CH_co.monitor.DefaultProgMonitor;
 import com.CH_co.monitor.ProgMonitorI;
 import com.CH_co.monitor.ProgMonitorPool;
@@ -535,30 +535,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
 
-  private void warnIfOnAWTthread() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "warnIfOnAWTthread()");
-    Thread th = Thread.currentThread();
-    ThreadGroup thGroup = th.getThreadGroup();
-    String thName = th.getName();
-    String thGroupName = null;
-    if (thGroup != null)
-      thGroupName = thGroup.getName();
-    if (thName.indexOf("AWT") >= 0) {
-      String messageText = "This Warning is displayed only to users with ID < 100\n\nAWT Thread " + thName + " (group " + thGroupName + ") at \n\n" + Misc.getStack(new Exception("Blocking of AWT Thread detected!"));
-      String title = "Warning: Network request using AWT Thread";
-      if (trace != null) trace.info(100, messageText);
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      Long uId = cache.getMyUserId();
-      if (uId != null && uId.longValue() < 100) {
-        NotificationCenter.show(NotificationCenter.WARNING_MESSAGE, title, messageText);
-        System.out.println(title);
-        System.out.println(messageText);
-        System.out.println();
-      }
-    }
-    if (trace != null) trace.exit(ServerInterfaceLayer.class);
-  }
-
   /**
   * Submit and wait for the reply.  This method stalls the Thread until reply becomes available.
   * @param timeout in milliseconds, 0=infinite
@@ -572,7 +548,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     ClientMessageAction replyMsg = null;
 
     if (!destroyed) {
-      warnIfOnAWTthread();
+      if (!IS_MOBILE_MODE) {
+        ThreadCheck.warnIfOnAWTthread();
+      }
 
       Stamp lStamp = new Stamp(msgAction.getStamp());
 
@@ -1043,7 +1021,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
             Throwable[][] errBuffers = new Throwable[hostIndexesToTry.length][1];
 
             Stats.setStatusAll("Attempting connection.");
-            
+
             StringBuffer sbSocketInfo = new StringBuffer();
             for (int k=0; k<hostIndexesToTry.length; k++) {
               sbSocketInfo.append("Socket host ").append(hostsAndPorts[hostIndexesToTry[k]][0]);
@@ -1339,7 +1317,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (trace != null) trace.data(19, "socket.getSoLinger()", socket.getSoLinger());
       if (trace != null) trace.data(20, "socket.getSoTimeout()", socket.getSoTimeout());
       if (trace != null) trace.data(21, "socket.getTcpNoDelay()", socket.getTcpNoDelay());
-      
+
       StringBuffer sb = new StringBuffer();
       sb.append("createSocket() < "+ socket+"\n");
       sb.append("getInetAddress()="+ socket.getInetAddress()+"\n");

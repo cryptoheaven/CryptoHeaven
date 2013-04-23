@@ -302,8 +302,9 @@ public class GlobalProperties extends Object {
   // build 764 Message reply quoting parts moved to common client package.
   // build 766,768,770 Fixing more exceptions based on bug reports
   // build 772,774,776 Unsealing objects in the cache outside of synchronized
+  // build 778 Removed GUI tree manipulations from non-gui threads
 
-  public static final short PROGRAM_BUILD_NUMBER = 776;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 778;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

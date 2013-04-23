@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2012 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 package com.CH_gui.tree;
 
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -24,19 +24,19 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 /**
- * <b>Copyright</b> &copy; 2001-2012
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- * Class Details: All "public" access to the tree structure is "synchronized"
- *
- * <b>$Revision: 1.6 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2012
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+* Class Details: All "public" access to the tree structure is "synchronized"
+*
+* <b>$Revision: 1.6 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FolderTreeModelGui extends DefaultTreeModel {
 
   private RecordFilter filter = null;
@@ -112,9 +112,9 @@ public class FolderTreeModelGui extends DefaultTreeModel {
   }
 
   /**
-   * overwrite method of super
-   * This sets the user object of the TreeNode identified by path and posts a node changed
-   */
+  * overwrite method of super
+  * This sets the user object of the TreeNode identified by path and posts a node changed
+  */
 //  public void valueForPathChanged(TreePath path, Object newValue) {
 //    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "valueForPathChanged(TreePath path, Object newValue)");
 //    if (trace != null) trace.args(path);
@@ -148,17 +148,17 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 
 
   /**
-   * @param folders is a non-empty array of FolderPairs that will be added to this tree model
-   */
+  * @param folders is a non-empty array of FolderPairs that will be added to this tree model
+  */
   public synchronized void addNodes(FolderPair[] folders) {
     addNodes(folders, true);
     // Java 1.4.1 screwes up in tree display if we don't reload() so do it here...
     reload();
   }
   /**
-   * Adding nodes keeping each child level sorted or not
-   * @param inOrder node sorting
-   */
+  * Adding nodes keeping each child level sorted or not
+  * @param inOrder node sorting
+  */
   private void addNodes(FolderPair[] folders, boolean inOrder) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "addNodes(FolderPair[], boolean inOrder)");
     if (trace != null) trace.args(folders);
@@ -239,9 +239,9 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 
 
   /** Add just one FolderPair to this tree
-   * If folder already exists in the tree than it is merged, if the parentNode changes, it is moved
-   * otherwise, it is added to new parent node or to the root
-   */
+  * If folder already exists in the tree than it is merged, if the parentNode changes, it is moved
+  * otherwise, it is added to new parent node or to the root
+  */
   private void addNode(FolderPair folderPair) {
     addNode(folderPair, true);
   }
@@ -417,9 +417,9 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 
 
   /** @param folder is a FolderRecord that will be removed from this tree model
-   * <code> folder </code> cannnot be null
-   * Note: only removal of FolderRecords is supported, and not FolderShares alone
-   */
+  * <code> folder </code> cannnot be null
+  * Note: only removal of FolderRecords is supported, and not FolderShares alone
+  */
   public synchronized boolean removeRecord(FolderRecord folder, boolean keepCacheResidantChildren) {
     Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "removeNodeFromModel(FolderRecord, boolean keepCacheResidantChildren)");
     if (trace != null) trace.args(folder);
@@ -488,9 +488,9 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 
 
   /** @return a brand new filtered tree model with nodes accepted by the <code> filter </code> only
-   * User Objects are the same, nodes are newly instantiated.
-   * Uses <code> treeModel </code> as a original model
-   */
+  * User Objects are the same, nodes are newly instantiated.
+  * Uses <code> treeModel </code> as a original model
+  */
   public synchronized FolderTreeModelGui createFilteredModel(RecordFilter filter, FolderTreeModelGui newModel) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "createFilteredModel(RecordFilter filter, FolderTreeModelCl newModel)");
     if (trace != null) trace.args(filter, newModel);
@@ -524,8 +524,8 @@ public class FolderTreeModelGui extends DefaultTreeModel {
 
 
   /**
-   * @return a node that has the specified folderId/shareId.
-   */
+  * @return a node that has the specified folderId/shareId.
+  */
   public synchronized FolderTreeNodeGui findNode(Long id, boolean isFolderId) {
     FolderTreeNodeGui node = (FolderTreeNodeGui) folderNodesHM.get(id);
     // if node found, see if it is the up-to-date node of this tree
