@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012 by CryptoHeaven Corp.,
+ * Copyright 2001-2013 by CryptoHeaven Corp.,
  * Mississauga, Ontario, Canada.
  * All rights reserved.
  *
@@ -19,7 +19,7 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2012
+ * <b>Copyright</b> &copy; 2001-2013
  * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
  * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
