@@ -820,7 +820,9 @@ public class MenuTreeModel extends Object {
     MenuActionItem insertionMenuItem = (MenuActionItem) insertionNode.getUserObject();
     if (trace != null) trace.data(50, insertionMenuItem);
 
-    int visibleBefore = countVisibleBeforeChild((DefaultMutableTreeNode) treeNodes[treeNodes.length-2], insertionNode);
+    int visibleBefore = 0;
+    if (treeNodes.length >= 2)
+      visibleBefore = countVisibleBeforeChild((DefaultMutableTreeNode) treeNodes[treeNodes.length-2], insertionNode);
     if (insertionMenuItem.isActionItem()) {
 //      // If buttton group exists, look and clear a similar action button from the group.
 //      ButtonGroup group = (ButtonGroup) insertionMenuItem.getAction().getValue(Actions.BUTTON_GROUP);
