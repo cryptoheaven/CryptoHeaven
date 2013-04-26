@@ -58,9 +58,12 @@ public class Stats extends Object {
   private static long maxTransferRateOut;
   private static Date initDate = new Date();
 
-  protected static final Object monitor = new Object();
+  private static final Object monitor = new Object();
   private static HashSet statsListeners = new HashSet();
 
+  // To prevent concurrent modification exception when listener is notified
+  // and tries to add/remove itself
+  private static ArrayList statsListenersTmp = new ArrayList();
 
   public static void clear() {
     synchronized (monitor) {
@@ -145,9 +148,11 @@ public class Stats extends Object {
     synchronized (monitor) {
       if (globeMoversTraceHM.size() == 0) {
         lastMovingStatus = Boolean.TRUE;
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsGlobeMove(lastMovingStatus);
+        statsListenersTmp.clear();
       }
       if (!globeMoversTraceHM.containsKey(mover)) {
         globeMoversTraceHM.put(mover, Misc.getStack(new Throwable(""+mover+" at " + new Date())));
@@ -161,9 +166,11 @@ public class Stats extends Object {
         globeMoversTraceHM.remove(mover);
         if (globeMoversTraceHM.size() == 0) {
           lastMovingStatus = Boolean.FALSE;
-          Iterator iter = statsListeners.iterator();
+          statsListenersTmp.addAll(statsListeners);
+          Iterator iter = statsListenersTmp.iterator();
           while (iter.hasNext())
             ((StatsListenerI) iter.next()).setStatsGlobeMove(lastMovingStatus);
+          statsListenersTmp.clear();
         }
       }
     }
@@ -174,9 +181,11 @@ public class Stats extends Object {
     if (trace != null) trace.args(newStatus);
     synchronized (monitor) {
       lastStatus = newStatus;
-      Iterator iter = statsListeners.iterator();
+      statsListenersTmp.addAll(statsListeners);
+      Iterator iter = statsListenersTmp.iterator();
       while (iter.hasNext())
         ((StatsListenerI) iter.next()).setStatsLastStatus(lastStatus);
+      statsListenersTmp.clear();
       statusHistoryL.addFirst(newStatus);
       statusHistoryDatesL.addFirst(new Date());
       while (statusHistoryL.size() > MAX_HISTORY_SIZE) {
@@ -206,9 +215,11 @@ public class Stats extends Object {
       boolean updated = pingMS == null || pingMS.longValue() != ms;
       if (updated) {
         pingMS = new Long(ms);
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsPing(pingMS);
+        statsListenersTmp.clear();
       }
     }
   }
@@ -225,9 +236,11 @@ public class Stats extends Object {
         } else {
           onlineStatus = Boolean.FALSE;
         }
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsConnections(connectionsPlain, connectionsHTML);
+        statsListenersTmp.clear();
       }
     }
   }
@@ -238,9 +251,11 @@ public class Stats extends Object {
       if (updated) {
         maxTransferRate = Math.max(maxTransferRate, bytesPerSecond);
         transferRate = new Long(bytesPerSecond);
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsTransferRate(transferRate);
+        statsListenersTmp.clear();
       }
     }
   }
@@ -250,9 +265,11 @@ public class Stats extends Object {
       if (updated) {
         maxTransferRateIn = Math.max(maxTransferRateIn, bytesPerSecond);
         transferRateIn = new Long(bytesPerSecond);
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsTransferRateIn(transferRateIn);
+        statsListenersTmp.clear();
       }
     }
   }
@@ -262,9 +279,11 @@ public class Stats extends Object {
       if (updated) {
         maxTransferRateOut = Math.max(maxTransferRateOut, bytesPerSecond);
         transferRateOut = new Long(bytesPerSecond);
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsTransferRateOut(transferRateOut);
+        statsListenersTmp.clear();
       }
     }
   }
@@ -274,9 +293,11 @@ public class Stats extends Object {
       boolean updated = sizeBytes == null || sizeBytes.longValue() != size;
       sizeBytes = new Long(size);
       if (updated) {
-        Iterator iter = statsListeners.iterator();
+        statsListenersTmp.addAll(statsListeners);
+        Iterator iter = statsListenersTmp.iterator();
         while (iter.hasNext())
           ((StatsListenerI) iter.next()).setStatsSizeBytes(sizeBytes);
+        statsListenersTmp.clear();
       }
     }
   }

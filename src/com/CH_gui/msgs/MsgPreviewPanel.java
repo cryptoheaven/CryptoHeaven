@@ -1070,6 +1070,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     boolean visible = false;
     String skipFileName1 = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject) : null;
     String skipFileName2 = skipFileNameForSubject != null ? FileTypes.getFileSafeShortString(skipFileNameForSubject, true) : null;
+    String skipFileName3 = skipFileNameForSubject == null || skipFileNameForSubject.trim().length() == 0 ? "no-subject" : null;
     jAttachments.removeAll();
     attachmentsMap.clear();
     if (attachments != null && attachments.length > 0) {
@@ -1080,11 +1081,13 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       for (int i=0; i<attachments.length; i++) {
         boolean skip = false;
         String name = ListRenderer.getRenderedText(attachments[i]);
-        if (skipFileName1 != null && attachments[i] instanceof FileLinkRecord && name.endsWith(".eml")) {
+        if (attachments[i] instanceof FileLinkRecord && name.endsWith(".eml")) {
           String fileName = name.substring(0, name.length()-".eml".length());
-          if (skipFileName1.startsWith(fileName) && (skipFileName1.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
+          if (skipFileName1 != null && skipFileName1.startsWith(fileName) && (skipFileName1.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
             skip = true;
-          else if (skipFileName2.startsWith(fileName) && (skipFileName2.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
+          else if (skipFileName2 != null && skipFileName2.startsWith(fileName) && (skipFileName2.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
+            skip = true;
+          else if (skipFileName3 != null && skipFileName3.startsWith(fileName) && (skipFileName3.length() == fileName.length() || fileName.length() > 25)) // at least first 25 chars have to match
             skip = true;
         }
         if (!skip) {
