@@ -38,12 +38,12 @@ public class DownloadUtilsGui {
    * @param fromMsgs are the parent messages that own the file attachments specified, NULL if fetching from a folder.
    * @param owner component for the file chooser dialog
    */
-  public static void downloadFilesChoice(Record[] toDownload, MsgLinkRecord[] fromMsgs, Component owner, ServerInterfaceLayer SIL) {
-    downloadFilesChoice(toDownload, fromMsgs, owner, SIL, false);
+  public static void downloadFilesChoice(Component owner, Record[] toDownload, MsgLinkRecord[] fromMsgs, ServerInterfaceLayer SIL) {
+    downloadFilesChoice(owner, toDownload, fromMsgs, SIL, false);
   }
-  public static void downloadFilesChoice(Record[] toDownload, MsgLinkRecord[] fromMsgs, Component owner, ServerInterfaceLayer SIL, boolean waitForComplete) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilsGui.class, "downloadFilesChoice(Record[] toDownload, MsgLinkRecord[] fromMsgs, Component owner, ServerInterfaceLayer SIL, boolean waitForComplete)");
-    if (trace != null) trace.args(toDownload, fromMsgs, owner, SIL);
+  public static void downloadFilesChoice(Component owner, Record[] toDownload, MsgLinkRecord[] fromMsgs, ServerInterfaceLayer SIL, boolean waitForComplete) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilsGui.class, "downloadFilesChoice(Component owner, Record[] toDownload, MsgLinkRecord[] fromMsgs, ServerInterfaceLayer SIL, boolean waitForComplete)");
+    if (trace != null) trace.args(owner, toDownload, fromMsgs, SIL);
     if (trace != null) trace.args(waitForComplete);
 
     /* Let the user choose the file destination */
@@ -55,7 +55,7 @@ public class DownloadUtilsGui {
       DownloadUtilities.setDefaultDestDir(destDir);
 
       // now, download all selected files and directories and messages...
-      DownloadUtilities.downloadFilesStartCoordinator(toDownload, fromMsgs, destDir, SIL);
+      DownloadUtilities.downloadFilesStartCoordinator(owner, toDownload, fromMsgs, destDir, SIL);
     }
 
     if (trace != null) trace.exit(DownloadUtilsGui.class);

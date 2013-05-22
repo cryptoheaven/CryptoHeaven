@@ -120,7 +120,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   /**
   * @return Directory for specified property name or null if unknown or directory DNE.
   */
-  private static File getDirForPropertyName(String propertyName) {
+  public static File getDirForPropertyName(String propertyName) {
     String pathName = GlobalProperties.getProperty(propertyName);
     return getDirForPathName(pathName);
   }
@@ -162,17 +162,18 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   * @param fileLink is the file to fetch
   * @param parentMsgLink if the file is an attachment, this specifies parent message
   */
-  public static void downloadAndOpen(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "downloadAndOpen(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose)");
-    if (trace != null) trace.args(fileLink, parentMsgLinks, SIL);
+  public static void downloadAndOpen(Object context, FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, File destDirOverride, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "downloadAndOpen(Object context, FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, File destDirOverride, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose)");
+    if (trace != null) trace.args(context);
+    if (trace != null) trace.args(fileLink, parentMsgLinks, SIL, destDirOverride);
     if (trace != null) trace.args(openCachedFileFirst);
     if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
-    if (openCachedFileFirst && openCachedFile(fileLink)) {
+    if (openCachedFileFirst && openCachedFile(context, fileLink)) {
       // all done
     } else {
-      File destDir = getDefaultTempDir();
-      downloadFilesStartCoordinator(new FileRecord[] { fileLink }, parentMsgLinks, destDir, SIL, false, true, suppressDownloadSoundsAndAutoClose);
+      File destDir = destDirOverride != null ? destDirOverride : getDefaultTempDir();
+      downloadFilesStartCoordinator(context, new FileRecord[] { fileLink }, parentMsgLinks, destDir, SIL, false, true, suppressDownloadSoundsAndAutoClose);
     }
 
     if (trace != null) trace.exit(DownloadUtilities.class);
@@ -182,8 +183,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   * @param fileLink is the file to fetch
   * @param parentMsgLink if the file is an attachment, this specifies parent message
   */
-  public static File download(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean suppressDownloadSoundsAndAutoClose) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "download(FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose)");
+  public static File download(Object context, FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean suppressDownloadSoundsAndAutoClose) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "download(Object context, FileLinkRecord fileLink, MsgLinkRecord[] parentMsgLinks, ServerInterfaceLayer SIL, boolean openCachedFileFirst, boolean suppressDownloadSoundsAndAutoClose)");
+    if (trace != null) trace.args(context);
     if (trace != null) trace.args(fileLink, parentMsgLinks, SIL);
     if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
@@ -193,7 +195,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       file = fileRec.getPlainDataFile();
     } else {
       File destDir = getDefaultTempDir();
-      downloadFilesStartCoordinator(new FileRecord[] { fileLink }, parentMsgLinks, destDir, SIL, true, false, suppressDownloadSoundsAndAutoClose);
+      downloadFilesStartCoordinator(context, new FileRecord[] { fileLink }, parentMsgLinks, destDir, SIL, true, false, suppressDownloadSoundsAndAutoClose);
       fileRec = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
       if (fileRec != null) // this can be null if file transfer was cancelled or interrupted
         file = fileRec.getPlainDataFile();
@@ -203,26 +205,27 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     return file;
   }
 
-  public static boolean openCachedFile(FileLinkRecord fileLink) {
+  public static boolean openCachedFile(Object context, FileLinkRecord fileLink) {
     boolean cachedFileOpened = false;
     FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
-    cachedFileOpened = FileLauncher.openFile(fileData);
+    cachedFileOpened = FileLauncher.openFile(context, fileData);
     if (cachedFileOpened && FileLobUpEditMonitor.canMonitor(fileLink)) {
       FileLobUpEditMonitor.registerForMonitoring(fileData.getPlainDataFile(), fileLink, fileData);
     }
     return cachedFileOpened;
   }
 
-  public static void downloadFilesStartCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL) {
-    downloadFilesStartCoordinator(toDownload, fromMsgs, destDir, SIL, false, false, false);
+  public static void downloadFilesStartCoordinator(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL) {
+    downloadFilesStartCoordinator(context, toDownload, fromMsgs, destDir, SIL, false, false, false);
   }
-  public static void downloadFilesStartCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "downloadFilesStartCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+  public static void downloadFilesStartCoordinator(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "downloadFilesStartCoordinator(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+    if (trace != null) trace.args(context);
     if (trace != null) trace.args(toDownload, fromMsgs, destDir, SIL);
     if (trace != null) trace.args(waitForComplete);
     if (trace != null) trace.args(openAfterDownload);
     if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
-    Thread th = new DownloadCoordinator(toDownload, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload, suppressDownloadSoundsAndAutoClose);
+    Thread th = new DownloadCoordinator(context, toDownload, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload, suppressDownloadSoundsAndAutoClose);
     th.start();
     if (waitForComplete)
       try { th.join(); } catch (InterruptedException e) { }
@@ -241,6 +244,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   */
   public static class DownloadCoordinator extends ThreadTraced {
 
+    private Object context;
     private Record[] toDownload;
     private MsgLinkRecord[] fromMsgs;  // set only when fetching file attachments from specified messages, else NULL
     private File destDir;
@@ -249,18 +253,20 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     private boolean openAfterDownload;
     private boolean suppressDownloadSoundsAndAutoClose;
 
-    public DownloadCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL) {
-      this(toDownload, fromMsgs, destDir, SIL, false, false, false);
+    public DownloadCoordinator(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL) {
+      this(context, toDownload, fromMsgs, destDir, SIL, false, false, false);
     }
 
-    public DownloadCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
+    public DownloadCoordinator(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
       super("Download Coordinator # " + downloadCoordinatorCount);
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "DownloadCoordinator(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "DownloadCoordinator(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+      if (trace != null) trace.args(context);
       if (trace != null) trace.args(toDownload, fromMsgs, destDir, SIL);
       if (trace != null) trace.args(waitForComplete);
       if (trace != null) trace.args(openAfterDownload);
       if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
+      this.context = context;
       this.toDownload = toDownload;
       this.fromMsgs = fromMsgs;
       this.destDir = destDir;
@@ -277,12 +283,12 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     }
     public void runTraced() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "DownloadCoordinator.runTraced()");
-      downloadRecords(toDownload, fromMsgs, destDir, false, true, null, SIL);
+      downloadRecords(context, toDownload, fromMsgs, destDir, false, true, null, SIL);
       if (trace != null) trace.exit(DownloadCoordinator.class);
     }
 
-    private void downloadRecords(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTreeAtOnce, Set excludeDirsAlreadyDone, ServerInterfaceLayer SIL) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "downloadRecords(Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTree, Collection excludeDirsAlreadyDone, ServerInterfaceLayer SIL)");
+    private void downloadRecords(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTreeAtOnce, Set excludeDirsAlreadyDone, ServerInterfaceLayer SIL) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadCoordinator.class, "downloadRecords(Object context, Record[] toDownload, MsgLinkRecord[] fromMsgs, File destDir, boolean fetchFilesForSingleFolders, boolean fetchFilesForFolderTree, Collection excludeDirsAlreadyDone, ServerInterfaceLayer SIL)");
       if (trace != null) trace.args(toDownload, fromMsgs, destDir);
       if (trace != null) trace.args(fetchFilesForFolderTreeAtOnce);
       if (trace != null) trace.args(excludeDirsAlreadyDone, SIL);
@@ -333,7 +339,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         if (filesV.size() > 0) {
           FileLinkRecord[] f = new FileLinkRecord[filesV.size()];
           filesV.toArray(f);
-          runDownloadFiles(f, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload, suppressDownloadSoundsAndAutoClose);
+          runDownloadFiles(context, f, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload, suppressDownloadSoundsAndAutoClose);
         }
         // process directories
         if (dirsV.size() > 0) {
@@ -388,10 +394,10 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
             if (!folderRecord.isCategoryType() && !folderRecord.isLocalFileType()) {
               // Download all messages to this directory...
-              downloadRecords(cache.getMsgLinkRecordsForFolder(shareRecord.folderId), null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
+              downloadRecords(context, cache.getMsgLinkRecordsForFolder(shareRecord.folderId), null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
 
               // Download all files to this directory...
-              downloadRecords(cache.getFileLinkRecords(shareRecord.shareId), null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
+              downloadRecords(context, cache.getFileLinkRecords(shareRecord.shareId), null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
             }
 
             // Download all child directories too...
@@ -403,7 +409,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
             childFolderPairs = (FolderPair[]) RecordUtils.difference(childFolderPairs, f);
 
             if (childFolderPairs != null && childFolderPairs.length > 0) {
-              downloadRecords(childFolderPairs, null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
+              downloadRecords(context, childFolderPairs, null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
             }
           } // end for
         } // end if any directories
@@ -540,8 +546,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   * @param fromMsgs is the message parent to specified files or is NULL if downloading from a folder.
   * @param destDir is the Local destination directory to which to download the files
   **/
-  private static void runDownloadFiles(FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "runDownloadFile(FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+  private static void runDownloadFiles(Object context, FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "runDownloadFile(Object context, FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+    if (trace != null) trace.args(context);
     if (trace != null) trace.args(files, fromMsgs, destDir, SIL);
     if (trace != null) trace.args(waitForComplete);
     if (trace != null) trace.args(openAfterDownload);
@@ -556,7 +563,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         for (int i=0; i<bunchSize; i++) {
           bunch[i] = files[count+i];
         }
-        runDownloadFileBunch(bunch, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload, suppressDownloadSoundsAndAutoClose);
+        runDownloadFileBunch(context, bunch, fromMsgs, destDir, SIL, waitForComplete, openAfterDownload, suppressDownloadSoundsAndAutoClose);
         count += bunchSize;
       }
     }
@@ -565,8 +572,9 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
   }
 
 
-  private static void runDownloadFileBunch(FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+  private static void runDownloadFileBunch(Object context, FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "runDownloadFileBunch(Object context, FileLinkRecord[] files, MsgLinkRecord[] fromMsgs, File destDir, ServerInterfaceLayer SIL, boolean waitForComplete, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
+    if (trace != null) trace.args(context);
     if (trace != null) trace.args(files, fromMsgs, destDir, SIL);
     if (trace != null) trace.args(waitForComplete);
     if (trace != null) trace.args(openAfterDownload);
@@ -608,7 +616,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     }
 
     MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_GET_FILES_DATA, request);
-    Thread th = new DownloadFileRunner(msgAction, destDir, files, fileNames, SIL, openAfterDownload, suppressDownloadSoundsAndAutoClose);
+    Thread th = new DownloadFileRunner(context, msgAction, destDir, files, fileNames, SIL, openAfterDownload, suppressDownloadSoundsAndAutoClose);
     th.start();
     if (waitForComplete)
       try { th.join(); } catch (InterruptedException e) { }
@@ -619,6 +627,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
 
   public static class DownloadFileRunner extends ThreadTraced {
 
+    private Object context;
     private MessageAction msgAction;
     private File destDir;
     private FileLinkRecord[] files;
@@ -627,13 +636,14 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     private boolean openAfterDownload;
     private boolean suppressDownloadSoundsAndAutoClose;
 
-    public DownloadFileRunner(MessageAction msgAction, File destDir, FileLinkRecord[] files, String[] fileNames, ServerInterfaceLayer SIL, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
+    public DownloadFileRunner(Object context, MessageAction msgAction, File destDir, FileLinkRecord[] files, String[] fileNames, ServerInterfaceLayer SIL, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose) {
       super("Download File Runner # " + downloadRunnerCount);
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadFileRunner.class, "DownloadRunner(MessageAction msgAction, File destDir, ServerInterfaceLayer SIL, boolean openAfterDownload, boolean suppressDownloadSoundsAndAutoClose)");
       if (trace != null) trace.args(msgAction, destDir, fileNames, SIL);
       if (trace != null) trace.args(openAfterDownload);
       if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
+      this.context = context;
       this.msgAction = msgAction;
       this.destDir = destDir;
       this.files = files;
@@ -659,7 +669,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       UploadDownloadSynch.entry(SIL.getMaxHeavyWorkerCount());
       try {
         // number of visible progress monitors are limited to the number of active transfer connections too
-        ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferDown(fileNames, destDir, files, !openAfterDownload, suppressDownloadSoundsAndAutoClose);
+        ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferDown(context, fileNames, destDir, files, !openAfterDownload, suppressDownloadSoundsAndAutoClose);
         ProgMonitorPool.registerProgMonitor(progressMonitor, msgAction.getStamp());
 
         replyAction = SIL.submitAndFetchReply(msgAction, 0);

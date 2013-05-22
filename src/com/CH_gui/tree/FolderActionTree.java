@@ -421,7 +421,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           selected = new FolderPair[] { selectFolder(w, title, new FolderFilter(new short[] { FolderRecord.CATEGORY_FILE_FOLDER, FolderRecord.FILE_FOLDER })) };
         }
         if (selected != null && selected[0] != null) {
-          UploadUtilsGui.uploadFileChoice(selected[0].getFolderShareRecord(), FolderActionTree.this, MainFrame.getServerInterfaceLayer());
+          UploadUtilsGui.uploadFileChoice(FolderActionTree.this, selected[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
         }
       }
     }
@@ -465,7 +465,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         FolderPair[] folderPairs = new FolderPair[selectedFolderPairs.size()];
         selectedFolderPairs.toArray(folderPairs);
         if (folderPairs != null && folderPairs.length > 0)
-          DownloadUtilsGui.downloadFilesChoice(folderPairs, null, FolderActionTree.this, MainFrame.getServerInterfaceLayer());
+          DownloadUtilsGui.downloadFilesChoice(FolderActionTree.this, folderPairs, null, MainFrame.getServerInterfaceLayer());
       }
     }
     private void updateText(int countSelectedFolderPairs) {

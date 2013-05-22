@@ -43,6 +43,8 @@ public interface SendMessageInfoProviderI {
   public static final short CONTENT_MODE_MAIL_HTML = 2;
   public static final short CONTENT_MODE_ADDRESS_BOOK_ENTRY = 3;
 
+  // get the provider gui component
+  public Object getContext();
   public String[] getContent();
   public Short getContentType();
   public short getContentMode();

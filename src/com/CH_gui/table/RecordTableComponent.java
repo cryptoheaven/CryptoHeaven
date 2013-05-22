@@ -131,6 +131,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
 
   private Thread timedScrollerThread;
 
+  private static long lastUserRefreshRequested;
+
   /**
   * Creates new RecordTableComponent.
   * @param recordTableScrollPane is often an RecordActionTable which is a subclass of RecordTableScrollPane
@@ -347,7 +349,11 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     return inThePast;
   }
 
-  public boolean updatePurchasePanel() {
+  /**
+   * Show 'warning' panel if account is overdue or over quota.
+   * @return true iff panel was made visible
+   */
+  private void updatePurchasePanel() {
     boolean showExpired = false;
     boolean showExpiredSub = false;
     boolean showOverQuota = false;
@@ -393,92 +399,100 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       }
     }
     boolean show = showExpired || showExpiredSub || showOverQuota || showOverQuotaSub || showOverTransfer || showOverTransferSub || showCloseToCapacity || showCloseToCapacitySub || showPurchase;
-    if (show) {
-      JMyLabel label = null;
-      String labelStr = "";
-      String signupUrl = URLs.get(URLs.SIGNUP_PAGE) +"?UserID="+ uRec.userId;
-      if (showExpired) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
-        try {
-          labelStr = "Warning: service subscription expired! Click here to renew.";
-          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
-        } catch (MalformedURLException ex) {
-        }
-      } else if (showExpiredSub) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-        try {
-          labelStr = "Your account is past due for renewal, please contact your administrator.";
-          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-        } catch (MalformedURLException ex) {
-        }
-      } else if (showOverQuota) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
-        try {
-          labelStr = "Warning: storage limit exceeded! Click here to upgrade.";
-          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
-        } catch (MalformedURLException ex) {
-        }
-      } else if (showOverQuotaSub) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-        try {
-          labelStr = "Storage limit exceeded, please contact your administrator.";
-          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-        } catch (MalformedURLException ex) {
-        }
-      } else if (showOverTransfer) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
-        try {
-          labelStr = "Warning: bandwidth usage limit exceeded! Please contact support.";
-          label = new JMyLinkLabel(labelStr, new URL("mailto:support@cryptoheaven.com"), "-1", new URLLauncherMAILTO());
-        } catch (MalformedURLException ex) {
-        }
-      } else if (showOverTransferSub) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
-        try {
-          labelStr = "Bandwidth usage limit exceeded, please contact your administrator.";
-          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-        } catch (MalformedURLException ex) {
-        }
+    if (show && System.currentTimeMillis() - lastUserRefreshRequested > 5*60*1000L) { // 5 minutes
+      // Confirm the warning with the server before we display anything..., this update will be called again when server returns an update.
+      ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+      if (SIL.isLoggedIn()) {
+        lastUserRefreshRequested = System.currentTimeMillis();
+        SIL.submitAndReturn(new MessageAction(CommandCodes.USR_Q_GET_INFO));
+      }
+    } else {
+      if (show) {
+        JMyLabel label = null;
+        String labelStr = "";
+        String signupUrl = URLs.get(URLs.SIGNUP_PAGE) +"?UserID="+ uRec.userId;
+        if (showExpired) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+          try {
+            labelStr = "Warning: service subscription expired! Click here to renew.";
+            label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showExpiredSub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+          try {
+            labelStr = "Your account is past due for renewal, please contact your administrator.";
+            label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverQuota) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+          try {
+            labelStr = "Warning: storage limit exceeded! Click here to upgrade.";
+            label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverQuotaSub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+          try {
+            labelStr = "Storage limit exceeded, please contact your administrator.";
+            label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverTransfer) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_ERROR));
+          try {
+            labelStr = "Warning: bandwidth usage limit exceeded! Please contact support.";
+            label = new JMyLinkLabel(labelStr, new URL("mailto:support@cryptoheaven.com"), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showOverTransferSub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_WARNING));
+          try {
+            labelStr = "Bandwidth usage limit exceeded, please contact your administrator.";
+            label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
 
-      } else if (showCloseToCapacity) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
-        try {
-          int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
-          labelStr = "Storage limit is near capacity, " + percent +"% used. Click here to upgrade.";
-          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
-        } catch (MalformedURLException ex) {
+        } else if (showCloseToCapacity) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+          try {
+            int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
+            labelStr = "Storage limit is near capacity, " + percent +"% used. Click here to upgrade.";
+            label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showCloseToCapacitySub) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+          try {
+            int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
+            labelStr = "Storage limit is near capacity, " + percent +"% used, please contact your administrator.";
+            label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
+          } catch (MalformedURLException ex) {
+          }
+        } else if (showPurchase) {
+          jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
+          try {
+            labelStr = "Please support our developers by purchasing a subscription.";
+            label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
+          } catch (MalformedURLException ex) {
+          }
         }
-      } else if (showCloseToCapacitySub) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
-        try {
-          int percent = (int) (uRec.storageUsed.doubleValue()*100L / uRec.storageLimit.doubleValue());
-          labelStr = "Storage limit is near capacity, " + percent +"% used, please contact your administrator.";
-          label = new JMyLinkLabel(labelStr, new URL("mailto:"+uRec.masterId), "-1", new URLLauncherMAILTO());
-        } catch (MalformedURLException ex) {
-        }
-      } else if (showPurchase) {
-        jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
-        try {
-          labelStr = "Please support our developers by purchasing a subscription.";
-          label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
-        } catch (MalformedURLException ex) {
+        if (label != null) {
+          if (purchasePanelLabelStr == null || !purchasePanelLabelStr.equals(labelStr)) {
+            purchasePanelLabelStr = labelStr;
+            label.setBorder(new EmptyBorder(3, 3, 3, 3));
+            jPurchasePanel.removeAll();
+            jPurchasePanel.add(label, BorderLayout.CENTER);
+            jPurchasePanel.revalidate();
+            jPurchasePanel.repaint();
+          }
         }
       }
-      if (label != null) {
-        if (purchasePanelLabelStr == null || !purchasePanelLabelStr.equals(labelStr)) {
-          purchasePanelLabelStr = labelStr;
-          label.setBorder(new EmptyBorder(3, 3, 3, 3));
-          jPurchasePanel.removeAll();
-          jPurchasePanel.add(label, BorderLayout.CENTER);
-          jPurchasePanel.revalidate();
-          jPurchasePanel.repaint();
-        }
+      if (jPurchasePanel.isVisible() != show) {
+        jPurchasePanel.setVisible(show);
       }
     }
-    if (jPurchasePanel.isVisible() != show) {
-      jPurchasePanel.setVisible(show);
-    }
-    return show;
   }
 
 //  /**

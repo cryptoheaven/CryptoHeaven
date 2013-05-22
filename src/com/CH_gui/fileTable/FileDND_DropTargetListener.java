@@ -209,7 +209,7 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
           filesV.toArray(files);
 
           if (isFileFolderType) {
-            new UploadUtilities.UploadCoordinator(files, uploadShareRec, MainFrame.getServerInterfaceLayer(), true, false).start();
+            new UploadUtilities.UploadCoordinator(event.getDropTargetContext().getComponent(), files, uploadShareRec, MainFrame.getServerInterfaceLayer(), true, false).start();
           } else if (isMsgFolderType) {
             new MessageFrame(new FolderPair[] { new FolderPair(uploadShareRec, uploadFolderRec) }, files);
           }

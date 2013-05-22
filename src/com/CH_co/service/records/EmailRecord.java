@@ -281,7 +281,7 @@ public class EmailRecord extends Record {
    */
   public static String validateEmailNickOrDomain(String address, Character subC, String emptySubstitute, boolean capitalizeAfterSubstitution) {
     StringBuffer sb = new StringBuffer();
-    char[] chars = address.toCharArray();
+    char[] chars = address != null ? address.toCharArray() : "".toCharArray();
     char lastC = subC != null ? subC.charValue() : '-';
     boolean lastSafeSub = false;
     for (int i=0; i<chars.length; i++) {

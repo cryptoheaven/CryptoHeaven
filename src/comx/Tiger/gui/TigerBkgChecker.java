@@ -680,7 +680,10 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
     stop();
     if (session.getLexicons() != null && session.getLexicons().length > 1) {
       component = textComp;
-      caretPos = component.getCaret().getDot();
+      try {
+        caretPos = component.getCaret().getDot();
+      } catch (Throwable t) {
+      }
       resume();
       recheckAll();
     }

@@ -844,6 +844,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             } else {
               ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
               new SendMessageRunner(SIL, new SendMessageInfoProviderI() {
+                public Object getContext() {
+                  return MsgComposePanel.this;
+                }
                 public String[] getContent() {
                   return new String[] { "ring...", "" };
                 }
@@ -2772,6 +2775,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     return replyToMsgLink;
   }
 
+  public Object getContext() {
+    return this;
+  }
   public String[] getContent() {
     return msgComponents.getContent();
   }

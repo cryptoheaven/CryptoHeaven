@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.monitor;
 
@@ -16,15 +16,15 @@ import com.CH_co.service.records.FileLinkRecord;
 import java.io.File;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ProgMonitorFactory {
 
   private static Class implJournal;
@@ -102,12 +102,12 @@ public class ProgMonitorFactory {
     return monitor;
   }
 
-  public static ProgMonitorI newInstanceTransferDown(String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose) {
+  public static ProgMonitorI newInstanceTransferDown(Object context, String[] tasks, File destDir, FileLinkRecord[] fileLinks, boolean isDownload, boolean suppressTransferSoundsAndAutoClose) {
     ProgMonitorI monitor = null;
     if (implTransfer != null) {
       try {
         monitor = (ProgMonitorTransferI) implTransfer.newInstance();
-        ((ProgMonitorTransferI) monitor).init(tasks, destDir, fileLinks, isDownload, suppressTransferSoundsAndAutoClose);
+        ((ProgMonitorTransferI) monitor).init(context, tasks, destDir, fileLinks, isDownload, suppressTransferSoundsAndAutoClose);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -118,12 +118,12 @@ public class ProgMonitorFactory {
     return monitor;
   }
 
-  public static ProgMonitorI newInstanceTransferUp(File[] tasks) {
+  public static ProgMonitorI newInstanceTransferUp(Object context, File[] tasks) {
     ProgMonitorI monitor = null;
     if (implTransfer != null) {
       try {
         monitor = (ProgMonitorTransferI) implTransfer.newInstance();
-        ((ProgMonitorTransferI) monitor).init(tasks);
+        ((ProgMonitorTransferI) monitor).init(context, tasks);
       } catch (Exception e) {
         e.printStackTrace();
       }

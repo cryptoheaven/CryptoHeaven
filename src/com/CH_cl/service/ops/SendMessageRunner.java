@@ -315,7 +315,7 @@ public class SendMessageRunner extends ThreadTraced {
           File_NewFiles_Rq localFileRequest = new File_NewFiles_Rq();
           newMsgRequest.localFiles = localFileRequest;
           // skip the owner ID and owner type, threaded run=false
-          replyClass = UploadUtilities.runUploadFileBunch(
+          replyClass = UploadUtilities.runUploadFileBunch(msgSendInfoProvider.getContext(), 
                             selectedLocalFileAttachments, sendMsgAction, localFileRequest,
                             symmetricAttachmentsKey, (Long) null, (Short) null, false, SIL);
           if (trace != null) trace.data(90, "reply class", replyClass);

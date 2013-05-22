@@ -428,11 +428,11 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
                   MessageDialog.showWarningDialog(null, body, title, true);
                 } else if (anyFolders) {
                   File[] dirs = (File[]) ArrayUtils.toArray(directoriesL, File.class);
-                  UploadUtilities.uploadFilesStartCoordinator(dirs, null, MainFrame.getServerInterfaceLayer());
+                  UploadUtilities.uploadFilesStartCoordinator(event.getDropTargetContext().getComponent(), dirs, null, MainFrame.getServerInterfaceLayer());
                 }
               } else if (acceptedFilesL.size() > 0) {
                 File[] files = (File[]) ArrayUtils.toArray(acceptedFilesL, File.class);
-                UploadUtilities.uploadFilesStartCoordinator(files, fPairs[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
+                UploadUtilities.uploadFilesStartCoordinator(event.getDropTargetContext().getComponent(), files, fPairs[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
               }
             } else {
               if (anyFiles && !anyFolders) {
@@ -440,7 +440,7 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
                 new MessageFrame(fPairs, files); // don't use pairs array because it might contain folders for unacceptable type, so create a new one with well checked object
               } else if (!anyFiles && anyFolders) {
                 File[] files = (File[]) ArrayUtils.toArray(directoriesL, File.class);
-                UploadUtilities.uploadFilesStartCoordinator(files, fPairs[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
+                UploadUtilities.uploadFilesStartCoordinator(event.getDropTargetContext().getComponent(), files, fPairs[0].getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
               } else {
                 String title = "Invalid Selection";
                 String body = "The destination folder is not compatible with your mixed selection of files and folders.  To attach files to a new message, please select files only.  To upload folders, please select folders only.  To upload files and folders please select a file folder destination.";
@@ -487,18 +487,22 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
   private boolean isAnyInPath(TreePath path, FolderPair[] fldPairs, boolean isSkipLastPath) {
     boolean inPath = false;
     // check if not dropping into our child folder
-    Object[] dropPath = path.getPath();
-    int size = dropPath.length;
-    if (isSkipLastPath)
-      size--; // skip the last path element check
-    for (int i=0; i<size; i++) {
-      FolderTreeNode node = (FolderTreeNode) dropPath[i];
-      FolderPair nodePair = node.getFolderObject();
-      if (nodePair != null) {
-        if (ArrayUtils.find(fldPairs, nodePair) >= 0) {
-          // drop into its own child!
-          inPath = true;
-          break;
+    if (path != null) {
+      Object[] dropPath = path.getPath();
+      if (dropPath != null) {
+        int size = dropPath.length;
+        if (isSkipLastPath)
+          size--; // skip the last path element check
+        for (int i=0; i<size; i++) {
+          FolderTreeNode node = (FolderTreeNode) dropPath[i];
+          FolderPair nodePair = node.getFolderObject();
+          if (nodePair != null) {
+            if (ArrayUtils.find(fldPairs, nodePair) >= 0) {
+              // drop into its own child!
+              inPath = true;
+              break;
+            }
+          }
         }
       }
     }

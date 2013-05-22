@@ -815,39 +815,41 @@ public class MenuTreeModel extends Object {
       menuNode.setShowing(true);
     }
 
-    // insert the action itself
-    DefaultMutableTreeNode insertionNode = (DefaultMutableTreeNode) treeNodes[treeNodes.length-1];
-    MenuActionItem insertionMenuItem = (MenuActionItem) insertionNode.getUserObject();
-    if (trace != null) trace.data(50, insertionMenuItem);
+    if (currentMenu != null) {
+      // insert the action itself
+      DefaultMutableTreeNode insertionNode = (DefaultMutableTreeNode) treeNodes[treeNodes.length-1];
+      MenuActionItem insertionMenuItem = (MenuActionItem) insertionNode.getUserObject();
+      if (trace != null) trace.data(50, insertionMenuItem);
 
-    int visibleBefore = 0;
-    if (treeNodes.length >= 2)
-      visibleBefore = countVisibleBeforeChild((DefaultMutableTreeNode) treeNodes[treeNodes.length-2], insertionNode);
-    if (insertionMenuItem.isActionItem()) {
-//      // If buttton group exists, look and clear a similar action button from the group.
-//      ButtonGroup group = (ButtonGroup) insertionMenuItem.getAction().getValue(Actions.BUTTON_GROUP);
-//      if (group != null) {
-//        Enumeration buttons = group.getElements();
-//        while (buttons.hasMoreElements()) {
-//          AbstractButton button = (AbstractButton) buttons.nextElement();
-//          String text = button.getText();
-//          if (text != null && text.equals(insertionMenuItem.getName())) {
-//            group.remove(button);
-//            break;
-//          }
-//        }
-//      }
-      JMenuItem jMenuItem = null;
-      if (!insertionMenuItem.isGUIButtonSet())
-        jMenuItem = convertActionToMenuItem(insertionMenuItem);
+      int visibleBefore = 0;
+      if (treeNodes.length >= 2)
+        visibleBefore = countVisibleBeforeChild((DefaultMutableTreeNode) treeNodes[treeNodes.length-2], insertionNode);
+      if (insertionMenuItem.isActionItem()) {
+  //      // If buttton group exists, look and clear a similar action button from the group.
+  //      ButtonGroup group = (ButtonGroup) insertionMenuItem.getAction().getValue(Actions.BUTTON_GROUP);
+  //      if (group != null) {
+  //        Enumeration buttons = group.getElements();
+  //        while (buttons.hasMoreElements()) {
+  //          AbstractButton button = (AbstractButton) buttons.nextElement();
+  //          String text = button.getText();
+  //          if (text != null && text.equals(insertionMenuItem.getName())) {
+  //            group.remove(button);
+  //            break;
+  //          }
+  //        }
+  //      }
+        JMenuItem jMenuItem = null;
+        if (!insertionMenuItem.isGUIButtonSet())
+          jMenuItem = convertActionToMenuItem(insertionMenuItem);
+        else
+          jMenuItem = (JMenuItem) insertionMenuItem.getGUIButton();
+        currentMenu.insert(jMenuItem, visibleBefore);
+      }
       else
-        jMenuItem = (JMenuItem) insertionMenuItem.getGUIButton();
-      currentMenu.insert(jMenuItem, visibleBefore);
-    }
-    else
-      currentMenu.insertSeparator(visibleBefore);
+        currentMenu.insertSeparator(visibleBefore);
 
-    insertionMenuItem.setShowing(true);
+      insertionMenuItem.setShowing(true);
+    }
 
     if (trace != null) trace.exit(MenuTreeModel.class, true);
     return true;

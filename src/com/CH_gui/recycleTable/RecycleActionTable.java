@@ -282,11 +282,11 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
     public void actionPerformedTraced(ActionEvent event) {
       FileRecord[] fileRecords = (FileRecord[]) getSelectedInstancesOf(FileRecord.class);
       if (fileRecords != null && fileRecords.length > 0) {
-        DownloadUtilsGui.downloadFilesChoice(fileRecords, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(RecycleActionTable.this, fileRecords, null, MainFrame.getServerInterfaceLayer());
       }
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedInstancesOf(MsgLinkRecord.class);
       if (msgLinks != null && msgLinks.length > 0) {
-        DownloadUtilsGui.downloadFilesChoice(msgLinks, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(RecycleActionTable.this, msgLinks, null, MainFrame.getServerInterfaceLayer());
       }
     }
   }
@@ -676,16 +676,16 @@ public class RecycleActionTable extends RecordActionTable implements ActionProdu
   private void openFile(final FileLinkRecord _fileLink) {
     // single file (no folder) download -- give option to OPEN or SAVE
     if (false && FileLauncher.isAudioWaveFilename(_fileLink.getFileName())) { // skip this and default to the dialog
-      DownloadUtilities.downloadAndOpen(_fileLink, null, MainFrame.getServerInterfaceLayer(), true, true);
+      DownloadUtilities.downloadAndOpen(RecycleActionTable.this, _fileLink, null, MainFrame.getServerInterfaceLayer(), null, true, true);
     } else {
       Runnable openTask = new Runnable() {
         public void run() {
-          DownloadUtilities.downloadAndOpen(_fileLink, null, MainFrame.getServerInterfaceLayer(), true, false);
+          DownloadUtilities.downloadAndOpen(RecycleActionTable.this, _fileLink, null, MainFrame.getServerInterfaceLayer(), null, true, false);
         }
       };
       Runnable saveTask = new Runnable() {
         public void run() {
-          DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, null, RecycleActionTable.this, MainFrame.getServerInterfaceLayer());
+          DownloadUtilsGui.downloadFilesChoice(RecycleActionTable.this, new FileLinkRecord[] { _fileLink }, null, MainFrame.getServerInterfaceLayer());
         }
       };
       Window w = SwingUtilities.windowForComponent(RecycleActionTable.this);

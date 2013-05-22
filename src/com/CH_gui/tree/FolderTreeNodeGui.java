@@ -14,9 +14,11 @@ package com.CH_gui.tree;
 
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
-import com.CH_co.tree.*;
-
-import javax.swing.tree.*;
+import com.CH_co.tree.FolderTreeNode;
+import com.CH_co.tree.MyMutableTreeNode;
+import com.CH_co.tree.MyTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 /**
 * <b>Copyright</b> &copy; 2001-2013
@@ -55,7 +57,10 @@ public class FolderTreeNodeGui extends FolderTreeNode implements MutableTreeNode
   }
 
   public TreeNode getChildAt(int childIndex) {
-    return (TreeNode) getChildNodeAt(childIndex);
+    if (getChildCount() > childIndex)
+      return (TreeNode) getChildNodeAt(childIndex);
+    else
+      return null;
   }
 
   public TreeNode getParent() {

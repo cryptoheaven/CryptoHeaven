@@ -292,7 +292,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     public void actionPerformedTraced(ActionEvent event) {
       FileRecord[] fileRecords = (FileRecord[]) getSelectedRecords();
       if (fileRecords != null && fileRecords.length > 0) {
-        DownloadUtilsGui.downloadFilesChoice(fileRecords, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(FileActionTable.this, fileRecords, null, MainFrame.getServerInterfaceLayer());
       }
     }
   }
@@ -703,16 +703,16 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private void openFile(final FileLinkRecord _fileLink) {
     // single file (no folder) download -- give option to OPEN or SAVE
     if (false && FileLauncher.isAudioWaveFilename(_fileLink.getFileName())) { // skip this and default to the dialog
-      DownloadUtilities.downloadAndOpen(_fileLink, null, MainFrame.getServerInterfaceLayer(), true, true);
+      DownloadUtilities.downloadAndOpen(this, _fileLink, null, MainFrame.getServerInterfaceLayer(), null, true, true);
     } else {
       Runnable openTask = new Runnable() {
         public void run() {
-          DownloadUtilities.downloadAndOpen(_fileLink, null, MainFrame.getServerInterfaceLayer(), true, false);
+          DownloadUtilities.downloadAndOpen(this, _fileLink, null, MainFrame.getServerInterfaceLayer(), null, true, false);
         }
       };
       Runnable saveTask = new Runnable() {
         public void run() {
-          DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, null, FileActionTable.this, MainFrame.getServerInterfaceLayer());
+          DownloadUtilsGui.downloadFilesChoice(FileActionTable.this, new FileLinkRecord[] { _fileLink }, null, MainFrame.getServerInterfaceLayer());
         }
       };
       Window w = SwingUtilities.windowForComponent(FileActionTable.this);

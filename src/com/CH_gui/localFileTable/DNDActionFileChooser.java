@@ -276,7 +276,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
         }
         FolderPair chosenFolderPair = getUploadDestination(anyDirs, anyFiles);
         if (chosenFolderPair != null) {
-          UploadUtilities.uploadFilesStartCoordinator(files, chosenFolderPair.getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
+          UploadUtilities.uploadFilesStartCoordinator(DNDActionFileChooser.this, files, chosenFolderPair.getFolderShareRecord(), MainFrame.getServerInterfaceLayer());
         }
       }
     }

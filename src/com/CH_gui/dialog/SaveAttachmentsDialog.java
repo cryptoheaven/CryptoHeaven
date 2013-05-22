@@ -447,7 +447,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
       new MsgPreviewFrame(paramParentMsgLinkRecords[0], mLinks);
     }
     for (int i=0; i<fLinks.length; i++) {
-      DownloadUtilities.downloadAndOpen(fLinks[i], paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), true, false);
+      DownloadUtilities.downloadAndOpen(this, fLinks[i], paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), null, true, false);
     }
     closeDialog();
 
@@ -462,7 +462,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     FileLinkRecord[] fLinks = (FileLinkRecord[]) ArrayUtils.gatherAllOfType(selections, FileLinkRecord.class);
     Record[] recs = (Record[]) ArrayUtils.concatinate(mLinks, fLinks, Record.class);
 
-    new DownloadUtilities.DownloadCoordinator(recs, paramParentMsgLinkRecords, localFileDestination, MainFrame.getServerInterfaceLayer()).start();
+    new DownloadUtilities.DownloadCoordinator(this, recs, paramParentMsgLinkRecords, localFileDestination, MainFrame.getServerInterfaceLayer()).start();
     closeDialog();
 
     if (trace != null) trace.exit(getClass());

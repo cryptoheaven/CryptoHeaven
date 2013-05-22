@@ -165,7 +165,7 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
         }
         if (fileRecs != null && fileRecs.length > 0) {
           // now, download all selected files and directories...
-          DownloadUtilities.downloadFilesStartCoordinator(fileRecs, fromMsgs, jFileChooser.getCurrentDirectory(), MainFrame.getServerInterfaceLayer());
+          DownloadUtilities.downloadFilesStartCoordinator(event.getDropTargetContext().getComponent(), fileRecs, fromMsgs, jFileChooser.getCurrentDirectory(), MainFrame.getServerInterfaceLayer());
         }
       }
       else {

@@ -615,8 +615,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
           if (replyMsg == null) {
             if (trace != null) trace.data(70, "TIMEOUT");
             if (trace != null) trace.data(71, "specified timeout was", timeout);
-            if (trace != null) trace.data(72, "timeout - clear any open progress dialogs");
-            ProgMonitorPool.getProgMonitor(msgAction.getStamp()).jobKilled();
           }
         } // end synchronized (stampList)
       } // end synchronized
@@ -625,6 +623,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (replyMsg != null) {
         replyMsg.setInterruptsFrom(msgAction);
       }
+    }
+
+    if (replyMsg == null) {
+      if (trace != null) trace.data(72, "clear any open progress dialogs");
+      ProgMonitorPool.getProgMonitor(msgAction.getStamp()).jobKilled();
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class, replyMsg);

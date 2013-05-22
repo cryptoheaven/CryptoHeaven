@@ -264,18 +264,22 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
       if (tableModel instanceof MsgTableModel) {
         MsgTableModel mtm = (MsgTableModel) tableModel;
         MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row));
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-        MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
-        Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
-        if (subjectValue != null) {
-          if (subjectValue instanceof StringBuffer)
-            sb = (StringBuffer) subjectValue;
-          else
-            sb = new StringBuffer(subjectValue.toString());
-        }
-        if (((MsgTableSorter) sTable.getModel()).isThreaded()) {
-          indentLevel = mLink.getSortThreadLayer();
+        if (mLink != null) {
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+          MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
+          if (mData != null) {
+            MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
+            Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
+            if (subjectValue != null) {
+              if (subjectValue instanceof StringBuffer)
+                sb = (StringBuffer) subjectValue;
+              else
+                sb = new StringBuffer(subjectValue.toString());
+            }
+            if (((MsgTableSorter) sTable.getModel()).isThreaded()) {
+              indentLevel = mLink.getSortThreadLayer();
+            }
+          }
         }
       }
 

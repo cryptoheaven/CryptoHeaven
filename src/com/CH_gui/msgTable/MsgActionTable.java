@@ -495,7 +495,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     public void actionPerformedTraced(ActionEvent event) {
       MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) getSelectedRecords();
       if (msgLinks != null && msgLinks.length > 0) {
-        DownloadUtilsGui.downloadFilesChoice(msgLinks, null, MsgActionTable.this, MainFrame.getServerInterfaceLayer());
+        DownloadUtilsGui.downloadFilesChoice(MsgActionTable.this, msgLinks, null, MainFrame.getServerInterfaceLayer());
       }
     }
   }

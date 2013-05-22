@@ -124,7 +124,7 @@ public class FileDataOps {
       MessageAction msgAction = new MessageAction(actionCode, request);
 
       if (actionCode == CommandCodes.FILE_Q_GET_FILES_DATA && fData.getEncSize().longValue() > getMaxFileDownSizeForMainConnection()) {
-        Thread th = new DownloadUtilities.DownloadFileRunner(msgAction, null, new FileLinkRecord[] { fLink }, new String[] { fLink.getFileName() }, SIL, false, false);
+        Thread th = new DownloadUtilities.DownloadFileRunner(null, msgAction, null, new FileLinkRecord[] { fLink }, new String[] { fLink.getFileName() }, SIL, false, false);
         th.start();
         // wait for completion...
         try { th.join(); } catch (InterruptedException e) { }

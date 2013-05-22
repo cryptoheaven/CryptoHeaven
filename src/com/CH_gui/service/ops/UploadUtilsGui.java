@@ -37,9 +37,9 @@ public class UploadUtilsGui {
     * Pops up a file choice dialog to choose which file(s) to upload, then launch UploadCoordinator.
     * @param shareId is the share to which to upload a file
     */
-  public static void uploadFileChoice(FolderShareRecord shareRecord, Component owner, ServerInterfaceLayer SIL) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadUtilsGui.class, "uploadFileChoice(FolderShareRecord shareRecord, Component owner, ServerInterfaceLayer SIL)");
-    if (trace != null) trace.args(shareRecord, owner, SIL);
+  public static void uploadFileChoice(Component owner, FolderShareRecord shareRecord, ServerInterfaceLayer SIL) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UploadUtilsGui.class, "uploadFileChoice(Component owner, FolderShareRecord shareRecord, ServerInterfaceLayer SIL)");
+    if (trace != null) trace.args(owner, shareRecord, SIL);
 
     /* Let the user choose which file to upload */
     FileChooser fileChooser = FileChooser.makeNew(owner, false, UploadUtilities.getDefaultSourceDir());
@@ -50,7 +50,7 @@ public class UploadUtilsGui {
       // source directory is the current directory from the file chooser, not the selected files
       UploadUtilities.setDefaultSourceDir(fileChooser.getCurrentDirectory());
       // now, upload all selected files and directories...
-      UploadUtilities.uploadFilesStartCoordinator(newFiles, shareRecord, SIL);
+      UploadUtilities.uploadFilesStartCoordinator(owner, newFiles, shareRecord, SIL);
     }
 
     if (trace != null) trace.exit(UploadUtilsGui.class);

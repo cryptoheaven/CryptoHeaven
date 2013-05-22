@@ -304,8 +304,9 @@ public class GlobalProperties extends Object {
   // build 772,774,776 Unsealing objects in the cache outside of synchronized
   // build 778 Removed GUI tree manipulations from non-gui threads
   // build 780 Filtering out 'no-subject' automatic .eml attachment, few reported exceptions fixed.
+  // build 782 Upload/Download take context for attaching progress indicators.
 
-  public static final short PROGRAM_BUILD_NUMBER = 780;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 782;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
@@ -377,10 +378,12 @@ public class GlobalProperties extends Object {
       }
     }
     if (!ok) {
-      //System.err.println("WARNING: Unable to load \"" + it + "\" .  Will use default values instead.");
+      // System.err.println("GlobalProperties: WARNING: Unable to load \"" + it + "\" .  Will use default values instead.");
     } else {
+      // System.err.println("GlobalProperties: starting to cleanup temp files");
       cleanupTempFiles();
       cleanupTempFilesOnFinalize();
+      // System.err.println("GlobalProperties: done cleanup of temp files");
     } // end if
     // if properties reset flag is set then reset properties
     String propResetFlag = properties.getProperty(PROPERTIES_RESET_AT_NEXT_LOAD);

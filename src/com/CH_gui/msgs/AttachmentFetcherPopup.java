@@ -246,16 +246,16 @@ public class AttachmentFetcherPopup extends ThreadTraced {
       if (trace != null) trace.args(event);
 
       if (false && FileLauncher.isAudioWaveFilename(fLink.getFileName())) { // skip play, default to save
-        DownloadUtilities.downloadAndOpen(fLink, paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), true, true);
+        DownloadUtilities.downloadAndOpen(parent, fLink, paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), null, true, true);
       } else {
         Runnable openTask = new Runnable() {
           public void run() {
-            DownloadUtilities.downloadAndOpen(fLink, paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), true, false);
+            DownloadUtilities.downloadAndOpen(parent, fLink, paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer(), null, true, false);
           }
         };
         Runnable saveTask = new Runnable() {
           public void run() {
-            DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { fLink }, paramParentMsgLinkRecords, parent, MainFrame.getServerInterfaceLayer());
+            DownloadUtilsGui.downloadFilesChoice(parent, new FileLinkRecord[] { fLink }, paramParentMsgLinkRecords, MainFrame.getServerInterfaceLayer());
           }
         };
         MsgLinkRecord parentMsgLink = null;

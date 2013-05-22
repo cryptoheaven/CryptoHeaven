@@ -1109,16 +1109,16 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 final FileLinkRecord _fileLink = (FileLinkRecord) att;
                 final MsgLinkRecord _parentMsgLink = parentMsgLink;
                 if (false && FileLauncher.isAudioWaveFilename(_fileLink.getFileName())) { // skip play, default to save
-                  DownloadUtilities.downloadAndOpen(_fileLink, new MsgLinkRecord[] { _parentMsgLink }, MainFrame.getServerInterfaceLayer(), true, true);
+                  DownloadUtilities.downloadAndOpen(MsgPreviewPanel.this, _fileLink, new MsgLinkRecord[] { _parentMsgLink }, MainFrame.getServerInterfaceLayer(), null, true, true);
                 } else {
                   Runnable openTask = new Runnable() {
                     public void run() {
-                      DownloadUtilities.downloadAndOpen(_fileLink, new MsgLinkRecord[] { _parentMsgLink }, MainFrame.getServerInterfaceLayer(), true, false);
+                      DownloadUtilities.downloadAndOpen(MsgPreviewPanel.this, _fileLink, new MsgLinkRecord[] { _parentMsgLink }, MainFrame.getServerInterfaceLayer(), null, true, false);
                     }
                   };
                   Runnable saveTask = new Runnable() {
                     public void run() {
-                      DownloadUtilsGui.downloadFilesChoice(new FileLinkRecord[] { _fileLink }, new MsgLinkRecord[] { _parentMsgLink }, MsgPreviewPanel.this, MainFrame.getServerInterfaceLayer());
+                      DownloadUtilsGui.downloadFilesChoice(MsgPreviewPanel.this, new FileLinkRecord[] { _fileLink }, new MsgLinkRecord[] { _parentMsgLink }, MainFrame.getServerInterfaceLayer());
                     }
                   };
                   Window w = SwingUtilities.windowForComponent(MsgPreviewPanel.this);
@@ -1198,7 +1198,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                       final FileLinkRecord fileLink = (FileLinkRecord) att;
                       File file = null;
                       synchronized (_clipDownloadMonitor) {
-                        file = DownloadUtilities.download(fileLink, new MsgLinkRecord[] { parentMsgLink }, MainFrame.getServerInterfaceLayer(), true);
+                        file = DownloadUtilities.download(MsgPreviewPanel.this, fileLink, new MsgLinkRecord[] { parentMsgLink }, MainFrame.getServerInterfaceLayer(), true);
                       }
                       if (file != null) {
                         if (FileLauncher.isAudioWaveFilename(fileLink.getFileName())) {
@@ -1279,7 +1279,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                         FileLinkRecord fileLink = (FileLinkRecord) att;
                         File file = null;
                         synchronized (_clipDownloadMonitor) {
-                          file = DownloadUtilities.download(fileLink, new MsgLinkRecord[] { parentMsgLink }, MainFrame.getServerInterfaceLayer(), true);
+                          file = DownloadUtilities.download(MsgPreviewPanel.this, fileLink, new MsgLinkRecord[] { parentMsgLink }, MainFrame.getServerInterfaceLayer(), true);
                         }
                         if (FileLauncher.isAudioWaveFilename(fileLink.getFileName())) {
                           DecodingAudioClipPlayer.close(file);
@@ -1305,7 +1305,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                         FileLinkRecord fileLink = (FileLinkRecord) att;
                         File file = null;
                         synchronized (_clipDownloadMonitor) {
-                          file = DownloadUtilities.download(fileLink, new MsgLinkRecord[] { parentMsgLink }, MainFrame.getServerInterfaceLayer(), true);
+                          file = DownloadUtilities.download(MsgPreviewPanel.this, fileLink, new MsgLinkRecord[] { parentMsgLink }, MainFrame.getServerInterfaceLayer(), true);
                         }
                         if (FileLauncher.isAudioWaveFilename(fileLink.getFileName())) {
                           int millisecondPosition = slider.getValue();
