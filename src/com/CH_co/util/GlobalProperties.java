@@ -305,8 +305,10 @@ public class GlobalProperties extends Object {
   // build 778 Removed GUI tree manipulations from non-gui threads
   // build 780 Filtering out 'no-subject' automatic .eml attachment, few reported exceptions fixed.
   // build 782 Upload/Download take context for attaching progress indicators.
+  // build 784 Progress monitor changes to accommodate Android, several exception fixes based on crash reports
+  // build 786 Fixes in background file uploads to prevent multiple workers competing for single file.
 
-  public static final short PROGRAM_BUILD_NUMBER = 782;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 786;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

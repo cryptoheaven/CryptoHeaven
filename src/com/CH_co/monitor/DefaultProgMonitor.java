@@ -47,6 +47,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   private String name;
   private boolean withProgressDialog;
 
+  private String lastStatusInfo;
+
   private static final Object counterMonitor = new Object();
   private static int counter = 0;
 
@@ -114,7 +116,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Preparing to send...");
+          lastStatusInfo = "Preparing to send...";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -136,7 +139,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Sending request...");
+          lastStatusInfo = "Sending request...";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -171,7 +175,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Waiting for reply...");
+          lastStatusInfo = "Waiting for reply...";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -203,7 +208,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Receiving reply... ");
+          lastStatusInfo = "Receiving reply... ";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -234,7 +240,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Receiving reply... done.");
+          lastStatusInfo = "Receiving reply... done.";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -265,7 +272,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Start executing reply... ");
+          lastStatusInfo = "Start executing reply... ";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -281,7 +289,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
         value++;
         if (withProgressDialog && pm != null) {
           pm.setProgress(value);
-          pm.setNote("Start executing reply... done.");
+          lastStatusInfo = "Start executing reply... done.";
+          pm.setNote(lastStatusInfo);
         }
       }
     }
@@ -289,6 +298,17 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   }
 
 
+  public String getLastStatusInfo() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "getLastStatusInfo()");
+    if (trace != null) trace.exit(DefaultProgMonitor.class, lastStatusInfo);
+    return lastStatusInfo;
+  }
+
+  public String getLastStatusTitle() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "getLastStatusTitle()");
+    if (trace != null) trace.exit(DefaultProgMonitor.class, actionName);
+    return actionName;
+  }
 
   public void setCurrentStatus(String currentStatus) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "setCurrentStatus(String currentStatus)");
@@ -298,7 +318,8 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
       value++;
       if (!Misc.isAllGUIsuppressed() && withProgressDialog && pm != null) {
         pm.setProgress(value);
-        pm.setNote(currentStatus);
+        lastStatusInfo = currentStatus;
+        pm.setNote(lastStatusInfo);
       }
     }
     if (trace != null) trace.exit(DefaultProgMonitor.class);
@@ -324,6 +345,12 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
   }
   public long getTransferred() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "getTransferred()");
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(DefaultProgMonitor.class, -1);
+    return -1;
+  }
+  public long getTransferSize() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DefaultProgMonitor.class, "getTransferSize()");
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(DefaultProgMonitor.class, -1);
     return -1;
@@ -383,6 +410,10 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     if (trace != null) trace.args(cancellable);
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(DefaultProgMonitor.class);
+  }
+
+  public void interruptAndCancel() {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   public void jobKilled() {

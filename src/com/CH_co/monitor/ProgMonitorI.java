@@ -1,33 +1,33 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.monitor;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.13 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.13 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public interface ProgMonitorI {
 
   public void enqueue(int actionCode, long stamp);
@@ -61,7 +61,6 @@ public interface ProgMonitorI {
   public void setFileNameDestination(String fileName);
   public void setFilePathDestination(String fileName);
 
-  public long getTransferred();
   public void setTransferSize(long size);
   public void updateTransferSize(long size);
   public void addBytes(long bytes);
@@ -77,8 +76,16 @@ public interface ProgMonitorI {
 
   public void setInterrupt(Interruptible interruptible);
   public void setCancellable(Cancellable cancellable);
+  public void interruptAndCancel();
 
   public boolean isAllDone();
   public boolean isCancelled();
   public boolean isJobKilled();
+
+  // pooling values from monitor
+  public long getTransferred();
+  public long getTransferSize();
+  public String getLastStatusInfo();
+  public String getLastStatusTitle();
+
 }

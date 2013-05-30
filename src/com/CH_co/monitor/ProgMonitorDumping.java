@@ -1,33 +1,33 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.monitor;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.13 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.13 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class ProgMonitorDumping extends Object implements ProgMonitorI {
 
   /** Creates new ProgMonitorDumping */
@@ -66,6 +66,12 @@ public class ProgMonitorDumping extends Object implements ProgMonitorI {
   }
   public void doneExecution(int actionCode) {
   }
+  public String getLastStatusInfo() {
+    return null;
+  }
+  public String getLastStatusTitle() {
+    return null;
+  }
   public void setCurrentStatus(String currentStatus) {
   }
   public void setFileNameSource(String fileName) {
@@ -75,6 +81,9 @@ public class ProgMonitorDumping extends Object implements ProgMonitorI {
   public void setFilePathDestination(String filePath) {
   }
   public long getTransferred() {
+    return -1;
+  }
+  public long getTransferSize() {
     return -1;
   }
   public void setTransferSize(long size) {
@@ -105,6 +114,8 @@ public class ProgMonitorDumping extends Object implements ProgMonitorI {
     return false;
   }
   public void setCancellable(Cancellable cancellable) {
+  }
+  public void interruptAndCancel() {
   }
   public boolean isJobKilled() {
     return false;

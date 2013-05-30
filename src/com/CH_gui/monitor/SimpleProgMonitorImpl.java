@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- * 
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+* 
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 package com.CH_gui.monitor;
 
 import com.CH_co.monitor.*;
@@ -20,15 +20,15 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class SimpleProgMonitorImpl implements ProgMonitorI {
 
   JLabel jLabelTop, jLabelBottom;
@@ -140,6 +140,14 @@ public class SimpleProgMonitorImpl implements ProgMonitorI {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  public String getLastStatusInfo() {
+    return null;
+  }
+
+  public String getLastStatusTitle() {
+    return null;
+  }
+
   public void setCurrentStatus(String currentStatus) {
     // no-op
   }
@@ -156,6 +164,10 @@ public class SimpleProgMonitorImpl implements ProgMonitorI {
   }
 
   public long getTransferred() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  public long getTransferSize() {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -208,6 +220,10 @@ public class SimpleProgMonitorImpl implements ProgMonitorI {
   }
 
   public void setCancellable(Cancellable cancellable) {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  public void interruptAndCancel() {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 

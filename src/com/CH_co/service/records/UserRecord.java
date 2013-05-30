@@ -567,9 +567,8 @@ public class UserRecord extends Record implements MemberRecordI { // implicit no
                   ACC_SPAM_YES_INTER | 
                   ACC_SPAM_MASK__NO_GRANT;
         flags = FLAG_ENABLE_ACCOUNT_DELETE | 
-                // web accounts can change password, promos can't
-                (status == STATUS_WEB ? FLAG_ENABLE_PASSWORD_CHANGE : 0) | 
-                FLAG_USER_ONLINE_STATUS_POPUP |
+                FLAG_ENABLE_PASSWORD_CHANGE | 
+                FLAG_USER_ONLINE_STATUS_POPUP | 
                 FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER | 
                 FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES | 
                 FLAG_MASK__NO_GRANT | 

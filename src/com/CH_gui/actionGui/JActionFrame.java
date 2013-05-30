@@ -140,7 +140,11 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
             if (trace != null) trace.info(11, "deepestComponent", deepestComponent);
 
             while (!(deepestComponent instanceof ActionProducerI)) {
-              deepestComponent = deepestComponent.getParent();
+              Component parent = deepestComponent.getParent();
+              if (parent == null)
+                break;
+              else
+                deepestComponent = parent;
             }
 
             MouseEvent deepEvent = SwingUtilities.convertMouseEvent(c, e, deepestComponent);

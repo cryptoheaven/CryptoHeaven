@@ -38,4 +38,8 @@ public interface ProgMonitorTransferI extends ProgMonitorI {
   */
   public void init(Object context, File[] tasks);
 
+  public boolean isMonitoringDownload();
+  public boolean isMonitoringOpen();
+  public void setOpenWhenFinished(boolean flag);
+
 }

@@ -1332,7 +1332,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Cut"));
     }
     public void actionPerformed(ActionEvent event) {
-      super.actionPerformed(event);
+      try {
+        super.actionPerformed(event);
+      } catch (Throwable t) {
+        // content issue - silent ignore
+      }
       setEnabledActions();
     }
   }
@@ -1351,7 +1355,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("actionTool_Copy"));
     }
     public void actionPerformed(ActionEvent event) {
-      super.actionPerformed(event);
+      try {
+        super.actionPerformed(event);
+      } catch (Throwable t) {
+        // content issue - silent ignore
+      }
       setEnabledActions();
     }
   }
@@ -1370,7 +1378,11 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       putValue(Actions.TOOL_NAME, com.CH_cl.lang.Lang.rb.getString("action_Paste"));
     }
     public void actionPerformed(ActionEvent event) {
-      super.actionPerformed(event);
+      try {
+        super.actionPerformed(event);
+      } catch (Throwable t) {
+        // content issue - silent ignore
+      }
       setEnabledActions();
     }
   }

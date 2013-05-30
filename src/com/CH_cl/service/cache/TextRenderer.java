@@ -129,6 +129,13 @@ public class TextRenderer {
     else if (value instanceof File) {
       File file = (File) value;
       label = file.getName();
+      if (includeFileSizes) {
+        try {
+          label += "   (" + Misc.getFormattedSize(file.length(), 4, 3) + ")";
+        } catch (Throwable t) {
+          // If I/O problem, skip the extra 'size' detail
+        }
+      }
     }
     else if (value instanceof InternetAddressRecord) {
       InternetAddressRecord eRec = (InternetAddressRecord) value;

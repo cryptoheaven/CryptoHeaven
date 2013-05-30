@@ -165,7 +165,8 @@ public class UserOps extends Object {
       MessageAction updateKeyAction = new MessageAction(actionCode.intValue(), updateKeyRequest);
       ClientMessageAction msgAction = SIL.submitAndFetchReply(updateKeyAction, 60000);
       if (msgAction == null || msgAction.getActionCode() <= 0) {
-        if (errBuffer != null) errBuffer.append("\n\nserver failed to respond");
+        if (errBuffer != null && (msgAction == null || msgAction.getActionCode() == 0))
+          errBuffer.append("\n\nserver failed to respond");
         error = true;
       } else {
         cache.setEncodedPassword(ba);

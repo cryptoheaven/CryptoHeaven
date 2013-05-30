@@ -671,6 +671,8 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         // number of visible progress monitors are limited to the number of active transfer connections too
         ProgMonitorI progressMonitor = ProgMonitorFactory.newInstanceTransferDown(context, fileNames, destDir, files, !openAfterDownload, suppressDownloadSoundsAndAutoClose);
         ProgMonitorPool.registerProgMonitor(progressMonitor, msgAction.getStamp());
+        // This will update the monitor after it is registered in the ProgMonitorPool - useful for android notification intents to update for opening progress activity
+        progressMonitor.setCurrentStatus("initializing transfer");
 
         replyAction = SIL.submitAndFetchReply(msgAction, 0);
       } catch (Throwable t) {

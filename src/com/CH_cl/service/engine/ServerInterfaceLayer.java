@@ -14,7 +14,6 @@ package com.CH_cl.service.engine;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.ops.FileLobUp;
 import com.CH_cl.util.ThreadCheck;
 import com.CH_co.monitor.DefaultProgMonitor;
 import com.CH_co.monitor.ProgMonitorI;
@@ -180,14 +179,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * Creates new ServerInterfaceLayer
   * @param connectedSocket through which communication will take place
   */
-  public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient, boolean isSuppressUploadContinue) {
+  public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient) {
     this(hostsAndPorts, null, null, isClient);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient, boolean isSuppressUploadContinue)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts);
     if (trace != null) trace.args(isClient);
     this.lastSIL = this;
-    if (isClient && !isSuppressUploadContinue)
-      FileLobUp.restoreState();
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**

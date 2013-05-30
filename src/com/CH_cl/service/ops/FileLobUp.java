@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.ops;
 
@@ -39,15 +39,15 @@ import java.util.ArrayList;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- *
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+*
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FileLobUp {
 
   private static final boolean DEBUG_CONSOLE = false;
@@ -85,7 +85,7 @@ public class FileLobUp {
   private boolean isSealed;
   private boolean isSigned;
   private boolean isEncryptExcempt;
-  private boolean isUploaded;
+  private boolean isDone;
   private boolean isUploadInProgress;
   private boolean isInterrupted;
   private String interruptedMsg;
@@ -228,20 +228,44 @@ public class FileLobUp {
     if (trace != null) trace.exit(FileLobUp.class);
   }
 
+  /**
+  * Restores only the items that are not already in our lists.
+  * Its safe to call restoreState multiple times or each time re-login completes for different user.
+  */
   public static void restoreState() {
     synchronized (stateMonitor) {
       String state = GlobalProperties.getProperty(PROPERTY_NAME);
       if (state != null && state.length() > 0) {
         try {
-          stateLocalL = (ArrayList) ArrayUtils.strToObj(state);
-          workersL = new ArrayList();
-          // Important to keep single copy of states because we are editing them too.
-          // Important to keep them in seperate instances of lists because they will change independently.
-          stateDriveL = new ArrayList(stateLocalL);
-          for (int i=0; i<stateLocalL.size(); i++) {
-            Object[] set = (Object[]) stateLocalL.get(i);
-            FileLobUp worker = new FileLobUp((String) set[0], (Long) set[1], (Long) set[2], (byte[]) set[3], (Long) set[4], (String) set[5], (byte[]) set[6]);
-            workersL.add(worker);
+          ArrayList tmpStatesL = (ArrayList) ArrayUtils.strToObj(state);
+          // Go through the list and create the missing workers only, ignore repetitive states.
+          for (int i=0; i<tmpStatesL.size(); i++) {
+            Object[] set = (Object[]) tmpStatesL.get(i);
+            Long fileLinkId= (Long) set[1];
+            // Look for existing states in HD represented list and RAM list.
+            Object[] prevDriveSet = findState(stateDriveL, fileLinkId);
+            Object[] prevLocalSet = findState(stateLocalL, fileLinkId);
+            // If any of the previous states are NULL, then we'll add it and create a worker.
+            if (prevLocalSet == null || prevDriveSet == null) {
+              // If prev HD set found, then use it, else use the restored one. No point checking 'Local' if 'Drive' does not exist.
+              if (prevDriveSet != null)
+                set = prevDriveSet;
+              // Restore the set into the 'Local' and 'HD' lists.
+              // Important to keep single copy of states 'set' Objects instead of clones, because we are editing them too and we want the 'Local' and 'Drive' lists to hold synchronized sets.
+              // Important to keep them in seperate instances of lists because the lists will change independently.
+              if (prevLocalSet == null) {
+                if (stateLocalL == null) stateLocalL = new ArrayList();
+                stateLocalL.add(set);
+              }
+              if (prevDriveSet == null) {
+                if (stateDriveL == null) stateDriveL = new ArrayList();
+                stateDriveL.add(set);
+              }
+              // Once the state lists are updated, create the worker.
+              if (workersL == null) workersL = new ArrayList();
+              FileLobUp worker = new FileLobUp((String) set[0], (Long) set[1], (Long) set[2], (byte[]) set[3], (Long) set[4], (String) set[5], (byte[]) set[6]);
+              workersL.add(worker);
+            }
           }
         } catch (Throwable t) {
           if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
@@ -249,6 +273,37 @@ public class FileLobUp {
         }
       }
     }
+  }
+
+  public static void restoreStateDelayed(long delayMillis) {
+    if (delayMillis <= 0)
+      restoreState();
+    else {
+      final java.util.Timer timer = new java.util.Timer("FileLobUp delayed restorer", true);
+      timer.schedule(new java.util.TimerTask() {
+        public void run() {
+          FileLobUp.restoreState();
+          timer.cancel();
+        }
+      }, delayMillis);
+    }
+  }
+
+  private static Object[] findState(ArrayList statesL, Long fileLinkId) {
+    Object[] set = null;
+    synchronized (stateMonitor) {
+      if (statesL != null && fileLinkId != null) {
+        for (int i=0; i<statesL.size(); i++) {
+          Object[] s = (Object[]) statesL.get(i);
+          Long linkId = (Long) s[1];
+          if (fileLinkId.equals(linkId)) {
+            set = s;
+            break;
+          }
+        }
+      }
+    }
+    return set;
   }
 
   private static void saveAndStoreState() {
@@ -288,26 +343,30 @@ public class FileLobUp {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
           Object token = new Object();
           if (arbiter.putToken(arbiterKeySeal, token)) {
-            boolean isCompleted = false;
-            while (!isCompleted && !isInterrupted) {
-              try {
-                if (isSigned)
-                  isCompleted = doEncryption(ServerInterfaceLayer.lastSIL);
-                else if (ServerInterfaceLayer.lastSIL.isLoggedIn())
-                  isCompleted = doEncryption(ServerInterfaceLayer.lastSIL);
-              } catch (Throwable t) {
-                if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
-                if (trace != null) trace.exception(getClass(), 100, t);
-              } finally {
-                if (isCompleted) {
-                  arbiter.removeToken(arbiterKeySeal, token);
-                } else if (!isInterrupted) {
-                  // Any exception or failure should hit this delay before retrying.
-                  if (trace != null) trace.data(200, "waiting to retry in triggerEncryption()");
-                  try { Thread.sleep(3000); } catch (InterruptedException interX) { }
-                  if (trace != null) trace.data(201, "woke up from waiting to retry in triggerEncryption()");
+            try {
+              boolean isCompleted = false;
+              while (!isCompleted && !isInterrupted) {
+                try {
+                  if (isSigned)
+                    isCompleted = doEncryption(ServerInterfaceLayer.lastSIL);
+                  else if (ServerInterfaceLayer.lastSIL.isLoggedIn())
+                    isCompleted = doEncryption(ServerInterfaceLayer.lastSIL);
+                } catch (Throwable t) {
+                  if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
+                  if (trace != null) trace.exception(getClass(), 100, t);
+                } finally {
+                  if (isCompleted) {
+                    // ok to exit
+                  } else if (!isInterrupted) {
+                    // Any exception or failure should hit this delay before retrying.
+                    if (trace != null) trace.data(200, "waiting to retry in triggerEncryption()");
+                    try { Thread.sleep(5000); } catch (InterruptedException interX) { }
+                    if (trace != null) trace.data(201, "woke up from waiting to retry in triggerEncryption()");
+                  }
                 }
               }
+            } finally {
+              arbiter.removeToken(arbiterKeySeal, token);
             }
           }
           if (trace != null) trace.exit(getClass());
@@ -322,7 +381,7 @@ public class FileLobUp {
   private void triggerUploading(final long startFromByte) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "triggerUploading()");
     if (trace != null) trace.args(startFromByte);
-    if (!isUploaded && !isUploadInProgress) {
+    if (!isDone && !isUploadInProgress) {
       Thread th = new ThreadTraced(new Runnable() {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
@@ -342,24 +401,23 @@ public class FileLobUp {
               long DELAY_FAILURE_MIN = 5 * 1000L;
               long DELAY_FAILURE_MAX = 10 * 60 * 1000L;
               long delayFailure = DELAY_FAILURE_MIN;
-              while (!isUploaded) {
+              while (!isDone) {
                 long timeStart = System.currentTimeMillis();
                 try {
                   if (DEBUG_CONSOLE) System.out.println("doUpload: trigger for "+plainDataFile);
                   if (trace != null) trace.data(10, "doUpload: trigger", plainDataFile);
                   // If retrying start from unknown byte count.
                   if (ServerInterfaceLayer.lastSIL.isLoggedIn()) {
-                    isUploaded = doUpload(isRetry ? -1 : startFromByte);
+                    isDone = doUpload(isRetry ? -1 : startFromByte);
                   }
                 } catch (Throwable t) {
                   if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
                   if (trace != null) trace.exception(getClass(), 100, t);
                 } finally {
-                  if (isUploaded) {
+                  if (isDone) {
                     if (DEBUG_CONSOLE) System.out.println("doUpload: completion in triggerUploading()");
                     if (trace != null) trace.data(110, "doUpload: trigger completed", plainDataFile);
                     isUploadInProgress = false;
-                    arbiter.removeToken(arbiterKeyUpload, token);
                   } else {
                     if (DEBUG_CONSOLE) System.out.println("doUpload: trigger will retry for "+plainDataFile);
                     if (trace != null) trace.data(120, "doUpload: trigger will retry", plainDataFile);
@@ -383,6 +441,8 @@ public class FileLobUp {
               // remove cache listeners after upload exits
               try { cache.removeFileLinkRecordListener(fileListener); } catch (Throwable t) { }
               try { cache.removeMsgLinkRecordListener(msgListener); } catch (Throwable t) { }
+              // remove arbiter's token
+              arbiter.removeToken(arbiterKeyUpload, token);
             }
           }
           if (trace != null) trace.exit(getClass());
@@ -418,12 +478,12 @@ public class FileLobUp {
   }
 
   /**
-   * Synchronized block that takes care of "sealing" and "signing"
-   * Synchronized because two different threads may call it...
-   * @param SIL
-   * @return
-   * @throws FileNotFoundException
-   */
+  * Synchronized block that takes care of "sealing" and "signing"
+  * Synchronized because two different threads may call it...
+  * @param SIL
+  * @return
+  * @throws FileNotFoundException
+  */
   private synchronized boolean doEncryption(ServerInterfaceLayer SIL) throws FileNotFoundException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "doEncryption(ServerInterfaceLayer SIL)");
     if (!isEncryptExcempt && (!isSealed || !isSigned)) {
@@ -617,7 +677,7 @@ public class FileLobUp {
           if (DEBUG_CONSOLE) System.out.println("doUpload: got encrypted data stream for "+plainDataFile+" fileLinkId="+fileLink.fileLinkId+" fileId="+fileLink.fileId+" starting point is "+startFromByte);
           if (startFromByte > 0) {
             long skipped = 0;
-            byte[] buffer = new byte[4*1024];
+            byte[] buffer = new byte[32*1024];
             while (skipped < startFromByte) {
               skipped += dEncStream.read(buffer, 0, (int) Math.min(startFromByte - skipped, buffer.length));
             }
@@ -687,9 +747,9 @@ public class FileLobUp {
         cleanupFiles();
       }
     }
-    boolean isDone = notOriginator || authorizationFailed || (isCompletedTransfer && isSigned) || isInterrupted;
-    if (trace != null) trace.exit(FileLobUp.class, isDone);
-    return isDone;
+    boolean isAllDone = notOriginator || authorizationFailed || (isCompletedTransfer && isSigned) || isInterrupted;
+    if (trace != null) trace.exit(FileLobUp.class, isAllDone);
+    return isAllDone;
   }
 
   private void resetUpload(ServerInterfaceLayer SIL) {
@@ -1018,9 +1078,9 @@ public class FileLobUp {
   }
 
   /**
-   * Checks with the engine if we still have UPLOAD privilege to it,
-   * if not then interrupts the UPLOAD.
-   */
+  * Checks with the engine if we still have UPLOAD privilege to it,
+  * if not then interrupts the UPLOAD.
+  */
   private void checkFileAccessForInterrupt(final ServerInterfaceLayer SIL) {
     Thread th = new ThreadTraced(new Runnable() {
       public void run() {
@@ -1144,7 +1204,7 @@ public class FileLobUp {
         } else if (count == 0) {
           // not EOF and no bytes?? wait a little
           if (trace != null) trace.data(200, "waiting for data - not EOF and no bytes", "FileAppendingInputStream.read(byte[] b, int off, int len)");
-          try { Thread.sleep(1); } catch (InterruptedException e) { }
+          try { Thread.sleep(5); } catch (InterruptedException e) { }
           if (trace != null) trace.data(201, "woke up from waiting for data - not EOF and no bytes - going into retry", "FileAppendingInputStream.read(byte[] b, int off, int len)");
         } else {
           break;

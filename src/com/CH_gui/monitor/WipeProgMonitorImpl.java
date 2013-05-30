@@ -182,15 +182,7 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "actionPerformed(ActionEvent event)");
         if (trace != null) trace.args(event);
         if (trace != null) trace.data(10, name);
-        cancelled = true;
-        Interruptible ourInterrupt = interrupt;
-        if (allDone || jobKilled) {
-          closeProgMonitor();
-        }
-        else if (ourInterrupt != null) {
-          closeProgMonitor();
-          ourInterrupt.interrupt();
-        }
+        interruptAndCancel();
         if (trace != null) trace.exit(getClass());
       }
     });
@@ -511,6 +503,15 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     }
     if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
+  public String getLastStatusInfo() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "getLastStatusInfo()");
+    String lastStatus = jStatus.getText();
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class, lastStatus);
+    return lastStatus;
+  }
+  public String getLastStatusTitle() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
   public void setCurrentStatus(String currentStatus) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setCurrentStatus(String currentStatus)");
     if (trace != null) trace.args(currentStatus);
@@ -544,6 +545,11 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(WipeProgMonitorImpl.class, totalBytes);
     return totalBytes;
+  }
+  public long getTransferSize() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "getTransferSize()");
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class, totalTransferSize);
+    return totalTransferSize;
   }
   public void setTransferSize(long size) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "setTransferSize(long size)");
@@ -658,6 +664,19 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
   }
 
   public void setCancellable(Cancellable cancellable) {
+  }
+
+  public void interruptAndCancel() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(WipeProgMonitorImpl.class, "interruptAndCancel()");
+    cancelled = true;
+    Interruptible ourInterrupt = interrupt;
+    if (allDone || jobKilled) {
+      closeProgMonitor();
+    } else if (ourInterrupt != null) {
+      closeProgMonitor();
+      ourInterrupt.interrupt();
+    }
+    if (trace != null) trace.exit(WipeProgMonitorImpl.class);
   }
 
   public boolean isJobKilled() {

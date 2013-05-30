@@ -18,6 +18,7 @@ import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.EngineFinder;
 import com.CH_cl.service.engine.LoginCoordinatorI;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.FileLobUp;
 import com.CH_cl.service.ops.UserOps;
 import com.CH_co.cryptx.*;
 import com.CH_co.monitor.ProgMonitorFactory;
@@ -1681,6 +1682,10 @@ public class LoginFrame extends JFrame {
         LoginFrame.this.setVisible(false);
         boolean isLoginSuccess = performLogin();
         if (isLoginSuccess) {
+          // Restore any prior uploads giving some time to other supporting login queries to complete.
+          // Delay is for smoother login experience, not necessary for any flow dependency.
+          FileLobUp.restoreStateDelayed(3000);
+          // dismiss GUI and complete
           LoginFrame.this.closeFrame();
           loginCoordinator.loginComplete(MainFrame.getServerInterfaceLayer(), true);
           UserRecord myUser = FetchedDataCache.getSingleInstance().getUserRecord();
@@ -1734,7 +1739,8 @@ public class LoginFrame extends JFrame {
           hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_3));
           hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, false, URLs.get(URLs.DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1));
         }
-        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true, false));
+        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true));
+        FileLobUp.restoreStateDelayed(5000);
       } catch (Throwable t) {
         t.printStackTrace();
       }

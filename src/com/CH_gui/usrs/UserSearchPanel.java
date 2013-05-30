@@ -415,7 +415,7 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
 
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          if (UserSearchPanel.this.isVisible()) {
+          if (UserSearchPanel.this.isVisible() && UserSearchPanel.this.isDisplayable()) {
             boolean querySatisfied = false;
             if (replyAction instanceof UsrAGetHandles) {
               UsrAGetHandles handlesAction = (UsrAGetHandles) replyAction;
@@ -446,7 +446,8 @@ public class UserSearchPanel extends JPanel implements ToolBarProducerI {
                   jRadioPartial.setSelected(true);
                   request.handleMode = 2;
                 }
-                runTraced(false);
+                // start another thread, to get out of this AWT-Thread
+                new UserSearchRunner(request, false).start();
               } else {
                 if (emailInvitationPanel != null && request.handle != null && request.handle.length() > 0) {
                   String line1 = "No user accounts found to match your search.";

@@ -345,20 +345,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "actionPerformed(ActionEvent event)");
         if (trace != null) trace.args(event);
         if (trace != null) trace.data(10, name);
-
-        cancelled = true;
-
-        Cancellable ourCancellable = cancellable;
-        if (ourCancellable != null)
-          ourCancellable.setCancelled();
-
-        Interruptible ourInterrupt = interrupt;
-        if (allDone || jobKilled) {
-          closeProgMonitor();
-        } else if (ourInterrupt != null) {
-          closeProgMonitor();
-          ourInterrupt.interrupt();
-        }
+        interruptAndCancel();
         if (trace != null) trace.exit(getClass());
       }
     });
@@ -686,6 +673,15 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     Stats.stopGlobe(this);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
+  public String getLastStatusInfo() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "getLastStatusInfo()");
+    String lastStatus = jStatus1.getText();
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class, lastStatus);
+    return lastStatus;
+  }
+  public String getLastStatusTitle() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
   public void setCurrentStatus(String currentStatus) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setCurrentStatus(String currentStatus)");
     if (trace != null) trace.args(currentStatus);
@@ -719,6 +715,12 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.data(10, name);
     if (trace != null) trace.exit(TransferProgMonitorImpl.class, totalBytes);
     return totalBytes;
+  }
+  public long getTransferSize() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "getTransferSize()");
+    if (trace != null) trace.data(10, name);
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class, totalTransferSize);
+    return totalTransferSize;
   }
   public void setTransferSize(long size) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "setTransferSize(long size)");
@@ -866,6 +868,22 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }
 
+  public boolean isMonitoringDownload() {
+    return monitoringType == MONITORING_DOWNLOAD || monitoringType == MONITORING_OPEN;
+  }
+
+  public boolean isMonitoringOpen() {
+    return monitoringType == MONITORING_OPEN;
+  }
+
+  public void setOpenWhenFinished(boolean flag) {
+    if (isMonitoringDownload()) {
+      monitoringType = flag ? MONITORING_OPEN : MONITORING_DOWNLOAD;
+    } else {
+      throw new IllegalStateException("Cannot set 'open' flag when not in download mode.");
+    }
+  }
+
   public boolean isAllDone() {
     return allDone;
   }
@@ -884,6 +902,22 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (cancelled) {
       closeProgMonitor();
       cancellable.setCancelled();
+    }
+    if (trace != null) trace.exit(TransferProgMonitorImpl.class);
+  }
+
+  public void interruptAndCancel() {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TransferProgMonitorImpl.class, "interruptAndCancel()");
+    cancelled = true;
+    Cancellable ourCancellable = cancellable;
+    if (ourCancellable != null)
+      ourCancellable.setCancelled();
+    Interruptible ourInterrupt = interrupt;
+    if (allDone || jobKilled) {
+      closeProgMonitor();
+    } else if (ourInterrupt != null) {
+      closeProgMonitor();
+      ourInterrupt.interrupt();
     }
     if (trace != null) trace.exit(TransferProgMonitorImpl.class);
   }

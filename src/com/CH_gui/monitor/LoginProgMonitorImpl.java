@@ -266,6 +266,12 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
     Stats.stopGlobe(this);
     if (trace != null) trace.exit(LoginProgMonitorImpl.class);
   }
+  public String getLastStatusInfo() {
+    return jStatus.getText();
+  }
+  public String getLastStatusTitle() {
+    return title;
+  }
   public void setCurrentStatus(String currentStatus) {
     jStatus.setText(currentStatus);
   }
@@ -276,6 +282,9 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
   public void setFilePathDestination(String filePath) {
   }
   public long getTransferred() {
+    return -1;
+  }
+  public long getTransferSize() {
     return -1;
   }
   public void setTransferSize(long size) {
@@ -339,6 +348,10 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
   }
 
   public void setCancellable(Cancellable cancellable) {
+  }
+
+  public void interruptAndCancel() {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   public boolean isJobKilled() {

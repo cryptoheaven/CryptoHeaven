@@ -215,7 +215,7 @@ public class SpeedLimiter extends Object {
       // avoid division by 0
       long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
 
-      // Update when rate changes more than 30% or is 1 second since last update has passed.
+      // Update when rate changes more than 30% or if 1 second since last update has passed.
       // Don't update if the global counter has started less than 600 ms ago
       if (elapsedMillis > 600) {
         if (byteRate > (lastUpdateRate * 1.3) || byteRate < (lastUpdateRate / 1.3) ||
@@ -236,7 +236,7 @@ public class SpeedLimiter extends Object {
       // avoid division by 0
       long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
 
-      // Update when rate changes more than 30% or is 1 second since last update has passed.
+      // Update when rate changes more than 30% or if 1 second since last update has passed.
       // Don't update if the global counter has started less than 600 ms ago
       if (elapsedMillis > 600) {
         if (byteRate > (lastUpdateRateIn * 1.3) || byteRate < (lastUpdateRateIn / 1.3) ||
@@ -257,7 +257,7 @@ public class SpeedLimiter extends Object {
       // avoid division by 0
       long byteRate = elapsedMillis > 0 ? (long) (totalBytes / (elapsedMillis / 1000.0)) : 0;
 
-      // Update when rate changes more than 30% or is 1 second since last update has passed.
+      // Update when rate changes more than 30% or if 1 second since last update has passed.
       // Don't update if the global counter has started less than 600 ms ago
       if (elapsedMillis > 600) {
         if (byteRate > (lastUpdateRateOut * 1.3) || byteRate < (lastUpdateRateOut / 1.3) ||

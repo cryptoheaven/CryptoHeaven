@@ -267,32 +267,32 @@ public class AccountOptionsDialog extends GeneralDialog {
         // Perform GUI updates in a GUI-safe-thread
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
-            // userRecord was updated with the fetched record and merged together
-            jPanelQuotas.updateQuotas(storageUsedF, transferUsedF, accountsUsedF);
+            if (AccountOptionsDialog.this.isVisible() && AccountOptionsDialog.this.isDisplayable()) {
+              // userRecord was updated with the fetched record and merged together
+              jPanelQuotas.updateQuotas(storageUsedF, transferUsedF, accountsUsedF);
 
-            if (userRecords.length == 1 && userRecords[0].defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
-              EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
-              String emlFull = emlRec.getEmailAddressFull();
-              defaultEmail = emlFull.toLowerCase();
-              jDefaultEmail.setText(emlFull);
-              if (emlFull.length() > 0)
-                jDefaultEmail.setCaretPosition(0);
-              setEditableDefaultEmail(myUserRecord, emlRec);
+              if (userRecords.length == 1 && userRecords[0].defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
+                EmailRecord emlRec = cache.getEmailRecord(userRecords[0].defaultEmlId);
+                String emlFull = emlRec.getEmailAddressFull();
+                defaultEmail = emlFull.toLowerCase();
+                jDefaultEmail.setText(emlFull);
+                setEditableDefaultEmail(myUserRecord, emlRec);
+              }
+
+              // update checkboxes
+              checks.updateCheckBoxes(myUserRecord, userRecords);
+
+              // update responder panel
+              if (autoResponderRecord != null) {
+                jPanelResponder.initializeData(userRecords.length == 1 ? userRecords[0].autoResp : null, autoResponderRecord);
+              }
+
+              SysOps.checkExpiry();
+              SysOps.checkQuotas(storageUsedF, transferUsedF, accountsUsedF);
+
+              // buttons enablement after fetch is done
+              setEnabledButtons();
             }
-
-            // update checkboxes
-            checks.updateCheckBoxes(myUserRecord, userRecords);
-
-            // update responder panel
-            if (autoResponderRecord != null) {
-              jPanelResponder.initializeData(userRecords.length == 1 ? userRecords[0].autoResp : null, autoResponderRecord);
-            }
-
-            SysOps.checkExpiry();
-            SysOps.checkQuotas(storageUsedF, transferUsedF, accountsUsedF);
-
-            // buttons enablement after fetch is done
-            setEnabledButtons();
           }
         });
 
