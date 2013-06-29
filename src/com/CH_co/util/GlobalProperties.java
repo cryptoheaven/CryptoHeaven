@@ -307,8 +307,9 @@ public class GlobalProperties extends Object {
   // build 782 Upload/Download take context for attaching progress indicators.
   // build 784 Progress monitor changes to accommodate Android, several exception fixes based on crash reports
   // build 786 Fixes in background file uploads to prevent multiple workers competing for single file.
+  // build 788 Minor fixes based on exception reports
 
-  public static final short PROGRAM_BUILD_NUMBER = 786;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 788;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

@@ -224,6 +224,8 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
       event.rejectDrop();
     } catch (UnsupportedFlavorException ufe) {
       event.rejectDrop();
+    } catch (Throwable t) {
+      event.rejectDrop();
     }
     restoreOriginalSelection();
     event.getDropTargetContext().dropComplete(true);

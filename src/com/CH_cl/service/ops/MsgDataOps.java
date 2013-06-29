@@ -70,7 +70,10 @@ public class MsgDataOps extends Object {
   }
 
   public static String getSubjectReply(MsgDataRecord replyToData, int truncateShort) {
-    String subject = STR_RE + " " + eliminatePrefixes(replyToData.getSubject());
+    String oldSubject = replyToData.getSubject();
+    if (oldSubject == null)
+      oldSubject = "";
+    String subject = STR_RE + " " + eliminatePrefixes(oldSubject);
     if (truncateShort > 0 && subject.length() > truncateShort) {
       subject = subject.substring(0, truncateShort) + "...";
     }
@@ -78,22 +81,24 @@ public class MsgDataOps extends Object {
   }
 
   public static String eliminatePrefixes(String str) {
-    boolean changed = false;
-    while (true) {
-      str = str.trim();
-      if (str.startsWith(STR_RE + " ") || str.toUpperCase().startsWith(STR_RE.toUpperCase() + " ")) {
-        str = str.substring(STR_RE.length() + 1);
-        changed = true;
-      }
-      if (str.startsWith(STR_FWD + " ") || str.toUpperCase().startsWith(STR_FWD.toUpperCase() + " ")) {
-        str = str.substring(STR_FWD.length() + 1);
-        changed = true;
-      }
+    if (str != null) {
+      boolean changed = false;
+      while (true) {
+        str = str.trim();
+        if (str.startsWith(STR_RE + " ") || str.toUpperCase().startsWith(STR_RE.toUpperCase() + " ")) {
+          str = str.substring(STR_RE.length() + 1);
+          changed = true;
+        }
+        if (str.startsWith(STR_FWD + " ") || str.toUpperCase().startsWith(STR_FWD.toUpperCase() + " ")) {
+          str = str.substring(STR_FWD.length() + 1);
+          changed = true;
+        }
 
-      if (!changed)
-        break;
-      else
-        changed = false;
+        if (!changed)
+          break;
+        else
+          changed = false;
+      }
     }
     return str;
   }

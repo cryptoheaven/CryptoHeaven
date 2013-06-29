@@ -86,7 +86,6 @@ public class FileLobUp {
   private boolean isSigned;
   private boolean isEncryptExcempt;
   private boolean isDone;
-  private boolean isUploadInProgress;
   private boolean isInterrupted;
   private String interruptedMsg;
   private final Object interruptMonitor = new Object();
@@ -238,6 +237,9 @@ public class FileLobUp {
       if (state != null && state.length() > 0) {
         try {
           ArrayList tmpStatesL = (ArrayList) ArrayUtils.strToObj(state);
+          ArrayList prevWorkersL = new ArrayList();
+          if (workersL != null)
+            prevWorkersL.addAll(workersL);
           // Go through the list and create the missing workers only, ignore repetitive states.
           for (int i=0; i<tmpStatesL.size(); i++) {
             Object[] set = (Object[]) tmpStatesL.get(i);
@@ -267,6 +269,9 @@ public class FileLobUp {
               workersL.add(worker);
             }
           }
+          // re-trigger older workers in case they died from OutOfMemory or some runtime problem
+          for (int i=0; i<prevWorkersL.size(); i++)
+            ((FileLobUp) prevWorkersL.get(i)).triggerUploading(-1);
         } catch (Throwable t) {
           if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
           GlobalProperties.setProperty(PROPERTY_NAME, "");
@@ -381,7 +386,7 @@ public class FileLobUp {
   private void triggerUploading(final long startFromByte) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileLobUp.class, "triggerUploading()");
     if (trace != null) trace.args(startFromByte);
-    if (!isDone && !isUploadInProgress) {
+    if (!isDone) {
       Thread th = new ThreadTraced(new Runnable() {
         public void run() {
           Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "run()");
@@ -395,7 +400,6 @@ public class FileLobUp {
               msgListener = new MsgListener();
               cache.addFileLinkRecordListener(fileListener);
               cache.addMsgLinkRecordListener(msgListener);
-              isUploadInProgress = true;
               boolean isRetry = false;
               long QUICK_FAILURE = 10 * 1000L;
               long DELAY_FAILURE_MIN = 5 * 1000L;
@@ -417,7 +421,6 @@ public class FileLobUp {
                   if (isDone) {
                     if (DEBUG_CONSOLE) System.out.println("doUpload: completion in triggerUploading()");
                     if (trace != null) trace.data(110, "doUpload: trigger completed", plainDataFile);
-                    isUploadInProgress = false;
                   } else {
                     if (DEBUG_CONSOLE) System.out.println("doUpload: trigger will retry for "+plainDataFile);
                     if (trace != null) trace.data(120, "doUpload: trigger will retry", plainDataFile);
