@@ -66,6 +66,7 @@ public class HTTP_Socket extends Socket {
   private static int MIN_TIME_TO_WAIT_TO_REQUEST_REPLY__SOCKET = 1000;
   private static int MAX_TIME_TO_WAIT_TO_REQUEST_REPLY__HTTP = 5000;
   private static int MAX_TIME_TO_WAIT_TO_REQUEST_REPLY__SOCKET = 15000;
+  private static int SOCKET_READ_TIMEOUT = 20000; // larger than max socket request delay
   private static int TIME_TO_WAIT_WHEN_BACKLOG = 1000;
   private static double TIME_TO_WAIT_POWER = 1.2;
 
@@ -179,6 +180,10 @@ public class HTTP_Socket extends Socket {
           try {
             //System.out.print("Making socket to " + proxyHost + ":" + proxyPort + "... ");
             Socket s = new Socket(proxyHost, proxyPort);
+            try {
+              s.setSoTimeout(SOCKET_READ_TIMEOUT);
+            } catch (Throwable t) {
+            }
             //System.out.print(" made.");
             synchronized (socketReturnBuf) {
               if (socketTimeout[0]) {

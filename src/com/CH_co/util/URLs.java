@@ -264,7 +264,7 @@ public class URLs extends Object {
 
     REPLY_PAGE = i;
     customizationKeys[i] = "REPLY_PAGE";
-    customizationStrings[i] = get(HOME_PAGE) + "/ch/web-mail.jsp?uId="; i++;
+    customizationStrings[i] = get(HOME_PAGE) + "/ch/web-mail-frame.jsp?uId="; i++;
 
     SIGNUP_PAGE = i;
     customizationKeys[i] = "SIGNUP_PAGE";
