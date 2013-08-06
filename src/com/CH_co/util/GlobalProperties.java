@@ -308,8 +308,9 @@ public class GlobalProperties extends Object {
   // build 784 Progress monitor changes to accommodate Android, several exception fixes based on crash reports
   // build 786 Fixes in background file uploads to prevent multiple workers competing for single file.
   // build 788 Minor fixes based on exception reports
+  // build 790 Enable Socket-Timeout for sockets connecting to the engine, support I/O cancellation via ProgMonitor for moving data between streams.
 
-  public static final short PROGRAM_BUILD_NUMBER = 788;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 790;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

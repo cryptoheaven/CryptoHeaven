@@ -325,16 +325,22 @@ public class FileUtils extends Object {
 
     // while not EOF
     while (charsRead != -1) {
-
       charsRead = in.read(buf);
+      if (charsRead >= 0) {
+        if (progressMonitor != null && progressMonitor.isCancelled())
+          throw new InterruptedIOException("I/O Cancelled");
+      }
       if (charsRead > 0) {
         // not EOF
         // This can be a long operation, yield to others
         Thread.yield();
         out.write(buf, 0, charsRead);
 
-        if (progressMonitor != null)
+        if (progressMonitor != null) {
+          if (progressMonitor.isCancelled())
+            throw new InterruptedIOException("I/O Cancelled");
           progressMonitor.addBytes(charsRead);
+        }
       } else if (charsRead == 0) {
         // not EOF and no bytes?? wait a little
         try { Thread.sleep(1); } catch (InterruptedException e) { }
