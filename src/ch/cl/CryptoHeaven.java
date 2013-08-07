@@ -14,7 +14,6 @@ package ch.cl;
 
 import com.CH_cl.service.ops.AutoUpdaterArgs;
 import com.CH_cl.util.GlobalSubProperties;
-import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import com.CH_co.cryptx.*;
 import com.CH_co.service.records.KeyRecord;
 import com.CH_co.service.records.UserRecord;

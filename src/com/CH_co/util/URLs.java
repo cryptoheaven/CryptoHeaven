@@ -420,14 +420,12 @@ public class URLs extends Object {
   }
 
   public static void loadPrivateLabel(String url) {
-    if (url == null || url.trim().length() == 0) {
-      loadDefaults();
-      // if no exception then set the new private label URL as default
-      PRIVATE_LABEL_SETTINGS_URL = null;
-    }
-    // load static customization
+    // reset first, in case the URL load fails, we have the initial values
+    loadDefaults();
+    PRIVATE_LABEL_SETTINGS_URL = null;
+    // next load static customization
     loadPrivateLabelFromClassDefaults();
-    // load dynamic customization
+    // last load dynamic customization
     if (url != null && url.trim().length() > 0) {
       try {
         URL u = new URL(url);
@@ -574,7 +572,6 @@ public class URLs extends Object {
       } catch (Throwable t) {
         System.out.println("Private Label NOT loaded, stack trace:");
         t.printStackTrace();
-        loadDefaults();
         throw new IllegalArgumentException("Error loading private label " + url + ", error message is " + t.getMessage());
       }
     }
