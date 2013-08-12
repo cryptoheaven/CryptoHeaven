@@ -1108,7 +1108,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       panel.add(listPane, new GridBagConstraints(0, posY, 2, 1, 10, 10,
           GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(10, 10, 10, 10), 0, 0));
       posY ++;
-      final JRadioButton jSendPlain = new JMyRadioButton("Send in Plain Text", false);
+      final JRadioButton jSendPlain = new JMyRadioButton("Send in Plain Text", true);
       //final JRadioButton jSendEncrypted = new JMyRadioButton("Send Encrypted with Question and Answer", false);
       final JRadioButton jSendEncrypted = new JMyRadioButton("Send Encrypted", false);
       final JCheckBox jQuestionAndAnswer = new JMyCheckBox("Encrypt with Question and Answer", false);
@@ -1194,41 +1194,23 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
           SwingUtilities.windowForComponent((Component) e.getSource()).dispose();
         }
       });
-      MessageDialog.showDialog(MsgComposePanel.this, panel, title, NotificationCenter.QUESTION_MESSAGE, buttons, null, true);
+      MessageDialog.showDialog(MsgComposePanel.this, panel, title, NotificationCenter.QUESTION_MESSAGE, buttons, 0, 0, null, true, true, true, true, null);
       if (trace != null) trace.exit(getClass(), okReturnBuffer[0]);
       return okReturnBuffer[0];
     }
     private void showRegularEmailWarningBeforeAndSend(final Record[] emlAddrs) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "showRegularEmailWarningBeforeAndSend(Record[] emlAddrs)");
       if (trace != null) trace.args(emlAddrs);
-      String hrefStart = "<a href=\""+URLs.get(URLs.TELL_A_FRIEND_PAGE)+"\">";
-      String hrefEnd = "</a>";
-      String warnMsg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Delivery_to_regular_email_recipients_will_be_send_through_unencrypted_mail..."), new Object[] {hrefStart, hrefEnd, hrefStart, hrefEnd});
+      String warnMsg = com.CH_cl.lang.Lang.rb.getString("msg_Delivery_to_regular_email_recipients_will_be_send_through_unencrypted_mail...");
       String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Regular_email_warning.");
-      JTextPane warnPane = new HTML_ClickablePane(warnMsg);
+      HTML_ClickablePane warnPane = new HTML_ClickablePane(warnMsg);
       JScrollPane warnScrollPane = new JScrollPane(warnPane);
-      warnPane.addMouseListener(new MouseAdapter() {
-        public void mouseClicked(MouseEvent e) {
-          if (!e.isConsumed()) {
-            StringBuffer initialEmails = new StringBuffer();
-            for (int i=0; i<emlAddrs.length; i++) {
-              String label = ListRenderer.getRenderedText(emlAddrs[i], false, false, false, false, false, true);
-              initialEmails.append(label);
-              if (i+1<emlAddrs.length)
-                initialEmails.append(", ");
-            }
-            Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);
-            if (w instanceof Dialog) new InviteByEmailDialog((Dialog) w, initialEmails.toString());
-            else if (w instanceof Frame) new InviteByEmailDialog((Frame) w, initialEmails.toString());
-            e.consume();
-          }
-        }
-      });
+      warnPane.setCaretPosition(0);
       JButton[] buttons = new JButton[3];
       buttons[0] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Always_Proceed"));
       buttons[1] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Proceed"));
       buttons[2] = new JMyButton(com.CH_cl.lang.Lang.rb.getString("button_Cancel"));
-      final JDialog warningDialog = MessageDialog.showDialog(MsgComposePanel.this, warnScrollPane, title, NotificationCenter.WARNING_MESSAGE, buttons, null, false);
+      final JDialog warningDialog = MessageDialog.showDialog(MsgComposePanel.this, warnScrollPane, title, NotificationCenter.WARNING_MESSAGE, buttons, 1, 2, null, false, true, true, true, null);
       warningDialog.addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
           setSendMessageInProgress(false);

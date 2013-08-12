@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.util;
 
@@ -18,21 +18,21 @@ import java.util.*;
 import com.CH_co.nanoxml.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.13 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.13 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class URLs extends Object {
 
   private static PrivateLabelI privateLabel;
@@ -64,8 +64,8 @@ public class URLs extends Object {
   public static int ACTIVATION_CODE_DEFAULT;
   public static int ACTIVATION_CODE_FIELD_REMOVED;
   /**
-   * @deprecated Server field is always initially hidden with option to show it
-   */
+  * @deprecated Server field is always initially hidden with option to show it
+  */
   public static int SERVER_FIELD_REMOVED;
   public static int NEW_ACCOUNT_BUTTON;
 
@@ -399,6 +399,22 @@ public class URLs extends Object {
       try {
         if (privateLabel.getSupportEmailBody() != null)
           customizationStrings[SUPPORT_BODY] = privateLabel.getSupportEmailBody();
+      } catch (Throwable t) { }
+      try {
+        if (privateLabel.getUrlFaq() != null)
+          customizationStrings[HELP_FAQ_PAGE] = privateLabel.getUrlFaq();
+      } catch (Throwable t) { }
+      try {
+        if (privateLabel.getUrlQuickTour() != null)
+          customizationStrings[HELP_QUICK_TOUR_PAGE] = privateLabel.getUrlQuickTour();
+      } catch (Throwable t) { }
+      try {
+        if (privateLabel.getUrlSignup() != null)
+          customizationStrings[SIGNUP_PAGE] = privateLabel.getUrlSignup();
+      } catch (Throwable t) { }
+      try {
+        if (privateLabel.getUrlUsersGuide() != null)
+          customizationStrings[HELP_USER_GUIDE_PAGE] = privateLabel.getUrlUsersGuide();
       } catch (Throwable t) { }
       try {
         if (privateLabel.getWelcomeEmailFrom() != null)

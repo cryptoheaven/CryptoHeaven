@@ -308,7 +308,6 @@ public class ImageNums extends Object {
 
   public static final int ANIM_SMALL_FIRST16;
   public static final int ANIM_SMALL16;
-  public static final int ANIM_KEY;
   public static final int ANIM_LOCK;
   public static final int ANIM_TRANSFER;
 
@@ -1215,8 +1214,6 @@ public class ImageNums extends Object {
     images[i] = "transparent16.png"; i++;
     ANIM_SMALL16 = i;
     images[i] = "anim-small16.gif"; i++;
-    ANIM_KEY = i;
-    images[i] = "anim_key.gif"; i++;
     ANIM_LOCK = i;
     images[i] = "anim_lock.gif"; i++;
     ANIM_TRANSFER = i;

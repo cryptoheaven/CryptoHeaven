@@ -96,7 +96,7 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
 
   private void initPanelComponents(String[] tasks, int initProgBarMin, int initProgBarMax, String infoNote) {
 
-    jImageLabel = new JMyLabel(Images.get(ImageNums.ANIM_KEY));
+    jImageLabel = new JMyLabel(Images.get(ImageNums.ANIM_TRANSFER));
     jImageLabel.setPreferredSize(new Dimension(110, 60));
 
     jCheckTasks = new JCheckBox[tasks.length];
@@ -301,7 +301,6 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
       if (currentTask >= 0 && currentTask < jCheckTasks.length) {
         MiscGui.setPlainFont(jCheckTasks[currentTask]);
         jCheckTasks[currentTask].setSelected(true);
-        jImageLabel.setIcon(Images.get(ImageNums.ANIM_TRANSFER));
       }
       currentTask ++;
       if (currentTask < jCheckTasks.length) {
