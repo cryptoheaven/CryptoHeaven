@@ -165,6 +165,13 @@ public class FolderOps extends Object {
             userIDsOfNeededKeysV.addElement(uId);
       }
     }
+    // Also check new owner's key, owner can be parent folders owner if inheriting from parent
+    {
+      KeyRecord kR = cache.getKeyRecordForUser(ownerUserId);
+      if (kR == null || kR.plainPublicKey == null)
+        if (!userIDsOfNeededKeysV.contains(ownerUserId))
+          userIDsOfNeededKeysV.addElement(ownerUserId);
+    }
     // We are lacking public KEYs, fetch them now.
     if (userIDsOfNeededKeysV.size() > 0) {
       SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, new Obj_IDList_Co(userIDsOfNeededKeysV)), 120000);
@@ -180,7 +187,7 @@ public class FolderOps extends Object {
         }
       } catch (Throwable t) {
         String title = "Fetch Error";
-        String msg = "Could not fetch user's Public Key.  Operation terminated.";
+        String msg = "Failed to create required folder access record, because user's Public Key is not available. User ID for which the keys could not be retrieved is "+ownerUserId;
         NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
         throw new RuntimeException(msg);
       }
@@ -188,6 +195,7 @@ public class FolderOps extends Object {
 
     for (int i=0; i<additionalShareCount; i++) {
       additionalShares[i].setFolderName(newShareName.trim());
+      Long shareOwnerId = additionalShares[i].ownerUserId;
       String desc = newShareDesc.trim();
       if (desc.length() > 0) {
         additionalShares[i].setFolderDesc(desc);
@@ -195,28 +203,34 @@ public class FolderOps extends Object {
         additionalShares[i].setFolderDesc(null);
       }
       if (additionalShares[i].isOwnedByUser()) {
-        KeyRecord kRec = cache.getKeyRecordForUser(additionalShares[i].ownerUserId);
-        // we should have the public key of the user, but check just in case
-        if (kRec != null) {
-          if (additionalShares[i].ownerUserId.equals(myUserId))
-            additionalShares[i].seal(cache.getUserRecord().getSymKeyFldShares());
-          else
-            additionalShares[i].seal(kRec);
+        if (shareOwnerId.equals(myUserId)) {
+          additionalShares[i].seal(cache.getUserRecord().getSymKeyFldShares());
         } else {
-          String title = "Fetch Error";
-          String msg = "Could not fetch user's Public Key to encrypt folder shares.  Operation terminated.";
-          NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
-          throw new RuntimeException(msg);
+          // we should have the public key of the user, but check just in case
+          KeyRecord kRec = cache.getKeyRecordForUser(shareOwnerId);
+          if (kRec != null) {
+            additionalShares[i].seal(kRec);
+          } else {
+            String title = "Fetch Error";
+            String msg = "Failed to create required folder access record, because user's Public Key required to encrypt this folder is not available. User ID for which the keys could not be retrieved is "+shareOwnerId;
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
+            throw new RuntimeException(msg);
+          }
         }
       } else {
         if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
-        FolderShareRecord groupShare = cache.getFolderShareRecordMy(additionalShares[i].ownerUserId, groupIDsSet);
+        FolderShareRecord groupShare = cache.getFolderShareRecordMy(shareOwnerId, groupIDsSet);
         // we should have the key of the group, but check just in case
         if (groupShare != null) {
           additionalShares[i].seal(groupShare.getSymmetricKey());
         } else {
           String title = "Fetch Error";
-          String msg = "Could not locate group's encryption key.  Operation terminated.";
+          String msg = null;
+          if (useInheritedSharing) {
+            msg = "Inheriting folder sharing properties requires access to all groups of the parent folder. You are not an authorized member of group ID "+shareOwnerId+" and you do not have the encryption keys required to create folders accessible by that group.";
+          } else {
+            msg = "Failed to create required folder access record, because group's encryption keys required to encrypt this folder are not available. You are not an authorized member of group ID "+shareOwnerId+" and you do not have the encryption keys required to create folders accessible by that group.";
+          }
           NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
           throw new RuntimeException(msg);
         }

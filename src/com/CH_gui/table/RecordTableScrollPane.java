@@ -41,6 +41,7 @@ import java.awt.event.ComponentEvent;
 import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
@@ -286,10 +287,12 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
         if (rec != null) {
           if (rec instanceof FileLinkRecord) {
             FileLinkRecord fLink = (FileLinkRecord) rec;
-            if (includeOlderVersions)
-              recordsL.addAll(recordTableModel.getAllVersions(fLink));
-            else
+            Collection all = null;
+            if (includeOlderVersions && (all=recordTableModel.getAllVersions(fLink)) != null && all.size() > 0) {
+              recordsL.addAll(all);
+            } else {
               recordsL.add(rec);
+            }
           } else {
             recordsL.add(rec);
           }

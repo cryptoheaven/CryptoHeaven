@@ -1498,7 +1498,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         if (isMove && sourceFolder != null) {
           FolderShareRecord sourceShare = cache.getFolderShareRecordMy(sourceFolder.folderId, true);
           FolderShareRecord chosenShare = chosenFolderPair.getFolderShareRecord();
-          if (sourceShare.canDelete.shortValue() == FolderShareRecord.YES && chosenShare.canWrite.shortValue() == FolderShareRecord.YES)
+          if (sourceShare != null && sourceShare.canDelete.shortValue() == FolderShareRecord.YES && chosenShare.canWrite.shortValue() == FolderShareRecord.YES)
             cache.removeMsgLinkRecords(mLinks);
         }
 

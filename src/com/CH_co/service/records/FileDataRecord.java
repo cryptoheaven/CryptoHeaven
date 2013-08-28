@@ -517,7 +517,6 @@ public class FileDataRecord extends Record {
       } // end if destinationFile != null
 
     } catch (Throwable t) {
-      t.printStackTrace();
       if (trace != null) trace.exception(FileDataRecord.class, 100, t);
 
       // cleanup encrypted file

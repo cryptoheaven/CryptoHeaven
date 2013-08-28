@@ -405,6 +405,11 @@ public class CacheMsgUtils {
 
       if (isForceOutputInHTMLPrintHeader || isForceOutputInHTMLBody || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         if (trace != null) trace.data(70, "making HTML header lines");
+        String dateCreated = "";
+        try {
+          dateCreated = new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated);
+        } catch (NullPointerException e) {
+        }
         content[0] = "text/html";
         content[1] =
             (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(TextRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
@@ -417,7 +422,7 @@ public class CacheMsgUtils {
             //(sbReplyTo != null ? ("<b>" + com.CH_gui.lang.Lang.rb.getString("column_Reply_To") + ":</b>  " + Misc.encodePlainIntoHtml(sbReplyTo.toString()) + " <br>") : "") +
             makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_To"), sb[SendMessageInfoProviderI.TO].toString(), isForceOutputInHTMLPrintHeader) +
             makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Cc"), sb[SendMessageInfoProviderI.CC].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated)), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(dateCreated), isForceOutputInHTMLPrintHeader) +
             makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
             (isForceOutputInHTMLPrintHeader ? "</table>" : "");
 
