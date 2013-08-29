@@ -1045,9 +1045,9 @@ public class FileLobUp {
         }
         if (!rounded) // round to next full hour
           seconds = (seconds / 3600) * 3600 + 3600;
-        long minutes = seconds / 60;
-        long hr = minutes / 60;
-        seconds %= 60;
+        long hr = (seconds / 60) / 60;
+        long minutes = (seconds / 60) - (hr * 60);
+        seconds = seconds - (hr * 60 * 60) - (minutes * 60);
         estimate = "Uploading: ";
         if (hr > 0) {
           estimate += hr + " hr ";
