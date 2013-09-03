@@ -122,7 +122,7 @@ public class MsgLinkOps {
 
   public synchronized static void addToLinkFetchQueue(ServerInterfaceLayer SIL, Long ownerLinkId, Long ownerObjId, short ownerType) {
     if (linkFetchQueue == null) {
-      linkFetchQueue = new QueueMM1("Link Fetch Queue", new QueueFetchProcessor());
+      linkFetchQueue = new QueueMM1("Msg Link Fetch Queue", new QueueFetchProcessor());
     }
     linkFetchQueue.getFifoWriterI().add(new Object[] { SIL, ownerLinkId, ownerObjId, new Short(ownerType) });
   }

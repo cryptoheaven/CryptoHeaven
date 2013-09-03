@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.io;
 
@@ -19,21 +19,21 @@ import com.CH_co.util.*;
 import java.io.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.19 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.19 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FileUtils extends Object {
 
 
@@ -54,11 +54,11 @@ public class FileUtils extends Object {
   }
 
   /**
-   * Reads serialized file from an input stream and creates a file with specified prefix
-   * and writes the data to that file.
-   * Does not close the input stream.
-   * If the originally written file had 0 bytes, a new File will be created with 0 bytes.
-   */
+  * Reads serialized file from an input stream and creates a file with specified prefix
+  * and writes the data to that file.
+  * Does not close the input stream.
+  * If the originally written file had 0 bytes, a new File will be created with 0 bytes.
+  */
   public static File unserializeFile(String newFilePrefix, DataInputStream2 in, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "unserializeFile(String, DataInputStream)");
     if (trace != null) trace.args(newFilePrefix);
@@ -122,15 +122,16 @@ public class FileUtils extends Object {
       throw ioEx;
     }
 
+    if (trace != null) trace.data(200, "unserializeFile done.");
     if (trace != null) trace.exit(FileUtils.class);
     return tempFile;
   }
 
 
   /**
-   * Serializes the contents of specified file into an output stream
-   * without closing the output stream.
-   */
+  * Serializes the contents of specified file into an output stream
+  * without closing the output stream.
+  */
   public static void serializeFile(File file, DataOutputStream2 out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "serializeFile(File file, DataOutputStream2 out, ProgMonitorI progressMonitor");
 
@@ -202,14 +203,15 @@ public class FileUtils extends Object {
       throw ioEx;
     }
 
+    if (trace != null) trace.data(200, "serializeFile done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 
 
   /**
-   * Moves specified number of bytes from an InputStream to an OutputStream.
-   * Flushes the output stream and does not close any of the streams.
-   */
+  * Moves specified number of bytes from an InputStream to an OutputStream.
+  * Flushes the output stream and does not close any of the streams.
+  */
   public static void moveData(DataInputStream in, OutputStream out, long dataLength, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, OutputStream, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
@@ -240,8 +242,9 @@ public class FileUtils extends Object {
       if (progressMonitor != null)
         progressMonitor.addBytes(remainder);
     }
-
     out.flush();
+
+    if (trace != null) trace.data(100, "moveData done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 
@@ -276,13 +279,14 @@ public class FileUtils extends Object {
         progressMonitor.addBytes(remainder);
     }
 
+    if (trace != null) trace.data(100, "moveData done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 
   /**
-   * Moves bytes from an InputStream to an OutputStream until EOF is reached.
-   * Flushes the output stream and does not close any of the streams.
-   */
+  * Moves bytes from an InputStream to an OutputStream until EOF is reached.
+  * Flushes the output stream and does not close any of the streams.
+  */
   public static void moveDataEOF(InputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(InputStream, OutputStream, ProgMonitor progressMonitor)");
 
@@ -308,14 +312,15 @@ public class FileUtils extends Object {
     } // end while
     out.flush();
 
+    if (trace != null) trace.data(100, "moveDataEOF done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 
 
   /**
-   * Moves characters from a Reader to a Writer until EOF is reached.
-   * Flushes the output writer and does not close any of the streams.
-   */
+  * Moves characters from a Reader to a Writer until EOF is reached.
+  * Flushes the output writer and does not close any of the streams.
+  */
   public static void moveDataEOF(Reader in, Writer out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(Reader, Writer, ProgMonitor progressMonitor)");
 
@@ -347,14 +352,16 @@ public class FileUtils extends Object {
       }
     } // end while
     out.flush();
+
+    if (trace != null) trace.data(100, "moveDataEOF done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 
   /**
-   * Moves bytes from an InputStream to an OutputStream until EOF is reached.
-   * Moves bytes in batches as data becomes available.
-   * Flushes the output stream and does not close any of the streams.
-   */
+  * Moves bytes from an InputStream to an OutputStream until EOF is reached.
+  * Moves bytes in batches as data becomes available.
+  * Flushes the output stream and does not close any of the streams.
+  */
   public static void moveDataStreamEOF(File fileIn, InputStream in, DataOutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataStreamEOF(File, InputStream, DataOutputStream, ProgMonitor progressMonitor)");
 
@@ -391,12 +398,13 @@ public class FileUtils extends Object {
     } // end while
     out.flush();
 
+    if (trace != null) trace.data(100, "moveDataStreamEOF done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 
   /**
-   * Reads bytes written by moveDataStreamEOF and writes them to an output stream.
-   */
+  * Reads bytes written by moveDataStreamEOF and writes them to an output stream.
+  */
   public static void readDataStreamEOF(DataInputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "readDataStreamEOF(DataInputStream in, OutputStream out, ProgMonitorI progressMonitor)");
 
@@ -417,6 +425,7 @@ public class FileUtils extends Object {
     }
     out.flush();
 
+    if (trace != null) trace.data(100, "readDataStreamEOF done.");
     if (trace != null) trace.exit(FileUtils.class);
   }
 }
