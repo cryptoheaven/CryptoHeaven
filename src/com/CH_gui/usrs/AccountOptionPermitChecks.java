@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_gui.usrs;
 
@@ -24,21 +24,21 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.21 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.21 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class AccountOptionPermitChecks extends Object {
 
   public JCheckBox jIncludeChangesToOptions;
@@ -220,6 +220,9 @@ public class AccountOptionPermitChecks extends Object {
 
 
   public JPanel createOptionsPanel(ChangeListener checkBoxListener, UserRecord myUserRecord, UserRecord[] userRecs) {
+    Long myFlags = myUserRecord.flags;
+    Long commonFlags = getMostCommonFlagsBits(userRecs);
+
     JPanel panel = new JPanel();
 
     panel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -260,37 +263,15 @@ public class AccountOptionPermitChecks extends Object {
     bottomPanel.setLayout(new GridBagLayout());
 
     int posY = 0;
-    
+
     jKeyOnServer = new JMyCheckBox(com.CH_cl.lang.Lang.rb.getString("check_Store_encrypted_Private_Key_on_the_server."));
-    jKeyOnServer.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        if (!jKeyOnServer.isSelected() && jPasswordReset.isSelected()) {
-          jKeyOnServer.setSelected(true);
-          MessageDialog.showWarningDialog(parent, "To remove private key from the server, you must have Password Reset and Key Recovery option disabled.", "Invalid selection.");
-        } else if (!jKeyOnServer.isSelected() && keyOnServerInitiallySelected) {
-          boolean rc = MessageDialog.showDialogYesNo(parent, "When you remove your private key from the server, access to your account will be restricted only to the single computer on which you store your private key.  Password Reset and Key Recovery features will be unavailable.  \n\nAre you sure you want to store your private key on this local computer?", "Confirmation");
-          jKeyOnServer.setSelected(!rc);
-          if (rc) {
-            jPasswordReset.setSelected(false);
-          }
-        }
-      }
-    });
     jKeyOnServerUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jKeyOnServer, jKeyOnServerUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jKeyOnServer, jKeyOnServerUpdate, myFlags, commonFlags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER, checkBoxListener, posY);
     posY ++;
 
     jPasswordReset = new JMyCheckBox("Enable Password Reset and Key Recovery");
-    jPasswordReset.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        if (jPasswordReset.isSelected() && !jKeyOnServer.isSelected()) {
-          jPasswordReset.setSelected(false);
-          MessageDialog.showWarningDialog(parent, "To enable Password Reset and Key Recovery feature, you must have Store encrypted Private Key on the server option enabled.", "Invalid selection.");
-        }
-      }
-    });
     jPasswordResetUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jPasswordReset, jPasswordResetUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jPasswordReset, jPasswordResetUpdate, myFlags, commonFlags, UserRecord.FLAG_ENABLE_PASSWORD_RESET_KEY_RECOVERY, checkBoxListener, posY);
     posY ++;
     if (!forSubAccounts) {
       jPasswordReset.setEnabled(false);
@@ -355,22 +336,22 @@ public class AccountOptionPermitChecks extends Object {
 
     jSecureReplyLink = new JMyCheckBox("Include secure reply link in external email.");
     jSecureReplyLinkUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jSecureReplyLink, jSecureReplyLinkUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, true, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jSecureReplyLink, jSecureReplyLinkUpdate, myFlags, commonFlags, UserRecord.FLAG_SKIP_SECURE_REPLY_LINK_IN_EXTERNAL_EMAILS, true, checkBoxListener, posY);
     posY ++;
 
     jUserOffline = new JMyCheckBox("Enable online status pop-up notifications.");
     jUserOfflineUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jUserOffline, jUserOfflineUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USER_ONLINE_STATUS_POPUP, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jUserOffline, jUserOfflineUpdate, myFlags, commonFlags, UserRecord.FLAG_USER_ONLINE_STATUS_POPUP, checkBoxListener, posY);
     posY ++;
 
     jUseEnterKeyChatSend = new JMyCheckBox("Use ENTER key to send messages during chat sessions.");
     jUseEnterKeyChatSendUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jUseEnterKeyChatSend, jUseEnterKeyChatSendUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jUseEnterKeyChatSend, jUseEnterKeyChatSendUpdate, myFlags, commonFlags, UserRecord.FLAG_USE_ENTER_TO_SEND_CHAT_MESSAGES, checkBoxListener, posY);
     posY ++;
 
     jAutoUpdates = new JMyCheckBox("Enable automatic software updates.");
     jAutoUpdatesUpdate = new JMyCheckBox();
-    addCheckBoxes(bottomPanel, includeUpdate, jAutoUpdates, jAutoUpdatesUpdate, myUserRecord.flags, getMostCommonFlagsBits(userRecs), UserRecord.FLAG_DISABLE_AUTO_UPDATES, true, checkBoxListener, posY);
+    addCheckBoxes(bottomPanel, includeUpdate, jAutoUpdates, jAutoUpdatesUpdate, myFlags, commonFlags, UserRecord.FLAG_DISABLE_AUTO_UPDATES, true, checkBoxListener, posY);
     posY ++;
 
 
@@ -381,6 +362,30 @@ public class AccountOptionPermitChecks extends Object {
     // insert the bottom portion of the panel
     panel.add(bottomPanel, new GridBagConstraints(0, 2, 1, 1, 10, 10,
         GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0,0,0,0), 0, 0));
+
+    // add listeners
+    jKeyOnServer.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (!jKeyOnServer.isSelected() && jPasswordReset.isSelected()) {
+          jKeyOnServer.setSelected(true);
+          MessageDialog.showWarningDialog(parent, "To remove private key from the server, you must have Password Reset and Key Recovery option disabled.", "Invalid selection.");
+        } else if (!jKeyOnServer.isSelected() && keyOnServerInitiallySelected) {
+          boolean rc = MessageDialog.showDialogYesNo(parent, "When you remove your private key from the server, access to your account will be restricted only to the single computer on which you store your private key.  Password Reset and Key Recovery features will be unavailable.  \n\nAre you sure you want to store your private key on this local computer?", "Confirmation");
+          jKeyOnServer.setSelected(!rc);
+          if (rc) {
+            jPasswordReset.setSelected(false);
+          }
+        }
+      }
+    });
+    jPasswordReset.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (jPasswordReset.isSelected() && !jKeyOnServer.isSelected()) {
+          jPasswordReset.setSelected(false);
+          MessageDialog.showWarningDialog(parent, "To enable Password Reset and Key Recovery feature, you must have Store encrypted Private Key on the server option enabled.", "Invalid selection.");
+        }
+      }
+    });
 
     return panel;
   }

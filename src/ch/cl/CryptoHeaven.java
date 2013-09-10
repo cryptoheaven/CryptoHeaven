@@ -222,15 +222,13 @@ public class CryptoHeaven extends Object {
         } else if (args[i].equals("-no-splash")) {
           skipSplashScreen = true;
         } else if (args[i].equals("-localKeyChangePass")) {
-          // Ability to recrypt locally stored keys for new name and password.
-          String sKeyId = args[i+1];
-          String oldName = args[i+2];
-          String oldPass = args[i+3];
-          String newName = args[i+4];
-          String newPass = args[i+5];
-          i += 5;
-
           try {
+            // Ability to recrypt locally stored keys for new name and password.
+            String sKeyId = args[i+1];
+            String oldName = args[i+2];
+            String oldPass = args[i+3];
+            String newName = args[i+4];
+            String newPass = args[i+5];
             // Check if the encrypted private part of the key is stored remotely... if so we will need to send an update.
             String keyPropertyName = "Enc" + RSAPrivateKey.OBJECT_NAME + "_" + sKeyId;
             GlobalSubProperties keyProperties = new GlobalSubProperties(GlobalSubProperties.PROPERTY_EXTENSION_KEYS);
@@ -258,11 +256,9 @@ public class CryptoHeaven extends Object {
           }
           System.exit(0);
         } else if (args[i].equals("-calcPassHash")) {
-          String handle = args[i+1];
-          String pass = args[i+2];
-          i += 2;
-          
           try {
+            String handle = args[i+1];
+            String pass = args[i+2];
             System.out.println("handle='"+handle+"'");
             System.out.println("password='"+pass+"'");
             BAEncodedPassword encPass = UserRecord.getBAEncodedPassword(pass.toCharArray(), handle);
