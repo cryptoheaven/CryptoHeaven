@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_cl.service.actions.file;
 
@@ -28,21 +28,21 @@ import com.CH_co.util.*;
 import java.io.File;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.10 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p>
+*
+* Class Description:
+*
+*
+* Class Details:
+*
+*
+* <b>$Revision: 1.10 $</b>
+* @author  Marcin Kurzawa
+* @version
+*/
 public class FileAGetFilesData extends ClientMessageAction {
 
   private File destinationDirectory;
@@ -58,9 +58,9 @@ public class FileAGetFilesData extends ClientMessageAction {
   }
 
   /**
-   * The action handler performs all actions related to the received message (reply),
-   * and optionally returns a request Message.  If there is no request, null is returned.
-   */
+  * The action handler performs all actions related to the received message (reply),
+  * and optionally returns a request Message.  If there is no request, null is returned.
+  */
   public MessageAction runAction() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileAGetFilesData.class, "runAction(Connection)");
 
@@ -105,8 +105,14 @@ public class FileAGetFilesData extends ClientMessageAction {
 
         try {
           BASymmetricKey symmetricKey = fileLinkRecord.getSymmetricKey();
-          if (symmetricKey == null)
+          if (symmetricKey == null) {
+            if (fileLinkRecord.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
+              MsgDataRecord parentData = cache.getMsgDataRecord(fileLinkRecord.ownerObjId);
+              if (parentData != null && parentData.bodyPassHash != null && parentData.getSymmetricBodyKey() == null)
+                throw new IllegalStateException("Please use the message password first to access the content. File symmetric key is not available without matching password.");
+            }
             throw new IllegalStateException("File symmetric key is not available.");
+          }
           // un-seal the data record -- create the plain version of encrypted file and verify signatures
           Boolean isDefaultTempDir = destinationDirectory != null && destinationDirectory.equals(DownloadUtilities.getDefaultTempDir()) ? Boolean.TRUE : Boolean.FALSE;
           fileDataRecord.unSeal(verifyingKeyRecord, symmetricKey,
@@ -125,10 +131,10 @@ public class FileAGetFilesData extends ClientMessageAction {
             setCancelled();
           } else {
             String msg = "Exception message is : " + t.getMessage() +
-                         "\n\nError occurred while decrypting and decompressing of file : " + fileLinkRecord.getFileName() +
-                         "\nThe attempted destination directory was : " + destinationDirectory.getAbsolutePath() +
-                         "\nThe private key for digest verification is : " + verifyingKeyRecord.verboseInfo() +
-                         "\nThe symmetric key for decryption of the file is : " + (fileLinkRecord.getSymmetricKey() != null ? fileLinkRecord.getSymmetricKey().verboseInfo() : null);
+                        "\n\nError occurred while decrypting and decompressing of file : " + fileLinkRecord.getFileName() +
+                        "\nThe attempted destination directory was : " + destinationDirectory.getAbsolutePath() +
+                        "\nThe private key for digest verification is : " + verifyingKeyRecord.verboseInfo() +
+                        "\nThe symmetric key for decryption of the file is : " + (fileLinkRecord.getSymmetricKey() != null ? fileLinkRecord.getSymmetricKey().verboseInfo() : null);
             String title = "Error Dialog";
             NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, title, msg);
           }

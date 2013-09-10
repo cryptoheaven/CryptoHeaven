@@ -147,8 +147,8 @@ public class EmailSendingAttOps extends Object {
    * Files are also unsealed and stored as plain files in the temporary filesystem.
    * @return msgRoot structure with unsealed message and file tree
    */
-  public static void unsealMessageWithAttachments(DefaultMutableTreeNode msgRoot, BASymmetricKey msgRootKey) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(EmailSendingAttOps.class, "unsealMessageWithAttachments(DefaultMutableTreeNode msgRoot, BASymmetricKey msgRootKey)");
+  public static void unsealMessageWithAttachments(DefaultMutableTreeNode msgRoot, BASymmetricKey msgRootKey, List bodyKeys) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(EmailSendingAttOps.class, "unsealMessageWithAttachments(DefaultMutableTreeNode msgRoot, BASymmetricKey msgRootKey, List bodyKeys)");
     if (trace != null) trace.args(msgRoot, msgRootKey);
     Enumeration enm = msgRoot.breadthFirstEnumeration();
     while (enm.hasMoreElements()) {
@@ -165,7 +165,7 @@ public class EmailSendingAttOps extends Object {
         data.decompressRecipients();
         if (parent == null) {
           link.setSymmetricKey(msgRootKey);
-          data.unSealWithoutVerify(msgRootKey, null);
+          data.unSealWithoutVerify(msgRootKey, bodyKeys);
         } else {
           Record[] parentRecs = (Record[]) parent.getUserObject();
           MsgLinkRecord parentLink = (MsgLinkRecord) parentRecs[0];
@@ -185,7 +185,7 @@ public class EmailSendingAttOps extends Object {
 
           if (unsealingKey != null) {
             link.unSeal(unsealingKey);
-            data.unSealWithoutVerify(link.getSymmetricKey(), null);
+            data.unSealWithoutVerify(link.getSymmetricKey(), bodyKeys);
           }
         }
       } else if (recs[0] instanceof FileLinkRecord) {

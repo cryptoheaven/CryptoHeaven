@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -81,6 +82,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
     if (destDir != null && msgs != null && msgs.length > 0) {
       try {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        List bodyKeys = cache.getMsgBodyKeys();
         for (int i=0; i<msgs.length; i++) {
           MsgLinkRecord msgLink = msgs[i];
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
@@ -95,7 +97,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
               DataAcquisitionHelperI dataHelper  = new DataAcquisitionHelperClient(SIL);
               DefaultMutableTreeNode msgRoot = EmailSendingAttOps.getMessageWithAttachments(dataHelper, cache.getMyUserId(), msgLink.msgLinkId);
               EmailSendingAttOps.fetchAllFileAttachments(dataHelper, msgRoot);
-              EmailSendingAttOps.unsealMessageWithAttachments(msgRoot, msgLink.getSymmetricKey());
+              EmailSendingAttOps.unsealMessageWithAttachments(msgRoot, msgLink.getSymmetricKey(), bodyKeys);
 
               String smtpHostProperty = null; // EngineGlobalProperties.PROP_EMAIL_SMTP_HOST;
               String smtpHostValue = null; //EngineGlobalProperties.getProperty(smtpHostProperty);

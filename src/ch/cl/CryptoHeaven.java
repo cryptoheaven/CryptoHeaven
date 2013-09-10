@@ -257,6 +257,22 @@ public class CryptoHeaven extends Object {
             System.out.println("Example: -localKeyChangePass 56789 \"John Blank\" oldpass \"John New\" newpass");
           }
           System.exit(0);
+        } else if (args[i].equals("-calcPassHash")) {
+          String handle = args[i+1];
+          String pass = args[i+2];
+          i += 2;
+          
+          try {
+            System.out.println("handle='"+handle+"'");
+            System.out.println("password='"+pass+"'");
+            BAEncodedPassword encPass = UserRecord.getBAEncodedPassword(pass.toCharArray(), handle);
+            System.out.println("PASSWORDHASH="+encPass.getHashValue());
+          } catch (Throwable t) {
+            System.out.println("Error: " + t.getMessage());
+            System.out.println("Arguments: -calcPassHash <handle> <password>");
+            System.out.println("Example: -calcPassHash \"John Blank\" \"2!.903jj3R\"");
+          }
+          System.exit(0);
         } else if (args[i].equals("-privateLabelURL")) {
           String privateLabelURL = args[i+1];
           i++;
