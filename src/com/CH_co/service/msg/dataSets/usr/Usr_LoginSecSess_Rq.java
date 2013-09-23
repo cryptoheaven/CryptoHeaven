@@ -1,14 +1,14 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
- *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
- */
+* Copyright 2001-2013 by CryptoHeaven Corp.,
+* Mississauga, Ontario, Canada.
+* All rights reserved.
+*
+* This software is the confidential and proprietary information
+* of CryptoHeaven Corp. ("Confidential Information").  You
+* shall not disclose such Confidential Information and shall use
+* it only in accordance with the terms of the license agreement
+* you entered into with CryptoHeaven Corp.
+*/
 
 package com.CH_co.service.msg.dataSets.usr;
 
@@ -24,15 +24,15 @@ import com.CH_co.trace.*;
 import com.CH_co.util.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p> 
- * 
- * Secure Seccion Login Request
- * @author  Marcin Kurzawa
- * @version 
- */
+* <b>Copyright</b> &copy; 2001-2013
+* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
+* CryptoHeaven Corp.
+* </a><br>All rights reserved.<p> 
+* 
+* Secure Seccion Login Request
+* @author  Marcin Kurzawa
+* @version 
+*/
 public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
   // <handle> <passwordHash> <sessionId> <clientVersion> <clientReleaseAndBuild> <sendPrivKey> [<locale-strings>]*
   public UserRecord userRecord;
@@ -47,6 +47,8 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
   public short clientBuild;
   public boolean sendPrivKey;
   public String invitedEmailAddress;
+  public String clientOS;
+
   public String[] clientLocale;
 
 
@@ -58,22 +60,24 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
 
   /** Creates new Usr_LoginSecSess_Rq */
   public Usr_LoginSecSess_Rq(UserRecord userRecord, long sessionId, float clientVersion, short clientRelease, boolean sendPrivKey) {
-    this(userRecord, sessionId, clientVersion, clientRelease, sendPrivKey, null);
+    this(userRecord, sessionId, clientVersion, clientRelease, sendPrivKey, null, null);
   }
-  public Usr_LoginSecSess_Rq(UserRecord userRecord, long sessionId, float clientVersion, short clientRelease, boolean sendPrivKey, String invitedEmailAddress) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Usr_LoginSecSess_Rq.class, "Usr_LoginSecSess_Rq(UserRecord userRecord, long sessionId, float clientVersion, short clientRelease, boolean sendPrivKey)");
+  public Usr_LoginSecSess_Rq(UserRecord userRecord, long sessionId, float clientVersion, short clientRelease, boolean sendPrivKey, String invitedEmailAddress, String clientOS) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Usr_LoginSecSess_Rq.class, "Usr_LoginSecSess_Rq(UserRecord userRecord, long sessionId, float clientVersion, short clientRelease, boolean sendPrivKey, String invitedEmailAddress, String clientOS)");
     if (trace != null) trace.args(userRecord);
     if (trace != null) trace.args(sessionId);
     if (trace != null) trace.args(clientVersion);
     if (trace != null) trace.args(clientRelease);
     if (trace != null) trace.args(sendPrivKey);
     if (trace != null) trace.args(invitedEmailAddress);
+    if (trace != null) trace.args(clientOS);
     this.userRecord = userRecord;
     this.sessionId = sessionId;
     this.clientVersion = clientVersion;
     this.clientRelease = clientRelease;
     this.sendPrivKey = sendPrivKey;
     this.invitedEmailAddress = invitedEmailAddress;
+    this.clientOS = clientOS;
     if (trace != null) trace.exit(Usr_LoginSecSess_Rq.class, this);
   }
 
@@ -102,6 +106,9 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
     }
     if (clientBuild >= 378) {
       dataOut.writeString(invitedEmailAddress);
+    }
+    if (clientBuild >= 794) {
+      dataOut.writeString(clientOS);
     }
     dataOut.write('\r');dataOut.write('\n');
 
@@ -134,6 +141,9 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
     if (this.clientBuild >= 378) {
       invitedEmailAddress = dataIn.readString();
     }
+    if (this.clientBuild >= 794) {
+      clientOS = dataIn.readString();
+    }
     // if \r\n was sent, read it too.
     if (dataIn.available() == 2) {
       dataIn.read();
@@ -148,13 +158,16 @@ public class Usr_LoginSecSess_Rq extends ProtocolMsgDataSet {
 
   public String toString() {
     return "[Usr_LoginSecSess_Rq"
-      + ": userRecord="     + userRecord
-      + ", sessionId="      + sessionId
-      + ", clientVersion="  + clientVersion
-      + ", clientRelease="  + clientRelease
-      + ", clientBuild="    + clientBuild
-      + ", sendPrivKey="    + sendPrivKey
-      + ", clientLocale="   + Misc.objToStr(clientLocale)
+      + ": handle="               + (userRecord != null ? userRecord.handle : "NULL")
+      + ", passwordHash="         + (userRecord != null ? ""+userRecord.passwordHash : "NULL")
+      + ", sessionId="            + sessionId
+      + ", clientVersion="        + clientVersion
+      + ", clientRelease="        + clientRelease
+      + ", clientBuild="          + clientBuild
+      + ", sendPrivKey="          + sendPrivKey
+      + ", invitedEmailAddress="  + invitedEmailAddress
+      + ", clientOS="             + clientOS
+      + ", clientLocale="         + Misc.objToStr(clientLocale)
       + "]";
   }
 
