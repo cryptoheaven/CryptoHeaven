@@ -71,6 +71,8 @@ public abstract class CommonSessionContext extends Object implements Interruptib
   public short serverBuild = 0;
   public Long lastReportedPingMS;
 
+  public String clientOS;
+
   private RSAKeyPair keyPairToReceiveWith;
   private RSAPublicKey publicKeyToSendWith;
 
