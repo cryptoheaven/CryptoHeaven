@@ -1548,7 +1548,28 @@ public class LoginFrame extends JFrame {
       uRec.passwordHash = ba.getHashValue();
       ba.clearContent();
 
-      login_request = new Usr_LoginSecSess_Rq(uRec, 0, GlobalProperties.PROGRAM_VERSION, GlobalProperties.PROGRAM_RELEASE, true, defaultSignupEmail);
+      String clientOS = "";
+      String info = "" + System.getProperty("os.name");
+      if (info == null || info.length() == 0) {
+        info = System.getProperty("http.agent");
+        if (info != null && info.length() > 0)
+          clientOS = "b";
+      }
+      if (info != null) {
+        info = info.toLowerCase();
+        if (info.contains("win"))
+          clientOS = "w";
+        else if (info.contains("mac"))
+          clientOS = "m";
+        else if (info.contains("linux"))
+          clientOS = "l";
+        else if (info.contains("unix"))
+          clientOS = "x";
+        else
+          clientOS = "-";
+      }
+
+      login_request = new Usr_LoginSecSess_Rq(uRec, 0, GlobalProperties.PROGRAM_VERSION, GlobalProperties.PROGRAM_RELEASE, true, defaultSignupEmail, clientOS);
 
       /* set new account request */
       if (isNewAccountDialog) {
