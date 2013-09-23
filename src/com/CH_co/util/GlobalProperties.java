@@ -310,8 +310,9 @@ public class GlobalProperties extends Object {
   // build 788 Minor fixes based on exception reports
   // build 790 Enable Socket-Timeout for sockets connecting to the engine, support I/O cancellation via ProgMonitor for moving data between streams.
   // build 792 Fixes for more detailed error message for creating folders that inherit from parent and creator has no access to all parent's share groups
+  // build 794 Send clientOS with login info
 
-  public static final short PROGRAM_BUILD_NUMBER = 792;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 794;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
