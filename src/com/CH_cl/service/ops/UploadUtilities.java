@@ -554,6 +554,8 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
       } catch (Throwable t) {
         if (trace != null) trace.exception(UploadRunner.class, 100, t);
       } finally {
+        // account for every exit
+        UploadDownloadSynch.exit();
         // After upload is done, remove the temporary files.
         for (int i=0; i<request.fileDataRecords.length; i++) {
           File encFile = request.fileDataRecords[i].getEncDataFile();
@@ -561,10 +563,6 @@ public class UploadUtilities extends Object { // implicit no-argument constructo
             GlobalProperties.addTempFileToCleanup(encFile);
         }
       }
-      // catch everything so we can decrement the counter properly
-
-      // account for every exit
-      UploadDownloadSynch.exit();
 
       lastReplyClass = replyClass;
       if (trace != null) trace.exit(UploadRunner.class, replyClass);

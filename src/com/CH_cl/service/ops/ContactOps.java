@@ -21,10 +21,7 @@ import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.cnt.Cnt_NewCnt_Rq;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
-import com.CH_co.service.records.ContactRecord;
-import com.CH_co.service.records.EmailRecord;
-import com.CH_co.service.records.KeyRecord;
-import com.CH_co.service.records.UserRecord;
+import com.CH_co.service.records.*;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.CallbackI;
@@ -97,35 +94,40 @@ public class ContactOps {
           FetchedDataCache cache = SIL.getFetchedDataCache();
           UserRecord myUser = cache.getUserRecord();
           Long myUserId = myUser.userId;
-          Long shareId = cache.getFolderShareRecordMy(myUser.contactFolderId, false).shareId;
-          BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
-          String contactReason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
 
-          for (int i=0; i<emailAddressesL.size(); i++) {
-            String emlAddr = (String) emailAddressesL.get(i);
-            EmailRecord emlRec = cache.getEmailRecord(emlAddr);
-            if (emlRec != null) {
-              Long contactWithId = emlRec.userId;
-              if (!myUserId.equals(contactWithId)) {
-                ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, contactWithId);
-                if (cRec == null) {
-                  // Check if we have user's public key, if not fetch it
-                  KeyRecord pubKey = cache.getKeyRecordForUser(contactWithId);
-                  if (pubKey == null) {
-                    Obj_IDList_Co request = new Obj_IDList_Co();
-                    request.IDs = new Long[] { contactWithId };
-                    MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-                    SIL.submitAndWait(msgAction, 60000);
+          if (myUserId != null) {
+            FolderShareRecord share = cache.getFolderShareRecordMy(myUser.contactFolderId, false);
+            if (share != null) {
+              Long shareId = share.shareId;
+              BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
+              String contactReason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
+              for (int i=0; i<emailAddressesL.size(); i++) {
+                String emlAddr = (String) emailAddressesL.get(i);
+                EmailRecord emlRec = cache.getEmailRecord(emlAddr);
+                if (emlRec != null) {
+                  Long contactWithId = emlRec.userId;
+                  if (!myUserId.equals(contactWithId)) {
+                    ContactRecord cRec = cache.getContactRecordOwnerWith(myUserId, contactWithId);
+                    if (cRec == null) {
+                      // Check if we have user's public key, if not fetch it
+                      KeyRecord pubKey = cache.getKeyRecordForUser(contactWithId);
+                      if (pubKey == null) {
+                        Obj_IDList_Co request = new Obj_IDList_Co();
+                        request.IDs = new Long[] { contactWithId };
+                        MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
+                        SIL.submitAndWait(msgAction, 60000);
+                      }
+                      Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
+                      request.shareId = shareId;
+                      request.contactRecord = new ContactRecord();
+                      request.contactRecord.contactWithId = contactWithId;
+                      request.contactRecord.setOwnerNote(emlAddr);
+                      request.contactRecord.setOtherNote(contactReason);
+                      request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
+                      request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
+                      SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
+                    }
                   }
-                  Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
-                  request.shareId = shareId;
-                  request.contactRecord = new ContactRecord();
-                  request.contactRecord.contactWithId = contactWithId;
-                  request.contactRecord.setOwnerNote(emlAddr);
-                  request.contactRecord.setOtherNote(contactReason);
-                  request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
-                  request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));
-                  SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
                 }
               }
             }

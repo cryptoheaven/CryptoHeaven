@@ -834,7 +834,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         public void runTraced() {
           ClientMessageAction msgAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(new MessageAction(CommandCodes.FLD_Q_RING_RING, new Obj_ID_Rq(_toFolderPair.getId())), 15000, 3);
           DefaultReplyRunner.runAction(msgAction);
-          if (msgAction.getActionCode() == CommandCodes.FLD_A_RING_RING) {
+          if (msgAction != null && msgAction.getActionCode() == CommandCodes.FLD_A_RING_RING) {
             Obj_List_Co reply = (Obj_List_Co) msgAction.getMsgDataSet();
             Object[] objs = reply.objs;
             Long[] distributionUserIDs = (Long[]) ArrayUtils.toArrayType((Object[]) objs[3], Long.class);

@@ -406,6 +406,9 @@ public class FileLobUp {
               long DELAY_FAILURE_MAX = 10 * 60 * 1000L;
               long delayFailure = DELAY_FAILURE_MIN;
               while (!isDone) {
+                // limit number of entries
+                UploadDownloadSynch.entry(ServerInterfaceLayer.lastSIL.getMaxHeavyWorkerCount());
+                // mark time
                 long timeStart = System.currentTimeMillis();
                 try {
                   if (DEBUG_CONSOLE) System.out.println("doUpload: trigger for "+plainDataFile);
@@ -418,6 +421,8 @@ public class FileLobUp {
                   if (DEBUG_CONSOLE) System.out.println(Misc.getStack(t));
                   if (trace != null) trace.exception(getClass(), 100, t);
                 } finally {
+                  // account for every exit
+                  UploadDownloadSynch.exit();
                   if (isDone) {
                     if (DEBUG_CONSOLE) System.out.println("doUpload: completion in triggerUploading()");
                     if (trace != null) trace.data(110, "doUpload: trigger completed", plainDataFile);

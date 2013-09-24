@@ -677,10 +677,10 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
         replyAction = SIL.submitAndFetchReply(msgAction, 0);
       } catch (Throwable t) {
         if (trace != null) trace.exception(DownloadFileRunner.class, 100, t);
+      } finally {
+        // account for every exit
+        UploadDownloadSynch.exit();
       }
-      // catch everything so we can decrement the counter properly
-      // account for every exit
-      UploadDownloadSynch.exit();
 
       if (replyAction instanceof FileAGetFilesData && replyAction.getActionCode() == CommandCodes.FILE_A_GET_FILES_DATA) {
         ((FileAGetFilesData)replyAction).setDestinationDirectory(destDir);
