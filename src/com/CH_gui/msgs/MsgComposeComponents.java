@@ -1168,23 +1168,16 @@ public class MsgComposeComponents extends Object implements DisposableObj {
               {"</html>", " "},
           }).toString();
       }
-      text =
-          "<html><body> " +
-          (addSignature ? signatureText : "") +
-          "<br>" +
-          "<table cellpadding='1' cellspacing='5' border='0'> " +
-            "<tr>" +
-              "<td align='left' valign='top' width='1' bgcolor='#666666'> " +
-              "</td>" +
-              "<td align='left' valign='top'> " +
-              com.CH_cl.lang.Lang.rb.getString("-----_Original_Message_-----") +
-              " <br>" +
-              content[1] + content[3] +
-              "</td> " +
-            "</tr> " +
-          "</table> " +
-          "<br>" +
-          "</body></html>";
+      text = "<html><body> " +
+              (addSignature ? signatureText : "") +
+              "<br>" +
+              "<div style=\"border:1px solid gray;padding: 10px\">" +
+                com.CH_cl.lang.Lang.rb.getString("-----_Original_Message_-----") +
+                "<br>" +
+                content[1] + content[3] +
+              "</div>" +
+              "<br>" +
+              "</body></html>";
       msgTypeArea.setHTML(true);
       msgTypeArea.setContentText(text, true, false, true);
     } else {

@@ -532,6 +532,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         boolean loginSuccessful = msgActionCode == CommandCodes.USR_A_LOGIN_SECURE_SESSION ||
                                   msgActionCode == CommandCodes.SYSNET_A_LOGIN ||
                                   msgActionCode == CommandCodes.SYS_A_LOGIN;
+        boolean loginFailedPermanent = msgActionCode == CommandCodes.USR_E_HANDLE_PASSWORD_COMBO_DNE ||
+                                      msgActionCode == CommandCodes.USR_E_USER_LOCKED_OUT;
+
+        // If permanent failure, nullify the login action to prevent re-tries.
+        if (loginFailedPermanent) {
+          workerManager.setLoginMsgAction(null);
+        }
 
         // If login was successful, then remember the login MessageAction.
         // We can do that because the writer is blocked until the streames become secured or they are unblocked by an login error action.

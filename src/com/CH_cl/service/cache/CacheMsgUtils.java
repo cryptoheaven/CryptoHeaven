@@ -468,9 +468,9 @@ public class CacheMsgUtils {
 
   private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
     if (htmlText != null && htmlText.length() > 0) {
-      return (isPrintHeader ? "<tr><td align='left' valign='top' width='100'><font size='-2'>" : "") +
+      return (isPrintHeader ? "<tr><td><font size='-2'>" : "") +
               "<b>" + name + ": </b>" +
-              (isPrintHeader ? "</font></td><td align='left' valign='top'><font size='-2'>" : "") +
+              (isPrintHeader ? "</font></td><td><font size='-2'>" : "") +
               htmlText +
               (isPrintHeader ? "</font></td></tr>" : "<br>");
     } else {
