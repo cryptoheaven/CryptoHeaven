@@ -403,13 +403,14 @@ public class CacheMsgUtils {
         quotedMsgBody = "";
       }
 
+      String dateCreated = "";
+      try {
+        dateCreated = new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated);
+      } catch (NullPointerException e) {
+      }
+
       if (isForceOutputInHTMLPrintHeader || isForceOutputInHTMLBody || dataRecord.isHtmlMail() || dataRecord.isTypeAddress()) {
         if (trace != null) trace.data(70, "making HTML header lines");
-        String dateCreated = "";
-        try {
-          dateCreated = new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated);
-        } catch (NullPointerException e) {
-        }
         content[0] = "text/html";
         content[1] =
             (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(TextRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
@@ -456,7 +457,7 @@ public class CacheMsgUtils {
             com.CH_cl.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
             (sb[SendMessageInfoProviderI.TO].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_To") + ": " + sb[SendMessageInfoProviderI.TO].toString() + "\n") : "") +
             (sb[SendMessageInfoProviderI.CC].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_Cc") + ": " + sb[SendMessageInfoProviderI.CC].toString() + "\n") : "") +
-            com.CH_cl.lang.Lang.rb.getString("column_Sent") + ": " + new SimpleDateFormat("EEEEE, MMMMM dd, yyyy h:mm aa").format(dataRecord.dateCreated) + "\n" +
+            com.CH_cl.lang.Lang.rb.getString("column_Sent") + ": " + dateCreated + "\n" +
             com.CH_cl.lang.Lang.rb.getString("column_Subject") + ": " + quotedSubject + " \n\n";
         content[3] = quotedMsgBody;
       }

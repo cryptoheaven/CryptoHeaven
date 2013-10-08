@@ -157,10 +157,10 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
     this.outgoingInterruptableActionsHM = new HashMap();
 
     this.reader = new ReaderThread("Worker Reader " + workerCount);
+    this.writer = new WriterThread("Worker Writer " + workerCount);
+
     reader.setDaemon(true);
     reader.start();
-
-    this.writer = new WriterThread("Worker Writer " + workerCount);
     writer.setDaemon(true);
     writer.start();
 
@@ -242,7 +242,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
       finished = true;
       workerManager.workerDone(this, cleanLogout, suppressConnectionTypePenalization);
       // signal the writer that reader is quitting
-      writer.interrupt();
+      if (writer != null)
+        writer.interrupt();
       // if both READER and WRITER are done, destory the worker
       if (finishedWriting) {
         destroyWorker();
