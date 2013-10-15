@@ -76,7 +76,7 @@ public class MultiPartFormOutputStream {
     if(boundary == null || boundary.length() == 0) {
       throw new IllegalArgumentException("Boundary stream is required.");
     }
-    this.out = new DataOutputStream(os);
+    this.out = new DataOutputStream(new BufferedOutputStream(os, 32*1024));
     this.boundary = boundary;
   }
 
@@ -266,7 +266,7 @@ public class MultiPartFormOutputStream {
     }
     out.writeBytes(NEWLINE);
     // write content
-    byte[] data = new byte[1024];
+    byte[] data = new byte[32*1024];
     int r = 0;
     while((r = is.read(data, 0, data.length)) != -1) {
       out.write(data, 0, r);

@@ -243,7 +243,7 @@ public class FileTextLexicon extends StreamTextLexicon {
     fileName = s;
     InputStream fileinputstream = null;
     try {
-      fileinputstream = new BufferedInputStream(new FileInputStream(s), 8*1024);
+      fileinputstream = new BufferedInputStream(new FileInputStream(s), 32*1024);
       load(fileinputstream);
     } finally {
       if (fileinputstream != null)

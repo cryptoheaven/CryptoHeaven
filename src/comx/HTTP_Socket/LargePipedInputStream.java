@@ -45,7 +45,7 @@ public class LargePipedInputStream extends InputStream {
   /**
    * The size of the pipe's circular input buffer.
    */
-  private static final int DEFAULT_PIPE_SIZE = 1024;
+  private static final int DEFAULT_PIPE_SIZE = 32*1024;
 
   /**
    * The circular buffer into which incoming data is placed.

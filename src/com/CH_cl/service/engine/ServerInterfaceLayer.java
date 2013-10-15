@@ -1267,7 +1267,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               } catch (InterruptedException x) {
               }
               socketBuffer[0] = new Socket(hostName, portNumber);
-              socketBuffer[0].setSoTimeout(ServerInterfaceWorker.PING_PONG_INTERVAL + (1000 * 10)); // a little more than ping-pong interval
+              try {
+                socketBuffer[0].setSoTimeout(ServerInterfaceWorker.PING_PONG_INTERVAL + (1000 * 10)); // a little more than ping-pong interval
+                socketBuffer[0].setSendBufferSize(32*1024);
+                socketBuffer[0].setReceiveBufferSize(32*1024);
+              } catch (Throwable t) {
+              }
             }
           } catch (UnknownHostException e1) {
             exceptionBuffer[0] = e1;

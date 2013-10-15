@@ -216,8 +216,8 @@ public class FileUtils extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, OutputStream, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
-    // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 32 KB at a time
+    byte[] buf = new byte[1024*32];
 
     // number of full turns
     long fullTurns = dataLength / buf.length;
@@ -252,8 +252,8 @@ public class FileUtils extends Object {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveData(DataInputStream, DataOutput, long dataLength, ProgMonitor progressMonitor)");
     if (trace != null) trace.args(dataLength);
 
-    // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 32 KB at a time
+    byte[] buf = new byte[1024*32];
 
     // number of full turns
     long fullTurns = dataLength / buf.length;
@@ -290,8 +290,8 @@ public class FileUtils extends Object {
   public static void moveDataEOF(InputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(InputStream, OutputStream, ProgMonitor progressMonitor)");
 
-    // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 32 KB at a time
+    byte[] buf = new byte[1024*32];
     int bytesRead = 0;
 
     // while not EOF
@@ -324,8 +324,8 @@ public class FileUtils extends Object {
   public static void moveDataEOF(Reader in, Writer out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataEOF(Reader, Writer, ProgMonitor progressMonitor)");
 
-    // 4 KB at a time
-    char[] buf = new char[1024*4];
+    // 32 KB at a time
+    char[] buf = new char[1024*32];
     int charsRead = 0;
 
     // while not EOF
@@ -365,8 +365,8 @@ public class FileUtils extends Object {
   public static void moveDataStreamEOF(File fileIn, InputStream in, DataOutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "moveDataStreamEOF(File, InputStream, DataOutputStream, ProgMonitor progressMonitor)");
 
-    // 4 KB at a time
-    byte[] buf = new byte[1024*4];
+    // 32 KB at a time
+    byte[] buf = new byte[1024*32];
     int bytesRead = 0;
     long totalRead = 0;
 
@@ -408,7 +408,7 @@ public class FileUtils extends Object {
   public static void readDataStreamEOF(DataInputStream in, OutputStream out, ProgMonitorI progressMonitor) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileUtils.class, "readDataStreamEOF(DataInputStream in, OutputStream out, ProgMonitorI progressMonitor)");
 
-    byte[] buf = new byte[1024*4];
+    byte[] buf = new byte[1024*32];
     int currentPartDataOutstanding = 0;
     while (currentPartDataOutstanding != -1) {
       while (currentPartDataOutstanding == 0)

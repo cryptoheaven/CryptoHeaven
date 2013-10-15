@@ -752,7 +752,7 @@ public class AutoUpdater extends ThreadTraced {
     BufferedOutputStream bout = null;
     try {
       fout = new FileOutputStream(toFill);
-      bout = new BufferedOutputStream(fout, 8*1024);
+      bout = new BufferedOutputStream(fout, 32*1024);
       for (int i=0; i<size; i++) {
         bout.write(0);
       }

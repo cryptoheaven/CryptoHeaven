@@ -182,6 +182,8 @@ public class HTTP_Socket extends Socket {
             Socket s = new Socket(proxyHost, proxyPort);
             try {
               s.setSoTimeout(SOCKET_READ_TIMEOUT);
+              s.setSendBufferSize(32*1024);
+              s.setReceiveBufferSize(32*1024);
             } catch (Throwable t) {
             }
             //System.out.print(" made.");

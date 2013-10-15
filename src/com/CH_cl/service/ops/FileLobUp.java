@@ -680,7 +680,7 @@ public class FileLobUp {
           if (verifEncDataDigest != null && !isSigned)
             startFromByte = 0;
           fileAppendingInputStream.setByteCounter(startFromByte);
-          dEncStream = new DigestInputStream(fileAppendingInputStream, new SHA256());
+          dEncStream = new DigestInputStream(new BufferedInputStream(fileAppendingInputStream, 32*1024), new SHA256());
           if (trace != null) trace.data(51, "doUpload: got encrypted data stream for "+plainDataFile+" fileLinkId="+fileLink.fileLinkId+" fileId="+fileLink.fileId+" starting point is "+startFromByte);
           if (DEBUG_CONSOLE) System.out.println("doUpload: got encrypted data stream for "+plainDataFile+" fileLinkId="+fileLink.fileLinkId+" fileId="+fileLink.fileId+" starting point is "+startFromByte);
           if (startFromByte > 0) {
@@ -1185,7 +1185,7 @@ public class FileLobUp {
         b = super.read();
         if (b == -1 && !isSealed) {
           if (trace != null) trace.data(100, "waiting for data", "FileAppendingInputStream.read()");
-          try { Thread.sleep(10); } catch (InterruptedException e) { }
+          try { Thread.sleep(1); } catch (InterruptedException e) { }
           if (trace != null) trace.data(101, "woke up from waiting for data - going into retry", "FileAppendingInputStream.read()");
         } else {
           break;
@@ -1207,12 +1207,12 @@ public class FileLobUp {
         count = super.read(b, off, len);
         if (count == -1 && !isSealed) {
           if (trace != null) trace.data(100, "waiting for data", "FileAppendingInputStream.read(byte[] b, int off, int len)");
-          try { Thread.sleep(10); } catch (InterruptedException e) { }
+          try { Thread.sleep(1); } catch (InterruptedException e) { }
           if (trace != null) trace.data(101, "woke up from waiting for data - going into retry", "FileAppendingInputStream.read(byte[] b, int off, int len)");
         } else if (count == 0) {
           // not EOF and no bytes?? wait a little
           if (trace != null) trace.data(200, "waiting for data - not EOF and no bytes", "FileAppendingInputStream.read(byte[] b, int off, int len)");
-          try { Thread.sleep(5); } catch (InterruptedException e) { }
+          try { Thread.sleep(1); } catch (InterruptedException e) { }
           if (trace != null) trace.data(201, "woke up from waiting for data - not EOF and no bytes - going into retry", "FileAppendingInputStream.read(byte[] b, int off, int len)");
         } else {
           break;

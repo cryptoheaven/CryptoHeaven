@@ -20,9 +20,7 @@ import com.CH_co.io.SpeedLimitedOutputStream;
 import com.CH_co.monitor.Interruptible;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -118,9 +116,9 @@ public abstract class CommonSessionContext extends Object implements Interruptib
 
     // no need to buffer up the socket streams as they already use internal buffering
     if (trace != null) trace.data(10, "getting input stream");
-    this.in = connectedSocket.getInputStream();
+    this.in = new BufferedInputStream(connectedSocket.getInputStream(), 32*1024);
     if (trace != null) trace.data(20, "getting output stream");
-    this.out = connectedSocket.getOutputStream();
+    this.out = new BufferedOutputStream(connectedSocket.getOutputStream(), 32*1024);
 
     /*
     try {

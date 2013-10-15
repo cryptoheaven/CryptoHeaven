@@ -54,7 +54,7 @@ public class Digester extends Object {
     digest.reset();
     InputStream fIn = new BufferedInputStream(new FileInputStream(file), 32*1024);
 
-    byte[] block = new byte[16*1024];
+    byte[] block = new byte[32*1024];
     int read = fIn.read(block);
     while (read != -1) {
       if (read > 0)
