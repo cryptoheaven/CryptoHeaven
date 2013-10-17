@@ -350,6 +350,8 @@ public class FileDataRecord extends Record {
                 // File already exists so mark the link to it and
                 plainDataFile = destinationFile;
                 destinationFile = null;
+                // no replace, so exit to avoid re-try and another dialog
+                break;
               }
             }
           }
