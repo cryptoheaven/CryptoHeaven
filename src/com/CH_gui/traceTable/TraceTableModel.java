@@ -296,7 +296,7 @@ public class TraceTableModel extends RecordTableModel {
           if (statsReply.stats != null) {
             int size = getRowCount();
             for (int i=0; i<statsReply.stats.length; i++) {
-              if (statsReply.stats[i].statId.longValue() > 0)
+              if (statsReply.stats[i].statId.longValue() >= 0)
                 statsReply.stats[i].statId = new Long(-(size+i));
             }
           }
