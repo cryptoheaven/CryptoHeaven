@@ -312,13 +312,14 @@ public class GlobalProperties extends Object {
   // build 792 Fixes for more detailed error message for creating folders that inherit from parent and creator has no access to all parent's share groups
   // build 794 Send clientOS with login info
   // build 796 Msg reply use 'div' instead of 'table', clear login info when server gives permanent error
+  // build 798 SaluSafe v1.32
 
-  public static final short PROGRAM_BUILD_NUMBER = 796;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 798;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 2;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
