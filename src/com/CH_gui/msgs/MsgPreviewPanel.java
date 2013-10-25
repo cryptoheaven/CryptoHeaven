@@ -18,6 +18,7 @@ import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_cl.util.MsgUtils;
 import com.CH_co.queue.Fifo;
 import com.CH_co.queue.ProcessingFunctionI;
 import com.CH_co.service.msg.CommandCodes;
@@ -394,9 +395,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     jPasswordField.addKeyListener(new KeyAdapter() {
       public void keyReleased(KeyEvent e) {
         if (msgDataRecord != null) {
-          Hasher.Set matchingSet = MsgPanelUtils.getMatchingPasswordHasher(msgDataRecord, jPasswordField.getText());
+          Hasher.Set matchingSet = MsgUtils.getMatchingPasswordHasher(msgDataRecord, jPasswordField.getText());
           if (matchingSet != null) {
-            MsgPanelUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
+            MsgUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
             // change our own display, but other listeners should be notified by the unlock code
             setCurrentMessageText();
             // refetch the attachments, maybe the subjects and filenames will show now

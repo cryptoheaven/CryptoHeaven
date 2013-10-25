@@ -146,9 +146,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * Static variable because it is a property of our Internet provider connectivity, so must be global for all SILs.
   */
   private static Class penalizedSocketType;
-  private static final int DELAY_PENALIZED_CONNECTION_TYPE = 2000;
+  private static final int DELAY_PENALIZED_CONNECTION_TYPE = 4000;
   // always delay protocoled sockets just a tiny bit to allow plain Socket some advantage of being first to connect...
-  private static final int DELAY_PROTOCOLED_CONNECTION  = 1500;
+  private static final int DELAY_PROTOCOLED_CONNECTION  = 3000;
   private static final int CONNECTION_TIMEOUT = 7000;
   private static final int MAX_CONNECTION_DELAY = Math.max(DELAY_PENALIZED_CONNECTION_TYPE, DELAY_PROTOCOLED_CONNECTION);
 

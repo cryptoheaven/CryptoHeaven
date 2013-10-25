@@ -64,6 +64,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
   public Short mark;
   public Timestamp firstSeen;
   public Timestamp firstDelivered;
+  public Timestamp firstRead;
 
   public Long getId() {
     return statId;
@@ -207,6 +208,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
       // date no matter what.  It should fix the lack of red flag for the first chat message.
       firstDelivered = record.firstDelivered;
       */
+      if (record.firstRead != null) firstRead = record.firstRead;
     }
     else
       super.mergeError(updated);
@@ -223,6 +225,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
       + ", mark="           + mark
       + ", firstSeen="      + firstSeen
       + ", firstDelivered=" + firstDelivered
+      + ", firstRead="      + firstRead
       + "]";
   }
 

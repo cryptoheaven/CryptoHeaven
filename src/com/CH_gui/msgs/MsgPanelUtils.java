@@ -15,28 +15,23 @@ package com.CH_gui.msgs;
 import com.CH_cl.service.cache.CacheEmlUtils;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.cache.TextRenderer;
-import com.CH_cl.service.ops.UserOps;
 import com.CH_cl.service.records.EmailAddressRecord;
-import com.CH_cl.service.records.filters.FolderFilter;
-import com.CH_co.cryptx.BASymCipherBulk;
-import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.MsgFilter;
+import com.CH_co.service.records.EmailRecord;
+import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.service.records.Record;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
-import com.CH_gui.frame.MainFrame;
+import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.HTML_Ops;
+import com.CH_co.util.HTML_utils;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyHTMLEditor;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.util.HTML_ClickablePane;
-import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.MiscGui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -703,49 +698,6 @@ public class MsgPanelUtils extends Object {
     } // end synchronized
 
     if (trace != null) trace.exit(MsgPanelUtils.class);
-  }
-
-  public static Hasher.Set getMatchingPasswordHasher(MsgDataRecord msgDataRecord, String pass) {
-    Hasher.Set matchingSet = null;
-    pass = pass.trim();
-    Hasher.Set set = new Hasher.Set(pass.toCharArray());
-    if (set.passwordHash.equals(msgDataRecord.bodyPassHash)) {
-      matchingSet = set;
-    } else {
-      // also try the new trimmed versions for Question & Answer
-      pass = getTrimmedPassword(pass);
-      set = new Hasher.Set(pass.toCharArray());
-      if (set.passwordHash.equals(msgDataRecord.bodyPassHash)) {
-        matchingSet = set;
-      }
-    }
-    return matchingSet;
-  }
-
-  public static String getTrimmedPassword(String pass) {
-    String passStripped = null;
-    if (pass != null) {
-      StringBuffer passStrippedBuf = new StringBuffer();
-      for (int i=0; i<pass.length(); i++) {
-        char lCh = pass.charAt(i);
-        lCh = Character.toLowerCase(lCh);
-        if (Character.isLetterOrDigit(lCh))
-          passStrippedBuf.append(lCh);
-      }
-      passStripped = passStrippedBuf.toString();
-    }
-    return passStripped;
-  }
-
-  public static void unlockPassProtectedMsg(MsgDataRecord msgDataRecord, Hasher.Set matchingSet) {
-    if (matchingSet != null) {
-      BASymCipherBulk encText = msgDataRecord.getEncText();
-      if (encText != null && encText.size() > 0 && msgDataRecord.getTextBody() == null) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        cache.addMsgBodyKey(matchingSet);
-        CacheMsgUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
-      }
-    }
   }
 
 }

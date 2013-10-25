@@ -122,6 +122,12 @@ public class MsgLinkRecord extends Record implements LinkRecordI {
     return statusName;
   }
 
+  public boolean isForwarded() {
+    return status != null && (status.shortValue() & STATUS_FLAG__FORWARDED) != 0;
+  }
+  public boolean isReplied() {
+    return status != null && (status.shortValue() & STATUS_FLAG__REPLIED) != 0;
+  }
   public boolean isStarred() {
     return status != null && (status.shortValue() & STATUS_FLAG__STARRED) != 0;
   }

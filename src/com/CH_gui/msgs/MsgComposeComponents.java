@@ -16,6 +16,7 @@ import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.MsgDataOps;
+import com.CH_cl.util.MsgUtils;
 import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
@@ -203,7 +204,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   }
 
   public String getPassword() {
-    String pass = isStagedSecure() ? MsgPanelUtils.getTrimmedPassword(jPasswordField.getText()) : null;
+    String pass = isStagedSecure() ? MsgUtils.getTrimmedPassword(jPasswordField.getText()) : null;
     return pass != null && pass.length() > 0 ? pass : null;
   }
 

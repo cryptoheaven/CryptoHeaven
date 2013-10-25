@@ -479,28 +479,28 @@ public class CacheMsgUtils {
     }
   }
 
-  public static void unlockPassProtectedMsg(MsgDataRecord msgDataRecStartWith, Hasher.Set bodyKey) {
+  public static void unlockPassProtectedMsgIncludingCached(MsgDataRecord msgDataRecStartWith, Hasher.Set bodyKey) {
     // first unseal the specific message so its fast for the user in the view
-    unlockPassProtectedMsgs(new MsgDataRecord[] { msgDataRecStartWith }, bodyKey);
+    doUnlockPassProtectedMsgs(new MsgDataRecord[] { msgDataRecStartWith }, bodyKey);
     // next unseal any other message that might be using the same password...
     Thread th = new ThreadTraced("UnlockPassProtectedMsgs Runner") {
       public void runTraced() {
-        unlockPassProtectedMsgs(null, null);
+        doUnlockPassProtectedMsgs(null, null);
       }
     };
     th.setDaemon(true);
     th.start();
   }
-  private static void unlockPassProtectedMsgs(MsgDataRecord[] msgDatas, Hasher.Set bodyKey) {
+  private static void doUnlockPassProtectedMsgs(MsgDataRecord[] msgDatas, Hasher.Set bodyKey) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (msgDatas == null)
       msgDatas = cache.getMsgDataRecords(new MsgFilter((Boolean) null, (Boolean) null, Boolean.FALSE));
-    List bodyKeys = null;
+    List keys = null;
     if (bodyKey == null) {
-      bodyKeys = cache.getMsgBodyKeys();
+      keys = cache.getMsgBodyKeys();
     } else {
-      bodyKeys = new ArrayList();
-      bodyKeys.add(bodyKey);
+      keys = new ArrayList();
+      keys.add(bodyKey);
     }
     ArrayList msgDatasL = new ArrayList();
     ArrayList msgLinksL = new ArrayList();
@@ -519,7 +519,7 @@ public class CacheMsgUtils {
           if (symmetricKey != null) {
             if (msgDatas[i].getSendPrivKeyId() != null) {
               // for performance don't verify everything, do it when person asks to see it
-              msgDatas[i].unSealWithoutVerify(symmetricKey, bodyKeys);
+              msgDatas[i].unSealWithoutVerify(symmetricKey, keys);
             }
             //msgDatas[i].unSealWithoutVerify(symmetricKey, bodyKeys);
             if (msgDatas[i].getTextBody() != null) {
@@ -557,7 +557,7 @@ public class CacheMsgUtils {
         MsgDataRecord[] msgDataAttachments = cache.getMsgDataRecordsForLinks(msgLinkAttachmentIDs);
         if (msgDataAttachments != null && msgDataAttachments.length > 0) {
           // recursively go through the attachments
-          unlockPassProtectedMsgs(msgDataAttachments, null);
+          doUnlockPassProtectedMsgs(msgDataAttachments, null);
         }
       }
     }

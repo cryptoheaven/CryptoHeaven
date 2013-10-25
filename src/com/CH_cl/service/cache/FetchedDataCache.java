@@ -3032,7 +3032,8 @@ public class FetchedDataCache extends Object {
     return list;
   }
   public synchronized void addMsgBodyKey(Hasher.Set key) {
-    msgBodyKeys.add(key);
+    if (!msgBodyKeys.contains(key))
+      msgBodyKeys.add(key);
   }
 
   /**

@@ -20,6 +20,7 @@ import com.CH_cl.service.cache.event.MsgDataRecordListener;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.MsgDataOps;
 import com.CH_cl.service.records.EmailAddressRecord;
+import com.CH_cl.util.MsgUtils;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
@@ -314,14 +315,14 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
       jPasswordField.addKeyListener(new KeyAdapter() {
         public void keyReleased(KeyEvent e) {
           MsgDataRecord msgDataRecord = cache.getMsgDataRecord(msgLink.msgId);
-          Hasher.Set matchingSet = MsgPanelUtils.getMatchingPasswordHasher(msgDataRecord, jPasswordField.getText());
+          Hasher.Set matchingSet = MsgUtils.getMatchingPasswordHasher(msgDataRecord, jPasswordField.getText());
           if (matchingSet != null) {
             if (jPasswordPane.getComponentCount() == 1) {
               jPasswordPane.add(new JMyLabel(" match"));
               jPasswordPane.revalidate();
               jPasswordPane.repaint();
             }
-            MsgPanelUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
+            MsgUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
           } else if (jPasswordPane.getComponentCount() == 2) {
             jPasswordPane.remove(1);
             jPasswordPane.revalidate();

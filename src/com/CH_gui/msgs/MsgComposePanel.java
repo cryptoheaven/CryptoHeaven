@@ -24,6 +24,7 @@ import com.CH_cl.service.ops.*;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_cl.util.MsgUtils;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.msg.CommandCodes;
@@ -49,7 +50,6 @@ import com.CH_gui.actionGui.JActionFrameClosable;
 import com.CH_gui.addressBook.*;
 import com.CH_gui.chatTable.ChatActionTable;
 import com.CH_gui.dialog.InitiateContactDialog;
-import com.CH_gui.dialog.InviteByEmailDialog;
 import com.CH_gui.dialog.RecipientsDialog;
 import com.CH_gui.dialog.RecordChooserDialog;
 import com.CH_gui.fileTable.FileDND_Transferable;
@@ -74,7 +74,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -1177,7 +1180,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
             if (jSendEncrypted.isSelected() && jQuestionAndAnswer.isSelected()) {
               question = jQuestion.getText();
               // strip password leaving only letters and digits
-              passStripped = MsgPanelUtils.getTrimmedPassword(jPassword.getText());
+              passStripped = MsgUtils.getTrimmedPassword(jPassword.getText());
             }
             msgComponents.setQuestion(question);
             msgComponents.setPassword(passStripped);
