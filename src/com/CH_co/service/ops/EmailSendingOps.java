@@ -21,6 +21,7 @@ import com.CH_co.util.URLs;
  *
  * <b>$Revision: 1.0 $</b>
  * $Rev: 1.2$
+ * 
  * @author  Marcin Kurzawa
  */
 public class EmailSendingOps {
