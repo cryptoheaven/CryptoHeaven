@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,16 +7,10 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   StringWordParser.java
-
 package comx.Tiger.ssce;
 
 import comx.Tiger.util.UniCharacter;
-
 import java.util.NoSuchElementException;
-
-// Referenced classes of package com.wintertree.ssce:
-//      WordParser
 
 public class StringWordParser implements WordParser {
 
@@ -37,10 +29,11 @@ public class StringWordParser implements WordParser {
     isHyphenDelimiter = flag;
     nReplacements = 0;
     nWords = 0;
-    if (s != null)
+    if (s != null) {
       theString = new StringBuffer(s);
-    else
+    } else {
       theString = null;
+    }
     subWordLength = -1;
     cachedWord = new StringBuffer();
   }
@@ -93,8 +86,9 @@ public class StringWordParser implements WordParser {
   }
 
   public String getWord() throws NoSuchElementException {
-    if (cachedWord.length() > 0)
+    if (cachedWord.length() > 0) {
       return cachedWord.toString();
+    }
     int i = findWordStart();
     if (i != cursor) {
       cursor = i;
@@ -107,19 +101,23 @@ public class StringWordParser implements WordParser {
       return cachedWord.toString();
     }
     int j = theString.length();
-    if (cursor >= j)
+    if (cursor >= j) {
       throw new NoSuchElementException();
+    }
     cachedWord.setLength(0);
     int k = 0;
     i = cursor;
     do {
-      if (i >= j)
+      if (i >= j) {
         break;
+      }
       char c = theString.charAt(i);
-      if (c == '.' && isSurroundedByWordChars(theString, i))
+      if (c == '.' && isSurroundedByWordChars(theString, i)) {
         k++;
-      if (!includeCharInWord(theString, i, k > 0))
+      }
+      if (!includeCharInWord(theString, i, k > 0)) {
         break;
+      }
       cachedWord.append(c);
       i++;
     } while (true);
@@ -128,8 +126,9 @@ public class StringWordParser implements WordParser {
       int l = 0;
       for (int i1 = 0; i1 < cachedWord.length(); i1++) {
         if (UniCharacter.isLetterOrDigit(cachedWord.charAt(i1))) {
-          if (++l <= 2)
+          if (++l <= 2) {
             continue;
+          }
           flag = false;
           break;
         }
@@ -142,8 +141,9 @@ public class StringWordParser implements WordParser {
         i++;
       }
     }
-    if (cachedWord.length() == 0)
+    if (cachedWord.length() == 0) {
       return cachedWord.toString();
+    }
     boolean flag1 = false;
     do {
       char c1 = cachedWord.charAt(cachedWord.length() - 1);
@@ -164,10 +164,10 @@ public class StringWordParser implements WordParser {
     boolean flag = true;
     try {
       String s = getWord();
-      if (s.length() == 0)
+      if (s.length() == 0) {
         flag = false;
-    }
-    catch (Exception exception) {
+      }
+    } catch (Exception exception) {
       flag = false;
     }
     return flag;
@@ -183,19 +183,22 @@ public class StringWordParser implements WordParser {
   public boolean isDoubledWord(boolean flag) {
     String s = getWord();
     String s1 = getPrevWord();
-    if (s1 == null)
+    if (s1 == null) {
       return false;
+    }
     boolean flag1;
-    if (flag)
+    if (flag) {
       flag1 = s1.equals(s);
-    else
+    } else {
       flag1 = s1.equalsIgnoreCase(s);
+    }
     if (flag1) {
       char c = s1.charAt(s1.length() - 1);
       int i = cursor - 1;
       do {
-        if (i < 0 || !flag1 || theString.charAt(i) == c)
+        if (i < 0 || !flag1 || theString.charAt(i) == c) {
           break;
+        }
         if (!UniCharacter.isWhitespace(theString.charAt(i))) {
           flag1 = false;
           break;
@@ -258,8 +261,9 @@ public class StringWordParser implements WordParser {
   }
 
   public void setText(String s) {
-    if (theString == null)
+    if (theString == null) {
       theString = new StringBuffer();
+    }
     theString.setLength(0);
     theString.append(s);
     cursor = 0;
@@ -290,8 +294,9 @@ public class StringWordParser implements WordParser {
     int i;
     for (i = cursor - 1; i >= 0 && UniCharacter.isApostrophe(theString.charAt(i)); i--);
     for (; i >= 0 && !isWordChar(theString.charAt(i)); i--);
-    if (i <= 0)
+    if (i <= 0) {
       return null;
+    }
     for (; i > 0 && isWordChar(theString.charAt(i - 1)); i--);
     int j = cursor;
     int k = subWordLength;
@@ -311,74 +316,80 @@ public class StringWordParser implements WordParser {
     char c = stringbuffer.charAt(i);
     int j = stringbuffer.length();
     if (c == '.') {
-      if (isSurroundedByWordChars(stringbuffer, i))
+      if (isSurroundedByWordChars(stringbuffer, i)) {
         return true;
-    } else
-      if (c == '-' && !isHyphenDelimiter) {
-        if (isSurroundedByWordChars(stringbuffer, i))
-          return true;
-      } else
-        if ('@' == c) {
-          boolean flag1 = false;
-          int k = i + 1;
-          do {
-            if (k >= j)
-              break;
-            char c1 = stringbuffer.charAt(k);
-            if (UniCharacter.isWhitespace(c1))
-              break;
-            if ('.' == c1 && isSurroundedByWordChars(stringbuffer, k)) {
-              flag1 = true;
-              break;
-            }
-            k++;
-          } while (true);
-          if (flag1 && isSurroundedByWordChars(stringbuffer, i))
-            return true;
-        } else
-          if (':' == c) {
-            if (i > 0 && UniCharacter.isLetterOrDigit(stringbuffer.charAt(i - 1)) && i + 1 < j && stringbuffer.charAt(i + 1) == '/')
-              return true;
-          } else
-            if ('/' == c) {
-              if (flag)
-                return true;
-              if (i > 0 && (stringbuffer.charAt(i - 1) == ':' || stringbuffer.charAt(i - 1) == '/') && (i + 1 < j && stringbuffer.charAt(i + 1) == '/' || UniCharacter.isLetterOrDigit(stringbuffer.charAt(i + 1))))
-                return true;
-            } else
-              if ('&' == c || '%' == c || '+' == c || '=' == c || '?' == c) {
-                if (flag)
-                  return true;
-              } else
-                if ('_' == c) {
-                  if (flag)
-                    return true;
-                  boolean flag2 = false;
-                  int l = i + 1;
-                  do {
-                    if (l >= j)
-                      break;
-                    char c2 = stringbuffer.charAt(l);
-                    if (UniCharacter.isWhitespace(c2))
-                      break;
-                    if ('.' == c2 && isSurroundedByWordChars(stringbuffer, l)) {
-                      flag2 = true;
-                      break;
-                    }
-                    l++;
-                  } while (true);
-                  if (flag2)
-                    return true;
-                } else
-                  if (isWordChar(c))
-                    return true;
+      }
+    } else if (c == '-' && !isHyphenDelimiter) {
+      if (isSurroundedByWordChars(stringbuffer, i)) {
+        return true;
+      }
+    } else if ('@' == c) {
+      boolean flag1 = false;
+      int k = i + 1;
+      do {
+        if (k >= j) {
+          break;
+        }
+        char c1 = stringbuffer.charAt(k);
+        if (UniCharacter.isWhitespace(c1)) {
+          break;
+        }
+        if ('.' == c1 && isSurroundedByWordChars(stringbuffer, k)) {
+          flag1 = true;
+          break;
+        }
+        k++;
+      } while (true);
+      if (flag1 && isSurroundedByWordChars(stringbuffer, i)) {
+        return true;
+      }
+    } else if (':' == c) {
+      if (i > 0 && UniCharacter.isLetterOrDigit(stringbuffer.charAt(i - 1)) && i + 1 < j && stringbuffer.charAt(i + 1) == '/') {
+        return true;
+      }
+    } else if ('/' == c) {
+      if (flag) {
+        return true;
+      }
+      if (i > 0 && (stringbuffer.charAt(i - 1) == ':' || stringbuffer.charAt(i - 1) == '/') && (i + 1 < j && stringbuffer.charAt(i + 1) == '/' || UniCharacter.isLetterOrDigit(stringbuffer.charAt(i + 1)))) {
+        return true;
+      }
+    } else if ('&' == c || '%' == c || '+' == c || '=' == c || '?' == c) {
+      if (flag) {
+        return true;
+      }
+    } else if ('_' == c) {
+      if (flag) {
+        return true;
+      }
+      boolean flag2 = false;
+      int l = i + 1;
+      do {
+        if (l >= j) {
+          break;
+        }
+        char c2 = stringbuffer.charAt(l);
+        if (UniCharacter.isWhitespace(c2)) {
+          break;
+        }
+        if ('.' == c2 && isSurroundedByWordChars(stringbuffer, l)) {
+          flag2 = true;
+          break;
+        }
+        l++;
+      } while (true);
+      if (flag2) {
+        return true;
+      }
+    } else if (isWordChar(c)) {
+      return true;
+    }
     return false;
   }
 
   /**
    * @deprecated Method includeCharInWord is deprecated
    */
-
   protected boolean includeCharInWord(char c, String s, int i, boolean flag) {
     return includeCharInWord(new StringBuffer(s), i, flag);
   }

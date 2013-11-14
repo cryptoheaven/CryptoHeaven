@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,13 +7,10 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   CompressedLexicon.java
-
 package comx.Tiger.ssce;
 
 import comx.Tiger.util.CharArray;
 import comx.Tiger.util.Comparable;
-
 import java.io.Serializable;
 
 class CLexSegment implements Comparable, Serializable {
@@ -28,13 +23,14 @@ class CLexSegment implements Comparable, Serializable {
 
   CLexSegment() {
     id = new char[4];
-    for (int i = 0; i < id.length; i++)
+    for (int i = 0; i < id.length; i++) {
       id[i] = '\0';
+    }
 
   }
 
   public int compareTo(Comparable comparable) {
-    CLexSegment clexsegment = (CLexSegment)comparable;
+    CLexSegment clexsegment = (CLexSegment) comparable;
     return CharArray.compare(id, clexsegment.id);
   }
 }

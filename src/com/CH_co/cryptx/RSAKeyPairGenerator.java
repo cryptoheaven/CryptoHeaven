@@ -1,32 +1,25 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_co.cryptx;
 
 import com.CH_co.monitor.Interrupter;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Date;
-import java.util.Random;
+
 
 /** 
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
-*
-*
-* @author  Marcin Kurzawa
-* @version 
-*/
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * @author  Marcin Kurzawa
+ */
 public class RSAKeyPairGenerator extends Object {
 
   public static final int DEFAULT_CERTAINTY = 128;
@@ -36,7 +29,7 @@ public class RSAKeyPairGenerator extends Object {
 
   private transient int strength = 3072;
   private transient int certainty = DEFAULT_CERTAINTY;
-  private transient Random random;
+  private transient SecureRandom random;
 
   /** Creates new RSAKeyPairGenerator */
   public RSAKeyPairGenerator() {
@@ -46,13 +39,13 @@ public class RSAKeyPairGenerator extends Object {
     return generateKeyPair(strength, certainty, random);
   }
 
-  public void initialize(int keySize, int certainty, Random random) {
+  public void initialize(int keySize, int certainty, SecureRandom random) {
     this.strength = keySize;
     this.certainty = certainty;
     this.random = random;
   }
 
-  public void initialize(int keySize, Random random) {
+  public void initialize(int keySize, SecureRandom random) {
     this.strength = keySize;
     this.random = random;
   }
@@ -90,7 +83,7 @@ public class RSAKeyPairGenerator extends Object {
   public static RSAKeyPair generateKeyPair(int strength) {
     return generateKeyPair(strength, DEFAULT_CERTAINTY, Rnd.getSecureRandom());
   }
-  public static RSAKeyPair generateKeyPair(int strength, Random random) {
+  public static RSAKeyPair generateKeyPair(int strength, SecureRandom random) {
     return generateKeyPair(strength, DEFAULT_CERTAINTY, random);
   }
   public static RSAKeyPair generateKeyPair(int strength, int certainty) {
@@ -105,10 +98,10 @@ public class RSAKeyPairGenerator extends Object {
     * specified minimum certainty that selected numbers are prime within 1-(1/2)^certainty.
     * @param random source of randomness for selection of prime numbers.
     */
-  public static RSAKeyPair generateKeyPair(int strength, int certainty, Random random) {
+  public static RSAKeyPair generateKeyPair(int strength, int certainty, SecureRandom random) {
     return generateKeyPair(strength, certainty, random, null);
   }
-  public static RSAKeyPair generateKeyPair(int strength, int certainty, Random random, Interrupter interrupter) {
+  public static RSAKeyPair generateKeyPair(int strength, int certainty, SecureRandom random, Interrupter interrupter) {
       BigInteger p=null, q=null, n=null, d=null, e=null, pSub1=null, qSub1=null, phi=null;
 
       boolean interrupted = false;

@@ -18,12 +18,6 @@ import javax.swing.Icon;
 /**
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description:
- *
- * Class Details:
- *
- * <b>$Revision: 1.0 $</b>
- *
  * @author  Marcin Kurzawa
  */
 public abstract class AbstractActionTraced extends AbstractAction {

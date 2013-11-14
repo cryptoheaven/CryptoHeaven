@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,26 +7,16 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package comx.HTTP_Socket;
 
 import java.io.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p> 
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.3 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class LargePipedOutputStream extends OutputStream {
 
@@ -46,7 +34,7 @@ public class LargePipedOutputStream extends OutputStream {
    * @param      snk   The piped input stream to connect to.
    * @exception  IOException  if an I/O error occurs.
    */
-  public LargePipedOutputStream(LargePipedInputStream snk)  throws IOException {
+  public LargePipedOutputStream(LargePipedInputStream snk) throws IOException {
     connect(snk);
   }
 
@@ -106,7 +94,7 @@ public class LargePipedOutputStream extends OutputStream {
    * @param      b   the <code>byte</code> to be written.
    * @exception  IOException  if an I/O error occurs.
    */
-  public void write(int b)  throws IOException {
+  public void write(int b) throws IOException {
     if (sink == null) {
       throw new IOException("Pipe not connected");
     }
@@ -160,7 +148,7 @@ public class LargePipedOutputStream extends OutputStream {
    *
    * @exception  IOException  if an I/O error occurs.
    */
-  public void close()  throws IOException {
+  public void close() throws IOException {
     if (sink != null) {
       sink.receivedLast();
     }

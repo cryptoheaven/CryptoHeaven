@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,26 +7,16 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package comx.HTTP_Socket;
 
 import java.io.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p> 
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.3 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class LargePipedInputStream extends InputStream {
   boolean closedByWriter = false;
@@ -173,7 +161,7 @@ public class LargePipedInputStream extends InputStream {
    *          returned when the end of the stream is reached.
    * @exception IOException If an I/O error has occurred.
    */
-  synchronized void receive(byte b[], int off, int len)  throws IOException {
+  synchronized void receive(byte b[], int off, int len) throws IOException {
     while (--len >= 0) {
       receive(b[off++]);
     }
@@ -205,7 +193,7 @@ public class LargePipedInputStream extends InputStream {
    *             stream is reached.
    * @exception  IOException  if the pipe is broken.
    */
-  public synchronized int read()  throws IOException {
+  public synchronized int read() throws IOException {
     if (!connected) {
       throw new IOException("Pipe not connected");
     } else if (closedByReader) {
@@ -261,7 +249,7 @@ public class LargePipedInputStream extends InputStream {
    *             the stream has been reached.
    * @exception  IOException  if an I/O error occurs.
    */
-  public synchronized int read(byte b[], int off, int len)  throws IOException {
+  public synchronized int read(byte b[], int off, int len) throws IOException {
     if (b == null) {
       throw new NullPointerException();
     } else if ((off < 0) || (off > b.length) || (len < 0) ||
@@ -318,7 +306,7 @@ public class LargePipedInputStream extends InputStream {
    *
    * @exception  IOException  if an I/O error occurs.
    */
-  public void close()  throws IOException {
+  public void close() throws IOException {
     in = -1;
     closedByReader = true;
   }

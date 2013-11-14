@@ -1,15 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_gui.usrs;
 
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -46,20 +43,11 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeListener;
 
 /**
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
-*
-* Class Description:
-*
-*
-* Class Details:
-*
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.14 $</b>
+*
 * @author  Marcin Kurzawa
-* @version
 */
 public class AccountOptionsQuotasPanel extends JPanel implements DisposableObj {
 
@@ -113,8 +101,8 @@ public class AccountOptionsQuotasPanel extends JPanel implements DisposableObj {
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
-    if ((userRecord.isFreePromoAccount() || userRecord.isGuestAccount()) && System.currentTimeMillis() < userRecord.dateCreated.getTime() + 2L*7L*24L*60L*60L*1000L) {
-      // skip displaying expiry date in the 1st 2 weeks of free accounts...
+    if (userRecord.isFreePromoAccount() || userRecord.isGuestAccount()) {
+      // free Web & Demo & Guest accounts never expire, so don't show expiry as it is irrelevant and never used
     } else {
       panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Expiry_Date")), new GridBagConstraints(0, posY, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));

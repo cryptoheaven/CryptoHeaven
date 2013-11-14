@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -18,20 +16,11 @@ import com.CH_co.trace.Trace;
 import com.CH_co.util.Misc;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.12 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public final class Rijndael_CBC extends Object{
 

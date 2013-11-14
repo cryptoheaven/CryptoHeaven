@@ -1,40 +1,30 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * This software is the confidential and proprietary information
- * of CryptoHeaven Corp. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with CryptoHeaven Corp.
+ * This software is the confidential and proprietary information of CryptoHeaven
+ * Corp. ("Confidential Information"). You shall not disclose such Confidential
+ * Information and shall use it only in accordance with the terms of the license
+ * agreement you entered into with CryptoHeaven Corp.
  */
-
 package comx.Tiger.gui;
 
+import comx.Tiger.ssce.FileTextLexicon;
+import comx.Tiger.ssce.PropSpellingSession;
 import comx.tig.en.SingleTigerSession;
-import comx.Tiger.ssce.*;
-import java.util.*;
+import java.util.Properties;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.3 $</b>
- * @author  Marcin Kurzawa
- * @version
+ *
+ * @author Marcin Kurzawa
  */
 public class TigerPropSession extends PropSpellingSession {
 
-  /** Creates new TigerPropSession */
+  /**
+   * Creates new TigerPropSession
+   */
   public TigerPropSession(Properties properties) {
     super(properties);
   }
@@ -57,9 +47,11 @@ public class TigerPropSession extends PropSpellingSession {
           }
         }
       }
-      TigerBkgChecker.backgroundCheckEnabled = Boolean.valueOf(properties.getProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, ""+TigerBkgChecker.backgroundCheckEnabled)).booleanValue();
+      TigerBkgChecker.backgroundCheckEnabled = Boolean.valueOf(properties.getProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, "" + TigerBkgChecker.backgroundCheckEnabled)).booleanValue();
       int countLanguageLexicons = SingleTigerSession.countLanguageLexicons(this);
-      if (countLanguageLexicons < 1) TigerBkgChecker.backgroundCheckEnabled = false;
+      if (countLanguageLexicons < 1) {
+        TigerBkgChecker.backgroundCheckEnabled = false;
+      }
     } catch (Throwable t) {
       t.printStackTrace();
     }

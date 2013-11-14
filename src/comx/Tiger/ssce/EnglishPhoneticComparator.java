@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,14 +7,9 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   EnglishPhoneticComparator.java
-
 package comx.Tiger.ssce;
 
 import comx.Tiger.util.UniCharacter;
-
-// Referenced classes of package com.wintertree.ssce:
-//      TypographicalComparator, WordComparator
 
 public class EnglishPhoneticComparator implements WordComparator {
 
@@ -69,11 +62,10 @@ public class EnglishPhoneticComparator implements WordComparator {
         if (i + 1 < s.length() && 'r' == s.charAt(i + 1)) {
           stringbuffer.append('R');
           i += 2;
-        } else
-          if (i + 1 < s.length() && 'h' == s.charAt(i + 1)) {
-            stringbuffer.append('H');
-            i += 2;
-          }
+        } else if (i + 1 < s.length() && 'h' == s.charAt(i + 1)) {
+          stringbuffer.append('H');
+          i += 2;
+        }
         break;
 
       case 120: // 'x'
@@ -82,20 +74,21 @@ public class EnglishPhoneticComparator implements WordComparator {
         break;
     }
     do {
-      if (i >= s.length())
+      if (i >= s.length()) {
         break;
+      }
       char c = s.charAt(i);
-      if (i + 1 < s.length() && c == s.charAt(i + 1))
+      if (i + 1 < s.length() && c == s.charAt(i + 1)) {
         if ('c' == c) {
           stringbuffer.append("KK");
           i += 2;
-        } else
-          if ('g' == c) {
-            stringbuffer.append('K');
-            i += 2;
-          } else {
-            i++;
-          }
+        } else if ('g' == c) {
+          stringbuffer.append('K');
+          i += 2;
+        } else {
+          i++;
+        }
+      }
       switch (c) {
         case 98: // 'b'
           stringbuffer.append('B');
@@ -106,18 +99,16 @@ public class EnglishPhoneticComparator implements WordComparator {
           if (i + 2 < s.length() && 'i' == s.charAt(i + 1) && 'a' == s.charAt(i + 2)) {
             stringbuffer.append('X');
             i += 3;
-          } else
-            if (i + 1 < s.length() && ('i' == s.charAt(i + 1) || 'e' == s.charAt(i + 1) || 'y' == s.charAt(i + 1))) {
-              stringbuffer.append('S');
-              i += 2;
-            } else
-              if (i + 1 < s.length() && 'k' == s.charAt(i + 1)) {
-                stringbuffer.append('K');
-                i += 2;
-              } else {
-                stringbuffer.append('K');
-                i++;
-              }
+          } else if (i + 1 < s.length() && ('i' == s.charAt(i + 1) || 'e' == s.charAt(i + 1) || 'y' == s.charAt(i + 1))) {
+            stringbuffer.append('S');
+            i += 2;
+          } else if (i + 1 < s.length() && 'k' == s.charAt(i + 1)) {
+            stringbuffer.append('K');
+            i += 2;
+          } else {
+            stringbuffer.append('K');
+            i++;
+          }
           break;
 
         case 100: // 'd'
@@ -139,22 +130,19 @@ public class EnglishPhoneticComparator implements WordComparator {
           if (i + 1 < s.length() && 'h' == s.charAt(i + 1) && (i + 2 <= s.length() || UniCharacter.isVowel(s.charAt(i + 2)))) {
             stringbuffer.append('K');
             i += 2;
-          } else
-            if (i + 1 < s.length() && 'n' == s.charAt(i + 1)) {
-              stringbuffer.append('N');
-              i += 2;
-            } else
-              if (i + 1 < s.length() && 'g' == s.charAt(i + 1)) {
-                stringbuffer.append('K');
-                i += 2;
-              } else
-                if (i + 1 < s.length() && ('i' == s.charAt(i + 1) || 'e' == s.charAt(i + 1) || 'y' == s.charAt(i + 1))) {
-                  stringbuffer.append('J');
-                  i += 2;
-                } else {
-                  stringbuffer.append('K');
-                  i++;
-                }
+          } else if (i + 1 < s.length() && 'n' == s.charAt(i + 1)) {
+            stringbuffer.append('N');
+            i += 2;
+          } else if (i + 1 < s.length() && 'g' == s.charAt(i + 1)) {
+            stringbuffer.append('K');
+            i += 2;
+          } else if (i + 1 < s.length() && ('i' == s.charAt(i + 1) || 'e' == s.charAt(i + 1) || 'y' == s.charAt(i + 1))) {
+            stringbuffer.append('J');
+            i += 2;
+          } else {
+            stringbuffer.append('K');
+            i++;
+          }
           break;
 
         case 104: // 'h'
@@ -220,36 +208,32 @@ public class EnglishPhoneticComparator implements WordComparator {
           if (i + 1 < s.length() && 'h' == s.charAt(i + 1)) {
             stringbuffer.append('X');
             i += 2;
-          } else
-            if (i + 2 < s.length() && 'i' == s.charAt(i + 1) && ('o' == s.charAt(i + 2) || 'a' == s.charAt(i + 2))) {
-              stringbuffer.append('X');
-              i += 3;
-            } else
-              if (i + 2 < s.length() && 'c' == s.charAt(i + 1) && 'h' == s.charAt(i + 2)) {
-                stringbuffer.append("SK");
-                i += 3;
-              } else {
-                stringbuffer.append('S');
-                i++;
-              }
+          } else if (i + 2 < s.length() && 'i' == s.charAt(i + 1) && ('o' == s.charAt(i + 2) || 'a' == s.charAt(i + 2))) {
+            stringbuffer.append('X');
+            i += 3;
+          } else if (i + 2 < s.length() && 'c' == s.charAt(i + 1) && 'h' == s.charAt(i + 2)) {
+            stringbuffer.append("SK");
+            i += 3;
+          } else {
+            stringbuffer.append('S');
+            i++;
+          }
           break;
 
         case 116: // 't'
           if (i + 1 < s.length() && 'h' == s.charAt(i + 1)) {
             stringbuffer.append('0');
             i += 2;
-          } else
-            if (i + 2 < s.length() && 'i' == s.charAt(i + 1) && ('o' == s.charAt(i + 2) || 'a' == s.charAt(i + 2))) {
-              stringbuffer.append('X');
-              i += 3;
-            } else
-              if (i + 2 < s.length() && 'c' == s.charAt(i + 1) && 'h' == s.charAt(i + 2)) {
-                stringbuffer.append('X');
-                i += 3;
-              } else {
-                stringbuffer.append('T');
-                i++;
-              }
+          } else if (i + 2 < s.length() && 'i' == s.charAt(i + 1) && ('o' == s.charAt(i + 2) || 'a' == s.charAt(i + 2))) {
+            stringbuffer.append('X');
+            i += 3;
+          } else if (i + 2 < s.length() && 'c' == s.charAt(i + 1) && 'h' == s.charAt(i + 2)) {
+            stringbuffer.append('X');
+            i += 3;
+          } else {
+            stringbuffer.append('T');
+            i++;
+          }
           break;
 
         case 118: // 'v'

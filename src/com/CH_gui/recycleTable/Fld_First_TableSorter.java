@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.recycleTable;
 
 import com.CH_co.service.records.FolderPair;
@@ -23,21 +20,15 @@ import com.CH_gui.table.RecordTableModel;
 import javax.swing.table.TableModel;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description:
  *  The only difference between this class and a TableSorter is that
  *  a method compareRowsByColumn is overriten, the new method makes sure that
  *  folders will go ahead of any files when sorting.
- * Class Details:
- *
- *
  * <b>$Revision: 1.1 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 public class Fld_First_TableSorter extends TableSorter {
 

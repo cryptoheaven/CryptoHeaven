@@ -1,15 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_gui.msgs;
 
 import com.CH_cl.service.actions.ClientMessageAction;
@@ -95,20 +92,11 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.undo.UndoManager;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
-*
-* Class Description:
-*
-*
-* Class Details:
-*
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.73 $</b>
+*
 * @author  Marcin Kurzawa
-* @version
 */
 public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarProducerI, DropTargetListener, DisposableObj, MsgTypeManagerI, MsgComposeManagerI, SendMessageInfoProviderI, UndoManagerI, VetoRisibleI {
 
@@ -263,7 +251,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
               boolean anyConverted = false;
               // This will also trigger fetch of any EmailRecord that we might be sending to
               // and panel renderer will be able to substitute it to show that encryption is possible.
-              anyConverted = UserOps.convertRecipientEmailAndUnknownUsersToFamiliars(MainFrame.getServerInterfaceLayer(), selectedRecipients[i], false);
+              anyConverted = UserOps.convertRecipientEmailAndUnknownUsersToFamiliars(MainFrame.getServerInterfaceLayer(), selectedRecipients[i], false, false);
               if (anyConverted)
                 redrawRecipients(i);
               if (markAsOriginalContent)
@@ -980,7 +968,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
               boolean anyExpanded = numRecipients != selectedRecipients[i].length;
               boolean anyConverted = false;
               if (selectedRecipients[i] != null && selectedRecipients[i].length > 0) {
-                anyConverted = UserOps.convertRecipientEmailAndUnknownUsersToFamiliars(SIL, selectedRecipients[i], isStagedSecure());
+                anyConverted = UserOps.convertRecipientEmailAndUnknownUsersToFamiliars(SIL, selectedRecipients[i], isStagedSecure(), isStagedSecure());
               }
               if (anyExpanded || anyConverted) {
                 redrawRecipients(i);
@@ -1075,22 +1063,13 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       panel.setLayout(new GridBagLayout());
 
       int posY = 0;
-      //String msgText = "Unable to find public keys for the following addresses: ";
-      String msgText1 = "Your message cannot be automatically encrypted for all recipients; ";
-      String msgText2 = "however, it can be encrypted using a Question and Answer. To read the ";
-      String msgText3 = "message your recipient will have to answer the question correctly. ";
+      String msgText1 = "The following email addresses support secure delivery via an encrypted";
+      String msgText2 = "pick-up account, or directly in plain text: ";
       panel.add(new JMyLabel(msgText1), new GridBagConstraints(0, posY, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 1, 10), 0, 0));
       posY ++;
       panel.add(new JMyLabel(msgText2), new GridBagConstraints(0, posY, 2, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 10, 1, 10), 0, 0));
-      posY ++;
-      panel.add(new JMyLabel(msgText3), new GridBagConstraints(0, posY, 2, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 10, 5, 10), 0, 0));
-      posY ++;
-      String msgText4 = "Addresses which do not support automatic encryption are: ";
-      panel.add(new JMyLabel(msgText4), new GridBagConstraints(0, posY, 2, 1, 10, 0,
-          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 10, 10, 10), 0, 0));
+          GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 10, 10, 10), 0, 0));
       posY ++;
       JPanel emlListPanel = new JPanel();
       emlListPanel.setLayout(new GridBagLayout());

@@ -31,7 +31,7 @@ package com.CH_co.nanoxml;
 
 
 /**
- * An XMLParseException is thrown when an error occures while parsing an XML
+ * An XMLParseException is thrown when an error occurs while parsing an XML
  * string.
  * <P>
  * $Revision: 1.1 $<BR>

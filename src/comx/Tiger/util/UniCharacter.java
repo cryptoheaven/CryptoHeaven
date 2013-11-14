@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,13 +7,7 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   UniCharacter.java
-
 package comx.Tiger.util;
-
-
-// Referenced classes of package com.wintertree.util:
-//      Search
 
 public class UniCharacter {
 
@@ -589,8 +581,9 @@ public class UniCharacter {
   }
 
   public static boolean isVowel(char c) {
-    if (c <= '\377')
+    if (c <= '\377') {
       return (Latin1CharClass[c] & 0x40) != 0;
+    }
     if (c > '\u029F') {
       return false;
     } else {
@@ -602,30 +595,35 @@ public class UniCharacter {
 
   public static char nextAccentFromBase(char c, char c1) {
     int i;
-    label0: {
+    label0:
+    {
       i = 0;
       int j = 0;
       int k = baseTbl.length - 1;
       int l;
       do {
-        if (j > k)
+        if (j > k) {
           break label0;
+        }
         l = (j + k) / 2;
-        char c2 = (char)(int)(baseTbl[l] >> 16);
+        char c2 = (char) (int) (baseTbl[l] >> 16);
         int j1 = c1 - c2;
         if (j1 < 0) {
           k = l - 1;
           continue;
         }
-        if (j1 <= 0)
+        if (j1 <= 0) {
           break;
+        }
         j = l + 1;
       } while (true);
       i = l + 1;
     }
-    for (int i1 = i; i1 < baseTbl.length; i1++)
-      if ((char)(int)(baseTbl[i1] & 65535L) == c)
-        return (char)(int)(baseTbl[i1] >> 16);
+    for (int i1 = i; i1 < baseTbl.length; i1++) {
+      if ((char) (int) (baseTbl[i1] & 65535L) == c) {
+        return (char) (int) (baseTbl[i1] >> 16);
+      }
+    }
 
     return '\0';
   }
@@ -633,26 +631,26 @@ public class UniCharacter {
   public static char toBase(char c) {
     if (c <= '\377') {
       char c1 = Latin1ToBase[c];
-      if (c1 != 0)
+      if (c1 != 0) {
         return c1;
-      else
+      } else {
         return c;
+      }
     }
     int i = 0;
     for (int j = baseTbl.length - 1; i <= j;) {
       int k = (i + j) / 2;
-      char c2 = (char)(int)(baseTbl[k] >> 16);
+      char c2 = (char) (int) (baseTbl[k] >> 16);
       int l = c - c2;
-      if (l < 0)
+      if (l < 0) {
         j = k - 1;
-      else
-        if (l > 0)
-          i = k + 1;
-        else
-          return (char)(int)(baseTbl[k] & 65535L);
+      } else if (l > 0) {
+        i = k + 1;
+      } else {
+        return (char) (int) (baseTbl[k] & 65535L);
+      }
     }
 
     return Character.toUpperCase(c);
   }
-
 }

@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,14 +7,9 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   HTMLStringWordParser.java
-
 package comx.Tiger.ssce;
 
 import comx.Tiger.util.UniCharacter;
-
-// Referenced classes of package com.wintertree.ssce:
-//      StringWordParser
 
 public class HTMLStringWordParser extends StringWordParser {
 
@@ -63,8 +56,9 @@ public class HTMLStringWordParser extends StringWordParser {
           }
         }
       }
-      if (!flag)
+      if (!flag) {
         stringbuffer.append(s.charAt(i));
+      }
     }
 
     return stringbuffer.toString();
@@ -78,8 +72,9 @@ public class HTMLStringWordParser extends StringWordParser {
       if (c > '\177' && c < '\377' && UniCharacter.isLetter(c)) {
         int j = 0;
         do {
-          if (j >= charEntitiesToChar.length)
+          if (j >= charEntitiesToChar.length) {
             break;
+          }
           if (charEntitiesToChar[j] == c) {
             stringbuffer.append("&" + wordCharEntities[j] + ";");
             flag = true;
@@ -88,8 +83,9 @@ public class HTMLStringWordParser extends StringWordParser {
           j++;
         } while (true);
       }
-      if (!flag)
+      if (!flag) {
         stringbuffer.append(s.charAt(i));
+      }
     }
 
     return stringbuffer.toString();
@@ -115,20 +111,24 @@ public class HTMLStringWordParser extends StringWordParser {
         flag = false;
         continue;
       }
-      if (!flag1)
+      if (!flag1) {
         continue;
+      }
       if (';' == c) {
         flag1 = false;
-        if (i + 1 >= super.theString.length())
+        if (i + 1 >= super.theString.length()) {
           continue;
+        }
         String s = super.theString.toString().substring(i + 1, j);
-        if (!isWordCharEntity(s))
+        if (!isWordCharEntity(s)) {
           continue;
+        }
         j = i;
         break;
       }
-      if (!UniCharacter.isWhitespace(c) && !UniCharacter.isPunctuation(c))
+      if (!UniCharacter.isWhitespace(c) && !UniCharacter.isPunctuation(c)) {
         continue;
+      }
       flag1 = false;
       j = i + 1;
       break;
@@ -143,32 +143,35 @@ public class HTMLStringWordParser extends StringWordParser {
     int i;
     for (i = super.cursor - 1; i >= 0 && !flag1; i--) {
       char c = super.theString.charAt(i);
-      if ('>' == c)
+      if ('>' == c) {
         flag = true;
-      else
-        if (';' == c && !flag) {
-          int k = i - 1;
-          do {
-            if (k < 0)
-              break;
-            char c1 = super.theString.charAt(k);
-            if (c1 == '&') {
-              i = k;
-              c = c1;
-              break;
-            }
-            if (!UniCharacter.isLetterOrDigit(c1) && c1 != '#')
-              break;
-            k--;
-          } while (true);
-        }
-      if (flag && '<' == c)
+      } else if (';' == c && !flag) {
+        int k = i - 1;
+        do {
+          if (k < 0) {
+            break;
+          }
+          char c1 = super.theString.charAt(k);
+          if (c1 == '&') {
+            i = k;
+            c = c1;
+            break;
+          }
+          if (!UniCharacter.isLetterOrDigit(c1) && c1 != '#') {
+            break;
+          }
+          k--;
+        } while (true);
+      }
+      if (flag && '<' == c) {
         flag = false;
+      }
       flag1 = !flag && !UniCharacter.isWhitespace(c);
     }
 
-    if (i <= 0)
+    if (i <= 0) {
       return null;
+    }
     for (; i > 0 && StringWordParser.isWordChar(super.theString.charAt(i - 1)); i--);
     int j = super.cursor;
     int l = super.subWordLength;
@@ -188,9 +191,11 @@ public class HTMLStringWordParser extends StringWordParser {
     char c = stringbuffer.charAt(i);
     if (c == '&') {
       int j;
-      for (j = i + 1; j < stringbuffer.length() && stringbuffer.charAt(j) != ';'; j++)
-        if (!UniCharacter.isLetterOrDigit(stringbuffer.charAt(j)))
+      for (j = i + 1; j < stringbuffer.length() && stringbuffer.charAt(j) != ';'; j++) {
+        if (!UniCharacter.isLetterOrDigit(stringbuffer.charAt(j))) {
           return false;
+        }
+      }
 
       if (i + 1 < stringbuffer.length() && j < stringbuffer.length() && stringbuffer.charAt(j) == ';') {
         char ac[] = new char[j - (i + 1)];
@@ -218,17 +223,21 @@ public class HTMLStringWordParser extends StringWordParser {
   }
 
   protected static String charToWordCharEntity(char c) {
-    for (int i = 0; i < charEntitiesToChar.length; i++)
-      if (charEntitiesToChar[i] == c)
+    for (int i = 0; i < charEntitiesToChar.length; i++) {
+      if (charEntitiesToChar[i] == c) {
         return wordCharEntities[i];
+      }
+    }
 
     return null;
   }
 
   protected static char wordCharEntityToChar(String s) {
-    for (int i = 0; i < wordCharEntities.length; i++)
-      if (wordCharEntities[i].equals(s))
+    for (int i = 0; i < wordCharEntities.length; i++) {
+      if (wordCharEntities[i].equals(s)) {
         return charEntitiesToChar[i];
+      }
+    }
 
     return '\0';
   }
@@ -236,5 +245,4 @@ public class HTMLStringWordParser extends StringWordParser {
   protected static boolean isWordCharEntity(String s) {
     return wordCharEntityToChar(s) != 0;
   }
-
 }

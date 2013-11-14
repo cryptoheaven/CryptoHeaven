@@ -11,9 +11,10 @@ import javax.swing.Icon;
 import javax.swing.JToggleButton;
 
 /**
-*
-* @author Marcin
-*/
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * @author  Marcin Kurzawa
+ */
 public class JMyToggleButton extends JToggleButton {
 
   /** Creates new JMyButton */

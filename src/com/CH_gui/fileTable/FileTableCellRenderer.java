@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.fileTable;
 
 import com.CH_gui.util.Images;
@@ -27,20 +24,14 @@ import com.CH_co.util.*;
 import com.CH_gui.service.records.RecordUtilsGui;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description:
  * This class renderers cells of a table, where files' information is displayed
  *
- * Class Details:
- *
- *
  * <b>$Revision: 1.21 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 
 public class FileTableCellRenderer extends RecordTableCellRenderer {

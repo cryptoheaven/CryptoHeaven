@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_co.service.msg.dataSets.sys;
 
 import java.io.*;
@@ -21,20 +18,11 @@ import com.CH_co.io.DataOutputStream2;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.5 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 public class Sys_Check_Co extends ProtocolMsgDataSet {
 

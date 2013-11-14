@@ -1,15 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_co.util;
 
 import com.CH_co.trace.TraceProperties;
@@ -22,12 +19,10 @@ import java.util.*;
 * properties. It reads an (program).properties file containing program-
 * specific properties. <p>
 *
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.96 $</b>
+*
 * @author  Marcin Kurzawa
 */
 public class GlobalProperties extends Object {
@@ -313,13 +308,14 @@ public class GlobalProperties extends Object {
   // build 794 Send clientOS with login info
   // build 796 Msg reply use 'div' instead of 'table', clear login info when server gives permanent error
   // build 798 SaluSafe v1.32
+  // build 800 SecureRandom adjustment, and use more bits for randomizing symmetric keys, cleaner plain email warning, don't automatically convert not hosted email addresses to web accounts, contact dialog simpler status line
 
-  public static final short PROGRAM_BUILD_NUMBER = 798;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 800;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 2;
+  public static final short PROGRAM_VERSION_MINOR = 3;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

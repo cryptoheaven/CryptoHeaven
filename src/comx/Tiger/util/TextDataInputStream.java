@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,11 +7,12 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   TextDataInputStream.java
-
 package comx.Tiger.util;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class TextDataInputStream extends DataInputStream {
 
@@ -27,24 +26,26 @@ public class TextDataInputStream extends DataInputStream {
     boolean flag = false;
     boolean flag1 = false;
     do {
-      if (flag || flag1)
+      if (flag || flag1) {
         break;
+      }
       try {
         c = readChar();
-      }
-      catch (EOFException eofexception) {
+      } catch (EOFException eofexception) {
         flag = true;
       }
-      if (!flag)
-        if (c == '\n')
+      if (!flag) {
+        if (c == '\n') {
           flag1 = true;
-        else
-          if (c != '\r')
-            stringbuffer.append(c);
+        } else if (c != '\r') {
+          stringbuffer.append(c);
+        }
+      }
     } while (true);
-    if (flag && stringbuffer.length() == 0)
+    if (flag && stringbuffer.length() == 0) {
       return null;
-    else
+    } else {
       return stringbuffer.toString();
+    }
   }
 }

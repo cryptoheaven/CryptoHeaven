@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.toolBar;
 
 import javax.swing.*;
@@ -22,12 +19,9 @@ import com.CH_gui.menuing.*;
 import com.CH_co.trace.Trace;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description: 
+ * Class Description:
  *  The only difference between this class and its parent's class is that 
  *  this class has a separator on the top of source list and the user can
  *  add it to the destination list as many times as desired without removing
@@ -39,8 +33,8 @@ import com.CH_co.trace.Trace;
  *  And separator is added to the source list before all the other elements
  *
  * <b>$Revision: 1.11 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class Tools_DualListBox extends DualListBox {
 

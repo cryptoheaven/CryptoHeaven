@@ -1,15 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_gui.gui;
 
 import com.CH_co.trace.Trace;
@@ -17,20 +14,11 @@ import java.awt.Rectangle;
 import javax.swing.JViewport;
 
 /**
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
-*
-* Class Description:
-*
-*
-* Class Details:
-*
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.9 $</b>
+*
 * @author  Marcin Kurzawa
-* @version
 */
 public class JBottomStickViewport extends JViewport {
 

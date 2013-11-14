@@ -1,7 +1,5 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  * 
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -15,20 +13,9 @@ package com.CH_co_eml.service.ops;
 import javax.mail.internet.InternetAddress;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.0 $</b>
- * @author  Marcin
- * @version
+ * @author  Marcin Kurzawa
  */
 public class EmailCommonOps {
 

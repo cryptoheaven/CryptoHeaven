@@ -5,8 +5,9 @@
 package com.CH_gui.dialog;
 
 /**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * @author Marcin
+ * @author  Marcin Kurzawa
  */
 public class ChatSessionChooserPanel extends javax.swing.JPanel {
 

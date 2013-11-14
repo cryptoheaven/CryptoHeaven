@@ -1,15 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_cl.service.ops;
 
 import com.CH_cl.service.actions.ClientMessageAction;
@@ -40,20 +37,11 @@ import java.util.HashSet;
 import java.util.Properties;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
-*
-* Class Description:
-*
-*
-* Class Details:
-*
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.34 $</b>
+*
 * @author  Marcin Kurzawa
-* @version
 */
 public class UserOps extends Object {
 
@@ -485,10 +473,11 @@ public class UserOps extends Object {
   * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
   * @return true if anything was converted.
   */
-  public static boolean convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts)");
+  public static boolean convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts, boolean convertNotHostedEmailAddressesToExistingAccounts) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts, boolean convertNotHostedEmailAddressesToExistingAccounts)");
     if (trace != null) trace.args(recipients);
     if (trace != null) trace.args(convertNotHostedEmailsToWebAccounts);
+    if (trace != null) trace.args(convertNotHostedEmailAddressesToExistingAccounts);
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
@@ -591,9 +580,10 @@ public class UserOps extends Object {
           Long userID = null;
           boolean isEmailHosted = false;
           if (eRec != null) {
-            userID = eRec.userId;
             isEmailHosted = eRec.isHosted();
-            if (trace != null) trace.data(70, addr);
+            if (isEmailHosted || convertNotHostedEmailAddressesToExistingAccounts)
+              userID = eRec.userId;
+            if (trace != null) trace.data(70, eRec, addr);
           } else {
             // see if numeric
             if (trace != null) trace.data(80, addr);
@@ -699,11 +689,11 @@ public class UserOps extends Object {
               contactIDsHS.add(recipient.getId());
             } else if (recipient instanceof MsgLinkRecord) {
               // address book entry
-              System.out.println("updateUsedStamp for Addres via Link");
+              if (trace != null) trace.data(15, "updateUsedStamp for Address via Link");
               addressLinkIDsHS.add(recipient.getId());
             } else if (recipient instanceof MsgDataRecord) {
               // address book entry
-              System.out.println("updateUsedStamp for Addres via Data");
+              if (trace != null) trace.data(16, "updateUsedStamp for Address via Data");
               MsgLinkRecord[] addrLinks = cache.getMsgLinkRecordsForMsg(recipient.getId());
               if (addrLinks != null && addrLinks.length > 0) {
                 for (int k=0; k<addrLinks.length; k++)

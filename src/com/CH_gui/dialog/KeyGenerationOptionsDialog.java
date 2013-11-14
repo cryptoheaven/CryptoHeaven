@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.dialog;
 
 import com.CH_co.service.records.KeyRecord;
@@ -32,20 +29,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.21 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class KeyGenerationOptionsDialog extends GeneralDialog {
 
@@ -148,19 +136,14 @@ public class KeyGenerationOptionsDialog extends GeneralDialog {
     jCertainty.setPaintTicks(true);
     jKeyLength.setPaintTrack(true);
     jCertainty.setPaintTrack(true);
-    /*
-    jKeyLength.setMajorTickSpacing(256);
-    jCertainty.setMajorTickSpacing(32);
-     */
-    //jKeyLength.setExtent(128);
-    //jCertainty.setExtent(16);
+
     //jKeyLength.setSnapToTicks(false);
     //jCertainty.setSnapToTicks(false);
 
-    jKeyLength.setMinorTickSpacing(128);
-    jKeyLength.setMajorTickSpacing(512);
-    jCertainty.setMinorTickSpacing(16);
-    jCertainty.setMajorTickSpacing(128);
+    jKeyLength.setMinorTickSpacing(256);
+    jKeyLength.setMajorTickSpacing(1024);
+    jCertainty.setMinorTickSpacing(64);
+    jCertainty.setMajorTickSpacing(256);
 
     Hashtable htKey = new Hashtable();
     htKey.put(new Integer(1024), new JMyLabel("1024"));

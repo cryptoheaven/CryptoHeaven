@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_cl.service.actions.sys;
 
 import com.CH_cl.service.actions.*;
@@ -18,10 +15,7 @@ import com.CH_co.trace.Trace;
 import com.CH_co.service.msg.MessageAction;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description: Action that does nothing.
  *                    When client cannot recognize the request, it will try
@@ -29,12 +23,9 @@ import com.CH_co.service.msg.MessageAction;
  *                    will be of valid format, connection will survive, if not
  *                    then client will be thrown off.  Useful to increase compatibility
  *                    between newer and older versions.
- * Class Details:
- *
- *
  * <b>$Revision: 1.7 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class SysANullAction extends ClientMessageAction {
 

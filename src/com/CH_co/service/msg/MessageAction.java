@@ -1,15 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
-
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_co.service.msg;
 
 import com.CH_co.io.DataInputStream2;
@@ -24,17 +21,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /** 
-* <b>Copyright</b> &copy; 2001-2013
-* <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
-* CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
 *
 * Basic action of the client or the server in response to the message data received.
 * Cancel relates to individual requests as canceled by for example a progress monitor.
 * Interrupt relates to chains of requests where some reply may cause subsequent requests.
 *
 * @author  Marcin Kurzawa
-* @version
 */
 public class MessageAction extends Message implements Cancellable {
 

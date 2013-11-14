@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.actions.ClientMessageAction;
@@ -57,10 +54,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.tree.TreePath;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description:
  *  This is a dialog that can serve two menu items: Create New Folder and Move Folder
@@ -72,8 +66,8 @@ import javax.swing.tree.TreePath;
  * The types are the same as in FolderRecord and in the same order.
  *
  * <b>$Revision: 1.35 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 
 public class Move_NewFld_Dialog extends GeneralDialog implements VisualsSavable {

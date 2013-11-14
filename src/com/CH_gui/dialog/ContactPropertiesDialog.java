@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.dialog;
 
 import com.CH_gui.util.*;
@@ -41,21 +38,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: 1.29 $</b>
- * @author  Marcin Kurzawa
- * @version
- */
+* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+*
+* <b>$Revision: 1.29 $</b>
+*
+* @author  Marcin Kurzawa
+*/
 public class ContactPropertiesDialog extends GeneralDialog { 
 
   private static final int DEFAULT_OK_INDEX = 0;
@@ -373,6 +361,13 @@ public class ContactPropertiesDialog extends GeneralDialog {
     jAllowFolderSharing.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_SHARE_FOLDERS) == 0);
     jNotifyOfOnlineStatus.setSelected((contactRecord.permits.intValue() & ContactRecord.PERMIT_DISABLE_SEE_ONLINE_STATUS) == 0);
 
+    if (contactRecord.isOfDeclinedTypeAnyState()) {
+      jAllowMessaging.setSelected(false);
+      jAllowFolderSharing.setSelected(false);
+      jAllowMessaging.setEnabled(false);
+      jAllowFolderSharing.setEnabled(false);
+    }
+
     jEnableAudibleOnlineNotify.setEnabled(amIOwner && jNotifyOfOnlineStatus.isSelected());
     jEnableAudibleOnlineNotify.setSelected((contactRecord.permits.intValue() & ContactRecord.SETTING_DISABLE_AUDIBLE_STATUS_NOTIFY) == 0);
 
@@ -488,8 +483,8 @@ public class ContactPropertiesDialog extends GeneralDialog {
   }
 
   /**
-   * @return true if name has changed
-   */
+  * @return true if name has changed
+  */
   private boolean isNameChanged() {
     String oldName = "";
     if (amIOwner) {
@@ -518,9 +513,9 @@ public class ContactPropertiesDialog extends GeneralDialog {
 
 
   /**
-   * Policy is to rename the current property contact and if the other way contact is
-   * of active type, rename it too.
-   */
+  * Policy is to rename the current property contact and if the other way contact is
+  * of active type, rename it too.
+  */
   private void pressedOK() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactPropertiesDialog.class, "pressedOK()");
 

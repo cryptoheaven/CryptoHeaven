@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,38 +7,32 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.gui;
 
-import java.awt.*;
-import java.io.*;
+import com.CH_gui.util.MiscGui;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.IllegalComponentStateException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Locale;
 import javax.accessibility.*;
 import javax.swing.Icon;
 import javax.swing.UIManager;
 
-import com.CH_gui.util.MiscGui;
-
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.4 $</b>
- * @author  Marcin Kurzawa
- * @version
+ *
+ * @author Marcin Kurzawa
  */
 public class JMyDotsIcon implements Icon, Serializable, Accessible {
 
   protected class AccessibleEllipsisIcon extends AccessibleContext implements AccessibleIcon, Serializable {
-
 
     public AccessibleRole getAccessibleRole() {
       return AccessibleRole.ICON;
@@ -66,8 +58,7 @@ public class JMyDotsIcon implements Icon, Serializable, Accessible {
       return null;
     }
 
-    public Locale getLocale()
-    throws IllegalComponentStateException {
+    public Locale getLocale() throws IllegalComponentStateException {
       return null;
     }
 
@@ -87,21 +78,17 @@ public class JMyDotsIcon implements Icon, Serializable, Accessible {
       return getIconWidth();
     }
 
-    private void readObject(ObjectInputStream objectinputstream)
-    throws ClassNotFoundException, IOException {
+    private void readObject(ObjectInputStream objectinputstream) throws ClassNotFoundException, IOException {
       objectinputstream.defaultReadObject();
     }
 
-    private void writeObject(ObjectOutputStream objectoutputstream)
-    throws IOException {
+    private void writeObject(ObjectOutputStream objectoutputstream) throws IOException {
       objectoutputstream.defaultWriteObject();
     }
 
     protected AccessibleEllipsisIcon() {
     }
   }
-
-
   protected int diameter;
   protected String description;
   protected AccessibleEllipsisIcon accessibleContext;
@@ -153,8 +140,9 @@ public class JMyDotsIcon implements Icon, Serializable, Accessible {
   }
 
   public AccessibleContext getAccessibleContext() {
-    if (accessibleContext == null)
+    if (accessibleContext == null) {
       accessibleContext = new AccessibleEllipsisIcon();
+    }
     return accessibleContext;
   }
 

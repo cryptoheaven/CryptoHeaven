@@ -41,15 +41,9 @@ import javax.swing.tree.*;
  * CryptoHeaven Corp.
  * </a><br>All rights reserved.<p>
  *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
  * <b>$Revision: 1.4 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 public class MenuEditorDialog extends GeneralDialog {
 

@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,10 +7,7 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   SuggestionSet.java
-
 package comx.Tiger.ssce;
-
 
 class Suggestion {
 
@@ -25,7 +20,7 @@ class Suggestion {
 
   public boolean equals(Object obj) {
     if (obj instanceof Suggestion) {
-      Suggestion suggestion = (Suggestion)obj;
+      Suggestion suggestion = (Suggestion) obj;
       return word.equals(suggestion.word);
     } else {
       return false;

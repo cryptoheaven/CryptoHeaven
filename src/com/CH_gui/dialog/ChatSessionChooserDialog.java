@@ -36,9 +36,10 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 /**
-*
-* @author Marcin
-*/
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * @author  Marcin Kurzawa
+ */
 public class ChatSessionChooserDialog extends GeneralDialog {
 
 

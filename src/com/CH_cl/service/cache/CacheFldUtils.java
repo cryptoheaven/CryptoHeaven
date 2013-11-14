@@ -1,14 +1,12 @@
-/*
-* Copyright 2001-2013 by CryptoHeaven Corp.,
-* Mississauga, Ontario, Canada.
-* All rights reserved.
-*
-* This software is the confidential and proprietary information
-* of CryptoHeaven Corp. ("Confidential Information").  You
-* shall not disclose such Confidential Information and shall use
-* it only in accordance with the terms of the license agreement
-* you entered into with CryptoHeaven Corp.
-*/
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information
+ * of CryptoHeaven Corp. ("Confidential Information").  You
+ * shall not disclose such Confidential Information and shall use
+ * it only in accordance with the terms of the license agreement
+ * you entered into with CryptoHeaven Corp.
+ */
 package com.CH_cl.service.cache;
 
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
@@ -20,9 +18,10 @@ import java.sql.Timestamp;
 import java.util.*;
 
 /**
-*
-* @author Marcin
-*/
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ *
+ * @author  Marcin Kurzawa
+ */
 public class CacheFldUtils {
 
   private static void addCategoryFolder(long folderId, long shareId, short folderType, Long userId, List foldersL, List sharesL) {

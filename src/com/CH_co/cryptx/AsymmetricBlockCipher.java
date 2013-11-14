@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,27 +7,20 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_co.cryptx;
 
-import java.util.Random;
-
+import com.CH_co.trace.Trace;
+import java.math.BigInteger;
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.DigestException;
-import java.math.BigInteger;
-
-import com.CH_co.trace.Trace;
+import java.security.SecureRandom;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class AsymmetricBlockCipher extends Object {
 
@@ -39,11 +30,11 @@ public class AsymmetricBlockCipher extends Object {
   // byte 24-x  : filler bytes
   // byte x-end : message data
   public static final int HEADER_SIZE = 23;
-  private Random random;
+  private SecureRandom random;
   private MessageDigest messageDigest;
 
   /** Creates new AsymmetricBlockCipher */
-  public AsymmetricBlockCipher(Random random) throws NoSuchAlgorithmException {
+  public AsymmetricBlockCipher(SecureRandom random) throws NoSuchAlgorithmException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(AsymmetricBlockCipher.class, "AsymmetricBlockCipher(Random random)");
     this.random = random;
     //this.messageDigest = MessageDigest.getInstance("MD5");

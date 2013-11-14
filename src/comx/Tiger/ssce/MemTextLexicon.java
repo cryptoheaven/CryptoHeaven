@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,16 +7,10 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   MemTextLexicon.java
-
 package comx.Tiger.ssce;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-// Referenced classes of package com.wintertree.ssce:
-//      LexiconUpdateException, ParameterException, WordException, EditableLexicon,
-//      SuggestionSet, WordComparator
 
 public class MemTextLexicon implements EditableLexicon {
 
@@ -37,8 +29,7 @@ public class MemTextLexicon implements EditableLexicon {
   public void addWord(String s) throws LexiconUpdateException {
     try {
       addWord(s, 105, "");
-    }
-    catch (Exception exception) {
+    } catch (Exception exception) {
       throw new LexiconUpdateException(s);
     }
   }
@@ -56,7 +47,7 @@ public class MemTextLexicon implements EditableLexicon {
     if (i != 97 && i != 65 && i != 99 && i != 67 && i != 101 && i != 105) {
       throw new ParameterException("Action unrecognized: " + i);
     } else {
-      theWords.put(s, (char)i + s1);
+      theWords.put(s, (char) i + s1);
       return;
     }
   }
@@ -67,17 +58,20 @@ public class MemTextLexicon implements EditableLexicon {
 
   public boolean equals(Object obj) {
     if (obj instanceof MemTextLexicon) {
-      MemTextLexicon memtextlexicon = (MemTextLexicon)obj;
-      if (theWords.size() != memtextlexicon.theWords.size())
+      MemTextLexicon memtextlexicon = (MemTextLexicon) obj;
+      if (theWords.size() != memtextlexicon.theWords.size()) {
         return false;
+      }
       for (Enumeration enumeration = theWords.keys(); enumeration.hasMoreElements();) {
-        String s = (String)enumeration.nextElement();
-        String s1 = (String)theWords.get(s);
-        String s2 = (String)memtextlexicon.theWords.get(s);
-        if (s1 == null && s2 != null || s1 != null && s2 == null)
+        String s = (String) enumeration.nextElement();
+        String s1 = (String) theWords.get(s);
+        String s2 = (String) memtextlexicon.theWords.get(s);
+        if (s1 == null && s2 != null || s1 != null && s2 == null) {
           return false;
-        if (s1 != null && !s1.equals(s2))
+        }
+        if (s1 != null && !s1.equals(s2)) {
           return false;
+        }
       }
       return true;
     } else {
@@ -91,10 +85,11 @@ public class MemTextLexicon implements EditableLexicon {
   }
 
   public int findWord(String s, boolean flag, StringBuffer stringbuffer) {
-    label0: {
+    label0:
+    {
       if (flag) {
         if (theWords.containsKey(s)) {
-          String s1 = (String)theWords.get(s);
+          String s1 = (String) theWords.get(s);
           stringbuffer.setLength(0);
           stringbuffer.append(s1.substring(1));
           return s1.charAt(0);
@@ -104,11 +99,12 @@ public class MemTextLexicon implements EditableLexicon {
       Enumeration enumeration = theWords.keys();
       String s2;
       do {
-        if (!enumeration.hasMoreElements())
+        if (!enumeration.hasMoreElements()) {
           break label0;
-        s2 = (String)enumeration.nextElement();
+        }
+        s2 = (String) enumeration.nextElement();
       } while (!s2.equalsIgnoreCase(s));
-      String s3 = (String)theWords.get(s2);
+      String s3 = (String) theWords.get(s2);
       stringbuffer.setLength(0);
       stringbuffer.append(s3.substring(1));
       return s3.charAt(0);
@@ -133,10 +129,11 @@ public class MemTextLexicon implements EditableLexicon {
   public void suggest(String s, int i, WordComparator wordcomparator, SuggestionSet suggestionset) {
     Enumeration enumeration = words();
     do {
-      if (!enumeration.hasMoreElements())
+      if (!enumeration.hasMoreElements()) {
         break;
-      String s1 = (String)enumeration.nextElement();
-      String s2 = (String)theWords.get(s1);
+      }
+      String s1 = (String) enumeration.nextElement();
+      String s2 = (String) theWords.get(s1);
       char c = s2.charAt(0);
       switch (c) {
         case 97: // 'a'
@@ -158,8 +155,9 @@ public class MemTextLexicon implements EditableLexicon {
         case 101: // 'e'
           int j = 0;
           while (j < suggestionset.size()) {
-            if (suggestionset.wordAt(j).equals(s1))
+            if (suggestionset.wordAt(j).equals(s1)) {
               suggestionset.deleteAt(j);
+            }
             j++;
           }
           break;
@@ -180,7 +178,7 @@ public class MemTextLexicon implements EditableLexicon {
     StringBuffer stringbuffer = new StringBuffer(getClass().getName() + '(');
     int i = 0;
     for (Enumeration enumeration = theWords.keys(); i < 3 && enumeration.hasMoreElements(); i++) {
-      stringbuffer.append((String)enumeration.nextElement());
+      stringbuffer.append((String) enumeration.nextElement());
       stringbuffer.append(", ");
     }
 

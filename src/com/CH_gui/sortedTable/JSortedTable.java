@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.sortedTable;
 
 import com.CH_cl.service.cache.*;
@@ -37,12 +34,9 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description: 
+ * Class Description:
  *  JSortedTable wraps around its DefaultTableModel a sorter -- TableSorter
  *
  * Class Details:
@@ -50,8 +44,8 @@ import javax.swing.table.*;
  *  be wraped anyways with the TableSorter
  *
  * <b>$Revision: 1.29 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 
 public class JSortedTable extends JTable implements DisposableObj {

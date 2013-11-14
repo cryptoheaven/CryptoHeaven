@@ -12,8 +12,8 @@ import java.security.InvalidKeyException;
  * Rijmen</a> and <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>.
  * <p>
  * <b>$Revision: 1.3 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 public class Rijndael_Algorithm extends Object {
 

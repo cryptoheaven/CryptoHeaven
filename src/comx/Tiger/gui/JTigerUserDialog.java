@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,41 +7,41 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package comx.Tiger.gui;
 
-import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
-
-import com.CH_guiLib.gui.*;
-
-import comx.Tiger.ssce.*;
+import com.CH_guiLib.gui.JMyRadioButton;
+import com.CH_guiLib.gui.JMyTextField;
+import com.CH_guiLib.gui.MyDefaultListCellRenderer;
+import comx.Tiger.ssce.EditableLexicon;
+import comx.Tiger.ssce.FileTextLexicon;
+import comx.Tiger.ssce.Lexicon;
+import comx.Tiger.ssce.SpellingSession;
 import comx.Tiger.util.MessageBox;
 import comx.Tiger.util.Sort;
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description:  
+ * Class Description:
  *
- * Interact with the user to edit the contents of a FileTextLexicon. 
- *
- * Class Details: 
- *
+ * Interact with the user to edit the contents of a FileTextLexicon.
  *
  * <b>$Revision: 1.4 $</b>
- * @author  Marcin Kurzawa
- * @version
+ *
+ * @author Marcin Kurzawa
  */
 public class JTigerUserDialog extends JDialog {
 
@@ -62,6 +60,7 @@ public class JTigerUserDialog extends JDialog {
 
   /**
    * Interact with the user to edit the contents of an EditableLexicon.
+   *
    * @param parent The parent frame
    * @param lexicon The lexicon to edit
    */
@@ -72,43 +71,43 @@ public class JTigerUserDialog extends JDialog {
     panel.setLayout(new GridBagLayout());
     getContentPane().add(panel, BorderLayout.CENTER);
 
-    panel.add(new JMyLabel("Words:"), new GridBagConstraints(0, 0, 2, 1, 10, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
-    panel.add(new JMyLabel("Other word:"), new GridBagConstraints(2, 0, 2, 1, 10, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
+    panel.add(new JMyLabel("Words:"), new GridBagConstraints(0, 0, 2, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
+    panel.add(new JMyLabel("Other word:"), new GridBagConstraints(2, 0, 2, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
 
-    panel.add(wordTextFld, new GridBagConstraints(0, 1, 2, 1, 10, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 0, 5), 0, 0));
-    panel.add(otherWordTextFld, new GridBagConstraints(2, 1, 2, 1, 10, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 0, 5), 0, 0));
+    panel.add(wordTextFld, new GridBagConstraints(0, 1, 2, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 0, 5), 0, 0));
+    panel.add(otherWordTextFld, new GridBagConstraints(2, 1, 2, 1, 10, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 0, 5), 0, 0));
 
-    panel.add(new JScrollPane(wordList), new GridBagConstraints(0, 2, 2, 2, 10, 10, 
-        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 5, 5), 0, 0));
-    panel.add(addWordBtn, new GridBagConstraints(2, 2, 1, 1, 5, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(deleteWordBtn, new GridBagConstraints(3, 2, 1, 1, 5, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(new JLabel(), new GridBagConstraints(2, 3, 1, 1, 10, 10, 
-        GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+    panel.add(new JScrollPane(wordList), new GridBagConstraints(0, 2, 2, 2, 10, 10,
+            GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 5, 5), 0, 0));
+    panel.add(addWordBtn, new GridBagConstraints(2, 2, 1, 1, 5, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(deleteWordBtn, new GridBagConstraints(3, 2, 1, 1, 5, 0,
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(new JLabel(), new GridBagConstraints(2, 3, 1, 1, 10, 10,
+            GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
-    panel.add(new JMyLabel("Action"), new GridBagConstraints(0, 4, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(new JMyLabel("Action"), new GridBagConstraints(0, 4, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    panel.add(ignoreRb, new GridBagConstraints(0, 5, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
-    panel.add(autoChangeCheckWordRb, new GridBagConstraints(0, 6, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
-    panel.add(autoChangeOtherWordRb, new GridBagConstraints(0, 7, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
-    panel.add(condChangeCheckWordRb, new GridBagConstraints(0, 8, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
-    panel.add(condChangeOtherWordRb, new GridBagConstraints(0, 9, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
-    panel.add(excludeRb, new GridBagConstraints(0, 10, 4, 1, 20, 0, 
-        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
+    panel.add(ignoreRb, new GridBagConstraints(0, 5, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
+    panel.add(autoChangeCheckWordRb, new GridBagConstraints(0, 6, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
+    panel.add(autoChangeOtherWordRb, new GridBagConstraints(0, 7, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
+    panel.add(condChangeCheckWordRb, new GridBagConstraints(0, 8, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
+    panel.add(condChangeOtherWordRb, new GridBagConstraints(0, 9, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
+    panel.add(excludeRb, new GridBagConstraints(0, 10, 4, 1, 20, 0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(0, 5, 0, 5), 0, 0));
 
-    panel.add(doneBtn, new GridBagConstraints(0, 12, 4, 1, 20, 0, 
-        GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(doneBtn, new GridBagConstraints(0, 12, 4, 1, 20, 0,
+            GridBagConstraints.CENTER, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     wordList.setVisibleRowCount(5);
     wordList.setCellRenderer(new MyDefaultListCellRenderer());
@@ -137,66 +136,76 @@ public class JTigerUserDialog extends JDialog {
     bg.add(excludeRb);
 
     ignoreRb.addActionListener(new ActionListener() {
+
       public void actionPerformed(ActionEvent event) {
-        if (wordTextFld.getText().equals(wordList.getSelectedValue()))
+        if (wordTextFld.getText().equals(wordList.getSelectedValue())) {
           addWordBtn_actionPerformed(event);
+        }
       }
     });
     autoChangeCheckWordRb.addActionListener(new ActionListener() {
+
       public void actionPerformed(ActionEvent event) {
-        if (wordTextFld.getText().equals(wordList.getSelectedValue()))
+        if (wordTextFld.getText().equals(wordList.getSelectedValue())) {
           addWordBtn_actionPerformed(event);
+        }
       }
     });
     autoChangeOtherWordRb.addActionListener(new ActionListener() {
+
       public void actionPerformed(ActionEvent event) {
-        if (wordTextFld.getText().equals(wordList.getSelectedValue()))
+        if (wordTextFld.getText().equals(wordList.getSelectedValue())) {
           addWordBtn_actionPerformed(event);
+        }
       }
     });
     condChangeCheckWordRb.addActionListener(new ActionListener() {
+
       public void actionPerformed(ActionEvent event) {
-        if (wordTextFld.getText().equals(wordList.getSelectedValue()))
+        if (wordTextFld.getText().equals(wordList.getSelectedValue())) {
           addWordBtn_actionPerformed(event);
+        }
       }
     });
     condChangeOtherWordRb.addActionListener(new ActionListener() {
+
       public void actionPerformed(ActionEvent event) {
-        if (wordTextFld.getText().equals(wordList.getSelectedValue()))
+        if (wordTextFld.getText().equals(wordList.getSelectedValue())) {
           addWordBtn_actionPerformed(event);
+        }
       }
     });
     excludeRb.addActionListener(new ActionListener() {
+
       public void actionPerformed(ActionEvent event) {
-        if (wordTextFld.getText().equals(wordList.getSelectedValue()))
+        if (wordTextFld.getText().equals(wordList.getSelectedValue())) {
           addWordBtn_actionPerformed(event);
+        }
       }
     });
 
     pack();
   }
-
-
   // Word list selection model needed because list data is dynamic.
   DefaultListModel wordListModel;
-
   /**
    * Lexicon being edited
    */
   protected EditableLexicon lexicon;
-
   // set to true to enable debugging messages
   public boolean debug = false;
 
   class SymAction implements java.awt.event.ActionListener {
+
     public void actionPerformed(java.awt.event.ActionEvent event) {
       Object object = event.getSource();
-      if (object == addWordBtn)
+      if (object == addWordBtn) {
         addWordBtn_actionPerformed(event);
-      else if (object == deleteWordBtn)
+      } else if (object == deleteWordBtn) {
         deleteWordBtn_actionPerformed(event);
-      else if (object == doneBtn)
+      } else if (object == doneBtn) {
         doneBtn_actionPerformed(event);
+      }
     }
   }
 
@@ -206,20 +215,15 @@ public class JTigerUserDialog extends JDialog {
     // Add the word to the lexicon.
     if (autoChangeCheckWordRb.isSelected()) {
       action = Lexicon.AUTO_CHANGE_PRESERVE_CASE_ACTION;
-    }
-    else if (autoChangeOtherWordRb.isSelected()) {
+    } else if (autoChangeOtherWordRb.isSelected()) {
       action = Lexicon.AUTO_CHANGE_ACTION;
-    }
-    else if (condChangeCheckWordRb.isSelected()) {
+    } else if (condChangeCheckWordRb.isSelected()) {
       action = Lexicon.CONDITIONAL_CHANGE_PRESERVE_CASE_ACTION;
-    }
-    else if (condChangeOtherWordRb.isSelected()) {
+    } else if (condChangeOtherWordRb.isSelected()) {
       action = Lexicon.CONDITIONAL_CHANGE_ACTION;
-    }
-    else if (excludeRb.isSelected()) {
+    } else if (excludeRb.isSelected()) {
       action = Lexicon.EXCLUDE_ACTION;
-    }
-    else {
+    } else {
       action = Lexicon.IGNORE_ACTION;
     }
 
@@ -228,9 +232,10 @@ public class JTigerUserDialog extends JDialog {
 
     try {
       lexicon.addWord(SpellingSession.stripPossessives(word), action, SpellingSession.stripPossessives(other));
-    }
-    catch (Exception e) {
-      if (debug) System.out.println(e);
+    } catch (Exception e) {
+      if (debug) {
+        System.out.println(e);
+      }
       MessageBox.createMessageBox("Edit dictionary", "Error adding word: " + e);
       return;
     }
@@ -242,14 +247,14 @@ public class JTigerUserDialog extends JDialog {
     // Delete the word from the lexicon.
     try {
       lexicon.deleteWord(wordTextFld.getText());
-    }
-    catch (Exception e) {
-      if (debug) System.out.println(e);
+    } catch (Exception e) {
+      if (debug) {
+        System.out.println(e);
+      }
       MessageBox.createMessageBox("Edit dictionary",
-      "Error deleting word: " + e);
+              "Error deleting word: " + e);
       return;
-    }
-    finally {
+    } finally {
       lexiconChanged();
     }
   }
@@ -260,10 +265,12 @@ public class JTigerUserDialog extends JDialog {
   }
 
   class SymListSelection implements ListSelectionListener {
+
     public void valueChanged(ListSelectionEvent event) {
       Object object = event.getSource();
-      if (object == wordList)
+      if (object == wordList) {
         wordList_valueChanged(event);
+      }
     }
   }
 
@@ -283,7 +290,7 @@ public class JTigerUserDialog extends JDialog {
     String words[] = new String[lexicon.size()];
     int i = 0;
     for (Enumeration e = lexicon.words(); e.hasMoreElements();) {
-      words[i++] = (String)e.nextElement();
+      words[i++] = (String) e.nextElement();
     }
     Sort.ascending(words);
 
@@ -308,7 +315,7 @@ public class JTigerUserDialog extends JDialog {
    * Respond to a different word being selected in the word list.
    */
   protected void wordListSelectionChanged() {
-    String word = (String)wordList.getSelectedValue();
+    String word = (String) wordList.getSelectedValue();
     if (word != null) {
       wordTextFld.setText(word);
       StringBuffer otherWord = new StringBuffer();
@@ -334,8 +341,7 @@ public class JTigerUserDialog extends JDialog {
           break;
       }
       otherWordTextFld.setText(otherWord.toString());
-    }
-    else {
+    } else {
       wordTextFld.setText("");
       otherWordTextFld.setText("");
     }

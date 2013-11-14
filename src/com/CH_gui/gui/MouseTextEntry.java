@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,35 +7,29 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.gui;
-
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.border.*;
-
-import java.util.Random;
 
 import com.CH_co.cryptx.Rnd;
 import com.CH_co.trace.Trace;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
+import java.util.Random;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.border.EmptyBorder;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description: 
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.13 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class MouseTextEntry extends JPanel {
 

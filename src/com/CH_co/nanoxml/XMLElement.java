@@ -30,13 +30,7 @@
 package com.CH_co.nanoxml;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;

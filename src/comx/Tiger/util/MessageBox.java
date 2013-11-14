@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,21 +7,23 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   MessageBox.java
-
 package comx.Tiger.util;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.util.EventObject;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MessageBox extends Dialog {
+
   class SymAction implements ActionListener {
 
     public void actionPerformed(ActionEvent actionevent) {
       Object obj = actionevent.getSource();
-      if (obj == okButton)
+      if (obj == okButton) {
         okButton_ActionPerformed(actionevent);
+      }
     }
 
     SymAction() {
@@ -34,15 +34,14 @@ public class MessageBox extends Dialog {
 
     public void windowClosing(WindowEvent windowevent) {
       Object obj = windowevent.getSource();
-      if (obj == MessageBox.this)
+      if (obj == MessageBox.this) {
         MessageBox_WindowClosing(windowevent);
+      }
     }
 
     SymWindow() {
     }
   }
-
-
   boolean fComponentsAdjusted;
   Label msgLabel;
   Button okButton;
@@ -74,8 +73,9 @@ public class MessageBox extends Dialog {
   public void addNotify() {
     Dimension dimension = getSize();
     super.addNotify();
-    if (fComponentsAdjusted)
+    if (fComponentsAdjusted) {
       return;
+    }
     Insets insets = getInsets();
     setSize(insets.left + insets.right + dimension.width, insets.top + insets.bottom + dimension.height);
     Component acomponent[] = getComponents();
@@ -98,8 +98,9 @@ public class MessageBox extends Dialog {
   }
 
   public static void createMessageBox(String s, String s1) {
-    if (localFrame == null)
+    if (localFrame == null) {
       localFrame = new Frame(s);
+    }
     MessageBox messagebox = new MessageBox(localFrame, s, s1);
     localFrame.setSize(messagebox.getSize().width, messagebox.getSize().height);
     messagebox.setVisible(true);
@@ -112,7 +113,8 @@ public class MessageBox extends Dialog {
   void okButton_ActionPerformed(ActionEvent actionevent) {
     setVisible(false);
     dispose();
-    if (localFrame != null)
+    if (localFrame != null) {
       localFrame.setVisible(false);
+    }
   }
 }

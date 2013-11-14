@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,22 +7,18 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   PropSpellingSession.java
-
 package comx.Tiger.ssce;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-// Referenced classes of package com.wintertree.ssce:
-//      SpellingSession, MemTextLexicon, FileTextLexicon, Lexicon, 
-//      EnglishPhoneticComparator, TypographicalComparator, CompressedLexicon, StreamTextLexicon, 
-//      WordComparator
-
-public class PropSpellingSession extends SpellingSession
-  implements Cloneable
-{
+public class PropSpellingSession extends SpellingSession implements Cloneable {
 
   protected URL codeBase;
   /**
@@ -45,8 +39,7 @@ public class PropSpellingSession extends SpellingSession
   public FileTextLexicon userLexicons[];
   protected String userLexPath;
 
-  public PropSpellingSession(Properties properties1, URL url, String s, String s1, String s2)
-  {
+  public PropSpellingSession(Properties properties1, URL url, String s, String s1, String s2) {
     mainLexPath = null;
     propertyPrefix = "";
     userLexPath = null;
@@ -56,36 +49,40 @@ public class PropSpellingSession extends SpellingSession
     mainLexPath = s1;
     userLexPath = s2;
     String s3 = "";
-    if (s != null)
+    if (s != null) {
       s3 = s;
+    }
     Vector vector1 = new Vector();
-    for (int i = 1; i < 99; i++)
-    {
+    for (int i = 1; i < 99; i++) {
       String s4 = properties1.getProperty(s3 + "UserLexicon" + i);
-      if (null == s4)
+      if (null == s4) {
         break;
+      }
       StringTokenizer stringtokenizer = new StringTokenizer(s4, ",");
       String s7 = "";
-      if (stringtokenizer.hasMoreTokens())
+      if (stringtokenizer.hasMoreTokens()) {
         s7 = stringtokenizer.nextToken();
+      }
       String s9 = "file";
-      if (stringtokenizer.hasMoreTokens())
+      if (stringtokenizer.hasMoreTokens()) {
         s9 = stringtokenizer.nextToken();
+      }
       String s11 = "T";
-      if (stringtokenizer.hasMoreTokens())
+      if (stringtokenizer.hasMoreTokens()) {
         s11 = stringtokenizer.nextToken();
+      }
       Lexicon lexicon = openLex(s7, s9, s11, s2);
       if (lexicon == null) {
         System.out.println("no user lexicon for " + s7 + ", " + s9 + ", " + s11 + ", " + s2 + ".");
         continue;
       }
-      if (lexicon instanceof FileTextLexicon)
+      if (lexicon instanceof FileTextLexicon) {
         vector1.addElement(lexicon);
+      }
     }
 
     userLexicons = null;
-    if (!vector1.isEmpty())
-    {
+    if (!vector1.isEmpty()) {
       userLexicons = new FileTextLexicon[vector1.size()];
       vector1.copyInto(userLexicons);
     }
@@ -95,61 +92,79 @@ public class PropSpellingSession extends SpellingSession
     setOptionsFromProperties(properties1, s3);
   }
 
-  public PropSpellingSession(Properties properties1)
-  {
+  public PropSpellingSession(Properties properties1) {
     this(properties1, null, null, null, null);
   }
 
-  public PropSpellingSession(Properties properties1, URL url)
-  {
+  public PropSpellingSession(Properties properties1, URL url) {
     this(properties1, url, null, null, null);
   }
 
   public void setOptionsFromProperties(Properties properties, String prefix) {
     String s3 = prefix != null ? prefix : "";
     String s6;
-    if ((s6 = properties.getProperty(s3 + "CASE_SENSITIVE_OPT")) != null)
+    if ((s6 = properties.getProperty(s3 + "CASE_SENSITIVE_OPT")) != null) {
       setOption(1, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "IGNORE_ALL_CAPS_WORD_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "IGNORE_ALL_CAPS_WORD_OPT")) != null) {
       setOption(2, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "IGNORE_CAPPED_WORD_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "IGNORE_CAPPED_WORD_OPT")) != null) {
       setOption(4, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "IGNORE_MIXED_CASE_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "IGNORE_MIXED_CASE_OPT")) != null) {
       setOption(8, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "IGNORE_MIXED_DIGITS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "IGNORE_MIXED_DIGITS_OPT")) != null) {
       setOption(16, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "IGNORE_NON_ALPHA_WORD_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "IGNORE_NON_ALPHA_WORD_OPT")) != null) {
       setOption(32, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "REPORT_DOUBLED_WORD_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "REPORT_DOUBLED_WORD_OPT")) != null) {
       setOption(64, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "REPORT_MIXED_CASE_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "REPORT_MIXED_CASE_OPT")) != null) {
       setOption(128, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "REPORT_MIXED_DIGITS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "REPORT_MIXED_DIGITS_OPT")) != null) {
       setOption(256, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "REPORT_UNCAPPED_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "REPORT_UNCAPPED_OPT")) != null) {
       setOption(1024, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "SPLIT_CONTRACTED_WORDS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "SPLIT_CONTRACTED_WORDS_OPT")) != null) {
       setOption(2048, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "SPLIT_HYPHENATED_WORDS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "SPLIT_HYPHENATED_WORDS_OPT")) != null) {
       setOption(4096, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "SPLIT_WORDS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "SPLIT_WORDS_OPT")) != null) {
       setOption(8192, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "STRIP_POSSESSIVES_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "STRIP_POSSESSIVES_OPT")) != null) {
       setOption(16384, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "SUGGEST_SPLIT_WORDS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "SUGGEST_SPLIT_WORDS_OPT")) != null) {
       setOption(32768, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "IGNORE_DOMAIN_NAMES_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "IGNORE_DOMAIN_NAMES_OPT")) != null) {
       setOption(0x10000, Boolean.valueOf(s6).booleanValue());
-    if ((s6 = properties.getProperty(s3 + "ALLOW_ACCENTED_CAPS_OPT")) != null)
+    }
+    if ((s6 = properties.getProperty(s3 + "ALLOW_ACCENTED_CAPS_OPT")) != null) {
       setOption(0x20000, Boolean.valueOf(s6).booleanValue());
+    }
     minSuggestDepth = 50;
-    if ((s6 = properties.getProperty(s3 + "MinSuggestDepth")) != null)
+    if ((s6 = properties.getProperty(s3 + "MinSuggestDepth")) != null) {
       minSuggestDepth = Integer.valueOf(s6).intValue();
-    if ((s6 = properties.getProperty(s3 + "Suggestions")) != null && s6.equalsIgnoreCase("Phonetic"))
+    }
+    if ((s6 = properties.getProperty(s3 + "Suggestions")) != null && s6.equalsIgnoreCase("Phonetic")) {
       comparator = new EnglishPhoneticComparator();
-    else
+    } else {
       comparator = new TypographicalComparator();
+    }
   }
+
   public void loadLanguageLexicons() {
     Vector vector = new Vector();
 
@@ -159,39 +174,46 @@ public class PropSpellingSession extends SpellingSession
       tempLexicon = getTempLexicon();
     } catch (Throwable t) {
     }
-    if (tempLexicon != null)
+    if (tempLexicon != null) {
       vector.addElement(tempLexicon);
-    else
+    } else {
       vector.addElement(new MemTextLexicon());
+    }
     tempLexiconX = 0;
     Lexicon[] userLexicons = getUserLexicons();
     // retain all user lexicons
-    for (int i=0; userLexicons!=null && i<userLexicons.length; i++)
+    for (int i = 0; userLexicons != null && i < userLexicons.length; i++) {
       vector.addElement(userLexicons[i]);
+    }
 
     String s3 = "";
-    if (propertyPrefix != null)
+    if (propertyPrefix != null) {
       s3 = propertyPrefix;
+    }
     String s1 = mainLexPath;
-    for (int j = 1; j < 99; j++)
-    {
+    for (int j = 1; j < 99; j++) {
       String prop = s3 + "MainLexicon" + j;
       String s5 = properties.getProperty(prop);
-      if (null == s5)
+      if (null == s5) {
         break;
+      }
       StringTokenizer stringtokenizer1 = new StringTokenizer(s5, ",");
       String s8 = "";
-      if (stringtokenizer1.hasMoreTokens())
+      if (stringtokenizer1.hasMoreTokens()) {
         s8 = stringtokenizer1.nextToken();
+      }
       String s10 = "file";
-      if (stringtokenizer1.hasMoreTokens())
+      if (stringtokenizer1.hasMoreTokens()) {
         s10 = stringtokenizer1.nextToken();
+      }
       String s12 = null;
-      if (stringtokenizer1.hasMoreTokens())
+      if (stringtokenizer1.hasMoreTokens()) {
         s12 = stringtokenizer1.nextToken();
+      }
       Lexicon lexicon1 = openLex(s8, s10, s12, s1);
-      if (lexicon1 == null)
+      if (lexicon1 == null) {
         System.out.println("no main lexicon for " + s8 + ", " + s10 + ", " + s12 + ", " + s1 + ".");
+      }
       if (lexicon1 != null) {
         vector.addElement(lexicon1);
       }
@@ -202,43 +224,38 @@ public class PropSpellingSession extends SpellingSession
     setLexicons(alexicon);
   }
 
-  public Object clone()
-  {
-    PropSpellingSession propspellingsession = (PropSpellingSession)super.clone();
+  public Object clone() {
+    PropSpellingSession propspellingsession = (PropSpellingSession) super.clone();
     propspellingsession.codeBase = codeBase;
     propspellingsession.comparator = comparator;
     propspellingsession.mainLexPath = mainLexPath;
     propspellingsession.minSuggestDepth = minSuggestDepth;
     propspellingsession.tempLexiconX = tempLexiconX;
-    if (properties != null)
+    if (properties != null) {
       propspellingsession.properties = new Properties(properties);
-    else
+    } else {
       propspellingsession.properties = null;
+    }
     propspellingsession.propertyPrefix = propertyPrefix;
-    if (userLexicons != null)
-    {
+    if (userLexicons != null) {
       propspellingsession.userLexicons = new FileTextLexicon[userLexicons.length];
       System.arraycopy(userLexicons, 0, propspellingsession.userLexicons, 0, propspellingsession.userLexicons.length);
-    } else
-    {
+    } else {
       propspellingsession.userLexicons = null;
     }
     propspellingsession.userLexPath = userLexPath;
     return propspellingsession;
   }
 
-  public WordComparator getComparator()
-  {
+  public WordComparator getComparator() {
     return comparator;
   }
 
-  public int getMinSuggestDepth()
-  {
+  public int getMinSuggestDepth() {
     return minSuggestDepth;
   }
 
-  public Properties getProperties()
-  {
+  public Properties getProperties() {
     properties.put("CASE_SENSITIVE_OPT", String.valueOf(getOption(1)));
     properties.put("IGNORE_ALL_CAPS_WORD_OPT", String.valueOf(getOption(2)));
     properties.put("IGNORE_CAPPED_WORD_OPT", String.valueOf(getOption(4)));
@@ -257,113 +274,109 @@ public class PropSpellingSession extends SpellingSession
     properties.put("IGNORE_DOMAIN_NAMES_OPT", String.valueOf(getOption(0x10000)));
     properties.put("ALLOW_ACCENTED_CAPS_OPT", String.valueOf(getOption(0x20000)));
     properties.put("MinSuggestDepth", String.valueOf(minSuggestDepth));
-    if (comparator instanceof EnglishPhoneticComparator)
+    if (comparator instanceof EnglishPhoneticComparator) {
       properties.put("Comparator", "Phonetic");
-    else
+    } else {
       properties.put("Comparator", "Typographical");
+    }
     return properties;
   }
 
-  public MemTextLexicon getTempLexicon()
-  {
+  public MemTextLexicon getTempLexicon() {
     Lexicon alexicon[] = getLexicons();
-    return (MemTextLexicon)alexicon[tempLexiconX];
+    return (MemTextLexicon) alexicon[tempLexiconX];
   }
 
-  public FileTextLexicon[] getUserLexicons()
-  {
+  public FileTextLexicon[] getUserLexicons() {
     return userLexicons;
   }
 
-  public void setComparator(WordComparator wordcomparator)
-  {
+  public void setComparator(WordComparator wordcomparator) {
     comparator = wordcomparator;
   }
 
-  public void setMinSuggestDepth(int i)
-  {
+  public void setMinSuggestDepth(int i) {
     minSuggestDepth = i;
   }
 
-  public MemTextLexicon setTempLexicon(MemTextLexicon memtextlexicon)
-  {
+  public MemTextLexicon setTempLexicon(MemTextLexicon memtextlexicon) {
     Lexicon alexicon[] = getLexicons();
-    MemTextLexicon memtextlexicon1 = (MemTextLexicon)alexicon[tempLexiconX];
+    MemTextLexicon memtextlexicon1 = (MemTextLexicon) alexicon[tempLexiconX];
     alexicon[tempLexiconX] = memtextlexicon;
     return memtextlexicon1;
   }
 
-  protected Lexicon openLex(String s, String s1, String s2, String s3)
-  {
+  protected Lexicon openLex(String s, String s1, String s2, String s3) {
     Object obj = null;
-    try
-    {
-      if (s1.equalsIgnoreCase("file"))
-      {
-        if (s3 != null && s.indexOf(File.separator) < 0)
-        {
-          if (!s3.endsWith(File.separator))
+    try {
+      if (s1.equalsIgnoreCase("file")) {
+        if (s3 != null && s.indexOf(File.separator) < 0) {
+          if (!s3.endsWith(File.separator)) {
             s3 = s3 + File.separator;
+          }
           s = s3 + s;
         }
-        if (s2 == null)
-          if (CompressedLexicon.isCompressedLexicon(s))
+        if (s2 == null) {
+          if (CompressedLexicon.isCompressedLexicon(s)) {
             s2 = "c";
-          else
+          } else {
             s2 = "t";
-        if (s2.equalsIgnoreCase("c"))
+          }
+        }
+        if (s2.equalsIgnoreCase("c")) {
           obj = new CompressedLexicon(s, 0);
-        else
+        } else {
           obj = new FileTextLexicon(s);
-      } else
-      if (s1.equalsIgnoreCase("resource"))
-      {
+        }
+      } else if (s1.equalsIgnoreCase("resource")) {
         java.io.InputStream inputstream = PropSpellingSession.class.getResourceAsStream(s);
-        if (null == inputstream)
+        if (null == inputstream) {
           throw new Exception();
-        if (s2.equalsIgnoreCase("t"))
+        }
+        if (s2.equalsIgnoreCase("t")) {
           obj = new StreamTextLexicon(inputstream);
-        else
+        } else {
           obj = new CompressedLexicon(inputstream);
-      } else
-      if (s1.equalsIgnoreCase("url"))
-      {
+        }
+      } else if (s1.equalsIgnoreCase("url")) {
         URL url;
-        if (codeBase == null)
+        if (codeBase == null) {
           url = new URL(s);
-        else
+        } else {
           url = new URL(codeBase + s);
+        }
         java.io.InputStream inputstream1 = url.openStream();
-        if (null == inputstream1)
+        if (null == inputstream1) {
           throw new Exception();
-        if (s2.equalsIgnoreCase("t"))
+        }
+        if (s2.equalsIgnoreCase("t")) {
           obj = new StreamTextLexicon(inputstream1);
-        else
+        } else {
           obj = new CompressedLexicon(inputstream1);
-      } else
-      if (s1.equalsIgnoreCase("stream"))
-      {
-        if (s3 != null && s.indexOf(File.separator) < 0)
-        {
-          if (!s3.endsWith(File.separator))
+        }
+      } else if (s1.equalsIgnoreCase("stream")) {
+        if (s3 != null && s.indexOf(File.separator) < 0) {
+          if (!s3.endsWith(File.separator)) {
             s3 = s3 + File.separator;
+          }
           s = s3 + s;
         }
-        InputStream fileinputstream = new BufferedInputStream(new FileInputStream(s), 32*1024);
-        if (fileinputstream == null)
+        InputStream fileinputstream = new BufferedInputStream(new FileInputStream(s), 32 * 1024);
+        if (fileinputstream == null) {
           throw new Exception();
-        if (s2.equalsIgnoreCase("c"))
+        }
+        if (s2.equalsIgnoreCase("c")) {
           obj = new CompressedLexicon(fileinputstream);
-        else
+        } else {
           obj = new StreamTextLexicon(fileinputstream);
+        }
       }
-    }
-    catch (Exception exception)
-    {
+    } catch (Exception exception) {
       exception.printStackTrace();
       System.err.println("Can't open " + s + "(" + s1 + "," + s2 + "):");
-      if (exception.getMessage() != null)
+      if (exception.getMessage() != null) {
         System.err.println("  " + exception);
+      }
     }
     return ((Lexicon) (obj));
   }

@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,14 +7,9 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   Lexicon.java
-
 package comx.Tiger.ssce;
 
 import java.io.Serializable;
-
-// Referenced classes of package com.wintertree.ssce:
-//      WordComparator, SuggestionSet
 
 public interface Lexicon extends Serializable {
 

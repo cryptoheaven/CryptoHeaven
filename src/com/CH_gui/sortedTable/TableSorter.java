@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.sortedTable;
 
 import java.util.*;
@@ -20,21 +17,16 @@ import com.CH_co.trace.Trace;
 import com.CH_gui.table.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description:
- *
  *
  * Class Details:   Sorts by raw columns, not model columns, hence it is
  *                  possible to sort by hidden as well as shown columns.
  *
- *
  * <b>$Revision: 1.18 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 
 public class TableSorter extends TableMap implements Comparator, TableModelListener {

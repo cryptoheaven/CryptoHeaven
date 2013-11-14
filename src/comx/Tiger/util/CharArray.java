@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,10 +7,7 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   CharArray.java
-
 package comx.Tiger.util;
-
 
 public class CharArray {
 
@@ -21,17 +16,20 @@ public class CharArray {
 
   public static final int compare(char ac[], char ac1[]) {
     int i;
-    for (i = 0; ac[i] == ac1[i];)
-      if (ac[i++] == 0)
+    for (i = 0; ac[i] == ac1[i];) {
+      if (ac[i++] == 0) {
         return 0;
+      }
+    }
 
     return ac[i] - ac1[i];
   }
 
   public static final int length(char ac[]) {
     int i = 0;
-    for (int j = 0; ac[j] != 0; j++)
+    for (int j = 0; ac[j] != 0; j++) {
       i++;
+    }
 
     return i;
   }

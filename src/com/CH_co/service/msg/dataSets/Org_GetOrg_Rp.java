@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_co.service.msg.dataSets;
 
 import java.io.IOException;
@@ -23,14 +20,10 @@ import com.CH_co.service.records.OrganizationRecord;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p> 
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  * 
  * Get My Organization Reply
  * @author  Marcin Kurzawa
- * @version 
  */
 public class Org_GetOrg_Rp extends ProtocolMsgDataSet {
   // <userId> <sponsorId> <lvl0Total> <lvl1Total> <lvl2Total> <lvl3Total> <lvl4Total> <lvl5Total> <lvl6Total> <lvl7Total> <lvl8Total> <lvl9Total> <dataUpdated>

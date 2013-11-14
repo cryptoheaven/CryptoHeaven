@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,40 +7,35 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package comx.Tiger.gui;
 
+import com.CH_cl.service.engine.ServerInterfaceLayer;
+import com.CH_cl.service.ops.UserOps;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyCheckBox;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.GeneralDialog;
-import com.CH_gui.gui.*;
-
-import com.CH_guiLib.gui.*;
-
-import com.CH_cl.service.engine.*;
-import com.CH_cl.service.ops.*;
-
+import com.CH_guiLib.gui.JMyComboBox;
+import comx.Tiger.ssce.PropSpellingSession;
+import comx.Tiger.ssce.SpellingSession;
 import comx.tig.en.SingleTigerSession;
-import comx.Tiger.ssce.*;
-
-import java.awt.*;
-import java.util.*;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.Properties;
 import javax.swing.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description:  
+ * Class Description:
  *
- * Interact with the user to set SpellingSession options. 
- *
- * Class Details: 
- *
+ * Interact with the user to set SpellingSession options.
  *
  * <b>$Revision: 1.4 $</b>
- * @author  Marcin Kurzawa
- * @version
+ *
+ * @author Marcin Kurzawa
  */
 public class JTigerOptionsDialog extends GeneralDialog {
 
@@ -50,6 +43,7 @@ public class JTigerOptionsDialog extends GeneralDialog {
 
   /**
    * Interact with the user to set SpellingSession options.
+   *
    * @param parent The parent frame
    * @param session The spelling session whose options are to be set
    */
@@ -60,13 +54,8 @@ public class JTigerOptionsDialog extends GeneralDialog {
 
     okBtn.setText("OK");
     okBtn.setActionCommand("OK");
-    //okBtn.setMnemonic((int)'O');
-    //okBtn.setFont(new Font("Dialog", Font.PLAIN, 12));
-    //okBtn.setBounds(104,216,88,40);
     cancelBtn.setText("Cancel");
     cancelBtn.setActionCommand("Cancel");
-    //cancelBtn.setFont(new Font("Dialog", Font.PLAIN, 12));
-    //cancelBtn.setBounds(216,216,88,38);
 
     JPanel panel = new JPanel();
     panel.setLayout(new GridBagLayout());
@@ -75,68 +64,61 @@ public class JTigerOptionsDialog extends GeneralDialog {
     initialLanguageChoice = ((PropSpellingSession) session).getProperties().getProperty(SingleTigerSession.PROPERTY__LANGUAGE_NAME);
     jLanguageCombo.setSelectedItem(initialLanguageChoice);
     panel.add(jLanguageLabel, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 2, 2), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 10, 2, 2), 0, 0));
     panel.add(jLanguageCombo, new GridBagConstraints(1, posY, 1, 1, 1, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 2, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(10, 2, 2, 10), 0, 0));
     panel.add(new JLabel(), new GridBagConstraints(2, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(0, 0, 0, 0), 0, 0));
     posY++;
-    
+
     enableBackgroundCheckerCkb.setText("Enable as-you-type spell checking.");
     enableBackgroundCheckerCkb.setActionCommand("Enable as-you-type spell checking.");
     panel.add(enableBackgroundCheckerCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     caseSensitiveCkb.setText("Enable case sensitive checking.");
     caseSensitiveCkb.setActionCommand("Enable case sensitive checking.");
-    //caseSensitiveCkb.setMnemonic((int)'E');
     panel.add(caseSensitiveCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     ignoreCapitalizedWordsCkb.setText("Ignore capitalized words (e.g., Canada).");
     ignoreCapitalizedWordsCkb.setActionCommand("Ignore capitalized words (e.g., Canada).");
-    //ignoreCapitalizedWordsCkb.setMnemonic((int)'C');
     panel.add(ignoreCapitalizedWordsCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     ignoreAllCapsWordsCkb.setText("Ignore all-caps words (e.g., ASAP).");
     ignoreAllCapsWordsCkb.setActionCommand("Ignore all-caps words (e.g., ASAP).");
-    //ignoreAllCapsWordsCkb.setMnemonic((int)'A');
     panel.add(ignoreAllCapsWordsCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     ignoreWordsWithNumbersCkb.setText("Ignore words with numbers (e.g., Y2K).");
     ignoreWordsWithNumbersCkb.setActionCommand("Ignore words with numbers (e.g., Y2K).");
-    //ignoreWordsWithNumbersCkb.setMnemonic((int)'N');
     panel.add(ignoreWordsWithNumbersCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     ignoreMixedCaseWordsCkb.setText("Ignore words with mixed case (e.g., SuperBase).");
     ignoreMixedCaseWordsCkb.setActionCommand("Ignore words with mixed case (e.g., SuperBase).");
-    //ignoreMixedCaseWordsCkb.setMnemonic((int)'M');
     panel.add(ignoreMixedCaseWordsCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     ignoreDomainNamesCkb.setText("Ignore domain names (e.g., domain.com).");
     ignoreDomainNamesCkb.setActionCommand("Ignore domain names (e.g., domain.com).");
-    //ignoreDomainNamesCkb.setMnemonic((int)'I');
     panel.add(ignoreDomainNamesCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     reportDoubledWordsCkb.setText("Report doubled words (e.g., the the).");
     reportDoubledWordsCkb.setActionCommand("Report doubled words (e.g., the the).");
-    //reportDoubledWordsCkb.setMnemonic((int)'D');
     panel.add(reportDoubledWordsCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
 
     suggestSplitWordsCkb.setText("Suggest split words.");
     suggestSplitWordsCkb.setActionCommand("Suggest split words.");
     panel.add(suggestSplitWordsCkb, new GridBagConstraints(0, posY++, 3, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 10, 10), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 10, 10), 0, 0));
     //}}
     // filler
     panel.add(new JLabel(), new GridBagConstraints(0, posY++, 3, 1, 10, 10,
-      GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
     //{{REGISTER_LISTENERS
     SymAction lSymAction = new SymAction();
@@ -157,11 +139,9 @@ public class JTigerOptionsDialog extends GeneralDialog {
     suggestSplitWordsCkb.setSelected(ssce.getOption(ssce.SUGGEST_SPLIT_WORDS_OPT));
 
     // Create and show the dialog
-    JButton[] buttons = new JButton[] { okBtn, cancelBtn };
+    JButton[] buttons = new JButton[]{okBtn, cancelBtn};
     init(parent, buttons, panel, 0, 1);
   }
-
-
   //{{DECLARE_CONTROLS
   String initialLanguageChoice = null;
   JLabel jLanguageLabel = new JMyLabel("Language:");
@@ -178,19 +158,20 @@ public class JTigerOptionsDialog extends GeneralDialog {
   JButton cancelBtn = new JMyButton();
   JCheckBox suggestSplitWordsCkb = new JMyCheckBox();
   //}}
-
   /**
    * Spelling session being edited
    */
   protected SpellingSession ssce;
 
   class SymAction implements java.awt.event.ActionListener {
+
     public void actionPerformed(java.awt.event.ActionEvent event) {
       Object object = event.getSource();
-      if (object == okBtn)
+      if (object == okBtn) {
         okBtn_actionPerformed(event);
-      else if (object == cancelBtn)
+      } else if (object == cancelBtn) {
         cancelBtn_actionPerformed(event);
+      }
     }
   }
 
@@ -210,12 +191,14 @@ public class JTigerOptionsDialog extends GeneralDialog {
     if (ssce instanceof PropSpellingSession) {
       String newLanguageChoice = (String) jLanguageCombo.getSelectedItem();
       boolean newLangSettingSet = false;
-      if (initialLanguageChoice == null || !initialLanguageChoice.equalsIgnoreCase(newLanguageChoice))
+      if (initialLanguageChoice == null || !initialLanguageChoice.equalsIgnoreCase(newLanguageChoice)) {
         newLangSettingSet = SingleTigerSession.loadLanguageLexicons((String) jLanguageCombo.getSelectedItem());
+      }
       Properties properties = ((PropSpellingSession) ssce).getProperties();
-      if (newLangSettingSet)
+      if (newLangSettingSet) {
         properties.setProperty(SingleTigerSession.PROPERTY__LANGUAGE_NAME, newLanguageChoice);
-      properties.setProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, ""+TigerBkgChecker.backgroundCheckEnabled);
+      }
+      properties.setProperty(TigerBkgChecker.PROPERTY__BACKGROUND_CHECK_ENABLED, "" + TigerBkgChecker.backgroundCheckEnabled);
       UserOps.updateUserSettingsSpellingProperties(SIL, properties);
     }
 

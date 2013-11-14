@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,15 +7,10 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-// Source File Name:   SortedSet.java
-
 package comx.Tiger.util;
 
 import java.util.Enumeration;
 import java.util.Vector;
-
-// Referenced classes of package com.wintertree.util:
-//      Comparable, Search
 
 public class SortedSet {
 
@@ -28,30 +21,36 @@ public class SortedSet {
   }
 
   public void addElement(Comparable comparable) {
-    if (Search.binary(set, comparable) >= 0)
+    if (Search.binary(set, comparable) >= 0) {
       return;
+    }
     int i = 0;
     do {
-      if (i >= set.size())
+      if (i >= set.size()) {
         break;
-      Comparable comparable1 = (Comparable)set.elementAt(i);
-      if (comparable.compareTo(comparable1) <= 0)
+      }
+      Comparable comparable1 = (Comparable) set.elementAt(i);
+      if (comparable.compareTo(comparable1) <= 0) {
         break;
+      }
       i++;
     } while (true);
     set.insertElementAt(comparable, i);
   }
 
   public void addElement(String s) {
-    if (Search.binary(set, s) >= 0)
+    if (Search.binary(set, s) >= 0) {
       return;
+    }
     int i = 0;
     do {
-      if (i >= set.size())
+      if (i >= set.size()) {
         break;
-      String s1 = (String)set.elementAt(i);
-      if (s.compareTo(s1) <= 0)
+      }
+      String s1 = (String) set.elementAt(i);
+      if (s.compareTo(s1) <= 0) {
         break;
+      }
       i++;
     } while (true);
     set.insertElementAt(s, i);

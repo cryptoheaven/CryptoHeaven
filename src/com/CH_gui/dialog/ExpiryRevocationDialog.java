@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.dialog;
 
 import com.CH_cl.service.cache.FetchedDataCache;
@@ -47,21 +44,10 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-/**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+/** 
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description:
- *
- *
- * Class Details:
- *
- *
- * <b>$Revision: $</b>
  * @author  Marcin Kurzawa
- * @version
  */
 public class ExpiryRevocationDialog extends GeneralDialog {
 

@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_co.io;
 
 import java.io.*;
@@ -17,13 +14,9 @@ import java.io.*;
 import com.CH_co.monitor.Interruptible;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p> 
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * @author  Marcin Kurzawa
- * @version 
  */
 public class InterruptibleOutputStream extends OutputStream implements Interruptible {
 

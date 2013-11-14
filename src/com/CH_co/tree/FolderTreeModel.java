@@ -1,7 +1,5 @@
 /*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  * 
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -20,15 +18,11 @@ import com.CH_co.util.ArrayUtils;
 import java.util.*;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Details: All "public" access to the tree structure is "synchronized"
  *
  * @author  Marcin Kurzawa
- * @version
  */
 public class FolderTreeModel {
 

@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,7 +7,6 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package com.CH_gui.service.records;
 
 import com.CH_gui.util.Images;
@@ -22,20 +19,11 @@ import com.CH_co.util.*;
 import javax.swing.*;
 
 /** 
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
- *
- * Class Description:
- *
- *
- * Class Details:
- *
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.6 $</b>
+ *
  * @author  Marcin Kurzawa
- * @version
  */
 public class ContactRecUtil extends Object {
 
@@ -103,11 +91,13 @@ public class ContactRecUtil extends Object {
         statusText = "Offline; Accepted";
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED :
-        statusText = "Offline; Accepted and Acknowledged";
+        //statusText = "Offline; Accepted and Acknowledged"; // too much detail with Acknowledged status
+        statusText = "Offline; Accepted";
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE :
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AVAILABLE :
-        statusText = "Online; Accepted and Acknowledged";
+        //statusText = "Online; Accepted and Acknowledged"; // too much detail with Acknowledged status
+        statusText = "Online; Accepted";
         break;
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_INACTIVE :
       case ContactRecord.STATUS_ACCEPTED_ACKNOWLEDGED_ONLINE_AWAY :
@@ -123,7 +113,8 @@ public class ContactRecUtil extends Object {
         statusText = "Declined";
         break;
       case ContactRecord.STATUS_DECLINED_ACKNOWLEDGED :
-        statusText = "Declined and Acknowledged";
+        //statusText = "Declined and Acknowledged"; // too much detail with Acknowledged status
+        statusText = "Declined";
         break;
       default :
         statusText = "unknown";

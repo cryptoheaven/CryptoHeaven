@@ -1,7 +1,5 @@
-/*
- * Copyright 2001-2013 by CryptoHeaven Corp.,
- * Mississauga, Ontario, Canada.
- * All rights reserved.
+/**
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -9,72 +7,55 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-
 package comx.Tiger.gui;
 
-import com.CH_gui.gui.*;
-import com.CH_guiLib.gui.*;
-
-import comx.tig.en.SingleTigerSession;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.JMyTextArea;
+import com.CH_gui.gui.MyInsets;
+import com.CH_guiLib.gui.JMyTextField;
+import com.CH_guiLib.gui.MyDefaultListCellRenderer;
 import comx.Tiger.ssce.*;
 import comx.Tiger.util.MessageBox;
-
+import comx.tig.en.SingleTigerSession;
 import java.awt.*;
 import java.util.Stack;
 import java.util.Vector;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.JTextComponent;
 
 /**
- * <b>Copyright</b> &copy; 2001-2013
- * <a href="http://www.CryptoHeaven.com/DevelopmentTeam/">
- * CryptoHeaven Corp.
- * </a><br>All rights reserved.<p>
+ * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
- * Class Description:  
+ * Class Description:
  *
- * Check the spelling of some text and interact with the user to correct
- * any spelling errors encountered using a Swing dialog. 
+ * Check the spelling of some text and interact with the user to correct any
+ * spelling errors encountered using a Swing dialog.
  *
- * Class Details: 
+ * Class Details:
  *
- * <P>The basic steps involved in using the JSpellCheckDlg class to check
- * text are:
- * <OL>
- * <LI>Create a MemTextLexicon object to hold ignore-all and change-all
- *	words.
- * <LI>Create one or more FileTextLexicon objects representing user
- *	lexicons.
- * <LI>Create a FileTextLexicon and CompressedLexicon object for the
- *	main lexicon.
- * <LI>Create a SpellingSession object.
- * <LI>Add the lexicon objects to an array, and pass the array to the
- *	SpellingSession objects's setLexicons method.
- * <LI>Create a TypographicalComparator or EnglishPhoneticComparator object.
- * <LI>If your application can display help information about the spelling-
- *	checker dialog, create an object derived from the HelpViewer class.
- * <LI>If the text being checked is contained by a TextArea component,
- *	create a TextAreaWordParser object.
- * <LI>Create an array to hold the set of user lexicons.
- * <LI>Create a JSpellCheckDlg object.
- * <LI>Call JSpellCheckDlg's show method.
- * <LI>When the dialog closes, call the userCanceled method to determine
- *	if the changes made by the user should be kept.
- * <LI>If the JSpellCheckDlg object was constructed to check a String,
- *	call the getText method to obtain the corrected text.
- * </OL>
- *
- * @see com.wintertree.ssce.CompressedLexicon
- * @see com.wintertree.ssce.EnglishPhoneticComparator
- * @see com.wintertree.ssce.FileTextLexicon
- * @see com.wintertree.ssce.MemTextLexicon
- * @see com.wintertree.ssce.SpellingSession
- * @see com.wintertree.ssce.TypographicalComparator
+ * <P>The basic steps involved in using the JSpellCheckDlg class to check text
+ * are: <OL> <LI>Create a MemTextLexicon object to hold ignore-all and
+ * change-all words. <LI>Create one or more FileTextLexicon objects representing
+ * user lexicons. <LI>Create a FileTextLexicon and CompressedLexicon object for
+ * the main lexicon. <LI>Create a SpellingSession object. <LI>Add the lexicon
+ * objects to an array, and pass the array to the SpellingSession objects's
+ * setLexicons method. <LI>Create a TypographicalComparator or
+ * EnglishPhoneticComparator object. <LI>If your application can display help
+ * information about the spelling- checker dialog, create an object derived from
+ * the HelpViewer class. <LI>If the text being checked is contained by a
+ * TextArea component, create a TextAreaWordParser object. <LI>Create an array
+ * to hold the set of user lexicons. <LI>Create a JSpellCheckDlg object.
+ * <LI>Call JSpellCheckDlg's show method. <LI>When the dialog closes, call the
+ * userCanceled method to determine if the changes made by the user should be
+ * kept. <LI>If the JSpellCheckDlg object was constructed to check a String,
+ * call the getText method to obtain the corrected text. </OL>
  *
  * <b>$Revision: 1.5 $</b>
- * @author  Marcin Kurzawa
- * @version
+ *
+ * @author Marcin Kurzawa
  */
 public class JTigerCheckDialog extends JDialog {
 
@@ -98,7 +79,6 @@ public class JTigerCheckDialog extends JDialog {
   JTextArea contextTextArea = new JMyTextArea();
   JScrollPane jScrollPane3 = new JScrollPane();
   JList userDictList = new JList();
-
 
   public JTigerCheckDialog(Frame parent, JTextComponent textComp, TigerPropSession speller) {
     this(parent, speller, new TigerWordParser(textComp, true, true), speller.getComparator(), speller.getUserLexicons());
@@ -128,61 +108,61 @@ public class JTigerCheckDialog extends JDialog {
     ignoreButton.setActionCommand("Ignore");
     ignoreButton.setToolTipText("Ignore this occurrence of the word.");
     buttonPanel.add(ignoreButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
+    posY++;
 
     ignoreAllButton.setText("Ignore All");
     ignoreAllButton.setActionCommand("Ignore All");
     ignoreAllButton.setToolTipText("Ignore this and all further occurrences of the word.");
     buttonPanel.add(ignoreAllButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 7, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 7, 7), 0, 0));
+    posY++;
 
     changeButton.setText("Change");
     changeButton.setActionCommand("Change");
     changeButton.setToolTipText("Change this occurrence of the word.");
     buttonPanel.add(changeButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
+    posY++;
 
     changeAllButton.setText("Change All");
     changeAllButton.setActionCommand("Change All");
     changeAllButton.setToolTipText("Change this and all further occurrences of the word.");
     buttonPanel.add(changeAllButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 7, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 7, 7), 0, 0));
+    posY++;
 
     suggestButton.setText("Suggest");
     suggestButton.setActionCommand("Suggest");
     suggestButton.setToolTipText("Look for better suggestions.");
     buttonPanel.add(suggestButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
+    posY++;
 
     addButton.setText("Add");
     addButton.setActionCommand("Add");
     addButton.setToolTipText("Add this word to the selected user dictionary.");
     buttonPanel.add(addButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 2, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 2, 7), 0, 0));
+    posY++;
 
     undoButton.setText("Undo");
     undoButton.setActionCommand("Undo");
     undoButton.setToolTipText("Undo the last change");
     buttonPanel.add(undoButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 7, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(2, 7, 7, 7), 0, 0));
+    posY++;
 
     cancelButton.setText("Done");
     cancelButton.setActionCommand("Done");
     cancelButton.setToolTipText("Stop the spelling check.");
     buttonPanel.add(cancelButton, new GridBagConstraints(0, posY, 1, 1, 1, 1,
-      GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
-    posY ++;
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new MyInsets(7, 7, 2, 7), 0, 0));
+    posY++;
 
     // filler
     buttonPanel.add(new JLabel(), new GridBagConstraints(0, posY, 1, 1, 1, 10,
-      GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
+            GridBagConstraints.CENTER, GridBagConstraints.BOTH, new MyInsets(0, 0, 0, 0), 0, 0));
 
 
     panel.setLayout(new GridBagLayout());
@@ -190,63 +170,63 @@ public class JTigerCheckDialog extends JDialog {
 
     problemLabel.setText("Not in dictionary:");
     panel.add(problemLabel, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 1, 5), 0, 0));
     problemTextFld.setToolTipText("The misspelled word");
-    posY ++;
+    posY++;
 
     panel.add(problemTextFld, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
-    posY ++;
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+    posY++;
 
     jLabel1.setText("Change to:");
     panel.add(jLabel1, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
-    posY ++;
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+    posY++;
 
     changeToTextFld.setToolTipText("The word to replace the misspelled word.");
     panel.add(changeToTextFld, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
-    posY ++;
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+    posY++;
 
     jLabel2.setText("Suggestions:");
     panel.add(jLabel2, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
-    posY ++;
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+    posY++;
 
     jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     panel.add(jScrollPane1, new GridBagConstraints(0, posY, 1, 1, 10, 10,
-      GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(1, 5, 1, 5), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(1, 5, 1, 5), 0, 0));
     suggestionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     suggestionList.setToolTipText("Suggested replacements for the misspelled word");
     suggestionList.setCellRenderer(new MyDefaultListCellRenderer());
     jScrollPane1.getViewport().add(suggestionList);
-    posY ++;
+    posY++;
 
     bottomPanel.setLayout(new GridBagLayout());
     posY = 0;
 
     jLabel3.setText("Add words to:");
     bottomPanel.add(jLabel3, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
-    posY ++;
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+    posY++;
 
     bottomPanel.add(jScrollPane3, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
     userDictList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     userDictList.setToolTipText("Select the user dictionary words will be added to when the Add button is pressed.");
     userDictList.setVisibleRowCount(2);
     userDictList.setCellRenderer(new MyDefaultListCellRenderer());
     jScrollPane3.getViewport().add(userDictList);
-    posY ++;
+    posY++;
 
     bottomPanel.add(jScrollPane2, new GridBagConstraints(0, posY, 1, 1, 10, 1,
-      GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
+            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(1, 5, 1, 5), 0, 0));
     contextTextArea.setLineWrap(true);
     contextTextArea.setAutoscrolls(false);
     contextTextArea.setWrapStyleWord(true);
     contextTextArea.setEditable(false);
     jScrollPane2.getViewport().add(contextTextArea);
-    posY ++;
+    posY++;
 
     // Register listeners.
     SymAction lSymAction = new SymAction();
@@ -265,6 +245,7 @@ public class JTigerCheckDialog extends JDialog {
     suggestionList.setModel(suggestionListModel);
 
     userDictList.addListSelectionListener(new ListSelectionListener() {
+
       public void valueChanged(ListSelectionEvent e) {
         updateUI();
       }
@@ -281,17 +262,18 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Check the spelling of text contained by a WordParser and interact with
-   * the user to dispose of spelling errors found using a Swing dialog box.
+   * Check the spelling of text contained by a WordParser and interact with the
+   * user to dispose of spelling errors found using a Swing dialog box.
+   *
    * @param parent The parent frame
    * @param speller The spelling session used to check spelling
    * @param parser The WordParser containing the text to check. If the user
-   *  makes corrections, the WordParser will be updated.
-   * @param comparator Used to locate suggested replacements for misspelled
-   * * words.
-   * @param userLexicons Array of user lexicon files which appear in
-   *	the "Add words to" choice in the dialog. If null or empty, the "Add"
-   *	button will be disabled.
+   * makes corrections, the WordParser will be updated.
+   * @param comparator Used to locate suggested replacements for misspelled *
+   * words.
+   * @param userLexicons Array of user lexicon files which appear in the "Add
+   * words to" choice in the dialog. If null or empty, the "Add" button will be
+   * disabled.
    */
   private JTigerCheckDialog(Frame parent, PropSpellingSession speller, WordParser parser, WordComparator comparator, FileTextLexicon[] userLexicons) {
     this(parent);
@@ -329,15 +311,16 @@ public class JTigerCheckDialog extends JDialog {
   /**
    * Check the spelling of a String and interact with the user to correct
    * spelling errors found in it using a Swing dialog.
+   *
    * @param parent The parent frame
    * @param speller The spelling session used to check spelling
-   * @param text The text to spell-check. When the dialog closes, call
-   *	the getText method to get the updated text.
-   * @param comparator Used to assess suggestions for misspelled words.
-   *	If null, a TypographicalComparator will be used.
-   * @param userLexicons Array of user lexicon files which appear in
-   *	the "Add words to" choice in the dialog. If null or empty, the "Add"
-   *	button will be disabled.
+   * @param text The text to spell-check. When the dialog closes, call the
+   * getText method to get the updated text.
+   * @param comparator Used to assess suggestions for misspelled words. If null,
+   * a TypographicalComparator will be used.
+   * @param userLexicons Array of user lexicon files which appear in the "Add
+   * words to" choice in the dialog. If null or empty, the "Add" button will be
+   * disabled.
    * @see #getText
    */
   private JTigerCheckDialog(Frame parent, PropSpellingSession speller, String text, WordComparator comparator, FileTextLexicon[] userLexicons) {
@@ -378,8 +361,9 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Obtain the (possibly updated) text. This method should be called
-   * only if the SpellingDialog was constructed to check a String.
+   * Obtain the (possibly updated) text. This method should be called only if
+   * the SpellingDialog was constructed to check a String.
+   *
    * @return The updated text
    */
   public String getText() {
@@ -391,8 +375,9 @@ public class JTigerCheckDialog extends JDialog {
 
   /**
    * Determine if the user canceled the spelling check.
-   * @return true if the user canceled; false if the spelling check
-   *	ran to completion.
+   *
+   * @return true if the user canceled; false if the spelling check ran to
+   * completion.
    */
   public boolean userCanceled() {
     return canceled;
@@ -404,23 +389,21 @@ public class JTigerCheckDialog extends JDialog {
   protected void busy(boolean b) {
     if (b) {
       setCursor(java.awt.Cursor.getPredefinedCursor(
-      java.awt.Cursor.WAIT_CURSOR));
-    }
-    else {
+              java.awt.Cursor.WAIT_CURSOR));
+    } else {
       setCursor(java.awt.Cursor.getDefaultCursor());
     }
   }
 
   /**
-   * Replace the word in the problem field with the word in the change-to
-   * field.
+   * Replace the word in the problem field with the word in the change-to field.
    */
   protected void changeWord() {
     // Replace function:  Substitute the word in the
     // Change To field for the current word.
     if (debug) {
-      System.out.println("replacing " + parser.getWord() + " with " +
-      changeToTextFld.getText());
+      System.out.println("replacing " + parser.getWord() + " with "
+              + changeToTextFld.getText());
     }
 
     // Temporarily make the context area editable or this won't work.
@@ -460,11 +443,12 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Locate a user lexicon with a given name in the set of lexicons owned
-   * by the spelling session.
+   * Locate a user lexicon with a given name in the set of lexicons owned by the
+   * spelling session.
+   *
    * @param fileName Name of the lexicon file to locate
-   * @return The lexicon object associated with the file name, or null if
-   *	the file could not be found.
+   * @return The lexicon object associated with the file name, or null if the
+   * file could not be found.
    */
   protected FileTextLexicon findLex(String fileName) {
     Lexicon lexSet[] = speller.getLexicons();
@@ -473,7 +457,7 @@ public class JTigerCheckDialog extends JDialog {
     }
     for (int i = 0; i < lexSet.length; ++i) {
       if (lexSet[i] instanceof FileTextLexicon) {
-        FileTextLexicon lex = (FileTextLexicon)lexSet[i];
+        FileTextLexicon lex = (FileTextLexicon) lexSet[i];
         if (lex.getFileName().equals(fileName)) {
           return lex;
         }
@@ -483,8 +467,9 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Fill the suggestions list with suggestions for the word in the
-   * problem field.
+   * Fill the suggestions list with suggestions for the word in the problem
+   * field.
+   *
    * @return The number of suggestions obtained.
    */
   protected int getSuggestions() {
@@ -501,10 +486,11 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Locate a temporary lexicon in the set of lexicons
-   * owned by the spelling session.
-   * @return The lexicon object, or null if a suitable lexicon could not
-   *	be found.
+   * Locate a temporary lexicon in the set of lexicons owned by the spelling
+   * session.
+   *
+   * @return The lexicon object, or null if a suitable lexicon could not be
+   * found.
    */
   protected MemTextLexicon getTempLex() {
     Lexicon lexSet[] = speller.getLexicons();
@@ -513,7 +499,7 @@ public class JTigerCheckDialog extends JDialog {
     }
     for (int i = 0; i < lexSet.length; ++i) {
       if (lexSet[i] instanceof MemTextLexicon) {
-        return (MemTextLexicon)lexSet[i];
+        return (MemTextLexicon) lexSet[i];
       }
     }
     return null;
@@ -521,8 +507,9 @@ public class JTigerCheckDialog extends JDialog {
 
   /**
    * Check the spelling of words until the user's attention is required.
-   * @return true if there is more text to check; false if all text has
-   *	been checked.
+   *
+   * @return true if there is more text to check; false if all text has been
+   * checked.
    */
   protected boolean runChecker() {
     problemTextFld.setText("");
@@ -547,9 +534,11 @@ public class JTigerCheckDialog extends JDialog {
       result = speller.check(parser, replWord);
       busy(false);
 
-      if (debug) System.out.println("runChecker: check result: " + result +
-                    " word: " + (parser.hasMoreElements() ? parser.getWord() : "(none)") +
-                    " replWord: " + replWord.toString());
+      if (debug) {
+        System.out.println("runChecker: check result: " + result
+                + " word: " + (parser.hasMoreElements() ? parser.getWord() : "(none)")
+                + " replWord: " + replWord.toString());
+      }
 
       // See if we should make an automatic change.
       if ((result & speller.AUTO_CHANGE_WORD_RSLT) != 0) {
@@ -559,18 +548,16 @@ public class JTigerCheckDialog extends JDialog {
         // Example: xxx AUTO_CHANGE a xxx
         // To prevent this, limit the number of automatic changes made
         // within the replacement text.
-        if (changeOffset >= lastAutoChangeOffset &&
-        changeOffset < lastAutoChangeOffset + lastAutoChangeLen) {
+        if (changeOffset >= lastAutoChangeOffset
+                && changeOffset < lastAutoChangeOffset + lastAutoChangeLen) {
           ++numAutoChanges;
-        }
-        else {
+        } else {
           numAutoChanges = 0;
         }
         if (numAutoChanges >= maxAutoChanges) {
           // Don't make the replacement. Just skip this word.
           parser.nextWord();
-        }
-        else {
+        } else {
           // Automatically replace the current word with the
           // indicated replacement.
           problemTextFld.setText(parser.getWord());
@@ -604,13 +591,11 @@ public class JTigerCheckDialog extends JDialog {
       // returned by check() is the best suggestion.
       suggestSearchDepth = minSuggestDepth;
       getSuggestions();
-    }
-    else if ((result & speller.UNCAPPED_WORD_RSLT) != 0) {
+    } else if ((result & speller.UNCAPPED_WORD_RSLT) != 0) {
       problemLabel.setText("Capitalization:");
       problemTextFld.setText(parser.getWord());
       changeToTextFld.setText(replWord.toString());
-    }
-    else if ((result & speller.DOUBLED_WORD_RSLT) != 0) {
+    } else if ((result & speller.DOUBLED_WORD_RSLT) != 0) {
       problemLabel.setText("Doubled word:");
       problemTextFld.setText(parser.getWord());
       changeToTextFld.setText("");
@@ -618,18 +603,15 @@ public class JTigerCheckDialog extends JDialog {
       // The Change button serves double-duty as a Delete button when
       // a doubled word is encountered. Indicate we're in this state.
       doubledWord = true;
-    }
-    else if ((result & speller.MIXED_CASE_WORD_RSLT) != 0) {
+    } else if ((result & speller.MIXED_CASE_WORD_RSLT) != 0) {
       problemLabel.setText("Mixed case:");
       problemTextFld.setText(parser.getWord());
       changeToTextFld.setText(replWord.toString());
-    }
-    else if ((result & speller.MIXED_DIGITS_WORD_RSLT) != 0) {
+    } else if ((result & speller.MIXED_DIGITS_WORD_RSLT) != 0) {
       problemLabel.setText("Contains digits:");
       problemTextFld.setText(parser.getWord());
       changeToTextFld.setText(replWord.toString());
-    }
-    else if ((result & speller.MISSPELLED_WORD_RSLT) != 0) {
+    } else if ((result & speller.MISSPELLED_WORD_RSLT) != 0) {
       // Present the misspelled word to the user.
       problemLabel.setText("Not in dictionary:");
       problemTextFld.setText(parser.getWord());
@@ -640,7 +622,7 @@ public class JTigerCheckDialog extends JDialog {
       suggestSearchDepth = minSuggestDepth;
       if (getSuggestions() > 0) {
         // Display the first suggestion in the Change To field.
-        changeToTextFld.setText((String)suggestionListModel.getElementAt(0));
+        changeToTextFld.setText((String) suggestionListModel.getElementAt(0));
       }
 
     }
@@ -660,13 +642,13 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Undo the last change made to the tex. If no changes can be undone,
-   * this method does nothing. Subsequent calls to this method will undo
-   * successive changes, starting with the most recent change.
+   * Undo the last change made to the tex. If no changes can be undone, this
+   * method does nothing. Subsequent calls to this method will undo successive
+   * changes, starting with the most recent change.
    */
   public void undo() {
     // Pop the last change off the stack.
-    UndoRecord undoRec = (UndoRecord)undoStack.pop();
+    UndoRecord undoRec = (UndoRecord) undoStack.pop();
 
     // Position to the location of the change.
     parser.setCursor(undoRec.offset);
@@ -693,12 +675,11 @@ public class JTigerCheckDialog extends JDialog {
     MemTextLexicon tmpLex = getTempLex();
     if (tmpLex != null) {
       StringBuffer junk = new StringBuffer();
-      if (tmpLex.findWord(undoRec.origText, true, junk) ==
-      MemTextLexicon.AUTO_CHANGE_PRESERVE_CASE_ACTION) {
+      if (tmpLex.findWord(undoRec.origText, true, junk)
+              == MemTextLexicon.AUTO_CHANGE_PRESERVE_CASE_ACTION) {
         try {
           tmpLex.deleteWord(undoRec.origText);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
           // Do nothing.
         }
       }
@@ -706,9 +687,9 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   /**
-   * Update the user interface to reflect the current state. Various
-   * buttons are enabled or disabled depending on whether their associated
-   * actions are appropriate at this point.
+   * Update the user interface to reflect the current state. Various buttons are
+   * enabled or disabled depending on whether their associated actions are
+   * appropriate at this point.
    */
   protected void updateUI() {
     // If the user has changed the word in the problem field, reset the
@@ -732,8 +713,7 @@ public class JTigerCheckDialog extends JDialog {
     // case.
     if (doubledWord) {
       changeButton.setText("Delete");
-    }
-    else {
+    } else {
       changeButton.setText("Change");
     }
     changeButton.setEnabled(true);
@@ -760,102 +740,91 @@ public class JTigerCheckDialog extends JDialog {
     // The Undo button is enabled if there are actions to undo.
     undoButton.setEnabled(!undoStack.empty());
   }
-
   /**
    * Initial depth used to obtain suggestions.
    */
   public int minSuggestDepth;
-
   /**
    * true if the user canceled
    */
   protected boolean canceled;
-
   /**
    * WordComparator used to locate suggestions for misspelled words.
    */
   protected WordComparator comparator;
-
   /**
-   * Delay starting until the dialog has been displayed. This
-   * prevents an exception which occurs if text is highlighted in
-   * the context area before the dialog is visible.
+   * Delay starting until the dialog has been displayed. This prevents an
+   * exception which occurs if text is highlighted in the context area before
+   * the dialog is visible.
    */
   protected boolean firstTime = true;
-
   /**
    * WordParser used to obtain words to check and update corrections.
    */
   protected WordParser parser;
-
   /**
    * SpellingSession used to check spelling and look up suggestions
    */
   protected SpellingSession speller;
-
   /**
    * true if a doubled word was detected.
    */
   private boolean doubledWord;
-
   /**
    * Current depth used to locate suggestions.
    */
   private int suggestSearchDepth;
-
   /**
    * List model used to update the suggestions JList, which is dynamic.
    */
   DefaultListModel suggestionListModel;
-
-  /** Contains the last word for which suggestions were located. The
-   * suggestion search depth is reset if the user changes the word.
+  /**
+   * Contains the last word for which suggestions were located. The suggestion
+   * search depth is reset if the user changes the word.
    */
   private String suggestWord;
-
   /**
-   * 1-shot timer used to delay checking until the dialog is displayed.
-   * This prevents an exception which occurs when text is highlighted in
-   * the context area before the dialog has been painted.
+   * 1-shot timer used to delay checking until the dialog is displayed. This
+   * prevents an exception which occurs when text is highlighted in the context
+   * area before the dialog has been painted.
    */
   private Timer checkStartDelayTimer;
-
   /**
    * Stack of changes which can be undone.
    */
   private Stack undoStack;
-
   /**
    * User dictionary names.
    */
   Vector userLexVec;
-
   // set to true to enable debugging messages
   public boolean debug = false;
 
-
   class SymAction implements java.awt.event.ActionListener {
+
     public void actionPerformed(java.awt.event.ActionEvent event) {
       Object object = event.getSource();
-      if (object == ignoreButton)
+      if (object == ignoreButton) {
         ignoreButton_actionPerformed(event);
-      else if (object == ignoreAllButton)
+      } else if (object == ignoreAllButton) {
         ignoreAllButton_actionPerformed(event);
-      else if (object == changeButton)
+      } else if (object == changeButton) {
         changeButton_actionPerformed(event);
-      else if (object == changeAllButton)
+      } else if (object == changeAllButton) {
         changeAllButton_actionPerformed(event);
-      else if (object == suggestButton)
+      } else if (object == suggestButton) {
         suggestButton_actionPerformed(event);
-      else if (object == addButton)
+      } else if (object == addButton) {
         addButton_actionPerformed(event);
-      else if (object == cancelButton)
+      } else if (object == cancelButton) {
         cancelButton_actionPerformed(event);
-      else if (object == undoButton)
+      } else if (object == undoButton) {
         undoButton_actionPerformed(event);
+      }
 
-      if (object == checkStartDelayTimer)
+      if (object == checkStartDelayTimer) {
         checkStartDelayTimer_actionPerformed(event);
+      }
     }
   }
 
@@ -875,8 +844,7 @@ public class JTigerCheckDialog extends JDialog {
     }
     try {
       tmpLex.addWord(word);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       // Do nothing.
     }
 
@@ -893,8 +861,7 @@ public class JTigerCheckDialog extends JDialog {
     if (doubledWord) {
       // Delete function:	 Delete the current word.
       deleteWord();
-    }
-    else {
+    } else {
       // Replace function:  Substitute the word in the
       // Change To field for the current word.
       changeWord();
@@ -907,7 +874,7 @@ public class JTigerCheckDialog extends JDialog {
     // Add the word and replacement to the temporary lexicon,
     // so the word will automatically be replaced next time it occurs.
     if (!problemTextFld.getText().equals(changeToTextFld.getText())) {
-      MemTextLexicon tmpLex =	getTempLex();
+      MemTextLexicon tmpLex = getTempLex();
       String word = problemTextFld.getText();
       String changeToWord = changeToTextFld.getText();
       if (speller.getOption(speller.STRIP_POSSESSIVES_OPT)) {
@@ -917,9 +884,8 @@ public class JTigerCheckDialog extends JDialog {
       if (tmpLex != null) {
         try {
           tmpLex.addWord(word,
-          tmpLex.AUTO_CHANGE_PRESERVE_CASE_ACTION, changeToWord);
-        }
-        catch (Exception e) {
+                  tmpLex.AUTO_CHANGE_PRESERVE_CASE_ACTION, changeToWord);
+        } catch (Exception e) {
           MessageBox.createMessageBox(getTitle(), "Error saving word: " + e);
         }
       }
@@ -939,7 +905,7 @@ public class JTigerCheckDialog extends JDialog {
     suggestWord = problemTextFld.getText();
     if (getSuggestions() > 0) {
       // Display the first suggestion in the Change To field.
-      changeToTextFld.setText((String)suggestionListModel.getElementAt(0));
+      changeToTextFld.setText((String) suggestionListModel.getElementAt(0));
     }
 
     // Advance to the next search depth in case the user
@@ -962,7 +928,7 @@ public class JTigerCheckDialog extends JDialog {
     if (pos < 0) {
       pos = 0;
     }
-    String filename = (String)userDictList.getModel().getElementAt(pos);
+    String filename = (String) userDictList.getModel().getElementAt(pos);
     FileTextLexicon lex = findLex(filename);
     if (lex != null) {
       String word = problemTextFld.getText();
@@ -971,8 +937,7 @@ public class JTigerCheckDialog extends JDialog {
       }
       try {
         lex.addWord(word);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         MessageBox.createMessageBox(getTitle(), "Error adding word to dictionary: " + e);
       }
     }
@@ -998,10 +963,12 @@ public class JTigerCheckDialog extends JDialog {
   }
 
   class SymListSelection implements ListSelectionListener {
+
     public void valueChanged(ListSelectionEvent event) {
       Object object = event.getSource();
-      if (object == suggestionList)
+      if (object == suggestionList) {
         suggestionList_valueChanged(event);
+      }
     }
   }
 
@@ -1009,29 +976,26 @@ public class JTigerCheckDialog extends JDialog {
     int newSel = suggestionList.getSelectedIndex();
     if (newSel >= 0) {
       // The change-to word becomes the selected suggestion.
-      changeToTextFld.setText((String)suggestionListModel.getElementAt(newSel));
+      changeToTextFld.setText((String) suggestionListModel.getElementAt(newSel));
     }
   }
-
 
   /**
    * Information recorded about an undo-able change.
    */
   private static class UndoRecord {
+
     /**
      * Location of the 1st changed character within the text.
      */
     int offset;
-
     /**
      * Original text (before the change).
      */
     String origText;
-
     /**
      * New text inserted by the change.
      */
     String newText;
   }
-
 }
