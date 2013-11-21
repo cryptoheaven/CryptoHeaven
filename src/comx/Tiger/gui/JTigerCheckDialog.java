@@ -9,6 +9,7 @@
  */
 package comx.Tiger.gui;
 
+import com.CH_co.util.NoObfuscateException;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.JMyTextArea;
@@ -349,6 +350,11 @@ public class JTigerCheckDialog extends JDialog {
     }
     userDictList.setListData(userLexVec);
     undoStack = new Stack();
+  }
+
+  public static JDialog buildCheckDialog_reflection(Frame parent, JTextComponent textComp) throws NoObfuscateException {
+    TigerPropSession speller = SingleTigerSession.getSingleInstance();
+    return new JTigerCheckDialog(parent, textComp, speller);
   }
 
   public void setVisible(boolean b) {

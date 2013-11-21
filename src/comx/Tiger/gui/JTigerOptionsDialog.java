@@ -11,6 +11,8 @@ package comx.Tiger.gui;
 
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.UserOps;
+import com.CH_co.util.NoObfuscateException;
+import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyCheckBox;
 import com.CH_gui.gui.JMyLabel;
@@ -142,6 +144,12 @@ public class JTigerOptionsDialog extends GeneralDialog {
     JButton[] buttons = new JButton[]{okBtn, cancelBtn};
     init(parent, buttons, panel, 0, 1);
   }
+
+  public static JDialog buildOptionsDialog_reflection(Frame parent) throws NoObfuscateException {
+    TigerPropSession speller = SingleTigerSession.getSingleInstance();
+    return new JTigerOptionsDialog(parent, speller, MainFrame.getServerInterfaceLayer());
+  }
+
   //{{DECLARE_CONTROLS
   String initialLanguageChoice = null;
   JLabel jLanguageLabel = new JMyLabel("Language:");

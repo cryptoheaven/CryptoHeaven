@@ -9,6 +9,7 @@
  */
 package comx.Tiger.gui;
 
+import com.CH_co.util.NoObfuscateException;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
@@ -21,6 +22,7 @@ import comx.Tiger.ssce.Lexicon;
 import comx.Tiger.ssce.SpellingSession;
 import comx.Tiger.util.MessageBox;
 import comx.Tiger.util.Sort;
+import comx.tig.en.SingleTigerSession;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -186,6 +188,12 @@ public class JTigerUserDialog extends JDialog {
 
     pack();
   }
+
+  public static JDialog buildUserDialog_reflection(Frame parent) throws NoObfuscateException {
+    TigerPropSession speller = SingleTigerSession.getSingleInstance();
+    return new JTigerUserDialog(parent, speller.getUserLexicons()[0]);
+  }
+
   // Word list selection model needed because list data is dynamic.
   DefaultListModel wordListModel;
   /**

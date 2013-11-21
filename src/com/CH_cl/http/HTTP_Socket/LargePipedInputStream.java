@@ -7,9 +7,11 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package comx.HTTP_Socket;
+package com.CH_cl.http.HTTP_Socket;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
 
 /** 
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.

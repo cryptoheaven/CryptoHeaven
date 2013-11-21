@@ -14,7 +14,6 @@ import com.CH_cl.service.cache.event.RecordEvent;
 import com.CH_cl.service.cache.event.UserSettingsRecordEvent;
 import com.CH_cl.service.cache.event.UserSettingsRecordListener;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
@@ -22,10 +21,10 @@ import com.CH_co.service.records.ContactRecord;
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.service.records.UserSettingsRecord;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.MyUncaughtExceptionHandlerOps;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.util.MessageDialog;
-import comx.Tiger.gui.TigerPropSession;
-import comx.tig.en.SingleTigerSession;
+import com.CH_gui.util.SpellCheckerWrapper;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.event.*;
@@ -254,8 +253,7 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
         }
         if (userSettingsRecord.spellingProps != null) {
           try {
-            TigerPropSession tigerSession = SingleTigerSession.getSingleInstance();
-            tigerSession.setOptionsFromProperties(userSettingsRecord.spellingProps, null);
+            SpellCheckerWrapper.setOptionsFromProperties(userSettingsRecord.spellingProps);
           } catch (Throwable t) {
             t.printStackTrace();
           }

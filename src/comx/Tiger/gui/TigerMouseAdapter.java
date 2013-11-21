@@ -9,6 +9,7 @@
  */
 package comx.Tiger.gui;
 
+import com.CH_co.util.NoObfuscateException;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -34,6 +35,11 @@ public class TigerMouseAdapter extends MouseAdapter {
 
   public TigerMouseAdapter(HTMLEditor editor) {
     this.editor = editor;
+  }
+
+  // Used to easily create and initialize with reflection
+  public static MouseAdapter createNewAdapter_reflection(Object htmlEditor) throws NoObfuscateException {
+    return new TigerMouseAdapter((HTMLEditor) htmlEditor);
   }
 
   public void mousePressed(MouseEvent mouseEvent) {

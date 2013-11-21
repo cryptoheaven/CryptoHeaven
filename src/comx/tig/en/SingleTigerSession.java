@@ -13,7 +13,9 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.service.records.UserSettingsRecord;
 import com.CH_co.trace.TraceProperties;
 import com.CH_co.util.ArrayUtils;
+import com.CH_co.util.NoObfuscateException;
 import com.CH_co.util.URLs;
+import com.CH_gui.util.SpellCheckerWrapper;
 import comx.Tiger.gui.TigerBkgChecker;
 import comx.Tiger.gui.TigerPropSession;
 import comx.Tiger.ssce.Lexicon;
@@ -44,7 +46,7 @@ public class SingleTigerSession extends Object {
   private static Properties defaultProperties = new Properties();
   private static String[][] DEFAULT_PROPERTIES;
   public static String PROPERTY__LANGUAGE_NAME = "LanguageName";
-  public static String PROPERTY__MAX_AVAIL_LANGS = "MaxAvailLangs";
+  public static String PROPERTY__MAX_AVAIL_LANGS = SpellCheckerWrapper.PROPERTY__MAX_AVAIL_LANGS;
   /**
    * 'languageNameSets' are in direct corelation with 'languageFiles' and
    * 'languageProperties', do not change their order.
@@ -299,6 +301,9 @@ public class SingleTigerSession extends Object {
     languageNamesAvailableV.toArray(languageNamesAvailable);
   }
 
+  public static TigerPropSession getSingleInstance_reflection() throws NoObfuscateException {
+    return getSingleInstance();
+  }
   public static TigerPropSession getSingleInstance() {
     synchronized (monitorObj) {
       if (singleInstance == null) {
@@ -401,6 +406,11 @@ public class SingleTigerSession extends Object {
     return specifiedLangFound;
   }
 
+  public static int countLanguageLexicons_reflection() throws NoObfuscateException {
+    TigerPropSession speller = SingleTigerSession.getSingleInstance();
+    return countLanguageLexicons(speller);
+  }
+
   public static int countLanguageLexicons(TigerPropSession session) {
     Lexicon[] lexicons = session.getLexicons();
     Lexicon[] userLex = session.getUserLexicons();
@@ -408,6 +418,10 @@ public class SingleTigerSession extends Object {
     int countUserLex = userLex != null ? userLex.length : 0;
     int countTempLex = tempLex != null ? 1 : 0;
     return lexicons.length - countUserLex - countTempLex;
+  }
+
+  public static String[] getAvailableLanguages_reflection() throws NoObfuscateException {
+    return getAvailableLanguages();
   }
 
   public static String[] getAvailableLanguages() {

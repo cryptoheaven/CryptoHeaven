@@ -7,7 +7,7 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package comx.HTTP_Common;
+package com.CH_cl.http.HTTP_Common;
 
 import java.util.Iterator;
 

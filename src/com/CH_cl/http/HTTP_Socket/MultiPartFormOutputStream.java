@@ -7,10 +7,12 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package comx.HTTP_Socket;
+package com.CH_cl.http.HTTP_Socket;
 
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.

@@ -7,10 +7,10 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package comx.HTTP_Common;
+package com.CH_cl.http.HTTP_Common;
 
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 /** 
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.

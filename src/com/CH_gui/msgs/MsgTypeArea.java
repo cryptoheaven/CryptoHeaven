@@ -9,27 +9,27 @@
  */
 package com.CH_gui.msgs;
 
-import com.CH_co.nanoxml.*;
-import com.CH_co.service.records.*;
+import com.CH_co.nanoxml.XMLElement;
+import com.CH_co.service.records.MsgDataRecord;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
-import com.CH_gui.addressBook.*;
+import com.CH_gui.addressBook.ContactInfoPanel;
 import com.CH_gui.gui.*;
-import com.CH_gui.util.*;
-
-// "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-import comx.tig.en.*;
-import comx.Tiger.gui.*;
-
+import com.CH_gui.util.ComponentContainerI;
+import com.CH_gui.util.HTML_ClickablePane;
+import com.CH_gui.util.SpellCheckerI;
+import com.CH_gui.util.SpellCheckerWrapper;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.*;
-
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.parser.ParserDelegator;
 
@@ -77,8 +77,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
 
   private String prevHtmlText, prevPlainText, setHtmlText, setPlainText;
 
-  // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
-  private Object tigerBkgChecker = null;
+  private SpellCheckerI tigerBkgChecker = null;
 
   /** Creates new MsgTypeArea */
   public MsgTypeArea(String htmlPropertyPostfix, short objType, boolean defaultHTML, UndoManagerI undoMngrI, boolean suppressSpellCheck, boolean isChatMode) {
@@ -100,20 +99,21 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
 
     init();
 
+    // Create spell checker for the message
     if (!suppressSpellCheck) {
-    //if (isChatMode && !suppressSpellCheck) {
-      // Create spell checker for the message
-      // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
       try {
-        tigerBkgChecker = new TigerBkgChecker(SingleTigerSession.getSingleInstance());
-        ((TigerBkgChecker) tigerBkgChecker).restart(getTextComponent());
-        jHtmlMessage.getInternalJEditorPane().addMouseListener(new TigerMouseAdapter(jHtmlMessage));
-        if (jTextMessage != null)
-          jTextMessage.addMouseListener(new TigerMouseAdapter(null));
+        tigerBkgChecker = SpellCheckerWrapper.getSpellChecker();
+        if (tigerBkgChecker != null) {
+          tigerBkgChecker.restart(getTextComponent());
+          jHtmlMessage.getInternalJEditorPane().addMouseListener(SpellCheckerWrapper.newSpellCheckerMouseAdapter(jHtmlMessage));
+          if (jTextMessage != null)
+            jTextMessage.addMouseListener(SpellCheckerWrapper.newSpellCheckerMouseAdapter(null));
+        }
       } catch (Throwable t) {
         t.printStackTrace();
       }
     }
+
     // avoid super small sizing especially in chat entry panel
     setMinimumSize(new Dimension(70, 70));
 
@@ -372,7 +372,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTypeArea.class, "setContent(String body)");
     if (trace != null) trace.args(body);
 
-    if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).stop();
+    if (tigerBkgChecker != null) ((SpellCheckerI) tigerBkgChecker).stop();
     removeMyListeners();
     if (isHTML) {
       jHtmlMessage.setContent(body);
@@ -383,7 +383,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
     }
     addMyListeners();
     HTML_ClickablePane.setBaseToDefault((HTMLDocument) jHtmlMessage.getInternalJEditorPane().getDocument());
-    if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).restart(getTextComponent());
+    if (tigerBkgChecker != null) ((SpellCheckerI) tigerBkgChecker).restart(getTextComponent());
 
     if (trace != null) trace.exit(MsgTypeArea.class);
   }
@@ -674,7 +674,7 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
   }
 
   public void disposeObj() {
-    if (tigerBkgChecker != null) ((TigerBkgChecker) tigerBkgChecker).stop();
+    if (tigerBkgChecker != null) ((SpellCheckerI) tigerBkgChecker).stop();
     removeMyListeners();
     remove(jMessage);
   }

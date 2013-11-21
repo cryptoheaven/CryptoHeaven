@@ -7,14 +7,14 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package comx.HTTP_Socket;
+package com.CH_cl.http.HTTP_Socket;
 
+import com.CH_cl.http.HTTP_Common.DataSet;
+import com.CH_cl.http.HTTP_Common.DataSetCache;
+import com.CH_cl.http.HTTP_Common.OrderedFifo;
+import com.CH_cl.http.HTTP_Common.SequenceFifo;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import comx.HTTP_Common.DataSet;
-import comx.HTTP_Common.DataSetCache;
-import comx.HTTP_Common.OrderedFifo;
-import comx.HTTP_Common.SequenceFifo;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;

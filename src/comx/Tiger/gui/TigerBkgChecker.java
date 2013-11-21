@@ -9,10 +9,13 @@
 package comx.Tiger.gui;
 
 import com.CH_co.trace.Trace;
+import com.CH_co.util.NoObfuscateException;
 import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.util.SpellCheckerI;
 import com.CH_guiLib.gui.JMyPopupMenu;
 import comx.Tiger.ssce.*;
 import comx.Tiger.util.UniCharacter;
+import comx.tig.en.SingleTigerSession;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
@@ -33,13 +36,13 @@ import javax.swing.text.*;
  * Class Description:
  *
  * Component which can be added as listener to JTextComponents to perform spell
- * checking in a background thread. Underlines with zig-zag mispelled words.
+ * checking in a background thread. Underlines with zig-zag misspelled words.
  *
  * <b>$Revision: 1.4 $</b>
  *
  * @author Marcin Kurzawa
  */
-public class TigerBkgChecker implements DocumentListener, CaretListener { //, MouseListener {
+public class TigerBkgChecker implements SpellCheckerI, DocumentListener, CaretListener { //, MouseListener {
 
   public static String PROPERTY__BACKGROUND_CHECK_ENABLED = "BACKGROUND_CHECKER";
   public static boolean backgroundCheckEnabled = true;
@@ -443,6 +446,11 @@ public class TigerBkgChecker implements DocumentListener, CaretListener { //, Mo
 
   public TigerBkgChecker(PropSpellingSession session) {
     this(session, null);
+  }
+
+  // Used to easily create and initialize with reflection
+  public static SpellCheckerI createNewChecker_reflection() throws NoObfuscateException {
+    return new TigerBkgChecker(SingleTigerSession.getSingleInstance());
   }
 
   public void addMisspelledWord(String word, int offset) throws BadLocationException {

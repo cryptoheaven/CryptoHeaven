@@ -12,7 +12,7 @@ package com.CH_gui.menuing;
 import com.CH_co.trace.Trace;
 import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.util.ActionProducerI;
-import comx.Tiger.gui.TigerBkgChecker;
+import com.CH_gui.util.SpellCheckerI;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Window;
@@ -58,10 +58,9 @@ public class PopupMouseAdapter extends MouseAdapter {
         EventListener[] listeners = jComp.getListeners(CaretListener.class);
         for (int i=0; listeners!=null && i<listeners.length; i++) {
           CaretListener listener = (CaretListener) listeners[i];
-          // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
           try {
-            if (listener instanceof TigerBkgChecker) {
-              TigerBkgChecker bgc = (TigerBkgChecker) listener;
+            if (listener instanceof SpellCheckerI) {
+              SpellCheckerI bgc = (SpellCheckerI) listener;
               Point pt = new Point(e.getX(), e.getY());
               if (bgc.isInMisspelledWord(pt))
                 jPopupSpell = bgc.createPopupMenu(e.getX(), e.getY(), 8, "Ignore All", "Add to Dictionary", "(no spelling suggestions)");

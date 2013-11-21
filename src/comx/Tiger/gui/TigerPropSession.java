@@ -8,6 +8,7 @@
  */
 package comx.Tiger.gui;
 
+import com.CH_co.util.NoObfuscateException;
 import comx.Tiger.ssce.FileTextLexicon;
 import comx.Tiger.ssce.PropSpellingSession;
 import comx.tig.en.SingleTigerSession;
@@ -29,9 +30,21 @@ public class TigerPropSession extends PropSpellingSession {
     super(properties);
   }
 
+  public Properties getProperties_reflection() throws NoObfuscateException {
+    return getProperties();
+  }
+
+  public int countUserLexicons_reflection() throws NoObfuscateException {
+    return countUserLexicons();
+  }
+
   public int countUserLexicons() {
     FileTextLexicon[] userLexicons = getUserLexicons();
     return userLexicons != null ? userLexicons.length : 0;
+  }
+
+  public void setOptionsFromProperties_reflection(Properties properties, String prefix) throws NoObfuscateException {
+    setOptionsFromProperties(properties, prefix);
   }
 
   public void setOptionsFromProperties(Properties properties, String prefix) {

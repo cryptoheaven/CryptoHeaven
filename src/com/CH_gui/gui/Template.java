@@ -11,11 +11,13 @@ package com.CH_gui.gui;
 
 import com.CH_co.util.URLs;
 import com.CH_gui.util.HTML_ClickablePane;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.HashMap;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /** 
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
@@ -28,7 +30,7 @@ public class Template extends Object {
 
   public static final int BACK_CONTACTS;
   public static final int BACK_GROUP;
-  public static final int BACK_FILES;
+  public static final int BACK_FILES = 0; // not used
   public static final int CATEGORY_MAIL;
   public static final int CATEGORY_FILE;
   public static final int CATEGORY_CHAT;
@@ -60,14 +62,18 @@ public class Template extends Object {
     int i = 0;
     templates = new String[23];
 
+    // keep first element NULL, for uninitialized items
+    templates[i] = null;
+    i++;
+
     BACK_CONTACTS = i;
     templates[i] = "back-contacts.html"; i++;
 
     BACK_GROUP = i;
     templates[i] = "back-group.html"; i++;
 
-    BACK_FILES = i;
-    templates[i] = "back-files.html"; i++;
+//    BACK_FILES = i;
+//    templates[i] = "back-files.html"; i++;
 
     CATEGORY_MAIL = i;
     templates[i] = "category-mail.html"; i++;

@@ -16,9 +16,8 @@ import com.CH_co.util.GlobalProperties;
 import com.CH_co.util.ImageNums;
 import com.CH_gui.util.HTML_ClickablePane;
 import com.CH_gui.util.Images;
-import comx.Tiger.gui.TigerBkgChecker;
-import comx.Tiger.gui.TigerMouseAdapter;
-import comx.tig.en.SingleTigerSession;
+import com.CH_gui.util.SpellCheckerI;
+import com.CH_gui.util.SpellCheckerWrapper;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -456,9 +455,9 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
 
   private void enableSpeller(JTextComponent textComp) {
     try {
-      TigerBkgChecker tigerBkgChecker = new TigerBkgChecker(SingleTigerSession.getSingleInstance());
-      ((TigerBkgChecker)tigerBkgChecker).restart(textComp);
-      textComp.addMouseListener(new TigerMouseAdapter(this));
+      SpellCheckerI tigerBkgChecker = SpellCheckerWrapper.getSpellChecker();
+      tigerBkgChecker.restart(textComp);
+      textComp.addMouseListener(SpellCheckerWrapper.newSpellCheckerMouseAdapter(this));
     } catch (Throwable t) {
       t.printStackTrace();
     }

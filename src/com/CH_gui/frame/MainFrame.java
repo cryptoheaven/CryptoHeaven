@@ -55,7 +55,6 @@ import com.CH_gui.table.TableComponent;
 import com.CH_gui.tree.FolderTreeComponent;
 import com.CH_gui.usrs.UserGuiOps;
 import com.CH_gui.util.*;
-import comx.tig.en.SingleTigerSession;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -1283,23 +1282,22 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     super.setVisible(b);
     if (b && !wasShown) {
       wasShown = true;
-      // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           try {
-            String[] langs = SingleTigerSession.getAvailableLanguages();
+            String[] langs = SpellCheckerWrapper.getAvailableLanguages();
             if (langs != null) {
               FetchedDataCache cache = FetchedDataCache.getSingleInstance();
               UserSettingsRecord usrSettingsRec = cache.getMyUserSettingsRecord();
               int maxAvailLangs = -1;
               try {
-                String maxAvailLangsStr = usrSettingsRec.spellingProps.getProperty(SingleTigerSession.PROPERTY__MAX_AVAIL_LANGS);
+                String maxAvailLangsStr = usrSettingsRec.spellingProps.getProperty(SpellCheckerWrapper.PROPERTY__MAX_AVAIL_LANGS);
                 if (maxAvailLangsStr != null) maxAvailLangs = Integer.parseInt(maxAvailLangsStr);
               } catch (Throwable t) {
               }
               if (maxAvailLangs == -1) {
-                Properties props = SingleTigerSession.getSingleInstance().getProperties();
-                props.setProperty(SingleTigerSession.PROPERTY__MAX_AVAIL_LANGS, ""+langs.length);
+                Properties props = SpellCheckerWrapper.getProperties();
+                props.setProperty(SpellCheckerWrapper.PROPERTY__MAX_AVAIL_LANGS, ""+langs.length);
                 UserOps.updateUserSettingsSpellingProperties(SIL, props);
               } else if (maxAvailLangs > -1 && langs.length > 1 && langs.length > maxAvailLangs) {
                 JPanel panel = new JPanel();
@@ -1322,8 +1320,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
                     if (w != null)
                       w.dispose();
                     if (jCheck.isSelected()) {
-                      Properties props = SingleTigerSession.getSingleInstance().getProperties();
-                      props.setProperty(SingleTigerSession.PROPERTY__MAX_AVAIL_LANGS, ""+SingleTigerSession.getAvailableLanguages().length);
+                      Properties props = SpellCheckerWrapper.getProperties();
+                      int availableLangs = SpellCheckerWrapper.getAvailableLanguages().length;
+                      props.setProperty(SpellCheckerWrapper.PROPERTY__MAX_AVAIL_LANGS, ""+availableLangs);
                       UserOps.updateUserSettingsSpellingProperties(SIL, props);
                     }
                   }

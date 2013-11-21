@@ -7,12 +7,13 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package comx.HTTP_Common;
+package com.CH_cl.http.HTTP_Common;
 
 import java.io.*;
-import java.net.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
 
 /** 
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.

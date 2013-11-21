@@ -10,7 +10,6 @@
 package com.CH_co.util;
 
 import com.CH_co.cryptx.SHA256;
-
 import java.io.*;
 import java.security.MessageDigest;
 
@@ -29,7 +28,7 @@ public class Digester extends Object {
     try {
       digest = MessageDigest.getInstance(algorithm);
     } catch (Throwable t) {
-      if (algorithm.equals(SHA256.name)) {
+      if (algorithm.equals(SHA256.name) || algorithm.endsWith("SHA256")) {
         digest = new com.CH_co.cryptx.SHA256();
       } else {
         throw new IllegalStateException(t.getMessage());

@@ -64,8 +64,6 @@ import com.CH_gui.msgTable.MsgDND_TransferableData;
 import com.CH_gui.util.*;
 import com.CH_guiLib.gui.JMyRadioButton;
 import com.CH_guiLib.gui.JMyTextField;
-import comx.Tiger.gui.*;
-import comx.tig.en.SingleTigerSession;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -1497,18 +1495,16 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       Window w = SwingUtilities.windowForComponent(MsgComposePanel.this);
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
-        // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
         try {
-          TigerPropSession speller = SingleTigerSession.getSingleInstance();
-          if (SingleTigerSession.countLanguageLexicons(speller) > 0) {
-            JTextComponent component = msgComponents.getMsgTypeArea();
-            JTigerCheckDialog spellDialog = new JTigerCheckDialog(parent, component, speller);
-            MiscGui.setSuggestedWindowLocation(parent, spellDialog);
-            spellDialog.setVisible(true);
-            EventListener[] listeners = component.getListeners(CaretListener.class);
+          if (SpellCheckerWrapper.countLanguageLexicons() > 0) {
+            JTextComponent textComp = msgComponents.getMsgTypeArea();
+            JDialog dialog = SpellCheckerWrapper.buildCheckDialog(parent, textComp);
+            MiscGui.setSuggestedWindowLocation(parent, dialog);
+            dialog.setVisible(true);
+            EventListener[] listeners = textComp.getListeners(CaretListener.class);
             for (int i=0; listeners!=null && i<listeners.length; i++)
-              if (listeners[i] instanceof TigerBkgChecker)
-                ((TigerBkgChecker) listeners[i]).recheckAll();
+              if (listeners[i] instanceof SpellCheckerI)
+                ((SpellCheckerI) listeners[i]).recheckAll();
           } else {
             MessageDialog.showErrorDialog(parent, "No dictionary found!", "No dictionary", false);
           }
@@ -1536,11 +1532,9 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         w = GeneralDialog.getDefaultParent();
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
-        // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
         try {
-          TigerPropSession speller = SingleTigerSession.getSingleInstance();
-          if (speller.countUserLexicons() > 0) {
-            JTigerUserDialog dialog = new JTigerUserDialog(parent, speller.getUserLexicons()[0]);
+          if (SpellCheckerWrapper.countUserLexicons() > 0) {
+            JDialog dialog = SpellCheckerWrapper.buildUserDialog(parent); 
             MiscGui.setSuggestedWindowLocation(parent, dialog);
             dialog.setVisible(true);
           } else {
@@ -1570,10 +1564,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         w = GeneralDialog.getDefaultParent();
       if (w instanceof Frame) {
         Frame parent = (Frame) w;
-        // "Tiger" is an optional spell-checker module. If "Tiger" family of packages is not included with the source, simply comment out this part.
         try {
-          TigerPropSession speller = SingleTigerSession.getSingleInstance();
-          new JTigerOptionsDialog(parent, speller, MainFrame.getServerInterfaceLayer());
+          SpellCheckerWrapper.buildOptionsDialog(parent);
         } catch (Throwable t) {
           t.printStackTrace();
         }
