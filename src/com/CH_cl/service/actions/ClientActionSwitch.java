@@ -304,6 +304,6 @@ public class ClientActionSwitch extends CommonActionSwitch {
 
     if (trace != null) trace.exit(ClientActionSwitch.class, actionClassName);
     return actionClassName;
-  } // end switch request
+  } // end switch request.
 
 }
