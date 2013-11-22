@@ -50,7 +50,6 @@ public class ClientActionSwitch extends CommonActionSwitch {
   private static Object[][] actionClassNames = null;
   private static String nullActionClassName = SysANullAction.class.getName();
 
-  
   static {
     actionClassNames = new Object[][] {
 
