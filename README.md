@@ -1,4 +1,4 @@
-CryptoHeaven - World's safest email
+CryptoHeaven - World's Safest Email
 ===================================
 
 CryptoHeaven client software for email/chat/storage. 
