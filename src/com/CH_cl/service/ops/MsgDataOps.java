@@ -81,7 +81,6 @@ public class MsgDataOps extends Object {
           str = str.substring(STR_FWD.length() + 1);
           changed = true;
         }
-
         if (!changed)
           break;
         else

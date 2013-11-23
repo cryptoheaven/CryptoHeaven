@@ -13,6 +13,8 @@ package com.CH_cl.service.ops;
 /**
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
  *
+ * Class Description: UNUSED CLASS HOLDER for future restartable file downloads.
+ * 
  * @author  Marcin Kurzawa
  */
 public class FileLobDown {
