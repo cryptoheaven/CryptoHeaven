@@ -112,7 +112,9 @@ public class MsgDataOps extends Object {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     // if not an attachment
     if (msgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-      shareId = cache.getFolderShareRecordMy(msgLink.ownerObjId, true).shareId;
+      FolderShareRecord share = cache.getFolderShareRecordMy(msgLink.ownerObjId, true);
+      if (share != null)
+        shareId = share.shareId;
       request = new Obj_IDList_Co(new Long[] {shareId, msgLink.msgLinkId});
     } else if (msgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord parentMsgData = cache.getMsgDataRecord(msgLink.ownerObjId);
