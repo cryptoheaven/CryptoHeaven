@@ -9,15 +9,12 @@
  */
 package com.CH_co.trace;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Stack;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.io.*;
-
-import com.CH_co.io.*;
+import com.CH_co.io.CountingOutputStream;
 import com.CH_co.util.Misc;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /** 
 * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
@@ -71,6 +68,8 @@ public class Trace extends Object {
   private int pauseCount;
 //  private static Hashtable tracePauseCount;
 
+  private static HashSet traceExceptionHooks;
+
   /** Creates new Trace */
   private Trace() {
     stack = new Stack();
@@ -109,8 +108,10 @@ public class Trace extends Object {
       out = null;
     }
 
-    DEBUG = TraceProperties.isTraceEnabled();
-    initialized = DEBUG;
+    boolean isEnabled = TraceProperties.isTraceEnabled();
+    initialized = isEnabled;
+    DEBUG = initialized || (traceExceptionHooks != null && traceExceptionHooks.size() > 0);
+
     if (withConsoleDebugInfo) {
       if (initialized)
         System.out.println("Trace is Enabled");
@@ -455,7 +456,41 @@ public class Trace extends Object {
   }
 
 
+  public static void exceptionHookAdd(TraceExceptionHookI hook) {
+    if (hook != null) {
+      if (traceExceptionHooks == null)
+        traceExceptionHooks = new HashSet();
+      traceExceptionHooks.add(hook);
+      // make sure DEBUG is ENABLED since we added a hook
+      DEBUG = true;
+    }
+  }
+  public static boolean exceptionHookRemove(TraceExceptionHookI hook) {
+    boolean isRemoved = false;
+    if (hook != null) {
+      if (traceExceptionHooks != null)
+        isRemoved = traceExceptionHooks.remove(hook);
+      // disable DEBUG if no more hooks and trace output is not initialized
+      if (isRemoved && !initialized && traceExceptionHooks.size() == 0)
+        DEBUG = false;
+    }
+    return isRemoved;
+  }
+
   public void exception(Class c, int tracePoint, Throwable t) {
+    if (traceExceptionHooks != null) {
+      Iterator iter = traceExceptionHooks.iterator();
+      while (iter.hasNext()) {
+        TraceExceptionHookI hook = (TraceExceptionHookI) iter.next();
+        try {
+          hook.traceExceptionHook(c, tracePoint, t);
+        } catch (Throwable thx) {
+          // Ignore any errors inside each hook execution so other hooks 
+          // are not blocked and trace continues as normal.
+        }
+      }
+    }
+
     if (this == dumpingTrace) return;
 
     // attempt to pop skipped exit points due to thrown exception

@@ -525,7 +525,6 @@ public class Misc extends Object {
     ByteArrayOutputStream bOut = new ByteArrayOutputStream();
     GZIPOutputStream gOut = new GZIPOutputStream(bOut);
     gOut.write(bytes);
-    gOut.flush();
     gOut.finish();
     gOut.close();
     return bOut.toByteArray();

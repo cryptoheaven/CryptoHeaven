@@ -9,7 +9,8 @@
  */
 package com.CH_co.trace;
 
-import com.CH_co.util.*;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.Misc;
 import java.util.*;
 
 /**
@@ -19,24 +20,53 @@ import java.util.*;
  */
 public class TraceDiagnostics {
 
-  public static void traceStart(Long userId) {
-    String[][] props = new String[][] {
+  private static String[][] defaults = new String[][] {
       {"TraceEnabled",                  "true"},
       {"Trace.*",                       "true"},
       {"Debug.Level.*",                 "10"},
       {"TraceBufferKB",                 "1"},
       {"OutputType",                    "file"},
-      {"OutputFilePrefix",              "BugReport-"+(userId != null ? userId+"-" : "")+Misc.getFormattedDateFileStr(new Date())},
+      {"OutputFilePrefix",              "BugReport"},
       {"OutputFileUseUniqueID",         "false"},
       {"OutputFileExt",                 "txt"},
       {"OutputFileSizeMB",              "0"},
-      };
-    for (int i=0; i<props.length; i++) {
-      TraceProperties.setProperty(props[i][0], props[i][1]);
+  };
+
+  public static void traceStart(Properties traceProperties) {
+    // load defaults first
+    for (int i=0; i<defaults.length; i++) {
+      TraceProperties.setProperty(defaults[i][0], defaults[i][1]);
     }
+    // load custom properties next
+    if (traceProperties != null) {
+      Enumeration keys = traceProperties.keys();
+      while (keys.hasMoreElements()) {
+        String key = (String) keys.nextElement();
+        String value = traceProperties.getProperty(key);
+        TraceProperties.setProperty(key, value);
+      }
+    }
+    // initialize trace after setting the properties
     Trace.initialLoad(false, true);
     initialDiagnosticsInfo(null);
   }
+
+  /**
+   * Default tracing with file output
+   * @param userId Id used to customize output file name.
+   */
+  public static void traceStart(Long userId) {
+    // load defaults first
+    for (int i=0; i<defaults.length; i++) {
+      TraceProperties.setProperty(defaults[i][0], defaults[i][1]);
+    }
+    // use supplied userID to customize the output file
+    TraceProperties.setProperty("OutputFilePrefix", "BugReport-"+(userId != null ? userId+"-" : "")+Misc.getFormattedDateFileStr(new Date()));
+    // initialize trace after setting the properties
+    Trace.initialLoad(false, true);
+    initialDiagnosticsInfo(null);
+  }
+
   public static void initialDiagnosticsInfo(StringBuffer infoBuffer) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceDiagnostics.class, "initialDiagnosticsInfo(StringBuffer infoBuffer)");
 

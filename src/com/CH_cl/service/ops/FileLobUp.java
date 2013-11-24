@@ -12,24 +12,28 @@ package com.CH_cl.service.ops;
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.actions.sys.SysANoop;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.cache.event.*;
-import com.CH_cl.service.engine.*;
+import com.CH_cl.service.cache.event.FileLinkRecordEvent;
+import com.CH_cl.service.cache.event.FileLinkRecordListener;
+import com.CH_cl.service.cache.event.MsgLinkRecordEvent;
+import com.CH_cl.service.cache.event.MsgLinkRecordListener;
+import com.CH_cl.service.engine.DefaultReplyRunner;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.util.TempFile;
-
 import com.CH_co.cryptx.*;
-import com.CH_co.io.*;
-import com.CH_co.monitor.Interruptible;
-import com.CH_co.monitor.ProgMonitorFactory;
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.monitor.ProgMonitorJournalI;
-import com.CH_co.monitor.Stats;
-import com.CH_co.service.msg.*;
-import com.CH_co.service.msg.dataSets.file.*;
-import com.CH_co.service.msg.dataSets.obj.*;
+import com.CH_co.io.FileUtils;
+import com.CH_co.io.InterruptibleInputStream;
+import com.CH_co.monitor.*;
+import com.CH_co.service.msg.CommandCodes;
+import com.CH_co.service.msg.MessageAction;
+import com.CH_co.service.msg.dataSets.file.File_GetAttr_Rp;
+import com.CH_co.service.msg.dataSets.file.File_Transfer_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_IDPair_Co;
+import com.CH_co.service.msg.dataSets.obj.Obj_ID_Rq;
+import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
 import com.CH_co.service.records.*;
-import com.CH_co.trace.*;
+import com.CH_co.trace.ThreadTraced;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
-
 import java.io.*;
 import java.security.*;
 import java.util.ArrayList;
@@ -836,7 +840,6 @@ public class FileLobUp {
       fileIn.close();
 
       gzipOut.finish();
-      gzipOut.flush();
       gzipOut.close();
 
       if (trace != null) trace.data(25, "GZIP completed of file len="+plainDataFile.length(), plainDataFile);

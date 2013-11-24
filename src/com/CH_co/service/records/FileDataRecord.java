@@ -182,7 +182,6 @@ public class FileDataRecord extends Record {
       dFileIn.close();
 
       gzipOut.finish();
-      gzipOut.flush();
       gzipOut.close();
 
       // create the original data digest
