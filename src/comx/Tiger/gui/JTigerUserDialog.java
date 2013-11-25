@@ -9,10 +9,10 @@
  */
 package comx.Tiger.gui;
 
-import com.CH_co.util.NoObfuscateException;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.NoObfuscateException;
 import com.CH_guiLib.gui.JMyRadioButton;
 import com.CH_guiLib.gui.JMyTextField;
 import com.CH_guiLib.gui.MyDefaultListCellRenderer;

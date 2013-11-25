@@ -11,13 +11,13 @@ package comx.Tiger.gui;
 
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.UserOps;
-import com.CH_co.util.NoObfuscateException;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyCheckBox;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
 import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.NoObfuscateException;
 import com.CH_guiLib.gui.JMyComboBox;
 import comx.Tiger.ssce.PropSpellingSession;
 import comx.Tiger.ssce.SpellingSession;

@@ -9,7 +9,7 @@
  */
 package comx.Tiger.gui;
 
-import com.CH_co.util.NoObfuscateException;
+import com.CH_gui.util.NoObfuscateException;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;

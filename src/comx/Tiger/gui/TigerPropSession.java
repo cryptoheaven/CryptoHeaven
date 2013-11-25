@@ -8,7 +8,7 @@
  */
 package comx.Tiger.gui;
 
-import com.CH_co.util.NoObfuscateException;
+import com.CH_gui.util.NoObfuscateException;
 import comx.Tiger.ssce.FileTextLexicon;
 import comx.Tiger.ssce.PropSpellingSession;
 import comx.tig.en.SingleTigerSession;

@@ -9,8 +9,8 @@
 package comx.Tiger.gui;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.NoObfuscateException;
 import com.CH_gui.action.AbstractActionTraced;
+import com.CH_gui.util.NoObfuscateException;
 import com.CH_gui.util.SpellCheckerI;
 import com.CH_guiLib.gui.JMyPopupMenu;
 import comx.Tiger.ssce.*;
