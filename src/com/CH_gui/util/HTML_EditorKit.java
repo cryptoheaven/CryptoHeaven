@@ -31,7 +31,7 @@ public class HTML_EditorKit extends HTMLEditorKit {
 
   private boolean alwaysUseCustomImageView = false;
   private boolean isDisplayRemoteImages = false;
-  private CallbackI remoteImageBlockedCallback;
+  private CallbackI remoteLoadBlockedCallback;
 
   public HTML_EditorKit() {
     super();
@@ -45,8 +45,8 @@ public class HTML_EditorKit extends HTMLEditorKit {
     isDisplayRemoteImages = enable;
   }
 
-  public void registerRemoteImageBlockedCallback(CallbackI remoteImageBlockedCallback) {
-    this.remoteImageBlockedCallback = remoteImageBlockedCallback;
+  public void registerRemoteLoadBlockedCallback(CallbackI remoteLoadBlockedCallback) {
+    this.remoteLoadBlockedCallback = remoteLoadBlockedCallback;
   }
 
   public ViewFactory getViewFactory() {
@@ -84,8 +84,8 @@ public class HTML_EditorKit extends HTMLEditorKit {
                       else
                         isRemoteBlocked = Boolean.TRUE;
                     }
-                    if (isRemoteBlocked != null && remoteImageBlockedCallback != null) {
-                      remoteImageBlockedCallback.callback(isRemoteBlocked);
+                    if (isRemoteBlocked != null && remoteLoadBlockedCallback != null) {
+                      remoteLoadBlockedCallback.callback(isRemoteBlocked);
                     }
                     if (isLocalBlocked || (isRemoteBlocked != null && isRemoteBlocked.booleanValue())) {
                       view = new javax.swing.text.ParagraphView(elem);

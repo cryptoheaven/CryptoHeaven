@@ -9,7 +9,10 @@
  */
 package com.CH_gui.msgs;
 
-import com.CH_cl.service.cache.*;
+import com.CH_cl.service.cache.CacheEmlUtils;
+import com.CH_cl.service.cache.CacheFldUtils;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
@@ -708,7 +711,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         HTML_EditorKit editorKit = new HTML_EditorKit();
         jHtmlMsg = new HTML_ClickablePane(no_selected_msg_html, editorKit);
         ((HTML_ClickablePane) jHtmlMsg).setEditable(false);
-        editorKit.registerRemoteImageBlockedCallback(new CallbackI() {
+        editorKit.registerRemoteLoadBlockedCallback(new CallbackI() {
           public void callback(Object value) {
             if (value instanceof Boolean) {
               Boolean isBlocked = (Boolean) value;
@@ -719,7 +722,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 if (!jImageFilterPanel.isVisible())
                   jImageFilterPanel.setVisible(true);
               } else {
-                if (isDefaultToPLAINpreferred(msgDataRecord)) {
+                if (CacheMsgUtils.isDefaultToPLAINpreferred(msgDataRecord)) {
                   if (!jLoadImages.isVisible()) {
                     jLoadImages.setText(STR_IMAGES_HIDE);
                     jLoadImages.setVisible(true);
@@ -1474,7 +1477,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               if (!jImageFilterPanel.isVisible())
                 jImageFilterPanel.setVisible(true);
             } else {
-              if (isDefaultToPLAINpreferred(msgDataRecord)) {
+              if (CacheMsgUtils.isDefaultToPLAINpreferred(msgDataRecord)) {
                 if (!jLoadImages.isVisible()) {
                   jLoadImages.setText(STR_IMAGES_HIDE);
                   jLoadImages.setVisible(true);
@@ -1981,7 +1984,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           jExpiration.setIcon(Images.get(exp));
           jExpiration.setText(exp.getText());
 
-          boolean displayHtmlMode = !isDefaultToPLAINpreferred(msgLink, msgData);
+          boolean displayHtmlMode = !CacheMsgUtils.isDefaultToPLAINpreferred(msgLink, msgData);
 
           // update text only if content changed
           if (isHTML != displayHtmlMode || msgDataChanged) {
@@ -2032,57 +2035,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private boolean isImageLoadEnabled() {
     return jLoadImages.getText().equals(STR_IMAGES_HIDE);
   }
-
-  /**
-  * @param mData
-  * @return true iff message should default to PLAIN mode given user's general settings
-  */
-  private static boolean isDefaultToPLAINpreferred(MsgDataRecord mData) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "isDefaultToPLAINpreferred(MsgDataRecord mData)");
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    boolean plainPreferred = false;
-    if (mData == null)
-      plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE);
-    else
-      plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE) &&
-                      !mData.senderUserId.equals(cache.getMyUserId()) && // Msgs created by myself never display in non-native mode
-                      !(CacheUsrUtils.convertUserIdToFamiliarUser(mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
-    if (trace != null) trace.exit(MsgPreviewPanel.class, plainPreferred);
-    return plainPreferred;
-  }
-
-  /**
-  * @param msgLink
-  * @param dataRecord
-  * @return true iff message should be displayed in PLAIN mode
-  */
-  public static boolean isDefaultToPLAINpreferred(MsgLinkRecord msgLink, MsgDataRecord dataRecord) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgPreviewPanel.class, "isDefaultToPLAINpreferred(MsgLinkRecord msgLink, MsgDataRecord dataRecord)");
-    boolean plainPreferred = false;
-    FolderRecord ownerFolder = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    if (dataRecord.isTypeAddress()) {
-      // display Address Records always in HTML
-      plainPreferred = false;
-      if (trace != null) trace.data(10, "plainPreferred=false due to address type");
-    } else if ( msgLink.getOwnerObjType().shortValue() == Record.RECORD_TYPE_FOLDER &&
-                (ownerFolder = cache.getFolderRecord(msgLink.getOwnerObjId())) != null &&
-                (ownerFolder.folderType.shortValue() == FolderRecord.POSTING_FOLDER || ownerFolder.folderType.shortValue() == FolderRecord.CHATTING_FOLDER)
-                ) {
-      // display Postings (Chatting msgs too) in NATIVE form because they were already visible in their full form the table anyway
-      plainPreferred = !dataRecord.isHtmlMail();
-      if (trace != null) trace.data(20, "plainPreferred = !dataRecord.isHtmlMail(); due to owning folder being posting/chatting type");
-    } else if (!Misc.isBitSet(msgLink.status, MsgLinkRecord.STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE) && isDefaultToPLAINpreferred(dataRecord)) {
-      plainPreferred = true;
-      if (trace != null) trace.data(30, "plainPreferred=true due to native preview mode non-approval and default-to-plain-preferred");
-    } else {
-      plainPreferred = !dataRecord.isHtmlMail();
-      if (trace != null) trace.data(40, "plainPreferred = !dataRecord.isHtmlMail();");
-    }
-    if (trace != null) trace.exit(MsgPreviewPanel.class, plainPreferred);
-    return plainPreferred;
-  }
-
 
   /****************************************************************************/
   /*        A c t i o n P r o d u c e r I
