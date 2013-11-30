@@ -9,12 +9,15 @@
  */
 package com.CH_gui.sortedTable;
 
-import java.util.*;
-import javax.swing.event.*;
-import javax.swing.table.TableModel;
-
 import com.CH_co.trace.Trace;
-import com.CH_gui.table.*;
+import com.CH_gui.table.ColumnHeaderData;
+import com.CH_gui.table.RecordTableModel;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Vector;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 
 /**
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
@@ -58,24 +61,27 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
   public void setModel(TableModel model) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableSorter.class, "setModel(TableModel)");
 
-    // fire before we adjust indexes because selection saving involves using valid indexes!
-    fireSortNotification(true);
+    try {
+      // fire before we adjust indexes because selection saving involves using valid indexes!
+      fireSortNotification(true);
 
-    synchronized (this) {
-      // do the rest
-      super.setRawModel(model);
-      reallocateIndexes();
+      synchronized (this) {
+        // do the rest
+        super.setRawModel(model);
+        reallocateIndexes();
 
-      clearSortOrders();
-      int numOfColumns = model.getColumnCount();
-      numOfColumns = (numOfColumns > 2) ? 2 : numOfColumns;
+        clearSortOrders();
+        int numOfColumns = model.getColumnCount();
+        numOfColumns = (numOfColumns > 2) ? 2 : numOfColumns;
 
-      for (int i=0; i<numOfColumns; i++)
-        setSortColumn(numOfColumns-1-i, true);
-      sort();
+        for (int i=0; i<numOfColumns; i++)
+          setSortColumn(numOfColumns-1-i, true);
+        sort();
+      }
+    } finally {
+      // always finish with post-sort notification
+      fireSortNotification(false);
     }
-
-    fireSortNotification(false);
 
     if (trace != null) trace.exit(TableSorter.class);
   }
@@ -214,7 +220,7 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
       // skip sorting for item updates
       boolean suppressSort = suppressUpdateSorts() && tableModelEvent.getType() == TableModelEvent.UPDATE;
       if (!suppressSort) {
-        fireSortNotification(true, true);
+        fireSortNotification(false, true);
       }
     } else {
       resort(tableModelEvent);
@@ -229,19 +235,25 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
     // skip sorting for item updates
     boolean suppressSort = suppressUpdateSorts() && tableModelEvent != null && tableModelEvent.getType() == TableModelEvent.UPDATE;
     // fire before we adjust indexes because selection saving involves using valid indexes!
-    if (!suppressSort)
-      fireSortNotification(true);
-    if (tableModelEvent != null) {
+    try {
+      // before sorting fire pre-sort notification
+      if (!suppressSort)
+        fireSortNotification(true);
       // Notify of insertions/deletions first, then sort and notify of update.
       // This should fix the SortSequence problem.
-      TableSorter.super.tableChanged(tableModelEvent);
-    }
-    if (!suppressSort) {
-      synchronized (this) {
-        reallocateIndexes();
-        sort();
+      if (tableModelEvent != null) {
+        TableSorter.super.tableChanged(tableModelEvent);
       }
-      fireSortNotification(false);
+      if (!suppressSort) {
+        synchronized (this) {
+          reallocateIndexes();
+          sort();
+        }
+      }
+    } finally {
+      // always finish with post-sort notification
+      if (!suppressSort)
+        fireSortNotification(false);
     }
     if (trace != null) trace.exit(TableSorter.class);
   }
@@ -383,10 +395,14 @@ public class TableSorter extends TableMap implements Comparator, TableModelListe
       boolean ascending = directions[i].booleanValue();
       setSortColumn(column, ascending);
     }
-    // fire before we adjust indexes because selection saving involves using valid indexes!
-    fireSortNotification(true);
-    sort();
-    fireSortNotification(false);
+    try {
+      // fire before we adjust indexes because selection saving involves using valid indexes!
+      fireSortNotification(true);
+      sort();
+    } finally {
+      // always finish with post-sort notification
+      fireSortNotification(false);
+    }
   }
 
   private void clearSortOrders() {

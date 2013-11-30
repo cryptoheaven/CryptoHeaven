@@ -9,11 +9,13 @@
  */
 package com.CH_gui.sortedTable;
 
-import java.lang.ref.WeakReference;
-import javax.swing.table.*;
-import javax.swing.event.*;
-
 import com.CH_co.trace.Trace;
+import java.lang.ref.WeakReference;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 /** 
  * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
@@ -41,10 +43,6 @@ public class TableMap extends AbstractTableModel implements TableModelListener {
     }
     return model;
   }
-  
-//  public TableModel getModel() {
-//    return model;
-//  }
 
   public void setRawModel (TableModel model) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableMap.class, "setModel()");
@@ -100,13 +98,13 @@ public class TableMap extends AbstractTableModel implements TableModelListener {
     return (model == null) ? false : model.isCellEditable(row, column);
   }
 
-  public void tableChanged (final TableModelEvent tableModelEvent) {
+  public void tableChanged(final TableModelEvent tableModelEvent) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableMap.class, "tableChanged(TableModelEvent tableModelEvent)");
     // sort will fire appropriate update event...
     // incase rows were inserted or deleted...
-    if (tableModelEvent.getFirstRow() < -1)
-      fireSortNotification(true, true);
-    else {
+    if (tableModelEvent.getFirstRow() < -1) {
+      fireSortNotification(false, true);
+    } else {
       fireTableChanged(tableModelEvent);
     }
     if (trace != null) trace.exit(TableMap.class);
@@ -132,9 +130,11 @@ public class TableMap extends AbstractTableModel implements TableModelListener {
   
   public void removeTableModelSortListeners() {
     TableModelSortListener[] listeners = (TableModelSortListener[]) sortingListenerList.getListeners(TableModelSortListener.class);
-    if (listeners != null && listeners.length > 0)
-      for (int i=0; i<listeners.length; i++)
+    if (listeners != null && listeners.length > 0) {
+      for (int i=0; i<listeners.length; i++) {
         sortingListenerList.remove(TableModelSortListener.class, listeners[i]);
+      }
+    }
   }
 
   /**
@@ -159,12 +159,12 @@ public class TableMap extends AbstractTableModel implements TableModelListener {
         // Lazily create the event:
         if (e == null) e = new TableModelSortEvent(this);
         if (preSort) {
-          if (isDeleteEvent)
+          if (isDeleteEvent) {
             ((TableModelSortListener)listeners[i+1]).preSortDeleteNotify(e);
-          else
+          } else {
             ((TableModelSortListener)listeners[i+1]).preSortNotify(e);
-        }
-        else {
+          }
+        } else {
           ((TableModelSortListener)listeners[i+1]).postSortNotify(e);
         }
       }

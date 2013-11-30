@@ -309,8 +309,9 @@ public class GlobalProperties extends Object {
   // build 796 Msg reply use 'div' instead of 'table', clear login info when server gives permanent error
   // build 798 SaluSafe v1.32
   // build 800 SecureRandom adjustment, and use more bits for randomizing symmetric keys, cleaner plain email warning, don't automatically convert not hosted email addresses to web accounts, contact dialog simpler status line
+  // build 802 Fix file attachment chooser dialog for case of multiple file versions in folder.
 
-  public static final short PROGRAM_BUILD_NUMBER = 800;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 802;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
