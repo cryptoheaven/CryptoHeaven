@@ -454,15 +454,7 @@ public class MsgTableModel extends RecordTableModel {
         // attachments
         case 1:
           if (msgData != null) {
-            int numOfAttachments = 0;
-            if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
-              numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
-              // if regular email, don't show serialized email as attachment in the table...
-              if (msgData.isEmail()) {
-                numOfAttachments --;
-              }
-            }
-            value = new Short((short) numOfAttachments);
+            value = new Short((short) msgData.getAttachmentCount(true));
           }
           break;
         // Flag
@@ -751,14 +743,7 @@ public class MsgTableModel extends RecordTableModel {
           }
 
           if (toAddAttachment) {
-            int numOfAttachments = 0;
-            if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
-              numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
-              // if regular email, don't show serialized email as attachment in the table...
-              if (msgData.isEmail()) {
-                numOfAttachments --;
-              }
-            }
+            int numOfAttachments = msgData.getAttachmentCount(true);
             if (numOfAttachments > 0) {
               String linkNames = "";
               FileLinkRecord[] fLinks = cache.getFileLinkRecordsOwnerAndType(msgData.msgId, new Short(Record.RECORD_TYPE_MESSAGE));

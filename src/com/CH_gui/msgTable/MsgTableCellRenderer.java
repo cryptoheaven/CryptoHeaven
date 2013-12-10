@@ -158,14 +158,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               if (rawModel instanceof MsgTableModel) {
                 MsgTableModel tableModel = (MsgTableModel) rawModel;
                 if (!tableModel.isModeMsgBody()) {
-                  int numOfAttachments = 0;
-                  if (mData.attachedFiles != null && mData.attachedMsgs != null) {
-                    numOfAttachments = mData.attachedFiles.shortValue() + mData.attachedMsgs.shortValue();
-                    // if regular email, don't show serialized email as attachment in the table...
-                    if (mData.isEmail()) {
-                      numOfAttachments --;
-                    }
-                  }
+                  int numOfAttachments = mData.getAttachmentCount(true);
                   if (numOfAttachments > 0) {
                     icon = Images.get(ImageNums.ATTACH_SMALL);
                     if (numOfAttachments == 1)
@@ -639,11 +632,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         // Attachments
         if (!isColumnVisible(table, 1)) {
           if (mData != null) {
-            int numOfAttachments = mData.attachedFiles.shortValue() + mData.attachedMsgs.shortValue();
-            // if regular email, don't show serialized email as attachment in the table...
-            if (mData.isEmail()) {
-              numOfAttachments --;
-            }
+            int numOfAttachments = mData.getAttachmentCount(true);
             if (numOfAttachments > 0) {
               JLabel icon = new JLabel(Images.get(ImageNums.ATTACH_SMALL));
               jIconSetRenderer.add(icon);

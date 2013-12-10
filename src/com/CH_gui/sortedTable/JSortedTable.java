@@ -127,14 +127,7 @@ public class JSortedTable extends JTable implements DisposableObj {
                 FetchedDataCache cache = FetchedDataCache.getSingleInstance();
                 MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
                 if (msgData != null) {
-                  int numOfAttachments = 0;
-                  if (msgData.attachedFiles != null && msgData.attachedMsgs != null) {
-                    numOfAttachments = msgData.attachedFiles.shortValue() + msgData.attachedMsgs.shortValue();
-                    // if regular email, don't show serialized email as attachment in the table...
-                    if (msgData.isEmail()) {
-                      numOfAttachments --;
-                    }
-                  }
+                  int numOfAttachments = msgData.getAttachmentCount(true);
                   if (numOfAttachments > 0) {
                     Window w = SwingUtilities.windowForComponent(sTable);
                     if (w instanceof Frame) new SaveAttachmentsDialog((Frame) w, new MsgLinkRecord[] { msgLink });

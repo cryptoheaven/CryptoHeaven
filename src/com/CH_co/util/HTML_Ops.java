@@ -51,7 +51,7 @@ public class HTML_Ops {
 
     // timing
     long start, end;
-    
+
     if (htmlMessage != null) {
 
       if (isRemoveStyles) {
@@ -62,7 +62,7 @@ public class HTML_Ops {
         end = System.currentTimeMillis();
         if (reportSB != null) reportSB.append("removed styles in ").append(end-start).append(" ms.\n");
       }
-      
+
       if (isRemoveInlineStyles) {
         start = System.currentTimeMillis();
         String[][] startTags = new String[][] {{ "style=\"", "STYLE=\"", "class=\"", "CLASS=\"" }};
@@ -104,8 +104,8 @@ public class HTML_Ops {
         if (reportSB != null) reportSB.append("removed invalid v's in ").append(end-start).append(" ms.\n");
       }
 
-      boolean removedLeadP = !isRemoveLeadP;
-      if (!removedLeadP) {
+      boolean removedLeadP = false;
+      if (isRemoveLeadP && !removedLeadP) {
         start = System.currentTimeMillis();
         int iStartP = htmlMessage.indexOf("<P>");
         int iStartP2 = htmlMessage.indexOf("</P>");
@@ -121,7 +121,7 @@ public class HTML_Ops {
         end = System.currentTimeMillis();
         if (reportSB != null) reportSB.append("removed lead Ps1 in ").append(end-start).append(" ms.\n");
       }
-      if (!removedLeadP) {
+      if (isRemoveLeadP && !removedLeadP) {
         start = System.currentTimeMillis();
         int iStartP = htmlMessage.indexOf("<p>");
         int iStartP2 = htmlMessage.indexOf("</p>");
@@ -344,7 +344,7 @@ public class HTML_Ops {
     if (trace != null) trace.exit(HTML_Ops.class, traceHTMLmsg);
     return htmlMessage;
   }
-  
+
   public static void main(String[] args) {
     if (args == null || args.length == 0) {
       System.out.println("Specify input HTML file.");
@@ -361,7 +361,7 @@ public class HTML_Ops {
         }
 
         StringBuffer reportSB = null;
-        
+
         String html = sb.toString();
         StringBuffer htmlSB = new StringBuffer(html);
         System.out.println("Timing clear function...");

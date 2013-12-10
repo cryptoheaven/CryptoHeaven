@@ -136,12 +136,21 @@ public class MsgDataRecord extends Record {
   }
 
   public boolean hasAttachments() {
-    return getAttachmentCount() > 0;
+    return getAttachmentCount(false) > 0;
+  }
+  public boolean hasAttachments(boolean isExcludeAutoEmailFileAttachment) {
+    return getAttachmentCount(isExcludeAutoEmailFileAttachment) > 0;
   }
 
   public int getAttachmentCount() {
+    return getAttachmentCount(false);
+  }
+  public int getAttachmentCount(boolean isExcludeAutoEmailFileAttachment) {
     int numFiles = attachedFiles != null ? attachedFiles.shortValue() : 0;
     int numMsgs = attachedMsgs != null ? attachedMsgs.shortValue() : 0;
+    // if regular email, it would have the auto-attached file
+    if (isExcludeAutoEmailFileAttachment && isEmail() && numFiles > 0)
+      numFiles --;
     return numFiles + numMsgs;
   }
 
