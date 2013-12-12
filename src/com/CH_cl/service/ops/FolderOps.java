@@ -495,22 +495,32 @@ public class FolderOps extends Object {
   */
   private static HashSet fldIDsForResynchQueueHS = new HashSet();
   public static void runResynchFolders_Delayed(ServerInterfaceLayer SIL, Long folderId, long delayMillis) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderOps.class, "runResynchFolders_Delayed(ServerInterfaceLayer SIL, Long folderId, long delayMillis)");
+    if (trace != null) trace.args(folderId);
+    if (trace != null) trace.args(delayMillis);
     boolean added;
     synchronized (fldIDsForResynchQueueHS) {
       added = fldIDsForResynchQueueHS.add(folderId);
     }
     if (added)
       runResynchFolders_Delayed(SIL, delayMillis);
+    if (trace != null) trace.exit(FolderOps.class);
   }
   public static void runResynchFolders_Delayed(ServerInterfaceLayer SIL, List additionalFldIDsL, long delayMillis) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderOps.class, "runResynchFolders_Delayed(ServerInterfaceLayer SIL, List additionalFldIDsL, long delayMillis)");
+    if (trace != null) trace.args(additionalFldIDsL);
+    if (trace != null) trace.args(delayMillis);
     boolean added;
     synchronized (fldIDsForResynchQueueHS) {
       added = fldIDsForResynchQueueHS.addAll(additionalFldIDsL);
     }
     if (added)
       runResynchFolders_Delayed(SIL, delayMillis);
+    if (trace != null) trace.exit(FolderOps.class);
   }
   private static void runResynchFolders_Delayed(final ServerInterfaceLayer SIL, final long delayMillis) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderOps.class, "runResynchFolders_Delayed(final ServerInterfaceLayer SIL, final long delayMillis)");
+    if (trace != null) trace.args(delayMillis);
     Thread th = new ThreadTraced("Delayed folder re-synch.") {
       public void runTraced() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "runTraced()");
@@ -528,7 +538,7 @@ public class FolderOps extends Object {
             List requestSetsL = CacheFldUtils.prepareSynchRequest(cache, folderIDsL, null, null, null, null);
             cache.markFolderViewInvalidated(folderIDsL, false);
             if (requestSetsL != null && requestSetsL.size() > 0) {
-              if (trace != null) trace.data(20, "Re-synch folders via FldARedFlagCount SENDING REQUEST");
+              if (trace != null) trace.data(20, "Re-synch folders SENDING REQUEST");
               if (trace != null) trace.data(21, "set="+requestSetsL);
               SIL.submitAndReturn(new MessageAction(CommandCodes.FLD_Q_SYNC, new Obj_List_Co(requestSetsL)), 90000);
             }
@@ -541,6 +551,7 @@ public class FolderOps extends Object {
     };
     th.setDaemon(true);
     th.start();
+    if (trace != null) trace.exit(FolderOps.class);
   }
 
 }
