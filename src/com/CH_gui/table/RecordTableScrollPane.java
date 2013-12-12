@@ -411,18 +411,22 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
 
   private class SortListener implements TableModelSortListener {
     private RecordTableSelection selection;
+    private long selectionStamp;
 
-    public synchronized void preSortDeleteNotify(TableModelSortEvent event) {
-      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "preSortDeleteNotify(TableModelSortEvent event)");
+    public synchronized void deleteNotify(TableModelSortEvent event) {
+      Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "deleteNotify(TableModelSortEvent event)");
       if (trace != null) trace.args(event);
       selection = RecordTableSelection.getData(RecordTableScrollPane.this);
+      selectionStamp = System.currentTimeMillis();
       if (trace != null) trace.exit(getClass());
     }
     public synchronized void preSortNotify(TableModelSortEvent event) {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "preSortNotify(TableModelSortEvent event)");
       if (trace != null) trace.args(event);
-      if (selection == null)
+      if (selection == null) {
         selection = RecordTableSelection.getData(RecordTableScrollPane.this);
+        selectionStamp = System.currentTimeMillis();
+      }
       if (trace != null) trace.exit(getClass());
     }
     public synchronized void postSortNotify(TableModelSortEvent event) {
@@ -441,7 +445,7 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       if (trace != null) trace.exit(getClass());
     }
     private synchronized boolean isSortingInProgress() {
-      boolean rc = selection != null;
+      boolean rc = selection != null && (System.currentTimeMillis() - selectionStamp < 1000);
       return rc;
     }
     private synchronized void endSorting() {

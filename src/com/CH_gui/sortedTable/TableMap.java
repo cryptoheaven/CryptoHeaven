@@ -144,10 +144,19 @@ public class TableMap extends AbstractTableModel implements TableModelListener {
   public void fireSortNotification(boolean preSort) {
     fireSortNotification(preSort, false);
   }
+  /**
+   * Notify all listeners that have registered interest for
+   * notification on this event type. Cannot specify preSort and isDeleteEvent simultaneously.
+   * @param preSort
+   * @param isDeleteEvent 
+   */
   public void fireSortNotification(boolean preSort, boolean isDeleteEvent) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TableMap.class, "fireSortNotification(boolean preSort, boolean isDeleteEvent)");
     if (trace != null) trace.args(preSort);
     if (trace != null) trace.args(isDeleteEvent);
+
+    if (isDeleteEvent && preSort)
+      throw new IllegalArgumentException("Cannot fire delete event and preSort together.");
 
     // Guaranteed to return a non-null array
     Object[] listeners = sortingListenerList.getListenerList();
@@ -158,14 +167,14 @@ public class TableMap extends AbstractTableModel implements TableModelListener {
       if (listeners[i] == TableModelSortListener.class) {
         // Lazily create the event:
         if (e == null) e = new TableModelSortEvent(this);
-        if (preSort) {
-          if (isDeleteEvent) {
-            ((TableModelSortListener)listeners[i+1]).preSortDeleteNotify(e);
-          } else {
-            ((TableModelSortListener)listeners[i+1]).preSortNotify(e);
-          }
+        if (isDeleteEvent) {
+          ((TableModelSortListener)listeners[i+1]).deleteNotify(e);
         } else {
-          ((TableModelSortListener)listeners[i+1]).postSortNotify(e);
+          if (preSort) {
+            ((TableModelSortListener)listeners[i+1]).preSortNotify(e);
+          } else {
+            ((TableModelSortListener)listeners[i+1]).postSortNotify(e);
+          }
         }
       }
     }

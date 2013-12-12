@@ -18,7 +18,7 @@ import java.util.EventListener;
  */
 public interface TableModelSortListener extends EventListener {
 
-  public void preSortDeleteNotify(TableModelSortEvent event);
+  public void deleteNotify(TableModelSortEvent event);
   public void preSortNotify(TableModelSortEvent event);
   public void postSortNotify(TableModelSortEvent event);
   
