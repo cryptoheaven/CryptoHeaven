@@ -309,9 +309,10 @@ public class GlobalProperties extends Object {
   // build 796 Msg reply use 'div' instead of 'table', clear login info when server gives permanent error
   // build 798 SaluSafe v1.32
   // build 800 SecureRandom adjustment, and use more bits for randomizing symmetric keys, cleaner plain email warning, don't automatically convert not hosted email addresses to web accounts, contact dialog simpler status line
-  // build 802 Fix file attachment chooser dialog for case of multiple file versions in folder.
+  // build 802 Fix file attachment chooser dialog for case of multiple file versions in folder. SaluSafe v1.33 and v1.34
+  // build 804 Provide support Copy & Paste support for copying address book tables for pasting into external spreadsheets.
 
-  public static final short PROGRAM_BUILD_NUMBER = 802;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 804;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

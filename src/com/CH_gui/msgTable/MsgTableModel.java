@@ -525,7 +525,15 @@ public class MsgTableModel extends RecordTableModel {
             }
             value = text;
           } else {
-            value = null;
+            // Enable Copy & Paste of Address Book from table view into external spreadsheet.
+            if (messageMode == MODE_ADDRESS || messageMode == MODE_WHITELIST) {
+              Object nameValue = getSubjectColumnValue(this, msgLink, msgData, null, cache);
+              String name = nameValue != null ? nameValue.toString() : null;
+              value = name;
+            } else {
+              // all other data types leave to renderers
+              value = null;
+            }
           }
           break;
         // Sent Date
