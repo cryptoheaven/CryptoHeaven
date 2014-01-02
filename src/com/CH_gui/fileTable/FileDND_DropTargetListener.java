@@ -56,15 +56,12 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
   }
 
   public void dragEnter(DropTargetDragEvent event) {
-    //System.out.println("FileDND_DropTargetListener.dragEnter");
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
     Point pt = event.getLocation();
     if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
       lastPt = pt;
-      //System.out.println("FileDND_DropTargetListener.dragOver");
-      updateCursor(event);
       highlightMouseOverFolder(event);
     }
   }
@@ -121,11 +118,9 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
     }
   }
   public void dragExit(DropTargetEvent event) {
-    //System.out.println("FileDND_DropTargetListener.dragExit");
     restoreOriginalSelection();
   }
   public void drop(DropTargetDropEvent event) {
-    //System.out.println("FileDND_DropTargetListener.drop");
     try {
       Transferable tr = event.getTransferable();
 
@@ -218,7 +213,7 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
     restoreOriginalSelection();
     event.getDropTargetContext().dropComplete(true);
   }
-  public void dropActionChanged(DropTargetDragEvent p1) {
-    //System.out.println("FileDND_DropTargetListener.dropActionChanged");
+  public void dropActionChanged(DropTargetDragEvent event) {
+    updateCursor(event);
   }
 } // end class FileDND_DropTargetListener

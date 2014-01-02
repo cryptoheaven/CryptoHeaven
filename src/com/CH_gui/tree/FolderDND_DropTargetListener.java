@@ -78,9 +78,6 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
     if (trace != null) trace.exit(FolderDND_DropTargetListener.class);
   }
   public void dragOver(DropTargetDragEvent event) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderDND_DropTargetListener.class, "dragOver(DropTargetDragEvent event)");
-    updateCursor(event);
-    if (trace != null) trace.exit(FolderDND_DropTargetListener.class);
   }
   private void updateCursor(DropTargetDragEvent event) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderDND_DropTargetListener.class, "updateCursor(DropTargetDragEvent event)");
@@ -499,6 +496,7 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
   public void dropActionChanged(DropTargetDragEvent event) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderDND_DropTargetListener.class, "dropActionChanged(DropTargetDragEvent event)");
     if (trace != null) trace.args(event);
+    updateCursor(event);
     if (trace != null) trace.exit(FolderDND_DropTargetListener.class);
   }
 

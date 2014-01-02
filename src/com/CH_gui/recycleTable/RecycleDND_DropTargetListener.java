@@ -66,7 +66,6 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
     Point pt = event.getLocation();
     if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
       lastPt = pt;
-      updateCursor(event);
       highlightMouseOverFolder(event);
     }
   }
@@ -221,7 +220,7 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
     restoreOriginalSelection();
     event.getDropTargetContext().dropComplete(true);
   }
-  public void dropActionChanged(DropTargetDragEvent p1) {
-    //System.out.println("FileDND_DropTargetListener.dropActionChanged");
+  public void dropActionChanged(DropTargetDragEvent event) {
+    updateCursor(event);
   }
 } // end class FileDND_DropTargetListener

@@ -1000,7 +1000,6 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
   private class ListDropTargetListener implements DropTargetListener {
 
     private JList dndDropList;
-    private Point lastPt;
 
     private ListDropTargetListener(JList dropList) {
       dndDropList = dropList;
@@ -1023,12 +1022,8 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
      * is invoked when a drag operation is going on
      */
     public void dragOver (DropTargetDragEvent event) {
-      Point pt = event.getLocation();
-      if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
-        lastPt = pt;
-        updateCursor(event);
-      }
       /*
+      Point pt = event.getLocation();
       if (!DragSource.isDragImageSupported()) {
         Point pt = event.getLocation();
         if (_pt == null || _pt.x != pt.x || _pt.y != pt.y) {
@@ -1141,6 +1136,7 @@ public class DualListBox extends JPanel implements StringHighlighterI, ListUpdat
      * is invoked if the use modifies the current drop gesture
      */
     public void dropActionChanged(DropTargetDragEvent event) {
+      updateCursor(event);
     }
   } // end private class ListDropTargetListener
 

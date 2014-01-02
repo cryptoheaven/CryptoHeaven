@@ -167,8 +167,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
   private UndoManager undoMngr;
 
-  private Point lastDndPt;
-
   private ToolBarModel toolBarModel;
 
   /** Creates new MsgComposePanel */
@@ -2466,11 +2464,6 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    Point pt = event.getLocation();
-    if (lastDndPt == null || lastDndPt.x != pt.x || lastDndPt.y != pt.y) {
-      lastDndPt = pt;
-      updateCursor(event);
-    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {
@@ -2550,7 +2543,8 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       setAttachmentsPanel();
     }
   }
-  public void dropActionChanged(DropTargetDragEvent p1) {
+  public void dropActionChanged(DropTargetDragEvent event) {
+    updateCursor(event);
   }
 
 

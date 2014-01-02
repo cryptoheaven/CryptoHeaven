@@ -18,7 +18,6 @@ import com.CH_gui.fileTable.*;
 import com.CH_gui.frame.*;
 import com.CH_gui.tree.*;
 
-import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 import java.io.*;
@@ -35,7 +34,6 @@ import java.util.List;
 public class MsgDND_DropTargetListener extends Object implements DropTargetListener {
 
   private MsgActionTable msgActionTable;
-  private Point lastPt;
 
   /** Creates new MsgDND_DropTargetListener */
   public MsgDND_DropTargetListener(MsgActionTable msgActionTable) {
@@ -49,11 +47,6 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    Point pt = event.getLocation();
-    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
-      lastPt = pt;
-      updateCursor(event);
-    }
   }
   private void updateCursor(DropTargetDragEvent event) {
     try {
@@ -172,5 +165,6 @@ public class MsgDND_DropTargetListener extends Object implements DropTargetListe
     event.getDropTargetContext().dropComplete(true);
   }
   public void dropActionChanged(DropTargetDragEvent event) {
+    updateCursor(event);
   }
 } // end class MsgDND_DropTargetListener

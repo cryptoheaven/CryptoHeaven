@@ -85,8 +85,6 @@ public class PersonDND_DropTargetListener extends Object implements DropTargetLi
         if (!jTable.getSelectionModel().isSelectedIndex(row) || selected == null || selected.length == 0)
           jTable.getSelectionModel().setSelectionInterval(row, row);
       }
-
-      updateCursor(event);
     }
   }
   private void updateCursor(DropTargetDragEvent event) {
@@ -123,10 +121,8 @@ public class PersonDND_DropTargetListener extends Object implements DropTargetLi
             event.isDataFlavorSupported(MsgDND_Transferable.MSG_RECORD_FLAVOR);
   }
   public void dragExit(DropTargetEvent event) {
-    //System.out.println("PersonDND_DropTargetListener.dragExit");
   }
   public void drop(DropTargetDropEvent event) {
-    //System.out.println("PersonDND_DropTargetListener.drop");
     try {
       Transferable tr = event.getTransferable();
 
@@ -193,6 +189,6 @@ public class PersonDND_DropTargetListener extends Object implements DropTargetLi
     event.getDropTargetContext().dropComplete(true);
   }
   public void dropActionChanged(DropTargetDragEvent event) {
-    //System.out.println("PersonDND_DropTargetListener.dropActionChanged");
+    updateCursor(event);
   }
 } // end class PersonDND_DropTargetListener

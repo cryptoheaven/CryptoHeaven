@@ -21,7 +21,6 @@ import com.CH_co.util.ArrayUtils;
 import com.CH_gui.fileTable.FileDND_Transferable;
 import com.CH_gui.fileTable.FileDND_TransferableData;
 import com.CH_gui.frame.MainFrame;
-import java.awt.Point;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
@@ -40,7 +39,6 @@ import javax.swing.JFileChooser;
 public class LocalFileDND_DropTargetListener extends Object implements DropTargetListener {
 
   private JFileChooser jFileChooser;
-  private Point lastPt;
 
   /** Creates new LocalFileDND_DropTargetListener */
   protected LocalFileDND_DropTargetListener(JFileChooser fileChooser) {
@@ -51,19 +49,11 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
   }
 
   public void dragEnter(DropTargetDragEvent event) {
-    //System.out.println("dragEnter");
     updateCursor(event);
   }
   public void dragOver(DropTargetDragEvent event) {
-    Point pt = event.getLocation();
-    if (lastPt == null || lastPt.x != pt.x || lastPt.y != pt.y) {
-      lastPt = pt;
-      //System.out.println("dragOver");
-      updateCursor(event);
-    }
   }
   private void updateCursor(DropTargetDragEvent event) {
-    //System.out.println("updateCursor");
     try {
       /*
       if (event.isDataFlavorSupported(MsgDND_Transferable.MSG_RECORD_FLAVOR)) {
@@ -86,10 +76,8 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
     }
   }
   public void dragExit(DropTargetEvent event) {
-    //System.out.println("dragExit");
   }
   public void drop(DropTargetDropEvent event) {
-    //System.out.println("drop");
 
     try {
       Transferable tr = event.getTransferable();
@@ -167,6 +155,6 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
     event.getDropTargetContext().dropComplete(true);
   }
   public void dropActionChanged(DropTargetDragEvent event) {
-    //System.out.println("dropActionChanged");
+    updateCursor(event);
   }
 }
