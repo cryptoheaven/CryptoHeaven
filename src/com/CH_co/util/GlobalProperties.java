@@ -312,13 +312,14 @@ public class GlobalProperties extends Object {
   // build 802 Fix file attachment chooser dialog for case of multiple file versions in folder. SaluSafe v1.33 and v1.34
   // build 804 Provide support Copy & Paste support for copying address book tables for pasting into external spreadsheets.
   // build 806 DND fix for flickering of Copy/Move cursors
+  // build 808 Fix manifest permissions attribute
 
-  public static final short PROGRAM_BUILD_NUMBER = 806;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 808;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 4;
+  public static final short PROGRAM_VERSION_MINOR = 5;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

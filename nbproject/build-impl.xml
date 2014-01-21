@@ -522,6 +522,8 @@ is divided into following sections:
                     <manifest>
                         <attribute name="Class-Path" value="${jar.classpath}"/>
                         <attribute name="Implementation-Version" value="${TODAY}"/>
+                        <attribute name="Permissions" value="all-permissions"/>
+                        <attribute name="Application-Name" value="CryptoHeaven"/>
                         <customize/>
                     </manifest>
                 </copylibs>
@@ -672,6 +674,8 @@ is divided into following sections:
             <j2seproject1:manifest>
                 <j2seproject1:attribute name="Main-Class" value="${main.class}"/>
                 <j2seproject1:attribute name="Implementation-Version" value="${TODAY}"/>
+                <j2seproject1:attribute name="Permissions" value="all-permissions"/>
+                <j2seproject1:attribute name="Application-Name" value="CryptoHeaven"/>
             </j2seproject1:manifest>
         </j2seproject1:jar>
         <echo level="info">To run this application from the command line without Ant, try:</echo>
