@@ -18,6 +18,7 @@ import com.CH_gui.frame.MessageFrame;
 import com.CH_gui.msgs.MsgPanelUtils;
 import com.CH_gui.util.URLLauncher;
 import java.awt.Component;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -32,7 +33,14 @@ public class URLLauncherMAILTO extends Object implements URLLauncher {
 
   public void openURL(URL url, Component invoker) {
     Record initialRecipient = null;
-    String path = URLDecoder.decode(url.getPath());
+    String path = url.getPath();
+    // this URL maybe HTML encoded - decode it now
+    try {
+      path = URLDecoder.decode(path, "UTF-8");
+    } catch (UnsupportedEncodingException x) {
+    }
+    // additionally convert all &amp; to &
+    path = path.replace("&amp;", "&");
     // find first Parent that is RecipientProviderI
     EmailRecord sendFromEmailAccount = null;
     MsgDataProviderI msgDataProvider = null;

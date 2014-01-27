@@ -313,8 +313,9 @@ public class GlobalProperties extends Object {
   // build 804 Provide support Copy & Paste support for copying address book tables for pasting into external spreadsheets.
   // build 806 DND fix for flickering of Copy/Move cursors
   // build 808 Fix manifest permissions attribute
+  // build 810 Clicking on URLs with encoding should decode url before passing it to the browser, plus Java 1.4 compatibility fix
 
-  public static final short PROGRAM_BUILD_NUMBER = 808;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 810;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

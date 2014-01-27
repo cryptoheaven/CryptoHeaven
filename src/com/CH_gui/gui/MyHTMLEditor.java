@@ -22,7 +22,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -405,10 +407,19 @@ public class MyHTMLEditor extends HTMLEditor implements DisposableObj {
   */
   public void linkActivated(URL url) {
     try {
-      if (url.getProtocol().startsWith("http"))
-        BrowserLauncher.openURL(url.toExternalForm());
-      else if (url.getProtocol().startsWith("mail"))
+      if (url.getProtocol().startsWith("http")) {
+        // this URL maybe HTML encoded - decode it now
+        String urlStr = url.toExternalForm();
+        try {
+          urlStr = URLDecoder.decode(urlStr, "UTF-8");
+        } catch (UnsupportedEncodingException x) {
+        }
+        // additionally convert all &amp; to &
+        urlStr = urlStr.replace("&amp;", "&");
+        BrowserLauncher.openURL(urlStr);
+      } else if (url.getProtocol().startsWith("mail")) {
         new URLLauncherMAILTO().openURL(url, this);
+      }
     } catch (IOException ex) {
       ex.printStackTrace();
     }

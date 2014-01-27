@@ -2,6 +2,7 @@ package com.CH_co.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +10,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 /**
  * BrowserLauncher is a class that provides one static method, openURL, which opens the default
@@ -486,6 +488,14 @@ public class BrowserLauncher {
    * @throws IOException If the web browser could not be located or does not run
    */
   public static void openURL(String url) throws IOException {
+    // this URL maybe HTML encoded if it comes from a click on HTML page - decode it now
+    try {
+      url = URLDecoder.decode(url, "UTF-8");
+    } catch (UnsupportedEncodingException x) {
+    }
+    // additionally convert all &amp; to &
+    url = url.replace("&amp;", "&");
+    // url is decoded now
     if (appletContext != null) {
       appletContext.showDocument(new URL(url), "_blank");
     } else {

@@ -1545,13 +1545,13 @@ public class LoginFrame extends JFrame {
       }
       if (info != null) {
         info = info.toLowerCase();
-        if (info.contains("win"))
+        if (info.indexOf("win") >= 0)
           clientOS = "w";
-        else if (info.contains("mac"))
+        else if (info.indexOf("mac") >= 0)
           clientOS = "m";
-        else if (info.contains("linux"))
+        else if (info.indexOf("linux") >= 0)
           clientOS = "l";
-        else if (info.contains("unix"))
+        else if (info.indexOf("unix") >= 0)
           clientOS = "x";
         else
           clientOS = "-";

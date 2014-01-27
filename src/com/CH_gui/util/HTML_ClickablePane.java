@@ -19,7 +19,9 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Hashtable;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -350,6 +352,18 @@ public class HTML_ClickablePane extends JTextPane implements URLLauncher {
       if (trace != null) trace.args(e);
       if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
         URL url = e.getURL();
+        // this URL maybe HTML encoded - decode it now
+        String urlStr = url.toExternalForm();
+        try {
+          urlStr = URLDecoder.decode(urlStr, "UTF-8");
+        } catch (UnsupportedEncodingException x) {
+        }
+        // additionally convert all &amp; to &
+        urlStr = urlStr.replace("&amp;", "&");
+        try {
+          url = new URL(urlStr);
+        } catch (MalformedURLException x2) {
+        }
         newClick(url);
       }
       if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {

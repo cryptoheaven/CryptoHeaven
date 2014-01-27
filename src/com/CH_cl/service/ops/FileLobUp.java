@@ -37,6 +37,7 @@ import com.CH_co.util.*;
 import java.io.*;
 import java.security.*;
 import java.util.ArrayList;
+import java.util.Timer;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -280,7 +281,7 @@ public class FileLobUp {
     if (delayMillis <= 0)
       restoreState();
     else {
-      final java.util.Timer timer = new java.util.Timer("FileLobUp delayed restorer", true);
+      final Timer timer = new Timer(true);
       timer.schedule(new java.util.TimerTask() {
         public void run() {
           FileLobUp.restoreState();
