@@ -314,8 +314,9 @@ public class GlobalProperties extends Object {
   // build 806 DND fix for flickering of Copy/Move cursors
   // build 808 Fix manifest permissions attribute
   // build 810 Clicking on URLs with encoding should decode url before passing it to the browser, plus Java 1.4 compatibility fix
+  // build 812 Trace history reported incorrect stats in some cases involving privilege records.
 
-  public static final short PROGRAM_BUILD_NUMBER = 810;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 812;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

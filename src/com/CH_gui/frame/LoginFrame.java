@@ -1709,7 +1709,8 @@ public class LoginFrame extends JFrame {
           userName.selectAll();
           password.requestFocusInWindow();
           password.getCaret().setVisible(true);
-          password.selectAll();
+          // remove incorrect password entry
+          password.setText("");
         }
       }
 

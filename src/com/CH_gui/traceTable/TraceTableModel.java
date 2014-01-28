@@ -284,8 +284,9 @@ public class TraceTableModel extends RecordTableModel {
           if (statsReply.stats != null) {
             int size = getRowCount();
             for (int i=0; i<statsReply.stats.length; i++) {
-              if (statsReply.stats[i].statId.longValue() >= 0)
-                statsReply.stats[i].statId = new Long(-(size+i));
+              // virtual stats have -ve IDs that we need to renumerate to make them unique in our table
+              if (statsReply.stats[i].statId.longValue() < 0)
+                statsReply.stats[i].statId = new Long(-(size+i+1));
             }
           }
           updateData(statsReply.stats);
