@@ -193,6 +193,14 @@ public class HTML_Ops {
         outerEndTags = new String[] { ">" };
         htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
         // Removal example:
+        // <base href="http://domain.com/">
+        startTags = new String[][] {{ "href=\"", "HREF=\"" }};
+        endTags = new String[][] {{ "\"" }};
+        replacementTags = new String[] { "" };
+        outerBeginTags = new String[] { "<base ", "<BASE " };
+        outerEndTags = new String[] { ">" };
+        htmlMessage = ArrayUtils.removeTags(htmlMessage, startTags, endTags, replacementTags, true, outerBeginTags, outerEndTags);
+        // Removal example:
         // <td style="background-image:url(http://img.en25.com/eloquaimages/clients/Tridel/{7c789a68-f648-42f2-aa2f-47a92ab8dbc8}_av2_nowavailable_bg_410.jpg);background-repeat:no-repeat;" width="410" align="left" valign="top">
         if (htmlMessage.indexOf("url(") >= 0 || htmlMessage.indexOf("URL(") >= 0) {
           htmlMessage = ArrayUtils.replaceKeyWords(htmlMessage,
