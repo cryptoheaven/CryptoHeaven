@@ -91,15 +91,17 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
     JSortedTable jTable = recycleActionTable.getJSortedTable();
     int row = jTable.rowAtPoint(location);
     if (row >= 0) {
+      if (!originalSelectionSaved) {
+        originallySelectedRecords = recycleActionTable.getSelectedRecords();
+        originalSelectionSaved = true;
+      }
       int modelRow = jTable.convertMyRowIndexToModel(row);
       RecycleTableModel model = (RecycleTableModel) jTable.getRawModel();
       Record rowRec = model.getRowObject(modelRow);
       if (rowRec instanceof FolderPair) {
-        if (!originalSelectionSaved) {
-          originallySelectedRecords = recycleActionTable.getSelectedRecords();
-          originalSelectionSaved = true;
-        }
         jTable.getSelectionModel().setSelectionInterval(row, row);
+      } else {
+        jTable.getSelectionModel().clearSelection();
       }
     }
   }

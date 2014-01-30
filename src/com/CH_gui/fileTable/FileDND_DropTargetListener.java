@@ -87,15 +87,17 @@ public class FileDND_DropTargetListener extends Object implements DropTargetList
     JSortedTable jTable = fileActionTable.getJSortedTable();
     int row = jTable.rowAtPoint(location);
     if (row >= 0) {
+      if (!originalSelectionSaved) {
+        originallySelectedRecords = fileActionTable.getSelectedRecords();
+        originalSelectionSaved = true;
+      }
       int modelRow = jTable.convertMyRowIndexToModel(row);
       FileTableModel model = (FileTableModel) jTable.getRawModel();
       Record rowRec = model.getRowObject(modelRow);
       if (rowRec instanceof FolderPair) {
-        if (!originalSelectionSaved) {
-          originallySelectedRecords = fileActionTable.getSelectedRecords();
-          originalSelectionSaved = true;
-        }
         jTable.getSelectionModel().setSelectionInterval(row, row);
+      } else {
+        jTable.getSelectionModel().clearSelection();
       }
     }
   }

@@ -78,6 +78,10 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
     if (trace != null) trace.exit(FolderDND_DropTargetListener.class);
   }
   public void dragOver(DropTargetDragEvent event) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderDND_DropTargetListener.class, "dragOver(DropTargetDragEvent event)");
+    // dragging over different folder types will change the cursor
+    updateCursor(event);
+    if (trace != null) trace.exit(FolderDND_DropTargetListener.class);
   }
   private void updateCursor(DropTargetDragEvent event) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderDND_DropTargetListener.class, "updateCursor(DropTargetDragEvent event)");
