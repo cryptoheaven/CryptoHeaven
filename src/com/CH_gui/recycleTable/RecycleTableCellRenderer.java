@@ -132,11 +132,11 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
               if (rec instanceof FileLinkRecord) {
                 FileLinkRecord link = (FileLinkRecord) rec;
                 isStarred = link.isStarred();
-                statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_FILE);
+                statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_FILE);
               } else if (rec instanceof MsgLinkRecord) {
                 MsgLinkRecord link = (MsgLinkRecord) rec;
                 isStarred = link.isStarred();
-                statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+                statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
               }
               if (statRecord != null)
                 flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());

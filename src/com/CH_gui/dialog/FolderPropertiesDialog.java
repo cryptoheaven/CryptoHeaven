@@ -487,8 +487,8 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
                     if (kRec != null) {
                       newShares[i].seal(kRec);
                     } else {
-                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, com.CH_cl.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."), com.CH_cl.lang.Lang.rb.getString("msgTitle_Fetch_Error"));
-                      throw new RuntimeException(com.CH_cl.lang.Lang.rb.getString("msg_Could_not_fetch_user's_Public_Key.__Operation_terminated."));
+                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, "Folder sharing change is not possible because member's encryption key could not be loaded.", com.CH_cl.lang.Lang.rb.getString("msgTitle_Fetch_Error"));
+                      throw new RuntimeException("Folder sharing change is not possible because user's Public Key could not be loaded.");
                     }
                   } else {
                     FolderShareRecord groupShare = cache.getFolderShareRecordMy(newShares[i].ownerUserId, true);
@@ -496,8 +496,8 @@ public class FolderPropertiesDialog extends GeneralDialog implements VisualsSava
                     if (groupShare != null) {
                       newShares[i].seal(groupShare.getSymmetricKey());
                     } else {
-                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, "Could not locate group's encryption key.  Operation terminated.", "Fetch Error");
-                      throw new RuntimeException("Could not locate group's encryption key.  Operation terminated.");
+                      MessageDialog.showErrorDialog(FolderPropertiesDialog.this, "Folder sharing change is not possible because group's encryption key could not be loaded.", "Fetch Error");
+                      throw new RuntimeException("Folder sharing change is not possible because group's encryption key could not be loaded.");
                     }
                   }
                 }

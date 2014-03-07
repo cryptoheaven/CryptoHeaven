@@ -25,6 +25,8 @@ import com.CH_gui.util.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.awt.dnd.*;
 import java.util.*;
@@ -41,13 +43,12 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   private Action[] actions;
 
   private static final int REFRESH_ACTION = 0;
-  private static final int INITIATE_ACTION = 1;
-  private static final int MESSAGE_ACTION = 2;
-
+  private static final int COPY_TO_CLIPBOARD_ACTION = 1;
+  private static final int ADD_TO_CONTACTS_ACTION = 2;
+  private static final int MESSAGE_ACTION = 3;
 
   private int leadingActionId = Actions.LEADING_ACTION_ID_STAT_ACTION_TABLE;
   private ServerInterfaceLayer SIL;
-
 
   /** Creates new TraceActionTable
    */
@@ -72,17 +73,21 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
 
 
   private void initActions() {
-    actions = new Action[3];
+    actions = new Action[4];
     actions[REFRESH_ACTION] = new RefreshAction(leadingActionId + REFRESH_ACTION);
-    actions[INITIATE_ACTION] = new InitiateAction(leadingActionId + INITIATE_ACTION);
+    actions[COPY_TO_CLIPBOARD_ACTION] = new CopyToClipboardAction(leadingActionId + COPY_TO_CLIPBOARD_ACTION);
+    actions[ADD_TO_CONTACTS_ACTION] = new InitiateContactAction(leadingActionId + ADD_TO_CONTACTS_ACTION);
     actions[MESSAGE_ACTION] = new SendMessageAction(leadingActionId + MESSAGE_ACTION);
     setEnabledActions();
   }
   public Action getRefreshAction() {
     return actions[REFRESH_ACTION];
   }
+  public Action getCopyToClipboardAction() {
+    return actions[COPY_TO_CLIPBOARD_ACTION];
+  }
   public Action getInitiateAction() {
-    return actions[INITIATE_ACTION];
+    return actions[ADD_TO_CONTACTS_ACTION];
   }
   public Action getMessageAction() {
     return actions[MESSAGE_ACTION];
@@ -112,12 +117,89 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
     }
   }
 
+  /** 
+   * Copy trace details to clipboard.
+   */
+  private class CopyToClipboardAction extends AbstractActionTraced {
+    public CopyToClipboardAction(int actionId) {
+      super(com.CH_cl.lang.Lang.rb.getString("action_Copy_To_Clipboard"), Images.get(ImageNums.COPY16));
+      putValue(Actions.ACTION_ID, new Integer(actionId));
+      putValue(Actions.TOOL_ICON, Images.get(ImageNums.COPY24));
+    }
+    public void actionPerformedTraced(ActionEvent event) {
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      ArrayList traceRecs = getTableModel().getRowListForViewOnly();
+      MultiHashMap traceRecsHM = new MultiHashMap(true);
+      if (traceRecs != null) {
+        // Group them by OBJECT
+        StringBuffer sb = new StringBuffer();
+        for (int i=0; i<traceRecs.size(); i++) {
+          TraceRecord rec = (TraceRecord) traceRecs.get(i);
+          traceRecsHM.put(rec.objId, rec);
+        }
+        // FOR EACH OBJECT WRITE OUT TRACE DATA
+        Set objIDs = traceRecsHM.keys();
+        Iterator iter = objIDs.iterator();
+        while (iter.hasNext()) {
+          Long objId = (Long) iter.next();
+          Collection traces = traceRecsHM.getAll(objId);
+          Iterator iterRec = traces.iterator();
+          while (iterRec.hasNext()) {
+            try {
+              TraceRecord trace = (TraceRecord) iterRec.next();
+              sb.append("Access Record for ");
+              Record obj = null;
+              if (trace.objType.byteValue() == TraceRecord.STAT_TYPE_MESSAGE) {
+                sb.append("message id ");
+                obj = cache.getMsgDataRecord(trace.objId);
+              } else if (trace.objType.byteValue() == TraceRecord.STAT_TYPE_FILE) {
+                sb.append("file id ");
+                obj = cache.getFileLinkRecordsForFile(trace.objId)[0]; // link will render into filename
+              } else if (trace.objType.byteValue() == TraceRecord.STAT_TYPE_FOLDER) {
+                sb.append("folder id ");
+                obj = cache.getFolderRecord(trace.objId);
+              }
+              sb.append(trace.objId);
+              if (obj != null) {
+                sb.append(" : ");
+                sb.append(ListRenderer.getRenderedText(obj));
+              }
+              sb.append("\n");
+              UserRecord uRec = cache.getUserRecord(trace.ownerUserId);
+              if (uRec != null)
+                sb.append("user: "+uRec.shortInfo()+"\n");
+              else
+                sb.append("user: "+java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {trace.ownerUserId})+"\n");
+              if (trace.hasHistoryRecord) {
+                sb.append("first seen: "+Misc.getFormattedTimestamp(trace.firstSeen)+"\n");
+                sb.append("retrieved: "+Misc.getFormattedTimestamp(trace.firstDelivered)+"\n");
+              } else {
+                sb.append("No access history found.\n");
+              }
+              if (trace.hasReadAccess)
+                sb.append("Object is currently accessible by the user.\n");
+              else
+                sb.append("Object is no longer accessible by the user.\n");
+              sb.append("\r\n");
+            } catch (Throwable t) {
+              t.printStackTrace();
+            }
+          }
+        }
+        String traceStr = sb.toString();
+        Transferable selection = new HtmlSelection(Misc.encodePlainIntoHtml(traceStr), traceStr);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(selection, null);
+        NotificationCenter.show(NotificationCenter.INFORMATION_MESSAGE, "Copied", "Trace records have been copied to clipboard.");
+      }
+    }
+  }
 
   /** 
    * Initiate a new contact.
    */
-  private class InitiateAction extends AbstractActionTraced {
-    public InitiateAction(int actionId) {
+  private class InitiateContactAction extends AbstractActionTraced {
+    public InitiateContactAction(int actionId) {
       super(com.CH_cl.lang.Lang.rb.getString("action_Add_to_Contact_List_..."), Images.get(ImageNums.CONTACT_ADD16));
       putValue(Actions.ACTION_ID, new Integer(actionId));
       putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Add_User_to_your_Contact_List."));
@@ -208,7 +290,6 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
     }
   }
 
-
   private UserRecord[] getUserRecords(TraceRecord[] traceRecords) {
     UserRecord[] userRecords = null;
     Vector userRecsV = new Vector();
@@ -243,6 +324,7 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
   public void setEnabledActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TraceActionTable.class, "setEnabledActions()");
     actions[REFRESH_ACTION].setEnabled(true);
+    actions[COPY_TO_CLIPBOARD_ACTION].setEnabled(getTableModel().getRowCount() > 0);
 
     int count = 0;
     boolean messageOk = true;
@@ -276,13 +358,13 @@ public class TraceActionTable extends RecordActionTable implements ActionProduce
 
     try {
       if (count == 0) {
-        actions[INITIATE_ACTION].setEnabled(false); // This list sometimes throws NullPointerException -- weird!!! why??
+        actions[ADD_TO_CONTACTS_ACTION].setEnabled(false); // This list sometimes throws NullPointerException -- weird!!! why??
         actions[MESSAGE_ACTION].setEnabled(false);
       } else if (count == 1) {
-        actions[INITIATE_ACTION].setEnabled(initiateOk);
+        actions[ADD_TO_CONTACTS_ACTION].setEnabled(initiateOk);
         actions[MESSAGE_ACTION].setEnabled(messageOk);
       } else {
-        actions[INITIATE_ACTION].setEnabled(false);
+        actions[ADD_TO_CONTACTS_ACTION].setEnabled(false);
         actions[MESSAGE_ACTION].setEnabled(messageOk);
       }
     } catch (NullPointerException e) {

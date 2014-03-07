@@ -88,7 +88,7 @@ public class MsgLinkOps {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       ArrayList statsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
-        StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+        StatRecord statRecord = cache.getStatRecordMyLinkId(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
         if (statRecord != null && !statRecord.mark.equals(newMark))
           statsL.add(statRecord);
       }

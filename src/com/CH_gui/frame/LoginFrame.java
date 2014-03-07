@@ -1303,19 +1303,23 @@ public class LoginFrame extends JFrame {
       if (isPasswordPresent(pass1) || defaultPassword != null || pass1.length == 0) { // 0 len pass for login to new web accounts only
         if (!isNewAccountDialog || isPasswordValid(pass1)) {
           if (!isNewAccountDialog || isPasswordValid(pass2 = retypePassword.getPassword())) {
-            if (!isNewAccountDialog || currentEmail.getText().trim().length() == 0 || EmailRecord.isEmailFormatValid(currentEmail.getText().trim())) {
-              String serverS = getServerStr();
-              if (Misc.parseHostAndPort(serverS) != null) {
-                if (!isNewAccountDialog || licenseCheck.isSelected()) {
-                  errorMsg = null;
+            if (!isNewAccountDialog || Arrays.equals(pass1, pass2)) {
+              if (!isNewAccountDialog || currentEmail.getText().trim().length() == 0 || EmailRecord.isEmailFormatValid(currentEmail.getText().trim())) {
+                String serverS = getServerStr();
+                if (Misc.parseHostAndPort(serverS) != null) {
+                  if (!isNewAccountDialog || licenseCheck.isSelected()) {
+                    errorMsg = null;
+                  } else {
+                    errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_You_must_accept_the_License_Agreement...");
+                  }
                 } else {
-                  errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_You_must_accept_the_License_Agreement...");
+                  errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
                 }
               } else {
-                errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
+                errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
               }
             } else {
-              errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
+              errorMsg = RETYPE_PASSWORD_ERROR;
             }
           } else {
             errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_The_retyped_password_does_not_match_the_entered_password.");

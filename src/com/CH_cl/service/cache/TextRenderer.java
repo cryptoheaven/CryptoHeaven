@@ -11,6 +11,7 @@ package com.CH_cl.service.cache;
 
 import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_co.service.records.*;
+import com.CH_co.util.ImageNums;
 import com.CH_co.util.Misc;
 import java.io.File;
 import java.util.*;
@@ -239,12 +240,10 @@ public class TextRenderer {
 
     if (toolTip == null && toolTipReturn != null) {
       // Here and not in the renderer is the proper place to set tool tip!  I don't know why is that...
-      if (ownerNote.length() > 0 && chatNote.length() == 0) {
+      if (ownerNote.length() > 0) {
         toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_folder."), new Object[] {ownerNote});
-      } else if (ownerNote.length() == 0 && chatNote.length() > 0) {
+      } else if (chatNote.length() > 0) {
         toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_You_are_sharing_this_chatting_folder_with_USER."), new Object[] {chatNote});
-      } else if (ownerNote.length() > 0 && chatNote.length() > 0) {
-        toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_chatting_folder._Other_participants_are_OTHER-USERS."), new Object[] {ownerNote, chatNote});
       } else {
         toolTip = "";
       }
@@ -256,7 +255,8 @@ public class TextRenderer {
 
     if (nodeText == null) {
 
-      String ownerAndChatNotes = ownerNote.length() > 0 ? ownerNote + " " + chatNote : chatNote;
+//      String ownerAndChatNotes = ownerNote.length() > 0 ? ownerNote + " " + chatNote : chatNote;
+      String ownerAndChatNotes = chatNote;
       String folderName = folderPair.getFolderShareRecord().getFolderName();
 
       // For Chatting folders, to save space, don't display the default "Chat Log" name.
@@ -379,12 +379,10 @@ public class TextRenderer {
         // use my contact list only, not the reciprocal contacts
         Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false);
         if (rec != null) {
-          sb.append('[');
           sb.append(getRenderedText(rec));
-          sb.append(']');
         }
         else {
-          sb.append("[*]");
+          sb.append("*");
         }
         ownerNote = sb.toString();
       } else {
@@ -408,8 +406,8 @@ public class TextRenderer {
           for (int i=0; i<allShares.length; i++) {
             FolderShareRecord share = allShares[i];
             if (share.isOwnedByGroup() ||
-                (!share.isOwnedBy(ownerUserId, (Long[]) null) &&
-                !share.isOwnedBy(myUserId, (Long[]) null))) {
+//                (!share.isOwnedBy(ownerUserId, (Long[]) null) &&
+                !share.isOwnedBy(myUserId, (Long[]) null)) {
               Record recipient = null;
               if (share.isOwnedByUser()) {
                 if (userL == null) userL = new ArrayList();
@@ -474,12 +472,6 @@ public class TextRenderer {
             sb.append(java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("User_(USER-ID)"), new Object[] {uidL.get(i)}));
             appended = true;
           }
-
-//          if (allShares.length > 1 && foundMine) {
-//            if (appended)
-//              sb.append(" / ");
-//            sb.append("me");
-//          }
         }
         chatNote = sb.toString();
         if (chatNote == null) chatNote = "";
@@ -497,12 +489,12 @@ public class TextRenderer {
   public static String getFolderAndShareNames(FolderPair fPair, boolean includeAllParticipants) {
     FolderRecord fRec = fPair.getFolderRecord();
     String[] notes = getFolderNote(fRec, includeAllParticipants);
-    String additionalNote = notes[0].length() > 0 ? notes[0] + " " + notes[1] : notes[1];
-    additionalNote = additionalNote.trim();
+    String shareNote = notes[1];
+    shareNote = shareNote.trim();
     String title = fPair.getMyName();
     String appendPostfix = null;
     if (title == null) title = "";
-    if (additionalNote.length() > 0) {
+    if (shareNote.length() > 0) {
       if (fRec.isChatting()) {
         String defaultChatFolderName = com.CH_cl.lang.Lang.rb.getString("folderName_Chat_Log");
         if (title.startsWith(defaultChatFolderName)) {
@@ -510,7 +502,7 @@ public class TextRenderer {
           appendPostfix = " chat";
         }
       }
-      title = title.length() > 0 ? title + " : " + additionalNote : additionalNote;
+      title = title.length() > 0 ? title + " : " + shareNote : shareNote;
     }
     if (appendPostfix != null)
       title += appendPostfix;
@@ -520,4 +512,77 @@ public class TextRenderer {
   public static String getFolderAndShareNamesForTreeDisplaySort(FolderPair fPair) {
     return getFolderAndShareNames(fPair, fPair.getFolderRecord().isChatting());
   }
+  
+  /**
+   * Makes the stats note for the chat message in HTML format and appends it to the string buffer.
+   * @param stats Stats for the message
+   * @param msgLink Msg Link
+   * @param msgData Msg Data
+   * @param myUserId User ID of the current session
+   * @param returnAppendSB Return buffer
+   * @return String or NULL (NULL when using the return StringBuffer)
+   */
+  public static String getStatsNote(int availableSlots, Collection stats, MsgLinkRecord msgLink, MsgDataRecord msgData, Long myUserId, StringBuffer returnAppendSB) {
+    boolean isUsingBuffer = returnAppendSB != null;
+    if (!isUsingBuffer)
+      returnAppendSB = new StringBuffer();
+    // proceed with rendering of stamps if there is at least one other than mine
+    if (stats != null && stats.size() >= 2) { // at least 2 (my and one more)
+      Long senderUserId = msgData.senderUserId;
+      HashMap statsWithReadHM = new HashMap();
+      Iterator iter = stats.iterator();
+      while (iter.hasNext()) {
+        StatRecord stat = (StatRecord) iter.next();
+        Long statOwnerUserId = stat.ownerUserId;
+        if (stat.firstRead != null && !statOwnerUserId.equals(myUserId) && !statOwnerUserId.equals(senderUserId)) {
+          StatRecord prevStat = (StatRecord) statsWithReadHM.get(stat.ownerUserId);
+          if (prevStat == null || prevStat.firstRead.after(stat.firstRead)) {
+            statsWithReadHM.put(statOwnerUserId, stat);
+          }
+        }
+      }
+      // If any stats to output
+      if (statsWithReadHM.size() > 0) {
+        Collection statsWithRead = statsWithReadHM.values();
+        // sort them in cronological order
+        List statsList = new ArrayList(statsWithRead);
+        Comparator comparator = new Comparator() {
+          public int compare(Object c1, Object c2) {
+            if (c1 instanceof StatRecord && c2 instanceof StatRecord) {
+              // latest one on top
+              return ((StatRecord) c2).firstRead.compareTo(((StatRecord) c1).firstRead);
+            } else {
+              return 0;
+            }
+          }
+        };
+        Collections.sort(statsList, comparator); // use the comparator as much as u want
+        // write out all stat confirmations
+        Iterator iterS = statsList.iterator();
+        int statSize = statsList.size();
+        returnAppendSB.append(" <font size=\"-2\" color=\"#777777\"> ");
+        int statCounter = 0;
+        while (iterS.hasNext()) {
+          statCounter ++;
+          StatRecord stat = (StatRecord) iterS.next();
+          if (statCounter < availableSlots || (statCounter == availableSlots && statSize == availableSlots)) {
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(stat.ownerUserId, true, false);
+            if (statCounter > 1)
+              returnAppendSB.append(", ");
+            returnAppendSB.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_READ_INLINE) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\">");
+            String userLabel = " " + getRenderedText(rec) + " " + Misc.getFormattedDate(stat.firstRead, true, true, false);
+            userLabel = userLabel.replace(" ", "&nbsp;"); // make each icon-user-stamp set non-breakable
+            returnAppendSB.append(userLabel);
+          }
+        }
+        if (statSize > availableSlots) {
+          // make #-others set non-breakable
+          returnAppendSB.append(", and&nbsp;" + (1 + statSize - availableSlots) + "&nbsp;others");
+        }
+        returnAppendSB.append("</font> ");
+      }
+    }
+    return isUsingBuffer ? null : returnAppendSB.toString();
+  }
+
 }

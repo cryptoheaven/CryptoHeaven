@@ -16,6 +16,7 @@ import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.cache.event.*;
 import com.CH_cl.service.ops.FileLinkOps;
 import com.CH_cl.service.ops.MsgLinkOps;
+import com.CH_cl.service.ops.StatOps;
 import com.CH_cl.service.records.filters.FixedFilter;
 import com.CH_cl.service.records.filters.TextSearchFilter;
 import com.CH_cl.util.UserColor;
@@ -28,10 +29,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MsgFilter;
 import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.HTML_Ops;
-import com.CH_co.util.HTML_utils;
-import com.CH_co.util.ImageNums;
-import com.CH_co.util.Misc;
+import com.CH_co.util.*;
 import com.CH_gui.addressBook.AddressTableCellRenderer;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.list.ListRenderer;
@@ -411,7 +409,7 @@ public class MsgTableModel extends RecordTableModel {
         if (msgLink.getPostRenderingCache() == null) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
-          getSubjectColumnValue(this, msgLink, msgData, null, cache);
+          getSubjectColumnValue(this, msgLink, msgData, null, null, cache, true);
         }
       }
       return TextRenderer.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
@@ -461,7 +459,7 @@ public class MsgTableModel extends RecordTableModel {
         case 2:
           boolean isStarred = msgLink.isStarred();
           boolean isFlagged = false;
-          StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+          StatRecord stat = cache.getStatRecordMyLinkId(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
           if (stat != null)
             isFlagged = StatRecord.getIconForFlag(stat.getFlag(isModeMsgBody())) != ImageNums.IMAGE_NONE;
           if (isStarred && isFlagged)
@@ -527,7 +525,7 @@ public class MsgTableModel extends RecordTableModel {
           } else {
             // Enable Copy & Paste of Address Book from table view into external spreadsheet.
             if (messageMode == MODE_ADDRESS || messageMode == MODE_WHITELIST) {
-              Object nameValue = getSubjectColumnValue(this, msgLink, msgData, null, cache);
+              Object nameValue = getSubjectColumnValue(this, msgLink, msgData, null, null, cache, false);
               String name = nameValue != null ? nameValue.toString() : null;
               value = name;
             } else {
@@ -629,7 +627,7 @@ public class MsgTableModel extends RecordTableModel {
     return value;
   }
 
-  public static Object getSubjectColumnValue(MsgTableModel model, MsgLinkRecord msgLink, MsgDataRecord msgData, MsgLinkRecord prevMsgLink, FetchedDataCache cache) {
+  public static Object getSubjectColumnValue(MsgTableModel model, MsgLinkRecord msgLink, MsgDataRecord msgData, MsgLinkRecord prevMsgLink, MsgLinkRecord nextMsgLink, FetchedDataCache cache, boolean isForSearchOnly) {
     Object value = null;
     String subject = null;
     if (msgData == null) {
@@ -667,9 +665,9 @@ public class MsgTableModel extends RecordTableModel {
           boolean isHTML = msgData.isHtml();
 
           boolean toAddFrom = false;
+          boolean toAddAttachment = false;
           boolean toAddSent = false;
           boolean toAddPriority = false;
-          boolean toAddAttachment = false;
           boolean toAddFlag = false;
           boolean toAddStar = false;
           
@@ -683,25 +681,28 @@ public class MsgTableModel extends RecordTableModel {
               toAddFrom = true;
             }
           }
-          // if table has no 'Sent' column prepend it to the body
-          if (model.getColumnHeaderData().convertRawColumnToModel(6) == -1) {
-            toAddSent = true;
-          }
-          // if table has no 'Priority' column prepend 'Priority' to the body
-          if (model.getColumnHeaderData().convertRawColumnToModel(0) == -1) {
-            toAddPriority = true;
-          }
           // if table has no 'Attachment' column prepend it to the body
           if (model.getColumnHeaderData().convertRawColumnToModel(1) == -1) {
             toAddAttachment = true;
           }
-          // if table has no 'Flag' column prepend it to the body
-          if (model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
-            toAddFlag = true;
-          }
-          // if table has no 'Flag' column prepend 'Star' to the body only if it is present
-          if (msgLink.isStarred() && model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
-            toAddStar = true;
+
+          if (!isForSearchOnly) {
+            // if table has no 'Sent' column prepend it to the body
+            if (model.getColumnHeaderData().convertRawColumnToModel(6) == -1) {
+              toAddSent = true;
+            }
+            // if table has no 'Priority' column prepend 'Priority' to the body
+            if (model.getColumnHeaderData().convertRawColumnToModel(0) == -1) {
+              toAddPriority = true;
+            }
+            // if table has no 'Flag' column prepend it to the body
+            if (model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
+              toAddFlag = true;
+            }
+            // if table has no 'Flag' column prepend 'Star' to the body only if it is present
+            if (msgLink.isStarred() && model.getColumnHeaderData().convertRawColumnToModel(2) == -1) {
+              toAddStar = true;
+            }
           }
 
           StringBuffer sb = new StringBuffer();
@@ -712,7 +713,7 @@ public class MsgTableModel extends RecordTableModel {
 
           int flagIcon = ImageNums.IMAGE_NONE;
           if (toAddFlag) {
-            StatRecord stat = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+            StatRecord stat = cache.getStatRecordMyLinkId(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
             if (stat != null) {
               Short flagS = stat.getFlag(model.isModeMsgBody());
               flagIcon = StatRecord.getIconForFlag(flagS);
@@ -839,8 +840,29 @@ public class MsgTableModel extends RecordTableModel {
               sb.append("<br>");
             }
             sb.append(messageText);
+            // remove </body></html> tags from the end of the body
+            sb = ArrayUtils.replaceKeyWords(sb,
+                    new String[][] {
+                      { "</body>", "" },
+                      { "</BODY>", "" },
+                      { "</html>", "" },
+                      { "</HTML>", "" },
+                    }, null, null, true);
           }
           sb.append(HTML_utils.HTML_FONT_END);
+
+          if (!isForSearchOnly) {
+            // add "Read" stamps to the last message or when stamps arrive
+            Collection stats = cache.getStatRecordsByObjId(msgLink.msgId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+            TextRenderer.getStatsNote(3, stats, msgLink, msgData, cache.getMyUserId(), sb);
+            // check if we should fetch more stats
+            if (nextMsgLink == null || (stats != null && stats.size() >= 2)) { // at least 2 (my and one more)
+              // fetch stats to ensure we have all data not just whatever came in some notification
+              StatOps.fetchStatsIfNotRecentlyRequested(MainFrame.getServerInterfaceLayer(), msgLink);
+            }
+          }
+
+          // Finish off the html content
           sb.append(HTML_utils.HTML_BODY_END);
           sb.append(HTML_utils.HTML_END);
           value = sb;

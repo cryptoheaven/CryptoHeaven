@@ -78,7 +78,9 @@ public class FetchedDataCache extends Object {
   private Map emailRecordMap;
   private MultiHashMap addrHashRecordMap_byMsgId; // key is the msgId
   private MultiHashMap addrHashRecordMap_byHash; // key is the hash
-  private Map[] statRecordMaps;
+  private Map statRecordMap;
+  private MultiHashMap[] statRecordMap_byLinkId; // one map per each obj type
+  private MultiHashMap[] statRecordMap_byObjId; // one map per each obj type
   private ArrayList msgBodyKeys;
   private Set requestedAddrSet;
 
@@ -141,9 +143,13 @@ public class FetchedDataCache extends Object {
     emailRecordMap = new HashMap();
     addrHashRecordMap_byMsgId = new MultiHashMap(true);
     addrHashRecordMap_byHash = new MultiHashMap(true);
-    statRecordMaps = new Map[3];
-    for (int i=0; i<3; i++)
-      statRecordMaps[i] = new HashMap();
+    statRecordMap = new HashMap();
+    statRecordMap_byLinkId = new MultiHashMap[3];
+    statRecordMap_byObjId = new MultiHashMap[3];
+    for (int i=0; i<3; i++) {
+      statRecordMap_byLinkId[i] = new MultiHashMap(true);
+      statRecordMap_byObjId[i] = new MultiHashMap(true);
+    }
     msgBodyKeys = new ArrayList();
     requestedAddrSet = new HashSet();
     fldIDsFetchRequestsIssuedSet = new HashSet();
@@ -183,8 +189,11 @@ public class FetchedDataCache extends Object {
       msgDataRecordMap.clear();
       msgDataRecordMap_byReplyToMsgId.clear();
       contactRecordMap.clear();
-      for (int i=0; i<3; i++)
-        statRecordMaps[i].clear();
+      statRecordMap.clear();
+      for (int i=0; i<3; i++) {
+        statRecordMap_byLinkId[i].clear();
+        statRecordMap_byObjId[i].clear();
+      }
       emailRecordMap.clear();
       folderRecordMap.clear();
       folderShareRecordMap.clear();
@@ -1645,9 +1654,6 @@ public class FetchedDataCache extends Object {
       }
       fireFileLinkRecordUpdated(records, RecordEvent.REMOVE);
 
-      // remove corresponding Stat Records
-      removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_INDEX_FILE), false);
-
       // recalculate flags in the involved folders
       statUpdatesInFoldersForVisualNotification(records, true, true);
     }
@@ -2454,17 +2460,17 @@ public class FetchedDataCache extends Object {
     // any exceptions due to possible inconsistant cache states.
     try {
       // gather all folders that the stats are for, but first fetch the links...
-      Long[] objLinkIDs = null;
       FileLinkRecord[] fileLinks = null;
       MsgLinkRecord[] msgLinks = null;
       FolderRecord[] folderRecs = null;
 
       if (records instanceof StatRecord[]) {
         StatRecord[] stats = (StatRecord[]) records;
-        objLinkIDs = StatRecord.getLinkIDs(stats);
-        fileLinks = getFileLinkRecords(objLinkIDs);
-        msgLinks = getMsgLinkRecords(objLinkIDs);
-        if (trace != null) trace.data(10, objLinkIDs);
+        Long[] msgLinkIDs = StatRecord.getLinkIDs(stats, StatRecord.STAT_TYPE_MESSAGE);
+        Long[] fileLinkIDs = StatRecord.getLinkIDs(stats, StatRecord.STAT_TYPE_FILE);
+        fileLinks = getFileLinkRecords(fileLinkIDs);
+        msgLinks = getMsgLinkRecords(msgLinkIDs);
+        if (trace != null) trace.data(10, msgLinkIDs, fileLinkIDs);
         if (trace != null) trace.data(11, fileLinks);
         if (trace != null) trace.data(12, msgLinks);
       }
@@ -2509,7 +2515,7 @@ public class FetchedDataCache extends Object {
           Long fRecId = fRec.folderId;
           int statType = -1;
           if (fRec != null) {
-            Long[] statIDs = null;
+            Long[] linkIDs = null;
             Record[] links = null;
             if (fRec.isFileType()) {
               links = getFileLinkRecordsOwnerAndType(fRecId, new Short(Record.RECORD_TYPE_FOLDER));
@@ -2522,14 +2528,14 @@ public class FetchedDataCache extends Object {
               if (trace != null) trace.data(31, links);
             }
             if (links != null && links.length > 0)
-              statIDs = RecordUtils.getIDs(links);
+              linkIDs = RecordUtils.getIDs(links);
 
             int redFlagCount = 0;
             int newFlagCount = 0;
-            if (statIDs != null && statIDs.length > 0) {
+            if (linkIDs != null && linkIDs.length > 0) {
               // Gather Stats for each folder
-              for (int k=0; k<statIDs.length; k++) {
-                StatRecord stat = getStatRecord(statIDs[k], statType);
+              for (int k=0; k<linkIDs.length; k++) {
+                StatRecord stat = getStatRecordMyLinkId(linkIDs[k], statType);
                 if (stat != null) {
                   if (stat.isFlagRed())
                     redFlagCount ++;
@@ -2651,9 +2657,6 @@ public class FetchedDataCache extends Object {
         }
       }
       fireMsgLinkRecordUpdated(records, RecordEvent.REMOVE);
-
-      // remove corresponding Stat Records
-      removeStatRecords(getStatRecords(RecordUtils.getIDs(records), STAT_TYPE_INDEX_MESSAGE), false);
 
       // recalculate flags in the involved folders
       statUpdatesInFoldersForVisualNotification(records, true, true);
@@ -3000,7 +3003,8 @@ public class FetchedDataCache extends Object {
       synchronized (this) {
         records = (MsgDataRecord[]) RecordUtils.remove(msgDataRecordMap, records);
         if (records != null) {
-          for (int i=0; i<records.length; i++) msgDataRecordMap_byReplyToMsgId.put(records[i].replyToMsgId, records[i]);
+          // for removed datas remove them from secondary hashtable
+          for (int i=0; i<records.length; i++) msgDataRecordMap_byReplyToMsgId.remove(records[i].replyToMsgId, records[i]);
           removeAddrHashRecords(RecordUtils.getIDs(records));
         }
       }
@@ -3121,15 +3125,34 @@ public class FetchedDataCache extends Object {
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
-      StatRecord[][] stats = new StatRecord[3][];
-      for (int i=0; i<stats.length; i++) {
-        stats[i] = StatRecord.gatherStatsOfType(records, StatRecord.STAT_TYPES[i]);
-        if (stats[i] != null && stats[i].length > 0) {
-          synchronized (this) {
-            stats[i] = (StatRecord[]) RecordUtils.merge(statRecordMaps[i], stats[i]);
+
+      synchronized (this) {
+        records = (StatRecord[]) RecordUtils.merge(statRecordMap, records);
+        for (int i=0; i<records.length; i++) {
+          int type = StatRecord.getTypeIndex(records[i].objType.byteValue());
+          statRecordMap_byLinkId[type].put(records[i].objLinkId, records[i]);
+          statRecordMap_byObjId[type].put(records[i].objId, records[i]);
+        }
+      }
+
+      // for any message stats, clear rendering cache as it may change due to possibly different "Read" stamp
+      HashSet msgLinksHS = new HashSet();
+      for (int i=0; i<records.length; i++) {
+        StatRecord stat = records[i];
+        if (stat.objType.byteValue() == StatRecord.STAT_TYPE_MESSAGE) {
+          MsgLinkRecord msgLink = getMsgLinkRecord(stat.objLinkId);
+          if (msgLink != null && !msgLinksHS.contains(msgLink)) {
+            msgLink.clearPostRenderingCache();
+            msgLinksHS.add(msgLink);
           }
         }
       }
+      // re-inject the messages into cache to trigger listener updates
+      if (msgLinksHS.size() > 0) {
+        MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksHS, MsgLinkRecord.class);
+        addMsgLinkRecords(msgLinks);
+      }
+
       fireStatRecordUpdated(records, RecordEvent.SET);
       // special case of allowing to lower flag counts for clearing of Chat flags to work when typing new msg.
       statUpdatesInFoldersForVisualNotification(records, true, false);
@@ -3144,28 +3167,28 @@ public class FetchedDataCache extends Object {
   public void removeStatRecords(StatRecord[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeStatRecords(StatRecord[] records)");
     if (trace != null) trace.args(records);
-
     removeStatRecords(records, false);
-
     if (trace != null) trace.exit(FetchedDataCache.class);
   }
+
   public void removeStatRecords(StatRecord[] records, boolean visualNotification) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "removeStatRecords(StatRecord[])");
     if (trace != null) trace.args(records);
 
     if (records != null && records.length > 0) {
-      StatRecord[][] stats = new StatRecord[3][];
-      for (int i=0; i<stats.length; i++) {
-        stats[i] = StatRecord.gatherStatsOfType(records, StatRecord.STAT_TYPES[i]);
-        if (stats[i] != null && stats[i].length > 0) {
-          synchronized (this) {
-            stats[i] = (StatRecord[]) RecordUtils.remove(statRecordMaps[i], stats[i]);
+      synchronized (this) {
+        records = (StatRecord[]) RecordUtils.remove(statRecordMap, records);
+        if (records != null) {
+          // for removed records remove them from secondary hashtable
+          for (int i=0; i<records.length; i++) {
+            int type = StatRecord.getTypeIndex(records[i].objType.byteValue());
+            statRecordMap_byLinkId[type].remove(records[i].objLinkId, records[i]);
+            statRecordMap_byObjId[type].remove(records[i].objId, records[i]);
           }
         }
       }
 
       fireStatRecordUpdated(records, RecordEvent.REMOVE);
-
       if (visualNotification)
         statUpdatesInFoldersForVisualNotification(records, true, true);
     }
@@ -3175,50 +3198,63 @@ public class FetchedDataCache extends Object {
 
   /**
   * Not traced for performance.
-  * @return Stat Record for a given Link ID (statId is the linkId for client purposes)
+  * @return Stat Record for a given Link ID
   */
-  public synchronized StatRecord getStatRecord(Long statId, int statType) {
-    return (StatRecord) statRecordMaps[statType].get(statId);
+  public synchronized Collection getStatRecordsByLinkId(Long linkId, int statType) {
+    return statRecordMap_byLinkId[statType].getAll(linkId);
+  }
+  private synchronized StatRecord getStatRecordByLinkId(Long linkId, int statType, Long userId) {
+    StatRecord myStat = null;
+    Collection recs = getStatRecordsByLinkId(linkId, statType);
+    if (recs != null) {
+      Iterator iter = recs.iterator();
+      while (iter.hasNext()) {
+        StatRecord rec = (StatRecord) iter.next();
+        if (rec.ownerUserId.equals(userId)) {
+          myStat = rec;
+          break;
+        }
+      }
+    }
+    return myStat;
+  }
+  public synchronized StatRecord getStatRecordMyLinkId(Long linkId, int statType) {
+    return getStatRecordByLinkId(linkId, statType, myUserId);
   }
 
   /**
-  * @return all StatRecords from cache for a given type
+  * Not traced for performance.
+  * @return Stat Record for a given Link ID
   */
-  public synchronized StatRecord[] getStatRecords(int statType) {
-    return (StatRecord[]) ArrayUtils.toArray(statRecordMaps[statType].values(), StatRecord.class);
+  public synchronized Collection getStatRecordsByObjId(Long objId, int statType) {
+    return statRecordMap_byObjId[statType].getAll(objId);
+  }
+  private synchronized StatRecord getStatRecordByObjId(Long objId, int statType, Long userId) {
+    StatRecord myStat = null;
+    Collection recs = getStatRecordsByObjId(objId, statType);
+    if (recs != null) {
+      Iterator iter = recs.iterator();
+      while (iter.hasNext()) {
+        StatRecord rec = (StatRecord) iter.next();
+        if (rec.ownerUserId.equals(userId)) {
+          myStat = rec;
+          break;
+        }
+      }
+    }
+    return myStat;
+  }
+  public synchronized StatRecord getStatRecordMyObjId(Long objId, int statType) {
+    return getStatRecordByObjId(objId, statType, myUserId);
   }
 
   /**
   * @return all StatRecords from cache
   */
   public synchronized StatRecord[] getStatRecords() {
-    int statCount = 0;
-    for (int i=0; i<3; i++)
-      statCount += statRecordMaps[i].size();
-    ArrayList statsL = new ArrayList(statCount);
-    for (int i=0; i<3; i++)
-      statsL.addAll(statRecordMaps[i].values());
-    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsL, StatRecord.class);
+    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statRecordMap.values(), StatRecord.class);
     return stats;
   }
-
-
-  /**
-  * @return all StatRecords from cache with specified IDs
-  */
-  public synchronized StatRecord[] getStatRecords(Long[] statIDs, int statType) {
-    ArrayList statsL = new ArrayList();
-    if (statIDs != null) {
-      for (int i=0; i<statIDs.length; i++) {
-        StatRecord rec = (StatRecord) statRecordMaps[statType].get(statIDs[i]);
-        if (rec != null)
-          statsL.add(rec);
-      }
-    }
-    StatRecord[] stats = (StatRecord[]) ArrayUtils.toArray(statsL, StatRecord.class);
-    return stats;
-  }
-
 
 
   /************************************

@@ -343,8 +343,10 @@ public class MessageActionNameSwitch extends Object {
       // =====================
       { new Integer(CommandCodes.STAT_Q_GET), "Get Object Statistics" },
       { new Integer(CommandCodes.STAT_Q_UPDATE), "Update Object Statistics" },
-      // Fetch All Object Stats
-      { new Integer(CommandCodes.STAT_Q_FETCH_ALL_OBJ_STATS), "Fetch Access History and Privileges" },
+      // Fetch All Object Trace Stats
+      { new Integer(CommandCodes.STAT_Q_FETCH_OBJ_TRACE), "Fetch Access Privileges and History" },
+      // Fetch All Object Existing Stats
+      { new Integer(CommandCodes.STAT_Q_FETCH_OBJ_EXISTING), "Fetch Access History" },
 
 
       // =============================
@@ -371,7 +373,7 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.SYS_Q_GET_TEMP_PUB_KEY), "Get Public Key" },
 
       // System Login
-      { new Integer(CommandCodes.SYS_Q_LOGIN), "Open Secure Channel" },
+      { new Integer(CommandCodes.SYS_Q_LOGIN), "System Secure Login" },
 
       // System Query
       { new Integer(CommandCodes.SYS_Q_QUERY), "Query" },
@@ -556,6 +558,7 @@ public class MessageActionNameSwitch extends Object {
 
       // Connection timeout
       { new Integer(CommandCodes.SYS_A_CONNECTION_TIMEOUT), "Connection Timeout" },
+      { new Integer(CommandCodes.SYS_A_CONNECTION_PRE_TIMEOUT_POKE), "Poke" },
       { new Integer(CommandCodes.SYS_E_BANDWIDTH_EXCEEDED), "Error: Bandwidth Limit Exceeded" },
       { new Integer(CommandCodes.SYS_E_ACCOUNT_EXPIRED), "Error: Account Expired" },
       { new Integer(CommandCodes.SYS_E_STORAGE_EXCEEDED), "Error: Storage Limit Exceeded" },
@@ -566,8 +569,8 @@ public class MessageActionNameSwitch extends Object {
       { new Integer(CommandCodes.SYS_A_GET_TEMP_PUB_KEY), "Get Public Key" },
 
       // System Login
-      { new Integer(CommandCodes.SYS_A_LOGIN), "Open Secure Channel" },
-      { new Integer(CommandCodes.SYS_E_LOGIN), "Open Secure Channel Failed" },
+      { new Integer(CommandCodes.SYS_A_LOGIN), "System Secure Login" },
+      { new Integer(CommandCodes.SYS_E_LOGIN), "System Secure Login Failed" },
 
       // System Query
       { new Integer(CommandCodes.SYS_A_QUERY), "Query" },

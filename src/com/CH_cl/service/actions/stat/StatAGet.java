@@ -50,8 +50,10 @@ public class StatAGet extends ClientMessageAction {
     cache.addStatRecords(statRecords);
 
     // Gather all Message Links and File Links that are involved to cause notification of listeners for link objects.
-    MsgLinkRecord[] msgLinks = cache.getMsgLinkRecords(RecordUtils.getIDs(statRecords));
-    FileLinkRecord[] fileLinks = cache.getFileLinkRecords(RecordUtils.getIDs(statRecords));
+    Long[] msgLinkIDs = StatRecord.getLinkIDs(statRecords, StatRecord.STAT_TYPE_MESSAGE);
+    Long[] fileLinkIDs = StatRecord.getLinkIDs(statRecords, StatRecord.STAT_TYPE_FILE);
+    MsgLinkRecord[] msgLinks = cache.getMsgLinkRecords(msgLinkIDs);
+    FileLinkRecord[] fileLinks = cache.getFileLinkRecords(fileLinkIDs);
 
     if (msgLinks != null && msgLinks.length > 0)
       cache.addMsgLinkRecords(msgLinks);

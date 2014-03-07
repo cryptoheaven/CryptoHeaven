@@ -1,16 +1,16 @@
 CryptoHeaven Service License Agreement
 
-Copyright (c) 2001-2013 CryptoHeaven Corp.  All rights reserved.
+Copyright (c) 2001-2014 CryptoHeaven Corp. All rights reserved.
 
-The CryptoHeaven Corp., its parents, subsidiaries, affiliates, officers, directors, associates, and employees, individually and collectively referred to as "CHC", grants you a non-exclusive and non-transferable license for the use of the CryptoHeaven Service and Software including without limitation any related software, storage and communication services which may be offered from time to time by CHC for use with your CryptoHeaven account, subject to the following conditions and terms of service referred hereto as the "TOS".
+CryptoHeaven Corp., its parents, subsidiaries, affiliates, officers, directors, associates, and employees, individually and collectively referred to as "CHC", grants you a non-exclusive and non-transferable license for the use of the CryptoHeaven Service and Software including without limitation any related software, storage and communication services which may be offered from time to time by CHC for use with your CryptoHeaven account, subject to the following conditions and terms of service referred hereto as the "TOS".
 
 The CryptoHeaven software including all copyright notices, documents, data, text, graphics, and any error corrections provided by CHC are referred hereto to as the "Software", individually and collectively with the communication services, storage, related software, CryptoHeaven web site and other software and services which may be offered at any time from time to time through, utilizing or otherwise connected to the CryptoHeaven web site are referred hereto as the "Service".
 
-The Service is provided to commercial users or individuals who are at least 18 years old or minors who have parental permission to open and maintain an account. Each active commercial user is required to upgrade to a paid account within 30 days from the account creation date.  BY COMPLETING THE REGISTRATION PROCESS, YOU ARE STATING THAT YOU ARE ELIGIBLE FOR AN ACCOUNT AND THAT YOU AGREE TO BE BOUND BY THE TOS.
+The Service is provided to commercial users or individuals who are at least 18 years old or minors who have parental permission to open and maintain an account. BY COMPLETING THE REGISTRATION PROCESS, YOU ARE STATING THAT YOU ARE ELIGIBLE FOR AN ACCOUNT AND THAT YOU AGREE TO BE BOUND BY THE TOS.
 
 1. MEMBER CONDUCT
 
-You understand that all information, data, text, software, music, sound, photographs, graphics, video, messages or other materials referred hereto as the "Content", whether publicly posted or privately transmitted, are the sole responsibility of the individual or entity from which such Content originated. This means that you, and not CHC, are entirely responsible for all Content that you upload, post, email or otherwise transmit via the Service. CHC has no ability to  control the Content posted or otherwise transmitted via the Service. You understand that by using the Service, you may be exposed to Content that is offensive, indecent or objectionable. Under no circumstances will CHC be liable in any way for any Content, including, but not limited to, for any errors or omissions in any Content, or for any loss or damage of any kind incurred as a result of the use of any Content posted, emailed or otherwise transmitted via the Service. 
+You understand that all information, data, text, software, music, sound, photographs, graphics, video, messages or other materials referred hereto as the "Content", whether publicly posted or privately transmitted, are the sole responsibility of the individual or entity from which such Content originated. This means that you, and not CHC, are entirely responsible for all Content that you upload, post, email or otherwise transmit via the Service. CHC has no ability to control the Content posted or otherwise transmitted via the Service. You understand that by using the Service, you may be exposed to Content that is offensive, indecent or objectionable. Under no circumstances will CHC be liable in any way for any Content, including, but not limited to, for any errors or omissions in any Content, or for any loss or damage of any kind incurred as a result of the use of any Content posted, emailed or otherwise transmitted via the Service. 
 
 You hereby agree to not use the Service to: 
 (i) transmit or store any Content that is unlawful, harmful, threatening, abusive, harassing, tortious, defamatory, vulgar, obscene, libelous, invasive of another's privacy, hateful, or racially, ethnically or otherwise objectionable;
@@ -27,7 +27,7 @@ You hereby agree to not use the Service to:
 
 2. GENERAL PRACTICES REGARDING USE 
 
-You acknowledge that CHC may establish general practices and limits concerning use of the Service, including without limitation the maximum number of days that email messages, postings or other uploaded Content will be retained by the Service, the maximum number of email messages that may be sent from or received by an account on the Service, the maximum size of any email message that may be sent from or received by an account on the Service, the maximum disk space that will be allotted on related servers on your behalf, and the maximum number of times (and the maximum duration for which) you may access the Service in a given period of time. You agree that CHC has no responsibility or liability for the deletion or failure to store any messages and other communications or other Content maintained or transmitted by the Service. You acknowledge that CHC reserves the right to log off accounts that are inactive for an extended period of time. You further acknowledge that CHC reserves the right to change these general practices and limits at any time, in its sole discretion, with or without notice, effective immediately.
+You acknowledge that CHC may establish general practices and limits concerning use of the Service, including without limitation the maximum number of days that Content will be retained by the Service, the maximum number of email messages that may be sent from or received by an account on the Service, the maximum size of any email message that may be sent from or received by an account on the Service, the maximum disk space that will be allotted on related servers on your behalf, and the maximum number of times (and the maximum duration for which) you may access the Service in a given period of time. You agree that CHC has no responsibility or liability for the deletion or failure to store any messages and other communications or other Content maintained or transmitted by the Service. You acknowledge that CHC reserves the right to log off accounts that are inactive for an extended period of time. You further acknowledge that CHC reserves the right to change these general practices and limits at any time, in its sole discretion, with or without notice, effective immediately.
 
 3. COPYRIGHT
 
@@ -49,7 +49,7 @@ CHC reserves the right to change the TOS or policies regarding the use of the Se
 
 CHC may terminate your access the Service at any time, with or without cause, with or without notice, effective immediately, for any reason whatsoever. Upon termination of the Service, your right to use the Service immediately ceases.
 
-CHC shall have no obligation to maintain any content in your account or to forward any unread or unsent messages to you or any third party.
+CHC shall have no obligation to maintain any Content in your account or to forward any portion of it to you or any third party.
 
 8. LIMITATION OF LIABILITY 
 
@@ -75,7 +75,7 @@ You may not use or otherwise export or re-export the Software except as authoriz
 
 12. TERMINATION FOR INFRINGEMENT. 
 
-You may not use the Software or Service in jurisdictions where it may be infringing any intellectual property rights.  Either party may terminate this License immediately should any Software or Service become, or in either party's opinion be likely to become, the subject of a claim of infringement of any intellectual property right. 
+You may not use the Software or Service in jurisdictions where it may be infringing any intellectual property rights. Either party may terminate this License immediately should any Software or Service become, or in either party's opinion be likely to become, the subject of a claim of infringement of any intellectual property right. 
 
 13. FEEDBACK
 

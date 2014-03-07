@@ -271,11 +271,12 @@ public class TraceTableModel extends RecordTableModel {
 
       private void doStatRequest(Stats_Get_Rq request) {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "doStatRequest()");
-        MessageAction msgAction = new MessageAction(CommandCodes.STAT_Q_FETCH_ALL_OBJ_STATS, request);
+        MessageAction msgAction = new MessageAction(CommandCodes.STAT_Q_FETCH_OBJ_TRACE, request);
         ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
         ClientMessageAction reply = serverInterfaceLayer.submitAndFetchReply(msgAction, 60000);
         if (trace != null) trace.data(10, reply);
         if (reply != null && reply.getActionCode() == CommandCodes.STAT_A_GET) {
+          ArrayList existingStatsList = new ArrayList();
           Stats_Get_Rp statsReply = (Stats_Get_Rp) reply.getMsgDataSet();
           if (trace != null) trace.data(20, statsReply);
           UserOps.fetchUnknownUsers(serverInterfaceLayer, statsReply.stats);
@@ -287,13 +288,16 @@ public class TraceTableModel extends RecordTableModel {
               // virtual stats have -ve IDs that we need to renumerate to make them unique in our table
               if (statsReply.stats[i].statId.longValue() < 0)
                 statsReply.stats[i].statId = new Long(-(size+i+1));
+              else
+                existingStatsList.add(statsReply.stats[i]);
             }
           }
           updateData(statsReply.stats);
           if (statsRecivedCallback != null)
             statsRecivedCallback.callback(statsReply);
-          // Clear the data from reply, we don't want it going to the cache.
-          statsReply.stats = new StatRecord[0];
+          // Take only the existing stats with +ve IDs into the cache...
+          StatRecord[] existingStats = (StatRecord[]) ArrayUtils.toArray(existingStatsList, StatRecord.class);
+          statsReply.stats = existingStats;
         }
         DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, reply);
         if (trace != null) trace.exit(getClass());

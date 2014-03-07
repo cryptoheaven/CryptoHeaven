@@ -13,6 +13,7 @@ import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.DownloadUtilities;
+import com.CH_cl.service.ops.FileLinkOps;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.monitor.Stats;
@@ -21,7 +22,6 @@ import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.file.File_MoveCopy_Rq;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDPair_Co;
 import com.CH_co.service.msg.dataSets.obj.Obj_List_Co;
-import com.CH_co.service.msg.dataSets.stat.Stats_Update_Rq;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.MultiFilter;
 import com.CH_co.service.records.filters.RecordFilter;
@@ -715,10 +715,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
   private void markSelectedAs(Short newMark) {
     if (StatRecord.FLAG_OLD.equals(newMark)) {
       FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class, getTableModel().getIsCollapseFileVersions());
-      markRecordsAs(records, newMark);
+      FileLinkOps.markRecordsAs(MainFrame.getServerInterfaceLayer(), records, newMark);
     } else {
       FileLinkRecord[] records = (FileLinkRecord[]) getSelectedInstancesOf(FileLinkRecord.class);
-      markRecordsAs(records, newMark);
+      FileLinkOps.markRecordsAs(MainFrame.getServerInterfaceLayer(), records, newMark);
     }
   }
   private void markAllAs(Short newMark) {
@@ -737,38 +737,9 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
     if (linksL.size() > 0) {
       FileLinkRecord[] links = new FileLinkRecord[linksL.size()];
       linksL.toArray(links);
-      markRecordsAs(links, newMark);
+      FileLinkOps.markRecordsAs(MainFrame.getServerInterfaceLayer(), links, newMark);
     }
   }
-  private void markRecordsAs(FileLinkRecord[] records, Short newMark) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileActionTable.class, "markRecordsAs(FileLinkRecord[] records, Short newMark)");
-    if (trace != null) trace.args(records, newMark);
-    if (records != null && records.length > 0) {
-      // gather all stats which need to be updated
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      ArrayList statsL = new ArrayList();
-      for (int i=0; i<records.length; i++) {
-        StatRecord statRecord = cache.getStatRecord(records[i].fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
-        if (statRecord != null && !statRecord.mark.equals(newMark))
-          statsL.add(statRecord);
-      }
-      if (statsL.size() > 0) {
-        StatRecord[] stats = new StatRecord[statsL.size()];
-        statsL.toArray(stats);
-        // clone the stats to send the request
-        StatRecord[] statsClones = (StatRecord[]) RecordUtils.cloneRecords(stats);
-
-        // set mark to "newMark" on the clones
-        for (int i=0; i<statsClones.length; i++)
-          statsClones[i].mark = newMark;
-
-        Stats_Update_Rq request = new Stats_Update_Rq(statsClones);
-        MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.STAT_Q_UPDATE, request));
-      }
-    }
-    if (trace != null) trace.exit(FileActionTable.class);
-  }
-
   private void markSelectedStarred(boolean markStarred) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgActionTable.class, "markSelectedStarred(boolean markStarred)");
     if (trace != null) trace.args(markStarred);
@@ -960,7 +931,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
           totalSize = new Long(fLink.origSize.longValue() + (totalSize != null ? totalSize.longValue() : 0));
 
           if (!(anySeen && anyUnseen)) {
-            StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
+            StatRecord statRecord = cache.getStatRecordMyLinkId(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
             if (statRecord != null) {
               if (statRecord.mark.equals(StatRecord.FLAG_OLD))
                 anySeen = true;
@@ -985,7 +956,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         FileRecord fRec = (FileRecord) tableModel.getRowObjectNoTrace(i);
         if (fRec instanceof FileLinkRecord) {
           FileLinkRecord fLink = (FileLinkRecord) fRec;
-          StatRecord statRecord = cache.getStatRecord(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
+          StatRecord statRecord = cache.getStatRecordMyLinkId(fLink.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
           if (statRecord != null && (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))) {
             anyUnseenGlobal = true;
             break;

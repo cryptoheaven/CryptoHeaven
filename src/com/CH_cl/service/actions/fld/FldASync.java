@@ -232,7 +232,7 @@ public class FldASync extends ClientMessageAction {
                 }
                 // server skips StatRecord marks for folder-re-synch, so check for BLANK value
                 if (serverStatMark != 0) {
-                  StatRecord stat = cache.getStatRecord(link.getId(), ((LinkRecordI) link).getCompatibleStatTypeIndex());
+                  StatRecord stat = cache.getStatRecordMyLinkId(link.getId(), ((LinkRecordI) link).getCompatibleStatTypeIndex());
                   if (stat != null) {
                     stat.mark = new Short(serverStatMark);
                     statsL.add(stat);

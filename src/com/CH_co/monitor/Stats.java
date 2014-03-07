@@ -40,7 +40,8 @@ public class Stats extends Object {
   protected static Long transferRateIn;
   protected static Long transferRateOut;
   protected static Long sizeBytes;
-
+  
+  private static long mainWorkerCounter;
   private static long maxTransferRate;
   private static long maxTransferRateIn;
   private static long maxTransferRateOut;
@@ -87,6 +88,9 @@ public class Stats extends Object {
   public static Long getTransferRateOut() {
     return transferRateOut;
   }
+  public static long getMainWorkerCounter() {
+    return mainWorkerCounter;
+  }
   public static long getMaxTransferRate() {
     return maxTransferRate;
   }
@@ -130,6 +134,13 @@ public class Stats extends Object {
       }
     }
     return moversTraceL;
+  }
+
+  public static void incrementMainWorkerCounter() {
+    synchronized (monitor) {
+      if (mainWorkerCounter < Long.MAX_VALUE)
+        mainWorkerCounter++;
+    }
   }
 
   public static void moveGlobe(Object mover) {

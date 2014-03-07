@@ -16,10 +16,7 @@ import com.CH_cl.service.actions.sys.SysANullAction;
 import com.CH_co.cryptx.RSAPublicKey;
 import com.CH_co.io.DataInputStream2;
 import com.CH_co.io.DataOutputStream2;
-import com.CH_co.monitor.DefaultProgMonitor;
-import com.CH_co.monitor.Interruptible;
-import com.CH_co.monitor.ProgMonitorI;
-import com.CH_co.monitor.ProgMonitorPool;
+import com.CH_co.monitor.*;
 import com.CH_co.queue.FifoWriterI;
 import com.CH_co.queue.PriorityFifoReaderI;
 import com.CH_co.service.msg.CommandCodes;
@@ -78,9 +75,15 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
   private static final int DEBUG__REQUEST_PACKET_DROP_FREQUENCY = 10;
   private static final int DEBUG__REPLY_PACKET_DROP_FREQUENCY = 10;
 
+  // Amount of disconnected time when exceeded, we'll request reconnection update.
   public static final int TIMEOUT_TO_TRIGGER_RECONNECT_UPDATE = 1000 * 45;
-  public static final int PING_PONG_INTERVAL = 1000 * 90;
-  private static final int PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK = 1; // zero for no pinging and exit after first ping delay
+
+  // Default long ping-pong delay, can be shortened based on socket.getSoTimeout() result.
+  public static int PING_PONG_INTERVAL = 1000 * 80;
+  public static final int PING_PONG_INTERVAL_MAX = 1000 * 90;
+
+  // Zero for no pinging and exit after first ping delay
+  private static final int PING_PONG_STREAK_COUNT_BEFORE_CONNECTION_BREAK = 1;
 
   /** Worker's manager */
   private WorkerManagerI workerManager;
@@ -348,6 +351,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           try {
             msgActionCode = ClientMessageAction.readActionCodeFromStream(dataIn);
           } catch (Throwable t) {
+            Stats.setStatusAll("Reader I/O exception: "+t.getMessage());
             if (trace != null) trace.exception(ReaderThread.class, 30, t);
             throw new IllegalStateException("Error reading Action Code, prevMsgActionCode="+prevMsgActionCode, t);
           }
@@ -421,6 +425,7 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             )
           {
             cleanBreak = true;
+            Stats.setStatusAll("Reader clean exit.");
             break;
           }
 
@@ -430,22 +435,29 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           msgActionStamp = 0;
         } // end while
 
+        Stats.setStatusAll("Reader finished.");
+        
         // catch re-login try
       } catch (IOException ioX) {
+        Stats.setStatusAll("Reader IOException: "+ioX.getMessage());
         if (trace != null) trace.exception(ReaderThread.class, 100, ioX);
         if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(ioX));
         // These should never happen, if so -- coding error.
       } catch (IllegalAccessException aX) {
+        Stats.setStatusAll("Reader Exception 2: "+aX.getMessage());
         if (trace != null) trace.exception(ReaderThread.class, 110, aX);
         if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(aX));
       } catch (InstantiationException iX) {
+        Stats.setStatusAll("Reader Exception 3: "+iX.getMessage());
         if (trace != null) trace.exception(ReaderThread.class, 120, iX);
         if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(iX));
       } catch (ClassNotFoundException cX) {
+        Stats.setStatusAll("Reader Exception 4: "+cX.getMessage());
         if (trace != null) trace.exception(ReaderThread.class, 130, cX);
         if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(cX));
         // Finally catch all throwable runtime exceptions.
       } catch (Throwable t) {
+        Stats.setStatusAll("Reader Throwable: "+t.getMessage());
         if (trace != null) trace.exception(ReaderThread.class, 200, t);
         if (!workerManager.isClientMode()) System.out.println("SIL Reader server-mode " +sessionContext.getSocketHostPort()+ " msgActionCode="+msgActionCode+", prevMsgActionCode="+prevMsgActionCode+", exception:\n"+Misc.getStack(t));
       }
@@ -533,6 +545,8 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         // If permanent failure, nullify the login action to prevent re-tries.
         if (loginFailedPermanent) {
           workerManager.setLoginMsgAction(null);
+          attemptLoginMessageAction = null;
+          finishReading(true);
         }
 
         // If login was successful, then remember the login MessageAction.
@@ -591,6 +605,14 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           System.out.println("reply dropped");
         } else {
           replyFifoWriterI.add(msgAction);
+        }
+      }
+
+      if (msgActionCode == CommandCodes.SYS_A_CONNECTION_PRE_TIMEOUT_POKE) {
+        // Wake up the WriterThread as it maybe sleeping or be somehow suspended by the OS.
+        // This 'refresher' on the WriterThread should help to send timely PING request as scheduled.
+        synchronized (requestPriorityFifoReaderI) {
+          requestPriorityFifoReaderI.notifyAll();
         }
       }
 
@@ -659,13 +681,10 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
         // for all outgoing messages
         while (!finished) {
 
-          int round = 0;
           long idleStartDate = System.currentTimeMillis();
 
           // grab next message action from the queue
           while (msgAction == null && !finished) {
-
-            round ++;
 
             synchronized (requestPriorityFifoReaderI) {
 
@@ -699,10 +718,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
                   try {
                     // calculate the remainder of time to the ping-pong interval
                     long pingPongRemainder = PING_PONG_INTERVAL - (currentDate - idleStartDate);
-                    pingPongRemainder = Math.max(1L, pingPongRemainder); // always positive
-                    pingPongRemainder = Math.min(PING_PONG_INTERVAL, pingPongRemainder); // PING_PONG_INTERVAL is maximum incase clock changed
+                    // always positive wait time
+                    pingPongRemainder = Math.max(1L, pingPongRemainder);
+                    // PING_PONG_INTERVAL is maximum incase clock changed
+                    pingPongRemainder = Math.min(PING_PONG_INTERVAL, pingPongRemainder);
                     requestPriorityFifoReaderI.wait(pingPongRemainder + 100); // 100ms extra
-                  } catch (InterruptedException e) { }
+                  } catch (InterruptedException e) {
+                  }
                 }
 
                 // If the computer was suspended, the sleep would be much longer than asked for... 
@@ -801,22 +823,27 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
           // If this was logout, do some cleanup
           if (msgActionCode == CommandCodes.USR_Q_LOGOUT) {
             cleanLogout = true;
+            Stats.setStatusAll("Writer clean logout.");
             break;
           }
 
           msgAction = null;
         } // end while (!finished)
 
+        Stats.setStatusAll("Writer finished.");
 
       // If there was a communication problem why the request was not send, try
       // pushing it back to the queue for resend.
       } catch (SocketException e) {
+        Stats.setStatusAll("Writer SocketException " + e.getMessage());
         if (trace != null) trace.exception(WriterThread.class, 100, e);
         if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exception:\n"+Misc.getStack(e));
       } catch (IOException e) {
+        Stats.setStatusAll("Writer IOException " + e.getMessage());
         if (trace != null) trace.exception(WriterThread.class, 110, e);
         if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exception:\n"+Misc.getStack(e));
       } catch (Throwable t) {
+        Stats.setStatusAll("Writer Throwable " + t.getMessage());
         if (trace != null) trace.exception(WriterThread.class, 120, t);
         if (!workerManager.isClientMode()) System.out.println("SIL Writer server-mode " +sessionContext.getSocketHostPort()+ " exception:\n"+Misc.getStack(t));
       }

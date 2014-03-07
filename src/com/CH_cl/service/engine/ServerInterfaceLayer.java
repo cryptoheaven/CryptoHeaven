@@ -31,6 +31,7 @@ import com.CH_co.util.*;
 import com.CH_cl.http.HTTP_Socket.HTTP_Socket;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -1048,12 +1049,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
             Socket socket = socketBuffers[joinedIndexFirst][0];
             if (trace != null) trace.data(60, "createWorker() attempted hosts and ports are", sbSocketInfo.toString());
-            Stats.setStatusAll("Attempted "+sbSocketInfo.toString());
             if (trace != null) trace.data(61, "createWorker() created socket is", socket);
             String type = socket != null ? socket.getClass().toString() : null;
             type = type != null ? type.substring(type.lastIndexOf(".")+1) : null;
             if (trace != null) trace.data(62, "socketType", type);
-            Stats.setStatusAll("Using "+socket+" type "+type);
+            Stats.setStatusAll("Connected new "+type);
 
             // Clear other sockets that might have been created too
             // remove socket that we are using so it doesn't get cleaned up here
@@ -1218,8 +1218,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       final Socket[] socketBuffer = new Socket[1];
       final Exception[] exceptionBuffer = new Exception[1];
 
-      Stats.setStatusAll("createSocket() > "+hostName+":"+portNumber);
-
       // try establishing a new connection in a seperate thread... so it doesn't block too long...
       Thread socketConnector = new ThreadTraced("Socket Connector") {
         public void runTraced() {
@@ -1261,10 +1259,24 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
               }
               socketBuffer[0] = new Socket(hostName, portNumber);
               try {
-                socketBuffer[0].setSoTimeout(ServerInterfaceWorker.PING_PONG_INTERVAL + (1000 * 10)); // a little more than ping-pong interval
                 socketBuffer[0].setSendBufferSize(32*1024);
+              } catch (SocketException x) {
+                Stats.setStatusAll("socket exception: "+x.getMessage());
+              }
+              try {
                 socketBuffer[0].setReceiveBufferSize(32*1024);
-              } catch (Throwable t) {
+              } catch (SocketException x) {
+                Stats.setStatusAll("socket exception: "+x.getMessage());
+              }
+              try {
+                socketBuffer[0].setSoTimeout(ServerInterfaceWorker.PING_PONG_INTERVAL_MAX + (1000 * 30)); // same as connection timeout interval
+              } catch (SocketException x) {
+                Stats.setStatusAll("socket exception: "+x.getMessage());
+                try {
+                  socketBuffer[0].setSoTimeout(ServerInterfaceWorker.PING_PONG_INTERVAL_MAX + (1000 * 20)); // a little less
+                } catch (SocketException x2) {
+                  Stats.setStatusAll("socket exception 2: "+x.getMessage());
+                }
               }
             }
           } catch (UnknownHostException e1) {
@@ -1316,21 +1328,6 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       if (trace != null) trace.data(19, "socket.getSoLinger()", socket.getSoLinger());
       if (trace != null) trace.data(20, "socket.getSoTimeout()", socket.getSoTimeout());
       if (trace != null) trace.data(21, "socket.getTcpNoDelay()", socket.getTcpNoDelay());
-
-      StringBuffer sb = new StringBuffer();
-      sb.append("createSocket() < "+ socket+"\n");
-      sb.append("getInetAddress()="+ socket.getInetAddress()+"\n");
-      sb.append("getLocalAddress()="+ socket.getLocalAddress()+"\n");
-      sb.append("getLocalPort()="+ socket.getLocalPort()+"\n");
-      sb.append("getPort()="+ socket.getPort()+"\n");
-      sb.append("getClass()="+ socket.getClass()+"\n");
-      sb.append("getKeepAlive()="+ socket.getKeepAlive()+"\n");
-      sb.append("getReceiveBufferSize()="+ socket.getReceiveBufferSize()+"\n");
-      sb.append("getSendBufferSize()="+ socket.getSendBufferSize()+"\n");
-      sb.append("getSoLinger()="+ socket.getSoLinger()+"\n");
-      sb.append("getSoTimeout()="+ socket.getSoTimeout()+"\n");
-      sb.append("getTcpNoDelay()="+ socket.getTcpNoDelay());
-      Stats.setStatusAll(sb.toString());
     }
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
@@ -1675,6 +1672,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         mainWorkerSubmition = false;
         // since workers submitting NOTIFY requests claim Main Persistent status, this cycle cannot break when there is a comm failure
         mainWorker = worker;
+        Stats.incrementMainWorkerCounter();
         isChanged = true;
       }
       // Allow multiple main workers because this can happen briefly when main worker connection is being recycled

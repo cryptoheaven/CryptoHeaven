@@ -119,7 +119,7 @@ public class FileAGetFiles extends ClientMessageAction {
       ArrayList objLinkIDsL = null;
       for (int i=0; i<fileLinks.length; i++) {
         FileLinkRecord link = fileLinks[i];
-        if (cache.getStatRecord(link.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE) == null) {
+        if (cache.getStatRecordMyLinkId(link.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
             FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);

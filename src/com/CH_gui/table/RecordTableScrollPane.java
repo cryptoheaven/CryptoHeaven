@@ -12,6 +12,7 @@ package com.CH_gui.table;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
+import com.CH_cl.service.ops.MsgLinkOps;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.file.File_GetFiles_Rq;
@@ -19,6 +20,7 @@ import com.CH_co.service.msg.dataSets.msg.Msg_GetMsgs_Rq;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.DisposableObj;
 import com.CH_co.util.GlobalProperties;
 import com.CH_gui.frame.MainFrame;
@@ -39,11 +41,9 @@ import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.table.TableModel;
@@ -557,6 +557,10 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
   * Worker that checks in the background for possible invalidated GUI that require refresh
   */
   private class SilentValidator extends ThreadTraced {
+    Record lastBottomRec = null;
+    Record lastTopRec = null;
+    int lastRecMarkCounter = 0;
+    int lastRecMarkCounter_Threshold = 1; // 1 for immediate, larger for delayed action
     private SilentValidator() {
       super("Silent Validator");
     }
@@ -600,31 +604,90 @@ public class RecordTableScrollPane extends JScrollPane implements VisualsSavable
       if (isShowing) {
         FolderPair folderPair = recordTableModel.getParentFolderPair();
         FolderRecord folder = folderPair != null ? folderPair.getFolderRecord() : null;
-        Long folderId = folder != null ? folder.folderId : null;
-        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-        FetchedDataCache cache = SIL.getFetchedDataCache();
-        boolean viewInvalidated = cache.wasFolderViewInvalidated(folderId);
-        if (folder != null && viewInvalidated) {
+        if (folder != null) {
+          Long folderId = folder != null ? folder.folderId : null;
+          ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
           if (SIL.hasPersistentMainWorker() && SIL.isLoggedIn()) {
-            if (!folder.isRecycleType()) {
-              FolderOps.runResynchFolders_Delayed(SIL, folderId, 100);
-            } else {
-              // re-fetch Recycled Files
-              cache.markFolderViewInvalidated(folderId, false);
-              File_GetFiles_Rq requestF = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
-              SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, requestF), 30000);
-              // re-fetch Recycled Messages
-              cache.markFolderViewInvalidated(folderId, false);
-              Msg_GetMsgs_Rq requestM = new Msg_GetMsgs_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
-              int messageMode = MsgTableModel.MODE_MSG; // default value in case this is a Recycle table
-              if (recordTableModel instanceof MsgTableModel)
-                messageMode = ((MsgTableModel) recordTableModel).getMode();
-              int actionM = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
-              SIL.submitAndReturn(new MessageAction(actionM, requestM), 30000);
+            FetchedDataCache cache = SIL.getFetchedDataCache();
+            // For Chat and Post folders, mark Read as those items are automatically opened
+            if (recordTableModel instanceof MsgTableModel && ((MsgTableModel) recordTableModel).isModeMsgBody()) {
+              // mark as 'Read' all elements between top and bottom of the visible area
+              Record topRec = getTopVisibleRecord();
+              Record bottomRec = getBottomVisibleRecord();
+              if (lastBottomRec == null || lastTopRec == null || !lastBottomRec.equals(bottomRec) || !lastTopRec.equals(topRec)) {
+                lastBottomRec = bottomRec;
+                lastTopRec = topRec;
+                lastRecMarkCounter = 0;
+              } else {
+                // counter will stop at value above threshold -- prepping when window is 'inactive'
+                if (lastRecMarkCounter < lastRecMarkCounter_Threshold) 
+                  lastRecMarkCounter ++;
+                // mark as "Read" only when the GUI window is open and in focus
+                Window window = SwingUtilities.windowForComponent(RecordTableScrollPane.this);
+                if (window != null && window.isActive()) {
+                  // send only when exactly equal to threshold.. this will prevend multiple sends if connection breaks, unless view actually changes
+                  if (lastRecMarkCounter == lastRecMarkCounter_Threshold) {
+                    // increment counter to prevent multiple requests, unless view actually changes
+                    lastRecMarkCounter ++;
+                    HashSet msgLinksHS = new HashSet();
+                    int top = getTopVisibleRow();
+                    int bottom = getBottomVisibleRow();
+                    for (int row=top; row<=bottom; row++) {
+                      Record rec = recordTableModel.getRowObject(jSTable.convertMyRowIndexToModel(row));
+                      if (rec instanceof MsgLinkRecord) {
+                        MsgLinkRecord msgLink = (MsgLinkRecord) rec;
+                        StatRecord stat = cache.getStatRecordMyLinkId(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+                        if (stat != null && stat.firstRead == null) {
+                          msgLinksHS.add(rec);
+                        }
+                      }
+                    }
+                    if (msgLinksHS.size() > 0) {
+                      MsgLinkRecord[] msgLinks = (MsgLinkRecord[]) ArrayUtils.toArray(msgLinksHS, MsgLinkRecord.class);
+                      MsgLinkOps.markRecordsAs(SIL, msgLinks, Short.valueOf(StatRecord.FLAG_READ));
+                    }
+                  }
+                }
+              }
+            }
+            // check validation
+            boolean viewInvalidated = cache.wasFolderViewInvalidated(folderId);
+            if (viewInvalidated) {
+              if (!folder.isRecycleType()) {
+                FolderOps.runResynchFolders_Delayed(SIL, folderId, 100);
+              } else {
+                // re-fetch Recycled Files
+                cache.markFolderViewInvalidated(folderId, false);
+                File_GetFiles_Rq requestF = new File_GetFiles_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -File_GetFiles_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (Timestamp) null);
+                SIL.submitAndReturn(new MessageAction(CommandCodes.FILE_Q_GET_FILES_STAGED, requestF), 30000);
+                // re-fetch Recycled Messages
+                cache.markFolderViewInvalidated(folderId, false);
+                Msg_GetMsgs_Rq requestM = new Msg_GetMsgs_Rq(folderPair.getFolderShareRecord().shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
+                int messageMode = MsgTableModel.MODE_MSG; // default value in case this is a Recycle table
+                if (recordTableModel instanceof MsgTableModel)
+                  messageMode = ((MsgTableModel) recordTableModel).getMode();
+                int actionM = (messageMode == MsgTableModel.MODE_POST || messageMode == MsgTableModel.MODE_CHAT) ? CommandCodes.MSG_Q_GET_FULL : CommandCodes.MSG_Q_GET_BRIEFS;
+                SIL.submitAndReturn(new MessageAction(actionM, requestM), 30000);
+              }
             }
           }
         }
       }
+    }
+    public Record getTopVisibleRecord() {
+      return recordTableModel.getRowObject(jSTable.convertMyRowIndexToModel(getTopVisibleRow()));
+    }
+    public Record getBottomVisibleRecord() {
+      return recordTableModel.getRowObject(jSTable.convertMyRowIndexToModel(getBottomVisibleRow()));
+    }
+    public int getTopVisibleRow() {
+      return jSTable.rowAtPoint(getViewport().getViewPosition());
+    }
+    public int getBottomVisibleRow() {
+      int y = getViewport().getViewPosition().y;
+      y += getViewport().getExtentSize().getHeight();
+      int row = jSTable.rowAtPoint(new Point(0, y));
+      return (row > -1) ? row : (jSTable.getRowCount() - 1);
     }
   }
 

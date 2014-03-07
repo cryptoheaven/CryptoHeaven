@@ -1166,7 +1166,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               }
               // participants got sorted so compare using "equals" method
               if (participants[i] != null && participants[i].equals(owner))
-                text = "[" + text + "]";
+                text = text + "*";
               JLabel label = new JMyLabel(text);
               label.setBorder(new EmptyBorder(0,3,0,3));
               label.setIconTextGap(2);

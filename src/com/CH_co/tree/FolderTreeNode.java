@@ -99,8 +99,6 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
     Short prevType = folderType;
     String folderName = folderTreeNodeSortNameProviderI != null ? folderTreeNodeSortNameProviderI.getSortName(folder) : folder.getMyName();
     if (folderName == null) folderName = "";
-    // chat folders use "[owner]" square brackets to indicate owner, ignore this in sorting
-    if (folderName.startsWith("[")) folderName = folderName.substring(1);
 
     Enumeration children = children();
     if (trace != null) trace.data(13, children);
@@ -115,8 +113,6 @@ public class FolderTreeNode extends MyDefaultMutableTreeNode {
       tempType = tempFolderRecord.folderType;
       tempName = folderTreeNodeSortNameProviderI != null ? folderTreeNodeSortNameProviderI.getSortName(tempFolder) : tempFolder.getMyName();
       if (tempName == null) tempName = "";
-      // chat folders use "[owner]" square brackets to indicate owner, ignore this in sorting
-      if (tempName.startsWith("[")) tempName = tempName.substring(1);
 
       int compare = folderRecord.compareFolderType(tempFolderRecord);
       if (compare > 0) {

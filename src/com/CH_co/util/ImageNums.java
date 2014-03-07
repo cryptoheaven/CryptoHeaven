@@ -134,6 +134,7 @@ public class ImageNums extends Object {
   public static final int PRIORITY_HIGH12;
   public static final int PRIORITY_LOW12;
   public static final int PRIORITY_BLANK_SMALL;
+  public static final int FLAG_READ_INLINE;
 
   public static final int LOCK_CLOSED_BLACK_SMALL;
   public static final int LOCK_CLOSED_SMALL;
@@ -488,7 +489,7 @@ public class ImageNums extends Object {
 
   static {
     int i = 0;
-    images = new String[344+50]; // plus emotions
+    images = new String[345+50]; // plus emotions
     imageUpdated = new boolean[images.length];
 
 
@@ -805,6 +806,9 @@ public class ImageNums extends Object {
 
     FLAG_RED_TOOL = i;
     images[i] = "flag-red-tool.png"; i++;
+
+    FLAG_READ_INLINE = i;
+    images[i] = "flag-read-inline.png"; i++;
 
     STAR_BRIGHT = i;
     images[i] = "star-bright.png"; i++;

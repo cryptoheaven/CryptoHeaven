@@ -253,7 +253,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 MsgLinkRecord link = (MsgLinkRecord) rec;
                 boolean isStarred = link.isStarred();
                 int flagIcon = ImageNums.IMAGE_NONE;
-                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
                 if (statRecord != null)
                   flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
                 if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {
@@ -327,7 +327,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
         JLabel thisCloned = null;
         StatRecord statRecord = null;
-        if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
+        if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
           thisCloned = jRendererBoldIconized;
         else
           thisCloned = jRendererPlainIconized;
@@ -340,7 +340,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         // for Address objects, change the first line to "Name" because we know this column is hidden
         if (mData != null && mData.isTypeAddress())
           thisCloned.setText(ListRenderer.getRenderedText(mData));
-        Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, cache);
+        Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, null, cache, false);
         JComponent subjectComp = (JComponent) getTableCellRendererComponent(table, subjectValue, isSelected, hasFocus, row, -1, 5);
         subjectComp.setOpaque(false);
         if (subjectComp instanceof JLabel) {
@@ -405,7 +405,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
           JLabel jAddrRenderer = null;
           StatRecord statRecord = null;
-          if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
+          if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
             jAddrRenderer = jRendererBoldIconized;
           else
             jAddrRenderer = jRendererPlainIconized;
@@ -424,7 +424,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
             jFlowPanel.removeAll();
             jFlowPanel.add(jAddrRenderer);
           }
-          Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, cache);
+          Object subjectValue = MsgTableModel.getSubjectColumnValue((MsgTableModel) rawModel, mLink, mData, null, null, cache, false);
           JComponent subjectComp = (JComponent) getTableCellRendererComponent(table, subjectValue, isSelected, hasFocus, row, -1, 5);
           subjectComp.setOpaque(false);
           if (subjectComp instanceof JLabel) {
@@ -470,11 +470,11 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
               MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(rowModel);
               if (mLink != null) {
                 MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
-                Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, null, cache);
+                Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, null, null, cache, false);
                 subject = subjectValue != null ? subjectValue.toString() : null;
                 boolean isFlagRed = false;
                 StatRecord statRecord = null;
-                isFlagRed = mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed();
+                isFlagRed = mLink != null && (statRecord = cache.getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed();
                 // set icon if in its own column (not as part of other)
                 if (column > -1) {
                   Icon icon = null;
@@ -586,7 +586,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           boolean isStarred = mLink != null && mLink.isStarred();
           int flagIcon = ImageNums.IMAGE_NONE;
           StatRecord statRecord = null;
-          if (mLink != null && (statRecord = cache.getStatRecord(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null) {
+          if (mLink != null && (statRecord = cache.getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null) {
             flagIcon = statRecord.getIcon();
           }
           if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {

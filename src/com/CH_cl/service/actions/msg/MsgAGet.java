@@ -295,7 +295,7 @@ public class MsgAGet extends ClientMessageAction {
       HashSet objLinkIDsHS = null;
       for (int i=0; i<linkRecords.length; i++) {
         MsgLinkRecord link = linkRecords[i];
-        if (cache.getStatRecord(link.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE) == null) {
+        if (cache.getStatRecordMyLinkId(link.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE) == null) {
           if (link.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
             if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
             FolderShareRecord share = cache.getFolderShareRecordMy(link.ownerObjId, groupIDsSet);

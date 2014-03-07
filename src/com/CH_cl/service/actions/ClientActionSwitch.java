@@ -249,6 +249,8 @@ public class ClientActionSwitch extends CommonActionSwitch {
 
       // Connection Timeout
       { new Integer(CommandCodes.SYS_A_CONNECTION_TIMEOUT), SysATimeout.class.getName() },
+      // Connection Pre-Timeout Poke
+      { new Integer(CommandCodes.SYS_A_CONNECTION_PRE_TIMEOUT_POKE), SysATimeoutPoke.class.getName() },
       { new Integer(CommandCodes.SYS_E_BANDWIDTH_EXCEEDED), ErrorBandwidthExceeded.class.getName() },
       { new Integer(CommandCodes.SYS_E_ACCOUNT_EXPIRED), ErrorAccountExpired.class.getName() },
       { new Integer(CommandCodes.SYS_E_STORAGE_EXCEEDED), ErrorStorageExceeded.class.getName() },

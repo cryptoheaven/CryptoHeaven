@@ -445,6 +445,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
             msgActionCode == CommandCodes.FILE_Q_UPDATE_DIGESTS ||
             msgActionCode == CommandCodes.MSG_Q_TYPING ||
             msgActionCode == CommandCodes.MSG_A_TYPING ||
+            msgActionCode == CommandCodes.STAT_Q_FETCH_OBJ_EXISTING ||
             msgActionCode == CommandCodes.USR_Q_CHANGE_ONLINE_STATUS ||
             msgActionCode == CommandCodes.USR_Q_GET_INIT_DATA ||
             msgActionCode == CommandCodes.USR_Q_LOGOUT ||

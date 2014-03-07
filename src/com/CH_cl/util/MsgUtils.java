@@ -12,7 +12,11 @@ package com.CH_cl.util;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.cryptx.BASymCipherBulk;
+import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rq;
 import com.CH_co.service.records.MsgDataRecord;
+import com.CH_co.service.records.MsgLinkRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.RecordUtils;
 import com.CH_co.util.Hasher;
 
 /**
@@ -52,6 +56,23 @@ public class MsgUtils {
       passStripped = passStrippedBuf.toString();
     }
     return passStripped;
+  }
+
+  public static Stats_Get_Rq prepMsgStatRequest(MsgLinkRecord msgLink) {
+    Stats_Get_Rq request = new Stats_Get_Rq();
+    request.statsForObjType = new Short(Record.RECORD_TYPE_MSG_LINK);
+    request.objLinkIDs = new Long[] { msgLink.msgLinkId };
+    if (msgLink.getOwnerObjType().shortValue() == Record.RECORD_TYPE_MESSAGE) {
+      request.ownerObjType = new Short(Record.RECORD_TYPE_MESSAGE);
+      Long[] msgIDs = new Long[] { msgLink.ownerObjId };
+      request.ownerObjIDs = msgIDs;
+    } else {
+      request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
+      Long[] folderIDs = new Long[] { msgLink.ownerObjId };
+      Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderSharesMyForFolders(folderIDs, true));
+      request.ownerObjIDs = shareIDs;
+    }
+    return request;
   }
 
   public static void unlockPassProtectedMsg(MsgDataRecord msgDataRecord, Hasher.Set matchingSet) {

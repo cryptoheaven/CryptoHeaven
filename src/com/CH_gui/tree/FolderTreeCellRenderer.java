@@ -107,15 +107,10 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
           String ownerNote = notes[0];
           String chatNote = notes[1];
 
-          if (ownerNote.length() > 0 && chatNote.length() == 0) {
-            //toolTip = "<html>The user <b>" + ownerNote + "</b> is the primary owner of this folder.";
+          if (ownerNote.length() > 0) {
             toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_folder."), new Object[] {ownerNote});
-          } else if (ownerNote.length() == 0 && chatNote.length() > 0) {
-            //toolTip = "<html>You are sharing this chatting folder with <b>" + chatNote + "</b>.";
+          } else if (chatNote.length() > 0) {
             toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_You_are_sharing_this_chatting_folder_with_USER."), new Object[] {chatNote});
-          } else if (ownerNote.length() > 0 && chatNote.length() > 0) {
-            //toolTip = "<html>The user <b>" + ownerNote+ "</b> is the primary owner of this chatting folder. <br>Other participants are <b>" + chatNote + "</b>.";
-            toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_The_user_USER_is_the_primary_owner_of_this_chatting_folder._Other_participants_are_OTHER-USERS."), new Object[] {ownerNote, chatNote});
           }
         }
         fRec.setCachedToolTip(toolTip == null ? "" : toolTip);

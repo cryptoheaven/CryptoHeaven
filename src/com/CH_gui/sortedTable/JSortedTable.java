@@ -10,6 +10,7 @@
 package com.CH_gui.sortedTable;
 
 import com.CH_cl.service.cache.*;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 
 import com.CH_co.service.records.*;
@@ -140,12 +141,16 @@ public class JSortedTable extends JTable implements DisposableObj {
               }
             }
           }
-          // See if we should remove the red flag from posting/chatting (open content) folder tables
+          // See if we should remove the red flag from posting/chatting (open content) folder tables, mark as Read, or fetch Read stats
           if (mtm.isModeMsgBody()) {
             int rawRow = sTable.convertMyRowIndexToModel(viewRow);
             MsgLinkRecord msgLink = (MsgLinkRecord) mtm.getRowObject(rawRow);
-            if (msgLink != null)
-              StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+            if (msgLink != null) {
+              ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+              StatOps.markOldIfNeeded(SIL, msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+              MsgLinkOps.markRecordsAs(SIL, new MsgLinkRecord[] { msgLink }, Short.valueOf(StatRecord.FLAG_READ));
+              StatOps.fetchStatsIfNotRecentlyRequested(SIL, msgLink);
+            }
           }
         }
 

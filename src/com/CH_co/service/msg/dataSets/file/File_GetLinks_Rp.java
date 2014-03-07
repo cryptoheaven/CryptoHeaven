@@ -85,6 +85,18 @@ public class File_GetLinks_Rp extends ProtocolMsgDataSet {
     if (trace != null) trace.exit(File_GetLinks_Rp.class);
   }
 
+  public boolean isUserSensitive() {
+    return true;
+  }
+
+  /**
+   * Set value and propagate the call to its members.
+   */
+  public void setServerSessionUserId(Long userId) {
+    super.setServerSessionUserId(userId);
+    if (stats_rp != null)
+      stats_rp.setServerSessionUserId(userId);
+  }
 
   /** Writes out 'this' object to a stream */
   public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {

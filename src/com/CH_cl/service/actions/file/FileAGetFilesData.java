@@ -11,6 +11,7 @@ package com.CH_cl.service.actions.file;
 
 import com.CH_cl.service.actions.*;
 import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.*;
 
 import com.CH_co.cryptx.*;
@@ -73,6 +74,7 @@ public class FileAGetFilesData extends ClientMessageAction {
       ProgMonitorI progressMonitor = ProgMonitorPool.getProgMonitor(getStamp());
 
       for (int i=0; i<fileDataRecords.length; i++) {
+        ServerInterfaceLayer SIL = getServerInterfaceLayer();
         FileDataRecord fileDataRecord = fileDataRecords[i];
 
         // get the file link for this data record which contains the symmetricKey
@@ -83,12 +85,12 @@ public class FileAGetFilesData extends ClientMessageAction {
 
         if (verifyingKeyRecord == null) {
           // we need to fetch the verifying key before we can unseal!
-          getServerInterfaceLayer().submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 120000);
+          SIL.submitAndWait(new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_KEYIDS, new Obj_IDList_Co(keyId)), 120000);
           verifyingKeyRecord = cache.getKeyRecord(keyId);
         }
 
         // We'll need completed data attributes before we can unseal!
-        FileDataRecord fileData = FileDataOps.getOrFetchFileDataAttr(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, fileDataRecord.fileId);
+        FileDataRecord fileData = FileDataOps.getOrFetchFileDataAttr(SIL, fileLinkRecord.fileLinkId, fileDataRecord.fileId);
         fileDataRecord.merge(fileData);
 
         try {
@@ -107,7 +109,8 @@ public class FileAGetFilesData extends ClientMessageAction {
                                     destinationDirectory, isDefaultTempDir, fileLinkRecord.getFileName(),
                                     progressMonitor, fileLinkRecord.origSize);
           Stats.setStatus("File downloaded: "+fileLinkRecord.getFileName());
-          StatOps.markOldIfNeeded(getServerInterfaceLayer(), fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
+          StatOps.markOldIfNeeded(SIL, fileLinkRecord.fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);
+          FileLinkOps.markRecordsAs(SIL, new FileLinkRecord[] { fileLinkRecord }, Short.valueOf(StatRecord.FLAG_READ));
         } catch (Throwable t) {
           // Failure of one of the files, should not affect the other when processing a few of them here.
           if (trace != null) trace.exception(FileAGetFilesData.class, 100, t);

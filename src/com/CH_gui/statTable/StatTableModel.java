@@ -14,19 +14,21 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.UserOps;
-import com.CH_cl.service.records.filters.StatFilter;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rp;
 import com.CH_co.service.msg.dataSets.stat.Stats_Get_Rq;
 import com.CH_co.service.records.*;
+import com.CH_co.service.records.filters.StatFilter;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.list.ListRenderer;
 import com.CH_gui.table.ColumnHeaderData;
 import com.CH_gui.table.RecordTableCellRenderer;
 import com.CH_gui.table.RecordTableModel;
+import java.util.ArrayList;
 
 /** 
 * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
@@ -153,15 +155,23 @@ public class StatTableModel extends RecordTableModel {
           objId = cache.getFolderShareRecordMy(((FileLinkRecord) parentObjLink).ownerObjId, true).shareId;
 
         request.ownerObjIDs = new Long[] { objId };
-        MessageAction msgAction = new MessageAction(CommandCodes.STAT_Q_FETCH_ALL_OBJ_STATS, request);
+        MessageAction msgAction = new MessageAction(CommandCodes.STAT_Q_FETCH_OBJ_TRACE, request);
         ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
         ClientMessageAction reply = serverInterfaceLayer.submitAndFetchReply(msgAction, 30000);
         if (reply != null && reply.getActionCode() == CommandCodes.STAT_A_GET) {
           Stats_Get_Rp statsReply = (Stats_Get_Rp) reply.getMsgDataSet();
           UserOps.fetchUnknownUsers(serverInterfaceLayer, statsReply.stats);
           updateData(statsReply.stats);
-          // Clear the data from reply, we don't want it going to the cache.
-          statsReply.stats = new StatRecord[0];
+          // Take only the existing stats with +ve IDs into the cache...
+          if (statsReply.stats != null) {
+            ArrayList existingStatsList = new ArrayList();
+            for (int i=0; i<statsReply.stats.length; i++) {
+              if (statsReply.stats[i].statId.longValue() > 0)
+                existingStatsList.add(statsReply.stats[i]);
+            }
+            StatRecord[] existingStats = (StatRecord[]) ArrayUtils.toArray(existingStatsList, StatRecord.class);
+            statsReply.stats = existingStats;
+          }
         }
         DefaultReplyRunner.nonThreadedRun(serverInterfaceLayer, reply);
       }

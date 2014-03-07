@@ -98,13 +98,13 @@ public class TraceRecordDialog extends GeneralDialog implements VisualsSavable {
     if (parentObjLinks.length == 1) {
       JLabel label = new JMyLabel(ListRenderer.getRenderedText(parentObjLinks[0]));
       label.setIcon(ListRenderer.getRenderedIcon(parentObjLinks[0]));
-      panel.add(label, new GridBagConstraints(0, posY, 3, 1, 10, 0,
+      panel.add(label, new GridBagConstraints(0, posY, 4, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 0, 5), 0, 0));
       posY ++;
     }
 
     TraceTableComponent traceComponent = new TraceTableComponent(parentObjLinks);
-    panel.add(traceComponent, new GridBagConstraints(0, posY, 3, 1, 10, 10,
+    panel.add(traceComponent, new GridBagConstraints(0, posY, 4, 1, 10, 10,
         GridBagConstraints.WEST, GridBagConstraints.BOTH, new MyInsets(0, 5, 5, 5), 0, 0));
     posY ++;
 
@@ -122,11 +122,12 @@ public class TraceRecordDialog extends GeneralDialog implements VisualsSavable {
       }
     });
 
-    panel.add(completenessLabel, new GridBagConstraints(0, posY, 3, 1, 10, 0, 
+    panel.add(completenessLabel, new GridBagConstraints(0, posY, 4, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
     posY ++;
 
     TraceActionTable actionTable = (TraceActionTable) traceComponent.getActionTable();
+    JButton copyToClipboardButton = new JActionButton(actionTable.getCopyToClipboardAction(), false, null, false);
     JButton initContactButton = new JActionButton(actionTable.getInitiateAction(), false, null, false);
 //    initContactButton.setText((String) actionTable.getInitiateAction().getValue(Actions.NAME));
 //    initContactButton.setHorizontalTextPosition(JButton.RIGHT);
@@ -140,9 +141,11 @@ public class TraceRecordDialog extends GeneralDialog implements VisualsSavable {
     // Filler and two buttons in one row.
     panel.add(new JMyLabel(), new GridBagConstraints(0, posY, 1, 1, 10, 0, 
         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(initContactButton, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
+    panel.add(copyToClipboardButton, new GridBagConstraints(1, posY, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
-    panel.add(msgUserButton, new GridBagConstraints(2, posY, 1, 1, 0, 0, 
+    panel.add(initContactButton, new GridBagConstraints(2, posY, 1, 1, 0, 0, 
+        GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
+    panel.add(msgUserButton, new GridBagConstraints(3, posY, 1, 1, 0, 0, 
         GridBagConstraints.WEST, GridBagConstraints.NONE, new MyInsets(5, 5, 5, 5), 0, 0));
 
     return panel;

@@ -306,7 +306,7 @@ public class CacheFldUtils {
               comboDiffBits = (cRec.permits.intValue() << 16) | cRec.status.intValue();
             } else {
               LinkRecordI link = (LinkRecordI) rec;
-              StatRecord stat = cache.getStatRecord(link.getId(), link.getCompatibleStatTypeIndex());
+              StatRecord stat = cache.getStatRecordMyLinkId(link.getId(), link.getCompatibleStatTypeIndex());
               comboDiffBits = (stat != null ? stat.mark.intValue() : 0) << 16;
               if (link instanceof FolderShareRecord) {
                 FolderShareRecord sLink = (FolderShareRecord) link;

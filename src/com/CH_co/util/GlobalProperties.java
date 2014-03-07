@@ -317,8 +317,9 @@ public class GlobalProperties extends Object {
   // build 812 Trace history reported incorrect stats in some cases involving privilege records.
   // build 814 Dragging msgs/files over folders in tree view was failing to update cursor.
   // build 816 Filtering out of external images should include removal of external base reference.
+  // build 818 Addition of firstRead stamp to the access records
 
-  public static final short PROGRAM_BUILD_NUMBER = 816;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 818;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

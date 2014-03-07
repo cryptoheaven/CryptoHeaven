@@ -1769,7 +1769,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           totalSize = new Long(len + (totalSize != null ? totalSize.longValue() : 0L));
         }
         if (!(anyRead && anyUnread)) {
-          StatRecord statRecord = cache.getStatRecord(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+          StatRecord statRecord = cache.getStatRecordMyLinkId(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
           if (statRecord != null) {
             if (statRecord.mark.equals(StatRecord.FLAG_OLD))
               anyRead = true;
@@ -1793,7 +1793,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         Record rec = tableModel.getRowObjectNoTrace(i);
         if (rec instanceof MsgLinkRecord) {
           MsgLinkRecord msgLink = (MsgLinkRecord) rec;
-          StatRecord statRecord = cache.getStatRecord(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+          StatRecord statRecord = cache.getStatRecordMyLinkId(msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
           if (statRecord != null && (statRecord.mark.equals(StatRecord.FLAG_NEW) || statRecord.mark.equals(StatRecord.FLAG_MARKED_NEW))) {
             anyUnreadGlobal = true;
             break;

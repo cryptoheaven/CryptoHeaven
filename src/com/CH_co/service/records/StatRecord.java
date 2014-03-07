@@ -28,6 +28,7 @@ public class StatRecord extends Record { // implicit no-argument constructor
   public static final Short FLAG_OLD = new Short((short) 2);
   public static final short FLAG_BCC = 4; // server only flag, client never sees it
   public static final Short FLAG_MARKED_NEW = new Short((short) 8);
+  public static final short FLAG_READ = -1; // request only flag, never stored in db, instead firstRead stamp gets written
 
   public static final short STATUS__UNSEEN_UNDELIVERED = 3;
   public static final short STATUS__UNSEEN_DELIVERED = 4;
@@ -56,6 +57,17 @@ public class StatRecord extends Record { // implicit no-argument constructor
 
   public Long getId() {
     return statId;
+  }
+
+  public static int getTypeIndex(byte type) {
+    int typeIndex = -1;
+    for (int i=0; i<StatRecord.STAT_TYPES.length; i++) {
+      if (type == StatRecord.STAT_TYPES[i]) {
+        typeIndex = i;
+        break;
+      }
+    }
+    return typeIndex;
   }
 
   public int getIcon() {
@@ -124,12 +136,32 @@ public class StatRecord extends Record { // implicit no-argument constructor
   public static Long[] getLinkIDs(StatRecord[] statRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StatRecord.class, "getLinkIDs(StatRecord[] statRecords)");
     if (trace != null) trace.args(statRecords);
+    ArrayList linkIDsL = new ArrayList();
+    if (statRecords != null) {
+      for (int i=0; i<statRecords.length; i++) {
+        if (!linkIDsL.contains(statRecords[i].objLinkId))
+          linkIDsL.add(statRecords[i].objLinkId);
+      }
+    }
+    Long[] linkIDs = (Long[]) ArrayUtils.toArray(linkIDsL, Long.class);
+    if (trace != null) trace.exit(StatRecord.class, linkIDs);
+    return linkIDs;
+  }
+
+  public static Long[] getLinkIDs(StatRecord[] statRecords, byte objType) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(StatRecord.class, "getLinkIDs(StatRecord[] statRecords, byte objType)");
+    if (trace != null) trace.args(statRecords);
+    if (trace != null) trace.args(objType);
 
     ArrayList linkIDsL = new ArrayList();
     if (statRecords != null) {
       for (int i=0; i<statRecords.length; i++) {
-        if (linkIDsL.contains(statRecords[i].objLinkId) == false)
-          linkIDsL.add(statRecords[i].objLinkId);
+        StatRecord rec = statRecords[i];
+        Long linkId = rec.objLinkId;
+        if (!linkIDsL.contains(linkId)) {
+          if (rec.objType.byteValue() == objType)
+            linkIDsL.add(linkId);
+        }
       }
     }
     Long[] linkIDs = (Long[]) ArrayUtils.toArray(linkIDsL, Long.class);

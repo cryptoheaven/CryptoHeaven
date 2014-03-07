@@ -262,7 +262,8 @@ public class PostTableCellRenderer extends MsgTableCellRenderer {
           MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
           if (mData != null) {
             MsgLinkRecord pLink = row > 0 ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row-1)) : null;
-            Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, cache);
+            MsgLinkRecord nLink = row < mtm.getRowCount() ? (MsgLinkRecord) mtm.getRowObject(sTable.convertMyRowIndexToModel(row+1)) : null;
+            Object subjectValue = mtm.getSubjectColumnValue(mtm, mLink, mData, pLink, nLink, cache, false);
             if (subjectValue != null) {
               if (subjectValue instanceof StringBuffer)
                 sb = (StringBuffer) subjectValue;

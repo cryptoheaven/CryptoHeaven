@@ -2011,7 +2011,9 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           }
           // see if a red flag needs to be "unset"
           if (isSwitchingDataView) {
-            StatOps.markOldIfNeeded(MainFrame.getServerInterfaceLayer(), msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+            ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+            StatOps.markOldIfNeeded(SIL, msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+            MsgLinkOps.markRecordsAs(SIL, new MsgLinkRecord[] { msgLink }, Short.valueOf(StatRecord.FLAG_READ));
           }
         } // end else
         setGUIComponentsForObj(msgData);

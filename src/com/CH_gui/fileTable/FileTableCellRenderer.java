@@ -124,7 +124,7 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
                 FileLinkRecord link = (FileLinkRecord) rec;
                 boolean isStarred = link.isStarred();
                 int flagIcon = ImageNums.IMAGE_NONE;
-                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecord(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_FILE);
+                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_FILE);
                 if (statRecord != null)
                   flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
                 if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {

@@ -1062,7 +1062,7 @@ public class MsgDataRecord extends Record {
   */
   public String getEncodedHTMLData() {
     if (encodedHTMLData == null || encodedHTMLData.length() == 0) {
-    encodedHTMLData = Misc.encodePlainIntoHtml(getText());
+      encodedHTMLData = Misc.encodePlainIntoHtml(getText());
     }
     return encodedHTMLData;
   }

@@ -273,8 +273,10 @@ public class CommandCodes extends Object {
   // Update Mark
   public static final int STAT_Q_UPDATE = 1210;
 
-  // Fetch All Object Stats
-  public static final int STAT_Q_FETCH_ALL_OBJ_STATS = 1220;
+  // Fetch All Object Trace Stats
+  public static final int STAT_Q_FETCH_OBJ_TRACE = 1220;
+  // Fetch All Object Existing Stats
+  public static final int STAT_Q_FETCH_OBJ_EXISTING = 1230;
 
 
   // =====================
@@ -518,6 +520,8 @@ public class CommandCodes extends Object {
 
   // Connection timeout
   public static final int SYS_A_CONNECTION_TIMEOUT = 5020;
+  // Connection pre-timeout poke to attempt to wake up potentioally suspended client by stimulating his I/O, used before sending a hard timeout notification
+  public static final int SYS_A_CONNECTION_PRE_TIMEOUT_POKE = 5021;
   public static final int SYS_E_BANDWIDTH_EXCEEDED = 5030;
   public static final int SYS_E_ACCOUNT_EXPIRED = 5040;
   public static final int SYS_E_STORAGE_EXCEEDED = 5050;
@@ -609,6 +613,7 @@ public class CommandCodes extends Object {
       case SYS_Q_NOTIFY :
       case SYS_A_NOTIFY :
       case SYS_A_CONNECTION_TIMEOUT :
+      case SYS_A_CONNECTION_PRE_TIMEOUT_POKE :
       case SYS_E_BANDWIDTH_EXCEEDED :
       case SYS_E_ACCOUNT_EXPIRED :
       case SYS_E_STORAGE_EXCEEDED :

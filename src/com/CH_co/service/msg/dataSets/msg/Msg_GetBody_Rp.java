@@ -63,6 +63,24 @@ public class Msg_GetBody_Rp extends ProtocolMsgDataSet {
     return true;
   }
 
+  /**
+   * Set value and propagate the call to its members.
+   */
+  public void setServerSessionCurrentStamp(Timestamp ts) {
+    super.setServerSessionCurrentStamp(ts);
+    if (stats_rp != null)
+      stats_rp.setServerSessionCurrentStamp(ts);
+  }
+
+  /**
+   * Set value and propagate the call to its members.
+   */
+  public void setServerSessionUserId(Long userId) {
+    super.setServerSessionUserId(userId);
+    if (stats_rp != null)
+      stats_rp.setServerSessionUserId(userId);
+  }
+
   /** Writes out 'this' object to a stream */
   public void writeToStream(DataOutputStream2 dataOut, ProgMonitorI progressMonitor, short clientBuild, short serverBuild) throws IOException {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(Msg_GetBody_Rp.class, "writeToStream(DataOutputStream2, ProgMonitor)");

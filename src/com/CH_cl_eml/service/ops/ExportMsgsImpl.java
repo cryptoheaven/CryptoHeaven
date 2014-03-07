@@ -12,6 +12,7 @@ package com.CH_cl_eml.service.ops;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.ExportMsgsI;
+import com.CH_cl.service.ops.MsgLinkOps;
 import com.CH_cl.service.ops.StatOps;
 
 import com.CH_co.monitor.*;
@@ -97,6 +98,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
               outStream.close();
               exportProgress.addProgress(" done.");
               StatOps.markOldIfNeeded(SIL, msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+              MsgLinkOps.markRecordsAs(SIL, new MsgLinkRecord[] { msgLink }, Short.valueOf(StatRecord.FLAG_READ));
             } else {
               exportProgress.addProgress(" already exists, skipped.");
             }

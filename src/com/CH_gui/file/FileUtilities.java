@@ -85,6 +85,7 @@ public class FileUtilities extends Object {
       public void run() {
         Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(getClass(), "renameFolderAndShares.afterKeyFetchRunner.run()");
 
+        boolean isError = false;
         try {
           Set groupIDsSet = null;
           for (int i=0; i<shares.length; i++) {
@@ -96,8 +97,16 @@ public class FileUtilities extends Object {
               share.setSymmetricKey(record.getSymmetricKey());
               if (ownerUserId.equals(myUserId))
                 share.seal(myUser.getSymKeyFldShares());
-              else
-                share.seal(cache.getKeyRecordForUser(ownerUserId));
+              else {
+                KeyRecord key = cache.getKeyRecordForUser(ownerUserId);
+                if (key != null && key.plainPublicKey != null)
+                  share.seal(key);
+                else {
+                  NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Fetch Error", "Could not fetch user's Public Key to rename the folder. Encryption key for user ID "+share.ownerUserId+" is not accessible.");
+                  isError = true;
+                  break;
+                }
+              }
             } else {
               if (groupIDsSet == null) groupIDsSet = cache.getFolderGroupIDsMySet();
               FolderShareRecord groupShare = cache.getFolderShareRecordMy(share.ownerUserId, groupIDsSet);
@@ -105,20 +114,23 @@ public class FileUtilities extends Object {
               if (groupShare != null) {
                 share.seal(groupShare.getSymmetricKey());
               } else {
-                MessageDialog.showErrorDialog(null, "Could not locate group's encryption key to rename the folder.  Operation terminated.", "Fetch Error");
-                throw new RuntimeException("Could not locate group's encryption key to rename the folder.  Operation terminated.");
+                NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Fetch Error", "Could not locate group's encryption key to rename the folder. Encryption key for group ID "+share.ownerUserId+" is not accessible.");
+                isError = true;
+                break;
               }
             }
           }
         } catch (Throwable t) {
           if (trace != null) trace.exception(getClass(), 100, t);
-          MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), "Could not fetch user's Public Key.  Operation terminated.", "Fetch Error");
-          throw new RuntimeException("Could not fetch user's Public Key.  Operation terminated.");
+          MessageDialog.showErrorDialog(GeneralDialog.getDefaultParent(), "Could not fetch user's Public Key to rename the folder.  Operation terminated.", "Fetch Error");
+          isError = true;
         }
 
-        Fld_AltStrs_Rq request = new Fld_AltStrs_Rq(shares);
-        MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_ALTER_STRS, request);
-        serverInterfaceLayer.submitAndReturn(msgAction);
+        if (!isError) {
+          Fld_AltStrs_Rq request = new Fld_AltStrs_Rq(shares);
+          MessageAction msgAction = new MessageAction(CommandCodes.FLD_Q_ALTER_STRS, request);
+          serverInterfaceLayer.submitAndReturn(msgAction);
+        }
 
         if (trace != null) trace.exit(FileUtilities.class);
       }
