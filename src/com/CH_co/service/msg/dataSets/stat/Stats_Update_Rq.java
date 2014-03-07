@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -20,7 +20,7 @@ import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.records.StatRecord;
 
 /** 
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.9 $</b>
  *

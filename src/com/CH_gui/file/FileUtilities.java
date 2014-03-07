@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -28,7 +28,7 @@ import com.CH_co.util.*;
 import com.CH_gui.util.*;
 
 /** 
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description:
  * All common methods for folders or/and folder records should be placed here

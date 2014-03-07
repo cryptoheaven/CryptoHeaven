@@ -5,7 +5,7 @@
 package com.CH_gui.dialog;
 
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * @author  Marcin Kurzawa
  */

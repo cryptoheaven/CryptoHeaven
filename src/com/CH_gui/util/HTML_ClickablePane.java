@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -35,7 +35,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 
 /**
-* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+* Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.24 $</b>
 *

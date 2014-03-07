@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -19,7 +19,7 @@ import com.CH_gui.menuing.*;
 import com.CH_co.trace.Trace;
 
 /** 
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * Class Description:
  *  The only difference between this class and its parent's class is that 

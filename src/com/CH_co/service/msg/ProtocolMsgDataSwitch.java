@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -26,7 +26,7 @@ import com.CH_co.util.Misc;
 import com.CH_co.trace.Trace;
 
 /** 
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * Translates ProtocolMsgDataSet instances into code number and vice versa
  * For cross-version compatibility, do not change the number codes for already existing request types.

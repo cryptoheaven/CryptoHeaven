@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -14,9 +14,7 @@ import com.CH_co.monitor.StatsListenerAdapter;
 import java.lang.reflect.Method;
 
 /**
-* <b>Copyright</b> &copy; 2001-2013 <a
-* href="http://www.CryptoHeaven.com/DevelopmentTeam/"> CryptoHeaven Corp.
-* </a><br>All rights reserved.<p>
+* Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
 * 
 * Class Description:
 * 

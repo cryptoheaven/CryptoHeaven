@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -71,7 +71,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.text.JTextComponent;
 
 /** 
-* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+* Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
 *
 * <b>$Revision: 1.61 $</b>
 *

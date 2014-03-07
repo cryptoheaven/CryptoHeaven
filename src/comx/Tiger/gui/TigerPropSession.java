@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information of CryptoHeaven
  * Corp. ("Confidential Information"). You shall not disclose such Confidential
@@ -15,7 +15,7 @@ import comx.tig.en.SingleTigerSession;
 import java.util.Properties;
 
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * <b>$Revision: 1.3 $</b>
  *

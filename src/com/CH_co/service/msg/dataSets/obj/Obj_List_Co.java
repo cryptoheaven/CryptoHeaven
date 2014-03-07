@@ -1,5 +1,5 @@
 /**
- * Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+ * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
  *
  * This software is the confidential and proprietary information
  * of CryptoHeaven Corp. ("Confidential Information").  You
@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /** 
-* Copyright 2001-2013 CryptoHeaven Corp. All Rights Reserved.
+* Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
 *
 * Class Description: General purpose data set to transfer an array of primitive objects and itself.
 *
