@@ -324,7 +324,7 @@ public class GlobalProperties extends Object {
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 5;
+  public static final short PROGRAM_VERSION_MINOR = 6;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;
