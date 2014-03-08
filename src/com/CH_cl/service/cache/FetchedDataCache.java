@@ -4475,7 +4475,7 @@ public class FetchedDataCache extends Object {
   }
 
   public synchronized boolean wasStatFetchForMsgIdRecent(Long msgId) {
-    long timeout = 1 * 60 * 1000; // 1 minute
+    long timeout = 3 * 60 * 1000; // 3 minutes
     return statsFetchedForMsgIds.containsKey(msgId) && ((Long) statsFetchedForMsgIds.get(msgId)).longValue() > System.currentTimeMillis() - timeout;
   }
 
