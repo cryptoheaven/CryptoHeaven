@@ -149,7 +149,7 @@ public class JSortedTable extends JTable implements DisposableObj {
               ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
               StatOps.markOldIfNeeded(SIL, msgLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
               MsgLinkOps.markRecordsAs(SIL, new MsgLinkRecord[] { msgLink }, Short.valueOf(StatRecord.FLAG_READ));
-              StatOps.fetchStatsIfNotRecentlyRequested(SIL, msgLink);
+              StatOps.addToStatFetchQueue(SIL, msgLink);
             }
           }
         }

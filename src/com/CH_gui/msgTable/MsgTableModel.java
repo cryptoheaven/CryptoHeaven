@@ -858,7 +858,7 @@ public class MsgTableModel extends RecordTableModel {
             // check if we should fetch more stats
             if (nextMsgLink == null || (stats != null && stats.size() >= 2)) { // at least 2 (my and one more)
               // fetch stats to ensure we have all data not just whatever came in some notification
-              StatOps.fetchStatsIfNotRecentlyRequested(MainFrame.getServerInterfaceLayer(), msgLink);
+              StatOps.addToStatFetchQueue(MainFrame.getServerInterfaceLayer(), msgLink);
             }
           }
 

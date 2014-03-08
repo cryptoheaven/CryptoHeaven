@@ -81,6 +81,7 @@ public class FetchedDataCache extends Object {
   private Map statRecordMap;
   private MultiHashMap[] statRecordMap_byLinkId; // one map per each obj type
   private MultiHashMap[] statRecordMap_byObjId; // one map per each obj type
+  private HashMap statsFetchedForMsgIds; // HashSet of fetched stats for msgIDs, and the stamps when they were fetched
   private ArrayList msgBodyKeys;
   private Set requestedAddrSet;
 
@@ -150,6 +151,7 @@ public class FetchedDataCache extends Object {
       statRecordMap_byLinkId[i] = new MultiHashMap(true);
       statRecordMap_byObjId[i] = new MultiHashMap(true);
     }
+    statsFetchedForMsgIds = new HashMap();
     msgBodyKeys = new ArrayList();
     requestedAddrSet = new HashSet();
     fldIDsFetchRequestsIssuedSet = new HashSet();
@@ -194,6 +196,7 @@ public class FetchedDataCache extends Object {
         statRecordMap_byLinkId[i].clear();
         statRecordMap_byObjId[i].clear();
       }
+      statsFetchedForMsgIds.clear();
       emailRecordMap.clear();
       folderRecordMap.clear();
       folderShareRecordMap.clear();
@@ -4465,6 +4468,15 @@ public class FetchedDataCache extends Object {
 
   public synchronized boolean wasFolderViewInvalidated(Long folderId) {
     return fldIDsViewInvalidatedSet.contains(folderId);
+  }
+
+  public synchronized void markStatFetchedForMsgId(Long msgId) {
+    statsFetchedForMsgIds.put(msgId, new Long(System.currentTimeMillis()));
+  }
+
+  public synchronized boolean wasStatFetchForMsgIdRecent(Long msgId) {
+    long timeout = 1 * 60 * 1000; // 1 minute
+    return statsFetchedForMsgIds.containsKey(msgId) && ((Long) statsFetchedForMsgIds.get(msgId)).longValue() > System.currentTimeMillis() - timeout;
   }
 
   /**************************************************
