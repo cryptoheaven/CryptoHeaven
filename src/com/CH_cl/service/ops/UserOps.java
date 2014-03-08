@@ -11,6 +11,7 @@ package com.CH_cl.service.ops;
 
 import com.CH_cl.service.actions.ClientMessageAction;
 import com.CH_cl.service.actions.usr.UsrALoginSecureSession;
+import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.DefaultReplyRunner;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.security.DigestException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -657,20 +659,20 @@ public class UserOps extends Object {
     return success;
   }
 
-  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI recipient) {
+  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI recipient, long timeout) {
     if (recipient instanceof Record) {
-      updateUsedStamp(SIL, new Record[][] { { (Record) recipient } });
+      updateUsedStamp(SIL, new Record[][] { { (Record) recipient } }, timeout);
     }
   }
-  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI[] memberRecipients) {
+  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI[] memberRecipients, long timeout) {
     Record[][] recipients = new Record[1][memberRecipients.length];
     for (int i=0; i<recipients.length; i++) {
       recipients[0][i] = (Record) memberRecipients[i];
     }
-    updateUsedStamp(SIL, recipients);
+    updateUsedStamp(SIL, recipients, timeout);
   }
-  public static void updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients)");
+  public static void updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients, long timeout) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients, long timeout)");
     if (trace != null) trace.args(SIL, msgRecipients);
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
@@ -678,6 +680,7 @@ public class UserOps extends Object {
       HashSet contactIDsHS = new HashSet();
       HashSet addressLinkIDsHS = new HashSet();
       HashSet groupShareIDsHS = new HashSet();
+      Date recent = new Date(System.currentTimeMillis() - timeout);
       for (int i=0; i<msgRecipients.length; i++) {
         Record[] recipients = msgRecipients[i];
         if (recipients != null) {
@@ -686,18 +689,24 @@ public class UserOps extends Object {
             if (trace != null) trace.data(10, "processing recipient", recipient.getClass().getSimpleName(), recipient);
             if (recipient instanceof ContactRecord) {
               // contact
-              contactIDsHS.add(recipient.getId());
+              ContactRecord rec = (ContactRecord) recipient;
+              if (rec.dateUsed == null || rec.dateUsed.before(recent))
+                contactIDsHS.add(rec.getId());
             } else if (recipient instanceof MsgLinkRecord) {
               // address book entry
               if (trace != null) trace.data(15, "updateUsedStamp for Address via Link");
-              addressLinkIDsHS.add(recipient.getId());
+              MsgLinkRecord rec = (MsgLinkRecord) recipient;
+              if (rec.dateUsed == null || rec.dateUsed.before(recent))
+                addressLinkIDsHS.add(rec.getId());
             } else if (recipient instanceof MsgDataRecord) {
               // address book entry
               if (trace != null) trace.data(16, "updateUsedStamp for Address via Data");
               MsgLinkRecord[] addrLinks = cache.getMsgLinkRecordsForMsg(recipient.getId());
               if (addrLinks != null && addrLinks.length > 0) {
-                for (int k=0; k<addrLinks.length; k++)
-                  addressLinkIDsHS.add(addrLinks[k].msgLinkId);
+                for (int k=0; k<addrLinks.length; k++) {
+                  if (addrLinks[k].dateUsed == null || addrLinks[k].dateUsed.before(recent))
+                    addressLinkIDsHS.add(addrLinks[k].msgLinkId);
+                }
               }
             } else if (recipient instanceof EmailAddressRecord) {
               // email address - match with address books
@@ -710,8 +719,8 @@ public class UserOps extends Object {
                 MsgLinkRecord[] addrLinks = cache.getMsgLinkRecordsForMsgs(addrIDs);
                 if (addrLinks != null && addrLinks.length > 0) {
                   for (int u=0; u<addrLinks.length; u++) {
-                    addressLinkIDsHS.add(addrLinks[u].msgLinkId);
-                    if (trace != null) trace.data(22, "Address Book entry link", addrLinks[u].msgLinkId);
+                    if (addrLinks[u].dateUsed == null || addrLinks[u].dateUsed.before(recent))
+                      addressLinkIDsHS.add(addrLinks[u].msgLinkId);
                   }
                 }
               }
@@ -720,7 +729,8 @@ public class UserOps extends Object {
               FolderPair pair = (FolderPair) recipient;
               FolderRecord folder = pair.getFolderRecord();
               FolderShareRecord share = pair.getFolderShareRecord();
-              groupShareIDsHS.add(share.shareId);
+              if (share.dateUsed == null || share.dateUsed.before(recent))
+                groupShareIDsHS.add(share.shareId);
               if (folder.isGroupType()) {
                 if (trace != null) trace.data(30, "Group Id", recipient.getId());
                 if (trace != null) trace.data(31, "Group Share", share);
@@ -728,7 +738,29 @@ public class UserOps extends Object {
                 if (trace != null) trace.data(40, "Folder Id", recipient.getId());
                 if (trace != null) trace.data(41, "Folder Share", share);
               }
-            }
+              // for folder recipients, get the owning Contacts and Groups to see if we should mark them too
+              FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(pair.getId());
+              // only mark them if there are few, max 3 (for example: mine, owners, +1 more group)
+              for (int z=0; z<allShares.length; z++) {
+                if (allShares[z].isOwnedByUser()) {
+                  Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(allShares[z].ownerUserId, true, false);
+                  if (familiar instanceof ContactRecord) {
+                    ContactRecord rec = (ContactRecord) familiar;
+                    if (rec.dateUsed == null || rec.dateUsed.before(recent))
+                      contactIDsHS.add(rec.getId());
+                  }
+                } else {
+                  // group owner is a group folder
+                  FolderRecord group = cache.getFolderRecord(allShares[z].ownerUserId);
+                  FolderPair groupPair = CacheFldUtils.convertRecordToPair(group);
+                  FolderShareRecord myGroupShare = groupPair != null ? groupPair.getFolderShareRecord() : null;
+                  if (myGroupShare != null) {
+                    if (myGroupShare.dateUsed == null || myGroupShare.dateUsed.before(recent))
+                      groupShareIDsHS.add(myGroupShare.shareId);
+                  }
+                }
+              }
+            } // end FolderPair
           }
         }
       }

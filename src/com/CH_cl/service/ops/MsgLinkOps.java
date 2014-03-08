@@ -87,10 +87,22 @@ public class MsgLinkOps {
       // gather all stats which need to be updated
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       ArrayList statsL = new ArrayList();
+      boolean isReadStamping = newMark.shortValue() == StatRecord.FLAG_READ;
+      Long myUserId = cache.getMyUserId();
       for (int i=0; i<records.length; i++) {
-        StatRecord statRecord = cache.getStatRecordMyLinkId(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
-        if (statRecord != null && !statRecord.mark.equals(newMark))
-          statsL.add(statRecord);
+        boolean isSkip = false;
+        // skip 'Read' stamping if I originated the message
+        if (isReadStamping) {
+          MsgDataRecord msgData = cache.getMsgDataRecord(records[i].msgId);
+          if (msgData != null && msgData.senderUserId.equals(myUserId)) {
+            isSkip = true;
+          }
+        }
+        if (!isSkip) {
+          StatRecord statRecord = cache.getStatRecordMyLinkId(records[i].msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+          if (statRecord != null && !statRecord.mark.equals(newMark))
+            statsL.add(statRecord);
+        }
       }
       if (statsL.size() > 0) {
         StatRecord[] stats = new StatRecord[statsL.size()];

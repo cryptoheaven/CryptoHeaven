@@ -406,7 +406,7 @@ public class AcceptDeclineContactDialog extends GeneralDialog {
         serverInterfaceLayer.submitAndReturn(new MessageAction(code, dataSet));
         // update 'Used' stamp for the Accepted contact
         if (accept)
-          UserOps.updateUsedStamp(serverInterfaceLayer, contactRecord);
+          UserOps.updateUsedStamp(serverInterfaceLayer, contactRecord, 0);
       }
     };
     th.setDaemon(true);

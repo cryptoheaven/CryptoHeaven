@@ -2668,7 +2668,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
         checkForUnknownRecipientsForAddressBookAdition_Threaded(preConversionSelectedRecipients, postConversionSelectedRecipients);
 
         // update 'Used' stamps for the recipient contacts - pre-conversion recipients include un-expanded groups
-        UserOps.updateUsedStamp(MainFrame.getServerInterfaceLayer(), preConversionSelectedRecipients);
+        UserOps.updateUsedStamp(MainFrame.getServerInterfaceLayer(), preConversionSelectedRecipients, 10 * 60 * 1000);
 
         // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
         if (trace != null) trace.exit(getClass());
