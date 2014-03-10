@@ -320,8 +320,9 @@ public class GlobalProperties extends Object {
   // build 818 Addition of firstRead stamp to the access records
   // build 820 Fetching 'Read' stamps is managed in a queued and fetched IDs cleaned together with cache cleanup.
   // build 822 Marking of recently used contacts extends to using chat folders
+  // build 824 Add API to allow sequential fetching of message bodies.
 
-  public static final short PROGRAM_BUILD_NUMBER = 822;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 824;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

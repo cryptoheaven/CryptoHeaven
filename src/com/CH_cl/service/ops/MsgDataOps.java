@@ -13,6 +13,9 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_co.cryptx.BASymmetricKey;
+import com.CH_co.monitor.Stats;
+import com.CH_co.queue.ProcessingFunctionI;
+import com.CH_co.queue.QueueMM1;
 import com.CH_co.service.msg.CommandCodes;
 import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
@@ -30,6 +33,8 @@ public class MsgDataOps extends Object {
 
   private static String STR_RE = com.CH_cl.lang.Lang.rb.getString("msg_Re");
   private static String STR_FWD = com.CH_cl.lang.Lang.rb.getString("msg_Fwd");
+
+  private static QueueMM1 bodyFetchQueue = null;
 
   public static String getSubjectForward(Object[] attachments) {
     return getSubjectForward(attachments, 0);
@@ -154,4 +159,21 @@ public class MsgDataOps extends Object {
     }
   }
 
+  public synchronized static void addToBodyFetchQueue(ServerInterfaceLayer SIL, MsgLinkRecord msgLink) {
+    if (bodyFetchQueue == null) {
+      bodyFetchQueue = new QueueMM1("Msg Body Fetch Queue", new QueueFetchProcessor());
+    }
+    bodyFetchQueue.getFifoWriterI().add(new Object[] { SIL, msgLink });
+  }
+
+  private static class QueueFetchProcessor implements ProcessingFunctionI {
+    public Object processQueuedObject(Object obj) {
+      Object[] objSet = (Object[]) obj;
+      ServerInterfaceLayer SIL = (ServerInterfaceLayer) objSet[0];
+      MsgLinkRecord msgLink = (MsgLinkRecord) objSet[1];
+      if (SIL != null && msgLink != null)
+        getOrFetchMsgBody(SIL, msgLink.msgLinkId, msgLink.msgId);
+      return null;
+    }
+  }
 }
