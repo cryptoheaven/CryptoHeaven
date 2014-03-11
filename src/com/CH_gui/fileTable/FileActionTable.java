@@ -55,6 +55,7 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -728,7 +729,10 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
       Record rec = tableModel.getRowObjectNoTrace(i);
       if (rec instanceof FileLinkRecord) {
         if (newMark.equals(StatRecord.FLAG_OLD) && tableModel.getIsCollapseFileVersions()) {
-          linksL.addAll(tableModel.getAllVersions((FileLinkRecord) rec));
+          // since tableModel is not synchronized, get the list and check again if not empty
+          Collection col = tableModel.getAllVersions((FileLinkRecord) rec);
+          if (col != null && !col.isEmpty())
+            linksL.addAll(col);
         } else {
           linksL.add(rec);
         }
