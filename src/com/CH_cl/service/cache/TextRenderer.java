@@ -143,7 +143,10 @@ public class TextRenderer {
     }
     else if (value instanceof EmailRecord) {
       EmailRecord eRec = (EmailRecord) value;
-      label = eRec.getEmailAddressFull();
+      if (includeFullEmailAddress)
+        label = eRec.getEmailAddressFull();
+      else
+        label = eRec.emailAddr;
     }
     else if (value instanceof InvEmlRecord) {
       InvEmlRecord rec = (InvEmlRecord) value;

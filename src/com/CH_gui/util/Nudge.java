@@ -25,19 +25,19 @@ import javax.swing.SwingUtilities;
  */
 public class Nudge {
 
-  public static void nudge(Component comp, boolean includeSound, boolean includeTitleRoll) {
-    nudge(comp, includeSound, includeTitleRoll, false);
+  public static void nudge(Component comp, boolean includeSound) {
+    nudge(comp, includeSound, false);
   }
 
-  public static void nudge(Component comp, boolean includeSound, boolean includeTitleRoll, boolean isShort) {
-    nudge(new Component[] { comp }, includeSound, includeTitleRoll, isShort);
+  public static void nudge(Component comp, boolean includeSound, boolean isShort) {
+    nudge(new Component[] { comp }, includeSound, isShort);
   }
 
-  public static void nudge(Component[] comps, boolean includeSound, final boolean includeTitleRoll) {
-    nudge(comps, includeSound, includeTitleRoll, false);
+  public static void nudge(Component[] comps, boolean includeSound) {
+    nudge(comps, includeSound, false);
   }
 
-  public static void nudge(Component[] comps, boolean includeSound, final boolean includeTitleRoll, final boolean isShort) {
+  public static void nudge(Component[] comps, boolean includeSound, final boolean isShort) {
     if (includeSound)
       Sounds.playAsynchronous(Sounds.RING_BELL);
     if (comps != null && comps.length > 0) {
@@ -70,8 +70,6 @@ public class Nudge {
                   window.setLocation(p);
                 }
                 try { Thread.sleep(50); } catch (InterruptedException ex) { }
-                if (includeTitleRoll && window instanceof JActionFrame)
-                  ((JActionFrame) window).triggerVisualUpdateNotificationRoll(null, "  *ring*");
               }
             };
             th.setDaemon(true);

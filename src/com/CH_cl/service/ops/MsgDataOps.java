@@ -21,6 +21,7 @@ import com.CH_co.service.msg.MessageAction;
 import com.CH_co.service.msg.ProtocolMsgDataSet;
 import com.CH_co.service.msg.dataSets.obj.Obj_IDList_Co;
 import com.CH_co.service.records.*;
+import com.CH_co.util.CallbackI;
 
 /**
 * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
@@ -159,11 +160,11 @@ public class MsgDataOps extends Object {
     }
   }
 
-  public synchronized static void addToBodyFetchQueue(ServerInterfaceLayer SIL, MsgLinkRecord msgLink) {
+  public synchronized static void addToBodyFetchQueue(ServerInterfaceLayer SIL, MsgLinkRecord msgLink, CallbackI callback) {
     if (bodyFetchQueue == null) {
       bodyFetchQueue = new QueueMM1("Msg Body Fetch Queue", new QueueFetchProcessor());
     }
-    bodyFetchQueue.getFifoWriterI().add(new Object[] { SIL, msgLink });
+    bodyFetchQueue.getFifoWriterI().add(new Object[] { SIL, msgLink, callback });
   }
 
   private static class QueueFetchProcessor implements ProcessingFunctionI {
@@ -171,8 +172,12 @@ public class MsgDataOps extends Object {
       Object[] objSet = (Object[]) obj;
       ServerInterfaceLayer SIL = (ServerInterfaceLayer) objSet[0];
       MsgLinkRecord msgLink = (MsgLinkRecord) objSet[1];
+      CallbackI callback = (CallbackI) objSet[2];
+      MsgDataRecord msgData = null;
       if (SIL != null && msgLink != null)
-        getOrFetchMsgBody(SIL, msgLink.msgLinkId, msgLink.msgId);
+        msgData = getOrFetchMsgBody(SIL, msgLink.msgLinkId, msgLink.msgId);
+      if (callback != null)
+        callback.callback(new Object[] { msgLink, msgData });
       return null;
     }
   }

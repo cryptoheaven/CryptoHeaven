@@ -20,6 +20,7 @@ import com.CH_co.service.records.filters.RecordFilter;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.DisposableObj;
+import com.CH_gui.actionGui.JActionFrame;
 import com.CH_gui.frame.ChatTableFrame;
 import com.CH_gui.frame.MainFrame;
 import com.CH_gui.util.Nudge;
@@ -33,6 +34,7 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.Iterator;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
@@ -279,6 +281,20 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgLinkRecord mLink = msgLinks[0];
           if (mLink.ownerObjType != null && mLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
+            // check if the link update is a cancelling notification
+            StatRecord stat = cache.getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+            if (stat != null && !stat.isFlagRed()) {
+              Collection chats = OpenChatFolders.getOpenChatFolders(mLink.ownerObjId);
+              if (chats != null) {
+                Iterator iter = chats.iterator();
+                while (iter.hasNext()) {
+                  Object next = iter.next();
+                  if (next instanceof JActionFrame)
+                    ((JActionFrame) next).triggerVisualUpdateCancel(mLink.msgLinkId);
+                }
+              }
+            }
+            // check if to open a chat window or add to popup slider
             UserRecord myUserRec = cache.getUserRecord();
             // only when msg link was created after my last login
             if (myUserRec != null && myUserRec.dateLastLogin != null && mLink.dateCreated.compareTo(myUserRec.dateLastLogin) > 0) {
@@ -300,7 +316,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
                       PopupWindowManager.addForScrolling(componentBuffer, msgData, true);
                       ChatTableFrame chatFrame = new ChatTableFrame(new FolderPair(sRec, fRec), Frame.ICONIFIED);
                       componentBuffer[0] = chatFrame;
-                      chatFrame.triggerVisualUpdateNotificationRoll();
+                      chatFrame.triggerVisualUpdateNotificationRoll(mLink.msgLinkId);
                     }
                   }
                 } else {
@@ -350,7 +366,7 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
                   chatComps = new Component[1];
                   chatComps[0] = new ChatTableFrame(new FolderPair(sRec, fRec));
                 }
-                Nudge.nudge(chatComps, cache.getUserRecord().online.charValue() != 'D', true);
+                Nudge.nudge(chatComps, cache.getUserRecord().online.charValue() != 'D');
               } catch (Throwable t) {
                 t.printStackTrace();
               }

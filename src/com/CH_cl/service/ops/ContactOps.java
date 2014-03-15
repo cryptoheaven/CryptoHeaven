@@ -49,6 +49,7 @@ public class ContactOps {
     // gather email addresses and nicks for adding to AddressBook
     final ArrayList emailAddressesL = returnEmlAddrsL != null ? returnEmlAddrsL : new ArrayList();
     final ArrayList emailNicksL = returnEmlNicksL != null ? returnEmlNicksL : new ArrayList();
+    final ArrayList emailPersonalsL = new ArrayList();
     if (emailAddresses != null) {
       StringTokenizer st = new StringTokenizer(emailAddresses, ",;:");
       while (st.hasMoreTokens()) {
@@ -56,15 +57,17 @@ public class ContactOps {
         String[] emls = EmailRecord.gatherAddresses(token);
         if (emls != null && emls.length > 0) {
           for (int i=0; i<emls.length; i++) {
+            String eml = emls[i];
             String addrFull;
             // If emails were separeted by other than ,;: then we will have multiple addresses here.  Otherwise use the original token with original personal info.
             if (emls.length == 1)
               addrFull = token;
             else
-              addrFull = emls[i];
-            if (EmailRecord.findEmailAddress(emailAddressesL, addrFull) < 0) {
-              emailAddressesL.add(addrFull);
+              addrFull = eml;
+            if (EmailRecord.findEmailAddress(emailAddressesL, eml) < 0) {
+              emailAddressesL.add(eml);
               emailNicksL.add(EmailRecord.getPersonalOrNick(addrFull));
+              emailPersonalsL.add(EmailRecord.getPersonal(addrFull));
             }
           }
         }
@@ -90,6 +93,7 @@ public class ContactOps {
               String contactReason = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {myUser.handle});
               for (int i=0; i<emailAddressesL.size(); i++) {
                 String emlAddr = (String) emailAddressesL.get(i);
+                String personal = (String) emailPersonalsL.get(i);
                 EmailRecord emlRec = cache.getEmailRecord(emlAddr);
                 if (emlRec != null) {
                   Long contactWithId = emlRec.userId;
@@ -108,7 +112,10 @@ public class ContactOps {
                       request.shareId = shareId;
                       request.contactRecord = new ContactRecord();
                       request.contactRecord.contactWithId = contactWithId;
-                      request.contactRecord.setOwnerNote(emlAddr);
+                      if (personal != null && personal.length() > 0)
+                        request.contactRecord.setOwnerNote(personal);
+                      else
+                        request.contactRecord.setOwnerNote(emlAddr);
                       request.contactRecord.setOtherNote(contactReason);
                       request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
                       request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(contactWithId));

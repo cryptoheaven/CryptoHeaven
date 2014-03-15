@@ -891,7 +891,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
                 }
               }).start();
               // person ringing must always hear the ring so that he refrains from abusing it and anoying other people...
-              Nudge.nudge(_this, true, false);
+              Nudge.nudge(_this, true);
             }
           }
         }

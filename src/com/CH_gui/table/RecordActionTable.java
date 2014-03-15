@@ -607,14 +607,15 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
           FolderRecord fRec = folderRecords[i];
           if (fRec.equals(parentFolder)) {
             int updates = fRec.getUpdateCount();
-            if (updates > 0) {
-              int lastMark = getFolderUpdateMark(fRec.folderId);
-              if (updates > lastMark) { // if updates is less then who cares for deletions, nothing new after all
-                Window w = SwingUtilities.windowForComponent(RecordActionTable.this);
-                if (w instanceof JActionFrame) {
-                  JActionFrame frame = (JActionFrame) w;
-                  frame.triggerVisualUpdateNotificationRoll();
-                }
+            int lastMark = getFolderUpdateMark(fRec.folderId);
+            if (updates != lastMark) {
+              Window w = SwingUtilities.windowForComponent(RecordActionTable.this);
+              if (w instanceof JActionFrame) {
+                JActionFrame frame = (JActionFrame) w;
+                if (updates > lastMark)
+                  frame.triggerVisualUpdateNotificationRoll(fRec.folderId);
+                else
+                  frame.triggerVisualUpdateCancel(fRec.folderId);
               }
             }
             // set the last processed update count even if zero

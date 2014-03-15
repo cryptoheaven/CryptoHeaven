@@ -321,8 +321,11 @@ public class GlobalProperties extends Object {
   // build 820 Fetching 'Read' stamps is managed in a queued and fetched IDs cleaned together with cache cleanup.
   // build 822 Marking of recently used contacts extends to using chat folders
   // build 824 Add API to allow sequential fetching of message bodies.
+  // build 826 When user has invalid key stored locally, but a valid key resides on the server, show error message, but allow login.
+  //           Notification on window title bars are canceled when they are no longer relevant.
+  //           Inviting users using full email address uses personal part for naming of your Contact object.
 
-  public static final short PROGRAM_BUILD_NUMBER = 824;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 826;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

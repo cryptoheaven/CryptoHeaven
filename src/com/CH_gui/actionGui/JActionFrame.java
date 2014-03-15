@@ -866,22 +866,27 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         updateNotifier = new TitleUpdateNotifier();
         notifyTimer = new Timer(50, updateNotifier);
       }
-      updateNotifier.addJob(mode, temporaryTitle, titlePrependix, titleAppendix, System.currentTimeMillis()+millis, 50, false);
+      updateNotifier.addJob(null, mode, temporaryTitle, titlePrependix, titleAppendix, System.currentTimeMillis()+millis, 50, false);
       if (!notifyTimer.isRunning()) notifyTimer.start();
     }
   }
-  public synchronized void triggerVisualUpdateNotificationRoll() {
-    triggerVisualUpdateNotificationRoll(null, "   *new*");
-  }
-  public synchronized void triggerVisualUpdateNotificationRoll(String titlePrependix, String titleAppendix) {
+  public synchronized void triggerVisualUpdateNotificationRoll(Long notificationID) {
     if (isWindowDeactivated) {
       if (notifyTimer == null) {
         updateNotifier = new TitleUpdateNotifier();
         notifyTimer = new Timer(100, updateNotifier);
       }
-      updateNotifier.addJob(TitleUpdateNotifier.MODE_ROLL, null, titlePrependix, titleAppendix, TitleUpdateNotifier.RUN_TIME__UNSPECIFIED, 100, true);
+      updateNotifier.addJob(notificationID, TitleUpdateNotifier.MODE_ROLL, null, null, "   *new*", TitleUpdateNotifier.RUN_TIME__UNSPECIFIED, 100, true);
       if (!notifyTimer.isRunning()) notifyTimer.start();
     }
+  }
+  public synchronized void triggerVisualUpdateCancelAll() {
+    if (updateNotifier != null)
+      updateNotifier.cancelAll();
+  }
+  public synchronized void triggerVisualUpdateCancel(Long notificationID) {
+    if (updateNotifier != null)
+      updateNotifier.cancel(notificationID);
   }
   private class TitleUpdateNotifier implements ActionListener {
     private static final int MODE_ROLL = 0;
@@ -899,9 +904,25 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
         }
       }
     }
-    private synchronized void addJob(int mode, String temporaryTitle, String titlePrependix, String titleAppendix, long expiryTime, int delay, boolean stopOnWindowActivation) {
+    private synchronized void cancel(Long notificationID) {
+      // Go through all the jobs and remove the matching one
+      if (jobsL != null) {
+        for (int i=jobsL.size()-1; i>=0; i--) {
+          Settings state = (Settings) jobsL.get(i);
+          if (notificationID.equals(state.notificationID))
+            jobsL.remove(i);
+        }
+      }
+    }
+    private synchronized void cancelAll() {
+      if (jobsL != null) {
+        jobsL.clear();
+      }
+    }
+    private synchronized void addJob(Long notificationID, int mode, String temporaryTitle, String titlePrependix, String titleAppendix, long expiryTime, int delay, boolean stopOnWindowActivation) {
       if (jobsL == null) jobsL = new ArrayList();
       Settings settings = new Settings();
+      settings.notificationID = notificationID;
       settings.runningMode = mode;
       settings.tempTitle = temporaryTitle;
       settings.titlePrependix = titlePrependix;
@@ -1032,6 +1053,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
     }
   }
   private static class Settings {
+    private Long notificationID;
     private int pauseState;
     private int notifyState;
     private int runningMode;

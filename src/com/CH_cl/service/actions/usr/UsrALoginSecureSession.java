@@ -63,8 +63,10 @@ public class UsrALoginSecureSession extends ClientMessageAction {
     FetchedDataCache cache = getFetchedDataCache();
 
     Long keyId = reply.keyId;
-    BASymCipherBlock encPrivateKey = reply.encPrivateKey;
+    BASymCipherBlock encPrivateKeyFromServer = reply.encPrivateKey;
+    BASymCipherBlock encPrivateKey = reply.encPrivateKey; // key from server, or will overwrite with local key from file
     BAAsyCipherBlock encSessionKeys = reply.encSessionKeys;
+    String encPrivateKeySourceFile = null;
 
     BAEncodedPassword encodedPassword = cache.getEncodedPassword();
     String keyPropertyName = null;
@@ -95,9 +97,12 @@ public class UsrALoginSecureSession extends ClientMessageAction {
           keyPropertyFileName = keyProperties.getPropertiesFullFileName();
 
           if (property != null && property.length() > 0) {
-            encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-            // migrate private key filename change, so store file location if the properties...
-            addPathToLastPrivKeyPaths(keyPropertyFileName);
+            encPrivateKeySourceFile = keyProperties.getPropertiesFullFileName();
+            encPrivateKey = makePrivKeyFromProperty(keyPropertyName, property, encPrivateKeySourceFile);
+            if (encPrivateKey != null) {
+              // migrate private key filename change, so store file location if the properties...
+              addPathToLastPrivKeyPaths(keyPropertyFileName);
+            }
           }
           // also try the alternate paths to key file
           else {
@@ -116,8 +121,10 @@ public class UsrALoginSecureSession extends ClientMessageAction {
                 keyPropBuffer.append(", \n");
                 keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
                 if (property != null && property.length() > 0) {
-                  encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-                  break;
+                  encPrivateKeySourceFile = keyProperties.getPropertiesFullFileName();
+                  encPrivateKey = makePrivKeyFromProperty(keyPropertyName, property, encPrivateKeySourceFile);
+                  if (encPrivateKey != null)
+                    break;
                 }
               }
             }
@@ -132,7 +139,8 @@ public class UsrALoginSecureSession extends ClientMessageAction {
                 keyPropBuffer.append(", \n");
                 keyPropBuffer.append(keyProperties.getPropertiesFullFileName());
                 if (property != null && property.length() > 0) {
-                  encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+                  encPrivateKeySourceFile = keyProperties.getPropertiesFullFileName();
+                  encPrivateKey = makePrivKeyFromProperty(keyPropertyName, property, encPrivateKeySourceFile);
                 }
               }
             }
@@ -163,13 +171,19 @@ public class UsrALoginSecureSession extends ClientMessageAction {
                 String property = keyProperties.getProperty(keyPropertyName);
 
                 if (property != null && property.length() > 0) {
+                  encPrivateKeySourceFile = keyProperties.getPropertiesFullFileName();
                   encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
-                  // remember the filename for next time -- TRIM the list to at most 5 paths
-                  addPathToLastPrivKeyPaths(file.getAbsolutePath());
+                  encPrivateKey = makePrivKeyFromProperty(keyPropertyName, property, encPrivateKeySourceFile);
+                  if (encPrivateKey != null) {
+                    // remember the filename for next time -- TRIM the list to at most 5 paths
+                    addPathToLastPrivKeyPaths(file.getAbsolutePath());
+                  }
                 }
               }
             }
-          } catch (Exception ex) {
+          } catch (InstantiationException ex) {
+            ex.printStackTrace();
+          } catch (IllegalAccessException ex) {
             ex.printStackTrace();
           }
         }
@@ -177,28 +191,45 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
       // if we already have it because we just created a new account, then skip the decryption
       if (privateKey == null) {
+        String errorMsg = null;
         // decrypt the private key using the password
         if (encPrivateKey != null) {
-
           SymmetricSmallBlockCipher symCipher = new SymmetricSmallBlockCipher(encodedPassword);
-
           // see if our encoded password will decrypt the encrypted private key
           BASymPlainBlock privateKeyBA = null;
           try {
             privateKeyBA = symCipher.blockDecrypt(encPrivateKey);
           } catch (Throwable t) {
             if (trace != null) trace.exception(UsrALoginSecureSession.class, 40, t);
-            throw new SecurityException("Invalid credentials for the specified account! \n\nLogin cannot complete!\n\n"+t.getMessage());
+            errorMsg = "Error logging in!\n\n"
+                    + t.getMessage()
+                    + (encPrivateKeySourceFile != null ? "\n\nInvalid Private Key was read from file:\n"+encPrivateKeySourceFile : "")
+                    + (encPrivateKeySourceFile != null ?"\n\nKey property name:\n"+keyPropertyName : "");
           }
-          byte[] privateKeyBytes = privateKeyBA.toByteArray();
-          privateKeyBA.clearContent();
-
-          // create a private key from its bytes
-          privateKey = RSAPrivateKey.bytesToObject(privateKeyBytes);
-          for (int i=0; i<privateKeyBytes.length; i++) {
-            privateKeyBytes[i] = 0;
+          // if failed on getting the private key.. try with server returned remote key, maybe local one is bad.
+          if (privateKeyBA == null) {
+            try {
+              privateKeyBA = symCipher.blockDecrypt(encPrivateKeyFromServer);
+              // since 2nd try passed, change the error message to specify which key passed and which failed
+              if (encPrivateKeyFromServer != null && !encPrivateKeyFromServer.equals(encPrivateKey))
+                errorMsg = errorMsg + "\n\nLogin completed using your key stored on the server.";
+            } catch (Throwable t) {
+              if (trace != null) trace.exception(UsrALoginSecureSession.class, 41, t);
+              errorMsg = "Invalid credentials for the specified account! \n\nLogin cannot complete!\n\n"+t.getMessage()+(encPrivateKeySourceFile != null ? "\n\nInvalid Private Key id="+keyId+" was read from file:\n"+encPrivateKeySourceFile : "");
+            }
           }
-
+          // if successfult in getting private key
+          if (privateKeyBA != null) {
+            byte[] privateKeyBytes = privateKeyBA.toByteArray();
+            privateKeyBA.clearContent();
+            // create a private key from its bytes
+            privateKey = RSAPrivateKey.bytesToObject(privateKeyBytes);
+            for (int i=0; i<privateKeyBytes.length; i++) {
+              privateKeyBytes[i] = 0;
+            }
+          }
+          if (errorMsg != null)
+            NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Sign In Error", errorMsg);
         }
         else {
           String message =
@@ -273,5 +304,15 @@ public class UsrALoginSecureSession extends ClientMessageAction {
 
   public static interface AlternateKeyFileProviderI {
     public String getAlternateKeyFile();
+  }
+
+  private static BASymCipherBlock makePrivKeyFromProperty(String keyPropertyName, String property, String sourceFile) {
+    BASymCipherBlock encPrivateKey = null;
+    try {
+      encPrivateKey = new BASymCipherBlock(ArrayUtils.toByteArray(property));
+    } catch (Throwable t) {
+      NotificationCenter.show(NotificationCenter.ERROR_MESSAGE, "Invalid encryption block!", "Invalid key property detected in file:\n"+sourceFile+"\n\nProperty name:\n"+keyPropertyName);
+    }
+    return encPrivateKey;
   }
 }

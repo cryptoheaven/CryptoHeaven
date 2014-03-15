@@ -60,7 +60,7 @@ public abstract class RecordTableFrame extends JActionFrameClosable {
     frame.toFront();
     frame.setState(JFrame.NORMAL);
     if (prevState != JFrame.ICONIFIED)
-      Nudge.nudge(frame, false, false, true);
+      Nudge.nudge(frame, false, true);
   }
 
 }
