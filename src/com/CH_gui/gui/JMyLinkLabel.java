@@ -9,8 +9,8 @@
  */
 package com.CH_gui.gui;
 
-import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.HTML_utils;
+import com.CH_gui.util.BrowserLauncher;
 import com.CH_gui.util.MessageDialog;
 import com.CH_gui.util.URLLauncher;
 import java.awt.Cursor;

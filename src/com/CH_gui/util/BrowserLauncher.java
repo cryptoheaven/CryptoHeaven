@@ -1,5 +1,8 @@
-package com.CH_co.util;
+package com.CH_gui.util;
 
+import com.CH_co.service.records.FileDataRecord;
+import com.CH_co.util.AppletTypeI;
+import com.CH_co.util.FileLauncher;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -669,6 +672,18 @@ public class BrowserLauncher {
         }
       }
     } // end appletContext == null
+  }
+
+  public static boolean openFile(Object context, File file) {
+    boolean cachedFileOpened = false;
+    if (file != null && file.exists()) {
+      try {
+        BrowserLauncher.openFile(file);
+        cachedFileOpened = true;
+      } catch (IOException x) {
+      }
+    }
+    return cachedFileOpened;
   }
 
   /**

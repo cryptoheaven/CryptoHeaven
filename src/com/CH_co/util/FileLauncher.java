@@ -11,7 +11,6 @@ package com.CH_co.util;
 
 import com.CH_co.service.records.FileDataRecord;
 import java.io.File;
-import java.io.IOException;
 
 /** 
  * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
@@ -20,34 +19,21 @@ import java.io.IOException;
  */
 public class FileLauncher {
 
-  private static FileOpener primaryFileOpener;
+  private static FileOpenerI primaryFileOpener;
 
   public static boolean openFile(Object context, FileDataRecord fileRec) {
     boolean cachedFileOpened = false;
-    if (fileRec != null &&
-        fileRec.getPlainDataFile() != null &&
-        fileRec.getPlainDataFile().exists())
+    if (primaryFileOpener != null
+            && fileRec != null
+            && fileRec.getPlainDataFile() != null
+            && fileRec.getPlainDataFile().exists())
     {
-      if (primaryFileOpener != null) {
-        cachedFileOpened = primaryFileOpener.open(context, fileRec.getPlainDataFile());
-      } else {
-        try {
-          File fileToOpen = fileRec.getPlainDataFile();
-  //        if (isAudioWaveFilename(fileToOpen.getName()))
-  //          DecodingAudioPlayer.play(fileToOpen);
-  //        else if (isImageFilename(fileToOpen.getName()))
-  //          ImageViewer.showImage(fileToOpen);
-  //        else
-            BrowserLauncher.openFile(fileToOpen);
-          cachedFileOpened = true;
-        } catch (IOException x1) {
-        }
-      }
+      cachedFileOpened = primaryFileOpener.openFile(context, fileRec.getPlainDataFile());
     }
     return cachedFileOpened;
   }
 
-  public static void setPrimaryFileOpener(FileOpener fileOpener) {
+  public static void setPrimaryFileOpener(FileOpenerI fileOpener) {
     primaryFileOpener = fileOpener;
   }
 
@@ -65,7 +51,7 @@ public class FileLauncher {
     return filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".gif") || filename.endsWith(".png");
   }
 
-  public interface FileOpener {
-    public boolean open(Object context, File file);
+  public interface FileOpenerI {
+    public boolean openFile(Object context, File file);
   }
 }

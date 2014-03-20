@@ -10,14 +10,10 @@
 package com.CH_gui.gui;
 
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.DisposableObj;
 import com.CH_co.util.GlobalProperties;
 import com.CH_co.util.ImageNums;
-import com.CH_gui.util.HTML_ClickablePane;
-import com.CH_gui.util.Images;
-import com.CH_gui.util.SpellCheckerI;
-import com.CH_gui.util.SpellCheckerWrapper;
+import com.CH_gui.util.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

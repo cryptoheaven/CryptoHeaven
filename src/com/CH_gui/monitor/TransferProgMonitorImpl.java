@@ -17,11 +17,15 @@ import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.service.records.FileLinkRecord;
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.*;
+import com.CH_co.util.GlobalProperties;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
+import com.CH_co.util.Sounds;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.gui.JMyCheckBox;
 import com.CH_gui.gui.JMyLabel;
 import com.CH_gui.gui.MyInsets;
+import com.CH_gui.util.BrowserLauncher;
 import com.CH_gui.util.Images;
 import com.CH_gui.util.MiscGui;
 import java.awt.*;
@@ -301,7 +305,8 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
           if (fileLinks != null) {
             for (int i=0; i<fileLinks.length; i++) {
               FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLinks[i].fileId);
-              FileLauncher.openFile(context, fileData);
+              if (fileData != null)
+                BrowserLauncher.openFile(context, fileData.getPlainDataFile());
             }
           }
           if (trace != null) trace.exit(getClass());
@@ -815,7 +820,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
                 tempFile.setReadOnly();
               }
               GlobalProperties.addTempFileToCleanup(tempFile);
-              boolean openned = FileLauncher.openFile(context, fileData);
+              boolean openned = BrowserLauncher.openFile(context, tempFile);
               if (openned && !shouldBeReadOnly)
                 FileLobUpEditMonitor.registerForMonitoring(tempFile, fileLink, fileData);
             }

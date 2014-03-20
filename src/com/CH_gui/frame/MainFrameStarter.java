@@ -248,6 +248,8 @@ public class MainFrameStarter extends Object {
       NotificationCenter.setImpl(NotificationShowerImpl.class);
       Sounds.setImpl(SoundsPlayerImpl.class);
       FileTypes.setFileTypeImpl(FileTypesIcons.class);
+      // setup default file opener
+      new BrowserLauncherFileOpener();
 
       // start main GUI
       new MainFrameStarter(splashWindow, skipLogin, swingMemoryFootprintTestExitWhenMainScreenLoaded, initialFolderId, initialMsgLinkId);

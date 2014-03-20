@@ -10,6 +10,7 @@
 package ch.cl;
 
 import com.CH_co.util.*;
+import com.CH_gui.util.BrowserLauncher;
 import java.net.URL;
 import javax.swing.JApplet;
 import javax.swing.JLabel;

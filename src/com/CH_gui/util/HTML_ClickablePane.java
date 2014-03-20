@@ -11,7 +11,6 @@ package com.CH_gui.util;
 
 import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
-import com.CH_co.util.BrowserLauncher;
 import com.CH_co.util.URLs;
 import java.awt.BorderLayout;
 import java.awt.Color;

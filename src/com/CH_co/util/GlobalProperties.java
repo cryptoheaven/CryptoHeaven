@@ -324,8 +324,9 @@ public class GlobalProperties extends Object {
   // build 826 When user has invalid key stored locally, but a valid key resides on the server, show error message, but allow login.
   //           Notification on window title bars are canceled when they are no longer relevant.
   //           Inviting users using full email address uses personal part for naming of your Contact object.
+  // build 828 Move BrowserLauncher to the gui side of API
 
-  public static final short PROGRAM_BUILD_NUMBER = 826;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 828;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
