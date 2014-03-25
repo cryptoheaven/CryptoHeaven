@@ -380,50 +380,39 @@ public class JSortedTable extends JTable implements DisposableObj {
       ImageIcon sortIcon = null;
       String sortToolTip = null;
 
-      {
-        int sortIconIndex;
-        TableSorter sorter = (TableSorter) getModel();
-        int modelColumn = table.convertColumnIndexToModel(column);
-        int rawColumn = modelColumn;
-        TableModel rawModel = getRawModel();
-        if (rawModel instanceof RecordTableModel) {
-          rawColumn = ((RecordTableModel) rawModel).getColumnHeaderData().convertColumnToRawModel(modelColumn);
-        }
+      int sortIconIndex;
+      TableSorter sorter = (TableSorter) getModel();
+      int modelColumn = table.convertColumnIndexToModel(column);
+      int rawColumn = modelColumn;
+      TableModel rawModel = getRawModel();
+      if (rawModel instanceof RecordTableModel) {
+        ColumnHeaderData columnHeaderData = ((RecordTableModel) rawModel).getColumnHeaderData();
+        rawColumn = columnHeaderData.convertColumnToRawModel(modelColumn);
+        columnIcon = columnHeaderData.getRawColumnIcon(rawColumn);
+        columnToolTip = columnHeaderData.getRawColumnTooltip(rawColumn);
+      }
 
-        int sortColumnIndex = sorter.getSortingColumnIndex(rawColumn);
-        boolean ascending = sorter.getSortingColumnDirection(rawColumn) > 0 ? true : false;
-        String order = ascending ? com.CH_cl.lang.Lang.rb.getString("sort_ascending") : com.CH_cl.lang.Lang.rb.getString("sort_descending");
+      int sortColumnIndex = sorter.getSortingColumnIndex(rawColumn);
+      boolean ascending = sorter.getSortingColumnDirection(rawColumn) > 0 ? true : false;
+      String order = ascending ? com.CH_cl.lang.Lang.rb.getString("sort_ascending") : com.CH_cl.lang.Lang.rb.getString("sort_descending");
 
-        /* sorted column */
-        if (sortColumnIndex == 0) {
-          sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING2 : ImageNums.ORDER_DESCENDING2;
+      /* sorted column */
+      if (sortColumnIndex == 0) {
+        sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING2 : ImageNums.ORDER_DESCENDING2;
+        sortIcon = Images.get(sortIconIndex);
+        sortToolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("sort_Primary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
+      }
+      /* last sorted column */
+      else if (sortColumnIndex == 1) {
+        if (DISPLAY_SECONDARY_SORT_ORDER_ICON) {
+          sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING : ImageNums.ORDER_DESCENDING;
           sortIcon = Images.get(sortIconIndex);
-          sortToolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("sort_Primary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
         }
-        /* last sorted column */
-        else if (sortColumnIndex == 1) {
-          if (DISPLAY_SECONDARY_SORT_ORDER_ICON) {
-            sortIconIndex = (ascending) ? ImageNums.ORDER_ASCENDING : ImageNums.ORDER_DESCENDING;
-            sortIcon = Images.get(sortIconIndex);
-          }
-          sortToolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("sort_Secondary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
-        }
+        sortToolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("sort_Secondary_sort_column,_sorted_in_{0}_order."), new Object[] {order});
       }
 
       JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
       panel.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-
-      if (table instanceof JSortedTable) {
-        JSortedTable sTable = (JSortedTable) table;
-        TableModel tModel = sTable.getRawModel();
-        if (tModel instanceof RecordTableModel) {
-          RecordTableModel rtModel = (RecordTableModel) tModel;
-          ColumnHeaderData columnHeaderData = rtModel.getColumnHeaderData();
-          int rawColumn = columnHeaderData.convertColumnToRawModel(table.convertColumnIndexToModel(column));
-          columnIcon = columnHeaderData.getRawColumnIcon(rawColumn);
-          columnToolTip = columnHeaderData.getRawColumnTooltip(rawColumn);
-        }
-      }
 
       JLabel columnLabel = new JMyLabel(columnName);
       columnLabel.setToolTipText(columnToolTip);

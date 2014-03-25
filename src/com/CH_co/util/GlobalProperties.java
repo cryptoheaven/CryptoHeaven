@@ -325,8 +325,9 @@ public class GlobalProperties extends Object {
   //           Notification on window title bars are canceled when they are no longer relevant.
   //           Inviting users using full email address uses personal part for naming of your Contact object.
   // build 828 Move BrowserLauncher to the gui side of API
+  // build 830 Catch more common exception as per bug reports.
 
-  public static final short PROGRAM_BUILD_NUMBER = 828;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 830;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

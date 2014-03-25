@@ -712,6 +712,9 @@ public class MsgTypeArea extends JPanel implements ComponentContainerI, Disposab
             flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
           } catch (NoSuchMethodError x) {
             // jre 1.4 -- ignore special handling, editor will use default PASTE
+          } catch (IllegalArgumentException x) {
+          } catch (IllegalStateException x) {
+          } catch (Exception x) {
           }
           if (flavors != null) {
             boolean isFormattedAvailable = false;

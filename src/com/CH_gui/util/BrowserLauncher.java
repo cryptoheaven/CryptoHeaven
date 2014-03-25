@@ -1,8 +1,6 @@
 package com.CH_gui.util;
 
-import com.CH_co.service.records.FileDataRecord;
 import com.CH_co.util.AppletTypeI;
-import com.CH_co.util.FileLauncher;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -495,6 +493,7 @@ public class BrowserLauncher {
     try {
       url = URLDecoder.decode(url, "UTF-8");
     } catch (UnsupportedEncodingException x) {
+    } catch (IllegalArgumentException x) {
     }
     // additionally convert all &amp; to &
     url = url.replace("&amp;", "&");

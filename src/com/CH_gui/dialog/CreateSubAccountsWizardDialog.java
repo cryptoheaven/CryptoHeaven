@@ -353,7 +353,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
         ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_NEW_SUB, set), 120000);
         DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
 
-        if (msgAction == null || msgAction.getActionCode() < 0) {
+        if (msgAction == null || msgAction.getActionCode() < 0 || !(msgAction.getMsgDataSet() instanceof Usr_GetSubAcc_Rp)) {
           error = true;
         } else {
 

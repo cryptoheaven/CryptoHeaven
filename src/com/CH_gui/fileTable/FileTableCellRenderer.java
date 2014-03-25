@@ -9,19 +9,21 @@
  */
 package com.CH_gui.fileTable;
 
-import com.CH_gui.util.Images;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.table.*;
-
-import com.CH_gui.sortedTable.JSortedTable;
-import com.CH_gui.table.*;
-
 import com.CH_cl.service.cache.FetchedDataCache;
-
-import com.CH_co.service.records.*;
-import com.CH_co.util.*;
+import com.CH_co.service.records.FileLinkRecord;
+import com.CH_co.service.records.Record;
+import com.CH_co.service.records.StatRecord;
+import com.CH_co.util.ImageNums;
+import com.CH_co.util.Misc;
 import com.CH_gui.service.records.RecordUtilsGui;
+import com.CH_gui.sortedTable.JSortedTable;
+import com.CH_gui.table.RecordTableCellRenderer;
+import com.CH_gui.util.Images;
+import java.awt.Color;
+import java.awt.Component;
+import javax.swing.Icon;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 /** 
  * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
@@ -149,7 +151,7 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
       // Size
       // set the size string adding words: bytes, KB, MB or GB
       else if (rawColumn == 3) {
-        if (value != null) {
+        if (value instanceof Long) { // also checks if != null
           setBorder(RecordTableCellRenderer.BORDER_TEXT);
           String sizeString = Misc.getFormattedSize((Long) value, 3, 2);
           setText(sizeString);

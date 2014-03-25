@@ -104,14 +104,14 @@ public class ColumnHeaderData extends Object implements Serializable {
       return null;
   }
   public String getRawColumnTooltip(int rawColumn) {
-    if (data[I_TOOLTIPS] != null && data[I_TOOLTIPS].length > rawColumn)
+    if (rawColumn >= 0 && data[I_TOOLTIPS] != null && data[I_TOOLTIPS].length > rawColumn)
       return (String) data[I_TOOLTIPS][rawColumn];
     else
       return null;
   }
   public ImageIcon getRawColumnIcon(int rawColumn) {
     Integer imageIconIndex = null;
-    if (data[I_HEADER_ICON_INDEX] != null && data[I_HEADER_ICON_INDEX].length > rawColumn)
+    if (rawColumn >= 0 && data[I_HEADER_ICON_INDEX] != null && data[I_HEADER_ICON_INDEX].length > rawColumn)
       imageIconIndex = (Integer) data[I_HEADER_ICON_INDEX][rawColumn];
     if (imageIconIndex != null)
       return Images.get(imageIconIndex.intValue());
