@@ -734,9 +734,9 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
           final Window w = SwingUtilities.windowForComponent(FolderActionTree.this);
           if (w instanceof Dialog || w instanceof Frame) {
             if (w instanceof Dialog)
-              d = new ContactSelectDialog((Dialog) w, false, false);
+              d = new ContactSelectDialog((Dialog) w, false, null, false);
             else
-              d = new ContactSelectDialog((Frame) w, false, false);
+              d = new ContactSelectDialog((Frame) w, false, null, false);
 
             d.setTitle("Transfer Ownership");
 

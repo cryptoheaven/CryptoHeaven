@@ -952,9 +952,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         Window w = SwingUtilities.windowForComponent(parent);
         if (w == null) w = MainFrame.getSingleInstance();
         if (w instanceof Dialog)
-          new ContactSelectDialog((Dialog) w, true).setSelectionCallback(selectionCallback);
+          new ContactSelectDialog((Dialog) w, true, null).setSelectionCallback(selectionCallback);
         else if (w instanceof Frame)
-          new ContactSelectDialog((Frame) w, true).setSelectionCallback(selectionCallback);
+          new ContactSelectDialog((Frame) w, true, null).setSelectionCallback(selectionCallback);
       } else {
         selectionCallback.callback(selectedRecords);
       }

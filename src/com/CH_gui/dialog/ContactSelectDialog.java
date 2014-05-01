@@ -9,23 +9,36 @@
  */
 package com.CH_gui.dialog;
 
-import com.CH_cl.service.cache.*;
-import com.CH_cl.service.records.filters.*;
-
-import com.CH_co.trace.Trace;
+import com.CH_cl.service.cache.FetchedDataCache;
+import com.CH_cl.service.records.filters.FixedFilter;
+import com.CH_cl.service.records.filters.FolderFilter;
+import com.CH_cl.service.records.filters.InverseFilter;
+import com.CH_cl.service.records.filters.RecordIdFilter;
 import com.CH_co.service.records.*;
-import com.CH_co.service.records.filters.*;
+import com.CH_co.service.records.filters.ContactFilterCo;
+import com.CH_co.service.records.filters.MultiFilter;
+import com.CH_co.service.records.filters.RecordFilter;
+import com.CH_co.trace.Trace;
+import com.CH_co.util.ArrayUtils;
 import com.CH_co.util.CallbackI;
-
-import com.CH_gui.contactTable.*;
-import com.CH_gui.gui.*;
-import com.CH_gui.table.*;
-import com.CH_gui.util.*;
-
+import com.CH_gui.contactTable.ContactActionTable;
+import com.CH_gui.contactTable.ContactTableComponent;
+import com.CH_gui.gui.JMyButton;
+import com.CH_gui.gui.JMyLabel;
+import com.CH_gui.gui.MyInsets;
+import com.CH_gui.gui.Template;
+import com.CH_gui.table.RecordTableComponent;
+import com.CH_gui.util.GeneralDialog;
+import com.CH_gui.util.VisualsSavable;
 import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /** 
  * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
@@ -56,24 +69,24 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
   private CallbackI selectionCallback;
 
   /** Creates new ContactSelectDialog */
-  public ContactSelectDialog(Dialog owner, boolean includeGroups) {
-    this(owner, includeGroups, true);
+  public ContactSelectDialog(Dialog owner, boolean includeGroups, FolderPair excludePair) {
+    this(owner, includeGroups, excludePair, true);
   }
-  public ContactSelectDialog(Frame owner, boolean includeGroups) {
-    this(owner, includeGroups, true);
+  public ContactSelectDialog(Frame owner, boolean includeGroups, FolderPair excludePair) {
+    this(owner, includeGroups, excludePair, true);
   }
   /** Creates new ContactSelectDialog */
-  public ContactSelectDialog(Dialog owner, boolean includeGroups, boolean show) {
+  public ContactSelectDialog(Dialog owner, boolean includeGroups, FolderPair excludePair, boolean show) {
     super(owner, com.CH_cl.lang.Lang.rb.getString("title_Select_Contacts"));
-    initialize(owner, includeGroups, show);
+    initialize(owner, includeGroups, excludePair, show);
   }
-  public ContactSelectDialog(Frame owner, boolean includeGroups, boolean show) {
+  public ContactSelectDialog(Frame owner, boolean includeGroups, FolderPair excludePair, boolean show) {
     super(owner, com.CH_cl.lang.Lang.rb.getString("title_Select_Contacts"));
-    initialize(owner, includeGroups, show);
+    initialize(owner, includeGroups, excludePair, show);
   }
-  private void initialize(Component owner, boolean includeGroups, boolean show) {
+  private void initialize(Component owner, boolean includeGroups, FolderPair excludePair, boolean show) {
     JButton[] buttons = createButtons();
-    JPanel panel = createMainPanel(includeGroups);
+    JPanel panel = createMainPanel(includeGroups, excludePair);
     init(owner, buttons, panel, DEFAULT_OK_INDEX, DEFAULT_CANCEL_INDEX, show);
     setEnabledButtons();
   }
@@ -101,7 +114,7 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     return buttons;
   }
 
-  private JPanel createMainPanel(boolean includeGroups) {
+  private JPanel createMainPanel(boolean includeGroups, FolderPair excludePair) {
     panel = new JPanel();
     panel.setLayout(new GridBagLayout());
 
@@ -121,8 +134,13 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     ContactRecord[] contacts = cache.getContactRecordsMyActive(true);
     FolderPair[] myGroups = null;
-    if (includeGroups)
+    if (includeGroups) {
       myGroups = cache.getFolderPairsMyOfType(FolderRecord.GROUP_FOLDER, true);
+      // exclude specific pair, to prevent users to adding its own group share to the list of additional shares....
+      // ie: Group1 should not be added to Group1 list of members to avoid 2nd share creation of same Group membership
+      if (excludePair != null)
+        myGroups = (FolderPair[]) ArrayUtils.removeElements(myGroups, excludePair);
+    }
     Record[] initialRecords = RecordUtils.concatinate(contacts, myGroups);
     UserRecord myUserRec = cache.getUserRecord();
     RecordFilter folderFilter = null;
@@ -136,6 +154,11 @@ public class ContactSelectDialog extends GeneralDialog implements VisualsSavable
                           true, myUserRec != null ? myUserRec.userId : null),
       folderFilter }
     , MultiFilter.OR);
+    if (excludePair != null) {
+      // additionally modify the live update filter to keep out the excludePair
+      RecordFilter excludeFilter = new InverseFilter(new RecordIdFilter(excludePair.getId()));
+      filter = new MultiFilter(new RecordFilter[] { filter, excludeFilter }, MultiFilter.AND);
+    }
     ContactTableComponent contactTableComponent = new ContactTableComponent(initialRecords, filter, Template.get(Template.NONE), Template.get(Template.BACK_CONTACTS), false, true, true);
     contactTableComponent.addTopContactBuildingPanel();
     contactTableComponent.setAutoCreateWebAccounts(true);

@@ -327,8 +327,9 @@ public class GlobalProperties extends Object {
   // build 828 Move BrowserLauncher to the gui side of API
   // build 830 Catch more common exception as per bug reports.
   // build 832 Fix exception due to missing language string.
+  // build 834 Prevent sharing a Group with itself, also handle prior such double shares gracefully.
 
-  public static final short PROGRAM_BUILD_NUMBER = 832;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 834;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

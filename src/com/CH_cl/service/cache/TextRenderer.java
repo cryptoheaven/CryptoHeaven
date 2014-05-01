@@ -11,6 +11,7 @@ package com.CH_cl.service.cache;
 
 import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_co.service.records.*;
+import com.CH_co.trace.Trace;
 import com.CH_co.util.ImageNums;
 import com.CH_co.util.Misc;
 import java.io.File;
@@ -28,7 +29,15 @@ public class TextRenderer {
   }
 
   public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeGroupOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
-
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextRenderer.class, "getRenderedText()");
+    if (trace != null) trace.args(value);
+    if (trace != null) trace.args(includeFileSizes);
+    if (trace != null) trace.args(includeFolderParticipants);
+    if (trace != null) trace.args(includeFolderOwner);
+    if (trace != null) trace.args(includeGroupOwner);
+    if (trace != null) trace.args(includeChatParticipants);
+    if (trace != null) trace.args(includeFullEmailAddress);
+    
     String label = null;
 
     if (value instanceof ContactRecord) {
@@ -53,7 +62,7 @@ public class TextRenderer {
           label = getFolderAndShareNames(fPair, true); // true for all participants
       } else if (fPair.getFolderRecord().isGroupType()) {
         if (includeGroupOwner)
-          label = getFolderAndShareNames(fPair, false); // false for all members, owner only please
+          label = getFolderAndShareNames(fPair, false); // false for not including all participants in the name
       } else {
         if (includeFolderParticipants)
           label = getFolderAndShareNames(fPair, true);
@@ -61,6 +70,7 @@ public class TextRenderer {
           label = getFolderAndShareNames(fPair, false);
       }
       if (label == null) {
+        if (trace != null) trace.data(30, "no special FolderPair handling, straight name");
         label = fPair.getMyName();
       }
     }
@@ -153,6 +163,7 @@ public class TextRenderer {
       label = rec.emailAddr;
     }
 
+    if (trace != null) trace.exit(TextRenderer.class, label);
     return label;
   }
 
@@ -362,6 +373,10 @@ public class TextRenderer {
   * @return name of the folder owner and all participants in a String[2] array with first being the owner.
   */
   private static String[] getFolderNote(FolderRecord fRec, boolean includeAllParticipants) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextRenderer.class, "getFolderNote(FolderRecord fRec, boolean includeAllParticipants)");
+    if (trace != null) trace.args(fRec);
+    if (trace != null) trace.args(includeAllParticipants);
+
     FetchedDataCache cache = null;
     Long myUserId = null;
     Long ownerUserId = null;
@@ -370,12 +385,14 @@ public class TextRenderer {
     String rcChatNote = "";
 
     if (ownerNote == null || chatNote == null) {
+      if (trace != null) trace.data(10, "ownerNote == null || chatNote == null");
       cache = FetchedDataCache.getSingleInstance();
       myUserId = cache.getMyUserId();
       ownerUserId = fRec.ownerUserId;
     }
 
     if (ownerNote == null) {
+      if (trace != null) trace.data(20, "ownerNote == null");
       // If folder is not yours show whose it is.
       if (!ownerUserId.equals(myUserId)) {
         StringBuffer sb = new StringBuffer(32);
@@ -483,13 +500,19 @@ public class TextRenderer {
       rcChatNote = chatNote;
     }
 
-    return new String[] {ownerNote, rcChatNote};
+    String[] rc = new String[] {ownerNote, rcChatNote};
+    if (trace != null) trace.exit(TextRenderer.class, rc);
+    return rc;
   }
 
   /**
   * @return name of the folder with participants for display.
   */
   public static String getFolderAndShareNames(FolderPair fPair, boolean includeAllParticipants) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextRenderer.class, "getFolderAndShareNames(FolderPair fPair, boolean includeAllParticipants)");
+    if (trace != null) trace.args(fPair);
+    if (trace != null) trace.args(includeAllParticipants);
+
     FolderRecord fRec = fPair.getFolderRecord();
     String[] notes = getFolderNote(fRec, includeAllParticipants);
     String shareNote = notes[1];
@@ -509,6 +532,8 @@ public class TextRenderer {
     }
     if (appendPostfix != null)
       title += appendPostfix;
+
+    if (trace != null) trace.exit(TextRenderer.class, title);
     return title;
   }
 

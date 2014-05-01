@@ -976,7 +976,8 @@ public class FetchedDataCache extends Object {
             }
           } else {
             // maybe this wasn't owned by me or so-far-known my groups... but maybe in next iteration a parent dependency will solve this one
-            exceptionL.add(sRec);
+            // Reverse the order for next iteration by inserting at the head, should help if odd case when a group has more than 1 share of its own.
+            exceptionL.add(0, sRec);
           }
         }
       } // end for

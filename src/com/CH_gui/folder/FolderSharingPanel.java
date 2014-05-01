@@ -419,7 +419,7 @@ public class FolderSharingPanel extends JPanel implements DisposableObj {
   private void pressedAdd() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderSharingPanel.class, "pressedAdd()");
 
-    ContactSelectDialog d = new ContactSelectDialog((JDialog) SwingUtilities.windowForComponent(this), true);
+    ContactSelectDialog d = new ContactSelectDialog((JDialog) SwingUtilities.windowForComponent(this), true, folderPair);
     d.setSelectionCallback(new CallbackI() {
       public void callback(Object value) {
         addSharesForContacts((MemberContactRecordI[]) value);
