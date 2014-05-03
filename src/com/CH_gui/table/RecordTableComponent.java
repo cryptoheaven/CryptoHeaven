@@ -12,6 +12,7 @@
 package com.CH_gui.table;
 
 import com.CH_cl.service.actions.ClientMessageAction;
+import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.*;
@@ -1106,7 +1107,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               jDescriptionPanel2.setVisible(true);
               panel = jDescriptionPanel2;
             }
-            Record[] participants = getFolderParticipants(fRec);
+            Record[] participants = CacheFldUtils.getFolderParticipants(fRec);
             Record owner = participants[0];
             // sort the list, first active contacts, then other contacts, then groups, then users
             Arrays.sort(participants, new Comparator() {
@@ -1230,49 +1231,6 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
       jDescriptionPanel2.repaint();
     }
     updatePurchasePanel();
-  }
-
-  /**
-  *
-  * @param fRec
-  * @return Array of all participants starting with folder owner
-  */
-  public Record[] getFolderParticipants(FolderRecord fRec) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    Long ownerUserId = fRec.ownerUserId;
-    ArrayList participantsL = new ArrayList();
-    // use my contact list only, not the reciprocal contacts
-    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false));
-    FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
-    for (int i=0; i<allShares.length; i++) {
-      FolderShareRecord share = allShares[i];
-      // all participants other than owner because he is already added
-      if (share.isOwnedByGroup() || !share.isOwnedBy(ownerUserId, (Long[]) null)) {
-        Record recipient = null;
-        if (share.isOwnedByUser()) {
-          // use my contact list only, not the reciprocal contacts
-          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, false);
-        } else {
-          recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
-        }
-        if (recipient != null)
-          participantsL.add(recipient);
-        else {
-          if (share.isOwnedByUser()) {
-            UserRecord usrRec = new UserRecord();
-            usrRec.userId = share.ownerUserId;
-            participantsL.add(usrRec);
-          } else {
-            FolderRecord fldRec = new FolderRecord();
-            fldRec.folderId = share.ownerUserId;
-            fldRec.folderType = new Short(FolderRecord.GROUP_FOLDER);
-            participantsL.add(fldRec);
-          }
-        }
-      }
-    }
-    Record[] participants = (Record[]) ArrayUtils.toArray(participantsL, Record.class);
-    return participants;
   }
 
   /**

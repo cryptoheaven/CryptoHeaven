@@ -328,8 +328,9 @@ public class GlobalProperties extends Object {
   // build 830 Catch more common exception as per bug reports.
   // build 832 Fix exception due to missing language string.
   // build 834 Prevent sharing a Group with itself, also handle prior such double shares gracefully.
+  // build 836 Moved utility function for gather folder participants to common package
 
-  public static final short PROGRAM_BUILD_NUMBER = 834;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 836;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

@@ -130,6 +130,49 @@ public class CacheFldUtils {
     return folderPairs;
   }
 
+  /**
+  *
+  * @param fRec
+  * @return Array of all participants starting with folder owner
+  */
+  public static Record[] getFolderParticipants(FolderRecord fRec) {
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    Long ownerUserId = fRec.ownerUserId;
+    ArrayList participantsL = new ArrayList();
+    // use my contact list only, not the reciprocal contacts
+    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false));
+    FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
+    for (int i=0; i<allShares.length; i++) {
+      FolderShareRecord share = allShares[i];
+      // all participants other than owner because he is already added
+      if (share.isOwnedByGroup() || !share.isOwnedBy(ownerUserId, (Long[]) null)) {
+        Record recipient = null;
+        if (share.isOwnedByUser()) {
+          // use my contact list only, not the reciprocal contacts
+          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, false);
+        } else {
+          recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
+        }
+        if (recipient != null)
+          participantsL.add(recipient);
+        else {
+          if (share.isOwnedByUser()) {
+            UserRecord usrRec = new UserRecord();
+            usrRec.userId = share.ownerUserId;
+            participantsL.add(usrRec);
+          } else {
+            FolderRecord fldRec = new FolderRecord();
+            fldRec.folderId = share.ownerUserId;
+            fldRec.folderType = new Short(FolderRecord.GROUP_FOLDER);
+            participantsL.add(fldRec);
+          }
+        }
+      }
+    }
+    Record[] participants = (Record[]) ArrayUtils.toArray(participantsL, Record.class);
+    return participants;
+  }
+
   public static void getKnownGroupMembers(Long groupId, ArrayList targetUIDsL) {
     ArrayList processedGroupIDsL = new ArrayList();
     getKnownGroupMembers_loop(groupId, targetUIDsL, processedGroupIDsL);
