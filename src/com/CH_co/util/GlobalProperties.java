@@ -329,8 +329,9 @@ public class GlobalProperties extends Object {
   // build 832 Fix exception due to missing language string.
   // build 834 Prevent sharing a Group with itself, also handle prior such double shares gracefully.
   // build 836 Moved utility function for gather folder participants to common package
+  // build 838 Added salumail.com to the list of available email domains.
 
-  public static final short PROGRAM_BUILD_NUMBER = 836;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 838;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
