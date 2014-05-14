@@ -330,13 +330,14 @@ public class GlobalProperties extends Object {
   // build 834 Prevent sharing a Group with itself, also handle prior such double shares gracefully.
   // build 836 Moved utility function for gather folder participants to common package
   // build 838 Added salumail.com to the list of available email domains.
+  // build 840 Fix download of File Folders containing files with multiple revisions.
 
-  public static final short PROGRAM_BUILD_NUMBER = 838;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 840;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 6;
+  public static final short PROGRAM_VERSION_MINOR = 7;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

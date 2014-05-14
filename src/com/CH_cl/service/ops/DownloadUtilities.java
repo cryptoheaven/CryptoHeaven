@@ -34,7 +34,10 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /** 
@@ -385,7 +388,29 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
               downloadRecords(context, cache.getMsgLinkRecordsForFolder(shareRecord.folderId), null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
 
               // Download all files to this directory...
-              downloadRecords(context, cache.getFileLinkRecords(shareRecord.shareId), null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
+              // but filter them to contain only most recent verion
+              FileLinkRecord[] fLinks = cache.getFileLinkRecords(shareRecord.shareId);
+              if (fLinks != null) {
+                MultiHashMap recordsHMfiles = new MultiHashMap(true);
+                HashSet recordsHMnames = new HashSet();
+                for (int k=0; k<fLinks.length; k++) {
+                  FileLinkRecord fLink = fLinks[k];
+                  String name = fLink.getFileName();
+                  recordsHMfiles.put(name, fLink);
+                  recordsHMnames.add(name);
+                }
+                ArrayList filesL = new ArrayList();
+                Iterator iter = recordsHMnames.iterator();
+                while (iter.hasNext()) {
+                  String name = (String) iter.next();
+                  Collection relatedLinks = recordsHMfiles.getAll(name);
+                  FileLinkRecord mostRecent = FileLinkRecord.getMostRecent(relatedLinks);
+                  filesL.add(mostRecent);
+                }
+                FileLinkRecord[] fLinksMostRecent = new FileLinkRecord[filesL.size()];
+                filesL.toArray(fLinksMostRecent);
+                downloadRecords(context, fLinksMostRecent, null, newDestDir, fetchFilesForSingleFolders, false, excludeDirsAlreadyDone, SIL);
+              }
             }
 
             // Download all child directories too...
