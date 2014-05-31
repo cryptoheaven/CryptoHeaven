@@ -16,8 +16,6 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.ops.MsgLinkOps;
-import com.CH_cl.service.records.EmailAddressRecord;
-import com.CH_cl.service.records.InternetAddressRecord;
 import com.CH_cl.service.records.filters.FolderFilter;
 import com.CH_co.cryptx.BASymmetricKey;
 import com.CH_co.monitor.Stats;
@@ -670,44 +668,8 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           if (msgData != null) {
-            Record recipient = CacheMsgUtils.getMsgSenderForReply(msgData);
-            Record[][] allRecipients = CacheMsgUtils.gatherAllMsgRecipients(msgData);
-            Record[] sender = new Record[] { recipient };
-            // add the sender to the TO header as recipient
-            if (allRecipients[0] != null) {
-              allRecipients[0] = (Record[]) ArrayUtils.concatinate(sender, allRecipients[0], Record.class);
-              allRecipients[0] = (Record[]) ArrayUtils.removeDuplicates(allRecipients[0]);
-            } else {
-              allRecipients[0] = new Record[] { recipient };
-            }
-
-            // add all replyTo addresses to the TO header as recipients
-            String[] replyTos = msgData.getReplyToAddresses();
-            if (replyTos != null && (replyTos.length > 1 || (replyTos.length == 1 && !EmailRecord.isAddressEqual(replyTos[0], msgData.getFromEmailAddress())))) {
-              EmailAddressRecord[] replyToEmlRecs = new EmailAddressRecord[replyTos.length];
-              for (int i=0; i<replyTos.length; i++) {
-                replyToEmlRecs[i] = new EmailAddressRecord(replyTos[i]);
-              }
-              allRecipients[0] = (Record[]) ArrayUtils.concatinate(allRecipients[0], replyToEmlRecs, Record.class);
-              allRecipients[0] = (Record[]) ArrayUtils.removeDuplicates(allRecipients[0]);
-            }
-
-            // subtract myself from TO, CC, BCC
-            // subtract my UserRecord first
-            for (int i=0; i<allRecipients.length; i++) {
-              if (allRecipients[i] != null && allRecipients[i].length > 0)
-                allRecipients[i] = RecordUtils.getDifference(allRecipients[i], new Record[] { cache.getUserRecord() });
-            }
-            // subtract my EmailRecords (after converting to EmailAddressRecords) next
-            EmailRecord[] myEmlRecs = cache.getEmailRecords(cache.getMyUserId());
-            EmailAddressRecord[] myEmlAddrRecs = new EmailAddressRecord[myEmlRecs.length];
-            for (int i=0; i<myEmlRecs.length; i++)
-              myEmlAddrRecs[i] = new EmailAddressRecord(myEmlRecs[i].getEmailAddressFull());
-            for (int i=0; i<allRecipients.length; i++) {
-              if (allRecipients[i] != null && allRecipients[i].length > 0)
-                allRecipients[i] = RecordUtils.getDifference(allRecipients[i], myEmlAddrRecs, new InternetAddressRecord.AddressComparator());
-            }
-
+            // prepare all recipients list based on the selected message
+            Record[][] allRecipients = CacheMsgUtils.getReplyAllRecipients(msgData);
             // new message trigger
             new MessageFrame(allRecipients, msgLink);
           }

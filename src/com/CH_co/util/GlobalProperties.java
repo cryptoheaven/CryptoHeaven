@@ -331,8 +331,9 @@ public class GlobalProperties extends Object {
   // build 836 Moved utility function for gather folder participants to common package
   // build 838 Added salumail.com to the list of available email domains.
   // build 840 Fix download of File Folders containing files with multiple revisions.
+  // build 842 Moved getReplyAllRecipients to common code to reuse in Android
 
-  public static final short PROGRAM_BUILD_NUMBER = 840;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 842;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
