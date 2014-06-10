@@ -330,18 +330,18 @@ public class EmailRecord extends Record {
   /**
    * A little dumb email format checker, only checks few things.
    * Name and domain must start and end with letter or digit.
-   * Forbiden character sets list.
+   * Forbidden character sets list.
    * @param email is an Email Address in the simple form, without any personal part, just nick@domain
    * @return true if email address has a good chance to be valid, false if it certainly is invalid.
    */
   public static boolean isEmailFormatValid(String email) {
     String[] forbidenSets = new String[] { " ","\t","\n" };
-    if (email != null && email.length() >= 7) {
+    if (email != null && email.length() >= 6) {
       int atIndex = email.indexOf('@');
       if (atIndex >= 1) {
         if (email.indexOf('@', atIndex+1) == -1) {
           int dotIndex = email.lastIndexOf('.');
-          if (dotIndex > (atIndex+2)) {
+          if (dotIndex >= (atIndex+2)) {
             if (dotIndex < (email.length()-2)) {
               if (email.charAt(email.length()-1) != '.') {
                 String domain = EmailRecord.getDomainFromSimpleAddress(email);
@@ -356,7 +356,7 @@ public class EmailRecord extends Record {
                 for (int i=0; is7Bit && i<nChars.length; i++)
                   is7Bit &= (nChars[i] & 0x7F) == nChars[i];
 
-                if (is7Bit && dChars.length >= 5 && nChars.length >= 1) {
+                if (is7Bit && dChars.length >= 4 && nChars.length >= 1) {
                   // Domain name must start and end with a letter or digit.
                   if (Character.isLetterOrDigit(dChars[0]) && Character.isLetterOrDigit(dChars[dChars.length-1])) {
                     // User name must start and end with a letter or digit.
