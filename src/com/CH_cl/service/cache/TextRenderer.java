@@ -14,6 +14,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ImageNums;
 import com.CH_co.util.Misc;
+import com.CH_co.util.SearchTextProviderI;
 import java.io.File;
 import java.util.*;
 
@@ -22,7 +23,7 @@ import java.util.*;
  *
  * @author  Marcin Kurzawa
  */
-public class TextRenderer {
+public class TextRenderer implements SearchTextProviderI {
 
   public static String getRenderedText(Object value) {
     return getRenderedText(value, false, false, false, false, false, false, false);
@@ -183,6 +184,10 @@ public class TextRenderer {
       sb = getSearchTextFor((FileLinkRecord) searchableObj, sb);
     else if (searchableObj instanceof MsgLinkRecord)
       sb = getSearchTextFor((MsgLinkRecord) searchableObj, includeMsgBody, sb);
+    else if (searchableObj instanceof FolderPair)
+      sb.add(convertValueToText((FolderPair) searchableObj, null));
+    else
+      sb.add(getRenderedText(searchableObj));
     return sb;
   }
 

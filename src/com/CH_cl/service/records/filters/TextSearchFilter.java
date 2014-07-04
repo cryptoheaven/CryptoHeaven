@@ -36,11 +36,15 @@ public class TextSearchFilter extends AbstractRecordFilter implements RecordFilt
     if (trace != null) trace.args(searchStr);
     if (trace != null) trace.args(includeMsgBodies);
     if (trace != null) trace.args(searchTextProvider);
-    this.searchStr = searchStr;
     this.includeMsgBodies = includeMsgBodies;
     this.searchTextProvider = searchTextProvider;
-    searchTokens = searchStr.split("[ ]+");
+    setSearchStr(searchStr);
     if (trace != null) trace.exit(TextSearchFilter.class);
+  }
+
+  public final void setSearchStr(String searchStr) {
+    this.searchStr = searchStr;
+    this.searchTokens = searchStr.split("[ ]+");
   }
 
   public boolean keep(Record record) {
@@ -53,6 +57,9 @@ public class TextSearchFilter extends AbstractRecordFilter implements RecordFilt
     } else if (record instanceof MsgLinkRecord) {
       MsgLinkRecord mLink = (MsgLinkRecord) record;
       if (isMatch(searchTextProvider.getSearchableCharSequencesFor(mLink, includeMsgBodies)))
+        keep = true;
+    } else {
+      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(record)))
         keep = true;
     }
 
