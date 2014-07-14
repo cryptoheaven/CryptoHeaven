@@ -360,8 +360,12 @@ public class MsgTableModel extends RecordTableModel {
 
           // add all messages for this folder
           MsgLinkRecord[] linkRecords = cache.getMsgLinkRecordsForFolder(folderId);
+          // pre-filter initial list
+          RecordFilter filter = getFilterCombined();
+          if (filter != null)
+            linkRecords = (MsgLinkRecord[]) RecordUtils.filter(linkRecords, filter);
           if (linkRecords != null && linkRecords.length > 0) {
-            updateData(linkRecords);
+            updateData(linkRecords, true);
           }
         }
       } // end if folderId != null

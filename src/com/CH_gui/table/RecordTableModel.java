@@ -385,7 +385,10 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   * should not be in the model, it will be removed with a call to removeData().
   */
   public synchronized void updateData(Record[] records) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "updateData(Record[] records)");
+    updateData(records, false);
+  }
+  public synchronized void updateData(Record[] records, boolean forceKeep) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(RecordTableModel.class, "updateData(Record[] records, boolean forceKeep)");
     if (trace != null) trace.args(records);
 
     boolean anyHiddenRows = getIsAnyCollapsedFileVersions();
@@ -400,7 +403,7 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
       Object[] prevFileBuffer = null;
       for (int i=0; i<records.length; i++) {
         Record newRec = records[i];
-        boolean keep = keep(newRec);
+        boolean keep = forceKeep || keep(newRec);
         Record rec = (Record) recordsHM.get(newRec.getId());
         if (keep) {
           if (rec != null) {
