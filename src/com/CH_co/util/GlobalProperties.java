@@ -334,13 +334,14 @@ public class GlobalProperties extends Object {
   // build 842 Moved getReplyAllRecipients to common code to reuse in Android
   // build 844 Fix Email Address format checking
   // build 846 Better support for 'search' function
+  // build 848 Fix 'copy to sent'
 
-  public static final short PROGRAM_BUILD_NUMBER = 846;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 848;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 7;
+  public static final short PROGRAM_VERSION_MINOR = 8;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

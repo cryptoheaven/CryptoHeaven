@@ -116,7 +116,7 @@ public class SendMessageRunner extends ThreadTraced {
         if (isAnyRecipientFolder)
           break;
       }
-      boolean shouldCopyToSent = !isAnyRecipientFolder || msgSendInfoProvider.isCopyToOutgoing();
+      boolean shouldCopyToSent = msgSendInfoProvider.isCopyToOutgoing() || (selectedLocalFileAttachments != null && selectedLocalFileAttachments.length > 0);
 
       boolean isSavingAsDraft = msgSendInfoProvider.isSavingAsDraft();
       if (!isSavingAsDraft && shouldCopyToSent) {
