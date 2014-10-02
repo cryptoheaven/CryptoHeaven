@@ -9,6 +9,7 @@
  */
 package com.CH_gui.frame;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
@@ -26,7 +27,7 @@ public class FileTableFrame extends RecordTableFrame {
 
   /** Creates new FileTableFrame */
   public FileTableFrame(FolderPair folderPair) {
-    super(TextRenderer.getFolderAndShareNames(folderPair, true), true, true);
+    super(TextRenderer.getFolderAndShareNames(FetchedDataCache.getSingleInstance(), folderPair, true), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableFrame.class, "FileTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 

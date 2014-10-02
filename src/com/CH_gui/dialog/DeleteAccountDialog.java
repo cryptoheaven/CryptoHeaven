@@ -58,7 +58,7 @@ public class DeleteAccountDialog extends GeneralDialog {
 
   private CheckDocumentListener checkDocumentListener;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
   private UserRecord userRecord;
 
@@ -80,8 +80,8 @@ public class DeleteAccountDialog extends GeneralDialog {
     this.isDeleteMyAccount = isDeleteMyAccount;
     this.subAccountsToDelete = subAccountsToDelete;
 
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
     userRecord = cache.getUserRecord();
 
     JButton[] buttons = createButtons();
@@ -142,7 +142,7 @@ public class DeleteAccountDialog extends GeneralDialog {
       UserRecord[] subUsers = cache.getUserRecords(subAccountsToDelete);
       for (int i=0; i<subUsers.length; i++) {
         // use my contact list only, not the reciprocal contacts
-        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, false);
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, subUsers[i].userId, true, false);
         listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
             GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
       }
@@ -283,9 +283,9 @@ public class DeleteAccountDialog extends GeneralDialog {
       if (!error) {
         boolean success = false;
         if (isDeleteMyAccount) {
-          success = UserOps.sendDeleteAccount(serverInterfaceLayer, oldBA);
+          success = UserOps.sendDeleteAccount(SIL, oldBA);
         } else {
-          success = UserOps.sendDeleteSubAccounts(serverInterfaceLayer, oldBA, subAccountsToDelete);
+          success = UserOps.sendDeleteSubAccounts(SIL, oldBA, subAccountsToDelete);
         }
         error = !success;
       }

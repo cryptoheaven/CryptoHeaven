@@ -323,7 +323,7 @@ public class RecycleTableModel extends RecordTableModel {
             } else {
               if (forSortOnly) {
                 // use my contact list only, not the reciprocal contacts
-                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
+                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(cache, msgData.senderUserId, true, false));
               } else {
                 value = msgData.senderUserId;
               }
@@ -623,7 +623,7 @@ public class RecycleTableModel extends RecordTableModel {
       if (halfPairPicksL.size() > 0) {
         halfPairPicks = new Record[halfPairPicksL.size()];
         halfPairPicksL.toArray(halfPairPicks);
-        pairPicks = CacheFldUtils.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
+        pairPicks = CacheFldUtils.convertRecordsToPairs(cache, halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
       }
 
       if (linksPicksL.size() > 0) {

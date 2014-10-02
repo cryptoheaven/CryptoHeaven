@@ -68,7 +68,7 @@ public class ExportMsgsImpl implements ExportMsgsI {
     exportProgress.addProgress("Downloading to " + destDir.getAbsolutePath() + "\n");
     if (destDir != null && msgs != null && msgs.length > 0) {
       try {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        FetchedDataCache cache = SIL.getFetchedDataCache();
         List bodyKeys = cache.getMsgBodyKeys();
         for (int i=0; i<msgs.length; i++) {
           MsgLinkRecord msgLink = msgs[i];

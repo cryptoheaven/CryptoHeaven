@@ -114,7 +114,7 @@ public class TraceTableModel extends RecordTableModel {
 
   /** Creates new TraceTableModel */
   public TraceTableModel(Record[] parentObjLinks) {
-    super(columnHeaderDatas[parentObjLinks.length > 1 || CacheMsgUtils.hasAttachments(parentObjLinks[0]) ? MODE_MULTI : (parentObjLinks[0] instanceof MsgLinkRecord ? (MODE_MSG):(MODE_FILE))]);
+    super(columnHeaderDatas[parentObjLinks.length > 1 || CacheMsgUtils.hasAttachments(FetchedDataCache.getSingleInstance(), parentObjLinks[0]) ? MODE_MULTI : (parentObjLinks[0] instanceof MsgLinkRecord ? (MODE_MSG):(MODE_FILE))]);
     initialize(parentObjLinks);
   }
   private void initialize(Record[] parentObjLinks) {

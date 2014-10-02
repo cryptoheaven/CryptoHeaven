@@ -58,7 +58,7 @@ public class FolderOps extends Object {
                                               ServerInterfaceLayer SIL
                                             )
   {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
 
     Fld_NewFld_Rq request = new Fld_NewFld_Rq();
     request.folderShareRecord = new FolderShareRecord();
@@ -242,8 +242,7 @@ public class FolderOps extends Object {
   /**
   * @return all chatting folder pairs related to the specified contact, including multi-user chat folders.
   */
-  public static FolderPair[] getAllChatFolderPairsFromCache(ContactRecord chatWithContact, FolderRecord[]  chatFlds) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  public static FolderPair[] getAllChatFolderPairsFromCache(final FetchedDataCache cache, ContactRecord chatWithContact, FolderRecord[]  chatFlds) {
     ArrayList chatFolderPairsL = null;
     // Any chatting folders present?
     if (chatFlds != null) {
@@ -251,7 +250,7 @@ public class FolderOps extends Object {
       for (int i=0; i<chatFlds.length; i++) {
         // Check folder's shares to confirm that one is mine and second other guy's.
         FolderShareRecord[] chatShares = cache.getFolderShareRecordsForFolder(chatFlds[i].folderId);
-        Long[] accessUserIDs = CacheUsrUtils.findAccessUsers(chatShares);
+        Long[] accessUserIDs = CacheUsrUtils.findAccessUsers(cache, chatShares);
         if (accessUserIDs.length >= 2) {
           boolean foundMy = false;
           boolean foundOther = false;
@@ -278,8 +277,7 @@ public class FolderOps extends Object {
   /**
   * @return chatting folder pair for chatting with specified contact searching between specified chat folder records.
   */
-  public static FolderPair getChatFolderPairFromCache(MemberContactRecordI[] chatWithContacts, FolderRecord[] chatFlds) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  public static FolderPair getChatFolderPairFromCache(FetchedDataCache cache, MemberContactRecordI[] chatWithContacts, FolderRecord[] chatFlds) {
     FolderRecord chatFolder = null;
     FolderShareRecord chatShare = null;
     // Any chatting folders present?
@@ -332,7 +330,7 @@ public class FolderOps extends Object {
 
   public static FolderPair getOrCreateAddressBook(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
     FolderPair fPair = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord userRecord = cache.getUserRecord();
     if (userRecord != null) {
       Long addrFolderId = userRecord.addrFolderId;
@@ -349,7 +347,7 @@ public class FolderOps extends Object {
         DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
       if (addrFolderId != null) {
-        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(addrFolderId));
+        fPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(addrFolderId));
       }
     }
     return fPair;
@@ -357,7 +355,7 @@ public class FolderOps extends Object {
 
   public static FolderPair getOrCreateWhiteList(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
     FolderPair fPair = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord userRecord = cache.getUserRecord();
     if (userRecord != null) {
       Long whiteFolderId = userRecord.whiteFolderId;
@@ -374,7 +372,7 @@ public class FolderOps extends Object {
         DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
       if (whiteFolderId != null) {
-        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(whiteFolderId));
+        fPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(whiteFolderId));
       }
     }
     return fPair;
@@ -382,7 +380,7 @@ public class FolderOps extends Object {
 
   public static FolderPair getOrCreateDraftFolder(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
     FolderPair fPair = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord userRecord = cache.getUserRecord();
     if (userRecord != null) {
       Long draftFolderId = userRecord.draftFolderId;
@@ -399,7 +397,7 @@ public class FolderOps extends Object {
         DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
       if (draftFolderId != null) {
-        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(draftFolderId));
+        fPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(draftFolderId));
       }
     }
     return fPair;
@@ -407,7 +405,7 @@ public class FolderOps extends Object {
 
   public static FolderPair getOrCreateJunkFolder(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
     FolderPair fPair = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord userRecord = cache.getUserRecord();
     if (userRecord != null) {
       Long junkFolderId = userRecord.junkFolderId;
@@ -424,7 +422,7 @@ public class FolderOps extends Object {
         DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
       if (junkFolderId != null) {
-        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(junkFolderId));
+        fPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(junkFolderId));
       }
     }
     return fPair;
@@ -432,7 +430,7 @@ public class FolderOps extends Object {
 
   public static FolderPair getOrCreateRecycleFolder(ServerInterfaceLayer SIL) { // pass in SIL so it works from APIs without main frame
     FolderPair fPair = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord userRecord = cache.getUserRecord();
     if (userRecord != null) {
       Long recycleFolderId = userRecord.recycleFolderId;
@@ -449,45 +447,12 @@ public class FolderOps extends Object {
         DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
       }
       if (recycleFolderId != null) {
-        fPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(recycleFolderId));
+        fPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(recycleFolderId));
       }
     }
     return fPair;
   }
 
-  /**
-  * Search among the cached folders, and find a folder which is most likely the
-  * root in the tree view.
-  * @return Root folder or null if guess cannot be made or some looping of folders is found.
-  */
-  public static FolderPair getRootmostFolderInViewHierarchy(Long childFolderId) {
-    HashSet visitedFolderIDsHS = new HashSet();
-    Set groupIDsSet = FetchedDataCache.getSingleInstance().getFolderGroupIDsMySet();
-    return getRootmostFolderInViewHierarchy(childFolderId, visitedFolderIDsHS, groupIDsSet);
-  }
-  private static FolderPair getRootmostFolderInViewHierarchy(Long childFolderId, Set visitedFolderIDsSet, Set groupIDsSet) {
-    // if visited, return null;
-    if (!visitedFolderIDsSet.contains(childFolderId)) {
-      visitedFolderIDsSet.add(childFolderId);
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      FolderRecord fRec = cache.getFolderRecord(childFolderId);
-      if (fRec != null) {
-        FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsSet);
-        if (sRec != null) {
-          FolderPair fPair = new FolderPair(sRec, fRec);
-          if (fPair.isViewRoot())
-            return fPair;
-          else {
-            Long parentFolderId = fPair.getParentId();
-            return getRootmostFolderInViewHierarchy(parentFolderId, visitedFolderIDsSet, groupIDsSet);
-          }
-        }
-      }
-    } else {
-      return null;
-    }
-    return null;
-  }
 
 
   /**

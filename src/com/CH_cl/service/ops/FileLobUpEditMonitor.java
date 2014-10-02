@@ -47,22 +47,37 @@ public class FileLobUpEditMonitor {
   public static final Object monitor = new Object();
   private static boolean isInitialized = false;
 
+  /** Cache which this monitor uses to check privileges etc. */
+  private final FetchedDataCache cache;
   /** List of files we are tracking for modifications. */
   private HashMap fileMap;
   /** List of files from the "fileMap" that were determined to be modified, but could not upload due to connectivity issues. */
   private HashMap fileEditsMap;
 
   /** Singleton getter. */
-  public static FileLobUpEditMonitor getInstance() {
-    return FileLobUpEditMonitorHolder.INSTANCE;
+  private static FileLobUpEditMonitor getInstance(final FetchedDataCache cache) {
+    if (FileLobUpEditMonitorHolder.INSTANCE != null)
+      return FileLobUpEditMonitorHolder.INSTANCE;
+    else
+      return FileLobUpEditMonitorHolder.getInstance(cache);
   }
   /** Singleton holder. */
   private static class FileLobUpEditMonitorHolder {
-    private static final FileLobUpEditMonitor INSTANCE = new FileLobUpEditMonitor();
+    private static FileLobUpEditMonitor INSTANCE;
+    private static final Object monitor = new Object();
+    private static FileLobUpEditMonitor getInstance(final FetchedDataCache cache) {
+      synchronized (monitor) {
+        if (INSTANCE == null) {
+          INSTANCE = new FileLobUpEditMonitor(cache);
+        }
+      }
+      return INSTANCE;
+    }
   }
 
 
-  private FileLobUpEditMonitor() {
+  private FileLobUpEditMonitor(final FetchedDataCache cache) {
+    this.cache = cache;
     init();
   }
 
@@ -90,10 +105,10 @@ public class FileLobUpEditMonitor {
     isInitialized = true;
   }
 
-  public static boolean canMonitor(FileLinkRecord remoteFile) {
+  public static boolean canMonitor(final FetchedDataCache cache, FileLinkRecord remoteFile) {
     boolean canMonitor = false;
     if (remoteFile.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
-      FolderShareRecord share = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(remoteFile.ownerObjId, true);
+      FolderShareRecord share = cache.getFolderShareRecordMy(remoteFile.ownerObjId, true);
       if (share != null && share.canWrite.shortValue() == FolderShareRecord.YES)
         canMonitor = true;
     }
@@ -111,20 +126,20 @@ public class FileLobUpEditMonitor {
     }
     return set;
   }
-  public static FileSet[] getModifiedFileSets() {
+  public static FileSet[] getModifiedFileSets(final FetchedDataCache cache) {
     FileSet[] set = null;
     synchronized (monitor) {
       if (isInitialized) {
-        set = getFileSets(getInstance().fileEditsMap);
+        set = getFileSets(getInstance(cache).fileEditsMap);
       }
     }
     return set;
   }
-  public static FileSet[] getMonitoredFileSets() {
+  public static FileSet[] getMonitoredFileSets(final FetchedDataCache cache) {
     FileSet[] set = null;
     synchronized (monitor) {
       if (isInitialized) {
-        set = getFileSets(getInstance().fileMap);
+        set = getFileSets(getInstance(cache).fileMap);
       }
     }
     return set;
@@ -135,24 +150,24 @@ public class FileLobUpEditMonitor {
   * @param localFile
   * @param remoteFile 
   */
-  public static void registerForMonitoring(File localFile, FileLinkRecord remoteFile, FileDataRecord remoteData) {
+  public static void registerForMonitoring(final FetchedDataCache cache, File localFile, FileLinkRecord remoteFile, FileDataRecord remoteData) {
     Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(FileLobUpEditMonitor.class, "registerForMonitoring(File localFile, FileLinkRecord remoteFile, FileDataRecord remoteData)");
     if (trace != null) trace.args(localFile, remoteFile, remoteData);
-    if (!canMonitor(remoteFile))
+    if (!canMonitor(cache, remoteFile))
       throw new IllegalArgumentException("File cannot be monitored for changes.");
     if (!remoteFile.fileId.equals(remoteData.fileId))
       throw new IllegalArgumentException("Please supply matching file link and data objects.");
-    addToMonitoring(new FileSet(localFile, remoteFile, remoteData));
+    addToMonitoring(cache, new FileSet(localFile, remoteFile, remoteData));
     if (trace != null) trace.exit(FileLobUpEditMonitor.class);
   }
 
-  public static boolean addToMonitoring(FileSet set) {
+  public static boolean addToMonitoring(final FetchedDataCache cache, FileSet set) {
     Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(FileLobUpEditMonitor.class, "addToMonitoring(FileSet set)");
     if (trace != null) trace.args(set);
     boolean rc = false;
     synchronized (monitor) {
       if (set.getLocalFile().exists()) {
-        getInstance().fileMap.put(set.getRemoteFile().fileLinkId, set);
+        getInstance(cache).fileMap.put(set.getRemoteFile().fileLinkId, set);
         rc = true;
       }
     }
@@ -160,11 +175,11 @@ public class FileLobUpEditMonitor {
     return rc;
   }
 
-  public static void removeFromMonitoring(Long fileLinkId) {
+  public static void removeFromMonitoring(final FetchedDataCache cache, Long fileLinkId) {
     Trace trace = null; if (Trace.DEBUG) trace = Trace.entry(FileLobUpEditMonitor.class, "removeFromMonitoring(Long fileLinkId)");
     if (trace != null) trace.args(fileLinkId);
     synchronized (monitor) {
-      FileLobUpEditMonitor instance = getInstance();
+      FileLobUpEditMonitor instance = getInstance(cache);
       instance.fileMap.remove(fileLinkId);
       instance.fileEditsMap.remove(fileLinkId);
     }
@@ -176,14 +191,13 @@ public class FileLobUpEditMonitor {
     synchronized (monitor) {
       Set keys = fileMap.keySet();
       if (keys != null && keys.size() > 0) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         Iterator iter = keys.iterator();
         while (iter.hasNext()) {
           Object key = iter.next();
           final FileSet set = (FileSet) fileMap.get(key);
           if (!set.localFile.exists()) {
             iter.remove();
-            removeFromMonitoring(set.getRemoteFile().fileLinkId);
+            removeFromMonitoring(cache, set.getRemoteFile().fileLinkId);
           } else if (set.timestampNextRetry > System.currentTimeMillis()) {
             // ignore for now until enough time passes from last error
             // Correct invalid stamps incase system clock was adjusted

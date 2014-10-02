@@ -65,7 +65,12 @@ public class SubUserActionTable extends RecordActionTable implements ActionProdu
 
   /** Creates new SubUserActionTable */
   public SubUserActionTable() {
-    super(new UserTableModel(UserTableModel.columnHeaderData_subAccounts, new SubUserFilter(MainFrame.getServerInterfaceLayer().getFetchedDataCache().getMyUserId(), false, true)));
+    super(new UserTableModel(UserTableModel.columnHeaderData_subAccounts, 
+            new SubUserFilter(
+                    MainFrame.getServerInterfaceLayer().getFetchedDataCache(), 
+                    MainFrame.getServerInterfaceLayer().getFetchedDataCache().getMyUserId(), 
+                    false, 
+                    true)));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SubUserActionTable.class, "SubUserActionTable()");
     SIL = MainFrame.getServerInterfaceLayer();
     initActions();

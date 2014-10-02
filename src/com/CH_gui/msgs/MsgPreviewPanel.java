@@ -155,6 +155,14 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private static final String STR_IMAGES_SHOW = "Show Images";
   private static final String STR_IMAGES_HIDE = "Hide Images";
 
+  public static final String[] contentReplyHeadings = { 
+    com.CH_cl.lang.Lang.rb.getString("column_From") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_To") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_Cc") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_Date") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_Subject") + ":"
+  };
+
   private boolean isWaitingForMsgBody;
   private String no_selected_msg_html;
 
@@ -186,13 +194,15 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     setGUIComponentsForObj(objType, null, false, false, false);
     restoreVisuals(GlobalProperties.getProperty(MiscGui.getVisualsKeyName(this)));
 
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
     // Listed on changes to the link/data so we can dynamically update the preview pane.
     linkListener = new MsgLinkListener();
-    FetchedDataCache.getSingleInstance().addMsgLinkRecordListener(linkListener);
+    cache.addMsgLinkRecordListener(linkListener);
     dataListener = new MsgDataListener();
-    FetchedDataCache.getSingleInstance().addMsgDataRecordListener(dataListener);
+    cache.addMsgDataRecordListener(dataListener);
     fileListener = new FileLinkListener();
-    FetchedDataCache.getSingleInstance().addFileLinkRecordListener(fileListener);
+    cache.addFileLinkRecordListener(fileListener);
 
     addPopup(jTextMessage);
     if (jHtmlMessage instanceof MyHTMLEditor) {
@@ -388,7 +398,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         if (msgDataRecord != null) {
           Hasher.Set matchingSet = MsgUtils.getMatchingPasswordHasher(msgDataRecord, jPasswordField.getText());
           if (matchingSet != null) {
-            MsgUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+            MsgUtils.unlockPassProtectedMsg(cache, msgDataRecord, matchingSet);
             // change our own display, but other listeners should be notified by the unlock code
             setCurrentMessageText();
             // refetch the attachments, maybe the subjects and filenames will show now
@@ -409,7 +420,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         jNotSpam.setDescription(null);
         // Move message to Inbox
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        FolderPair inbox = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().msgFolderId));
+        FolderPair inbox = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(cache.getUserRecord().msgFolderId));
         MsgActionTable.doMoveOrCopyOrSaveAttachmentsAction(true, inbox, new MsgLinkRecord[] { msgLinkRecord });
         // Add sender email address at once to Whitelist (free up AWT thread)
         Thread th = new ThreadTraced("Not Spam Mover") {
@@ -722,7 +733,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 if (!jImageFilterPanel.isVisible())
                   jImageFilterPanel.setVisible(true);
               } else {
-                if (CacheMsgUtils.isDefaultToPLAINpreferred(msgDataRecord)) {
+                if (CacheMsgUtils.isDefaultToPLAINpreferred(FetchedDataCache.getSingleInstance(), msgDataRecord)) {
                   if (!jLoadImages.isVisible()) {
                     jLoadImages.setText(STR_IMAGES_HIDE);
                     jLoadImages.setVisible(true);
@@ -896,7 +907,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   }
 
 
-  private void setRecipientsPanel(final MsgDataRecord dataRecord, final JPanel jRecipients, final JPanel jParentLineRecipients) {
+  private void setRecipientsPanel(final FetchedDataCache cache, final MsgDataRecord dataRecord, final JPanel jRecipients, final JPanel jParentLineRecipients) {
     // Since there is a problem when a frame shows up with this panel,
     // do this at the end of all AWT events after the frame is already shown.
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -905,7 +916,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
 
         // Don't do a flowing-resizable panel, just put a label style boxes
         //MsgPanelUtils.drawMsgRecipientsPanel(dataRecord, jRecipients, maxSize);
-        Record[][] recipientsAll = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
+        Record[][] recipientsAll = CacheMsgUtils.gatherAllMsgRecipients(cache, dataRecord);
         jRecipients.removeAll();
         Record[][] objSets = recipientsAll;
         Record[] recipients = null;
@@ -938,7 +949,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                 JLabel label = new JMyLabel();
                 // just for display convert any EmailAddressRecord to familiar Address Book entry
                 if (recipient instanceof EmailAddressRecord) {
-                  recipient = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) recipient).address);
+                  recipient = CacheEmlUtils.convertToFamiliarEmailRecord(cache, ((EmailAddressRecord) recipient).address);
                 }
                 label.setText(ListRenderer.getRenderedText(recipient, false, false, true, false, true, true));
                 label.setIcon(ListRenderer.getRenderedIcon(recipient));
@@ -1094,7 +1105,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               Object att = objs[1];
               if (att instanceof MsgLinkRecord) {
                 MsgLinkRecord msgLink = (MsgLinkRecord) att;
-                MsgLinkRecord[] parents = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForMsg(msgLink.msgId);
+                FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+                MsgLinkRecord[] parents = cache.getMsgLinkRecordsForMsg(msgLink.msgId);
                 if (parents != null && parents.length > 0)
                   new MsgPreviewFrame(parents[0], new MsgLinkRecord[] { msgLink });
               } else if (att instanceof FileLinkRecord) {
@@ -1477,7 +1489,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               if (!jImageFilterPanel.isVisible())
                 jImageFilterPanel.setVisible(true);
             } else {
-              if (CacheMsgUtils.isDefaultToPLAINpreferred(msgDataRecord)) {
+              if (CacheMsgUtils.isDefaultToPLAINpreferred(FetchedDataCache.getSingleInstance(), msgDataRecord)) {
                 if (!jLoadImages.isVisible()) {
                   jLoadImages.setText(STR_IMAGES_HIDE);
                   jLoadImages.setVisible(true);
@@ -1496,7 +1508,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
         } else {
           MsgPanelUtils.setPreviewContent_Threaded(msgLinkRecord == null ? no_selected_msg_html : STR_LOADING, isHTML, false, true, true, jMessage);
           // Clear panels and make them original size.
-          setRecipientsPanel(null, jRecipients, jLineRecipients);
+          setRecipientsPanel(null, null, jRecipients, jLineRecipients);
           setAttachmentsButton();
           setAttachmentsPanel(null, null, jAttachments, attachmentsMap, jLineAttachments);
         }
@@ -1562,7 +1574,8 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
     if (dataRecord != null) {
       objType = dataRecord.objType.shortValue();
       priority = dataRecord.getPriorityTextAndIcon();
-      String expiryText = dataRecord.getExpirationIconAndText(FetchedDataCache.getSingleInstance().getMyUserId(), true).getText();
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      String expiryText = dataRecord.getExpirationIconAndText(cache.getMyUserId(), true).getText();
       isExpiry = expiryText != null && expiryText.trim().length() > 0;
       isPassword = dataRecord.bodyPassHash != null && dataRecord.getTextBody() == null && dataRecord.getEncText() != null && dataRecord.getEncText().size() > 0;
       hasAttachments = dataRecord.attachedFiles.shortValue() + dataRecord.attachedMsgs.shortValue() > 0;
@@ -1675,16 +1688,17 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   * Dispose the object and release resources to help in garbage collection.
   */
   public void disposeObj() {
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (linkListener != null) {
-      FetchedDataCache.getSingleInstance().removeMsgLinkRecordListener(linkListener);
+      cache.removeMsgLinkRecordListener(linkListener);
       linkListener = null;
     }
     if (dataListener != null) {
-      FetchedDataCache.getSingleInstance().removeMsgDataRecordListener(dataListener);
+      cache.removeMsgDataRecordListener(dataListener);
       dataListener = null;
     }
     if (fileListener != null) {
-      FetchedDataCache.getSingleInstance().removeFileLinkRecordListener(fileListener);
+      cache.removeFileLinkRecordListener(fileListener);
       fileListener = null;
     }
     if (msgPreviewUpdateFifo != null) {
@@ -1715,7 +1729,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       context.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       try {
         boolean simplifyHTML = msgDataRecord.isHtmlMail() && isForceSimpleHTML;
-        String[] contentParts = CacheMsgUtils.makeReplyToContent(msgLinkRecord, msgDataRecord, simplifyHTML, true, false);
+        String[] contentParts = CacheMsgUtils.makeReplyToContent(FetchedDataCache.getSingleInstance(), msgLinkRecord, msgDataRecord, simplifyHTML, true, false, contentReplyHeadings);
         StringBuffer sb = new StringBuffer();
         // start the html printed body
         sb.append("<html><body>");
@@ -1783,7 +1797,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             // fetching can take a while so show the "Loading..." sign
             jLoadingLabel.setVisible(true);
             // Prepare and send the request
-            ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(previewMsgLink);
+            ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(cache, previewMsgLink);
             serverInterfaceLayer.submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 30000);
           }
         } catch (Throwable t) {
@@ -1931,7 +1945,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
                               msgLink.ownerObjId.equals(cache.getUserRecord().junkFolderId));
 
           // Set text and icon for the From field in the preview.
-          Record sender = CacheMsgUtils.getFromAsFamiliar(msgData);
+          Record sender = CacheMsgUtils.getFromAsFamiliar(cache, msgData);
           if (sender != null) {
             // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
             if (!msgData.isRegularEmail() && (sender instanceof EmailAddressRecord || sender instanceof MsgDataRecord)) {
@@ -1968,7 +1982,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
               jReplyTo.setText("");
             }
 
-            setRecipientsPanel(msgData, jRecipients, jLineRecipients);
+            setRecipientsPanel(cache, msgData, jRecipients, jLineRecipients);
 
             jSubject.setIcon(ListRenderer.getRenderedIcon(msgData));
             jSubject.setText(ListRenderer.getRenderedText(msgData));
@@ -1984,7 +1998,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
           jExpiration.setIcon(Images.get(exp));
           jExpiration.setText(exp.getText());
 
-          boolean displayHtmlMode = !CacheMsgUtils.isDefaultToPLAINpreferred(msgLink, msgData);
+          boolean displayHtmlMode = !CacheMsgUtils.isDefaultToPLAINpreferred(cache, msgLink, msgData);
 
           // update text only if content changed
           if (isHTML != displayHtmlMode || msgDataChanged) {

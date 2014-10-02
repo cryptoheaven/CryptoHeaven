@@ -662,7 +662,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
         // If notification capable contact.
         if (cRec.previousStatus != null && cRec.ownerUserId.equals(userId)) {
           // use my contact list only, not the reciprocal contacts
-          String userName = ListRenderer.getRenderedText( CacheUsrUtils.convertUserIdToFamiliarUser(cRec.contactWithId, true, false) );
+          String userName = ListRenderer.getRenderedText( CacheUsrUtils.convertUserIdToFamiliarUser(cache, cRec.contactWithId, true, false) );
           // If STATUS pop-up notifications enabled
           if (userRecord != null && (userRecord.flags.longValue() & UserRecord.FLAG_USER_ONLINE_STATUS_POPUP) != 0) {
             // Popup slider for user "OFFLINE" notification
@@ -679,7 +679,7 @@ public abstract class RecordActionTable extends RecordTableScrollPane implements
               }
 
               if (chattingFolders != null && chattingFolders.length > 0) {
-                FolderPair[] chatFolderPairs = FolderOps.getAllChatFolderPairsFromCache(cRec, chattingFolders);
+                FolderPair[] chatFolderPairs = FolderOps.getAllChatFolderPairsFromCache(cache, cRec, chattingFolders);
                 if (chatFolderPairs != null && chatFolderPairs.length > 0) {
                   for (int k=0; k<chatFolderPairs.length; k++) {
                     Window w = SwingUtilities.windowForComponent(RecordActionTable.this);

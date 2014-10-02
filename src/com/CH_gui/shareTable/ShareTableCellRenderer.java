@@ -33,6 +33,7 @@ import javax.swing.table.TableModel;
 */
 public class ShareTableCellRenderer extends RecordTableCellRenderer {
 
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -52,14 +53,14 @@ public class ShareTableCellRenderer extends RecordTableCellRenderer {
           UserRecord uRec = null;
           FolderRecord gRec = null;
           if (shareRecord.isOwnedByUser()) {
-            uRec = FetchedDataCache.getSingleInstance().getUserRecord(shareRecord.ownerUserId);
+            uRec = cache.getUserRecord(shareRecord.ownerUserId);
           } else if (shareRecord.isOwnedByGroup()) {
-            gRec = FetchedDataCache.getSingleInstance().getFolderRecord(shareRecord.ownerUserId);
+            gRec = cache.getFolderRecord(shareRecord.ownerUserId);
           }
 
           if (uRec != null) {
             // use my contact list only, not the reciprocal contacts
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, uRec.userId, true, false);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           } else if (gRec != null) {

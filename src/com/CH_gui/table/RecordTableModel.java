@@ -9,6 +9,8 @@
  */
 package com.CH_gui.table;
 
+import com.CH_cl.util.SearchTextProviderI;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
 import com.CH_co.service.records.FileLinkRecord;
 import com.CH_co.service.records.FolderPair;
@@ -235,12 +237,12 @@ public abstract class RecordTableModel extends AbstractTableModel implements Sea
   public abstract Object getValueAtRawColumn(Record record, int rawColumn, boolean forSortOnly);
   public abstract RecordTableCellRenderer createRenderer();
 
-  public Collection getSearchableCharSequencesFor(Object searchableObj) {
-    return getSearchableCharSequencesFor(searchableObj, true);
+  public Collection getSearchableCharSequencesFor(FetchedDataCache cache, Object searchableObj) {
+    return getSearchableCharSequencesFor(cache, searchableObj, true);
   }
-  public Collection getSearchableCharSequencesFor(Object searchableObj, boolean providerSetting) {
+  public Collection getSearchableCharSequencesFor(FetchedDataCache cache, Object searchableObj, boolean providerSetting) {
     if (searchableObj instanceof Record)
-      return TextRenderer.getSearchTextFor((Record) searchableObj, providerSetting);
+      return TextRenderer.getSearchTextFor(cache, (Record) searchableObj, providerSetting);
     else
       return null;
   }

@@ -195,14 +195,15 @@ public class GroupActionTable extends RecordActionTable implements ActionProduce
         StringBuffer errBuffer = new StringBuffer();
         for (int i=0; i<shares.length; i++) {
           FolderShareRecord shareRecord = shares[i];
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           if (shareRecord.isOwnedByUser()) {
-            UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(shareRecord.ownerUserId);
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
+            UserRecord uRec = cache.getUserRecord(shareRecord.ownerUserId);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, uRec.userId, true, false);
             recipientsV.addElement(rec);
           } else if (shareRecord.isOwnedByGroup()) {
-            FolderRecord gRec = FetchedDataCache.getSingleInstance().getFolderRecord(shareRecord.ownerUserId);
+            FolderRecord gRec = cache.getFolderRecord(shareRecord.ownerUserId);
             if (gRec != null) {
-              FolderShareRecord share = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(gRec.folderId, true);
+              FolderShareRecord share = cache.getFolderShareRecordMy(gRec.folderId, true);
               FolderPair fPair = new FolderPair(share, gRec);
               recipientsV.addElement(fPair);
             } else {

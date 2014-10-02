@@ -288,7 +288,7 @@ public class DNDActionFileChooser extends DNDFileChooser implements ActionProduc
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(cache, allFolderRecords);
     allFolderPairs = (FolderPair[]) FolderFilter.MOVE_FOLDER.filterInclude(allFolderPairs);
 
     Window w = SwingUtilities.windowForComponent(this);

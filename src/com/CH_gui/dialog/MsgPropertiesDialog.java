@@ -15,7 +15,6 @@ import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.event.MsgDataRecordEvent;
 import com.CH_cl.service.cache.event.MsgDataRecordListener;
 import com.CH_cl.service.engine.ServerInterfaceLayer;
-import com.CH_cl.service.ops.MsgDataOps;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_cl.util.MsgUtils;
 import com.CH_co.service.msg.CommandCodes;
@@ -310,7 +309,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
               jPasswordPane.revalidate();
               jPasswordPane.repaint();
             }
-            MsgUtils.unlockPassProtectedMsg(msgDataRecord, matchingSet);
+            MsgUtils.unlockPassProtectedMsg(cache, msgDataRecord, matchingSet);
           } else if (jPasswordPane.getComponentCount() == 2) {
             jPasswordPane.remove(1);
             jPasswordPane.revalidate();
@@ -768,7 +767,7 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
   private void updateData(final MsgDataRecord dataRecord) {
     // complete digest verification if not already done
     if (dataRecord.isDigestOk() == null || dataRecord.isEncDigestOk() == null) {
-      MsgDataOps.tryToUnsealMsgDataWithVerification(dataRecord);
+      CacheMsgUtils.tryToUnsealMsgDataWithVerification(cache, dataRecord);
     }
 
     jTranscript.setEnabled(true);
@@ -786,8 +785,8 @@ public class MsgPropertiesDialog extends GeneralDialog implements VisualsSavable
     jSizeOnDisk.setText(oSize);
 
     // jFrom email address, contact or user
-    Record sender = CacheMsgUtils.getFromAsFamiliar(dataRecord);
-    Record signRec = CacheUsrUtils.convertUserIdToFamiliarUser(dataRecord.senderUserId, true, false);
+    Record sender = CacheMsgUtils.getFromAsFamiliar(cache, dataRecord);
+    Record signRec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, dataRecord.senderUserId, true, false);
     if (sender != null) {
       // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
       if (!dataRecord.isRegularEmail() && (sender instanceof EmailAddressRecord || sender instanceof MsgDataRecord)) {

@@ -178,7 +178,7 @@ public class PasswordResetDialog extends GeneralDialog {
     listPanel.setLayout(new GridBagLayout());
     UserRecord[] subUsers = cache.getUserRecords(subAccountsToManage);
     for (int i=0; i<subUsers.length; i++) {
-      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, false);
+      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, subUsers[i].userId, true, false);
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 5), 0, 0));
       jSubAccountsNotes[i] = new JMyLabel();

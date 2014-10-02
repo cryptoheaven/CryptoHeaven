@@ -9,6 +9,8 @@
  */
 package com.CH_cl.service.records.filters;
 
+import com.CH_cl.util.SearchTextProviderI;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.trace.Trace;
 import com.CH_co.service.records.*;
 import com.CH_co.service.records.filters.*;
@@ -25,17 +27,19 @@ import java.util.*;
  */
 public class TextSearchFilter extends AbstractRecordFilter implements RecordFilter {
 
+  private FetchedDataCache cache;
   private String searchStr;
   private String[] searchTokens;
   private boolean includeMsgBodies;
   private SearchTextProviderI searchTextProvider;
 
   /** Creates new TextSearchFilter */
-  public TextSearchFilter(String searchStr, boolean includeMsgBodies, SearchTextProviderI searchTextProvider) {
+  public TextSearchFilter(FetchedDataCache cache, String searchStr, boolean includeMsgBodies, SearchTextProviderI searchTextProvider) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextSearchFilter.class, "TextSearchFilter(String searchStr, boolean includeMsgBodies, SearchTextProviderI searchTextProvider)");
     if (trace != null) trace.args(searchStr);
     if (trace != null) trace.args(includeMsgBodies);
     if (trace != null) trace.args(searchTextProvider);
+    this.cache = cache;
     this.includeMsgBodies = includeMsgBodies;
     this.searchTextProvider = searchTextProvider;
     setSearchStr(searchStr);
@@ -52,14 +56,14 @@ public class TextSearchFilter extends AbstractRecordFilter implements RecordFilt
 
     if (record instanceof FileLinkRecord) {
       FileLinkRecord fLink = (FileLinkRecord) record;
-      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(fLink)))
+      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(cache, fLink)))
         keep = true;
     } else if (record instanceof MsgLinkRecord) {
       MsgLinkRecord mLink = (MsgLinkRecord) record;
-      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(mLink, includeMsgBodies)))
+      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(cache, mLink, includeMsgBodies)))
         keep = true;
     } else {
-      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(record)))
+      if (isMatch(searchTextProvider.getSearchableCharSequencesFor(cache, record)))
         keep = true;
     }
 

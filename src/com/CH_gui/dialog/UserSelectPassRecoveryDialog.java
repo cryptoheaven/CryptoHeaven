@@ -9,6 +9,7 @@
  */
 package com.CH_gui.dialog;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_gui.gui.JMyButton;
 import com.CH_gui.util.GeneralDialog;
 import com.CH_gui.util.MessageDialog;
@@ -90,7 +91,7 @@ public class UserSelectPassRecoveryDialog extends GeneralDialog {
             // Create runnables to be executed after Recovery Challenge is recived
             Runnable passRecoveryRunner = new Runnable() {
               public void run() {
-                new PassRecoveryRecoverDialog(loginFrame, MainFrame.getServerInterfaceLayer().getFetchedDataCache().getMyPassRecoveryRecord());
+                new PassRecoveryRecoverDialog(loginFrame, FetchedDataCache.getSingleInstance().getMyPassRecoveryRecord());
               }
             };
             Runnable timeoutRunner = new Runnable() {

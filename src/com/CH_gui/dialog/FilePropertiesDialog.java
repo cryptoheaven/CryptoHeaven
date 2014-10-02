@@ -174,7 +174,8 @@ public class FilePropertiesDialog extends GeneralDialog implements VisualsSavabl
     panel.add(new JMyLabel(com.CH_cl.lang.Lang.rb.getString("label_Location")), new GridBagConstraints(0, 4, 1, 1, 0, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(5, 5, 5, 5), 0, 0));
 
-    Record locationRecord = FileLinkRecUtil.getLocationRecord(fileLink);
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    Record locationRecord = FileLinkRecUtil.getLocationRecord(cache, fileLink);
     JLabel jLocationRecord = null;
     if (locationRecord != null) {
       if (locationRecord instanceof FolderPair) {

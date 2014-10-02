@@ -10,6 +10,7 @@
 package com.CH_gui.gui;
 
 import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.records.EmailAddressRecord;
 import com.CH_co.service.records.EmailRecord;
 import com.CH_co.service.records.MsgDataRecord;
@@ -58,7 +59,7 @@ public class URLLauncherMAILTO extends Object implements URLLauncher {
       try {
         userid = Long.valueOf(path);
         // use my contact list only, not the reciprocal contacts
-        initialRecipient = CacheUsrUtils.convertUserIdToFamiliarUser(userid, true, false);
+        initialRecipient = CacheUsrUtils.convertUserIdToFamiliarUser(FetchedDataCache.getSingleInstance(), userid, true, false);
       } catch (Throwable t) {
       }
       if (initialRecipient == null)

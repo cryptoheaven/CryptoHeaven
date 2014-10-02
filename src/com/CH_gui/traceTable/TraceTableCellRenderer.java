@@ -42,6 +42,8 @@ import javax.swing.table.TableModel;
 
 public class TraceTableCellRenderer extends RecordTableCellRenderer {
 
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -65,11 +67,11 @@ public class TraceTableCellRenderer extends RecordTableCellRenderer {
         }
         // User info
         else if (rawColumn == 3) {
-          UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(traceRecord.ownerUserId);
+          UserRecord uRec = cache.getUserRecord(traceRecord.ownerUserId);
 
           if (uRec != null) {
             // use my contact list only, not the reciprocal contacts
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, uRec.userId, true, false);
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
           }

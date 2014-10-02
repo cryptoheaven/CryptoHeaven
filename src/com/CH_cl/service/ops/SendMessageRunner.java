@@ -116,11 +116,12 @@ public class SendMessageRunner extends ThreadTraced {
         if (isAnyRecipientFolder)
           break;
       }
-      boolean shouldCopyToSent = msgSendInfoProvider.isCopyToOutgoing() || (selectedLocalFileAttachments != null && selectedLocalFileAttachments.length > 0);
+//      boolean shouldCopyToSent = !isAnyRecipientFolder || msgSendInfoProvider.isCopyToOutgoing();
+      boolean shouldCopyToSent = msgSendInfoProvider.isCopyToOutgoing() || (selectedLocalFileAttachments != null && selectedLocalFileAttachments.length > 0 && !isAnyRecipientFolder);
 
       boolean isSavingAsDraft = msgSendInfoProvider.isSavingAsDraft();
       if (!isSavingAsDraft && shouldCopyToSent) {
-        selectedRecipients[BCC] = addOutgoingToRecipients(selectedRecipients[BCC]);
+        selectedRecipients[BCC] = addOutgoingToRecipients(cache, selectedRecipients[BCC]);
       }
 
       // remove recipients that are repeated in lower level recipient type
@@ -196,7 +197,7 @@ public class SendMessageRunner extends ThreadTraced {
 
         if (linkRecords != null && linkRecords.length > 0) {
           // create Msg Data Record
-          dataRecord = prepareMsgDataRecord(symmetricKey);
+          dataRecord = prepareMsgDataRecord(cache, symmetricKey);
           if (isSavingAsDraft) {
             dataRecord.setRecipients(recipientsSB.toString());
             shareIDs = new Long[] { cache.getFolderShareRecordMy(myUserRecord.draftFolderId, false).shareId };
@@ -209,12 +210,12 @@ public class SendMessageRunner extends ThreadTraced {
 
           // create message attachments
           if (selectedMsgAndPostAttachments != null && selectedMsgAndPostAttachments.length > 0) {
-            msgAttachments = prepareMsgAttachments(selectedMsgAndPostAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
+            msgAttachments = prepareMsgAttachments(cache, selectedMsgAndPostAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
           }
 
           // create file attachments
           if (selectedAndInlineFileAttachments != null && selectedAndInlineFileAttachments.length > 0) {
-            fileAttachments = prepareFileAttachments(selectedAndInlineFileAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
+            fileAttachments = prepareFileAttachments(cache, selectedAndInlineFileAttachments, symmetricAttachmentsKey, fromMsgLinkIDsL, fromShareIDsL);
           }
 
           // convert IDs vector to array of IDs
@@ -343,11 +344,10 @@ public class SendMessageRunner extends ThreadTraced {
   * Adjusts the recipient list to include the CC is selected.
   * Call only when CC checkbox is selected.
   */
-  private static Record[] addOutgoingToRecipients(Record[] recipients) {
+  private static Record[] addOutgoingToRecipients(final FetchedDataCache cache, Record[] recipients) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "addOutgoingToRecipients(Record[] recipients)");
     if (trace != null) trace.args(recipients);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     // if CC: to Outgoing folder, then prepare the sentPair FolderPair and add it to recipients (if not already selected)
     Long sentFolderId = cache.getUserRecord().sentFolderId;
     if (RecordUtils.find(recipients, sentFolderId) == null) {
@@ -508,10 +508,10 @@ public class SendMessageRunner extends ThreadTraced {
   }
 
 
-  public static MsgDataRecord prepareMsgDataRecord(BASymmetricKey symmetricKey, Short importance, String subject, String body, String password) {
-    return prepareMsgDataRecord(symmetricKey, importance, new Short(MsgDataRecord.OBJ_TYPE_MSG), subject, body, password);
+  public static MsgDataRecord prepareMsgDataRecord(final FetchedDataCache cache, BASymmetricKey symmetricKey, Short importance, String subject, String body, String password) {
+    return prepareMsgDataRecord(cache, symmetricKey, importance, new Short(MsgDataRecord.OBJ_TYPE_MSG), subject, body, password);
   }
-  public static MsgDataRecord prepareMsgDataRecord(BASymmetricKey symmetricKey, Short importance, Short objType, String subject, String body, String password) {
+  public static MsgDataRecord prepareMsgDataRecord(final FetchedDataCache cache, BASymmetricKey symmetricKey, Short importance, Short objType, String subject, String body, String password) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgDataRecord(BASymmetricKey symmetricKey, Short importance, String subject, String body, String password)");
     if (trace != null) trace.args(symmetricKey, importance, subject, body, password);
     MsgDataRecord dataRecord = new MsgDataRecord();
@@ -524,11 +524,11 @@ public class SendMessageRunner extends ThreadTraced {
     }
     dataRecord.setTextBody(body);
     Hasher.Set bodyKey = password != null ? new Hasher.Set(password.toCharArray()) : null;
-    dataRecord.seal(symmetricKey, bodyKey, FetchedDataCache.getSingleInstance().getKeyRecordMyCurrent());
+    dataRecord.seal(symmetricKey, bodyKey, cache.getKeyRecordMyCurrent());
     if (trace != null) trace.exit(SendMessageRunner.class, dataRecord);
     return dataRecord;
   }
-  private MsgDataRecord prepareMsgDataRecord(BASymmetricKey symmetricKey) {
+  private MsgDataRecord prepareMsgDataRecord(final FetchedDataCache cache, BASymmetricKey symmetricKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgAttachments(BASymmetricKey symmetricKey)");
     if (trace != null) trace.args(symmetricKey);
     short msgPriority = msgSendInfoProvider.getPriority();
@@ -536,7 +536,7 @@ public class SendMessageRunner extends ThreadTraced {
     String[] content = msgSendInfoProvider.getContent();
     String question = msgSendInfoProvider.getQuestion();
     String password = msgSendInfoProvider.getPassword();
-    MsgDataRecord dataRecord = prepareMsgDataRecord(symmetricKey, new Short(msgPriority), objType, content[0], content[1], password);
+    MsgDataRecord dataRecord = prepareMsgDataRecord(cache, symmetricKey, new Short(msgPriority), objType, content[0], content[1], password);
     dataRecord.bodyPassHint = question == null || question.trim().length() == 0 ? null : question.trim();
     dataRecord.dateExpired = msgSendInfoProvider.getExpiry();
     if (trace != null) trace.exit(SendMessageRunner.class, dataRecord);
@@ -548,11 +548,10 @@ public class SendMessageRunner extends ThreadTraced {
   * Clone and encrypt message links to create message attachments links.
   * Fills the share ID vector with involved shares from where the attachments are taken.
   */
-  private static MsgLinkRecord[] prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsV, ArrayList fromShareIDsV) {
+  private static MsgLinkRecord[] prepareMsgAttachments(final FetchedDataCache cache, MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsV, ArrayList fromShareIDsV) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareMsgAttachments(MsgLinkRecord[] selectedMsgLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL)");
     if (trace != null) trace.args(selectedMsgLinks, symmetricKey, fromMsgLinkIDsV, fromShareIDsV);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     MsgLinkRecord[] msgAttachments = (MsgLinkRecord[]) RecordUtils.cloneRecords(selectedMsgLinks);
     for (int i=0; i<msgAttachments.length; i++) {
       MsgLinkRecord mLink = msgAttachments[i];
@@ -568,7 +567,7 @@ public class SendMessageRunner extends ThreadTraced {
           addUniqueIdTo(shareRecord.shareId, fromShareIDsV);
         }
       } else if (ownerObjType == Record.RECORD_TYPE_MESSAGE) {
-        addUniqueAttachmentIDsTo(mLink.ownerObjId, fromMsgLinkIDsV, fromShareIDsV);
+        addUniqueAttachmentIDsTo(cache, mLink.ownerObjId, fromMsgLinkIDsV, fromShareIDsV);
       } else {
         throw new IllegalArgumentException("Don't know how to handle owner type " + ownerObjType);
       }
@@ -583,8 +582,7 @@ public class SendMessageRunner extends ThreadTraced {
       v.add(id);
     }
   }
-  private static void addUniqueAttachmentIDsTo(Long ownerMsgId, ArrayList msgLinkIDsL, ArrayList shareIDsL) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  private static void addUniqueAttachmentIDsTo(final FetchedDataCache cache, Long ownerMsgId, ArrayList msgLinkIDsL, ArrayList shareIDsL) {
     MsgLinkRecord[] ownerMsgLinks = cache.getMsgLinkRecordsForMsg(ownerMsgId);
     MsgLinkRecord ownerMsgLink = ownerMsgLinks != null && ownerMsgLinks.length > 0 ? ownerMsgLinks[0] : null;
     if (ownerMsgLink != null) {
@@ -603,11 +601,10 @@ public class SendMessageRunner extends ThreadTraced {
   * Clone and encrypt file links to create message attachment file links.
   * Fills the share ID vector with involved shares from where the attachments are taken.
   */
-  private static FileLinkRecord[] prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL) {
+  private static FileLinkRecord[] prepareFileAttachments(final FetchedDataCache cache, FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "prepareFileAttachments(FileLinkRecord[] selectedFileLinks, BASymmetricKey symmetricKey, ArrayList fromMsgLinkIDsL, ArrayList fromShareIDsL)");
     if (trace != null) trace.args(selectedFileLinks, symmetricKey, fromMsgLinkIDsL, fromShareIDsL);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FileLinkRecord[] fileAttachments = (FileLinkRecord[]) RecordUtils.cloneRecords(selectedFileLinks);
 
     for (int i=0; i<fileAttachments.length; i++) {
@@ -622,7 +619,7 @@ public class SendMessageRunner extends ThreadTraced {
           addUniqueIdTo(shareRecord.shareId, fromShareIDsL);
         }
       } else if (ownerObjType == Record.RECORD_TYPE_MESSAGE) {
-        addUniqueAttachmentIDsTo(fLink.ownerObjId, fromMsgLinkIDsL, fromShareIDsL);
+        addUniqueAttachmentIDsTo(cache, fLink.ownerObjId, fromMsgLinkIDsL, fromShareIDsL);
       } else {
         throw new IllegalArgumentException("Don't know how to handle owner type " + ownerObjType);
       }

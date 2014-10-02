@@ -31,7 +31,8 @@ import com.CH_gui.table.RecordTableModel;
  * @author  Marcin Kurzawa
  */
 public class KeyTableModel extends RecordTableModel {
-  
+
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
   private KeyListener keyListener;
 
   private static String STR_KEY = com.CH_cl.lang.Lang.rb.getString("column_Key");
@@ -86,7 +87,6 @@ public class KeyTableModel extends RecordTableModel {
   public synchronized void setAutoUpdate(boolean flag) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(KeyTableModel.class, "setAutoUpdate(boolean flag)");
     if (trace != null) trace.args(flag);
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (flag) {
       if (keyListener == null) {
         keyListener = new KeyListener();
@@ -126,7 +126,7 @@ public class KeyTableModel extends RecordTableModel {
         case 1: 
           value = keyRecord.ownerUserId;
           // use my contact list only, not the reciprocal contacts
-          Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(keyRecord.ownerUserId, true, false);
+          Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(cache, keyRecord.ownerUserId, true, false);
           if (owner == null) {
             UserRecord uRec = new UserRecord();
             uRec.userId = keyRecord.ownerUserId;

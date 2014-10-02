@@ -394,7 +394,7 @@ public class MsgAGet extends ClientMessageAction {
           }
         }
         // now gather all Recipient email addresses
-        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
+        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(cache, dataRecord);
         for (int j=0; j<recipients.length; j++) {
           for (int k=0; k<recipients[j].length; k++) {
             Record recipient = recipients[j][k];

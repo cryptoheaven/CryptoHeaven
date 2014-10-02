@@ -809,20 +809,21 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     if (monitoringType == MONITORING_OPEN) {
       if (fileLinks != null) {
         for (int i=0; i<fileLinks.length; i++) {
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FileLinkRecord fileLink = fileLinks[i];
-          FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
+          FileDataRecord fileData = cache.getFileDataRecord(fileLink.fileId);
           if (fileData != null) {
             File tempFile = fileData.getPlainDataFile();
             if (tempFile != null) {
               boolean shouldBeReadOnly = false;
-              if (!FileLobUpEditMonitor.canMonitor(fileLink)) {
+              if (!FileLobUpEditMonitor.canMonitor(cache, fileLink)) {
                 shouldBeReadOnly = true;
                 tempFile.setReadOnly();
               }
               GlobalProperties.addTempFileToCleanup(tempFile);
               boolean openned = BrowserLauncher.openFile(context, tempFile);
               if (openned && !shouldBeReadOnly)
-                FileLobUpEditMonitor.registerForMonitoring(tempFile, fileLink, fileData);
+                FileLobUpEditMonitor.registerForMonitoring(cache, tempFile, fileLink, fileData);
             }
           }
         }

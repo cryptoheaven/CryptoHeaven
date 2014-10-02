@@ -111,6 +111,14 @@ public class FetchedDataCache extends Object {
     private static final FetchedDataCache INSTANCE = new FetchedDataCache();
   }
 
+  /**
+   * Instantiates new cache for use by web-server in web-applications.
+   * @returns new instance of the cache.
+   */
+  public static FetchedDataCache getNewInstance() {
+    return new FetchedDataCache();
+  }
+
   /** Creates new FetchedDataCache */
   private FetchedDataCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FetchedDataCache.class, "FetchedDataCache()");

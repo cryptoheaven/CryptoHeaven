@@ -237,7 +237,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   // =====================================================================
 
   /** Display a dialog so the user can enter new folder's info and
-    * selectect which folder of the tree will be the parent.
+    * select which folder of the tree will be the parent.
     * Submit Create New Folder request
     */
   private class NewFolderAction extends AbstractActionTraced {
@@ -367,7 +367,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         boolean confirmed = MsgActionTable.showConfirmationDialog(FolderActionTree.this, title, messageText, folderPairs, NotificationCenter.RECYCLE_MESSAGE, true);
         if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-          FolderPair recycleFolderPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
+          FolderPair recycleFolderPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
           FileActionTable.doMoveOrSaveAttachmentsAction(recycleFolderPair, null, folderPairs);
         }
       }
@@ -1064,7 +1064,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
         fRec = cache.getFolderRecord(uRec.recycleFolderId);
       }
       if (fRec != null) {
-        actionFolderPair = CacheFldUtils.convertRecordToPair(fRec);
+        actionFolderPair = CacheFldUtils.convertRecordToPair(cache, fRec);
       }
       return actionFolderPair;
     }
@@ -1122,7 +1122,7 @@ public class FolderActionTree extends FolderTree implements ActionProducerI, Dis
   public static FolderPair selectFolder(Window parent, String title, AbstractRecordFilter filter) {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(cache, allFolderRecords);
     allFolderPairs = (FolderPair[]) filter.filterInclude(allFolderPairs);
 
     FolderPair chosenPair = null;

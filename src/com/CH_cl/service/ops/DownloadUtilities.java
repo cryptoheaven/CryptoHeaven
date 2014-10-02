@@ -35,7 +35,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -160,7 +159,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     if (trace != null) trace.args(openCachedFileFirst);
     if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
-    if (openCachedFileFirst && openCachedFile(context, fileLink)) {
+    if (openCachedFileFirst && openCachedFile(context, SIL.getFetchedDataCache(), fileLink)) {
       // all done
     } else {
       File destDir = destDirOverride != null ? destDirOverride : getDefaultTempDir();
@@ -181,13 +180,13 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
     File file = null;
-    FileDataRecord fileRec = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
+    FileDataRecord fileRec = SIL.getFetchedDataCache().getFileDataRecord(fileLink.fileId);
     if (fileRec != null && fileRec.getPlainDataFile() != null && fileRec.getPlainDataFile().exists()) {
       file = fileRec.getPlainDataFile();
     } else {
       File destDir = getDefaultTempDir();
       downloadFilesStartCoordinator(context, new FileRecord[] { fileLink }, parentMsgLinks, destDir, SIL, true, false, suppressDownloadSoundsAndAutoClose);
-      fileRec = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
+      fileRec = SIL.getFetchedDataCache().getFileDataRecord(fileLink.fileId);
       if (fileRec != null) // this can be null if file transfer was cancelled or interrupted
         file = fileRec.getPlainDataFile();
     }
@@ -196,12 +195,12 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     return file;
   }
 
-  public static boolean openCachedFile(Object context, FileLinkRecord fileLink) {
+  public static boolean openCachedFile(Object context, FetchedDataCache cache, FileLinkRecord fileLink) {
     boolean cachedFileOpened = false;
-    FileDataRecord fileData = FetchedDataCache.getSingleInstance().getFileDataRecord(fileLink.fileId);
+    FileDataRecord fileData = cache.getFileDataRecord(fileLink.fileId);
     cachedFileOpened = FileLauncher.openFile(context, fileData);
-    if (cachedFileOpened && FileLobUpEditMonitor.canMonitor(fileLink)) {
-      FileLobUpEditMonitor.registerForMonitoring(fileData.getPlainDataFile(), fileLink, fileData);
+    if (cachedFileOpened && FileLobUpEditMonitor.canMonitor(cache, fileLink)) {
+      FileLobUpEditMonitor.registerForMonitoring(cache, fileData.getPlainDataFile(), fileLink, fileData);
     }
     return cachedFileOpened;
   }
@@ -371,7 +370,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
             }
           }
 
-          FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
+          FetchedDataCache cache = SIL.getFetchedDataCache();
 
           for (int i=0; i<f.length; i++) {
             FolderRecord folderRecord = f[i].getFolderRecord();
@@ -436,7 +435,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "fetchMsgListings(FolderPair[] folders, ServerInterfaceLayer SIL)");
     if (trace != null) trace.args(folders);
 
-    final FetchedDataCache _cache = ServerInterfaceLayer.getFetchedDataCache();
+    final FetchedDataCache _cache = SIL.getFetchedDataCache();
 
     FolderShareRecord[] fldShares = FolderPair.getFolderShareRecords(folders);
     Long[] folderIDs = FolderShareRecord.getFolderIDs(fldShares);
@@ -468,7 +467,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
       Long folderId = fldShares[i].folderId;
       Msg_GetMsgs_Rq request = new Msg_GetMsgs_Rq(shareId, Record.RECORD_TYPE_FOLDER, folderId, (short) -Msg_GetMsgs_Rq.FETCH_NUM_LIST__INITIAL_SIZE, (short) Msg_GetMsgs_Rq.FETCH_NUM_NEW__INITIAL_SIZE, (Timestamp) null);
       // Gather messages already fetched so we don't re-fetch all items if not necessary
-      MsgLinkRecord[] existingMsgLinks = CacheMsgUtils.getMsgLinkRecordsWithFetchedDatas(folderId);
+      MsgLinkRecord[] existingMsgLinks = CacheMsgUtils.getMsgLinkRecordsWithFetchedDatas(_cache, folderId);
       request.exceptLinkIDs = RecordUtils.getIDs(existingMsgLinks);
       MessageAction msgAction = new MessageAction(CommandCodes.MSG_Q_GET_FULL, request);
       SIL.submitAndReturn(msgAction, 30000);
@@ -496,7 +495,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(DownloadUtilities.class, "fetchFileListings(FolderPair[] folders, ServerInterfaceLayer SIL)");
     if (trace != null) trace.args(folders);
 
-    final FetchedDataCache _cache = ServerInterfaceLayer.getFetchedDataCache();
+    final FetchedDataCache _cache = SIL.getFetchedDataCache();
 
     FolderShareRecord[] fldShares = FolderPair.getFolderShareRecords(folders);
     Long[] folderIDs = FolderShareRecord.getFolderIDs(fldShares);
@@ -593,7 +592,7 @@ public class DownloadUtilities extends Object { // implicit no-argument construc
     if (trace != null) trace.args(openAfterDownload);
     if (trace != null) trace.args(suppressDownloadSoundsAndAutoClose);
 
-    FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
 
     // Order by fileLinkID ascending
     Arrays.sort(files);

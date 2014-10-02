@@ -26,6 +26,8 @@ import java.util.Enumeration;
  */
 public class FolderTreeModelCl extends FolderTreeModel {
 
+  private FetchedDataCache cache;
+
   /** Creates new FolderTreeModelCl */
   public FolderTreeModelCl() {
     super();
@@ -40,13 +42,6 @@ public class FolderTreeModelCl extends FolderTreeModel {
     if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
-  /** Creates new FolderTreeModelCl with specified folder filter. */
-  public FolderTreeModelCl(RecordFilter filter, FolderPair[] initialFolderPairs) {
-    super(filter, initialFolderPairs);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl(FolderFilter folderFilter, FolderPair[] initialFolderPairs)");
-    if (trace != null) trace.exit(FolderTreeModelCl.class);
-  }
-
   /** Creates new FolderTreeModelCl */
   public FolderTreeModelCl(FolderTreeNode root) {
     super(root);
@@ -54,14 +49,15 @@ public class FolderTreeModelCl extends FolderTreeModel {
     if (trace != null) trace.exit(FolderTreeModelCl.class);
   }
 
-  /** Creates new FolderTreeModelCl */
-  public FolderTreeModelCl(FolderTreeNode root, RecordFilter filter, FolderPair[] initialFolderPairs) {
-    super(root, filter, initialFolderPairs);
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelCl.class, "FolderTreeModelCl(FolderTreeNode root, FolderFilter folderFilter, FolderPair[] initialFolderPairs)");
-    if (trace != null) trace.exit(FolderTreeModelCl.class);
+  /**
+   * Must call this initialization method before using the model.
+   * @param cache 
+   */
+  public synchronized void initWithReferenceCache(FetchedDataCache cache) {
+    this.cache = cache;
   }
 
-    /** @param folder is a FolderRecord that will be removed from this tree model
+  /** @param folder is a FolderRecord that will be removed from this tree model
    * <code> folder </code> cannnot be null
    * Note: only removal of FolderRecords is supported, and not FolderShares alone
    */
@@ -80,7 +76,6 @@ public class FolderTreeModelCl extends FolderTreeModel {
       if (keepCacheResidantChildren) {
         Enumeration enm = nodeToRemove.postorderEnumeration(); // all descending children
         if (enm != null && enm.hasMoreElements()) {
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           while (enm.hasMoreElements()) {
             FolderTreeNode childNode = (FolderTreeNode) enm.nextElement();
             FolderPair fPair = childNode.getFolderObject();

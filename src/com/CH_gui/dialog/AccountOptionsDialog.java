@@ -241,10 +241,12 @@ public class AccountOptionsDialog extends GeneralDialog {
           ClientMessageAction reply = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_CUMULATIVE_USAGE, request), 60000);
           if (reply != null) {
             DefaultReplyRunner.nonThreadedRun(SIL, reply);
-            Obj_List_Co set = (Obj_List_Co) reply.getMsgDataSet();
-            storageUsed = (Long) ((Object[]) set.objs[1])[0];
-            transferUsed = (Long) ((Object[]) set.objs[2])[0];
-            accountsUsed = (Short) ((Object[]) set.objs[3])[0];
+            if (reply.getActionCode() == CommandCodes.USR_A_CUMULATIVE_USAGE) {
+              Obj_List_Co set = (Obj_List_Co) reply.getMsgDataSet();
+              storageUsed = (Long) ((Object[]) set.objs[1])[0];
+              transferUsed = (Long) ((Object[]) set.objs[2])[0];
+              accountsUsed = (Short) ((Object[]) set.objs[3])[0];
+            }
           }
         }
 
@@ -275,8 +277,8 @@ public class AccountOptionsDialog extends GeneralDialog {
                 jPanelResponder.initializeData(userRecords.length == 1 ? userRecords[0].autoResp : null, autoResponderRecord);
               }
 
-              SysOps.checkExpiry();
-              SysOps.checkQuotas(storageUsedF, transferUsedF, accountsUsedF);
+              SysOps.checkExpiry(cache);
+              SysOps.checkQuotas(cache, storageUsedF, transferUsedF, accountsUsedF);
 
               // buttons enablement after fetch is done
               setEnabledButtons();
@@ -599,7 +601,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     listPanel.setLayout(new GridBagLayout());
     for (int i=0; i<subUsers.length; i++) {
       // use my contact list only, not the reciprocal contacts
-      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, false);
+      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, subUsers[i].userId, true, false);
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
     }
@@ -1002,7 +1004,7 @@ public class AccountOptionsDialog extends GeneralDialog {
     if (userRecords.length == 1) {
       UserRecord uRec = cache.getUserRecord(userRecords[0].userId);
       if (uRec != null) {
-        String[] emls = CacheUsrUtils.getCachedDefaultEmail(uRec, false);
+        String[] emls = CacheUsrUtils.getCachedDefaultEmail(cache, uRec, false);
         if (emls != null) {
           jDefaultEmail.setText(emls[2]);
           jDefaultEmail.setCaretPosition(0);

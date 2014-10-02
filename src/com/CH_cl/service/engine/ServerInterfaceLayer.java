@@ -114,6 +114,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
       ExecutionQueue so that its not blocked while independent jobs are being run. */
   private Fifo independentExecutionQueue;
   private ProcessingFunctionI independentExecutor;
+  /** Cache reference for checking login status or clearing when logging out. NULLABLE for engine or service mode */
+  private final FetchedDataCache cache;
 
   /** List to put the waiting stamps. */
   private final ArrayList stampList = new ArrayList();
@@ -170,11 +172,16 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   private HashSet statusListenersL;
 
   /**
-  * Creates new ServerInterfaceLayer
-  * @param connectedSocket through which communication will take place
-  */
+   * Creates new ServerInterfaceLayer for service mode.
+   */
   public ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient) {
-    this(hostsAndPorts, null, null, isClient);
+    this(null, hostsAndPorts, isClient);
+  }
+  /**
+   * Creates new ServerInterfaceLayer for client mode.
+   */
+  public ServerInterfaceLayer(final FetchedDataCache cache, Object[][] hostsAndPorts, boolean isClient) {
+    this(cache, hostsAndPorts, null, null, isClient);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts);
     if (trace != null) trace.args(isClient);
@@ -182,15 +189,18 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
   /**
-  * Creates new ServerInterfaceLayer
-  * @param independentExecutor if null, IndependentClientQueueExecutionFunction will be used.
-  * @param connectedSocket through which communication will take place
-  */
+   * Creates new ServerInterfaceLayer
+   * @param independentExecutor if null, IndependentClientQueueExecutionFunction will be used.
+   */
   public ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient) {
+    this(null, hostsAndPorts, independentExecutor, fixedMaxConnectionCount, isClient);
+  }
+  public ServerInterfaceLayer(final FetchedDataCache cache, Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "ServerInterfaceLayer(Object[][] hostsAndPorts, ProcessingFunctionI independentExecutor, Integer fixedMaxConnectionCount, boolean isClient)");
     if (trace != null) trace.args(hostsAndPorts, independentExecutor, fixedMaxConnectionCount);
     if (trace != null) trace.args(isClient);
 
+    this.cache = cache;
     this.isClient = isClient;
 
     this.hostsAndPorts = hostsAndPorts;
@@ -244,7 +254,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     this.executionQueue.installSink("Execution Queue", new QueueExecutionFunction());
 
     // Create the job queue
-    this.jobFifo = new JobFifo();
+    this.jobFifo = new JobFifo(cache);
 
     // Create the independent execution queue
     this.independentExecutor = independentExecutor != null ? independentExecutor : new IndependentClientQueueExecutionFunction(this);
@@ -275,7 +285,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     jobScanner.setDaemon(true);
     jobScanner.start();
 
-    if (isClient) {
+    if (isClient && cache != null) {
       // Start monitoring for CPU suspension so we can requests updates when we wake up.
       new SleepMonitor().start();
     }
@@ -344,10 +354,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   * @return the Fetched Data Cache storage where all data is to be cached.
   * There should be only one instance of this cache in the program runtime.
   */
-  public static FetchedDataCache getFetchedDataCache() {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ServerInterfaceLayer.class, "getFetchedDataCache()");
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    if (trace != null) trace.exit(ServerInterfaceLayer.class);
+  public FetchedDataCache getFetchedDataCache() {
     return cache;
   }
 
@@ -540,7 +547,11 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     if (!destroyed) {
       if (!IS_MOBILE_MODE) {
-        ThreadCheck.warnIfOnAWTthread();
+        if (cache != null) {
+          Long uId = cache.getMyUserId();
+          if (uId != null && uId.longValue() < 100)
+            ThreadCheck.warnIfOnAWTthread();
+        }
       }
 
       Stamp lStamp = new Stamp(msgAction.getStamp());
@@ -1449,7 +1460,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
         if (trace != null) trace.data(70, "all threads released and stamps cleared.");
 
         if (trace != null) trace.data(71, "clearing data cach");
-        FetchedDataCache.getSingleInstance().clear();
+        if (cache != null)
+          cache.clear();
         if (trace != null) trace.data(80, "data cach cleared");
       }
     }
@@ -1467,7 +1479,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
     disconnect();
     // clear the cache
-    FetchedDataCache.getSingleInstance().clear();
+    if (cache != null)
+      cache.clear();
 
     if (trace != null) trace.exit(ServerInterfaceLayer.class);
   }
@@ -1558,8 +1571,9 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public boolean isLoggedIn() {
     boolean rc = false;
     if (isLastLoginMsgActionSet())
-      if (getFetchedDataCache().getMyUserId() != null)
-        rc = true;
+      if (cache != null)
+        if (cache.getMyUserId() != null)
+          rc = true;
     return rc;
   }
   public ProtocolMsgDataSet getLoginMsgDataSet() {
@@ -2112,11 +2126,12 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
     }
     private void sleepDetected() {
       // invalidate views of fetched folders so that client reloads them on demand
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-      FolderRecord[] folders = cache.getFolderRecords();
-      for (int i=0; i<folders.length; i++) {
-        Long folderId = folders[i].folderId;
-        cache.markFolderViewInvalidated(folderId, true);
+      if (cache != null) {
+        FolderRecord[] folders = cache.getFolderRecords();
+        for (int i=0; i<folders.length; i++) {
+          Long folderId = folders[i].folderId;
+          cache.markFolderViewInvalidated(folderId, true);
+        }
       }
     }
   }

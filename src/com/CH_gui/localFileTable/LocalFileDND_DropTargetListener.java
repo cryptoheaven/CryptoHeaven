@@ -126,7 +126,7 @@ public class LocalFileDND_DropTargetListener extends Object implements DropTarge
         }
         // if any folders
         if (data.fileRecordIDs[0] != null && data.fileRecordIDs[0].length > 0) {
-          fileRecsV.addAll(Arrays.asList(CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]))));
+          fileRecsV.addAll(Arrays.asList(CacheFldUtils.convertRecordsToPairs(cache, cache.getFolderRecords(data.fileRecordIDs[0]))));
         }
         FileRecord[] fileRecs = null;
         if (fileRecsV.size() > 0) {

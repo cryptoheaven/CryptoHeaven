@@ -41,6 +41,8 @@ import javax.swing.table.TableModel;
 
 public class StatTableCellRenderer extends RecordTableCellRenderer {
 
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -54,11 +56,11 @@ public class StatTableCellRenderer extends RecordTableCellRenderer {
         StatTableModel tm = (StatTableModel) tableModel;
         StatRecord statRecord = (StatRecord) tm.getRowObject(sTable.convertMyRowIndexToModel(row));
 
-        UserRecord uRec = FetchedDataCache.getSingleInstance().getUserRecord(statRecord.ownerUserId);
+        UserRecord uRec = cache.getUserRecord(statRecord.ownerUserId);
 
         if (uRec != null) {
           // use my contact list only, not the reciprocal contacts
-          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(uRec.userId, true, false);
+          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, uRec.userId, true, false);
           setIcon(ListRenderer.getRenderedIcon(rec));
           setText(ListRenderer.getRenderedText(rec));
         }

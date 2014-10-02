@@ -45,7 +45,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
 
   private JMyTextField[] jAs;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
   private PassRecoveryRecord initialRecoveryRecord;
   private boolean reportActivityMode;
@@ -69,8 +69,8 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
     this.reportSince = reportSince;
     this.include24ExpiryNote = include24ExpiryNote;
 
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
 
     JButton[] buttons = createButtons();
     JPanel passRecoveryPanel = createMainPanel(initialRecoveryRecord);
@@ -316,7 +316,7 @@ public class PassRecoveryRecoverDialog extends GeneralDialog {
         request.objs = new Object[2];
         request.objs[0] = initialRecoveryRecord.userId;
         request.objs[1] = new Obj_List_Co(answersHashMD5);
-        serverInterfaceLayer.submitAndWait(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_COMPLETE, request), 30000);
+        SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_PASS_RECOVERY_GET_COMPLETE, request), 30000);
         PassRecoveryRecord passRecoveryRec = cache.getMyPassRecoveryRecord();
         if (passRecoveryRec.encPassList != null && passRecoveryRec.encPassList.length > 0) {
           char[] passChars = passRecoveryRec.recoverPassword(passRecoveryRec.questions, answers);

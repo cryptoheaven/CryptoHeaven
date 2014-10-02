@@ -496,7 +496,7 @@ public class FileTableModel extends RecordTableModel {
       if (halfPairPicksL.size() > 0) {
         halfPairPicks = new Record[halfPairPicksL.size()];
         halfPairPicksL.toArray(halfPairPicks);
-        pairPicks = CacheFldUtils.convertRecordsToPairs(halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
+        pairPicks = CacheFldUtils.convertRecordsToPairs(cache, halfPairPicks, event.getEventType() == RecordEvent.REMOVE);
       }
 
       if (linksPicksL.size() > 0) {

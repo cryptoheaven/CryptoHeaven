@@ -7,8 +7,9 @@
  * it only in accordance with the terms of the license agreement
  * you entered into with CryptoHeaven Corp.
  */
-package com.CH_co.util;
+package com.CH_cl.util;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import java.util.Collection;
 
 /**
@@ -25,7 +26,7 @@ public interface SearchTextProviderI {
    * @param searchableObj
    * @return a Collection of CharSequence objects
    */
-  public Collection getSearchableCharSequencesFor(Object searchableObj);
+  public Collection getSearchableCharSequencesFor(FetchedDataCache cache, Object searchableObj);
 
   /**
    * Gathers a Collection of CharSequence objects
@@ -33,6 +34,6 @@ public interface SearchTextProviderI {
    * @param providerSetting
    * @return a Collection of CharSequence objects
    */
-  public Collection getSearchableCharSequencesFor(Object searchableObj, boolean providerSetting);
+  public Collection getSearchableCharSequencesFor(FetchedDataCache cache, Object searchableObj, boolean providerSetting);
 
 }

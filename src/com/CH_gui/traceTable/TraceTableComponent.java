@@ -28,7 +28,7 @@ public class TraceTableComponent extends RecordTableComponent {
 
   /** Creates new TraceTableComponent */
   public TraceTableComponent(Record[] parentObjLinks) {
-    super(parentObjLinks != null && (parentObjLinks.length > 1 || CacheMsgUtils.hasAttachments(parentObjLinks[0])) ?  new TraceActionMultiTable(parentObjLinks) : new TraceActionTable(parentObjLinks), Template.get(Template.NONE));
+    super(parentObjLinks != null && (parentObjLinks.length > 1 || CacheMsgUtils.hasAttachments(FetchedDataCache.getSingleInstance(), parentObjLinks[0])) ?  new TraceActionMultiTable(parentObjLinks) : new TraceActionTable(parentObjLinks), Template.get(Template.NONE));
     initialize(parentObjLinks);
   }
   private void initialize(Record[] parentObjLinks) {

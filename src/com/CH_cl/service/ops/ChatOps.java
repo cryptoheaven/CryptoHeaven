@@ -37,18 +37,18 @@ public class ChatOps {
   * Look in the cache for existing chat folder 
   * @return null if not found or FolderPair that matches the member exactly.
   */
-  public static FolderPair doGetChatFolder(MemberContactRecordI chatWithContact) {
-    return doGetChatFolder(new MemberContactRecordI[] { chatWithContact });
+  public static FolderPair doGetChatFolder(final FetchedDataCache cache, MemberContactRecordI chatWithContact) {
+    return doGetChatFolder(cache,new MemberContactRecordI[] { chatWithContact });
   }
 
   /** 
   * Look in the cache for existing chat folder 
   * @return null if not found or FolderPair that matches the members exactly.
   */
-  public static FolderPair doGetChatFolder(MemberContactRecordI[] chatWithContacts) {
+  public static FolderPair doGetChatFolder(final FetchedDataCache cache, MemberContactRecordI[] chatWithContacts) {
     // Look for a folder that is shared exclusively with specified contact(s).
-    FolderRecord[] chatFlds = FetchedDataCache.getSingleInstance().getFolderRecordsChatting();
-    FolderPair chatFolderPair = FolderOps.getChatFolderPairFromCache(chatWithContacts, chatFlds);
+    FolderRecord[] chatFlds = cache.getFolderRecordsChatting();
+    FolderPair chatFolderPair = FolderOps.getChatFolderPairFromCache(cache, chatWithContacts, chatFlds);
     return chatFolderPair;
   }
 
@@ -72,7 +72,7 @@ public class ChatOps {
 
         FolderPair chatPair = null;
 
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        FetchedDataCache cache = _SIL.getFetchedDataCache();
         StringBuffer folderName = new StringBuffer(com.CH_cl.lang.Lang.rb.getString("folderName_Chat_Log"));
         String folderDesc = "";
         String ownerHandle = cache.getUserRecord().handle;
@@ -80,7 +80,7 @@ public class ChatOps {
         folderName.append(ownerHandle);
         if (_chatWithContacts.length > 1) {
           for (int i=0; i<_chatWithContacts.length; i++) {
-            String name = TextRenderer.getRenderedText(_chatWithContacts[i]);
+            String name = TextRenderer.getRenderedText(_SIL.getFetchedDataCache(), _chatWithContacts[i]);
             folderName.append(", ");
             // if there are too many shares that would make the name too long, then just truncate it
             if (folderName.length() + name.length() > 100) {
@@ -91,7 +91,7 @@ public class ChatOps {
             }
           }
         } else {
-          String otherName = TextRenderer.getRenderedText(_chatWithContacts[0]);
+          String otherName = TextRenderer.getRenderedText(_SIL.getFetchedDataCache(), _chatWithContacts[0]);
           folderName.append(", ");
           folderName.append(otherName);
         }

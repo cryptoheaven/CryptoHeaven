@@ -62,7 +62,7 @@ public class MsgPanelUtils extends Object {
       FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       EmailRecord[] emlRecs = cache.getEmailRecords(cache.getMyUserId());
       if (emlRecs.length > 0) {
-        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(originalMsg);
+        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(cache, originalMsg);
         for (int recipientType=0; recipientType<recipients.length; recipientType++) {
           if (recipients[recipientType] != null) {
             for (int i=0; i<recipients[recipientType].length; i++) {
@@ -105,7 +105,7 @@ public class MsgPanelUtils extends Object {
 
     Record[][] recipients = null;
     if (dataRecord != null)
-      recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
+      recipients = CacheMsgUtils.gatherAllMsgRecipients(FetchedDataCache.getSingleInstance(), dataRecord);
     drawRecordFlowPanel(recipients,
                         new Boolean[] { Boolean.valueOf(includeTO), Boolean.valueOf(includeCC), Boolean.valueOf(includeBCC) },
                         includeLabels ? new String[] { com.CH_cl.lang.Lang.rb.getString("label_To"), com.CH_cl.lang.Lang.rb.getString("label_Cc"), com.CH_cl.lang.Lang.rb.getString("label_Bcc") } : null,
@@ -140,6 +140,7 @@ public class MsgPanelUtils extends Object {
     int labelRendererIndex = jLabelRenderers != null ? 0 : -1;
 
     if (includeSets != null) {
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       for (int setIndex=0; setIndex<objSets.length; setIndex++) {
         if (includeSets.length > setIndex) {
           Object[] objs = objSets[setIndex];
@@ -173,7 +174,7 @@ public class MsgPanelUtils extends Object {
                 label.setBorder(new EmptyBorder(2,0,2,5));
                 // just for display convert any EmailAddressRecord to familiar Address Book entry
                 if (obj instanceof EmailAddressRecord) {
-                  obj = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) obj).address);
+                  obj = CacheEmlUtils.convertToFamiliarEmailRecord(cache, ((EmailAddressRecord) obj).address);
                 }
                 label.setIcon(ListRenderer.getRenderedIcon(obj, true));
                 label.setText(ListRenderer.getRenderedText(obj, false, false, true, false, true, true));

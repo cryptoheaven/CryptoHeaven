@@ -48,13 +48,13 @@ import java.util.Properties;
 public class UserOps extends Object {
 
 
-  public static void fetchUnknownUsers(ServerInterfaceLayer SIL, StatRecord[] statRecords) {
+  public static void fetchUnknownUsers(final ServerInterfaceLayer SIL, StatRecord[] statRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "fetchUnknownUsers(ServerInterfaceLayer SIL, StatRecord[] statRecords)");
     if (trace != null) trace.args(SIL, statRecords);
 
     // Gather all userIDs for which we don't have user handles and fetch them.
     ArrayList userIDsL = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     for (int i=0; i<statRecords.length; i++) {
       StatRecord stat = statRecords[i];
       if (cache.getUserRecord(stat.ownerUserId) == null) {
@@ -72,13 +72,13 @@ public class UserOps extends Object {
     if (trace != null) trace.exit(UserOps.class);
   }
 
-  public static void fetchUnknownUsers(ServerInterfaceLayer SIL, EmailRecord[] emailRecords) {
+  public static void fetchUnknownUsers(final ServerInterfaceLayer SIL, EmailRecord[] emailRecords) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "fetchUnknownUsers(ServerInterfaceLayer SIL, EmailRecord[] emailRecords)");
     if (trace != null) trace.args(SIL, emailRecords);
 
     // Gather all userIDs for which we don't have user handles and fetch them.
     ArrayList userIDsL = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     for (int i=0; i<emailRecords.length; i++) {
       EmailRecord email = emailRecords[i];
       if (email.userId != null && cache.getUserRecord(email.userId) == null) {
@@ -102,13 +102,13 @@ public class UserOps extends Object {
     if (trace != null) trace.exit(UserOps.class);
   }
 
-  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, BAEncodedPassword ba, boolean storeKeyOnServer, File privateKeyFile, StringBuffer errBuffer) {
+  public static boolean sendPasswordChange(final ServerInterfaceLayer SIL, BAEncodedPassword ba, boolean storeKeyOnServer, File privateKeyFile, StringBuffer errBuffer) {
     return sendPasswordChange(SIL, null, ba, storeKeyOnServer, null, privateKeyFile, errBuffer);
   }
-  public static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, StringBuffer errBuffer) {
+  public static boolean sendPasswordChange(final ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, StringBuffer errBuffer) {
     return sendPasswordChange(SIL, newUserName, ba, storeKeyOnServer, null, null, errBuffer);
   }
-  private static boolean sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errBuffer) {
+  private static boolean sendPasswordChange(final ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errBuffer) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordChange(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean storeKeyOnServer, Integer actionCode, File privateKeyFile, StringBuffer errBuffer)");
     if (trace != null) trace.args(SIL, newUserName, ba);
     if (trace != null) trace.args(storeKeyOnServer);
@@ -198,7 +198,7 @@ public class UserOps extends Object {
     return success;
   }
 
-  public static boolean sendPasswordReset(ServerInterfaceLayer SIL, BAEncodedPassword ba, KeyRecoveryRecord[] subAccountsRecoveryRecs, char[] newPassword) {
+  public static boolean sendPasswordReset(final ServerInterfaceLayer SIL, BAEncodedPassword ba, KeyRecoveryRecord[] subAccountsRecoveryRecs, char[] newPassword) {
     boolean success = false;
     Usr_AltUsrPass_Rq altUsrPassSet = createAltUserPassRequest(SIL, null, ba, false);
 
@@ -228,7 +228,7 @@ public class UserOps extends Object {
     return success;
   }
 
-  public static boolean sendChangeStatusSubAccounts(ServerInterfaceLayer SIL, BAEncodedPassword ba, Long[] toManageUserIDs, short toStatus, String statusMsg) {
+  public static boolean sendChangeStatusSubAccounts(final ServerInterfaceLayer SIL, BAEncodedPassword ba, Long[] toManageUserIDs, short toStatus, String statusMsg) {
     boolean success = false;
     Usr_AltUsrPass_Rq altUsrPassSet = createAltUserPassRequest(SIL, null, ba, false);
     Obj_List_Co request = new Obj_List_Co();
@@ -239,7 +239,7 @@ public class UserOps extends Object {
     return success;
   }
 
-  public static boolean sendDeleteAccount(ServerInterfaceLayer SIL, BAEncodedPassword ba) {
+  public static boolean sendDeleteAccount(final ServerInterfaceLayer SIL, BAEncodedPassword ba) {
     boolean success = false;
     Usr_AltUsrPass_Rq altUsrPassSet = createAltUserPassRequest(SIL, null, ba, false);
     ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.USR_Q_DELETE, altUsrPassSet), 5*60000);
@@ -248,7 +248,7 @@ public class UserOps extends Object {
     return success;
   }
 
-  public static boolean sendDeleteSubAccounts(ServerInterfaceLayer SIL, BAEncodedPassword ba, Long[] toDeleteUserIDs) {
+  public static boolean sendDeleteSubAccounts(final ServerInterfaceLayer SIL, BAEncodedPassword ba, Long[] toDeleteUserIDs) {
     boolean success = false;
     Usr_AltUsrPass_Rq altUsrPassSet = createAltUserPassRequest(SIL, null, ba, false);
     Obj_List_Co request = new Obj_List_Co();
@@ -259,7 +259,7 @@ public class UserOps extends Object {
     return success;
   }
 
-  private static Usr_AltUsrPass_Rq createAltUserPassRequest(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean includePrivKey) {
+  private static Usr_AltUsrPass_Rq createAltUserPassRequest(final ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean includePrivKey) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "createAltUserPassRequest(ServerInterfaceLayer SIL, String newUserName, BAEncodedPassword ba, boolean includePrivKey)");
     if (trace != null) trace.args(SIL, newUserName, ba);
     if (trace != null) trace.args(includePrivKey);
@@ -306,7 +306,7 @@ public class UserOps extends Object {
   /**
   * @return converted records into ContactRecords or User records, unwinding Groups as well
   */
-  public static Record[] getOrFetchFamiliarUsers(ServerInterfaceLayer SIL, Record[] records) {
+  public static Record[] getOrFetchFamiliarUsers(final ServerInterfaceLayer SIL, Record[] records) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "getOrFetchFamiliarUsers(Record[] records)");
     if (trace != null) trace.args(records);
 
@@ -314,7 +314,7 @@ public class UserOps extends Object {
     ArrayList cRecsL = new ArrayList();
     ArrayList fRecsL = new ArrayList();
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     Long userId = cache.getMyUserId();
     if (records != null && records.length > 0) {
       for (int i=0; i<records.length; i++) {
@@ -341,7 +341,7 @@ public class UserOps extends Object {
         Usr_UsrHandles_Rp usrSet = (Usr_UsrHandles_Rp) msgAction.getMsgDataSet();
         UserRecord[] usrRecs = usrSet.userRecords;
         for (int i=0; i<usrRecs.length; i++) {
-          Record user = CacheUsrUtils.convertUserIdToFamiliarUser(usrRecs[i].userId, true, false);
+          Record user = CacheUsrUtils.convertUserIdToFamiliarUser(SIL.getFetchedDataCache(), usrRecs[i].userId, true, false);
           if (!usersL.contains(user))
             usersL.add(user);
         }
@@ -354,9 +354,9 @@ public class UserOps extends Object {
     return users;
   }
 
-  public static String[] getOrFetchOrMakeDefaultEmail(ServerInterfaceLayer SIL, Long userId, boolean isGeneratePersonalPart) {
+  public static String[] getOrFetchOrMakeDefaultEmail(final ServerInterfaceLayer SIL, Long userId, boolean isGeneratePersonalPart) {
     String[] emailAddr = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserRecord uRec = cache.getUserRecord(userId);
     if (uRec != null) {
       emailAddr = getOrFetchDefaultEmail(SIL, uRec, isGeneratePersonalPart);
@@ -388,18 +388,19 @@ public class UserOps extends Object {
   * Find user's default email address in the cache or fetch from the server.
   * @return personal (nullable), short, full parts of default email address for specified user
   */
-  public static String[] getOrFetchDefaultEmail(ServerInterfaceLayer SIL, UserRecord userRecord, boolean isGeneratePersonalPart) {
-    String[] emailAddr = CacheUsrUtils.getCachedDefaultEmail(userRecord, isGeneratePersonalPart);
+  public static String[] getOrFetchDefaultEmail(final ServerInterfaceLayer SIL, UserRecord userRecord, boolean isGeneratePersonalPart) {
+    final FetchedDataCache cache = SIL.getFetchedDataCache();
+    String[] emailAddr = CacheUsrUtils.getCachedDefaultEmail(cache, userRecord, isGeneratePersonalPart);
     if (emailAddr == null) {
       if (userRecord.defaultEmlId != null && userRecord.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
         SIL.submitAndWait(new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(userRecord.userId)), 30000);
       }
-      emailAddr = CacheUsrUtils.getCachedDefaultEmail(userRecord, isGeneratePersonalPart);
+      emailAddr = CacheUsrUtils.getCachedDefaultEmail(cache, userRecord, isGeneratePersonalPart);
     }
     return emailAddr;
   }
 
-  public static Object[] getCachedOrMakeSenderDefaultEmailSet(MsgDataRecord dataRecord) {
+  public static Object[] getCachedOrMakeSenderDefaultEmailSet(final FetchedDataCache cache, MsgDataRecord dataRecord) {
     Record sender = null;
     String senderEmailShort = "";
     String senderEmailFull = "";
@@ -416,10 +417,10 @@ public class UserOps extends Object {
         senderEmailShort = nick + "@" + domain;
       }
     } else {
-      sender = FetchedDataCache.getSingleInstance().getUserRecord(dataRecord.senderUserId);
+      sender = cache.getUserRecord(dataRecord.senderUserId);
       String[] emls = null;
       if (sender != null)
-        emls = CacheUsrUtils.getCachedDefaultEmail((UserRecord) sender, true);
+        emls = CacheUsrUtils.getCachedDefaultEmail(cache, (UserRecord) sender, true);
       if (emls == null) {
         if (sender != null)
           emls = makeDefaultEmail((UserRecord) sender, true);
@@ -437,7 +438,7 @@ public class UserOps extends Object {
   /**
   * @return expanded list of recipients
   */
-  public static Record[] getExpandedListOfRecipients(ServerInterfaceLayer SIL, Record[] recipients, boolean expandAddressBooks, boolean expandGroups) {
+  public static Record[] getExpandedListOfRecipients(final ServerInterfaceLayer SIL, Record[] recipients, boolean expandAddressBooks, boolean expandGroups) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "getExpandedListOfRecipients(ServerInterfaceLayer SIL, Record[] recipients, boolean expandAddressBooks, boolean expandGroups)");
     if (trace != null) trace.args(recipients);
     if (trace != null) trace.args(expandAddressBooks);
@@ -447,7 +448,7 @@ public class UserOps extends Object {
       Record[] addressBooks = (Record[]) addressBookFilter.filterInclude(recipients);
       recipients = addressBookFilter.filterExclude(recipients);
       // gather address contacts for the address books selected
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = SIL.getFetchedDataCache();
       MsgLinkRecord[] addressContactLinks = cache.getMsgLinkRecordsOwnersAndType(RecordUtils.getIDs(addressBooks), new Short(Record.RECORD_TYPE_FOLDER));
       Record[] addressContactDatas = cache.getMsgDataRecordsForLinks(RecordUtils.getIDs(addressContactLinks));
       // filter out messages leaving address contacts objects
@@ -475,13 +476,13 @@ public class UserOps extends Object {
   * Conversion steps: EmailAddressRecord -> (UserRecord | ContactRecord)
   * @return true if anything was converted.
   */
-  public static boolean convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts, boolean convertNotHostedEmailAddressesToExistingAccounts) {
+  public static boolean convertRecipientEmailAndUnknownUsersToFamiliars(final ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts, boolean convertNotHostedEmailAddressesToExistingAccounts) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "convertRecipientEmailAndUnknownUsersToFamiliars(ServerInterfaceLayer SIL, Record[] recipients, boolean convertNotHostedEmailsToWebAccounts, boolean convertNotHostedEmailAddressesToExistingAccounts)");
     if (trace != null) trace.args(recipients);
     if (trace != null) trace.args(convertNotHostedEmailsToWebAccounts);
     if (trace != null) trace.args(convertNotHostedEmailAddressesToExistingAccounts);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
 
     boolean anyConverted = false;
     ArrayList unknownEmailsV = new ArrayList();
@@ -538,7 +539,7 @@ public class UserOps extends Object {
         ContactRecord cRec = (ContactRecord) rec;
         if (!cRec.ownerUserId.equals(cache.getMyUserId())) {
           Long otherUserId = cRec.ownerUserId;
-          rec = CacheUsrUtils.convertUserIdToFamiliarUser(otherUserId, true, false);
+          rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, otherUserId, true, false);
           recipients[i] = rec;
           anyConverted = true;
         }
@@ -601,7 +602,7 @@ public class UserOps extends Object {
 
           if (userID != null) {
             boolean includeWebUsers = convertNotHostedEmailsToWebAccounts || isEmailHosted;
-            Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(userID, true, false, includeWebUsers);
+            Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(cache, userID, true, false, includeWebUsers);
             if (trace != null) trace.data(100, familiar);
             if (familiar != null) {
               recipients[i] = familiar;
@@ -617,7 +618,7 @@ public class UserOps extends Object {
     return anyConverted;
   }
 
-  public static boolean sendPassRecoverySettings(ServerInterfaceLayer SIL, PassRecoveryRecord passRecoveryRecord) {
+  public static boolean sendPassRecoverySettings(final ServerInterfaceLayer SIL, PassRecoveryRecord passRecoveryRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "sendPasswordRecoverySettings(ServerInterfaceLayer SIL, PassRecoveryRecord passRecoveryRecord)");
     if (trace != null) trace.args(SIL, passRecoveryRecord);
 
@@ -659,23 +660,23 @@ public class UserOps extends Object {
     return success;
   }
 
-  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI recipient, long timeout) {
+  public static void updateUsedStamp(final ServerInterfaceLayer SIL, MemberContactRecordI recipient, long timeout) {
     if (recipient instanceof Record) {
       updateUsedStamp(SIL, new Record[][] { { (Record) recipient } }, timeout);
     }
   }
-  public static void updateUsedStamp(ServerInterfaceLayer SIL, MemberContactRecordI[] memberRecipients, long timeout) {
+  public static void updateUsedStamp(final ServerInterfaceLayer SIL, MemberContactRecordI[] memberRecipients, long timeout) {
     Record[][] recipients = new Record[1][memberRecipients.length];
     for (int i=0; i<recipients.length; i++) {
       recipients[0][i] = (Record) memberRecipients[i];
     }
     updateUsedStamp(SIL, recipients, timeout);
   }
-  public static void updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients, long timeout) {
+  public static void updateUsedStamp(final ServerInterfaceLayer SIL, Record[][] msgRecipients, long timeout) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(UserOps.class, "updateUsedStamp(ServerInterfaceLayer SIL, Record[][] msgRecipients, long timeout)");
     if (trace != null) trace.args(SIL, msgRecipients);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     if (msgRecipients != null) {
       HashSet contactIDsHS = new HashSet();
       HashSet addressLinkIDsHS = new HashSet();
@@ -743,7 +744,7 @@ public class UserOps extends Object {
               // only mark them if there are few, max 3 (for example: mine, owners, +1 more group)
               for (int z=0; z<allShares.length; z++) {
                 if (allShares[z].isOwnedByUser()) {
-                  Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(allShares[z].ownerUserId, true, false);
+                  Record familiar = CacheUsrUtils.convertUserIdToFamiliarUser(cache, allShares[z].ownerUserId, true, false);
                   if (familiar instanceof ContactRecord) {
                     ContactRecord rec = (ContactRecord) familiar;
                     if (rec.dateUsed == null || rec.dateUsed.before(recent))
@@ -752,7 +753,7 @@ public class UserOps extends Object {
                 } else {
                   // group owner is a group folder
                   FolderRecord group = cache.getFolderRecord(allShares[z].ownerUserId);
-                  FolderPair groupPair = CacheFldUtils.convertRecordToPair(group);
+                  FolderPair groupPair = CacheFldUtils.convertRecordToPair(cache, group);
                   FolderShareRecord myGroupShare = groupPair != null ? groupPair.getFolderShareRecord() : null;
                   if (myGroupShare != null) {
                     if (myGroupShare.dateUsed == null || myGroupShare.dateUsed.before(recent))
@@ -776,7 +777,7 @@ public class UserOps extends Object {
   }
 
   public static void updateUserSettingsSpellingProperties(ServerInterfaceLayer SIL, Properties properties) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     UserSettingsRecord usrSettingsRec = cache.getMyUserSettingsRecord();
     if (usrSettingsRec == null) {
       usrSettingsRec = new UserSettingsRecord();

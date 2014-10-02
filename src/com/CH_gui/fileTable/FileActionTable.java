@@ -450,7 +450,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
         boolean confirmed = MsgActionTable.showConfirmationDialog(FileActionTable.this, title, messageText, toDelete, NotificationCenter.RECYCLE_MESSAGE, true);
         if (confirmed) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-          FolderPair recycleFolderPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
+          FolderPair recycleFolderPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
           doMoveOrSaveAttachmentsAction(recycleFolderPair, fileLinks, folderPairs);
         }
 
@@ -780,7 +780,7 @@ public class FileActionTable extends RecordActionTable implements ActionProducer
 
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(cache, allFolderRecords);
     allFolderPairs = (FolderPair[]) FolderFilter.MOVE_FOLDER.filterInclude(allFolderPairs);
 
     Window w = SwingUtilities.windowForComponent(this);

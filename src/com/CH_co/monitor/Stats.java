@@ -10,7 +10,6 @@
 package com.CH_co.monitor;
 
 import com.CH_co.trace.Trace;
-import com.CH_co.util.Misc;
 import java.util.*;
 
 /** 
@@ -28,7 +27,7 @@ public class Stats extends Object {
   protected static final LinkedList statusHistoryDatesAllL = new LinkedList(); // pair dates for the string entries.. always go hand-in-hand
   private static final int MAX_HISTORY_SIZE = 500;
 
-  private static HashMap globeMoversTraceHM = new HashMap(); // for debug, stack traces of our Movers
+  private static HashSet globeMoversTraceHS = new HashSet();
 
   protected static String lastStatus;
   protected static Boolean lastMovingStatus;
@@ -60,7 +59,7 @@ public class Stats extends Object {
       statusHistoryAllL.clear();
       statusHistoryDatesL.clear();
       statusHistoryDatesAllL.clear();
-      globeMoversTraceHM.clear();
+      globeMoversTraceHS.clear();
     }
   }
 
@@ -126,16 +125,6 @@ public class Stats extends Object {
     return new ArrayList[] { historyL, historyDatesL };
   }
 
-  public static ArrayList getGlobeMoversTraceL() {
-    ArrayList moversTraceL = null;
-    synchronized (monitor) {
-      if (globeMoversTraceHM.size() > 0) {
-        moversTraceL = new ArrayList(globeMoversTraceHM.values());
-      }
-    }
-    return moversTraceL;
-  }
-
   public static void incrementMainWorkerCounter() {
     synchronized (monitor) {
       if (mainWorkerCounter < Long.MAX_VALUE)
@@ -145,25 +134,27 @@ public class Stats extends Object {
 
   public static void moveGlobe(Object mover) {
     synchronized (monitor) {
-      if (globeMoversTraceHM.size() == 0) {
+      if (globeMoversTraceHS.size() == 0) {
         lastMovingStatus = Boolean.TRUE;
-        statsListenersTmp.addAll(statsListeners);
-        Iterator iter = statsListenersTmp.iterator();
-        while (iter.hasNext())
-          ((StatsListenerI) iter.next()).setStatsGlobeMove(lastMovingStatus);
-        statsListenersTmp.clear();
+        if (statsListeners != null && statsListeners.size() > 0) {
+          statsListenersTmp.addAll(statsListeners);
+          Iterator iter = statsListenersTmp.iterator();
+          while (iter.hasNext())
+            ((StatsListenerI) iter.next()).setStatsGlobeMove(lastMovingStatus);
+          statsListenersTmp.clear();
+        }
       }
-      if (!globeMoversTraceHM.containsKey(mover)) {
-        globeMoversTraceHM.put(mover, Misc.getStack(new Throwable(""+mover+" at " + new Date())));
+      if (!globeMoversTraceHS.contains(mover)) {
+        globeMoversTraceHS.add(mover);
       }
     }
   }
 
   public static void stopGlobe(Object mover) {
     synchronized (monitor) {
-      if (globeMoversTraceHM.containsKey(mover)) {
-        globeMoversTraceHM.remove(mover);
-        if (globeMoversTraceHM.size() == 0) {
+      if (globeMoversTraceHS.contains(mover)) {
+        globeMoversTraceHS.remove(mover);
+        if (globeMoversTraceHS.size() == 0) {
           lastMovingStatus = Boolean.FALSE;
           statsListenersTmp.addAll(statsListeners);
           Iterator iter = statsListenersTmp.iterator();

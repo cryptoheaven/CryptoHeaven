@@ -28,12 +28,14 @@ import com.CH_co.trace.Trace;
  */
 public class InvEmlFilter extends AbstractRecordFilter implements RecordFilter {
 
+  private FetchedDataCache cache;
   private boolean onlySelfSent;
   private boolean includeRemoved;
 
   /** Creates new InvEmlFilter */
-  public InvEmlFilter(boolean onlySelfSent, boolean includeRemoved) {
+  public InvEmlFilter(final FetchedDataCache cache, boolean onlySelfSent, boolean includeRemoved) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(InvEmlFilter.class, "InvEmlFilter(boolean onlySelfSent, boolean includeRemoved)");
+    this.cache = cache;
     this.onlySelfSent = onlySelfSent;
     this.includeRemoved = includeRemoved;
     if (trace != null) trace.exit(InvEmlFilter.class);
@@ -46,7 +48,6 @@ public class InvEmlFilter extends AbstractRecordFilter implements RecordFilter {
       InvEmlRecord invEmlRecord = (InvEmlRecord) record;
       if (includeRemoved || !invEmlRecord.removed.booleanValue()) {
         if (onlySelfSent) {
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           Long userId = cache.getMyUserId();
           if (userId != null)
             keep = userId.equals(invEmlRecord.sentByUID);

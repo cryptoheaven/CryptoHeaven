@@ -26,7 +26,7 @@ import com.CH_co.util.Hasher;
  */
 public class MsgUtils {
 
-    public static Hasher.Set getMatchingPasswordHasher(MsgDataRecord msgDataRecord, String pass) {
+  public static Hasher.Set getMatchingPasswordHasher(MsgDataRecord msgDataRecord, String pass) {
     Hasher.Set matchingSet = null;
     pass = pass.trim();
     Hasher.Set set = new Hasher.Set(pass.toCharArray());
@@ -58,7 +58,7 @@ public class MsgUtils {
     return passStripped;
   }
 
-  public static Stats_Get_Rq prepMsgStatRequest(MsgLinkRecord msgLink) {
+  public static Stats_Get_Rq prepMsgStatRequest(FetchedDataCache cache, MsgLinkRecord msgLink) {
     Stats_Get_Rq request = new Stats_Get_Rq();
     request.statsForObjType = new Short(Record.RECORD_TYPE_MSG_LINK);
     request.objLinkIDs = new Long[] { msgLink.msgLinkId };
@@ -69,19 +69,18 @@ public class MsgUtils {
     } else {
       request.ownerObjType = new Short(Record.RECORD_TYPE_SHARE);
       Long[] folderIDs = new Long[] { msgLink.ownerObjId };
-      Long[] shareIDs = RecordUtils.getIDs(FetchedDataCache.getSingleInstance().getFolderSharesMyForFolders(folderIDs, true));
+      Long[] shareIDs = RecordUtils.getIDs(cache.getFolderSharesMyForFolders(folderIDs, true));
       request.ownerObjIDs = shareIDs;
     }
     return request;
   }
 
-  public static void unlockPassProtectedMsg(MsgDataRecord msgDataRecord, Hasher.Set matchingSet) {
+  public static void unlockPassProtectedMsg(FetchedDataCache cache, MsgDataRecord msgDataRecord, Hasher.Set matchingSet) {
     if (matchingSet != null) {
       BASymCipherBulk encText = msgDataRecord.getEncText();
       if (encText != null && encText.size() > 0 && msgDataRecord.getTextBody() == null) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         cache.addMsgBodyKey(matchingSet);
-        CacheMsgUtils.unlockPassProtectedMsgIncludingCached(msgDataRecord, matchingSet);
+        CacheMsgUtils.unlockPassProtectedMsgIncludingCached(cache, msgDataRecord, matchingSet);
       }
     }
   }

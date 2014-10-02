@@ -56,7 +56,7 @@ public class StatOps {
   }
 
   private static void fetchStatsForMsg(ServerInterfaceLayer SIL, MsgLinkRecord msgLink) {
-    ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.STAT_Q_FETCH_OBJ_EXISTING, MsgUtils.prepMsgStatRequest(msgLink)), 60000);
+    ClientMessageAction msgAction = SIL.submitAndFetchReply(new MessageAction(CommandCodes.STAT_Q_FETCH_OBJ_EXISTING, MsgUtils.prepMsgStatRequest(SIL.getFetchedDataCache(), msgLink)), 60000);
     if (msgAction != null && msgAction.getActionCode() == CommandCodes.STAT_A_GET) {
       SIL.getFetchedDataCache().markStatFetchedForMsgId(msgLink.msgId);
     }
@@ -64,7 +64,7 @@ public class StatOps {
   }
 
   public static void markOldIfNeeded(ServerInterfaceLayer SIL, Long objLinkId, int statType) {
-    StatRecord stat = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(objLinkId, statType);
+    StatRecord stat = SIL.getFetchedDataCache().getStatRecordMyLinkId(objLinkId, statType);
     if (stat != null && stat.isFlagRed()) {
       // clone the stats to send the request
       StatRecord statClone = (StatRecord) stat.clone();

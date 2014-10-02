@@ -56,30 +56,29 @@ public class CacheFldUtils {
     * <code> recs </code> can be an instance of FolderRecord or FolderShareRecord
     * Pairs can only exist with the current user's shares, cannot form a pair with some other share.
     */
-  public static FolderPair convertRecordToPair(Record rec) {
-    FolderPair[] pairs = convertRecordToPairs(rec);
+  public static FolderPair convertRecordToPair(final FetchedDataCache cache, Record rec) {
+    FolderPair[] pairs = convertRecordToPairs(cache, rec);
     FolderPair pair = null;
     if (pairs != null && pairs.length > 0)
       pair = pairs[0];
     return pair;
   }
-  public static FolderPair[] convertRecordToPairs(Record rec) {
-    FolderPair[] pairs = convertRecordsToPairs(new Record[] { rec });
+  public static FolderPair[] convertRecordToPairs(final FetchedDataCache cache, Record rec) {
+    FolderPair[] pairs = convertRecordsToPairs(cache, new Record[] { rec });
     return pairs;
   }
-  public static FolderPair[] convertRecordsToPairs(Record[] recs) {
-    FolderPair[] pairs = convertRecordsToPairs(recs, false);
+  public static FolderPair[] convertRecordsToPairs(final FetchedDataCache cache, Record[] recs) {
+    FolderPair[] pairs = convertRecordsToPairs(cache, recs, false);
     return pairs;
   }
-  public static FolderPair[] convertRecordsToPairs(Record[] recs, boolean makeupPairsIfDoNotExist) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "convertRecordsToPairs(Record[], boolean makeupPairsIfDoNotExist)");
+  public static FolderPair[] convertRecordsToPairs(final FetchedDataCache cache, Record[] recs, boolean makeupPairsIfDoNotExist) {
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "convertRecordsToPairs(FetchedDataCache cache, Record[], boolean makeupPairsIfDoNotExist)");
     if (trace != null) trace.args(recs);
     if (trace != null) trace.args(makeupPairsIfDoNotExist);
 
     FolderPair[] folderPairs = null;
 
     if (recs != null && recs.length > 0) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       ArrayList list = new ArrayList(recs.length);
       FolderPair folderPair = null;
       Long userId = cache.getMyUserId();
@@ -135,12 +134,11 @@ public class CacheFldUtils {
   * @param fRec
   * @return Array of all participants starting with folder owner
   */
-  public static Record[] getFolderParticipants(FolderRecord fRec) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  public static Record[] getFolderParticipants(final FetchedDataCache cache, FolderRecord fRec) {
     Long ownerUserId = fRec.ownerUserId;
     ArrayList participantsL = new ArrayList();
     // use my contact list only, not the reciprocal contacts
-    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false));
+    participantsL.add(CacheUsrUtils.convertUserIdToFamiliarUser(cache, ownerUserId, true, false));
     FolderShareRecord[] allShares = cache.getFolderShareRecordsForFolder(fRec.folderId);
     for (int i=0; i<allShares.length; i++) {
       FolderShareRecord share = allShares[i];
@@ -149,9 +147,9 @@ public class CacheFldUtils {
         Record recipient = null;
         if (share.isOwnedByUser()) {
           // use my contact list only, not the reciprocal contacts
-          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, false);
+          recipient = CacheUsrUtils.convertUserIdToFamiliarUser(cache, share.ownerUserId, true, false);
         } else {
-          recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
+          recipient = cache.getFolderRecord(share.ownerUserId);
         }
         if (recipient != null)
           participantsL.add(recipient);
@@ -173,13 +171,12 @@ public class CacheFldUtils {
     return participants;
   }
 
-  public static void getKnownGroupMembers(Long groupId, ArrayList targetUIDsL) {
+  public static void getKnownGroupMembers(final FetchedDataCache cache, Long groupId, ArrayList targetUIDsL) {
     ArrayList processedGroupIDsL = new ArrayList();
-    getKnownGroupMembers_loop(groupId, targetUIDsL, processedGroupIDsL);
+    getKnownGroupMembers_loop(cache, groupId, targetUIDsL, processedGroupIDsL);
   }
-  private static void getKnownGroupMembers_loop(Long groupId, ArrayList targetUIDsL, ArrayList processedGroupIDsL) {
+  private static void getKnownGroupMembers_loop(final FetchedDataCache cache, Long groupId, ArrayList targetUIDsL, ArrayList processedGroupIDsL) {
     processedGroupIDsL.add(groupId);
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     FolderShareRecord[] shares = cache.getFolderShareRecordsForFolder(groupId);
     if (shares != null) {
       for (int i=0; i<shares.length; i++) {
@@ -189,10 +186,43 @@ public class CacheFldUtils {
             targetUIDsL.add(share.ownerUserId);
         } else {
           if (!processedGroupIDsL.contains(share.ownerUserId))
-            getKnownGroupMembers_loop(share.ownerUserId, targetUIDsL, processedGroupIDsL);
+            getKnownGroupMembers_loop(cache, share.ownerUserId, targetUIDsL, processedGroupIDsL);
         }
       }
     }
+  }
+
+  /**
+   * Search among the cached folders, and find a folder which is most likely the
+   * root in the tree view.
+   * @return Root folder or null if guess cannot be made or some looping of folders is found.
+   */
+  public static FolderPair getRootmostFolderInViewHierarchy(final FetchedDataCache cache, Long childFolderId) {
+    HashSet visitedFolderIDsHS = new HashSet();
+    Set groupIDsSet = cache.getFolderGroupIDsMySet();
+    return getRootmostFolderInViewHierarchy(cache, childFolderId, visitedFolderIDsHS, groupIDsSet);
+  }
+
+  private static FolderPair getRootmostFolderInViewHierarchy(final FetchedDataCache cache, Long childFolderId, Set visitedFolderIDsSet, Set groupIDsSet) {
+    if (!visitedFolderIDsSet.contains(childFolderId)) {
+      visitedFolderIDsSet.add(childFolderId);
+      FolderRecord fRec = cache.getFolderRecord(childFolderId);
+      if (fRec != null) {
+        FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, groupIDsSet);
+        if (sRec != null) {
+          FolderPair fPair = new FolderPair(sRec, fRec);
+          if (fPair.isViewRoot()) {
+            return fPair;
+          } else {
+            Long parentFolderId = fPair.getParentId();
+            return getRootmostFolderInViewHierarchy(cache, parentFolderId, visitedFolderIDsSet, groupIDsSet);
+          }
+        }
+      }
+    } else {
+      return null;
+    }
+    return null;
   }
 
   public static void makeFolderCategories(Long userId, List foldersBufferL, List sharesBufferL) {
@@ -208,7 +238,7 @@ public class CacheFldUtils {
   }
 
 
-  public static List prepareSynchRequest(FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, Collection wasFetchedL, Collection wasInvalidatedL, List resultRequestSetsL) {
+  public static List prepareSynchRequest(final FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, Collection wasFetchedL, Collection wasInvalidatedL, List resultRequestSetsL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "prepareSynchRequest(FetchedDataCache cache, Collection folderIDsL, Collection startStampsL, Collection wasFetchedL, Collection wasInvalidatedL, List resultRequestSetsL)");
     if (trace != null) trace.args(folderIDsL, startStampsL, wasFetchedL, wasInvalidatedL);
     // smaller-and-faster batch for initial re-synch, larger for continuation requests
@@ -235,7 +265,7 @@ public class CacheFldUtils {
     return resultRequestSetsL;
   }
 
-  public static List prepareSynchRequest(FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, Boolean wasFetched, Boolean wasInvalidated, List resultRequestSetsL) {
+  public static List prepareSynchRequest(final FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, Boolean wasFetched, Boolean wasInvalidated, List resultRequestSetsL) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheFldUtils.class, "prepareSynchRequest(FetchedDataCache cache, Long folderId, Timestamp startStamp, int maxItemsForFetchedFolders, int maxItemsForNonFetchedFoldersInitial, int maxItemsForNonFetchedFoldersNext, int maxItemsForProbingNewItems, Boolean wasFetched, Boolean wasInvalidated, List resultRequestSetsL)");
     if (trace != null) trace.args(folderId, startStamp);
     if (trace != null) trace.args(maxItemsForFetchedFolders);

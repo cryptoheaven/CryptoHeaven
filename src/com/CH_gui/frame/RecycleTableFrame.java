@@ -9,6 +9,7 @@
  */
 package com.CH_gui.frame;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.trace.Trace;
@@ -26,7 +27,7 @@ public class RecycleTableFrame extends RecordTableFrame {
 
   /** Creates new RecycleTableFrame */
   public RecycleTableFrame(FolderPair folderPair) {
-    super(TextRenderer.getFolderAndShareNames(folderPair, true), true, true);
+    super(TextRenderer.getFolderAndShareNames(FetchedDataCache.getSingleInstance(), folderPair, true), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FileTableFrame.class, "RecycleTableFrame(FolderPair folderPair)");
     if (trace != null) trace.args(folderPair);
 

@@ -22,8 +22,7 @@ import java.text.SimpleDateFormat;
  */
 public class SysOps {
 
-  public static void checkExpiry() {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  public static void checkExpiry(final FetchedDataCache cache) {
     UserRecord uRec = cache.getUserRecord();
     if (uRec != null) {
       // we are not enforcing expiry date on free accounts
@@ -80,11 +79,10 @@ public class SysOps {
     }
   }
 
-  public static void checkQuotas() {
-    checkQuotas(null, null, null);
+  public static void checkQuotas(final FetchedDataCache cache) {
+    checkQuotas(cache, null, null, null);
   }
-  public static void checkQuotas(Long storageUsedF, Long transferUsedF, Short subAccountsUsedF) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  public static void checkQuotas(final FetchedDataCache cache, Long storageUsedF, Long transferUsedF, Short subAccountsUsedF) {
     UserRecord uRec = cache.getUserRecord();
     if (uRec != null) {
       long transferLimit = uRec.transferLimit.longValue();

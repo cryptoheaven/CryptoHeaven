@@ -163,7 +163,8 @@ public class UserTableModel extends RecordTableModel {
   public synchronized void initData(Long newParentId) {
     Long parentId = getParentUserId();
     if (parentId == null || !parentId.equals(newParentId)) {
-      RecordFilter filter = new SubUserFilter(newParentId, false, true);
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      RecordFilter filter = new SubUserFilter(cache, newParentId, false, true);
       setFilter(filter);
       switchData(newParentId);
       refreshData(newParentId, false);
@@ -292,7 +293,7 @@ public class UserTableModel extends RecordTableModel {
           break;
           */
         case 3:
-          String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(userRecord, false);
+          String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(FetchedDataCache.getSingleInstance(), userRecord, false);
           String emailAddress = emailStrings != null ? emailStrings[2] : "N/A";
           value = emailAddress;
           break;

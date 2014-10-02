@@ -40,6 +40,8 @@ import javax.swing.JTree;
 */
 public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
 
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
   /** Creates new FolderTreeCellRenderer */
   public FolderTreeCellRenderer() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeCellRenderer.class, "FolderTreeCellRenderer()");
@@ -89,7 +91,7 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
       FolderRecord fRec = folderPair.getFolderRecord();
 
       if (fRec.folderType.shortValue() == FolderRecord.MESSAGE_FOLDER) {
-        UserRecord myUserRec = FetchedDataCache.getSingleInstance().getUserRecord();
+        UserRecord myUserRec = cache.getUserRecord();
         icon = Images.get(fRec.getIcon(selected, myUserRec, false));
       } else {
         icon = Images.get(fRec.getIcon(selected, null, false));
@@ -103,7 +105,7 @@ public class FolderTreeCellRenderer extends MyDefaultTreeCellRenderer {
           String times = updateCount > 1 ? com.CH_cl.lang.Lang.rb.getString("times") : com.CH_cl.lang.Lang.rb.getString("time");
           toolTip = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("folderTip_This_folder_was_updated_NUMBER-OF_TIMES_while_you_were_not_viewing_its_content..."), new Object[] {new Integer(updateCount), times});
         } else {
-          String[] notes = TextRenderer.getOwnerAndChatNote(fRec);
+          String[] notes = TextRenderer.getOwnerAndChatNote(cache, fRec);
           String ownerNote = notes[0];
           String chatNote = notes[1];
 

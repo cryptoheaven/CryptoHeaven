@@ -370,7 +370,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         try {
           if (trace != null) trace.data(250, "making main tree");
           // Make the main tree
-          treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, SIL.getFetchedDataCache().getFolderPairs(new FixedFilter(true), true), false);
+          FolderPair[] initialFolderPairs = FetchedDataCache.getSingleInstance().getFolderPairs(new FixedFilter(true), true);
+          treeComp = new FolderTreeComponent(true, FolderFilter.MAIN_VIEW, initialFolderPairs, false);
         } catch (Throwable t) {
           if (trace != null) trace.exception(MainFrame.class, 300, t);
           t.printStackTrace();
@@ -387,11 +388,12 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
             if (oldShowsB != null)
               oldShow = oldShowsB.booleanValue();
           }
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           RecordFilter contactFilter = new MultiFilter(new RecordFilter[] {
             //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
-            new ContactFilterCl(oldShow),
+            new ContactFilterCl(cache, oldShow),
             new FolderFilter(FolderRecord.GROUP_FOLDER),
-            new InvEmlFilter(true, false) }
+            new InvEmlFilter(cache, true, false) }
           , MultiFilter.OR);
 
           // Make the ContactTableComponent
@@ -522,7 +524,8 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     }
 
     // set window title
-    UserRecord uRec = SIL.getFetchedDataCache().getUserRecord();
+    final FetchedDataCache cache = SIL.getFetchedDataCache();
+    UserRecord uRec = cache.getUserRecord();
     setUserTitle(uRec);
 
     // Check or display the 'upgrade' popup window.
@@ -990,9 +993,9 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   */
   protected static class ManageWhiteListAction extends AbstractActionTraced {
     public ManageWhiteListAction(int actionId) {
-      super(com.CH_cl.lang.Lang.rb.getString("action_Manage_WhiteList_..."));
+      super(com.CH_cl.lang.Lang.rb.getString("action_Manage_Whitelist_..."));
       putValue(Actions.ACTION_ID, new Integer(actionId));
-      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Manage_WhiteList_..."));
+      putValue(Actions.TOOL_TIP, com.CH_cl.lang.Lang.rb.getString("actionTip_Manage_Whitelist_..."));
       putValue(Actions.IN_TOOLBAR, Boolean.FALSE);
     }
     public void actionPerformedTraced(ActionEvent event) {
@@ -1060,7 +1063,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
     // check for modified files that could not start uploading
     FileLobUpEditMonitor.FileSet[] modifiedSets = null;
     try {
-      modifiedSets = FileLobUpEditMonitor.getModifiedFileSets();
+      modifiedSets = FileLobUpEditMonitor.getModifiedFileSets(FetchedDataCache.getSingleInstance());
     } catch (NoClassDefFoundError e) {
       // recompiling project usually causes the exit to fail here - so skip this error
     }
@@ -1126,7 +1129,7 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
   private void exitActionCheckOpenFiles_Threaded(final boolean suppressErrors) {
     FileLobUpEditMonitor.FileSet[] monitoredSets = null;
     try {
-      monitoredSets = FileLobUpEditMonitor.getModifiedFileSets();
+      monitoredSets = FileLobUpEditMonitor.getModifiedFileSets(FetchedDataCache.getSingleInstance());
     } catch (NoClassDefFoundError e) {
       // recompiling project usually causes the exit to fail here - so skip this error
     }
@@ -1151,16 +1154,17 @@ public class MainFrame extends JActionFrame implements ActionProducerI, LoginCoo
         final long _totalSize = totalSize;
         Thread tempFileWiper = new ThreadTraced("TempFileWiper") {
           public void runTraced() {
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             SimpleProgMonitorImpl progMonitor = new SimpleProgMonitorImpl(_totalSize);
             StringBuffer errorMsg = new StringBuffer();
             boolean anyError = false;
             for (int i=0; i<_wipeLocalFilesL.size(); i++) {
               FileLobUpEditMonitor.FileSet set = (FileLobUpEditMonitor.FileSet) _wipeLocalFilesL.get(i);
               File file = set.getLocalFile();
-              FileLobUpEditMonitor.removeFromMonitoring(set.getRemoteFile().fileLinkId);
+              FileLobUpEditMonitor.removeFromMonitoring(cache, set.getRemoteFile().fileLinkId);
               if (!CleanupAgent.wipe(file, new RandomInputStream(Rnd.getSecureRandom()), progMonitor, false, null)) {
                 // re-register if wipe failed - note that wipe does rename so if any data was wiped/changed, adding will fail
-                FileLobUpEditMonitor.addToMonitoring(set);
+                FileLobUpEditMonitor.addToMonitoring(cache, set);
                 if (!suppressErrors)
                   anyError = true;
                 if (errorMsg.length() == 0) {

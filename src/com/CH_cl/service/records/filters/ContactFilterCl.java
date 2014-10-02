@@ -30,6 +30,7 @@ import com.CH_co.trace.Trace;
  */
 public class ContactFilterCl extends AbstractRecordFilter implements RecordFilter {
 
+  private FetchedDataCache cache;
   private Boolean keepIncoming;
   
 //  /**
@@ -52,10 +53,11 @@ public class ContactFilterCl extends AbstractRecordFilter implements RecordFilte
    * Creates new ContactFilterCl for incoming contacts (other's contacts with you) 
    * Outgoing Contacts are kept too.
    */
-  public ContactFilterCl(boolean keepIncoming) {
+  public ContactFilterCl(final FetchedDataCache cache, boolean keepIncoming) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactFilterCl.class, "ContactFilter(boolean keepIncoming)");
     if (trace != null) trace.args(keepIncoming);
 
+    this.cache = cache;
     this.keepIncoming = Boolean.valueOf(keepIncoming);
 
     if (trace != null) trace.exit(ContactFilterCl.class);
@@ -69,7 +71,7 @@ public class ContactFilterCl extends AbstractRecordFilter implements RecordFilte
       
       ContactRecord contact = (ContactRecord) record;
 
-      Long myUserId = FetchedDataCache.getSingleInstance().getMyUserId();
+      Long myUserId = cache.getMyUserId();
       keep = contact.ownerUserId.equals(myUserId) || contact.contactWithId.equals(myUserId);
       if (keep == true && keepIncoming != null && keepIncoming.booleanValue() == false) {
         if (!contact.ownerUserId.equals(myUserId)) {

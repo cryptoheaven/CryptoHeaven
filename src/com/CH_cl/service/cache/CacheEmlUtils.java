@@ -36,10 +36,9 @@ public class CacheEmlUtils extends Object {
   /**
   * Familiar are those in AddressBooks, not in WhiteLists, first the first match, ignore others.
   */
-  public static Record convertToFamiliarEmailRecord(String emailAddress) {
+  public static Record convertToFamiliarEmailRecord(FetchedDataCache cache, String emailAddress) {
     Record familiar;
     MsgDataRecord addrRecord = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     MsgDataRecord[] addrRecords = cache.getAddrRecords(emailAddress);
     Long[] addrIDs = RecordUtils.getIDs(addrRecords);
     if (addrRecords != null && addrRecords.length > 0) {

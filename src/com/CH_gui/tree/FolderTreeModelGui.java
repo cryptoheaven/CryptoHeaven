@@ -487,7 +487,7 @@ public class FolderTreeModelGui extends DefaultTreeModel {
   * Uses <code> treeModel </code> as a original model
   */
   public synchronized FolderTreeModelGui createFilteredModel(RecordFilter filter, FolderTreeModelGui newModel) {
-    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "createFilteredModel(RecordFilter filter, FolderTreeModelCl newModel)");
+    Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderTreeModelGui.class, "createFilteredModel(RecordFilter filter, FolderTreeModelGui newModel)");
     if (trace != null) trace.args(filter, newModel);
 
     FolderTreeNodeGui rootNode = (FolderTreeNodeGui) getRootNode();

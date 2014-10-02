@@ -189,7 +189,7 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     }
 
     if (label == null) {
-      label = TextRenderer.getRenderedText(value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeGroupOwner, includeChatParticipants, includeFullEmailAddress, includeUploadPendingNote);
+      label = TextRenderer.getRenderedText(FetchedDataCache.getSingleInstance(), value, includeFileSizes, includeFolderParticipants, includeFolderOwner, includeGroupOwner, includeChatParticipants, includeFullEmailAddress, includeUploadPendingNote);
     }
 
     if (label == null) {
@@ -289,7 +289,8 @@ public class ListRenderer implements ListCellRenderer, Cloneable {
     if (forSendReceive) {
       // just for display convert any EmailAddressRecord to familiar Address Book entry
       if (value instanceof EmailAddressRecord) {
-        value = CacheEmlUtils.convertToFamiliarEmailRecord(((EmailAddressRecord) value).address);
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        value = CacheEmlUtils.convertToFamiliarEmailRecord(cache, ((EmailAddressRecord) value).address);
       }
     }
     label = getRenderedText(value, withFileSizes, withFolderParticipants, withFolderOwner, withGroupOwner, withChatParticipants, withFullEmailAddresses, withUploadPendingNote, stringHighlighter);

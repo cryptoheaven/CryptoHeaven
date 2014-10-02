@@ -35,7 +35,7 @@ public class MsgLinkOps {
   private static QueueMM1 linkFetchQueue = null;
 
   public static MsgLinkRecord[] getOrFetchMsgLinksByOwner(ServerInterfaceLayer SIL, Long ownerLinkId, Long ownerObjId, short ownerType) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     MsgLinkRecord[] mLinks = null;
     if (ownerType == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord mData = cache.getMsgDataRecord(ownerObjId);
@@ -85,7 +85,7 @@ public class MsgLinkOps {
   public static void markRecordsAs(ServerInterfaceLayer SIL, MsgLinkRecord[] records, Short newMark) {
     if (records != null && records.length > 0) {
       // gather all stats which need to be updated
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = SIL.getFetchedDataCache();
       ArrayList statsL = new ArrayList();
       boolean isReadStamping = newMark.shortValue() == StatRecord.FLAG_READ;
       Long myUserId = cache.getMyUserId();

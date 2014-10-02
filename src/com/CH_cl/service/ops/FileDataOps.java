@@ -48,7 +48,7 @@ public class FileDataOps {
     if (trace != null) trace.args(actionCode);
     if (trace != null) trace.args(fileLinkId, fileId);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     FileDataRecord fData = cache.getFileDataRecord(fileId);
 
     boolean doFetching = false;

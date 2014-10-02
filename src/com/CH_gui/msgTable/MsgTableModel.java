@@ -73,41 +73,41 @@ public class MsgTableModel extends RecordTableModel {
   public static final int COLUMN_INDEX__POSTING = 5; // reflects the model index of "Posting" column
   public static final int COLUMN_INDEX__SENT = 6; // reflects the model index of "Sent" column
 
-  private static String STR_PRIORITY = com.CH_cl.lang.Lang.rb.getString("column_Priority");
-  private static String STR_SECURE_LOCK = com.CH_cl.lang.Lang.rb.getString("column_Secure_Lock");
-  private static String STR_ATTACHMENT = com.CH_cl.lang.Lang.rb.getString("column_Attachment");
-  private static String STR_FLAG = com.CH_cl.lang.Lang.rb.getString("column_Flag");
+  private static final String STR_PRIORITY = com.CH_cl.lang.Lang.rb.getString("column_Priority");
+  private static final String STR_SECURE_LOCK = com.CH_cl.lang.Lang.rb.getString("column_Secure_Lock");
+  private static final String STR_ATTACHMENT = com.CH_cl.lang.Lang.rb.getString("column_Attachment");
+  private static final String STR_FLAG = com.CH_cl.lang.Lang.rb.getString("column_Flag");
 
-  private static String STR_FROM = com.CH_cl.lang.Lang.rb.getString("column_From");
+  private static final String STR_FROM = com.CH_cl.lang.Lang.rb.getString("column_From");
 
-  private static String STR_TO = com.CH_cl.lang.Lang.rb.getString("column_To");
-  private static String STR_E_MAIL_ADDRESS = com.CH_cl.lang.Lang.rb.getString("column_E_Mail_Address");
+  private static final String STR_TO = com.CH_cl.lang.Lang.rb.getString("column_To");
+  private static final String STR_E_MAIL_ADDRESS = com.CH_cl.lang.Lang.rb.getString("column_E_Mail_Address");
 
-  private static String STR_SUBJECT = com.CH_cl.lang.Lang.rb.getString("column_Subject");
-  private static String STR_POSTING = com.CH_cl.lang.Lang.rb.getString("column_Posting");
-  private static String STR_MESSAGE = com.CH_cl.lang.Lang.rb.getString("column_Message");
-  private static String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Name");
+  private static final String STR_SUBJECT = com.CH_cl.lang.Lang.rb.getString("column_Subject");
+  private static final String STR_POSTING = com.CH_cl.lang.Lang.rb.getString("column_Posting");
+  private static final String STR_MESSAGE = com.CH_cl.lang.Lang.rb.getString("column_Message");
+  private static final String STR_NAME = com.CH_cl.lang.Lang.rb.getString("column_Name");
 
-  private static String STR_SENT = com.CH_cl.lang.Lang.rb.getString("column_Sent");
-  private static String STR_LINK_ID = com.CH_cl.lang.Lang.rb.getString("column_Link_ID");
-  private static String STR_DATA_ID = com.CH_cl.lang.Lang.rb.getString("column_Data_ID");
-  private static String STR_FETCH_COUNT = com.CH_cl.lang.Lang.rb.getString("column_Fetch_count");
-  private static String STR_CREATED = com.CH_cl.lang.Lang.rb.getString("column_Created");
-  private static String STR_DELIVERED = com.CH_cl.lang.Lang.rb.getString("column_Delivered");
-  private static String STR_EXPIRY = com.CH_cl.lang.Lang.rb.getString("column_Expiration");
-  private static String STR_PASSWORD = com.CH_cl.lang.Lang.rb.getString("column_Password");
-  private static String STR_UPDATED = com.CH_cl.lang.Lang.rb.getString("column_Updated");
-  private static String STR_SIZE_ON_DISK = com.CH_cl.lang.Lang.rb.getString("column_Size_on_Disk");
-  private static String STR_IN_REPLY_TO = com.CH_cl.lang.Lang.rb.getString("column_In_reply_to");
+  private static final String STR_SENT = com.CH_cl.lang.Lang.rb.getString("column_Sent");
+  private static final String STR_LINK_ID = com.CH_cl.lang.Lang.rb.getString("column_Link_ID");
+  private static final String STR_DATA_ID = com.CH_cl.lang.Lang.rb.getString("column_Data_ID");
+  private static final String STR_FETCH_COUNT = com.CH_cl.lang.Lang.rb.getString("column_Fetch_count");
+  private static final String STR_CREATED = com.CH_cl.lang.Lang.rb.getString("column_Created");
+  private static final String STR_DELIVERED = com.CH_cl.lang.Lang.rb.getString("column_Delivered");
+  private static final String STR_EXPIRY = com.CH_cl.lang.Lang.rb.getString("column_Expiration");
+  private static final String STR_PASSWORD = com.CH_cl.lang.Lang.rb.getString("column_Password");
+  private static final String STR_UPDATED = com.CH_cl.lang.Lang.rb.getString("column_Updated");
+  private static final String STR_SIZE_ON_DISK = com.CH_cl.lang.Lang.rb.getString("column_Size_on_Disk");
+  private static final String STR_IN_REPLY_TO = com.CH_cl.lang.Lang.rb.getString("column_In_reply_to");
 
-  private static String STR_BUSINESS_PHONE = com.CH_cl.lang.Lang.rb.getString("column_Business_Phone");
-  private static String STR_HOME_PHONE = com.CH_cl.lang.Lang.rb.getString("column_Home_Phone");
+  private static final String STR_BUSINESS_PHONE = com.CH_cl.lang.Lang.rb.getString("column_Business_Phone");
+  private static final String STR_HOME_PHONE = com.CH_cl.lang.Lang.rb.getString("column_Home_Phone");
 
-  private static String STR_TIP_MESSAGE_PRIORITY = com.CH_cl.lang.Lang.rb.getString("columnTip_Message_Priority");
-  private static String STR_TIP_MESSAGE_ATTACHMENTS = com.CH_cl.lang.Lang.rb.getString("columnTip_Message_Attachments");
-  private static String STR_TIP_NEW_OLD_STATUS_FLAG = com.CH_cl.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag");
-  private static String STR_TIP_PASSWORD = com.CH_cl.lang.Lang.rb.getString("columnTip_Password");
-  private static String STR_TIP_SECURE_LOCK = com.CH_cl.lang.Lang.rb.getString("columnTip_Secure_Lock");
+  private static final String STR_TIP_MESSAGE_PRIORITY = com.CH_cl.lang.Lang.rb.getString("columnTip_Message_Priority");
+  private static final String STR_TIP_MESSAGE_ATTACHMENTS = com.CH_cl.lang.Lang.rb.getString("columnTip_Message_Attachments");
+  private static final String STR_TIP_NEW_OLD_STATUS_FLAG = com.CH_cl.lang.Lang.rb.getString("columnTip_New/Old_Status_Flag");
+  private static final String STR_TIP_PASSWORD = com.CH_cl.lang.Lang.rb.getString("columnTip_Password");
+  private static final String STR_TIP_SECURE_LOCK = com.CH_cl.lang.Lang.rb.getString("columnTip_Secure_Lock");
 
   static final ColumnHeaderData[] columnHeaderDatas = new ColumnHeaderData[] {
       // mail
@@ -399,10 +399,10 @@ public class MsgTableModel extends RecordTableModel {
     }
   }
 
-  public Collection getSearchableCharSequencesFor(Object searchableObj) {
-    return getSearchableCharSequencesFor(searchableObj, true);
+  public Collection getSearchableCharSequencesFor(FetchedDataCache cache, Object searchableObj) {
+    return getSearchableCharSequencesFor(cache, searchableObj, true);
   }
-  public Collection getSearchableCharSequencesFor(Object searchableObj, boolean includeMsgBody) {
+  public Collection getSearchableCharSequencesFor(FetchedDataCache cache, Object searchableObj, boolean includeMsgBody) {
     if (searchableObj instanceof Record) {
       // The searchable string should use the possibly dynamically prepared
       // version which may include attachments, etc.  So if we don't have the 
@@ -411,14 +411,13 @@ public class MsgTableModel extends RecordTableModel {
       if (searchableObj instanceof MsgLinkRecord) {
         MsgLinkRecord msgLink = (MsgLinkRecord) searchableObj;
         if (msgLink.getPostRenderingCache() == null) {
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           getSubjectColumnValue(this, msgLink, msgData, null, null, cache, true);
         }
       }
-      return TextRenderer.getSearchTextFor((Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
+      return TextRenderer.getSearchTextFor(cache, (Record) searchableObj, isModeAddr() || !isModeMsgBody() ? includeMsgBody : true); // chat and posting folder always includes bodies
     } else {
-      return super.getSearchableCharSequencesFor(searchableObj, includeMsgBody);
+      return super.getSearchableCharSequencesFor(cache, searchableObj, includeMsgBody);
     }
   }
 
@@ -484,7 +483,7 @@ public class MsgTableModel extends RecordTableModel {
             } else {
               if (forSortOnly) {
                 // use my contact list only, not the reciprocal contacts
-                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
+                value = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(cache, msgData.senderUserId, true, false));
               } else {
                 value = msgData.senderUserId;
               }
@@ -497,7 +496,7 @@ public class MsgTableModel extends RecordTableModel {
             if (forSortOnly) {
               String sortStr = null;
               // just get the second token because it is usually the first recipient
-              Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(msgData.getRecipients(), 1);
+              Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(cache, msgData.getRecipients(), 1);
               for (int i=0; sortStr==null && i<recipients.length; i++)
                 for (int k=0; sortStr==null && k<recipients[i].length; k++)
                   if (recipients[i][k] != null)
@@ -678,8 +677,8 @@ public class MsgTableModel extends RecordTableModel {
           String fromName = null;
           String prevFromName = null;
           // if table has no 'From' column prepend it to the body
-          if (model.getColumnHeaderData().convertRawColumnToModel(3) == -1 && msgData != null) {
-            fromName = getFromName(msgData);
+          if (model.getColumnHeaderData().convertRawColumnToModel(3) == -1) {
+            fromName = getFromName(cache, msgData);
             prevFromName = getFromName(prevMsgLink, cache);
             if (!fromName.equals(prevFromName)) {
               toAddFrom = true;
@@ -858,7 +857,7 @@ public class MsgTableModel extends RecordTableModel {
           if (!isForSearchOnly) {
             // add "Read" stamps to the last message or when stamps arrive
             Collection stats = cache.getStatRecordsByObjId(msgLink.msgId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
-            TextRenderer.getStatsNote(3, stats, msgLink, msgData, cache.getMyUserId(), sb);
+            TextRenderer.getStatsNote(cache, 3, stats, msgLink, msgData, cache.getMyUserId(), sb);
             // check if we should fetch more stats
             if (nextMsgLink == null || (stats != null && stats.size() >= 2)) { // at least 2 (my and one more)
               // fetch stats to ensure we have all data not just whatever came in some notification
@@ -880,10 +879,10 @@ public class MsgTableModel extends RecordTableModel {
   }
 
   private static String getFromName(MsgLinkRecord msgLink, FetchedDataCache cache) {
-    return msgLink != null ? getFromName(cache.getMsgDataRecord(msgLink.msgId)) : null;
+    return msgLink != null ? getFromName(cache, cache.getMsgDataRecord(msgLink.msgId)) : null;
   }
 
-  private static String getFromName(MsgDataRecord msgData) {
+  private static String getFromName(FetchedDataCache cache, MsgDataRecord msgData) {
     String fromName = null;
     if (msgData != null) {
       String fromEmailAddress = msgData.getFromEmailAddress();
@@ -891,7 +890,7 @@ public class MsgTableModel extends RecordTableModel {
         fromName = fromEmailAddress;
       } else {
         // use my contact list only, not the reciprocal contacts
-        fromName = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
+        fromName = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(cache, msgData.senderUserId, true, false));
       }
     }
     return fromName;
@@ -987,7 +986,7 @@ public class MsgTableModel extends RecordTableModel {
           // Gather items already fetched so we don't re-fetch all items if not necessary.
           // Useful when performing fetch for content searches when user clicks body filtering on and off a few times -- it will skip previously fetched bodies and continue on...
           if (_action == CommandCodes.MSG_Q_GET_FULL) {
-            MsgLinkRecord[] existingLinks = CacheMsgUtils.getMsgLinkRecordsWithFetchedDatas(folderId);
+            MsgLinkRecord[] existingLinks = CacheMsgUtils.getMsgLinkRecordsWithFetchedDatas(cache, folderId);
             request.exceptLinkIDs = RecordUtils.getIDs(existingLinks);
           } else {
             MsgLinkRecord[] existingLinks = FetchedDataCache.getSingleInstance().getMsgLinkRecordsForFolder(folderId);

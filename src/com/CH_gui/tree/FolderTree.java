@@ -9,6 +9,7 @@
  */
 package com.CH_gui.tree;
 
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.cache.TextRenderer;
 import com.CH_co.service.records.FolderPair;
 import com.CH_co.service.records.filters.RecordFilter;
@@ -39,8 +40,9 @@ public class FolderTree extends JTree implements DisposableObj {
 
   static {
     FolderTreeNode.folderTreeNodeSortNameProviderI = new FolderTreeNodeSortNameProviderI() {
+      private FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       public String getSortName(FolderPair fPair) {
-        String sortName = TextRenderer.getFolderAndShareNamesForTreeDisplaySort(fPair);
+        String sortName = TextRenderer.getFolderAndShareNamesForTreeDisplaySort(cache, fPair);
         // If name is known/unsealed, append unique ID to prevent jumping sort positions when folders have identical names and types
         if (sortName != null && sortName.length() > 0)
           sortName += " " + fPair.getId();
@@ -139,7 +141,7 @@ public class FolderTree extends JTree implements DisposableObj {
         nodeText = com.CH_cl.lang.Lang.rb.getString("folder_Desktop");
       } else {
         StringBuffer toolTipReturn = new StringBuffer();
-        nodeText = TextRenderer.convertValueToText(folderPair, toolTipReturn);
+        nodeText = TextRenderer.convertValueToText(FetchedDataCache.getSingleInstance(), folderPair, toolTipReturn);
         String toolTip = toolTipReturn.toString();
         setToolTipText(toolTip != null && toolTip.length() > 0 ? toolTip : null);
       }

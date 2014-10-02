@@ -9,7 +9,8 @@
  */
 package com.CH_gui.frame;
 
-import com.CH_cl.service.ops.MsgDataOps;
+import com.CH_cl.service.cache.CacheMsgUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
@@ -125,7 +126,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg) {
-    super(truncate(MsgDataOps.getSubjectReply(replyToMsg)), true, true);
+    super(truncate(CacheMsgUtils.getSubjectReply(FetchedDataCache.getSingleInstance(), replyToMsg)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[][] initialRecipients, MsgLinkRecord replyToMsg)");
     if (trace != null) trace.args(initialRecipients, replyToMsg);
 
@@ -148,7 +149,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, LinkRecordI[] attachments) {
-    super(truncate(MsgDataOps.getSubjectForward(attachments)), true, true);
+    super(truncate(CacheMsgUtils.getSubjectForward(FetchedDataCache.getSingleInstance(), attachments)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, LinkRecordI[] attachments)");
     if (trace != null) trace.args(initialRecipients, attachments);
 
@@ -181,7 +182,7 @@ public class MessageFrame extends JActionFrameClosable {
 
   /** Creates new MessageFrame */
   public MessageFrame(Record[] initialRecipients, String subject, String plainBody, File[] attachFiles) {
-    super(truncate(MsgDataOps.getSubjectForward(attachFiles)), true, true);
+    super(truncate(CacheMsgUtils.getSubjectForward(FetchedDataCache.getSingleInstance(), attachFiles)), true, true);
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MessageFrame.class, "MessageFrame(Record[] initialRecipients, String subject, String plainBody, File[] attachFiles)");
     if (trace != null) trace.args(initialRecipients, subject, plainBody, attachFiles);
 

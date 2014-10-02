@@ -389,7 +389,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
         boolean option = showConfirmationDialog(MsgActionTable.this, title, messageText, msgLinks, NotificationCenter.RECYCLE_MESSAGE, true);
         if (option == true) {
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-          FolderPair recycleFolderPair = CacheFldUtils.convertRecordToPair(cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
+          FolderPair recycleFolderPair = CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(cache.getUserRecord().recycleFolderId));
           moveOrCopyAction(true, msgLinks, recycleFolderPair);
         }
       }
@@ -628,7 +628,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           if (msgData != null) {
-            Record recipient = CacheMsgUtils.getMsgSenderForReply(msgData);
+            Record recipient = CacheMsgUtils.getMsgSenderForReply(cache, msgData);
             if (recipient != null) {
               // new message trigger
               new MessageFrame(new Record[][] {{ recipient }}, msgLink);
@@ -669,7 +669,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
           MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
           if (msgData != null) {
             // prepare all recipients list based on the selected message
-            Record[][] allRecipients = CacheMsgUtils.getReplyAllRecipients(msgData);
+            Record[][] allRecipients = CacheMsgUtils.getReplyAllRecipients(cache, msgData);
             // new message trigger
             new MessageFrame(allRecipients, msgLink);
           }
@@ -1178,9 +1178,10 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     if (msgData.isTypeMessage() && (msgData.isEmail() || msgData.getFromEmailAddress() != null)) {
       emailAddress = msgData.getFromEmailAddress();
     } else {
-      senderUser = FetchedDataCache.getSingleInstance().getUserRecord(msgData.senderUserId);
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      senderUser = cache.getUserRecord(msgData.senderUserId);
       if (senderUser != null) {
-        String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(senderUser, true);
+        String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(cache, senderUser, true);
         emailAddress = emailStrings != null ? emailStrings[2] : null;
         if (emailAddress == null || emailAddress.length() == 0) {
           if (showAddressFrameIfNoEmail) {
@@ -1468,7 +1469,7 @@ public class MsgActionTable extends RecordActionTable implements ActionProducerI
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(cache, allFolderRecords);
     allFolderPairs = (FolderPair[]) FolderFilter.MOVE_FOLDER.filterInclude(allFolderPairs);
 
     Window w = SwingUtilities.windowForComponent(MsgActionTable.this);

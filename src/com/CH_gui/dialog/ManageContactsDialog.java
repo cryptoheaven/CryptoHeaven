@@ -312,7 +312,7 @@ public class ManageContactsDialog extends GeneralDialog {
 
   private void pressedUsers() {
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    SubUserFilter subUserFilter = new SubUserFilter(cache.getMyUserId(), true, false);
+    SubUserFilter subUserFilter = new SubUserFilter(cache, cache.getMyUserId(), true, false);
     UserRecord[] subUsers = (UserRecord[]) RecordUtils.filter(cache.getUserRecords(), subUserFilter);
 
     DualListBoxDialog d = new DualListBoxDialog(this, "Select Users", "Available Users", "Selected Users", subUsers, selectedUserRecords);
@@ -355,7 +355,7 @@ public class ManageContactsDialog extends GeneralDialog {
                     ContactRecord[] ownerContacts = (ContactRecord[]) RecordUtils.filter(cRecs, new ContactFilterCo(selectedUserIDs));
                     Long[] uIDs = ContactRecord.getContactWithUserIDs(ownerContacts, true);
                     // Fill the lists
-                    SubUserFilter subUserFilter = new SubUserFilter(cache.getMyUserId(), true, false);
+                    SubUserFilter subUserFilter = new SubUserFilter(cache, cache.getMyUserId(), true, false);
                     UserRecord[] subUsers = (UserRecord[]) RecordUtils.filter(cache.getUserRecords(), subUserFilter);
                     UserRecord[] chosenContactUsers = cache.getUserRecords(uIDs);
                     UserRecord[] notChosenContactUsers = (UserRecord[]) ArrayUtils.getDifference(subUsers, chosenContactUsers);

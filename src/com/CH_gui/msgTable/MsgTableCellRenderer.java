@@ -44,6 +44,8 @@ import javax.swing.table.TableModel;
 */
 public class MsgTableCellRenderer extends RecordTableCellRenderer {
 
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+
   private static Color regularMsgAltColor = new Color(236, 251, 232, ALPHA);
   private static Color regularMsgAltColorSelected = new Color(189, 201, 186, ALPHA);
   private static Color[] altBkColors = new Color[] { regularMsgAltColor, regularMsgAltColorSelected };
@@ -129,7 +131,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           String toolTip = pri.getText();
           icon = Images.get(pri);
           if (!isDoubleLineView) {
-            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
             MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
             // if Expiration or Password column is not visible
@@ -199,7 +200,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 // if Expiration or Password column is not visible
                 boolean col_19 = isColumnVisible(table, 19); // expiry column
                 boolean col_20 = isColumnVisible(table, 20); // password protection column
-                FetchedDataCache cache = FetchedDataCache.getSingleInstance();
                 MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
                 MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
                 boolean isSet = false;
@@ -253,7 +253,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
                 MsgLinkRecord link = (MsgLinkRecord) rec;
                 boolean isStarred = link.isStarred();
                 int flagIcon = ImageNums.IMAGE_NONE;
-                StatRecord statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+                StatRecord statRecord = cache.getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
                 if (statRecord != null)
                   flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
                 if (isStarred && flagIcon != ImageNums.IMAGE_NONE) {
@@ -288,7 +288,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         // The From field is the contact name or user's short info, whichever is available
         Long userId = (Long) value;
         // use my contact list only, not the reciprocal contacts
-        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(userId, true, false);
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, userId, true, false);
         if (rec != null) {
           setIcon(ListRenderer.getRenderedIcon(rec));
           setText(ListRenderer.getRenderedText(rec));
@@ -301,8 +301,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       // From (email)
       else if (value instanceof String) {
         setHorizontalAlignment(LEFT);
-        Record sender = CacheEmlUtils.convertToFamiliarEmailRecord((String) value);
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        Record sender = CacheEmlUtils.convertToFamiliarEmailRecord(cache, (String) value);
         MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
         MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
         // if Secure from an Email Address or Address Book entry (Secure in here is not regular, so either max secure or web ssl)
@@ -322,12 +321,11 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       boolean col_5 = isColumnVisible(table, 5);
       TableModel rawModel = null;
       if (!col_5 && table instanceof JSortedTable && (rawModel = ((JSortedTable) table).getRawModel()) instanceof MsgTableModel) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
         MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
         JLabel thisCloned = null;
         StatRecord statRecord = null;
-        if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
+        if (mLink != null && (statRecord = cache.getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
           thisCloned = jRendererBoldIconized;
         else
           thisCloned = jRendererPlainIconized;
@@ -376,7 +374,7 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
       if (value != null) {
 
         StringBuffer toolTipBuf = new StringBuffer();
-        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients((String) value);
+        Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(cache, (String) value);
 
         JPanel jFlowPanel = jRecipientPanelRenderer;
         jFlowPanel.removeAll();
@@ -400,12 +398,11 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         TableModel rawModel = null;
         if (!col_3 && !col_5 && table instanceof JSortedTable && (rawModel = ((JSortedTable) table).getRawModel()) instanceof MsgTableModel) {
           jFlowPanel.setOpaque(false);
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
           MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
           JLabel jAddrRenderer = null;
           StatRecord statRecord = null;
-          if (mLink != null && (statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
+          if (mLink != null && (statRecord = cache.getStatRecordMyLinkId(mLink.msgLinkId, FetchedDataCache.STAT_TYPE_INDEX_MESSAGE)) != null && statRecord.isFlagRed())
             jAddrRenderer = jRendererBoldIconized;
           else
             jAddrRenderer = jRendererPlainIconized;
@@ -464,7 +461,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
           // If message status is UNREAD then display closed main icon, otherwise open mail icon.
           // Since multiple views may display the same message links, we must choose how to view them in the renderer.
           if (tableModel instanceof MsgTableModel) {
-            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             int rowModel = sTable.convertMyRowIndexToModel(row);
             if (rowModel >= 0) {
               MsgLinkRecord mLink = (MsgLinkRecord) mtm.getRowObject(rowModel);
@@ -575,7 +571,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
         jIconSetRenderer.setOpaque(false);
         int iconIndex = 0;
 
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
         MsgDataRecord mData = null;
         if (mLink != null)
@@ -686,7 +681,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
     else if (value instanceof Timestamp) {
       // Expiration
       if (rawColumn == 19) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
         MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
         ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId());
@@ -730,7 +724,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
     // Expiration Date
     else if (rawColumn == 19) {
       setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
       MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
       ImageText exp = mData.getExpirationIconAndText(cache.getMyUserId(), true);
@@ -745,7 +738,6 @@ public class MsgTableCellRenderer extends RecordTableCellRenderer {
     else if (rawColumn == 20) {
       setText("");
       setBorder(RecordTableCellRenderer.BORDER_ICON);
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       MsgLinkRecord mLink = (MsgLinkRecord) getRecord(table, row);
       MsgDataRecord mData = cache.getMsgDataRecord(mLink.msgId);
       if (mData.bodyPassHash != null) {

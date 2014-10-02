@@ -1294,7 +1294,7 @@ public class LoginFrame extends JFrame {
   * @return error message if input is not valid, else return NULL for valid.
   */
   private String isInputValid() {
-    String errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Invalid_input,_please_recheck_your_entry_fields");
+    String errorMsg = null;
     boolean rc = false;
     char[] pass1 = null;
     char[] pass2 = null;
@@ -1302,27 +1302,23 @@ public class LoginFrame extends JFrame {
       pass1 = password.getPassword();
       if (isPasswordPresent(pass1) || defaultPassword != null || pass1.length == 0) { // 0 len pass for login to new web accounts only
         if (!isNewAccountDialog || isPasswordValid(pass1)) {
-          if (!isNewAccountDialog || isPasswordValid(pass2 = retypePassword.getPassword())) {
-            if (!isNewAccountDialog || Arrays.equals(pass1, pass2)) {
-              if (!isNewAccountDialog || currentEmail.getText().trim().length() == 0 || EmailRecord.isEmailFormatValid(currentEmail.getText().trim())) {
-                String serverS = getServerStr();
-                if (Misc.parseHostAndPort(serverS) != null) {
-                  if (!isNewAccountDialog || licenseCheck.isSelected()) {
-                    errorMsg = null;
-                  } else {
-                    errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_You_must_accept_the_License_Agreement...");
-                  }
+          if (!isNewAccountDialog || Arrays.equals(pass1, pass2 = retypePassword.getPassword())) {
+            if (!isNewAccountDialog || currentEmail.getText().trim().length() == 0 || EmailRecord.isEmailFormatValid(currentEmail.getText().trim())) {
+              String serverS = getServerStr();
+              if (Misc.parseHostAndPort(serverS) != null) {
+                if (!isNewAccountDialog || licenseCheck.isSelected()) {
+                  errorMsg = null;
                 } else {
-                  errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
+                  errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_You_must_accept_the_License_Agreement...");
                 }
               } else {
-                errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
+                errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_Server_does_not_appear_to_be_in_a_valid_format...");
               }
             } else {
-              errorMsg = RETYPE_PASSWORD_ERROR;
+              errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_Specified_email_address_does_not_appear_to_be_in_a_valid_format...");
             }
           } else {
-            errorMsg = com.CH_cl.lang.Lang.rb.getString("msg_The_retyped_password_does_not_match_the_entered_password.");
+            errorMsg = RETYPE_PASSWORD_ERROR;
           }
         } else {
           errorMsg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_Password_must_be_minimum_of_###_characters_long..."), new Object[] {new Integer(MIN_PASSWORD_LENGTH)});
@@ -1753,7 +1749,8 @@ public class LoginFrame extends JFrame {
           hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, true, URLs.get(URLs.DEFAULT_SERVER_3));
           hostsAndPorts = EngineFinder.addOrRemoveServer(hostsAndPorts, false, URLs.get(URLs.DEFAULT_SERVER__PROHIBIT_DATA_CONNECTIONS_1));
         }
-        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(hostsAndPorts, true));
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        MainFrame.setServerInterfaceLayer(new ServerInterfaceLayer(cache, hostsAndPorts, true));
         FileLobUp.restoreStateDelayed(5000);
       } catch (Throwable t) {
         t.printStackTrace();
@@ -1924,7 +1921,7 @@ public class LoginFrame extends JFrame {
       }
 
       if (replyAction != null && replyAction.getActionCode() == CommandCodes.USR_A_LOGIN_SECURE_SESSION) {
-        ServerInterfaceLayer.getFetchedDataCache().setEncodedPassword(getBAEncodedPassword());
+        FetchedDataCache.getSingleInstance().setEncodedPassword(getBAEncodedPassword());
         success = true;
 
         // check version
@@ -2015,7 +2012,7 @@ public class LoginFrame extends JFrame {
     // If this was creation of a new account, we must update the key record with encrypted private portion,
     // or store it locally.
     if (success && newAccountCreated) {
-      FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       RSAPrivateKey rsaPrivKey = cache.getNewUserPrivateKey();
       if (rsaPrivKey != null) { // if we are retrying this function then it would be already null
         sendKeyUpdate(rsaPrivKey, storeRemoteFlag);
@@ -2104,7 +2101,7 @@ public class LoginFrame extends JFrame {
 
     try {
       ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-      FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
+      FetchedDataCache cache = SIL.getFetchedDataCache();
       BAEncodedPassword baEncPass = cache.getEncodedPassword();
 
       KeyRecord keyRecord = cache.getKeyRecordMyCurrent();
@@ -2184,13 +2181,14 @@ public class LoginFrame extends JFrame {
       // username and email address check passed, create new user account now...
       if (chkEmailOk) {
         // remember the new user private key for the purpose of decrypting the login reply session key
-        ServerInterfaceLayer.getFetchedDataCache().setNewUserPrivateKey(request.keyRecord.getPrivateKey());
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+        cache.setNewUserPrivateKey(request.keyRecord.getPrivateKey());
         MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_NEW_USER, request);
         ClientMessageAction replyAction = MainFrame.getServerInterfaceLayer().submitAndFetchReply(msgAction, 90000);
         if (replyAction.getActionCode() == CommandCodes.USR_A_NEW_USER){
           success = true;
         } else {
-          ServerInterfaceLayer.getFetchedDataCache().setNewUserPrivateKey(null);
+          cache.setNewUserPrivateKey(null);
         }
         // don't start a new thread here, just execute the action synchronously
         DefaultReplyRunner.nonThreadedRun(MainFrame.getServerInterfaceLayer(), replyAction);
@@ -2253,8 +2251,8 @@ public class LoginFrame extends JFrame {
 
     // whiteShareRecord
     newUser_request.whiteShareRecord = new FolderShareRecord();
-    newUser_request.whiteShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_WhiteList"));
-    newUser_request.whiteShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_WhiteList"));
+    newUser_request.whiteShareRecord.setFolderName(com.CH_cl.lang.Lang.rb.getString("folder_Whitelist"));
+    newUser_request.whiteShareRecord.setFolderDesc(com.CH_cl.lang.Lang.rb.getString("folderDesc_Whitelist"));
     newUser_request.whiteShareRecord.setSymmetricKey(new BASymmetricKey(32));
     newUser_request.whiteShareRecord.seal(symKeyFldShares);
 

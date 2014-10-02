@@ -155,7 +155,7 @@ public class ChatActionTable extends MsgActionTable implements DisposableObj {
               if (w instanceof JActionFrame) {
                 JActionFrame f = (JActionFrame) w;
                 // use my contact list only, not the reciprocal contacts
-                Record r = CacheUsrUtils.convertUserIdToFamiliarUser(userId, true, false);
+                Record r = CacheUsrUtils.convertUserIdToFamiliarUser(FetchedDataCache.getSingleInstance(), userId, true, false);
                 String name = ListRenderer.getRenderedText(r);
                 String msg = java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("USER-NAME_is_typing_a_message."), new Object[] {name});
                 f.triggerVisualUpdateNotificationStill(msg, f.getTitle() + " :: ", null, TYPING_NOTIFY_MILLIS);

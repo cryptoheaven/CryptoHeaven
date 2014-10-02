@@ -81,7 +81,7 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
           if (args.equalsIgnoreCase("Local")) {
             new LocalFileTableFrame("Browse");
           } else if (args.equalsIgnoreCase("My Files")) {
-            new FileTableFrame(CacheFldUtils.convertRecordToPair(cache.getFolderRecord(uRec.fileFolderId)));
+            new FileTableFrame(CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(uRec.fileFolderId)));
           } else if (args.equalsIgnoreCase("Address Book") || args.equalsIgnoreCase("Address-Book")) {
             FolderPair fPair = FolderOps.getOrCreateAddressBook(MainFrame.getServerInterfaceLayer());
             if (fPair != null)
@@ -95,13 +95,13 @@ public class URLLauncherCHACTION extends Object implements URLLauncher {
             if (fPair != null)
               new MsgTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Inbox")) {
-            new MsgTableFrame(CacheFldUtils.convertRecordToPair(cache.getFolderRecord(uRec.msgFolderId)));
+            new MsgTableFrame(CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(uRec.msgFolderId)));
           } else if (args.equalsIgnoreCase("Spam")) {
             FolderPair fPair = FolderOps.getOrCreateJunkFolder(MainFrame.getServerInterfaceLayer());
             if (fPair != null)
               new MsgTableFrame(fPair);
           } else if (args.equalsIgnoreCase("Sent")) {
-            new MsgTableFrame(CacheFldUtils.convertRecordToPair(cache.getFolderRecord(uRec.sentFolderId)));
+            new MsgTableFrame(CacheFldUtils.convertRecordToPair(cache, cache.getFolderRecord(uRec.sentFolderId)));
           } else if (args.equalsIgnoreCase("Contacts")) {
             new ContactTableFrame();
           }

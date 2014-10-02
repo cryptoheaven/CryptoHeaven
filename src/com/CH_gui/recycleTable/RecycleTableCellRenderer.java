@@ -41,6 +41,7 @@ import javax.swing.table.TableModel;
 
 public class RecycleTableCellRenderer extends RecordTableCellRenderer {
 
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
   private static final Color fileAltColor = new Color(245, 243, 233, ALPHA);
   private static final Color fileAltColorSelected = new Color(202, 200, 192, ALPHA);
@@ -132,11 +133,11 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
               if (rec instanceof FileLinkRecord) {
                 FileLinkRecord link = (FileLinkRecord) rec;
                 isStarred = link.isStarred();
-                statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_FILE);
+                statRecord = cache.getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_FILE);
               } else if (rec instanceof MsgLinkRecord) {
                 MsgLinkRecord link = (MsgLinkRecord) rec;
                 isStarred = link.isStarred();
-                statRecord = FetchedDataCache.getSingleInstance().getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
+                statRecord = cache.getStatRecordMyLinkId(link.getId(), FetchedDataCache.STAT_TYPE_INDEX_MESSAGE);
               }
               if (statRecord != null)
                 flagIcon = StatRecord.getIconForFlag(statRecord.getFlag());
@@ -167,7 +168,7 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
           // The From field is the contact name or user's short info, whichever is available
           Long userId = (Long) value;
           // use my contact list only, not the reciprocal contacts
-          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(userId, true, false);
+          Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, userId, true, false);
           if (rec != null) {
             setIcon(ListRenderer.getRenderedIcon(rec));
             setText(ListRenderer.getRenderedText(rec));
@@ -181,7 +182,7 @@ public class RecycleTableCellRenderer extends RecordTableCellRenderer {
         else if (value instanceof String) {
           setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
           setHorizontalAlignment(LEFT);
-          Record sender = CacheEmlUtils.convertToFamiliarEmailRecord((String) value);
+          Record sender = CacheEmlUtils.convertToFamiliarEmailRecord(cache, (String) value);
           setIcon(ListRenderer.getRenderedIcon(sender));
           setText(ListRenderer.getRenderedText(sender));
         }

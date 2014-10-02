@@ -10,6 +10,7 @@
 package com.CH_gui.actionGui;
 
 import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.service.records.UserRecord;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.GlobalProperties;
@@ -829,7 +830,7 @@ public abstract class JActionFrame extends JFrame implements ContainerListener, 
 
   public void setUserTitle(UserRecord uRec) {
     if (uRec != null) {
-      String title = CacheUsrUtils.getDefaultApplicationTitle(uRec);
+      String title = CacheUsrUtils.getDefaultApplicationTitle(FetchedDataCache.getSingleInstance(), uRec);
       setTitle(title);
     } else {
       setTitle(getDefaultTitle());

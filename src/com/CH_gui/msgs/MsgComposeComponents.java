@@ -12,7 +12,6 @@ package com.CH_gui.msgs;
 import com.CH_cl.service.cache.CacheMsgUtils;
 import com.CH_cl.service.cache.CacheUsrUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
-import com.CH_cl.service.ops.MsgDataOps;
 import com.CH_cl.util.MsgUtils;
 import com.CH_co.nanoxml.XMLElement;
 import com.CH_co.service.msg.CommandCodes;
@@ -266,7 +265,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
       for (int i=0; i<tempRecipients.length; i++) {
         tempRecipients[i] = recipients[i];
         if (tempRecipients[i] instanceof UserRecord) {
-          Record converted = CacheUsrUtils.convertUserIdToFamiliarUser(((UserRecord)tempRecipients[i]).userId, true, false);
+          Record converted = CacheUsrUtils.convertUserIdToFamiliarUser(cache, ((UserRecord)tempRecipients[i]).userId, true, false);
           tempRecipients[i] = converted != null ? converted : tempRecipients[i];
         }
       }
@@ -1131,11 +1130,11 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     setFromAccounts(dataRecord);
 
     if (isReply)
-      setSubject(MsgDataOps.getSubjectReply(dataRecord, 250));
+      setSubject(CacheMsgUtils.getSubjectReply(dataRecord, 250));
     else if (isForward)
-      setSubject(MsgDataOps.getSubjectForward(new Object[] { dataRecord }, 250));
+      setSubject(CacheMsgUtils.getSubjectForward(cache, new Object[] { dataRecord }, 250));
 
-    String[] content = CacheMsgUtils.makeReplyToContent(quotedMsg, dataRecord, false, false, false);
+    String[] content = CacheMsgUtils.makeReplyToContent(cache, quotedMsg, dataRecord, false, false, false, MsgPreviewPanel.contentReplyHeadings);
 
     String text = null;
     String[] sigText = addSignature ? CacheMsgUtils.getSigText(userSettingsRecord) : null;
@@ -1193,7 +1192,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
   public void setForward(Object[] selectedAttachments) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposeComponents.class, "setForward(Record[] selectedAttachments)");
     if (trace != null) trace.args(selectedAttachments);
-    setSubject(MsgDataOps.getSubjectForward(selectedAttachments, 250));
+    setSubject(CacheMsgUtils.getSubjectForward(cache, selectedAttachments, 250));
     if (trace != null) trace.exit(MsgComposeComponents.class);
   }
 

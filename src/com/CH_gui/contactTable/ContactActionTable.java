@@ -335,14 +335,15 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Delete_Confirmation");
       boolean option = MessageDialog.showDialogYesNo(ContactActionTable.this, messageText, title);
       if (option == true) {
+        ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         ContactRecord[] contacts = (ContactRecord[]) getSelectedInstancesOf(ContactRecord.class);
         if (contacts != null && contacts.length > 0) {
           Obj_IDs_Co request = new Obj_IDs_Co();
           request.IDs = new Long[2][];
           request.IDs[0] = RecordUtils.getIDs(contacts);
-          FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
           request.IDs[1] = new Long[] { cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId };
-          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.CNT_Q_REMOVE_CONTACTS, request));
+          SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_REMOVE_CONTACTS, request));
         }
         FolderPair[] groups = (FolderPair[]) getSelectedInstancesOf(FolderPair.class);
         if (groups != null && groups.length > 0) {
@@ -356,9 +357,8 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
           for (int i=0; i<invites.length; i++)
             invites[i].removed = Boolean.TRUE;
           // add updated records to the cache so listeners can update
-          FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
           cache.addInvEmlRecords(invites);
-          MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.INV_Q_REMOVE, request));
+          SIL.submitAndReturn(new MessageAction(CommandCodes.INV_Q_REMOVE, request));
         }
       }
     }
@@ -457,7 +457,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
               String fullName = userId.equals(cRec.ownerUserId) ? cRec.getOwnerNote() : cRec.getOtherNote();
               UserRecord uRec = cache.getUserRecord(otherUID);
               if (uRec != null) {
-                String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(uRec, false);
+                String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(cache, uRec, false);
                 emailAddress = emailStrings != null ? emailStrings[2] : null;
                 if (emailAddress != null && emailAddress.length() > 0) {
                   emailNicksL.add(fullName);
@@ -611,9 +611,9 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
       ContactTableModel tableModel = (ContactTableModel) ContactActionTable.this.getTableModel();
       RecordFilter filter = new MultiFilter(new RecordFilter[] {
         //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, isShow),
-        new ContactFilterCl(isShow),
+        new ContactFilterCl(cache, isShow),
         new FolderFilter(FolderRecord.GROUP_FOLDER),
-        new InvEmlFilter(true, false) }
+        new InvEmlFilter(cache, true, false) }
       , MultiFilter.OR);
       tableModel.setFilter(filter);
       tableModel.setData(cache.getContactRecords());
@@ -867,7 +867,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
               }
               targetUIDsL.addAll(userIDsL);
               for (int i=0; i<groupIDsL.size(); i++)
-                CacheFldUtils.getKnownGroupMembers((Long) groupIDsL.get(i), targetUIDsL);
+                CacheFldUtils.getKnownGroupMembers(cache, (Long) groupIDsL.get(i), targetUIDsL);
               Collections.sort(targetUIDsL);
               if (trace != null) trace.data(20, "target UIDs are: ", Misc.objToStr(targetUIDsL));
 
@@ -900,7 +900,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
                       } else if (share.isOwnedByGroup()) {
                         lvl1groupIDsL.add(share.ownerUserId);
                         if (trace != null) trace.data(42, "g"+share.ownerUserId+"("+ListRenderer.getRenderedText(cache.getFolderRecord(share.ownerUserId))+")");
-                        CacheFldUtils.getKnownGroupMembers(share.ownerUserId, chatUserIDsL);
+                        CacheFldUtils.getKnownGroupMembers(cache, share.ownerUserId, chatUserIDsL);
                       }
                     }
                   }
@@ -909,7 +909,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
                   if (chatUserIDsL.containsAll(targetUIDsL)) {
                     if (trace != null) trace.data(60, "lvl1userIDsL=", Misc.objToStr(lvl1userIDsL));
                     if (trace != null) trace.data(61, "lvl1groupIDsL=", Misc.objToStr(lvl1groupIDsL));
-                    FolderPair suitableChat = CacheFldUtils.convertRecordToPair(chat);
+                    FolderPair suitableChat = CacheFldUtils.convertRecordToPair(cache, chat);
                     if (perfectMatch == null 
                             && userIDsL.containsAll(lvl1userIDsL) && lvl1userIDsL.containsAll(userIDsL) 
                             && groupIDsL.containsAll(lvl1groupIDsL) && lvl1groupIDsL.containsAll(groupIDsL)) 
@@ -975,7 +975,7 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
         }
       }
     };
-    FolderPair chat = ChatOps.doGetChatFolder(contacts);
+    FolderPair chat = ChatOps.doGetChatFolder(FetchedDataCache.getSingleInstance(), contacts);
     if (chat != null)
       callbackChatOpener.callback(chat);
     else
@@ -1138,13 +1138,10 @@ public class ContactActionTable extends RecordActionTable implements ActionProdu
   private void reAddGroupsToCache() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ContactActionTable.class, "reAddGroupsToCache()");
 
-    ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
-    if (SIL != null) {
-      FetchedDataCache cache = ServerInterfaceLayer.getFetchedDataCache();
-      FolderPair[] myGroups = cache.getFolderPairsMyOfType(FolderRecord.GROUP_FOLDER, true);
-      FolderRecord[] myGroupFolders = FolderPair.getFolderRecords(myGroups);
-      cache.addFolderRecords(myGroupFolders);
-    }
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FolderPair[] myGroups = cache.getFolderPairsMyOfType(FolderRecord.GROUP_FOLDER, true);
+    FolderRecord[] myGroupFolders = FolderPair.getFolderRecords(myGroups);
+    cache.addFolderRecords(myGroupFolders);
 
     if (trace != null) trace.exit(ContactActionTable.class);
   }

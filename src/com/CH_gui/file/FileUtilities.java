@@ -174,14 +174,14 @@ public class FileUtilities extends Object {
     record.setFileType(FileTypes.getFileType(newName));
     record.seal();
 
-    ServerInterfaceLayer serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    FetchedDataCache cache = serverInterfaceLayer.getFetchedDataCache();
+    ServerInterfaceLayer SIL = MainFrame.getServerInterfaceLayer();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
 
     Long shareId = cache.getFolderShareRecordMy(record.getParentId(), true).shareId;
 
     File_Rename_Rq request = new File_Rename_Rq(shareId, record);
     MessageAction msgAction = new MessageAction(CommandCodes.FILE_Q_RENAME, request);
-    serverInterfaceLayer.submitAndReturn(msgAction);
+    SIL.submitAndReturn(msgAction);
 
     if (trace != null) trace.exit(FileUtilities.class);
   }

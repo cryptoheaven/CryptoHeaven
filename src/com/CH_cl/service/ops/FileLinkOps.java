@@ -43,7 +43,7 @@ public class FileLinkOps {
   * @return
   */
   public static FileLinkRecord[] getOrFetchFileLinksByOwner(ServerInterfaceLayer SIL, Long ownerLinkId, Long ownerObjId, short ownerType) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+    FetchedDataCache cache = SIL.getFetchedDataCache();
     FileLinkRecord[] fLinks = null;
     if (ownerType == Record.RECORD_TYPE_MESSAGE) {
       MsgDataRecord mData = cache.getMsgDataRecord(ownerObjId);
@@ -93,7 +93,7 @@ public class FileLinkOps {
   public static void markRecordsAs(ServerInterfaceLayer SIL, FileLinkRecord[] records, Short newMark) {
     if (records != null && records.length > 0) {
       // gather all stats which need to be updated
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = SIL.getFetchedDataCache();
       ArrayList statsL = new ArrayList();
       for (int i=0; i<records.length; i++) {
         StatRecord statRecord = cache.getStatRecordMyLinkId(records[i].fileLinkId, FetchedDataCache.STAT_TYPE_INDEX_FILE);

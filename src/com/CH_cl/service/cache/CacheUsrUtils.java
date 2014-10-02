@@ -27,7 +27,7 @@ import java.util.Set;
 */
 public class CacheUsrUtils {
 
-  public static Record[][] checkValidityOfRecipients(Record[][] selectedRecipients, StringBuffer errorSB) {
+  public static Record[][] checkValidityOfRecipients(final FetchedDataCache cache, Record[][] selectedRecipients, StringBuffer errorSB) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUsrUtils.class, "checkValidityOfRecipients(Record[][] selectedRecipients, StringBuffer errorSB)");
     if (trace != null) trace.args(selectedRecipients);
     // check for contacts to have messaging enabled
@@ -61,7 +61,6 @@ public class CacheUsrUtils {
           }
         } else if (rec instanceof FolderRecord) {
           FolderRecord fldRec = (FolderRecord) rec;
-          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
           FolderRecord fRec = cache.getFolderRecord(fldRec.folderId);
           if (fRec == null || cache.getFolderShareRecordMy(fRec.folderId, true) == null) {
             if (badFoldersL == null) badFoldersL = new ArrayList();
@@ -75,9 +74,9 @@ public class CacheUsrUtils {
         }
       }
     }
-    appendInvalidRecipientErrMsg(errorSB, badContactsL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
-    appendInvalidRecipientErrMsg(errorSB, badAddressesL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
-    appendInvalidRecipientErrMsg(errorSB, badFoldersL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
+    appendInvalidRecipientErrMsg(cache, errorSB, badContactsL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_selected_contact(s)_have_messaging_permission_disabled..."));
+    appendInvalidRecipientErrMsg(cache, errorSB, badAddressesL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_address_contacts_do_not_have_a_default_email_address_present..."));
+    appendInvalidRecipientErrMsg(cache, errorSB, badFoldersL, com.CH_cl.lang.Lang.rb.getString("msg_The_following_folders_cannot_be_found_or_are_not_accessible..."));
     Record[][] filteredSelectedRecipients = new Record[filteredSelectedRecipientsL.length][];
     for (int recipientType=0; recipientType<filteredSelectedRecipients.length; recipientType++) {
       Record[] recipients = new Record[filteredSelectedRecipientsL[recipientType].size()];
@@ -87,13 +86,13 @@ public class CacheUsrUtils {
     if (trace != null) trace.exit(CacheUsrUtils.class, filteredSelectedRecipients);
     return filteredSelectedRecipients;
   }
-  private static void appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix) {
+  private static void appendInvalidRecipientErrMsg(final FetchedDataCache cache,StringBuffer errSB, ArrayList recsL, String msgPrefix) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUsrUtils.class, "appendInvalidRecipientErrMsg(StringBuffer errSB, ArrayList recsL, String msgPrefix)");
     if (trace != null) trace.args(errSB, recsL, msgPrefix);
     if (recsL != null) {
       StringBuffer sb = new StringBuffer();
       for (int i=0; i<recsL.size(); i++) {
-        sb.append(TextRenderer.getRenderedText(recsL.get(i)));
+        sb.append(TextRenderer.getRenderedText(cache, recsL.get(i)));
         if (i<recsL.size()-1)
           sb.append(", ");
       }
@@ -108,17 +107,16 @@ public class CacheUsrUtils {
   /**
   * @return an acknowledged contact record or user record.
   */
-  public static Record convertUserIdToFamiliarUser(Long userId, boolean recipientOk, boolean senderOk) {
-    return convertUserIdToFamiliarUser(userId, recipientOk, senderOk, true);
+  public static Record convertUserIdToFamiliarUser(final FetchedDataCache cache, Long userId, boolean recipientOk, boolean senderOk) {
+    return convertUserIdToFamiliarUser(cache, userId, recipientOk, senderOk, true);
   }
-  public static Record convertUserIdToFamiliarUser(Long userId, boolean recipientOk, boolean senderOk, boolean includeWebUsers) {
+  public static Record convertUserIdToFamiliarUser(final FetchedDataCache cache, Long userId, boolean recipientOk, boolean senderOk, boolean includeWebUsers) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUsrUtils.class, "convertUserIdToFamiliarUser(Long userId, boolean recipientOk, boolean senderOk, boolean includeWebUsers)");
     if (trace != null) trace.args(userId);
     if (trace != null) trace.args(recipientOk);
     if (trace != null) trace.args(senderOk);
     if (trace != null) trace.args(includeWebUsers);
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     Long myUserId = cache.getMyUserId();
     Record familiarUser = null;
     if (recipientOk) {
@@ -162,18 +160,18 @@ public class CacheUsrUtils {
   * @return All user IDs that have access to specified shares through share ownerships or groups
   * Do not include related shares lookup
   */
-  public static Long[] findAccessUsers(FolderShareRecord[] shares) {
+  public static Long[] findAccessUsers(final FetchedDataCache cache, FolderShareRecord[] shares) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheUsrUtils.class, "findAccessUsers(con, FolderShareRecord[] shares)");
     if (trace != null) trace.args(shares);
     HashSet uIDsSet = new HashSet();
     HashSet gIDsSet = new HashSet();
-    findAccessUsers(shares, uIDsSet, gIDsSet);
+    findAccessUsers(cache, shares, uIDsSet, gIDsSet);
     Long[] userIDs = new Long[uIDsSet.size()];
     uIDsSet.toArray(userIDs);
     if (trace != null) trace.exit(CacheUsrUtils.class, userIDs);
     return userIDs;
   }
-  private static void findAccessUsers(FolderShareRecord[] shares, Set uIDsSet, Set gIDsSet) {
+  private static void findAccessUsers(final FetchedDataCache cache, FolderShareRecord[] shares, Set uIDsSet, Set gIDsSet) {
     Long[] uIDs = FolderShareRecord.getOwnerUserIDs(shares);
     if (uIDs != null) {
       uIDsSet.addAll(Arrays.asList(uIDs));
@@ -192,10 +190,9 @@ public class CacheUsrUtils {
       if (gIDsL != null && gIDsL.size() > 0) {
         gIDs = new Long[gIDsL.size()];
         gIDsL.toArray(gIDs);
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderShareRecord[] groupShares = cache.getFolderShareRecordsForFolders(gIDs);
         if (groupShares != null) {
-          findAccessUsers(groupShares, uIDsSet, gIDsSet);
+          findAccessUsers(cache, groupShares, uIDsSet, gIDsSet);
         }
       }
     }
@@ -204,10 +201,9 @@ public class CacheUsrUtils {
   /**
   * @return personal (nullable), short, full parts of default email address for specified user
   */
-  public static String[] getCachedDefaultEmail(UserRecord userRecord, boolean isGeneratePersonalPart) {
+  public static String[] getCachedDefaultEmail(final FetchedDataCache cache, UserRecord userRecord, boolean isGeneratePersonalPart) {
     String[] emailAddr = null;
     if (userRecord.defaultEmlId != null && userRecord.defaultEmlId.longValue() != UserRecord.GENERIC_EMAIL_ID) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       EmailRecord emlRec = cache.getEmailRecord(userRecord.defaultEmlId);
       if (emlRec != null) {
         emailAddr = new String[3];
@@ -225,10 +221,10 @@ public class CacheUsrUtils {
     return emailAddr;
   }
 
-  public static String getDefaultApplicationTitle(UserRecord userRecord) {
+  public static String getDefaultApplicationTitle(final FetchedDataCache cache, UserRecord userRecord) {
     String emailStr = "";
     if (!userRecord.isWebAccount()) {
-      String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(userRecord, false);
+      String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(cache, userRecord, false);
       emailStr = emailStrings != null ? " :: " + emailStrings[2] : "";
     }
     String title = userRecord.shortInfo() + emailStr;
@@ -239,13 +235,12 @@ public class CacheUsrUtils {
   /**
   * @return a set of personal(nullable)/short/full version of email address.
   */
-  public static String[] getEmailAddressSet(Record rec) {
+  public static String[] getEmailAddressSet(final FetchedDataCache cache, Record rec) {
     String[] emailSet = null;
     if (rec instanceof UserRecord) {
-      emailSet = CacheUsrUtils.getCachedDefaultEmail((UserRecord) rec, false);
+      emailSet = CacheUsrUtils.getCachedDefaultEmail(cache, (UserRecord) rec, false);
     } else if (rec instanceof ContactRecord) {
       ContactRecord cRec = (ContactRecord) rec;
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       Long myUserId = cache.getMyUserId();
       Long otherUserId = null;
       if (cRec.ownerUserId.equals(myUserId)) {
@@ -256,11 +251,11 @@ public class CacheUsrUtils {
       // try using UserRecord, else return NULL
       UserRecord uRec = cache.getUserRecord(otherUserId);
       if (uRec != null) {
-        emailSet = CacheUsrUtils.getCachedDefaultEmail((UserRecord) uRec, false);
+        emailSet = CacheUsrUtils.getCachedDefaultEmail(cache, (UserRecord) uRec, false);
       }
       if (emailSet == null) {
         emailSet = new String[3];
-        emailSet[0] = TextRenderer.getRenderedText(cRec);
+        emailSet[0] = TextRenderer.getRenderedText(cache, cRec);
         emailSet[1] = "" + otherUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0];
         emailSet[2] = emailSet[0] + " <" + otherUserId + "@" + URLs.getElements(URLs.DOMAIN_MAIL)[0] + ">";
       }

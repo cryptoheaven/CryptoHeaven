@@ -44,7 +44,6 @@ public class ContactOps {
   public static ArrayList doInviteToContacts_Threaded(final ServerInterfaceLayer SIL, String emlAddresses, String emlPersonalMessage, final CallbackI callback, final boolean autoCreateWebAccounts, ArrayList returnEmlAddrsL, ArrayList returnEmlNicksL) {
     final String emailAddresses = emlAddresses != null ? emlAddresses.trim() : null;
     final String emlPersonalMsg = emlPersonalMessage != null ? emlPersonalMessage.trim() : null;
-    //final String[] texts = Misc.getEmailInvitationText(personalMsg, null, FetchedDataCache.getSingleInstance().getUserRecord());
 
     // gather email addresses and nicks for adding to AddressBook
     final ArrayList emailAddressesL = returnEmlAddrsL != null ? returnEmlAddrsL : new ArrayList();

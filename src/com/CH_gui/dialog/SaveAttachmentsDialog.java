@@ -555,7 +555,7 @@ public class SaveAttachmentsDialog extends GeneralDialog implements DragGestureL
     FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(cache, allFolderRecords);
     allFolderPairs = (FolderPair[]) FolderFilter.MOVE_FOLDER.filterInclude(allFolderPairs);
 
     // An invalid destinations are filtered out

@@ -428,7 +428,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
                 break;
               }
             }
-            String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(uRec, false);
+            String[] emailStrings = CacheUsrUtils.getCachedDefaultEmail(cache, uRec, false);
             String emailAddress = emailStrings != null ? emailStrings[2] : "N/A";
             bodyBuf.append("  login name: \"");
             bodyBuf.append(handle);
@@ -647,7 +647,7 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
     }
     // Check if you are not creating more accounts than your master account can handle
     //myUser.
-    UserRecord[] myCurrentSubUsers = (UserRecord[]) RecordUtils.filter(cache.getUserRecords(), new SubUserFilter(myUser.userId, false, true));
+    UserRecord[] myCurrentSubUsers = (UserRecord[]) RecordUtils.filter(cache.getUserRecords(), new SubUserFilter(cache, myUser.userId, false, true));
     if (myCurrentSubUsers != null && myCurrentSubUsers.length + accountsV.size() > myUser.maxSubAccounts.shortValue()) {
       isValid = false;
       sb.append("Your subscription level is for "+(myUser.maxSubAccounts.shortValue()+1)+" user accounts in total, 1 administrative and "+myUser.maxSubAccounts+" managed.  Creation of all specified user accounts would exceed your quota.  To enable management of a larger group please upgrade your account.");
@@ -699,8 +699,9 @@ public class CreateSubAccountsWizardDialog extends WizardDialog implements Inter
 
   private static void sendMessageToSelf(ServerInterfaceLayer SIL, String subject, String body) {
     BASymmetricKey ba = new BASymmetricKey(32);
-    MsgLinkRecord[] linkRecords = SendMessageRunner.prepareMsgLinkRecords(SIL, new UserRecord[] { SIL.getFetchedDataCache().getUserRecord() }, ba);
-    MsgDataRecord dataRecord = SendMessageRunner.prepareMsgDataRecord(ba, new Short(MsgDataRecord.IMPORTANCE_HIGH_PLAIN), subject, body, null);
+    FetchedDataCache cache = SIL.getFetchedDataCache();
+    MsgLinkRecord[] linkRecords = SendMessageRunner.prepareMsgLinkRecords(SIL, new UserRecord[] { cache.getUserRecord() }, ba);
+    MsgDataRecord dataRecord = SendMessageRunner.prepareMsgDataRecord(cache, ba, new Short(MsgDataRecord.IMPORTANCE_HIGH_PLAIN), subject, body, null);
     Msg_New_Rq newMsgRequest = new Msg_New_Rq(null, null, null, linkRecords, dataRecord, null, null, null, null);
     MessageAction requestMessageAction = new MessageAction(CommandCodes.MSG_Q_NEW, newMsgRequest);
     SIL.submitAndReturn(requestMessageAction);

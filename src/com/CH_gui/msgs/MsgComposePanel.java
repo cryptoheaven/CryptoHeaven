@@ -485,7 +485,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     if (dataRecord.getText() != null) {
       updateGUIthreadSafe.run();
     } else {
-      ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(draftMsgLink);
+      ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(cache, draftMsgLink);
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
@@ -510,7 +510,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
     // Initialize selected recipients for mail and anything in Drafts folder
     if (dataRecord.isTypeMessage() || (draftMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER && draftMsgLink.ownerObjId.equals(userRecord.draftFolderId))) {
-      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(dataRecord);
+      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(cache, dataRecord);
       for (int i=0; i<selectedRecipients.length && i<recipients.length; i++) {
         selectedRecipients[i] = recipients[i];
       }
@@ -518,7 +518,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       // For addresses, initialize recipient to be the folder of the link
       if (draftMsgLink.ownerObjType.shortValue() == Record.RECORD_TYPE_FOLDER) {
         FolderRecord toFolder = cache.getFolderRecord(draftMsgLink.ownerObjId);
-        selectedRecipients[TO] = CacheFldUtils.convertRecordToPairs(toFolder);
+        selectedRecipients[TO] = CacheFldUtils.convertRecordToPairs(cache, toFolder);
       }
     }
 
@@ -581,7 +581,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     if (dataRecord.getText() != null) {
       updateGUIthreadSafe.run();
     } else {
-      ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(forwardMsg);
+      ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(cache, forwardMsg);
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
@@ -628,7 +628,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       updateGUIthreadSafe.run();
     } else {
       if (trace != null) trace.data(20, "message text is NOT available, will request message body then set reply content.");
-      ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(replyToMsg);
+      ProtocolMsgDataSet request = MsgDataOps.prepareRequestToFetchMsgBody(cache, replyToMsg);
       MainFrame.getServerInterfaceLayer().submitAndReturn(new MessageAction(CommandCodes.MSG_Q_GET_BODY, request), 25000, null, updateGUIthreadSafe, updateGUIthreadSafe);
     }
     if (trace != null) trace.exit(MsgComposePanel.class);
@@ -1630,7 +1630,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgComposePanel.class, "checkValidityOfRecipients(boolean withRedraw)");
     if (trace != null) trace.args(withRedraw);
     StringBuffer errorSB = new StringBuffer();
-    selectedRecipients = CacheUsrUtils.checkValidityOfRecipients(selectedRecipients, errorSB);
+    selectedRecipients = CacheUsrUtils.checkValidityOfRecipients(cache, selectedRecipients, errorSB);
     if (errorSB.length() > 0) {
       String title = com.CH_cl.lang.Lang.rb.getString("msgTitle_Invalid_recipient");
       MessageDialog.showDialog(MsgComposePanel.this, errorSB.toString(), title, NotificationCenter.WARNING_MESSAGE, false);
@@ -2093,7 +2093,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
 
           BASymmetricKey key = new BASymmetricKey(32);
           MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(SIL, recipients, key);
-          MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
+          MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(SIL.getFetchedDataCache(), key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), addressPreview.toString(), addressFull.toString(), null);
           Msg_New_Rq request = new Msg_New_Rq(addrBook.getFolderShareRecord().shareId, null, links[0], data);
           request.hashes = SendMessageRunner.prepareAddrHashes(data);
           MessageAction action = new MessageAction(CommandCodes.MSG_Q_NEW, request);
@@ -2413,7 +2413,7 @@ public class MsgComposePanel extends JPanel implements ActionProducerI, ToolBarP
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TypingGUIUpdater.class, "TypingGUIUpdater.run()");
 
       // use my contact list only, not the reciprocal contacts
-      Record r = CacheUsrUtils.convertUserIdToFamiliarUser(userId, true, false);
+      Record r = CacheUsrUtils.convertUserIdToFamiliarUser(cache, userId, true, false);
       final String name = ListRenderer.getRenderedText(r);
 
       Timer timer = new Timer(0, new ActionListener() {

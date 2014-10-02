@@ -291,7 +291,7 @@ public class EngineFinder extends Object {
   /**
    * To open a URL input stream this method will wait the maximum of time specified, if it is taking longer, just quit and return null.
    * @param url The URL to open
-   * @param maxWaitMillis The maximum amount of time this operation is permited to take.
+   * @param maxWaitMillis The maximum amount of time this operation is permitted to take.
    * @return The opened InputStream or null if failed or time exceeded.
    */
   private static InputStream openStream(final URL url, int maxWaitMillis) {

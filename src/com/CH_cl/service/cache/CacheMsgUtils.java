@@ -36,19 +36,21 @@ import java.util.StringTokenizer;
 */
 public class CacheMsgUtils {
 
+  private static final String STR_RE = com.CH_cl.lang.Lang.rb.getString("msg_Re");
+  private static final String STR_FWD = com.CH_cl.lang.Lang.rb.getString("msg_Fwd");
 
   /**
   * Gathers all recipients into a Record[]
   */
-  public static Record[][] gatherAllMsgRecipients(MsgDataRecord dataRecord) {
+  public static Record[][] gatherAllMsgRecipients(final FetchedDataCache cache, MsgDataRecord dataRecord) {
     if (dataRecord != null)
-      return gatherAllMsgRecipients(dataRecord.getRecipients());
+      return gatherAllMsgRecipients(cache, dataRecord.getRecipients());
     return null;
   }
-  public static Record[][] gatherAllMsgRecipients(String recipients) {
-    return gatherAllMsgRecipients(recipients, -1);
+  public static Record[][] gatherAllMsgRecipients(final FetchedDataCache cache, String recipients) {
+    return gatherAllMsgRecipients(cache, recipients, -1);
   }
-  public static Record[][] gatherAllMsgRecipients(String recipients, int gatherFirst_N_only) {
+  public static Record[][] gatherAllMsgRecipients(final FetchedDataCache cache, String recipients, int gatherFirst_N_only) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "gatherAllMsgRecipients(String recipients, int gatherFirst_N_only)");
     if (trace != null) trace.args(recipients);
     if (trace != null) trace.args(gatherFirst_N_only);
@@ -58,7 +60,6 @@ public class CacheMsgUtils {
     ArrayList recsLbcc = new ArrayList();
     int countGathered = 0;
     if (recipients != null && recipients.length() > 0) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       StringTokenizer st = new StringTokenizer(recipients);
       try { // If recipient list is invalid, skip them all together
         while (st.hasMoreTokens() && (gatherFirst_N_only == -1 || countGathered <= gatherFirst_N_only)) {
@@ -80,7 +81,7 @@ public class CacheMsgUtils {
           if (typeChar == MsgDataRecord.RECIPIENT_USER || typeChar == MsgDataRecord.RECIPIENT_BOARD) {
             Long lId = Long.valueOf(sId);
             if (typeChar == MsgDataRecord.RECIPIENT_USER) {
-              rec = CacheUsrUtils.convertUserIdToFamiliarUser(lId, true, false);
+              rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, lId, true, false);
               if (rec != null) {
                 recsL.add(rec);
               } else {
@@ -138,20 +139,19 @@ public class CacheMsgUtils {
   }
 
 
-  public static Record getFromAsFamiliar(MsgDataRecord msgData) {
+  public static Record getFromAsFamiliar(final FetchedDataCache cache, MsgDataRecord msgData) {
     Record fromRec = null;
     String fromEmailAddress = msgData.getFromEmailAddress();
     if (msgData.isEmail() || fromEmailAddress != null) {
-      fromRec = CacheEmlUtils.convertToFamiliarEmailRecord(fromEmailAddress);
+      fromRec = CacheEmlUtils.convertToFamiliarEmailRecord(cache, fromEmailAddress);
     } else {
       // use my contact list only, not the reciprocal contacts
-      fromRec = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
+      fromRec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, msgData.senderUserId, true, false);
     }
     return fromRec;
   }
 
-  public static MsgLinkRecord[] getMsgLinkRecordsWithFetchedDatas(Long folderId) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  public static MsgLinkRecord[] getMsgLinkRecordsWithFetchedDatas(final FetchedDataCache cache, Long folderId) {
     MsgLinkRecord[] mLinks = cache.getMsgLinkRecordsForFolder(folderId);
     ArrayList mLinksFetchedL = new ArrayList();
     for (int i=0; i<mLinks.length; i++) {
@@ -162,9 +162,8 @@ public class CacheMsgUtils {
     return (MsgLinkRecord[]) ArrayUtils.toArray(mLinksFetchedL, MsgLinkRecord.class);
   }
 
-  public static Record getMsgSenderForReply(MsgDataRecord msgData) {
+  public static Record getMsgSenderForReply(final FetchedDataCache cache, MsgDataRecord msgData) {
     Record sender = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     String fromEmailAddress = msgData.getFromEmailAddress();
     if (msgData.isEmail() || fromEmailAddress != null) {
       String[] replyTos = msgData.getReplyToAddresses();
@@ -190,10 +189,9 @@ public class CacheMsgUtils {
     return sender;
   }
 
-  public static Record[][] getReplyAllRecipients(MsgDataRecord msgData) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-    Record recipient = CacheMsgUtils.getMsgSenderForReply(msgData);
-    Record[][] allRecipients = CacheMsgUtils.gatherAllMsgRecipients(msgData);
+  public static Record[][] getReplyAllRecipients(final FetchedDataCache cache, MsgDataRecord msgData) {
+    Record recipient = CacheMsgUtils.getMsgSenderForReply(cache, msgData);
+    Record[][] allRecipients = CacheMsgUtils.gatherAllMsgRecipients(cache, msgData);
     Record[] sender = new Record[] { recipient };
     // add the sender to the TO header as recipient
     if (allRecipients[0] != null) {
@@ -317,10 +315,67 @@ public class CacheMsgUtils {
     return type;
   }
 
-  public static boolean hasAttachments(Record rec) {
+  public static String getSubjectForward(final FetchedDataCache cache, Object[] attachments) {
+    return getSubjectForward(cache, attachments, 0);
+  }
+  public static String getSubjectForward(final FetchedDataCache cache, Object[] attachments, int truncateShort) {
+    StringBuffer sb = new StringBuffer();
+    for (int i=0; i<attachments.length; i++) {
+      sb.append(TextRenderer.getRenderedText(cache, attachments[i]));
+      if (i < attachments.length - 1)
+        sb.append("; ");
+    }
+    String subject = STR_FWD + " [" + sb.toString() + "]";
+    if (truncateShort > 0 && subject.length() > truncateShort) {
+      subject = subject.substring(0, truncateShort) + "...";
+    }
+    return subject;
+  }
+
+  public static String getSubjectReply(final FetchedDataCache cache, MsgLinkRecord replyToLink) {
+    return getSubjectReply(cache, replyToLink, 0);
+  }
+  public static String getSubjectReply(final FetchedDataCache cache, MsgLinkRecord replyToLink, int truncateShort) {
+    MsgDataRecord replyToData = cache.getMsgDataRecord(replyToLink.msgId);
+    return getSubjectReply(replyToData, truncateShort);
+  }
+
+  public static String getSubjectReply(MsgDataRecord replyToData, int truncateShort) {
+    String oldSubject = replyToData.getSubject();
+    if (oldSubject == null)
+      oldSubject = "";
+    String subject = STR_RE + " " + eliminatePrefixes(oldSubject);
+    if (truncateShort > 0 && subject.length() > truncateShort) {
+      subject = subject.substring(0, truncateShort) + "...";
+    }
+    return subject;
+  }
+
+  private static String eliminatePrefixes(String str) {
+    if (str != null) {
+      boolean changed = false;
+      while (true) {
+        str = str.trim();
+        if (str.startsWith(STR_RE + " ") || str.toUpperCase().startsWith(STR_RE.toUpperCase() + " ")) {
+          str = str.substring(STR_RE.length() + 1);
+          changed = true;
+        }
+        if (str.startsWith(STR_FWD + " ") || str.toUpperCase().startsWith(STR_FWD.toUpperCase() + " ")) {
+          str = str.substring(STR_FWD.length() + 1);
+          changed = true;
+        }
+        if (!changed)
+          break;
+        else
+          changed = false;
+      }
+    }
+    return str;
+  }
+
+  public static boolean hasAttachments(final FetchedDataCache cache, Record rec) {
     boolean hasAttachments = false;
     if (rec instanceof MsgLinkRecord) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       MsgDataRecord msgData = cache.getMsgDataRecord(((MsgLinkRecord) rec).msgId);
       hasAttachments = msgData.hasAttachments();
     } else if (rec instanceof MsgDataRecord) {
@@ -330,9 +385,10 @@ public class CacheMsgUtils {
   }
 
   /**
+   * @param headings: translated strings for From, To, Cc, Date, Subject
   * @return Elements consist of: header type ("text/plain" or "text/html"), header, body type, body
   */
-  public static String[] makeReplyToContent(MsgLinkRecord linkRecord, MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody) {
+  public static String[] makeReplyToContent(final FetchedDataCache cache, MsgLinkRecord linkRecord, MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody, String[] headings) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "makeReplyToContent(MsgDataRecord dataRecord, boolean isForceConvertHTMLtoPLAIN, boolean isForceOutputInHTMLPrintHeader, boolean isForceOutputInHTMLBody)");
     if (trace != null) trace.args(dataRecord);
     if (trace != null) trace.args(isForceConvertHTMLtoPLAIN);
@@ -340,24 +396,23 @@ public class CacheMsgUtils {
     if (trace != null) trace.args(isForceOutputInHTMLBody);
 
     String[] content = new String[4]; // header type, header, body type, body
+    int FROM=0,TO=1, CC=2, DATE=3, SUBJECT=4; // heading indexes
 
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-
-    Object[] senderSet = UserOps.getCachedOrMakeSenderDefaultEmailSet(dataRecord);
+    Object[] senderSet = UserOps.getCachedOrMakeSenderDefaultEmailSet(cache, dataRecord);
     Record sender = (Record) senderSet[0];
     String senderEmailShort = (String) senderSet[1];
     String senderEmailFull = (String) senderSet[2];
 
     if (sender != null) {
-      Record[][] recipients = gatherAllMsgRecipients(dataRecord);
+      Record[][] recipients = gatherAllMsgRecipients(cache, dataRecord);
       StringBuffer[] sb = new StringBuffer[recipients.length];
       for (int recipientType=0; recipientType<recipients.length; recipientType++) {
         sb[recipientType] = new StringBuffer();
         if (recipients[recipientType] != null) {
           for (int i=0; i<recipients[recipientType].length; i++) {
             Record recipient = recipients[recipientType][i];
-            String displayName = TextRenderer.getRenderedText(recipient);
-            String[] emailAddr = CacheUsrUtils.getEmailAddressSet(recipient);
+            String displayName = TextRenderer.getRenderedText(cache, recipient);
+            String[] emailAddr = CacheUsrUtils.getEmailAddressSet(cache, recipient);
             if (dataRecord.isHtmlMail()) {
               // skip embeding link if generating Print Header
               if (isForceOutputInHTMLPrintHeader || emailAddr == null) {
@@ -443,18 +498,17 @@ public class CacheMsgUtils {
         if (trace != null) trace.data(70, "making HTML header lines");
         content[0] = "text/html";
         content[1] =
-            (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(TextRenderer.getRenderedText(cache.getUserRecord())) + "</b></font>" : "") +
+            (isForceOutputInHTMLPrintHeader ? "<font size='-1'><b>" + Misc.encodePlainIntoHtml(TextRenderer.getRenderedText(cache, cache.getUserRecord())) + "</b></font>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<hr color=#000000 noshade size=2>" : "") +
             (isForceOutputInHTMLPrintHeader ? "<table cellpadding='0' cellspacing='0' border='0'>" : "") +
 
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_From"),
+            makeHtmlHeaderLine(headings[FROM],
                 (isForceOutputInHTMLPrintHeader ? Misc.encodePlainIntoHtml(senderEmailFull) : "<A href='mailto:" + senderEmailShort + "'>" + Misc.encodePlainIntoHtml(senderEmailFull) + "</A>"),
                 isForceOutputInHTMLPrintHeader) +
-            //(sbReplyTo != null ? ("<b>" + com.CH_gui.lang.Lang.rb.getString("column_Reply_To") + ":</b>  " + Misc.encodePlainIntoHtml(sbReplyTo.toString()) + " <br>") : "") +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_To"), sb[SendMessageInfoProviderI.TO].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Cc"), sb[SendMessageInfoProviderI.CC].toString(), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Sent"), Misc.encodePlainIntoHtml(dateCreated), isForceOutputInHTMLPrintHeader) +
-            makeHtmlHeaderLine(com.CH_cl.lang.Lang.rb.getString("column_Subject"), Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(headings[TO], sb[SendMessageInfoProviderI.TO].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(headings[CC], sb[SendMessageInfoProviderI.CC].toString(), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(headings[DATE], Misc.encodePlainIntoHtml(dateCreated), isForceOutputInHTMLPrintHeader) +
+            makeHtmlHeaderLine(headings[SUBJECT], Misc.encodePlainIntoHtml(quotedSubject), isForceOutputInHTMLPrintHeader) +
             (isForceOutputInHTMLPrintHeader ? "</table>" : "");
 
         if (content[2].equalsIgnoreCase("text/html")) {
@@ -484,11 +538,11 @@ public class CacheMsgUtils {
       } else {
         content[0] = "text/plain";
         content[1] =
-            com.CH_cl.lang.Lang.rb.getString("column_From") + ": " + senderEmailFull + "\n" +
-            (sb[SendMessageInfoProviderI.TO].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_To") + ": " + sb[SendMessageInfoProviderI.TO].toString() + "\n") : "") +
-            (sb[SendMessageInfoProviderI.CC].length() > 0 ? (com.CH_cl.lang.Lang.rb.getString("column_Cc") + ": " + sb[SendMessageInfoProviderI.CC].toString() + "\n") : "") +
-            com.CH_cl.lang.Lang.rb.getString("column_Sent") + ": " + dateCreated + "\n" +
-            com.CH_cl.lang.Lang.rb.getString("column_Subject") + ": " + quotedSubject + " \n\n";
+            headings[FROM] + senderEmailFull + "\n" +
+            (sb[SendMessageInfoProviderI.TO].length() > 0 ? (headings[TO] + sb[SendMessageInfoProviderI.TO].toString() + "\n") : "") +
+            (sb[SendMessageInfoProviderI.CC].length() > 0 ? (headings[CC] + sb[SendMessageInfoProviderI.CC].toString() + "\n") : "") +
+            headings[DATE] + dateCreated + "\n" +
+            headings[SUBJECT] + quotedSubject + " \n\n";
         content[3] = quotedMsgBody;
       }
     }
@@ -500,7 +554,7 @@ public class CacheMsgUtils {
   private static String makeHtmlHeaderLine(String name, String htmlText, boolean isPrintHeader) {
     if (htmlText != null && htmlText.length() > 0) {
       return (isPrintHeader ? "<tr><td><font size='-2'>" : "") +
-              "<b>" + name + ": </b>" +
+              "<b>" + name + " </b>" +
               (isPrintHeader ? "</font></td><td><font size='-2'>" : "") +
               htmlText +
               (isPrintHeader ? "</font></td></tr>" : "<br>");
@@ -509,20 +563,40 @@ public class CacheMsgUtils {
     }
   }
 
-  public static void unlockPassProtectedMsgIncludingCached(MsgDataRecord msgDataRecStartWith, Hasher.Set bodyKey) {
+  public static void tryToUnsealMsgDataWithVerification(final FetchedDataCache cache, MsgDataRecord dataRecord) {
+    MsgLinkRecord[] linkRecords = cache.getMsgLinkRecordsForMsg(dataRecord.msgId);
+    if (linkRecords != null && linkRecords.length > 0) {
+      // if this data record contains sendPrivKeyId, then signature needs to be verified
+      if (dataRecord.getSendPrivKeyId() != null) {
+        KeyRecord msgSigningKeyRec = cache.getKeyRecord(dataRecord.getSendPrivKeyId());
+        if (msgSigningKeyRec != null) {
+          BASymmetricKey symKey = null;
+          for (int i=0; i<linkRecords.length; i++) {
+            if (linkRecords[i] != null)
+              symKey = linkRecords[i].getSymmetricKey();
+            if (symKey != null)
+              break;
+          }
+          if (symKey != null)
+            dataRecord.unSeal(symKey, cache.getMsgBodyKeys(), msgSigningKeyRec);
+        }
+      }
+    }
+  }
+
+  public static void unlockPassProtectedMsgIncludingCached(final FetchedDataCache cache, MsgDataRecord msgDataRecStartWith, Hasher.Set bodyKey) {
     // first unseal the specific message so its fast for the user in the view
-    doUnlockPassProtectedMsgs(new MsgDataRecord[] { msgDataRecStartWith }, bodyKey);
+    doUnlockPassProtectedMsgs(cache, new MsgDataRecord[] { msgDataRecStartWith }, bodyKey);
     // next unseal any other message that might be using the same password...
     Thread th = new ThreadTraced("UnlockPassProtectedMsgs Runner") {
       public void runTraced() {
-        doUnlockPassProtectedMsgs(null, null);
+        doUnlockPassProtectedMsgs(cache, null, null);
       }
     };
     th.setDaemon(true);
     th.start();
   }
-  private static void doUnlockPassProtectedMsgs(MsgDataRecord[] msgDatas, Hasher.Set bodyKey) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  private static void doUnlockPassProtectedMsgs(final FetchedDataCache cache, MsgDataRecord[] msgDatas, Hasher.Set bodyKey) {
     if (msgDatas == null)
       msgDatas = cache.getMsgDataRecords(new MsgFilter((Boolean) null, (Boolean) null, Boolean.FALSE));
     List keys = null;
@@ -587,7 +661,7 @@ public class CacheMsgUtils {
         MsgDataRecord[] msgDataAttachments = cache.getMsgDataRecordsForLinks(msgLinkAttachmentIDs);
         if (msgDataAttachments != null && msgDataAttachments.length > 0) {
           // recursively go through the attachments
-          doUnlockPassProtectedMsgs(msgDataAttachments, null);
+          doUnlockPassProtectedMsgs(cache, msgDataAttachments, null);
         }
       }
     }
@@ -598,16 +672,15 @@ public class CacheMsgUtils {
   * @param mData
   * @return true iff message should default to PLAIN mode given user's general settings
   */
-  public static boolean isDefaultToPLAINpreferred(MsgDataRecord mData) {
+  public static boolean isDefaultToPLAINpreferred(final FetchedDataCache cache, MsgDataRecord mData) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "isDefaultToPLAINpreferred(MsgDataRecord mData)");
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     boolean plainPreferred = false;
     if (mData == null)
       plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE);
     else
       plainPreferred = Misc.isBitSet(cache.getUserRecord().notifyByEmail, UserRecord.EMAIL_MANUAL_SELECT_PREVIEW_MODE) &&
                       !mData.senderUserId.equals(cache.getMyUserId()) && // Msgs created by myself never display in non-native mode
-                      !(CacheUsrUtils.convertUserIdToFamiliarUser(mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
+                      !(CacheUsrUtils.convertUserIdToFamiliarUser(cache, mData.senderUserId, true, false, false) instanceof ContactRecord); // skip non-native mode for Msgs from your Contacts
     if (trace != null) trace.exit(CacheMsgUtils.class, plainPreferred);
     return plainPreferred;
   }
@@ -617,11 +690,10 @@ public class CacheMsgUtils {
   * @param dataRecord
   * @return true iff message should be displayed in PLAIN mode given individual Message setting and user settings.
   */
-  public static boolean isDefaultToPLAINpreferred(MsgLinkRecord msgLink, MsgDataRecord dataRecord) {
+  public static boolean isDefaultToPLAINpreferred(final FetchedDataCache cache, MsgLinkRecord msgLink, MsgDataRecord dataRecord) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(CacheMsgUtils.class, "isDefaultToPLAINpreferred(MsgLinkRecord msgLink, MsgDataRecord dataRecord)");
     boolean plainPreferred = false;
     FolderRecord ownerFolder = null;
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     if (dataRecord.isTypeAddress()) {
       // display Address Records always in HTML
       plainPreferred = false;
@@ -633,7 +705,7 @@ public class CacheMsgUtils {
       // display Postings (Chatting msgs too) in NATIVE form because they were already visible in their full form the table anyway
       plainPreferred = !dataRecord.isHtmlMail();
       if (trace != null) trace.data(20, "plainPreferred = !dataRecord.isHtmlMail(); due to owning folder being posting/chatting type");
-    } else if (!Misc.isBitSet(msgLink.status, MsgLinkRecord.STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE) && isDefaultToPLAINpreferred(dataRecord)) {
+    } else if (!Misc.isBitSet(msgLink.status, MsgLinkRecord.STATUS_FLAG__APPROVED_FOR_NATIVE_PREVIEW_MODE) && isDefaultToPLAINpreferred(cache, dataRecord)) {
       plainPreferred = true;
       if (trace != null) trace.data(30, "plainPreferred=true due to native preview mode non-approval and default-to-plain-preferred");
     } else {

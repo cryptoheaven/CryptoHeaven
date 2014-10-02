@@ -164,7 +164,7 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
         RecycleDND_TransferableData transferRecs = (RecycleDND_TransferableData) tr.getTransferData(RecycleDND_Transferable.RECYCLE_RECORD_FLAVOR);
         event.acceptDrop(DnDConstants.ACTION_MOVE);
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
-        FolderPair moveToPair = CacheFldUtils.convertRecordToPair(uploadShareRec);
+        FolderPair moveToPair = CacheFldUtils.convertRecordToPair(cache, uploadShareRec);
         // move Files and Folders
         FileLinkRecord[] fLinks = null;
         if (transferRecs.recycleRecordIDs[2] != null)
@@ -172,7 +172,7 @@ public class RecycleDND_DropTargetListener extends Object implements DropTargetL
         else 
           fLinks = cache.getFileLinkRecords(transferRecs.recycleRecordIDs[1]);
         FileLinkRecord[] fLinksFiltered = (FileLinkRecord[]) new FileFilter(moveToPair.getId(), true).filterExclude(fLinks);
-        FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
+        FileActionTable.doMoveOrSaveAttachmentsAction(moveToPair, fLinksFiltered, CacheFldUtils.convertRecordsToPairs(cache, cache.getFolderRecords(transferRecs.recycleRecordIDs[0])));
         // move Msgs
         MsgLinkRecord[] mLinks = cache.getMsgLinkRecords(transferRecs.recycleRecordIDs[3]);
         MsgLinkRecord[] mLinksFiltered = (MsgLinkRecord[]) new MsgFilter(Record.RECORD_TYPE_FOLDER, moveToPair.getId()).filterExclude(mLinks);

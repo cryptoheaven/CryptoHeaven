@@ -14,7 +14,7 @@ import com.CH_co.service.records.*;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.ImageNums;
 import com.CH_co.util.Misc;
-import com.CH_co.util.SearchTextProviderI;
+import com.CH_cl.util.SearchTextProviderI;
 import java.io.File;
 import java.util.*;
 
@@ -25,11 +25,11 @@ import java.util.*;
  */
 public class TextRenderer implements SearchTextProviderI {
 
-  public static String getRenderedText(Object value) {
-    return getRenderedText(value, false, false, false, false, false, false, false);
+  public static String getRenderedText(final FetchedDataCache cache, Object value) {
+    return getRenderedText(cache, value, false, false, false, false, false, false, false);
   }
 
-  public static String getRenderedText(Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeGroupOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
+  public static String getRenderedText(final FetchedDataCache cache, Object value, boolean includeFileSizes, boolean includeFolderParticipants, boolean includeFolderOwner, boolean includeGroupOwner, boolean includeChatParticipants, boolean includeFullEmailAddress, boolean includeUploadPendingNote) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextRenderer.class, "getRenderedText()");
     if (trace != null) trace.args(value);
     if (trace != null) trace.args(includeFileSizes);
@@ -43,7 +43,7 @@ public class TextRenderer implements SearchTextProviderI {
 
     if (value instanceof ContactRecord) {
       ContactRecord cRec = (ContactRecord) value;
-      Long myUserId = FetchedDataCache.getSingleInstance().getMyUserId();
+      Long myUserId = cache.getMyUserId();
       if (myUserId != null)
         label = cRec.getNote(myUserId);
     }
@@ -60,15 +60,15 @@ public class TextRenderer implements SearchTextProviderI {
       FolderPair fPair = (FolderPair) value;
       if (fPair.getFolderRecord().isChatting()) {
         if (includeChatParticipants)
-          label = getFolderAndShareNames(fPair, true); // true for all participants
+          label = getFolderAndShareNames(cache, fPair, true); // true for all participants
       } else if (fPair.getFolderRecord().isGroupType()) {
         if (includeGroupOwner)
-          label = getFolderAndShareNames(fPair, false); // false for not including all participants in the name
+          label = getFolderAndShareNames(cache, fPair, false); // false for not including all participants in the name
       } else {
         if (includeFolderParticipants)
-          label = getFolderAndShareNames(fPair, true);
+          label = getFolderAndShareNames(cache, fPair, true);
         else if (includeFolderOwner)
-          label = getFolderAndShareNames(fPair, false);
+          label = getFolderAndShareNames(cache, fPair, false);
       }
       if (label == null) {
         if (trace != null) trace.data(30, "no special FolderPair handling, straight name");
@@ -79,7 +79,7 @@ public class TextRenderer implements SearchTextProviderI {
       MsgDataRecord mData = null;
       if (value instanceof MsgLinkRecord) {
         MsgLinkRecord mLink = (MsgLinkRecord) value;
-        mData = FetchedDataCache.getSingleInstance().getMsgDataRecord(mLink.msgId);
+        mData = cache.getMsgDataRecord(mLink.msgId);
       } else {
         mData = (MsgDataRecord) value;
       }
@@ -121,7 +121,7 @@ public class TextRenderer implements SearchTextProviderI {
     }
     else if (value instanceof FolderRecord) {
       FolderRecord fRec = (FolderRecord) value;
-      FolderShareRecord sRec = FetchedDataCache.getSingleInstance().getFolderShareRecordMy(fRec.folderId, true);
+      FolderShareRecord sRec = cache.getFolderShareRecordMy(fRec.folderId, true);
       if (sRec != null) {
         label = sRec.getFolderName();
       } else if (!fRec.isGroupType()) {
@@ -168,26 +168,26 @@ public class TextRenderer implements SearchTextProviderI {
     return label;
   }
 
-  public Collection getSearchableCharSequencesFor(Object searchableObj) {
-    return getSearchableCharSequencesFor(searchableObj, true);
+  public Collection getSearchableCharSequencesFor(final FetchedDataCache cache, Object searchableObj) {
+    return getSearchableCharSequencesFor(cache, searchableObj, true);
   }
-  public Collection getSearchableCharSequencesFor(Object searchableObj, boolean includeMsgBody) {
+  public Collection getSearchableCharSequencesFor(final FetchedDataCache cache, Object searchableObj, boolean includeMsgBody) {
     if (searchableObj instanceof Record)
-      return getSearchTextFor((Record) searchableObj, includeMsgBody);
+      return getSearchTextFor(cache, (Record) searchableObj, includeMsgBody);
     else
       return null;
   }
 
-  public static Collection getSearchTextFor(Record searchableObj, boolean includeMsgBody) {
+  public static Collection getSearchTextFor(final FetchedDataCache cache, Record searchableObj, boolean includeMsgBody) {
     Collection sb = new LinkedList();
     if (searchableObj instanceof FileLinkRecord)
       sb = getSearchTextFor((FileLinkRecord) searchableObj, sb);
     else if (searchableObj instanceof MsgLinkRecord)
-      sb = getSearchTextFor((MsgLinkRecord) searchableObj, includeMsgBody, sb);
+      sb = getSearchTextFor(cache, (MsgLinkRecord) searchableObj, includeMsgBody, sb);
     else if (searchableObj instanceof FolderPair)
-      sb.add(convertValueToText((FolderPair) searchableObj, null));
+      sb.add(convertValueToText(cache, (FolderPair) searchableObj, null));
     else
-      sb.add(getRenderedText(searchableObj));
+      sb.add(getRenderedText(cache, searchableObj));
     return sb;
   }
 
@@ -197,8 +197,7 @@ public class TextRenderer implements SearchTextProviderI {
     return sb;
   }
 
-  private static Collection getSearchTextFor(MsgLinkRecord msgLink, boolean includeMsgBody, Collection sb) {
-    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+  private static Collection getSearchTextFor(final FetchedDataCache cache, MsgLinkRecord msgLink, boolean includeMsgBody, Collection sb) {
     MsgDataRecord msgData = cache.getMsgDataRecord(msgLink.msgId);
     if (msgData != null) {
       // searching chat msgs should also include attachment listing -- use cached string
@@ -215,23 +214,23 @@ public class TextRenderer implements SearchTextProviderI {
 
       String fromEmailAddress = msgData.getFromEmailAddress();
       if (msgData.isEmail() || fromEmailAddress != null) {
-        sb.add(TextRenderer.getRenderedText(CacheEmlUtils.convertToFamiliarEmailRecord(fromEmailAddress)));
+        sb.add(TextRenderer.getRenderedText(cache, CacheEmlUtils.convertToFamiliarEmailRecord(cache, fromEmailAddress)));
         sb.add(fromEmailAddress); // also include the email address instead of only the converted Address Contact
       } else {
         // use my contact list only, not the reciprocal contacts
-        Record fromAsFamiliar = CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false);
+        Record fromAsFamiliar = CacheUsrUtils.convertUserIdToFamiliarUser(cache, msgData.senderUserId, true, false);
         Record fromUser = cache.getUserRecord(msgData.senderUserId);
         if (fromAsFamiliar != null)
-          sb.add(TextRenderer.getRenderedText(fromAsFamiliar));
+          sb.add(TextRenderer.getRenderedText(cache, fromAsFamiliar));
         if (fromUser != null)
-          sb.add(TextRenderer.getRenderedText(fromUser));
+          sb.add(TextRenderer.getRenderedText(cache, fromUser));
       }
 
-      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(msgData.getRecipients());
+      Record[][] recipients = CacheMsgUtils.gatherAllMsgRecipients(cache, msgData.getRecipients());
       for (int i=0; i<recipients.length; i++)
         for (int k=0; k<recipients[i].length; k++)
           if (recipients[i][k] != null && !(recipients[i][k] instanceof FolderPair) && !(recipients[i][k] instanceof FolderRecord) && !(recipients[i][k] instanceof FolderShareRecord))
-            sb.add(TextRenderer.getRenderedText(recipients[i][k]));
+            sb.add(TextRenderer.getRenderedText(cache, recipients[i][k]));
     }
     return sb;
   }
@@ -240,7 +239,7 @@ public class TextRenderer implements SearchTextProviderI {
   * Overwrite the method from super class to get the string for the label.
   * @return string for each node label
   */
-  public static String convertValueToText(FolderPair folderPair, StringBuffer toolTipReturn) {
+  public static String convertValueToText(final FetchedDataCache cache, FolderPair folderPair, StringBuffer toolTipReturn) {
     String nodeText = "";
     FolderRecord fRec = folderPair.getFolderRecord();
     nodeText = fRec.getCachedDisplayText();
@@ -252,7 +251,7 @@ public class TextRenderer implements SearchTextProviderI {
     String appendPostfix = null;
 
     if (nodeText == null || (toolTip == null && toolTipReturn != null)) {
-      String[] notes = getOwnerAndChatNote(fRec);
+      String[] notes = getOwnerAndChatNote(cache, fRec);
       ownerNote = notes[0];
       chatNote = notes[1];
     }
@@ -285,9 +284,10 @@ public class TextRenderer implements SearchTextProviderI {
         if (fName.startsWith(defaultChatFolderName)) {
           if (ownerAndChatNotes.length() > 0) {
             nodeText = "";
-            appendPostfix = "chat";
+//            appendPostfix = "chat"; // remove due to ackward translations
           } else {
-            nodeText = "Chat...";
+            nodeText = "..."; // avoid additional problems with translation
+//            nodeText = "Chat...";
           }
         } else if (ownerAndChatNotes.length() == 0) {
           // not yet fetched live chatting shares
@@ -313,7 +313,7 @@ public class TextRenderer implements SearchTextProviderI {
 
         StringBuffer newNameSB = new StringBuffer();
         if (updateNoteSB.length() > 0) {
-          boolean isSpamFolder = fRec.folderId.equals(FetchedDataCache.getSingleInstance().getUserRecord().junkFolderId);
+          boolean isSpamFolder = fRec.folderId.equals(cache.getUserRecord().junkFolderId);
           boolean isRecycleFolder = fRec.isRecycleType();
           boolean isHTML = false;
           // skip BOLD for Spam folder
@@ -368,21 +368,20 @@ public class TextRenderer implements SearchTextProviderI {
   /**
   * @return name of the folder owner and all participants in a String[2] array with first being the owner.
   */
-  public static String[] getOwnerAndChatNote(FolderRecord fRec) {
+  public static String[] getOwnerAndChatNote(final FetchedDataCache cache, FolderRecord fRec) {
     String[] rc = null;
     if (fRec != null)
-      rc = getFolderNote(fRec, fRec.isChatting());
+      rc = getFolderNote(cache, fRec, fRec.isChatting());
     return rc;
   }
   /**
   * @return name of the folder owner and all participants in a String[2] array with first being the owner.
   */
-  private static String[] getFolderNote(FolderRecord fRec, boolean includeAllParticipants) {
+  private static String[] getFolderNote(final FetchedDataCache cache, FolderRecord fRec, boolean includeAllParticipants) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextRenderer.class, "getFolderNote(FolderRecord fRec, boolean includeAllParticipants)");
     if (trace != null) trace.args(fRec);
     if (trace != null) trace.args(includeAllParticipants);
 
-    FetchedDataCache cache = null;
     Long myUserId = null;
     Long ownerUserId = null;
     String ownerNote = fRec.getCachedOwnerNote();
@@ -391,7 +390,6 @@ public class TextRenderer implements SearchTextProviderI {
 
     if (ownerNote == null || chatNote == null) {
       if (trace != null) trace.data(10, "ownerNote == null || chatNote == null");
-      cache = FetchedDataCache.getSingleInstance();
       myUserId = cache.getMyUserId();
       ownerUserId = fRec.ownerUserId;
     }
@@ -402,9 +400,9 @@ public class TextRenderer implements SearchTextProviderI {
       if (!ownerUserId.equals(myUserId)) {
         StringBuffer sb = new StringBuffer(32);
         // use my contact list only, not the reciprocal contacts
-        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(ownerUserId, true, false);
+        Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, ownerUserId, true, false);
         if (rec != null) {
-          sb.append(getRenderedText(rec));
+          sb.append(getRenderedText(cache, rec));
         }
         else {
           sb.append("*");
@@ -437,7 +435,7 @@ public class TextRenderer implements SearchTextProviderI {
               if (share.isOwnedByUser()) {
                 if (userL == null) userL = new ArrayList();
                 // use my contact list only, not the reciprocal contacts
-                recipient = CacheUsrUtils.convertUserIdToFamiliarUser(share.ownerUserId, true, false);
+                recipient = CacheUsrUtils.convertUserIdToFamiliarUser(cache, share.ownerUserId, true, false);
                 if (recipient != null)
                   userL.add(recipient);
                 else {
@@ -446,7 +444,7 @@ public class TextRenderer implements SearchTextProviderI {
                 }
               } else {
                 if (groupL == null) groupL = new ArrayList();
-                recipient = FetchedDataCache.getSingleInstance().getFolderRecord(share.ownerUserId);
+                recipient = cache.getFolderRecord(share.ownerUserId);
                 if (recipient != null)
                   groupL.add(recipient);
                 else {
@@ -460,8 +458,8 @@ public class TextRenderer implements SearchTextProviderI {
           }
           Comparator compare = new Comparator() {
             public int compare(Object o1, Object o2) {
-              String s1 = getRenderedText(o1);
-              String s2 = getRenderedText(o2);
+              String s1 = getRenderedText(cache, o1);
+              String s2 = getRenderedText(cache, o2);
               if (s1 == null && s2 == null)
                 return 0;
               else if (s1 == null)
@@ -484,7 +482,7 @@ public class TextRenderer implements SearchTextProviderI {
           for (int i=0; i<recipientsL.size(); i++) {
             Record recipient = (Record) recipientsL.get(i);
             if (appended) sb.append(" / ");
-            sb.append(getRenderedText(recipient));
+            sb.append(getRenderedText(cache, recipient));
             appended = true;
           }
           for (int i=0; gidL != null && i<gidL.size(); i++) {
@@ -513,13 +511,13 @@ public class TextRenderer implements SearchTextProviderI {
   /**
   * @return name of the folder with participants for display.
   */
-  public static String getFolderAndShareNames(FolderPair fPair, boolean includeAllParticipants) {
+  public static String getFolderAndShareNames(final FetchedDataCache cache, FolderPair fPair, boolean includeAllParticipants) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(TextRenderer.class, "getFolderAndShareNames(FolderPair fPair, boolean includeAllParticipants)");
     if (trace != null) trace.args(fPair);
     if (trace != null) trace.args(includeAllParticipants);
 
     FolderRecord fRec = fPair.getFolderRecord();
-    String[] notes = getFolderNote(fRec, includeAllParticipants);
+    String[] notes = getFolderNote(cache, fRec, includeAllParticipants);
     String shareNote = notes[1];
     shareNote = shareNote.trim();
     String title = fPair.getMyName();
@@ -530,7 +528,7 @@ public class TextRenderer implements SearchTextProviderI {
         String defaultChatFolderName = com.CH_cl.lang.Lang.rb.getString("folderName_Chat_Log");
         if (title.startsWith(defaultChatFolderName)) {
           title = "";
-          appendPostfix = " chat";
+//          appendPostfix = " chat"; // remove due to ackward translations
         }
       }
       title = title.length() > 0 ? title + " : " + shareNote : shareNote;
@@ -542,8 +540,8 @@ public class TextRenderer implements SearchTextProviderI {
     return title;
   }
 
-  public static String getFolderAndShareNamesForTreeDisplaySort(FolderPair fPair) {
-    return getFolderAndShareNames(fPair, fPair.getFolderRecord().isChatting());
+  public static String getFolderAndShareNamesForTreeDisplaySort(final FetchedDataCache cache, FolderPair fPair) {
+    return getFolderAndShareNames(cache, fPair, fPair.getFolderRecord().isChatting());
   }
   
   /**
@@ -555,7 +553,7 @@ public class TextRenderer implements SearchTextProviderI {
    * @param returnAppendSB Return buffer
    * @return String or NULL (NULL when using the return StringBuffer)
    */
-  public static String getStatsNote(int availableSlots, Collection stats, MsgLinkRecord msgLink, MsgDataRecord msgData, Long myUserId, StringBuffer returnAppendSB) {
+  public static String getStatsNote(final FetchedDataCache cache, int availableSlots, Collection stats, MsgLinkRecord msgLink, MsgDataRecord msgData, Long myUserId, StringBuffer returnAppendSB) {
     boolean isUsingBuffer = returnAppendSB != null;
     if (!isUsingBuffer)
       returnAppendSB = new StringBuffer();
@@ -599,11 +597,11 @@ public class TextRenderer implements SearchTextProviderI {
           statCounter ++;
           StatRecord stat = (StatRecord) iterS.next();
           if (statCounter < availableSlots || (statCounter == availableSlots && statSize == availableSlots)) {
-            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(stat.ownerUserId, true, false);
+            Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, stat.ownerUserId, true, false);
             if (statCounter > 1)
               returnAppendSB.append(", ");
             returnAppendSB.append("<img src=\"images/" + com.CH_co.util.ImageNums.getImageName(ImageNums.FLAG_READ_INLINE) + "\" align=\"ABSBOTTOM\" width=\"12\" height=\"12\">");
-            String userLabel = " " + getRenderedText(rec) + " " + Misc.getFormattedDate(stat.firstRead, true, true, false);
+            String userLabel = " " + getRenderedText(cache, rec) + " " + Misc.getFormattedDate(stat.firstRead, true, true, false);
             userLabel = userLabel.replace(" ", "&nbsp;"); // make each icon-user-stamp set non-breakable
             returnAppendSB.append(userLabel);
           }

@@ -32,6 +32,7 @@ import java.awt.Window;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.Iterator;
@@ -48,6 +49,8 @@ import javax.swing.border.EmptyBorder;
 */
 
 public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
+
+  private final boolean ENABLE_FILTER_OUT_INCOMPLETE_FOLDERS = false;
 
   private FolderTree tree;
 
@@ -390,13 +393,15 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
     public void run() {
       Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(FolderGUIUpdater.class, "FolderGUIUpdater.run()");
 
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
       Record[] records = null;
       if (event instanceof FolderRecordEvent) {
         records = ((FolderRecordEvent) event).getFolderRecords();
         if (event.getEventType() == RecordEvent.REMOVE) {
           removeFoldersFromTree((FolderRecord[]) records);
         } else if (event.getEventType() == RecordEvent.SET) {
-          setFoldersInTree(CacheFldUtils.convertRecordsToPairs(records));
+          FolderPair[] fPairs = CacheFldUtils.convertRecordsToPairs(cache, records);
+          setFolderPairs(fPairs);
         }
       }
       else if (event instanceof FolderShareRecordEvent) {
@@ -404,7 +409,8 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
         if (event.getEventType() == RecordEvent.REMOVE) {
           // removal of shares does nothing to the tree
         } else {
-          setFoldersInTree(CacheFldUtils.convertRecordsToPairs(records));
+          FolderPair[] fPairs = CacheFldUtils.convertRecordsToPairs(cache, records);
+          setFolderPairs(fPairs);
         }
       }
       else if (event instanceof UserRecordEvent) {
@@ -416,6 +422,31 @@ public class FolderTreeScrollPane extends JScrollPane implements DisposableObj {
 
       // Runnable, not a custom Thread -- DO NOT clear the trace stack as it is run by the AWT-EventQueue Thread.
       if (trace != null) trace.exit(FolderGUIUpdater.class);
+    }
+    private void setFolderPairs(FolderPair[] fPairs) {
+      if (fPairs != null && fPairs.length > 0) {
+        if (ENABLE_FILTER_OUT_INCOMPLETE_FOLDERS) {
+          ArrayList fPairsL = new ArrayList();
+          FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+          for (int i=0; i<fPairs.length; i++) {
+            boolean skip = false;
+            FolderPair fPair = fPairs[i];
+            FolderRecord fRec = fPair.getFolderRecord();
+            // skip Live Chat folders if we only have our own single share record.. wait for others
+            if (fRec.isChattingLive()) {
+              FolderShareRecord[] shares = cache.getFolderShareRecordsForFolder(fRec.folderId);
+              if (shares == null || shares.length <= 1) {
+                skip = true;
+              }
+            }
+            if (!skip)
+              fPairsL.add(fPair);
+          }
+          if (fPairsL.size() > 0)
+            fPairs = (FolderPair[]) ArrayUtils.toArray(fPairsL, FolderPair.class);
+        }
+        setFoldersInTree(fPairs);
+      }
     }
   } // end class FolderGUIUpdater
 

@@ -189,7 +189,7 @@ public class InactivityEventQueue extends EventQueue implements ActionListener {
       if (System.currentTimeMillis() - memoryErrorMessageStamp > 60000L) {
         memoryErrorMessageStamp = System.currentTimeMillis();
         try {
-          MessageDialog.showErrorDialog(null, "Sufficient amount of memory could not be allocated.  Please close some of your unused windows and retry.", "Memory heap full");
+          MessageDialog.showErrorDialog(null, "Sufficient amount of memory could not be allocated. Please restart the program or close unused windows and retry.", "Memory heap full");
         } catch (Throwable t) {
         }
       }

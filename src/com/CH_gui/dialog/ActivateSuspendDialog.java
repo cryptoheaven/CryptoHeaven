@@ -61,7 +61,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
 
   private CheckDocumentListener checkDocumentListener;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
   private UserRecord userRecord;
 
@@ -81,8 +81,8 @@ public class ActivateSuspendDialog extends GeneralDialog {
 
     this.subAccountsToManage = subAccountsToManage;
 
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
     userRecord = cache.getUserRecord();
 
     JButton[] buttons = createButtons();
@@ -160,7 +160,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
     UserRecord[] subUsers = cache.getUserRecords(subAccountsToManage);
     for (int i=0; i<subUsers.length; i++) {
       // use my contact list only, not the reciprocal contacts
-      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(subUsers[i].userId, true, false);
+      Record rec = CacheUsrUtils.convertUserIdToFamiliarUser(cache, subUsers[i].userId, true, false);
       listPanel.add(new JMyLabel(ListRenderer.getRenderedText(rec), ListRenderer.getRenderedIcon(rec), JLabel.LEADING), new GridBagConstraints(0, i, 2, 1, 10, 0,
           GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new MyInsets(2, 10, 2, 10), 0, 0));
     }
@@ -323,7 +323,7 @@ public class ActivateSuspendDialog extends GeneralDialog {
       if (!error) {
         short toStatus = jSuspend.isSelected() ? UserRecord.STATUS_BUSINESS_SUB_HELD : UserRecord.STATUS_BUSINESS_SUB;
         String statusMsg = jSuspendReason.getText();
-        boolean success = UserOps.sendChangeStatusSubAccounts(serverInterfaceLayer, oldBA, subAccountsToManage, toStatus, statusMsg);
+        boolean success = UserOps.sendChangeStatusSubAccounts(SIL, oldBA, subAccountsToManage, toStatus, statusMsg);
         error = !success;
       }
 

@@ -22,14 +22,13 @@ import com.CH_co.service.records.*;
  */
 public class FileLinkRecUtil extends Object {
 
-  public static String getLocationInfo(FileLinkRecord fileLinkRecord) {
+  public static String getLocationInfo(final FetchedDataCache cache, FileLinkRecord fileLinkRecord) {
     String locationType = "";
     String locationDesc = "";
 
     short type = fileLinkRecord.ownerObjType.shortValue();
     switch (type) {
       case Record.RECORD_TYPE_FOLDER:
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderShareRecord sRec = cache.getFolderShareRecordMy(fileLinkRecord.ownerObjId, true);
         if (sRec != null)
           locationDesc = sRec.getFolderName();
@@ -45,13 +44,12 @@ public class FileLinkRecUtil extends Object {
   }
 
 
-  public static Record getLocationRecord(FileLinkRecord fileLinkRecord) {
+  public static Record getLocationRecord(final FetchedDataCache cache, FileLinkRecord fileLinkRecord) {
     Record locationRecord = null;
     short type = fileLinkRecord.ownerObjType.shortValue();
     switch (type) {
       case Record.RECORD_TYPE_FOLDER:
         //locationType = FolderRecord.getFolderType(type);
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderShareRecord shareRecord = cache.getFolderShareRecordMy(fileLinkRecord.ownerObjId, true);
         FolderRecord folderRecord = cache.getFolderRecord(fileLinkRecord.ownerObjId);
         locationRecord = new FolderPair(shareRecord, folderRecord);

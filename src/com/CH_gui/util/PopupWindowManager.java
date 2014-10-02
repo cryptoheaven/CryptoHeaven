@@ -10,6 +10,7 @@
 package com.CH_gui.util;
 
 import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.service.records.MsgDataRecord;
 import com.CH_co.util.HTML_Ops;
 import com.CH_co.util.ImageNums;
@@ -49,7 +50,7 @@ public class PopupWindowManager extends Object {
   public static void addForScrolling(final Component[] componentBuffer, MsgDataRecord msgData, boolean suppressIsNewCheck) {
     try {
       if (suppressIsNewCheck || markNewMsgStamp(msgData)) {
-        String user = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(msgData.senderUserId, true, false));
+        String user = ListRenderer.getRenderedText(CacheUsrUtils.convertUserIdToFamiliarUser(FetchedDataCache.getSingleInstance(), msgData.senderUserId, true, false));
         final String sub = msgData.isTypeAddress() ? msgData.fileAs : msgData.getSubject();
         final boolean addSub = sub != null && sub.length() > 0;
 

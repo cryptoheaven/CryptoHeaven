@@ -298,7 +298,7 @@ public class ContactTableModel extends RecordTableModel {
         if (halfPairPicksV.size() > 0) {
           halfPairPicks = new Record[halfPairPicksV.size()];
           halfPairPicksV.toArray(halfPairPicks);
-          pairPicks = CacheFldUtils.convertRecordsToPairs(halfPairPicks);
+          pairPicks = CacheFldUtils.convertRecordsToPairs(cache, halfPairPicks);
         }
 
         if (contactPicksV.size() > 0) {

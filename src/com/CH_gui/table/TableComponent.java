@@ -9,6 +9,7 @@
  */
 package com.CH_gui.table;
 
+import com.CH_cl.service.cache.CacheFldUtils;
 import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_cl.service.ops.FolderOps;
 import com.CH_cl.service.ops.UploadUtilities;
@@ -960,7 +961,7 @@ public class TableComponent extends JPanel implements TreeSelectionListener, Vis
           Long sentFolderId = cache.getUserRecord().sentFolderId;
           isSentFolder = selectedFolderID.equals(sentFolderId);
           if (!isSentFolder && folderRecord.folderType.shortValue() == FolderRecord.MESSAGE_FOLDER) {
-            FolderPair fPair = FolderOps.getRootmostFolderInViewHierarchy(selectedFolderID);
+            FolderPair fPair = CacheFldUtils.getRootmostFolderInViewHierarchy(cache, selectedFolderID);
             isSentFolder = fPair != null && fPair.getId().equals(sentFolderId);
           }
         }

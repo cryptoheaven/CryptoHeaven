@@ -60,7 +60,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
 
   private CheckDocumentListener checkDocumentListener;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
 
   /** Creates new ChangePasswordDialog */
@@ -68,8 +68,8 @@ public class ChangeUserNameDialog extends GeneralDialog {
     super(frame, com.CH_cl.lang.Lang.rb.getString("title_Change_Username"));
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(ChangePasswordDialog.class, "ChangeUserNameDialog(Frame frame)");
 
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
 
     JButton[] buttons = createButtons();
     JPanel panel = createMainPanel();
@@ -249,7 +249,7 @@ public class ChangeUserNameDialog extends GeneralDialog {
         boolean isMyKeyLocal = !Misc.isBitSet(cache.getUserRecord().flags, UserRecord.FLAG_STORE_ENC_PRIVATE_KEY_ON_SERVER);
         //boolean isLocalKey = KeyOps.isKeyStoredLocally(cache.getKeyRecordMyCurrent().keyId);
         StringBuffer errBuffer = new StringBuffer();
-        boolean success = UserOps.sendPasswordChange(serverInterfaceLayer, newUserName, ba, !isMyKeyLocal, errBuffer);
+        boolean success = UserOps.sendPasswordChange(SIL, newUserName, ba, !isMyKeyLocal, errBuffer);
         error = !success;
 
         if (error) {

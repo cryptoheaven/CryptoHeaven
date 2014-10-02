@@ -25,14 +25,16 @@ import com.CH_co.service.records.filters.*;
 public class SubUserFilter extends AbstractRecordFilter implements RecordFilter {
 
   // keep only the user records which are children of the parent
+  private FetchedDataCache cache;
   private Long parentUserId;
   private boolean includeSelf;
   private boolean includeAllLevels;
 
 
   /** Creates new SubUserFilter */
-  public SubUserFilter(Long parentUserId, boolean includeSelf, boolean includeAllLevels) {
+  public SubUserFilter(final FetchedDataCache cache, Long parentUserId, boolean includeSelf, boolean includeAllLevels) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SubUserFilter.class, "SubUserFilter(UserRecord parentUser, boolean includeSelf, boolean includeAllLevels)");
+    this.cache = cache;
     this.parentUserId = parentUserId;
     this.includeSelf = includeSelf;
     this.includeAllLevels = includeAllLevels;
@@ -55,7 +57,6 @@ public class SubUserFilter extends AbstractRecordFilter implements RecordFilter 
       } else if (userRecord.parentId == null || userRecord.parentId.equals(userRecord.userId)) {
         keep = false;
       } else if (includeAllLevels) {
-        FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         UserRecord parentUser = cache.getUserRecord(userRecord.parentId);
         if (parentUser != null)
           keep = keep(parentUser);

@@ -10,6 +10,7 @@
 package com.CH_gui.keyTable;
 
 import com.CH_cl.service.cache.CacheUsrUtils;
+import com.CH_cl.service.cache.FetchedDataCache;
 import com.CH_co.service.records.KeyRecord;
 import com.CH_co.service.records.Record;
 import com.CH_co.service.records.UserRecord;
@@ -28,6 +29,8 @@ import javax.swing.JTable;
  * @author  Marcin Kurzawa
  */
 public class KeyTableCellRenderer extends RecordTableCellRenderer {
+
+  private final FetchedDataCache cache = FetchedDataCache.getSingleInstance();
 
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -52,7 +55,7 @@ public class KeyTableCellRenderer extends RecordTableCellRenderer {
         JSortedTable jSortedTable = (JSortedTable) table;
         KeyRecord kRec = (KeyRecord) (((KeyTableModel) jSortedTable.getRawModel()).getRowObject(jSortedTable.convertMyRowIndexToModel(row)));
         // use my contact list only, not the reciprocal contacts
-        Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(kRec.ownerUserId, true, false);
+        Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(cache, kRec.ownerUserId, true, false);
         if (owner == null) {
           UserRecord uRec = new UserRecord();
           uRec.userId = kRec.keyId;

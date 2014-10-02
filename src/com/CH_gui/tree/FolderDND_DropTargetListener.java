@@ -154,7 +154,8 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
             // check if not dropping into its own child
             Transferable tr = event.getTransferable();
             FolderDND_TransferableData data = (FolderDND_TransferableData) tr.getTransferData(FolderDND_Transferable.FOLDER_RECORD_FLAVOR);
-            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(FetchedDataCache.getSingleInstance().getFolderRecords(data.folderIDs));
+            FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache, cache.getFolderRecords(data.folderIDs));
             if (!isAnyInPath(path, fldPairs, true)) // don't want ugly icon when user hovers over self -- we'll reject it during drop
               acceptMove = true;
           }
@@ -163,7 +164,7 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
             FetchedDataCache cache = FetchedDataCache.getSingleInstance();
             Transferable tr = event.getTransferable();
             FileDND_TransferableData data = (FileDND_TransferableData) tr.getTransferData(FileDND_Transferable.FILE_RECORD_FLAVOR);
-            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]));
+            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache, cache.getFolderRecords(data.fileRecordIDs[0]));
             // reject if there are any folders droped onto its child
             boolean isOntoChild = fldPairs != null && fldPairs.length > 0 && isAnyInPath(path, fldPairs, true);
             if (!isOntoChild) {
@@ -333,7 +334,7 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
               fLinks = cache.getFileLinkRecords(data.fileRecordIDs[2]);
             else 
               fLinks = cache.getFileLinkRecords(data.fileRecordIDs[1]);
-            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.fileRecordIDs[0]));
+            FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache, cache.getFolderRecords(data.fileRecordIDs[0]));
             if (isFileFolderType || isRecycleFolderType) {
               // reject if there are any folders droped onto its child
               boolean isOntoSelfOrChild = fldPairs != null && fldPairs.length > 0 && isAnyInPath(path, fldPairs, false);
@@ -445,7 +446,7 @@ public class FolderDND_DropTargetListener extends Object implements DropTargetLi
       if (toMoveFolders) {
         FetchedDataCache cache = FetchedDataCache.getSingleInstance();
         FolderDND_TransferableData data = (FolderDND_TransferableData) tr.getTransferData(FolderDND_Transferable.FOLDER_RECORD_FLAVOR);
-        FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache.getFolderRecords(data.folderIDs));
+        FolderPair[] fldPairs = CacheFldUtils.convertRecordsToPairs(cache, cache.getFolderRecords(data.folderIDs));
         // Don't allow dropping onto itself
         boolean dropOntoItself = pair != null && pair.equals(fldPairs[0]);
         if (!dropOntoItself) {

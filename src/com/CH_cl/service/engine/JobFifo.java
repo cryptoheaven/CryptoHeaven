@@ -28,16 +28,19 @@ public class JobFifo extends PriorityJobFifo {
   private FetchedDataCache cache;
 
   /** Creates new JobFifo */
-  public JobFifo() {
+  public JobFifo(FetchedDataCache cache) {
     super();
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(JobFifo.class, "JobFifo()");
-    cache = FetchedDataCache.getSingleInstance();
+    this.cache = cache;
     if (trace != null) trace.exit(JobFifo.class);
   }
 
   public long getFileOrigSizeSum(Long[] fileLinkIDs) {
-    FileLinkRecord[] fileLinks = cache.getFileLinkRecords(fileLinkIDs);
-    long sizeSum = FileLinkRecord.getFileOrigSizeSum(fileLinks);
+    long sizeSum = -1;
+    if (cache != null) {
+      FileLinkRecord[] fileLinks = cache.getFileLinkRecords(fileLinkIDs);
+      sizeSum = FileLinkRecord.getFileOrigSizeSum(fileLinks);
+    }
     return sizeSum;
   }
 

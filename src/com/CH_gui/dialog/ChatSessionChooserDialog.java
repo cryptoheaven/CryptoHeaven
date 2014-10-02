@@ -55,7 +55,7 @@ public class ChatSessionChooserDialog extends GeneralDialog {
   private JButton okButton;
   private JButton cancelButton;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
 
   private FolderRecordListener folderListener;
@@ -69,8 +69,8 @@ public class ChatSessionChooserDialog extends GeneralDialog {
     this.perfectMatch = perfectMatch;
     this.suitableChatsL = suitableChatsL;
 
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
 
     JButton[] buttons = createButtons();
     panel = new ChatSessionChooserPanel();

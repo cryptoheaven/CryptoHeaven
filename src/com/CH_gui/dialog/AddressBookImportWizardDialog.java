@@ -229,7 +229,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
                 XMLElement[] address = makeAddressFromData(mappedLine, destinationFields.length);
                 BASymmetricKey key = new BASymmetricKey(32);
                 MsgLinkRecord[] links = SendMessageRunner.prepareMsgLinkRecords(SIL, recipient, key);
-                MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), address[0].toString(), address[1].toString(), null);
+                MsgDataRecord data = SendMessageRunner.prepareMsgDataRecord(cache, key, new Short(MsgDataRecord.IMPORTANCE_NORMAL_PLAIN), new Short(MsgDataRecord.OBJ_TYPE_ADDR), address[0].toString(), address[1].toString(), null);
                 Msg_New_Rq request = new Msg_New_Rq(shareId, null, links[0], data);
                 request.hashes = SendMessageRunner.prepareAddrHashes(data);
                 MessageAction action = new MessageAction(CommandCodes.MSG_Q_NEW, request);
@@ -480,7 +480,7 @@ public class AddressBookImportWizardDialog extends WizardDialog {
     FolderFilter filter = FolderFilter.NON_LOCAL_FOLDERS;
     FolderTreeModelGui treeModel = new FolderTreeModelGui(filter);
     FolderRecord[] allFolderRecords = cache.getFolderRecords();
-    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(allFolderRecords);
+    FolderPair[] allFolderPairs = CacheFldUtils.convertRecordsToPairs(cache, allFolderRecords);
     allFolderPairs = (FolderPair[]) filter.filterInclude(allFolderPairs);
     treeModel.addNodes(allFolderPairs);
     filteredTree = new FolderTree(treeModel);

@@ -261,12 +261,13 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     if (recordTableScrollPane instanceof ActionProducerI)
       addMouseListener(new PopupMouseAdapter(this, (ActionProducerI) recordTableScrollPane));
 
+    FetchedDataCache cache = FetchedDataCache.getSingleInstance();
     // Listen on folder changes so we can adjust title and description
-    FetchedDataCache.getSingleInstance().addFolderShareRecordListener(folderShareListener = new FolderShareListener());
+    cache.addFolderShareRecordListener(folderShareListener = new FolderShareListener());
     // Listen on Contact changes so we can adjust participants
-    FetchedDataCache.getSingleInstance().addContactRecordListener(contactListener = new ContactListener());
+    cache.addContactRecordListener(contactListener = new ContactListener());
     // Listen on User changes so we can adjust expiry/over limit panel
-    FetchedDataCache.getSingleInstance().addUserRecordListener(userListener = new UserListener());
+    cache.addUserRecordListener(userListener = new UserListener());
 
     if (toolBarModel != null)
       toolBarModel.addComponentActions(this);
@@ -463,7 +464,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
         } else if (showPurchase) {
           jPurchasePanel.setBackground(Color.decode("0x"+MsgDataRecord.BACKGROUND_COLOR_INFO));
           try {
-            labelStr = "Please support our developers by purchasing a subscription.";
+            labelStr = "Add more storage space and support our developers by purchasing a subscription.";
             label = new JMyLinkLabel(labelStr, new URL(signupUrl), "-1");
           } catch (MalformedURLException ex) {
           }
@@ -1074,7 +1075,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 if (fRec.ownerUserId.equals(cache.getMyUserId()))
                   desc = "Your shared " + fRec.getFolderType();
                 else {
-                  Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(fRec.ownerUserId, true, false, true);
+                  Record owner = CacheUsrUtils.convertUserIdToFamiliarUser(cache, fRec.ownerUserId, true, false, true);
                   if (owner == null) {
                     owner = new UserRecord();
                     ((UserRecord) owner).userId = fRec.ownerUserId;
@@ -1107,7 +1108,7 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
               jDescriptionPanel2.setVisible(true);
               panel = jDescriptionPanel2;
             }
-            Record[] participants = CacheFldUtils.getFolderParticipants(fRec);
+            Record[] participants = CacheFldUtils.getFolderParticipants(cache, fRec);
             Record owner = participants[0];
             // sort the list, first active contacts, then other contacts, then groups, then users
             Arrays.sort(participants, new Comparator() {
@@ -1152,10 +1153,10 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
                 FolderRecord fldRec = (FolderRecord) participants[i];
                 if (fldRec.isGroupType()) {
                   // look inside the group for online/offline contacts
-                  Long[] accessUsers = CacheUsrUtils.findAccessUsers(cache.getFolderShareRecordsForFolder(fldRec.folderId));
+                  Long[] accessUsers = CacheUsrUtils.findAccessUsers(cache, cache.getFolderShareRecordsForFolder(fldRec.folderId));
                   for (int a=0; a<accessUsers.length; a++) {
                     // use my contact list only, not the reciprocal contacts
-                    Record accessUser = CacheUsrUtils.convertUserIdToFamiliarUser(accessUsers[a], true, false);
+                    Record accessUser = CacheUsrUtils.convertUserIdToFamiliarUser(cache, accessUsers[a], true, false);
                     if (accessUser instanceof ContactRecord) {
                       ContactRecord cRec = (ContactRecord) accessUser;
                       boolean isOnline = cRec.isOnlineStatus();
@@ -1390,7 +1391,8 @@ public abstract class RecordTableComponent extends JPanel implements ToolBarProd
     if (anyToSelect)
       setAutoScrollSuppressed(true);
     if (filterStr != null && filterStr.trim().length() > 0) {
-      recordTableScrollPane.getTableModel().setFilterNarrowing(new TextSearchFilter(filterStr, includeMsgBodies, recordTableScrollPane.getTableModel()));
+      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      recordTableScrollPane.getTableModel().setFilterNarrowing(new TextSearchFilter(cache, filterStr, includeMsgBodies, recordTableScrollPane.getTableModel()));
     } else {
       recordTableScrollPane.getTableModel().setFilterNarrowing(null);
     }

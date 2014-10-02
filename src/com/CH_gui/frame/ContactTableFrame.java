@@ -46,9 +46,9 @@ public class ContactTableFrame extends RecordTableFrame {
     //UserRecord myUserRec = cache.getUserRecord();
     RecordFilter filter = new MultiFilter(new RecordFilter[] { 
       //new ContactFilterCl(myUserRec != null ? myUserRec.contactFolderId : null, oldShow),
-      new ContactFilterCl(oldShow),
+      new ContactFilterCl(cache, oldShow),
       new FolderFilter(FolderRecord.GROUP_FOLDER),
-      new InvEmlFilter(true, false) }
+      new InvEmlFilter(cache, true, false) }
     , MultiFilter.OR);
     ContactTableComponent mainComponent = new ContactTableComponent4Frame(cache.getContactRecords(), filter, Template.get(Template.EMPTY_CONTACTS), Template.get(Template.BACK_CONTACTS), true, false, false);
     mainComponent.addTopContactBuildingPanel();

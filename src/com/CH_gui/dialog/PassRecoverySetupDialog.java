@@ -87,7 +87,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
   private JPanel panelPlainRec;
   private JPanel panelEncRec;
 
-  private ServerInterfaceLayer serverInterfaceLayer;
+  private ServerInterfaceLayer SIL;
   private FetchedDataCache cache;
   private PassRecoveryRecord initialRecoveryRecord;
 
@@ -96,8 +96,8 @@ public class PassRecoverySetupDialog extends GeneralDialog {
     super(frame, "Password Recovery");
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(PassRecoverySetupDialog.class, "PassRecoverySetupDialog(Frame frame)");
 
-    serverInterfaceLayer = MainFrame.getServerInterfaceLayer();
-    cache = serverInterfaceLayer.getFetchedDataCache();
+    SIL = MainFrame.getServerInterfaceLayer();
+    cache = SIL.getFetchedDataCache();
     initialRecoveryRecord = cache.getMyPassRecoveryRecord();
     if (initialRecoveryRecord != null) {
       initial_num_questions = initialRecoveryRecord.numQs.shortValue();
@@ -457,7 +457,7 @@ public class PassRecoverySetupDialog extends GeneralDialog {
           answers[i] = jAs[i].getText();
         }
         passRecoveryRecord.setData(jEnableRecovery.isSelected(), jOldPass.getPassword(), jEnableHint.isSelected() ? jPassHint.getText() : "", jEnableQA.isSelected(), numQs, numAs, questions, answers);
-        boolean success = UserOps.sendPassRecoverySettings(serverInterfaceLayer, passRecoveryRecord);
+        boolean success = UserOps.sendPassRecoverySettings(SIL, passRecoveryRecord);
         error = !success;
       }
 
