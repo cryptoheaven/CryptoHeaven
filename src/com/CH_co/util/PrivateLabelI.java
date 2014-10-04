@@ -51,6 +51,11 @@ public interface PrivateLabelI {
   public String getPrivateLabelURL();
 
   /**
+   * @return true if settings in the PrivateLabel class should be loaded on top of the XML settings.
+   */
+  public boolean getPrivateLabelClassOverwritesXMLvalues();
+
+  /**
   * @return Service / Software name
   */
   public String getServiceSoftwareName();

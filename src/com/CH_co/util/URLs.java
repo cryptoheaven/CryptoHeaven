@@ -27,6 +27,7 @@ public class URLs extends Object {
 
   // Private Labels usually have custom settings stored in XML files on a web server
   private static String PRIVATE_LABEL_SETTINGS_URL = null;
+  private static boolean PRIVATE_LABEL_CLASS_TO_OVERWRITE_XML = false;
 
   // optional in auto-update to redirect main jar distribution
   public static String FILENAME__MAIN_JAR = "CryptoHeaven.jar";
@@ -313,6 +314,9 @@ public class URLs extends Object {
   private static void loadPrivateLabelFromClassDefaults() {
     if (privateLabel != null) {
       try {
+        PRIVATE_LABEL_CLASS_TO_OVERWRITE_XML = privateLabel.getPrivateLabelClassOverwritesXMLvalues();
+      } catch (Throwable t) { }
+      try {
         if (privateLabel.getJarName() != null)
           FILENAME__MAIN_JAR = privateLabel.getJarName();
       } catch (Throwable t) { }
@@ -579,6 +583,8 @@ public class URLs extends Object {
         throw new IllegalArgumentException("Error loading private label " + url + ", error message is " + t.getMessage());
       }
     }
+    if (PRIVATE_LABEL_CLASS_TO_OVERWRITE_XML)
+      loadPrivateLabelFromClassDefaults();
   }
 
   public static void main(String[] args) {
