@@ -13,6 +13,8 @@ import java.net.URL;
 import java.util.*;
 
 import com.CH_co.nanoxml.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
 * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
@@ -445,30 +447,30 @@ public class URLs extends Object {
         //System.out.println("***\nContent="+sb.toString());
         XMLElement xml = new XMLElement();
         xml.parseString(sb.toString());
-        if (xml.getName().equals("XML_Private_Label")) {
+        if (xml.getName().equalsIgnoreCase("XML_Private_Label")) {
           java.util.Enumeration e1 = xml.enumerateChildren();
           while (e1.hasMoreElements()) {
             XMLElement xml2 = (XMLElement) e1.nextElement();
-            if (xml2.getName().equals("Customization")) {
+            if (xml2.getName().equalsIgnoreCase("Customization")) {
               java.util.Enumeration e2 = xml2.enumerateChildren();
               while (e2.hasMoreElements()) {
                 XMLElement xml3 = (XMLElement) e2.nextElement();
-                if (xml3.getName().equals("Images")) {
+                if (xml3.getName().equalsIgnoreCase("Images")) {
 
                   java.util.Hashtable replacementHT = new java.util.Hashtable();
                   java.util.Enumeration e3 = xml3.enumerateChildren();
 
                   while (e3.hasMoreElements()) {
                     XMLElement xml4 = (XMLElement) e3.nextElement();
-                    if (xml4.getName().equals("Img")) {
+                    if (xml4.getName().equalsIgnoreCase("Img")) {
                       java.util.Enumeration e4 = xml4.enumerateChildren();
                       String name = null;
                       String source = null;
                       while (e4.hasMoreElements()) {
                         XMLElement xml5 = (XMLElement) e4.nextElement();
-                        if (xml5.getName().equals("Name"))
+                        if (xml5.getName().equalsIgnoreCase("Name"))
                           name = xml5.getContent();
-                        else if (xml5.getName().equals("Source")) {
+                        else if (xml5.getName().equalsIgnoreCase("Source") || xml5.getName().equalsIgnoreCase("src")) {
                           source = xml5.getContent();
                           source = new URL(u, source).toExternalForm();
                         }
@@ -508,22 +510,22 @@ public class URLs extends Object {
                   }
                 }
 
-                if (xml3.getName().equals("Templates")) {
+                if (xml3.getName().equalsIgnoreCase("Templates")) {
 
                   replacementTemplatesHM = new HashMap();
                   Enumeration e3 = xml3.enumerateChildren();
 
                   while (e3.hasMoreElements()) {
                     XMLElement xml4 = (XMLElement) e3.nextElement();
-                    if (xml4.getName().equals("Template")) {
+                    if (xml4.getName().equalsIgnoreCase("Template")) {
                       java.util.Enumeration e4 = xml4.enumerateChildren();
                       String name = null;
                       String source = null;
                       while (e4.hasMoreElements()) {
                         XMLElement xml5 = (XMLElement) e4.nextElement();
-                        if (xml5.getName().equals("Name"))
+                        if (xml5.getName().equalsIgnoreCase("Name"))
                           name = xml5.getContent();
-                        else if (xml5.getName().equals("Source")) {
+                        else if (xml5.getName().equalsIgnoreCase("Source") || xml5.getName().equalsIgnoreCase("src")) {
                           source = xml5.getContent();
                           source = new URL(u, source).toExternalForm();
                         }
@@ -535,26 +537,47 @@ public class URLs extends Object {
                   }
                 }
 
-                if (xml3.getName().equals("Strings") || xml3.getName().equals("Settings")) {
+                if (xml3.getName().equalsIgnoreCase("Strings") || xml3.getName().equalsIgnoreCase("Settings")) {
 
                   HashMap replacementHM = new HashMap();
                   Enumeration e3 = xml3.enumerateChildren();
 
                   while (e3.hasMoreElements()) {
                     XMLElement xml4 = (XMLElement) e3.nextElement();
-                    if (xml4.getName().equals("string") || xml4.getName().equals("set")) {
+                    if (xml4.getName().equalsIgnoreCase("string") || xml4.getName().equalsIgnoreCase("set")) {
                       java.util.Enumeration e4 = xml4.enumerateChildren();
                       String key = null;
-                      String str= null;
+                      String str = null;
+                      String content = null;
                       while (e4.hasMoreElements()) {
                         XMLElement xml5 = (XMLElement) e4.nextElement();
-                        if (xml5.getName().equals("key"))
+                        if (xml5.getName().equalsIgnoreCase("key"))
                           key = xml5.getContent();
-                        else if (xml5.getName().equals("str"))
+                        else if (xml5.getName().equalsIgnoreCase("str"))
                           str = xml5.getContent();
+                        else if (xml5.getName().equalsIgnoreCase("source") || xml5.getName().equalsIgnoreCase("src")) {
+                          String source = xml5.getContent();
+                          try {
+                            URL sourceURL = new URL(u, source);
+                            BufferedReader in = new BufferedReader(new InputStreamReader(sourceURL.openStream()));
+                            StringBuffer contentSB = new StringBuffer();
+                            String inputLine;
+                            while ((inputLine = in.readLine()) != null) {
+                              if (contentSB.length() > 0)
+                                contentSB.append("\n");
+                              contentSB.append(inputLine);
+                            }
+                            in.close();
+                            content = contentSB.toString();
+                          } catch (Exception x) {
+                          }
+                        }
                       }
-                      if (key != null && str != null) {
-                        replacementHM.put(key, str);
+                      if (key != null && (str != null || content != null)) {
+                        if (content != null)
+                          replacementHM.put(key, content);
+                        else
+                          replacementHM.put(key, str);
                       }
                     }
                   }
