@@ -643,12 +643,16 @@ public class MsgPanelUtils extends Object {
                         try {
                           String text = content[0];
                           if (isHTMLview) {
-                            boolean isRemoveStyles = false;
+                            boolean isRemoveStyles = true; // this will help to diplay some complex HTML messages that were blank before
                             boolean isRemoveInlineStyles = false;
-                            boolean isRemoveHead = false;
+                            boolean isRemoveHead = true; // this will help to diplay some complex HTML messages that were blank before
+                            boolean isRemoveLeapP = true;
+                            boolean isRemoveMap = true;
+                            boolean isRemoveComment = true;
                             boolean isRemoveRemoteLoading = !skipRemoteLoadingCleaning;
+                            boolean isConvertPtoBR = false;
 
-                            text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, isRemoveStyles, isRemoveInlineStyles, isRemoveHead, true, true, true, isRemoveRemoteLoading, false);
+                            text = HTML_Ops.clearHTMLheaderAndConditionForDisplay(text, isRemoveStyles, isRemoveInlineStyles, isRemoveHead, isRemoveLeapP, isRemoveMap, isRemoveComment, isRemoveRemoteLoading, isConvertPtoBR);
                           }
 
                           // Eliminate flickering and improve performance by skipping duplicate requests

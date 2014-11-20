@@ -123,7 +123,7 @@ public class MsgTableStarterFrame extends MsgTableFrame implements ActionProduce
   /**    A c t i o n   P r o d u c e r  I     **/
   /*********************************************/
 
-  /** @return all the acitons that this objects produces.
+  /** @return all the actions that this objects produces.
    */
   public Action[] getActions() {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(MsgTableStarterFrame.class, "getActions()");

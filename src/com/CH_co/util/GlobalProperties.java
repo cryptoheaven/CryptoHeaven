@@ -336,8 +336,9 @@ public class GlobalProperties extends Object {
   // build 846 Better support for 'search' function
   // build 848 Fix 'copy to sent'
   // build 850 Changes for running with multiple instance of the cache, -useful for web application server that reuses common code.
+  // build 852 HTML header and styles cleanup to help diplay some complex HTML messages that were blank before
 
-  public static final short PROGRAM_BUILD_NUMBER = 850;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 852;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
