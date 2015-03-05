@@ -60,7 +60,7 @@ public class StatOps {
     if (msgAction != null && msgAction.getActionCode() == CommandCodes.STAT_A_GET) {
       SIL.getFetchedDataCache().markStatFetchedForMsgId(msgLink.msgId);
     }
-    DefaultReplyRunner.nonThreadedRun(SIL, msgAction);
+    DefaultReplyRunner.nonThreadedRun(SIL, msgAction, true);
   }
 
   public static void markOldIfNeeded(ServerInterfaceLayer SIL, Long objLinkId, int statType) {
