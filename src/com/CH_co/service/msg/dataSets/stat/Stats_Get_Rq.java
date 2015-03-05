@@ -79,9 +79,10 @@ public class Stats_Get_Rq extends ProtocolMsgDataSet {
 
   public String toString() {
     return "[Stats_Get_Rq"
-      + ": ownerObjType=" + ownerObjType
-      + ", ownerObjIDs="  + Misc.objToStr(ownerObjIDs)
-      + ", objLinkIDs="   + Misc.objToStr(objLinkIDs)
+      + ": statsForObjType="  + statsForObjType
+      + ", ownerObjType="     + ownerObjType
+      + ", ownerObjIDs="      + Misc.objToStr(ownerObjIDs)
+      + ", objLinkIDs="       + Misc.objToStr(objLinkIDs)
       + "]";
   }
 

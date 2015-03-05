@@ -337,8 +337,9 @@ public class GlobalProperties extends Object {
   // build 848 Fix 'copy to sent'
   // build 850 Changes for running with multiple instance of the cache, -useful for web application server that reuses common code.
   // build 852 HTML header and styles cleanup to help diplay some complex HTML messages that were blank before
+  // build 854 Fixed contact creation glitch for case when other party's account got deleted.
 
-  public static final short PROGRAM_BUILD_NUMBER = 852;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 854;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!

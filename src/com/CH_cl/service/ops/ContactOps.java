@@ -174,69 +174,76 @@ public class ContactOps {
 
         String reasonStr = reason != null && reason.trim().length() > 0 ? reason.trim() : java.text.MessageFormat.format(com.CH_cl.lang.Lang.rb.getString("msg_USER_requests_authorization_for_addition_to_Contact_List."), new Object[] {cache.getUserRecord().handle});
 
-        Long shareId = cache.getFolderShareRecordMy(cache.getUserRecord().contactFolderId, false).shareId;
-        BASymmetricKey folderSymKey = cache.getFolderShareRecord(shareId).getSymmetricKey();
+        UserRecord myUser = cache.getUserRecord();
+        if (myUser != null) {
+          Long contactFolderId = myUser.contactFolderId;
+          FolderShareRecord contactShare = cache.getFolderShareRecordMy(contactFolderId, false);
+          if (contactShare != null) {
+            Long shareId = contactShare.shareId;
+            BASymmetricKey folderSymKey = contactShare.getSymmetricKey();
 
-        // make sure we have all public keys of other users
-        ArrayList userIDsWithNoKeysL = new ArrayList();
-        for (int i=0; i<contactWithUserIds.length; i++) {
-          if (cache.getKeyRecordForUser(contactWithUserIds[i]) == null)
-            userIDsWithNoKeysL.add(contactWithUserIds[i]);
-        }
-        if (userIDsWithNoKeysL.size() > 0) {
-          Obj_IDList_Co request = new Obj_IDList_Co(userIDsWithNoKeysL);
-          MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
-          SIL.submitAndWait(msgAction, 60000, 3);
-        }
+            // make sure we have all public keys of other users
+            ArrayList userIDsWithNoKeysL = new ArrayList();
+            for (int i=0; i<contactWithUserIds.length; i++) {
+              if (cache.getKeyRecordForUser(contactWithUserIds[i]) == null)
+                userIDsWithNoKeysL.add(contactWithUserIds[i]);
+            }
+            if (userIDsWithNoKeysL.size() > 0) {
+              Obj_IDList_Co request = new Obj_IDList_Co(userIDsWithNoKeysL);
+              MessageAction msgAction = new MessageAction(CommandCodes.KEY_Q_GET_PUBLIC_KEYS_FOR_USERS, request);
+              SIL.submitAndWait(msgAction, 60000, 3);
+            }
 
-        // filter only the userIDs that actually exist by checking if key exists or was returned
-        ArrayList userIDsL = new ArrayList();
-        for (int i=0; i<contactWithUserIds.length; i++) {
-          Long contactWithUserId = contactWithUserIds[i];
-          if (cache.getKeyRecordForUser(contactWithUserIds[i]) != null)
-            userIDsL.add(contactWithUserId);
-        }
-        Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
-        
-        // fetch any unknown user handles so we can name our contact
-        ArrayList unknownUserIDsL = new ArrayList();
-        for (int i=0; i<userIDs.length; i++) {
-          Long userId = userIDs[i];
-          UserRecord uRec = cache.getUserRecord(userId);
-          if (uRec == null)
-            unknownUserIDsL.add(userId);
-        }
-        if (unknownUserIDsL.size() > 0) {
-          MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsL));
-          SIL.submitAndWait(msgAction, 60000, 3);
-        }
+            // filter only the userIDs that actually exist by checking if key exists or was returned
+            ArrayList userIDsL = new ArrayList();
+            for (int i=0; i<contactWithUserIds.length; i++) {
+              Long contactWithUserId = contactWithUserIds[i];
+              if (cache.getKeyRecordForUser(contactWithUserIds[i]) != null)
+                userIDsL.add(contactWithUserId);
+            }
+            Long[] userIDs = (Long[]) ArrayUtils.toArray(userIDsL, Long.class);
 
-        // send the Contact creation requests
-        for (int i=0; i<userIDs.length; i++) {
-          //1310 <shareId>   <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
+            // fetch any unknown user handles so we can name our contact
+            ArrayList unknownUserIDsL = new ArrayList();
+            for (int i=0; i<userIDs.length; i++) {
+              Long userId = userIDs[i];
+              UserRecord uRec = cache.getUserRecord(userId);
+              if (uRec == null)
+                unknownUserIDsL.add(userId);
+            }
+            if (unknownUserIDsL.size() > 0) {
+              MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_HANDLES, new Obj_IDList_Co(unknownUserIDsL));
+              SIL.submitAndWait(msgAction, 60000, 3);
+            }
 
-          // process each contact separately one at a time
-          Long userId = userIDs[i];
-          UserRecord uRec = cache.getUserRecord(userId);
+            // send the Contact creation requests
+            for (int i=0; i<userIDs.length; i++) {
+              //1310 <shareId>   <contactWithId> <encOwnerNote> <otherKeyId> <encOtherSymKey> <encOtherNote>
 
-          Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
-          request.shareId = shareId;
-          request.contactRecord = new ContactRecord();
-          request.contactRecord.contactWithId = userId;
-          request.contactRecord.setOwnerNote(name != null && name.trim().length() > 0 ? name.trim() : (uRec != null ? uRec.handle : userId.toString()));
-          request.contactRecord.setOtherNote(reasonStr);
-          request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
-          request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(userId));
+              // process each contact separately one at a time
+              Long userId = userIDs[i];
+              UserRecord uRec = cache.getUserRecord(userId);
 
-          // using the callback we must know when it is finished so use submit with fetch
-          if (callback != null) {
-            SIL.submitAndWait(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request), 60000);
-          } else {
-            SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
+              Cnt_NewCnt_Rq request = new Cnt_NewCnt_Rq();
+              request.shareId = shareId;
+              request.contactRecord = new ContactRecord();
+              request.contactRecord.contactWithId = userId;
+              request.contactRecord.setOwnerNote(name != null && name.trim().length() > 0 ? name.trim() : (uRec != null ? uRec.handle : userId.toString()));
+              request.contactRecord.setOtherNote(reasonStr);
+              request.contactRecord.setOtherSymKey(new BASymmetricKey(32));
+              request.contactRecord.seal(folderSymKey, cache.getKeyRecordForUser(userId));
+
+              // using the callback we must know when it is finished so use submit with fetch
+              if (callback != null) {
+                SIL.submitAndWait(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request), 60000);
+              } else {
+                SIL.submitAndReturn(new MessageAction(CommandCodes.CNT_Q_NEW_CONTACT, request));
+              }
+            }
+            if (callback != null) {
+              callback.callback(userIDs);
+            }
           }
-        }
-        if (callback != null) {
-          callback.callback(userIDs);
         }
       }
     };
