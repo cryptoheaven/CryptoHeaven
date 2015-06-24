@@ -339,13 +339,15 @@ public class GlobalProperties extends Object {
   // build 852 HTML header and styles cleanup to help diplay some complex HTML messages that were blank before
   // build 854 Fixed contact creation glitch for case when other party's account got deleted.
   // build 856 Background fetching of object stats should suppress any displayable fetch errors.
+  // build 858 Switch to mail API v1.5.3
+  // build 860 Longer timeouts for popup progress dialogs.
 
-  public static final short PROGRAM_BUILD_NUMBER = 856;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 860;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
-  public static final float PROGRAM_VERSION = 3.8f;
-  public static final short PROGRAM_VERSION_MINOR = 9;
+  public static final float PROGRAM_VERSION = 3.9f;
+  public static final short PROGRAM_VERSION_MINOR = 0;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

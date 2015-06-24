@@ -159,7 +159,7 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
 
   private boolean isClient;
   public Date lastForcedWorkerStamp;
-  public Date lastWorkerActivityStamp;
+  private Date lastWorkerActivityStamp;
   public boolean lastWorkerActivityResyncPending;
 
   private BurstableBucket burstableMonitorWorkerCreatings;

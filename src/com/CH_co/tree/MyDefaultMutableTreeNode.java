@@ -9,8 +9,16 @@
  */
 package com.CH_co.tree;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.EmptyStackException;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.Stack;
+import java.util.Vector;
 
 /**
  * Copyright 2001-2014 CryptoHeaven Corp. All Rights Reserved.
@@ -1184,6 +1192,9 @@ public class MyDefaultMutableTreeNode implements MyMutableTreeNode {
     if (tValues.length > 0 && tValues[0].equals("userObject")) {
       userObject = tValues[1];
     }
+  }
+
+  private void readObjectNoData() throws ObjectStreamException {
   }
 
   final class PreorderEnumeration implements Enumeration {

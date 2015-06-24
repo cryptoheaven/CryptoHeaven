@@ -2012,7 +2012,7 @@ public class LoginFrame extends JFrame {
     // If this was creation of a new account, we must update the key record with encrypted private portion,
     // or store it locally.
     if (success && newAccountCreated) {
-      FetchedDataCache cache = FetchedDataCache.getSingleInstance();
+      FetchedDataCache cache = MainFrame.getServerInterfaceLayer().getFetchedDataCache();
       RSAPrivateKey rsaPrivKey = cache.getNewUserPrivateKey();
       if (rsaPrivKey != null) { // if we are retrying this function then it would be already null
         sendKeyUpdate(rsaPrivKey, storeRemoteFlag);
