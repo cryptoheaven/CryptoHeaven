@@ -39,6 +39,14 @@ public class CacheMsgUtils {
   private static final String STR_RE = com.CH_cl.lang.Lang.rb.getString("msg_Re");
   private static final String STR_FWD = com.CH_cl.lang.Lang.rb.getString("msg_Fwd");
 
+  public static final String[] CONTENT_REPLY_HEADINGS = { 
+    com.CH_cl.lang.Lang.rb.getString("column_From") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_To") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_Cc") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_Date") + ":", 
+    com.CH_cl.lang.Lang.rb.getString("column_Subject") + ":"
+  };
+
   /**
   * Gathers all recipients into a Record[]
   */

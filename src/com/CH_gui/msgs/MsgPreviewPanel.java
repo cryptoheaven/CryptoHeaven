@@ -155,14 +155,6 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
   private static final String STR_IMAGES_SHOW = "Show Images";
   private static final String STR_IMAGES_HIDE = "Hide Images";
 
-  public static final String[] contentReplyHeadings = { 
-    com.CH_cl.lang.Lang.rb.getString("column_From") + ":", 
-    com.CH_cl.lang.Lang.rb.getString("column_To") + ":", 
-    com.CH_cl.lang.Lang.rb.getString("column_Cc") + ":", 
-    com.CH_cl.lang.Lang.rb.getString("column_Date") + ":", 
-    com.CH_cl.lang.Lang.rb.getString("column_Subject") + ":"
-  };
-
   private boolean isWaitingForMsgBody;
   private String no_selected_msg_html;
 
@@ -936,7 +928,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
             else
               setHeader = com.CH_cl.lang.Lang.rb.getString("label_Bcc");
             JLabel headerLabel = new JMyLabel("<html>"+setHeader+"</html>");
-            if (setIndex == 0) {
+            if (setIndex == 0 || labelsL.isEmpty()) {
               headerLabel.setBorder(new EmptyBorder(0,0,0,3));
             } else {
               headerLabel.setBorder(new EmptyBorder(0,5,0,3));
@@ -1729,7 +1721,7 @@ public class MsgPreviewPanel extends JPanel implements ActionProducerI, RecordSe
       context.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       try {
         boolean simplifyHTML = msgDataRecord.isHtmlMail() && isForceSimpleHTML;
-        String[] contentParts = CacheMsgUtils.makeReplyToContent(FetchedDataCache.getSingleInstance(), msgLinkRecord, msgDataRecord, simplifyHTML, true, false, contentReplyHeadings);
+        String[] contentParts = CacheMsgUtils.makeReplyToContent(FetchedDataCache.getSingleInstance(), msgLinkRecord, msgDataRecord, simplifyHTML, true, false, CacheMsgUtils.CONTENT_REPLY_HEADINGS);
         StringBuffer sb = new StringBuffer();
         // start the html printed body
         sb.append("<html><body>");

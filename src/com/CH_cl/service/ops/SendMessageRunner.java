@@ -344,7 +344,7 @@ public class SendMessageRunner extends ThreadTraced {
   * Adjusts the recipient list to include the CC is selected.
   * Call only when CC checkbox is selected.
   */
-  private static Record[] addOutgoingToRecipients(final FetchedDataCache cache, Record[] recipients) {
+  public static Record[] addOutgoingToRecipients(final FetchedDataCache cache, Record[] recipients) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(SendMessageRunner.class, "addOutgoingToRecipients(Record[] recipients)");
     if (trace != null) trace.args(recipients);
 

@@ -1134,7 +1134,7 @@ public class MsgComposeComponents extends Object implements DisposableObj {
     else if (isForward)
       setSubject(CacheMsgUtils.getSubjectForward(cache, new Object[] { dataRecord }, 250));
 
-    String[] content = CacheMsgUtils.makeReplyToContent(cache, quotedMsg, dataRecord, false, false, false, MsgPreviewPanel.contentReplyHeadings);
+    String[] content = CacheMsgUtils.makeReplyToContent(cache, quotedMsg, dataRecord, false, false, false, CacheMsgUtils.CONTENT_REPLY_HEADINGS);
 
     String text = null;
     String[] sigText = addSignature ? CacheMsgUtils.getSigText(userSettingsRecord) : null;
