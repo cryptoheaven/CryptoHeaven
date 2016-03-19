@@ -29,6 +29,7 @@ import com.CH_co.trace.ThreadTraced;
 import com.CH_co.trace.Trace;
 import com.CH_co.util.*;
 import com.CH_cl.http.HTTP_Socket.HTTP_Socket;
+import com.CH_co.cryptx.Rnd;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -170,6 +171,8 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   public static ServerInterfaceLayer lastSIL;
 
   private HashSet statusListenersL;
+
+  private final long _clientSessionId = Rnd.getSecureRandom().nextLong();
 
   /**
    * Creates new ServerInterfaceLayer for service mode.
@@ -1750,6 +1753,14 @@ public final class ServerInterfaceLayer extends Object implements WorkerManagerI
   */
   public boolean isClientMode() {
     return isClient;
+  }
+
+  /**
+  * Client session Id that does not change for the duration of the SIL instance
+  * @return
+  */
+  public long getClientSessionID() {
+    return _clientSessionId;
   }
 
   /**

@@ -924,4 +924,7 @@ public final class TransferProgMonitorImpl extends JFrame implements ProgMonitor
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  public boolean isLoginMonitor() {
+    return false;
+  }
 }

@@ -67,6 +67,11 @@ public interface WorkerManagerI extends RequestSubmitterI {
   public boolean isClientMode();
 
   /**
+  * @return true if running in client mode, false for server mode
+  */
+  public long getClientSessionID();
+
+  /**
   * @return true if Manager is destroyed
   */
   public boolean isDestroyed();

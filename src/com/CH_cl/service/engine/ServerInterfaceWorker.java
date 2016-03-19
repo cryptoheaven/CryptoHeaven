@@ -1010,8 +1010,13 @@ public final class ServerInterfaceWorker extends Object implements Interruptible
             }
             synchronized (loginDataSet) {
               // set the session ID
-              if (loginDataSet instanceof Usr_LoginSecSess_Rq)
-                ((Usr_LoginSecSess_Rq) loginDataSet).sessionId = ClientSessionContext.SESSION_ID;
+              if (loginDataSet instanceof Usr_LoginSecSess_Rq) {
+//                ((Usr_LoginSecSess_Rq) loginDataSet).sessionId = ClientSessionContext.SESSION_ID;
+                if (workerManager.isClientMode())
+                  ((Usr_LoginSecSess_Rq) loginDataSet).sessionId = workerManager.getClientSessionID();
+                else
+                  ((Usr_LoginSecSess_Rq) loginDataSet).sessionId = ClientSessionContext.SESSION_ID;
+              }
               // make sure the current session context key is used for this login and not the key from another session!
               RSAPublicKey publicKeyToSendWith = sessionContext.getPublicKeyToSendWith();
               if (publicKeyToSendWith != null && encDataSet != null) {

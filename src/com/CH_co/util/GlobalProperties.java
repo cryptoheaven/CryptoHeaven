@@ -342,13 +342,14 @@ public class GlobalProperties extends Object {
   // build 858 Switch to mail API v1.5.3
   // build 860 Longer timeouts for popup progress dialogs.
   // build 862 Maintenance update, Copyright 2016 
+  // build 864 minor changes - client session ID taken from SIL, not static common context
 
-  public static final short PROGRAM_BUILD_NUMBER = 862;  // even
+  public static final short PROGRAM_BUILD_NUMBER = 864;  // even
   public static final boolean IS_BETA = false;
 
   // These final values are used in other places during compilation... keep them final!
   public static final float PROGRAM_VERSION = 3.9f;
-  public static final short PROGRAM_VERSION_MINOR = 1;
+  public static final short PROGRAM_VERSION_MINOR = 2;
   public static final String PROGRAM_VERSION_STR = "v"+PROGRAM_VERSION+(PROGRAM_VERSION_MINOR != 0 ? "."+PROGRAM_VERSION_MINOR : "");
 
   public static final short PROGRAM_RELEASE_ALPHA = 1;

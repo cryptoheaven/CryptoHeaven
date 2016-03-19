@@ -106,7 +106,7 @@ public class FileTableCellRenderer extends RecordTableCellRenderer {
 
       // set an file icon beside folder name
       // this is for weird scenario where we have selected multiple folders and folder names appear in first column
-      if (value instanceof String && table.getColumnName(column).equals(com.CH_cl.lang.Lang.rb.getString("column_Folder_Name"))) {
+      if (value instanceof String && com.CH_cl.lang.Lang.rb.getString("column_Folder_Name").equals(table.getColumnName(column))) {
         setBorder(RecordTableCellRenderer.BORDER_ICONIZED);
         setIcon(Images.get(ImageNums.FLD_FILE16));
       }

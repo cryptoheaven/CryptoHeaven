@@ -671,4 +671,7 @@ public class WipeProgMonitorImpl extends JFrame implements ProgMonitorWipeI {
     return jobKilled;
   }
 
+  public boolean isLoginMonitor() {
+    return false;
+  }
 }

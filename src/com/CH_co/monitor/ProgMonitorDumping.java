@@ -110,4 +110,7 @@ public class ProgMonitorDumping extends Object implements ProgMonitorI {
   }
   public void appendLine(String info) {
   }
+  public boolean isLoginMonitor() {
+    return false;
+  }
 }

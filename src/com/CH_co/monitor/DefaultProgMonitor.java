@@ -471,4 +471,7 @@ public class DefaultProgMonitor extends AbstractProgMonitor implements ProgMonit
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  public boolean isLoginMonitor() {
+    return false;
+  }
 }

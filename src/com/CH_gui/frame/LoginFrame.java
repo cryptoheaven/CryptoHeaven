@@ -1771,6 +1771,7 @@ public class LoginFrame extends JFrame {
     boolean isSuccess = false;
     boolean newAccountCreated = false;
     boolean isStoreRemoteFlag = false;
+    long[] loginMsgStampBuffer = new long[] { 0 };
 
     // Notify main frame that login will now be attempted.
     loginCoordinator.loginAttemptCloseCurrentSession(MainFrame.getServerInterfaceLayer());
@@ -1811,7 +1812,7 @@ public class LoginFrame extends JFrame {
                                 com.CH_cl.lang.Lang.rb.getString("label_Load_Main_Program") },
                                 isUsernameInRetry ? "Retrying with username: " + userName.getText() : null);
         loginCoordinator.setLoginProgMonitor(loginProgMonitor);
-        loginSuccess = login(request, loginProgMonitor);
+        loginSuccess = login(request, loginProgMonitor, loginMsgStampBuffer);
       }
 
       if (!loginSuccess) {      /* try again */
@@ -1854,7 +1855,7 @@ public class LoginFrame extends JFrame {
         // retry a few times in case connection breaks in the middle of the request we don't want login to fail
         for (int i=0; i<3; i++) {
           if (trace != null) trace.data(100, "fetching login info to cache try #" + (i+1));
-          if (fetchLoginInfoToCache(loginProgMonitor, newAccountCreated, isStoreRemoteFlag)) {
+          if (fetchLoginInfoToCache(loginProgMonitor, newAccountCreated, isStoreRemoteFlag, loginMsgStampBuffer[0])) {
             isSuccess = true;
             break;
           }
@@ -1882,9 +1883,11 @@ public class LoginFrame extends JFrame {
   * Submit and fetch request to login
   * @return true on success, false on failure
   */
-  private boolean login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor) {
+  private boolean login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor, long[] loginMsgStampBuffer) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "login(Usr_LoginSecSess_Rq request, ProgMonitorI loginProgMonitor)");
-    MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_LOGIN_SECURE_SESSION, request, false);
+    MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_LOGIN_SECURE_SESSION, request);
+    if (loginMsgStampBuffer != null && loginMsgStampBuffer.length > 0)
+      loginMsgStampBuffer[0] = msgAction.getStamp();
 
     boolean success = false;
 
@@ -1976,13 +1979,13 @@ public class LoginFrame extends JFrame {
   }
 
   /* Submit and fetch request to fetch user info, keys, contacts, folders to the cache */
-  private boolean fetchLoginInfoToCache(ProgMonitorI loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag) {
+  private boolean fetchLoginInfoToCache(ProgMonitorI loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag, long loginMsgStamp) {
     Trace trace = null;  if (Trace.DEBUG) trace = Trace.entry(LoginFrame.class, "fetchLoginInfoToCache(ProgMonitorI loginProgMonitor, boolean newAccountCreated, boolean storeRemoteFlag)");
     if (trace != null) trace.args(loginProgMonitor);
     if (trace != null) trace.args(newAccountCreated);
     if (trace != null) trace.args(storeRemoteFlag);
     boolean success = false;
-    MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_LOGIN_INFO, false);
+    MessageAction msgAction = new MessageAction(CommandCodes.USR_Q_GET_LOGIN_INFO, loginMsgStamp);
 
     if (trace != null) trace.data(10, "advance progress monitor, about to fetch login info");
     if (!loginProgMonitor.isAllDone())

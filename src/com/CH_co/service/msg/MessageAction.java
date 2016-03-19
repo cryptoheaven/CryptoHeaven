@@ -64,7 +64,7 @@ public class MessageAction extends Message implements Cancellable {
   public MessageAction(int actionCode, String strMsg) {
     this(actionCode, new Str_Rp(strMsg), true);
   }
-  public MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, boolean timeStamp) {
+  private MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, boolean timeStamp) {
     this(actionCode, protocolMsgDataSet, timeStamp == true ? nextStamp() : 0, false, null, null);
   }
   private MessageAction(int actionCode, ProtocolMsgDataSet protocolMsgDataSet, long uniqueStamp, boolean cancelled, Interrupter interrupter, Interruptible interruptible) {
@@ -102,10 +102,10 @@ public class MessageAction extends Message implements Cancellable {
 
   /**
   * Create a Message Action without message data set.
-  * @param timeStamp true if message should be time stamped, false otherwise (stamp=0)
+  * @param timeStamp Custom stamp, instead of next unique stamp
   */
-  public MessageAction(int actionCode, boolean timeStamp) {
-    this(actionCode, (ProtocolMsgDataSet) null, timeStamp);
+  public MessageAction(int actionCode, long customStamp) {
+    this(actionCode, (ProtocolMsgDataSet) null, customStamp, false, null, null);
   }
   /**
   * Create a Message Action without message data set and time-stamped.

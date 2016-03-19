@@ -231,4 +231,8 @@ public class SimpleProgMonitorImpl implements ProgMonitorI {
   public boolean isJobKilled() {
     throw new UnsupportedOperationException("Not supported yet.");
   }
+
+  public boolean isLoginMonitor() {
+    return false;
+  }
 }

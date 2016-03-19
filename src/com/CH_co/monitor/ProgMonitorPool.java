@@ -48,7 +48,7 @@ public class ProgMonitorPool extends Object { // no-argument implicit constructo
     Long ID = new Long(id);
     Object obj = hm.get(ID);
     if (obj != null)
-      throw new IllegalArgumentException("Specified progress monitor is already registered, cannot register again!");
+      throw new IllegalArgumentException("Specified progress monitor "+id+" is already registered, cannot register again!");
     hm.put(ID, progressMonitor);
   }
 

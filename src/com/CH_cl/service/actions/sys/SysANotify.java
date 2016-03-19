@@ -51,7 +51,7 @@ public class SysANotify extends ClientMessageAction {
 
     final FetchedDataCache cache = getServerInterfaceLayer().getFetchedDataCache();
 
-    if (cache.getUserRecord() != null && cache.getKeyRecordMyCurrent() != null && cache.getKeyRecordMyCurrent().getPrivateKey() != null) {
+    if (cache != null && cache.getUserRecord() != null && cache.getKeyRecordMyCurrent() != null && cache.getKeyRecordMyCurrent().getPrivateKey() != null) {
       final ServerInterfaceLayer SIL = getServerInterfaceLayer();
 
       long stampNow = System.currentTimeMillis();

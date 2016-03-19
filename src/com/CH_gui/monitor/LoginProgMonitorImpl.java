@@ -353,4 +353,7 @@ public class LoginProgMonitorImpl extends JDialog implements ProgMonitorLoginI {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  public boolean isLoginMonitor() {
+    return true;
+  }
 }

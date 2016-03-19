@@ -69,6 +69,7 @@ public interface ProgMonitorI {
   public boolean isAllDone();
   public boolean isCancelled();
   public boolean isJobKilled();
+  public boolean isLoginMonitor();
 
   // pooling values from monitor
   public long getTransferred();

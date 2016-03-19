@@ -4381,58 +4381,64 @@ public class FetchedDataCache extends Object {
     return removed;
   }
 
-  public synchronized Record getNextItem(Record item, int direction) {
+  public Record getNextItem(Record item, int direction) {
     Record next = null;
     if (viewIterators != null) {
-      for (int i=viewIterators.size()-1; i>=0; i--) {
-        RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
-        int position = iter.getPosition(item);
-        if (position != -1) {
-          next = iter.getItemNext(item, direction);
-          // If resolved, escape, else maybe another iterator will resolve this position...
-          if (next != null) 
-            break;
+      synchronized (viewIterators) {
+        for (int i=viewIterators.size()-1; i>=0; i--) {
+          RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
+          int position = iter.getPosition(item);
+          if (position != -1) {
+            next = iter.getItemNext(item, direction);
+            // If resolved, escape, else maybe another iterator will resolve this position...
+            if (next != null) 
+              break;
+          }
         }
       }
     }
     return next;
   }
 
-  public synchronized int getViewPosition(Record item) {
+  public int getViewPosition(Record item) {
     int position = -1;
     if (viewIterators != null) {
-      for (int i=viewIterators.size()-1; i>=0; i--) {
-        RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
-        position = iter.getPosition(item);
-        if (position != -1) {
-          // see if we need to adjust for "LOADING" rendering items
-          Record first = iter.getItem(0);
-          if (first != null && first.getId().longValue() < 0)
-            position --;
-          break;
+      synchronized (viewIterators) {
+        for (int i=viewIterators.size()-1; i>=0; i--) {
+          RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
+          position = iter.getPosition(item);
+          if (position != -1) {
+            // see if we need to adjust for "LOADING" rendering items
+            Record first = iter.getItem(0);
+            if (first != null && first.getId().longValue() < 0)
+              position --;
+            break;
+          }
         }
       }
     }
     return position;
   }
 
-  public synchronized int getViewCount(Record item) {
+  public int getViewCount(Record item) {
     int count = -1;
     int position = -1;
     if (viewIterators != null) {
-      for (int i=viewIterators.size()-1; i>=0; i--) {
-        RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
-        position = iter.getPosition(item);
-        if (position != -1) {
-          count = iter.getCount();
-          // see if we need to adjust for "LOADING" rendering items
-          Record first = iter.getItem(0);
-          Record last = iter.getItem(count-1);
-          if (first != null && first.getId().longValue() < 0)
-            count --;
-          if (last != null && last.getId().longValue() < 0)
-            count --;
-          break;
+      synchronized (viewIterators) {
+        for (int i=viewIterators.size()-1; i>=0; i--) {
+          RecordIteratorI iter = (RecordIteratorI) viewIterators.get(i);
+          position = iter.getPosition(item);
+          if (position != -1) {
+            count = iter.getCount();
+            // see if we need to adjust for "LOADING" rendering items
+            Record first = iter.getItem(0);
+            Record last = iter.getItem(count-1);
+            if (first != null && first.getId().longValue() < 0)
+              count --;
+            if (last != null && last.getId().longValue() < 0)
+              count --;
+            break;
+          }
         }
       }
     }

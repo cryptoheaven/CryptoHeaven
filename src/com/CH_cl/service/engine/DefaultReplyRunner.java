@@ -114,7 +114,7 @@ public class DefaultReplyRunner extends ThreadTraced {
         progressMonitor.doneExecution(actionCode);
 
       if (reply == null && msgAction.getStamp() != 0) {
-        if (progressMonitor != null)
+        if (progressMonitor != null && !progressMonitor.isLoginMonitor())
           progressMonitor.allDone();
       }
     }
