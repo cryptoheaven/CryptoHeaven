@@ -398,8 +398,9 @@ public class FileLobUp {
               cache.addFileLinkRecordListener(fileListener);
               cache.addMsgLinkRecordListener(msgListener);
               boolean isRetry = false;
-              long QUICK_FAILURE = 10 * 1000L;
+              long QUICK_FAILURE = 20 * 1000L;
               long DELAY_FAILURE_MIN = 5 * 1000L;
+              long DELAY_FAILURE_NORMAL = 30 * 1000L;
               long DELAY_FAILURE_MAX = 10 * 60 * 1000L;
               long delayFailure = DELAY_FAILURE_MIN;
               while (!isDone) {
@@ -432,10 +433,10 @@ public class FileLobUp {
                     long timeElapsed = System.currentTimeMillis() - timeStart;
                     // for quick failures, increase the sleep time and cap it off at DELAY_FAILURE_MAX
                     if (timeElapsed < QUICK_FAILURE) {
-                      delayFailure = (long) (delayFailure * 1.5);
+                      delayFailure = (long) (delayFailure * 2.0);
                       delayFailure = Math.min(delayFailure, DELAY_FAILURE_MAX);
-                    } else {
-                      delayFailure = DELAY_FAILURE_MIN;
+                    } else if (delayFailure > DELAY_FAILURE_NORMAL) {
+                      delayFailure = DELAY_FAILURE_NORMAL;
                     }
                     try { Thread.sleep(delayFailure); } catch (InterruptedException interX) { }
                     if (trace != null) trace.data(201, "woke up from waiting to retry in triggerUploading()", plainDataFile);
